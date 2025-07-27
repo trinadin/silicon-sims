@@ -7,6 +7,7 @@ using FSO.Server.Protocol.Electron.Packets;
 using FSO.Server.Servers;
 using FSO.Server.Servers.City;
 using FSO.Server.Servers.Lot;
+using FSO.Server.Servers.Lot.Lifecycle;
 using FSO.Server.Servers.Tasks;
 using FSO.Server.Servers.UserApi;
 using FSO.Server.Utils;
@@ -74,6 +75,9 @@ namespace FSO.Server
             Content.Content.Get().Upgrades.LoadJSONTuning();
 
             onProgress?.Invoke(10);
+
+            // Don't really need performance reporting, and it causes a startup delay.
+            CityConnections.UseCounters = false;
 
             // Cities take 20%, lots take 20%, tasks take 10%
             CommonInit(onProgress);

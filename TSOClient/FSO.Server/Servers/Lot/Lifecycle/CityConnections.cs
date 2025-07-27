@@ -15,6 +15,7 @@ namespace FSO.Server.Servers.Lot.Lifecycle
 {
     public class CityConnections
     {
+        public static bool UseCounters = true;
         private static Logger LOG = LogManager.GetCurrentClassLogger();
         private Dictionary<LotServerConfigurationCity, CityConnection> Connections;
         private Thread ConnectionWatcher;
@@ -30,20 +31,24 @@ namespace FSO.Server.Servers.Lot.Lifecycle
         public CityConnections(LotServerConfiguration config, IKernel kernel)
         {
             Config = config;
-            try
+            if (UseCounters)
             {
-                CpuCounter = new PerformanceCounter();
-                CpuCounter.CategoryName = "Processor";
-                CpuCounter.CounterName = "% Processor Time";
-                CpuCounter.InstanceName = "_Total";
-
-                if (PerformanceCounterCategory.Exists("Processor"))
+                try
                 {
-                    var firstValue = CpuCounter.NextValue();
+                    CpuCounter = new PerformanceCounter();
+                    CpuCounter.CategoryName = "Processor";
+                    CpuCounter.CounterName = "% Processor Time";
+                    CpuCounter.InstanceName = "_Total";
+
+                    if (PerformanceCounterCategory.Exists("Processor"))
+                    {
+                        var firstValue = CpuCounter.NextValue();
+                    }
                 }
-            } catch
-            {
-                LOG.Info("Performance counters are not supported on this platform, running without.");
+                catch
+                {
+                    LOG.Info("Performance counters are not supported on this platform, running without.");
+                }
             }
 
             Connections = new Dictionary<LotServerConfigurationCity, CityConnection>();
