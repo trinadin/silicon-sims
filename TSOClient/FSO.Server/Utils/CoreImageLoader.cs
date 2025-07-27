@@ -10,10 +10,10 @@ namespace FSO.Server.Utils
     {
         public static TexBitmap SoftImageFetch(Stream stream, AbstractTextureRef texRef)
         {
-            Image<Rgba32> result = null;
+            Image<Bgra32> result = null;
             try
             {
-                result = Image.Load(stream);
+                result = Image.Load<Bgra32>(stream);
             }
             catch (Exception)
             {

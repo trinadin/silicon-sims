@@ -41,7 +41,7 @@ namespace FSO.Client
             else
                 gameLocator = new WindowsLocator();
 
-            bool useDX = false;
+            bool useDX = !linux;
 
             #region User resolution parmeters
 

@@ -5,6 +5,7 @@ using FSO.Server.Framework.Voltron;
 using FSO.Server.Protocol.Electron.Packets;
 using Ninject;
 using NLog;
+using System;
 using System.Threading;
 
 namespace FSO.Server.Servers.City.Handlers
@@ -142,13 +143,16 @@ namespace FSO.Server.Servers.City.Handlers
 
                     if (session is VoltronSession vSession)
                     {
+                        da.Avatars.UpdateModerationLevel(avatarId, (int)vSession.ModerationLevel);
                         vSession.AvatarId = avatarId;
                         vSession.AvatarClaimId = claim.Value;
                     }
+                    else
+                    {
+                        throw new InvalidOperationException();
+                    }
 
                     Context.BroadcastUserList(false);
-
-                    // TODO: Try and update the avatar's moderation level to match the user
 
                     session.Response(ArchiveAvatarSelectCode.Success);
                     return;

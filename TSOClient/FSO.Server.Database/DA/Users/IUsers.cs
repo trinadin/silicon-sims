@@ -18,6 +18,7 @@ namespace FSO.Server.Database.DA.Users
         User GetByEmail(string email);
         void UpdateAuth(UserAuthenticate auth);
         void UpdateLastLogin(uint id, uint last_login);
+        void UpdatePermissions(uint id, bool is_moderator, bool is_admin);
 
         DbAuthAttempt GetRemainingAuth(uint user_id, string ip);
         int FailedConsecutive(uint user_id, string ip);

@@ -37,6 +37,7 @@ namespace FSO.Server.Database.DA.Avatars
         void UpdateAvatarJobLevel(DbJobLevel jobLevel);
         void UpdateMoveDate(uint id, uint date);
         void UpdateMayorNhood(uint id, uint? nhood);
+        void UpdateModerationLevel(uint id, int level);
 
         List<DbAvatar> SearchExact(int shard_id, string name, int limit);
         List<DbAvatar> SearchWildcard(int shard_id, string name, int limit);

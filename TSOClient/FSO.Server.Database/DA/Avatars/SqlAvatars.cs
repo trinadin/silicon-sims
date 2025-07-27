@@ -152,6 +152,11 @@ namespace FSO.Server.Database.DA.Avatars
             Context.Connection.Query("UPDATE fso_avatars SET mayor_nhood = @nhood WHERE avatar_id = @id", new { id = id, nhood = nhood });
         }
 
+        public void UpdateModerationLevel(uint id, int moderation_level)
+        {
+            Context.Connection.Query("UPDATE fso_avatars SET moderation_level = @moderation_level WHERE avatar_id = @id", new { id, moderation_level });
+        }
+
 
         public void UpdateAvatarLotSave(uint id, DbAvatar avatar)
         {

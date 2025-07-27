@@ -19,6 +19,7 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -158,7 +159,9 @@ namespace FSO.Server.Servers.City
                 // TODO: check IP ban
 
                 var user = da.ArchiveUsers.GetByClientHash(packet.Password);
-                var ip = session.IoSession.RemoteEndPoint.ToString();
+                var ip = (session.IoSession.RemoteEndPoint as IPEndPoint).Address.ToString();
+
+                bool forceAdmin = ip == "127.0.0.1";
 
                 if (user == null)
                 {
@@ -169,8 +172,8 @@ namespace FSO.Server.Servers.City
                         username = packet.Password,
                         user_state = Database.DA.Users.UserState.email_confirm,
                         email = "",
-                        is_admin = false,
-                        is_moderator = false,
+                        is_admin = forceAdmin,
+                        is_moderator = forceAdmin,
                         is_banned = false,
                         client_id = "0",
                         register_ip = ip,
@@ -212,6 +215,13 @@ namespace FSO.Server.Servers.City
                     da.ArchiveUsers.UpdateDisplayName(user.user_id, packet.User);
 
                     user.display_name = packet.User;
+                }
+
+                if (forceAdmin && (!user.is_admin || !user.is_moderator))
+                {
+                    da.Users.UpdatePermissions(user.user_id, true, true);
+                    user.is_admin = true;
+                    user.is_moderator = true;
                 }
 
                 // We're authenticated by this point. Upgrade the session to voltron.
