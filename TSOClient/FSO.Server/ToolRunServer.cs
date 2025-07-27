@@ -49,8 +49,9 @@ namespace FSO.Server
             this.HostPool = hostPool;
         }
 
-        public int RunEmbedded(Action<Action> onStarted)
+        public int RunEmbedded(Action<Action> onStarted, Action<float> onProgress = null, Action<Exception> onError = null)
         {
+            onProgress?.Invoke(0);
             LOG.Info("Starting embedded server");
 
             if (Config.Services == null)
@@ -72,16 +73,28 @@ namespace FSO.Server
 
             Content.Content.Get().Upgrades.LoadJSONTuning();
 
-            CommonInit();
+            onProgress?.Invoke(10);
 
+            // Cities take 20%, lots take 20%, tasks take 10%
+            CommonInit(onProgress);
+
+            onProgress?.Invoke(60);
+
+            int i = 0;
             LOG.Info("Starting services");
             foreach (AbstractServer server in Servers)
             {
                 LOG.Info("Starting " + server.GetType().ToString() + "...");
                 server.Start();
+
+                onProgress?.Invoke(60 + ((20f * (++i)) / Servers.Count));
             }
 
+            onProgress?.Invoke(80);
+
             HostPool.Start();
+
+            onProgress?.Invoke(100);
 
             onStarted(() =>
             {
@@ -112,7 +125,7 @@ namespace FSO.Server
             return 1;
         }
 
-        private void CommonInit()
+        private void CommonInit(Action<float> onProgress = null)
         {
             Kernel.Bind<Content.Content>().ToConstant(Content.Content.Get());
             Kernel.Bind<MemoryCache>().ToConstant(new MemoryCache("fso_server"));
@@ -146,6 +159,8 @@ namespace FSO.Server
                 }
             }
 
+            int i = 0;
+
             foreach (var cityServer in Config.Services.Cities)
             {
                 if (cityServer.Archive == null) cityServer.Archive = Config.Archive;
@@ -162,8 +177,11 @@ namespace FSO.Server
                 var city = childKernel.Get<CityServer>(new ConstructorArgument("config", cityServer));
                 CityServers.Add(city);
                 Servers.Add(city);
+
+                onProgress?.Invoke(10 + (20 * (++i)) / Config.Services.Cities.Count);
             }
 
+            i = 0;
             foreach (var lotServer in Config.Services.Lots)
             {
                 if (lotServer.SimNFS == null) lotServer.SimNFS = Config.SimNFS;
@@ -175,6 +193,8 @@ namespace FSO.Server
                 Servers.Add(
                     childKernel.Get<LotServer>(new ConstructorArgument("config", lotServer))
                 );
+
+                onProgress?.Invoke(30 + (20 * (++i)) / Config.Services.Lots.Count);
             }
 
             if (Config.Services.Tasks != null

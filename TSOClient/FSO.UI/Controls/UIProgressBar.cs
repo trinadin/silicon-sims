@@ -148,6 +148,8 @@ namespace FSO.Client.UI.Controls
                 {
                     m_Value = newValue;
                 }
+
+                Invalidate();
             }
         }
 

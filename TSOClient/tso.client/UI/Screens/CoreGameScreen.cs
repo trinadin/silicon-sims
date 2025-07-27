@@ -305,6 +305,11 @@ namespace FSO.Client.UI.Screens
             UserList = new UIArchiveUserList();
             UserList.Visible = false;
             ControllerUtils.BindController<UserListController>(UserList);
+            var userListController = UserList.FindController<UserListController>();
+            if (userListController != null)
+            {
+                userListController.FlashCallback = FlashUserList;
+            }
             WindowContainer.Add(UserList);
 
             var status = new UINetStatusTray();
@@ -841,11 +846,17 @@ namespace FSO.Client.UI.Screens
             UserList.X = (GlobalSettings.Default.GraphicsWidth - UserList.Width) / 2;
             UserList.Y = (GlobalSettings.Default.GraphicsHeight - UserList.Height) / 2;
             WindowContainer.SendToFront(UserList);
+            ucp.FlashUserList(false);
         }
 
         public void FlashInbox(bool flash)
         {
             ucp.FlashInbox(flash);
+        }
+
+        public void FlashUserList(bool flash)
+        {
+            ucp.FlashUserList(flash);
         }
 
         private void MouseHandler(UIMouseEventType type, UpdateState state)

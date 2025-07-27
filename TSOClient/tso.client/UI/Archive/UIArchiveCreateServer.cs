@@ -304,6 +304,13 @@ namespace FSO.Client.UI.Archive
 
             dir = null;
 
+            if (dataFolder == null || dataFolder == "")
+            {
+                // Try the data/ subfolder.
+
+                dataFolder = Path.Combine(Path.GetDirectoryName(manifest.ActivePath), "data");
+            }
+
             if (dataFolder == null || !Directory.Exists(dataFolder))
             {
                 return false;

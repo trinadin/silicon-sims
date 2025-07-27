@@ -9,10 +9,11 @@ namespace FSO.Client.UI.Archive
 {
     internal class UIArchiveServerStatusDialog : UIDialog
     {
-        private UILabel InfoText;
+        private readonly UILabel InfoText;
         private bool WaitStart;
-        private Action OnComplete;
-        private EmbeddedServer Server;
+        private readonly Action OnComplete;
+        private readonly EmbeddedServer Server;
+        private readonly UIProgressBar ProgressBar;
 
         public UIArchiveServerStatusDialog(bool waitStart, EmbeddedServer server, Action onComplete) : base(UIDialogStyle.Standard, false)
         {
@@ -29,7 +30,20 @@ namespace FSO.Client.UI.Archive
                 Wrapped = true,
             });
 
-            SetSize(200 + 40, 50 + 70);
+            int ySize = 50 + 70;
+
+            if (waitStart)
+            {
+                ySize += 37;
+
+                Add(ProgressBar = new UIProgressBar()
+                {
+                    Position = new Microsoft.Xna.Framework.Vector2(20, 105),
+                    Size = new Microsoft.Xna.Framework.Vector2(200, 27)
+                });
+            }
+
+            SetSize(200 + 40, ySize);
 
             if (!WaitStart)
             {
@@ -49,6 +63,11 @@ namespace FSO.Client.UI.Archive
 
             if (WaitStart)
             {
+                if (Server.ReadyPercent != ProgressBar.Value)
+                {
+                    ProgressBar.Value = Server.ReadyPercent;
+                }
+
                 if (Server.Ready && OnComplete != null)
                 {
                     OnComplete();

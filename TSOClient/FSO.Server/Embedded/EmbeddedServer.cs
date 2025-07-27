@@ -13,6 +13,8 @@ namespace FSO.Server.Embedded
     public class EmbeddedServer
     {
         public bool Ready { get; private set; }
+        public float ReadyPercent { get; private set; }
+        public Exception Error { get; private set; }
 
         private Thread ServerThread;
         private Action ShutdownAction;
@@ -40,11 +42,21 @@ namespace FSO.Server.Embedded
 
                 var tool = kernel.Get<ToolRunServer>(new ConstructorArgument("options", new RunServerOptions()));
 
-                tool.RunEmbedded((Action shutdown) =>
-                {
-                    ShutdownAction = shutdown;
-                    Ready = true;
-                });
+                tool.RunEmbedded(
+                    (Action shutdown) =>
+                    {
+                        ShutdownAction = shutdown;
+                        Ready = true;
+                    },
+                    (float progress) =>
+                    {
+                        ReadyPercent = progress;
+                    },
+                    (Exception error) =>
+                    {
+                        Error = error;
+                    }
+                );
             });
 
             ServerThread.Start();

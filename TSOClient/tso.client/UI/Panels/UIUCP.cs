@@ -110,6 +110,10 @@ namespace FSO.Client.UI.Panels
 
         private int InboxFlashTime;
         private bool InboxFlashing;
+
+        private int UserListFlashTime;
+        private bool UserListFlashing;
+
         public bool SpecialMusic;
 
         public UIUCP(UIScreen owner)
@@ -432,25 +436,8 @@ namespace FSO.Client.UI.Panels
             TimeText.Caption = hour.ToString() + ":" + ZeroPad(min.ToString(), 2) + " " + suffix;
             MoneyText.Caption = "$" + Game.VisualBudget.ToString("##,#0");
 
-            if (InboxFlashing)
-            {
-                if ((InboxFlashTime++) > FSOEnvironment.RefreshRate/2)
-                {
-                    if (PhoneButton.ForceState == 2)
-                    {
-                        PhoneButton.ForceState = -1;
-                        Invalidate();
-                    }
-                } else
-                {
-                    if (PhoneButton.ForceState != 2)
-                    {
-                        PhoneButton.ForceState = 2;
-                        Invalidate();
-                    }
-                }
-                InboxFlashTime %= FSOEnvironment.RefreshRate;
-            }
+            AdvanceFlashing(InboxFlashing, ref InboxFlashTime, PhoneButton);
+            AdvanceFlashing(UserListFlashing, ref UserListFlashTime, BudgetButton);
 
             var keys = state.NewKeys;
             var nofocus = state.InputManager.GetFocus() == null;
@@ -498,6 +485,30 @@ namespace FSO.Client.UI.Panels
             if (keys.Contains(Keys.F5)) SetPanel(5); // Options Mode Panel
         }
 
+        private void AdvanceFlashing(bool flash, ref int flashTime, UIButton button)
+        {
+            if (flash)
+            {
+                if ((flashTime++) > FSOEnvironment.RefreshRate / 2)
+                {
+                    if (button.ForceState == 2)
+                    {
+                        button.ForceState = -1;
+                        Invalidate();
+                    }
+                }
+                else
+                {
+                    if (button.ForceState != 2)
+                    {
+                        button.ForceState = 2;
+                        Invalidate();
+                    }
+                }
+                flashTime %= FSOEnvironment.RefreshRate;
+            }
+        }
+
         public void FlashInbox(bool flash)
         {
             InboxFlashing = flash;
@@ -505,6 +516,16 @@ namespace FSO.Client.UI.Panels
             if (!flash)
             {
                 PhoneButton.ForceState = -1;
+            }
+        }
+
+        public void FlashUserList(bool flash)
+        {
+            UserListFlashing = flash;
+            UserListFlashTime = 0;
+            if (!flash)
+            {
+                BudgetButton.ForceState = -1;
             }
         }
 
