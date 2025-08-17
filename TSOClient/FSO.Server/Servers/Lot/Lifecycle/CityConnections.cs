@@ -253,6 +253,11 @@ namespace FSO.Server.Servers.Lot.Lifecycle
         {
         }
 
+        public bool HasModerationLevel(int threshold)
+        {
+            return true;
+        }
+
         public void DemandAvatar(uint id, AvatarPermissions permission)
         {
         }

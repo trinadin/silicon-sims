@@ -6,6 +6,10 @@ namespace FSO.Common.Security
     {
         public static NullSecurityContext INSTANCE = new NullSecurityContext();
 
+        public bool HasModerationLevel(int threshold)
+        {
+            return true;
+        }
 
         public void DemandAvatar(uint id, AvatarPermissions permission)
         {

@@ -108,7 +108,10 @@ namespace FSO.Client.UI.Controls
 
         public UICombobox()
         {
+            var ui = Content.Content.Get().CustomUI;
+
             Script = this.RenderScript("messageinboxmenu.uis");
+            backgroundCollapsedImage = ui.Get("archive_combobox.png").Get(GameFacade.GraphicsDevice);
             Background = new UIImage(backgroundCollapsedImage).With9Slice(40, 40, 6, 6);
             this.AddAt(0, Background);
 

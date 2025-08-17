@@ -390,6 +390,11 @@ namespace FSO.Server.Utils
         {
         }
 
+        public bool HasModerationLevel(int threshold)
+        {
+            return true;
+        }
+
         public void DemandAvatar(uint id, AvatarPermissions permission)
         {
         }

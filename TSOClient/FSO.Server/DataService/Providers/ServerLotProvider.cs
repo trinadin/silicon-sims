@@ -317,8 +317,11 @@ namespace FSO.Server.DataService.Providers
                     break;
                 //roommate only
                 case "Lot_Thumbnail":
-                    if (lot.Lot_Category == 11) context.DemandAvatar(lot.Lot_LeaderID, AvatarPermissions.WRITE);
-                    else context.DemandAvatars(roomies, AvatarPermissions.WRITE);
+                    if (!context.HasModerationLevel(1))
+                    {
+                        if (lot.Lot_Category == 11) context.DemandAvatar(lot.Lot_LeaderID, AvatarPermissions.WRITE);
+                        else context.DemandAvatars(roomies, AvatarPermissions.WRITE);
+                    }
                     //TODO: needs to be generic data, png, size 288x288, less than 1MB
                     break;
                 case "Lot_IsOnline":

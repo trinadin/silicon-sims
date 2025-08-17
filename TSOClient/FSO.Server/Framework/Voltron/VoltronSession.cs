@@ -45,6 +45,11 @@ namespace FSO.Server.Framework.Voltron
             base.Close();
         }
 
+        public bool HasModerationLevel(int threshold)
+        {
+            return ModerationLevel >= threshold;
+        }
+
 
         public void DemandAvatar(uint id, AvatarPermissions permission)
         {

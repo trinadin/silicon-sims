@@ -17,6 +17,10 @@ namespace FSO.Server.Framework.Gluon
 
         public string PublicHost { get; set; }
 
+        public bool HasModerationLevel(int threshold)
+        {
+            return true;
+        }
 
 
         public void DemandAvatar(uint id, AvatarPermissions permission)
