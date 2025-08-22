@@ -40,6 +40,7 @@ namespace FSO.Server.Protocol.Electron
             typeof(ArchiveAvatarsRequest),
             typeof(ArchiveAvatarsResponse),
             typeof(ArchiveClientList),
+            typeof(ArchiveModerationRequest),
         };
 
         static ElectronPackets()

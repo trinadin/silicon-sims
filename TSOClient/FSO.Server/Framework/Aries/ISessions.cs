@@ -10,6 +10,7 @@ namespace FSO.Server.Framework.Aries
 
         ISessionGroup GetOrCreateGroup(object id);
         IVoltronSession GetByAvatarId(uint id);
+        IVoltronSession[] GetAllByUserId(uint id);
         ISessionProxy All();
         HashSet<IAriesSession> Clone();
 

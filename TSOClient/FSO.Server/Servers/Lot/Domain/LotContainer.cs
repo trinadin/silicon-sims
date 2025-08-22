@@ -1425,32 +1425,7 @@ namespace FSO.Server.Servers.Lot.Domain
             if (rage < 7)
                 state.AvatarFlags |= VMTSOAvatarFlags.NewPlayer;
 
-            if (LotPersist.category == LotCategory.community)
-            {
-                if (LotPersist.owner_id == avatar.avatar_id)
-                {
-                    state.Permissions = VMTSOAvatarPermissions.Owner;
-                } else state.Permissions = VMTSOAvatarPermissions.Visitor; //needs to be set by the VM.
-            }
-            else
-            {
-                var roomieStatus = myRoomieLots.FindAll(x => x.lot_id == Context.DbId).FirstOrDefault();
-                if (roomieStatus != null && roomieStatus.is_pending == 0)
-                {
-                    switch (roomieStatus.permissions_level)
-                    {
-                        case 0:
-                            state.Permissions = VMTSOAvatarPermissions.Roommate; break;
-                        case 1:
-                            state.Permissions = VMTSOAvatarPermissions.BuildBuyRoommate; break;
-                        case 2:
-                            state.Permissions = VMTSOAvatarPermissions.Owner; break;
-                    }
-                }
-                else state.Permissions = VMTSOAvatarPermissions.Visitor;
-            }
-
-            if (avatar.moderation_level > 0) state.Permissions = VMTSOAvatarPermissions.Admin;
+            state.Permissions = GetAvatarPermissions(avatar, myRoomieLots);
 
             var motives = new short[16];
             for (int i=0; i<16; i++)
@@ -1480,6 +1455,41 @@ namespace FSO.Server.Servers.Lot.Domain
             }
 
             return state;
+        }
+
+        private VMTSOAvatarPermissions GetAvatarPermissions(DbAvatar avatar, List<DbRoommate> myRoomieLots)
+        {
+            VMTSOAvatarPermissions permissions = VMTSOAvatarPermissions.Visitor;
+
+            if (LotPersist.category == LotCategory.community)
+            {
+                if (LotPersist.owner_id == avatar.avatar_id)
+                {
+                    permissions = VMTSOAvatarPermissions.Owner;
+                }
+                else permissions = VMTSOAvatarPermissions.Visitor; //needs to be set by the VM.
+            }
+            else
+            {
+                var roomieStatus = myRoomieLots.FindAll(x => x.lot_id == Context.DbId).FirstOrDefault();
+                if (roomieStatus != null && roomieStatus.is_pending == 0)
+                {
+                    switch (roomieStatus.permissions_level)
+                    {
+                        case 0:
+                            permissions = VMTSOAvatarPermissions.Roommate; break;
+                        case 1:
+                            permissions = VMTSOAvatarPermissions.BuildBuyRoommate; break;
+                        case 2:
+                            permissions = VMTSOAvatarPermissions.Owner; break;
+                    }
+                }
+                else permissions = VMTSOAvatarPermissions.Visitor;
+            }
+
+            if (avatar.moderation_level > 0) permissions = VMTSOAvatarPermissions.Admin;
+
+            return permissions;
         }
 
         public DbAvatar StateToDb(VMNetAvatarPersistState avatar)
@@ -1546,6 +1556,14 @@ namespace FSO.Server.Servers.Lot.Domain
                     mode = VMChangePermissionsMode.OWNER_SWITCH_WITH_OBJECTS; break;
                 case ChangeType.ROOMIE_INHERIT_OBJECTS_ONLY:
                     mode = VMChangePermissionsMode.OBJECTS_ONLY; break;
+                case ChangeType.RELOAD_PERMISSIONS:
+                    using (var da = DAFactory.Get())
+                    {
+                        var ava = da.Avatars.Get(avatar_id);
+                        var roomies = da.Roommates.GetAvatarsLots(avatar_id);
+                        newLevel = GetAvatarPermissions(ava, roomies);
+                    }
+                    break;
             }
 
             try

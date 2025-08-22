@@ -68,16 +68,10 @@ namespace FSO.Client.UI.Archive
 
         public UIArchiveCreateServer() : base(UIDialogStyle.Close, true)
         {
-            Config = new ArchiveConfiguration()
-            {
-                ArchiveDataDirectory = "C:\\fsonfssd",
-                ServerKey = GlobalSettings.Default.ArchiveServerGUID,
-                CityPort = 33101,
-                LotPort = 34101,
-                Flags = GetDefaultFlags()
-            };
+            var clientConfig = ClientArchiveConfiguration.Default;
+            Config = clientConfig.ToHostConfig();
 
-            Caption = "Create Server";
+            Caption = "Host Server";
 
             var vbox = new UIVBoxContainer();
 
@@ -94,6 +88,7 @@ namespace FSO.Client.UI.Archive
             vbox.Add(SaveCombo);
 
             PopulateSaves();
+            SelectSaveByName(clientConfig.SelectedArchiveName);
 
             vbox.Add(new UILabel()
             {
@@ -102,7 +97,8 @@ namespace FSO.Client.UI.Archive
 
             vbox.Add(NameInput = new UITextBox()
             {
-                Size = new Microsoft.Xna.Framework.Vector2(150, 25)
+                Size = new Microsoft.Xna.Framework.Vector2(150, 25),
+                CurrentText = clientConfig.PlayerName,
             });
 
             var flagsVbox = new UIVBoxContainer();
@@ -190,11 +186,19 @@ namespace FSO.Client.UI.Archive
             SetSize((int)vbox.Size.X + 40, (int)vbox.Size.Y + 70);
             Add(vbox);
 
+            NameInput.OnChange += ValidateInputs;
             CustomPortsButton.OnButtonClick += ChangePorts;
             StartButton.OnButtonClick += Start;
             CloseButton.OnButtonClick += Close;
 
+            ValidateInputs(NameInput);
+
             UpdateButtons();
+        }
+
+        private void SelectSaveByName(string name)
+        {
+            SaveCombo.SelectedIndex = Math.Max(0, SaveCombo.Items.FindIndex((item) => item.Name == name));
         }
 
         private void ChangePorts(UIElement button)
@@ -292,7 +296,13 @@ namespace FSO.Client.UI.Archive
 
         private void Close(Framework.UIElement button)
         {
+            SaveConfig();
             FindController<ConnectArchiveController>().SwitchMode(ConnectArchiveMode.Landing);
+        }
+
+        private void ValidateInputs(Framework.UIElement element)
+        {
+            StartButton.Disabled = NameInput.CurrentText.Length == 0;
         }
 
         private bool ValidateData(ArchiveManifest manifest, out string dir)
@@ -435,6 +445,8 @@ namespace FSO.Client.UI.Archive
 
         private void Start(Framework.UIElement button)
         {
+            SaveConfig();
+
             Visible = false;
             var selected = SaveCombo.SelectedItem as ArchiveManifest;
 
@@ -484,6 +496,17 @@ namespace FSO.Client.UI.Archive
             Config.Disposables = new IDisposable[] { cityNat, lotNat };
 
             return true;
+        }
+
+        private void SaveConfig()
+        {
+            var clientConfig = ClientArchiveConfiguration.Default;
+            var selected = SaveCombo.SelectedItem as ArchiveManifest;
+
+            clientConfig.ApplyHostConfig(Config);
+            clientConfig.PlayerName = NameInput.CurrentText;
+            clientConfig.SelectedArchiveName = selected?.Name ?? "";
+            clientConfig.Save();
         }
 
         private void StartWithConfig()

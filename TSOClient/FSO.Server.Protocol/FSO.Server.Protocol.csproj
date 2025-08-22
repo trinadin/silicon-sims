@@ -103,6 +103,7 @@
     <Compile Include="Electron\ElectronPackets.cs" />
     <Compile Include="Electron\ElectronPacketType.cs" />
     <Compile Include="Electron\IElectronPacket.cs" />
+    <Compile Include="Electron\Model\ArchiveModerationRequestType.cs" />
     <Compile Include="Electron\Model\ChangeRoommateResponseStatus.cs" />
     <Compile Include="Electron\Model\ChangeRoommateType.cs" />
     <Compile Include="Electron\Model\FindAvatarResponseStatus.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="Electron\Packets\ArchiveAvatarsRequest.cs" />
     <Compile Include="Electron\Packets\ArchiveAvatarsResponse.cs" />
     <Compile Include="Electron\Packets\ArchiveClientList.cs" />
+    <Compile Include="Electron\Packets\ArchiveModerationRequest.cs" />
     <Compile Include="Electron\Packets\AvatarRetireRequest.cs" />
     <Compile Include="Electron\Packets\BulletinRequest.cs" />
     <Compile Include="Electron\Packets\BulletinResponse.cs" />

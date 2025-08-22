@@ -380,6 +380,16 @@ namespace FSO.Client.Controllers
             });
         }
 
+        public void ArchiveModRequest(uint entityId, ArchiveModerationRequestType type, int value = 0)
+        {
+            Network.CityClient.Write(new ArchiveModerationRequest()
+            {
+                EntityId = entityId,
+                Type = type,
+                Value = value
+            });
+        }
+
         public void HandleVMShutdown(VMCloseNetReason reason)
         {
             JoinLotRegulator.AsyncTransition("Disconnect");

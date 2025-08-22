@@ -36,6 +36,7 @@ namespace FSO.Server.Protocol.Electron
         ArchiveAvatarSelectRequest,
         ArchiveAvatarSelectResponse,
         ArchiveClientList,
+        ArchiveModerationRequest,
         Unknown = 0xFFFF
     }
 

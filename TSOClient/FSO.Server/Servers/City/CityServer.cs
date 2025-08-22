@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -457,6 +456,7 @@ namespace FSO.Server.Servers.City
 
                 typeof(ArchiveAvatarsHandler),
                 typeof(ArchiveAvatarSelectHandler),
+                typeof(ArchiveModerationHandler)
             };
         }
     }

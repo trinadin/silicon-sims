@@ -187,6 +187,7 @@
     <Compile Include="Servers\City\Domain\Tuning.cs" />
     <Compile Include="Servers\City\Handlers\ArchiveAvatarsHandler.cs" />
     <Compile Include="Servers\City\Handlers\ArchiveAvatarSelectHandler.cs" />
+    <Compile Include="Servers\City\Handlers\ArchiveModerationHandler.cs" />
     <Compile Include="Servers\City\Handlers\BulletinHandler.cs" />
     <Compile Include="Servers\City\Handlers\CityResourceHandler.cs" />
     <Compile Include="Servers\City\Handlers\NhoodHandler.cs" />

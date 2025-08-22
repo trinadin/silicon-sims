@@ -118,9 +118,8 @@ namespace FSO.Client.Controllers
 
             ShowMainDialog(new UIArchiveServerStatusDialog(true, embedded, () =>
             {
-                // TODO: passthru display name, ports
                 ShowMainDialog(null);
-                FSOFacade.Controller.ConnectToArchive("riperiperi", "127.0.0.1", true);
+                FSOFacade.Controller.ConnectToArchive(ClientArchiveConfiguration.Default.PlayerName, "127.0.0.1", true);
             }));
         }
 

@@ -1,5 +1,7 @@
 ﻿using FSO.Client.Controllers;
+using FSO.Client.Model.Archive;
 using FSO.Client.UI.Controls;
+using FSO.Common;
 using Microsoft.Xna.Framework;
 
 namespace FSO.Client.UI.Archive
@@ -14,6 +16,8 @@ namespace FSO.Client.UI.Archive
         {
             Caption = "Join Server";
             var vbox = new UIVBoxContainer();
+
+            var clientConfig = ClientArchiveConfiguration.Default;
 
             vbox.Add(new UILabel()
             {
@@ -61,23 +65,36 @@ namespace FSO.Client.UI.Archive
 
             Add(vbox);
 
-            NameInput.CurrentText = "riperiperi";
-            AddressInput.CurrentText = "127.0.0.1";
+            NameInput.CurrentText = clientConfig.PlayerName;
+            AddressInput.CurrentText = clientConfig.LastJoinedHost;
 
             NameInput.OnChange += ValidateInputs;
             AddressInput.OnChange += ValidateInputs;
 
             JoinButton.OnButtonClick += Join;
             CloseButton.OnButtonClick += Close;
+
+            ValidateInputs(NameInput);
+        }
+
+        private void SaveConfig()
+        {
+            var clientConfig = ClientArchiveConfiguration.Default;
+
+            clientConfig.PlayerName = NameInput.CurrentText;
+            clientConfig.LastJoinedHost = AddressInput.CurrentText;
+            clientConfig.Save();
         }
 
         private void Close(Framework.UIElement button)
         {
+            SaveConfig();
             FindController<ConnectArchiveController>().SwitchMode(ConnectArchiveMode.Landing);
         }
 
         private void Join(Framework.UIElement button)
         {
+            SaveConfig(); 
             FSOFacade.Controller.ConnectToArchive(NameInput.CurrentText, AddressInput.CurrentText, false);
         }
 
