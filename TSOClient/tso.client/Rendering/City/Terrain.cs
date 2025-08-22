@@ -60,6 +60,7 @@ namespace FSO.Client.Rendering.City
             }
         }
         private Color m_TintColor;
+        private Color m_TintColorSprite;
 
         public Effect Shader2D, PixelShader, VertexShader;
         private Vector3 m_LightPosition;
@@ -991,7 +992,7 @@ namespace FSO.Client.Rendering.City
 
                             double scale = Math.Round((treeWidth * iScale / 128.0)*1000)/1000;
 
-                            spriteBatch.Draw(lotImg, new Rectangle((int)(xy.X - (lotImgWidth/2) * scale), (int)(xy.Y - (lotImgHeight/2) * scale), (int)(scale * lotImgWidth), (int)(scale * lotImgHeight)), m_TintColor);
+                            spriteBatch.Draw(lotImg, new Rectangle((int)(xy.X - (lotImgWidth/2) * scale), (int)(xy.Y - (lotImgHeight/2) * scale), (int)(scale * lotImgWidth), (int)(scale * lotImgHeight)), m_TintColorSprite);
                         }
                         else //if there is no house, draw the forest that's meant to be here.
                         {
@@ -1000,7 +1001,7 @@ namespace FSO.Client.Rendering.City
                             if (!(fType == -1 || fDens == 0))
                             {
                                 double scale = treeWidth * iScale / 128.0;
-                                spriteBatch.Draw(Content.Forest, new Rectangle((int)(xy.X - 64.0 * scale), (int)(xy.Y - 56.0 * scale), (int)(scale * 128), (int)(scale * 80)), new Rectangle((int)(128 * (fDens - 1)), (int)(80 * fType), 128, 80), m_TintColor);
+                                spriteBatch.Draw(Content.Forest, new Rectangle((int)(xy.X - 64.0 * scale), (int)(xy.Y - 56.0 * scale), (int)(scale * 128), (int)(scale * 80)), new Rectangle((int)(128 * (fDens - 1)), (int)(80 * fType), 128, 80), m_TintColorSprite);
                                 //draw correct forest from forest atlas
                             }
                         }
@@ -1231,6 +1232,17 @@ namespace FSO.Client.Rendering.City
             return new Color(vec);
         }
 
+        private Color SRGBSpriteMul(Color linearMul)
+        {
+            var linearVec = linearMul.ToVector4();
+
+            linearVec.X = (float)Math.Pow(linearVec.X, 1 / 2.2f);
+            linearVec.Y = (float)Math.Pow(linearVec.Y, 1 / 2.2f);
+            linearVec.Z = (float)Math.Pow(linearVec.Z, 1 / 2.2f);
+
+            return new Color(linearVec);
+        }
+
         private float Time;
         public void SetTimeOfDay(double time) 
         {
@@ -1248,6 +1260,8 @@ namespace FSO.Client.Rendering.City
                         Weather.OutsideWeatherTint.ToVector4()
                         );
             }
+
+            m_TintColorSprite = SRGBSpriteMul(m_TintColor);
 
             m_LightPosition = new Vector3(0, 0, -263);
             Matrix Transform = Matrix.Identity;
