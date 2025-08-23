@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FSO.Client.Rendering.City
 {
@@ -95,20 +96,10 @@ namespace FSO.Client.Rendering.City
 
                     Action<byte[]> callback = (data) =>
                     {
-                        if (data != null && !result.Dead && !result.Loaded)
+                        if (data != null && !result.Dead && !result.Loading)
                         {
-                            using (var mem = new MemoryStream(data))
-                            {
-                                result.Loaded = true;
-                                try
-                                {
-                                    result.LotTexture = ImageLoader.FromStream(GameFacade.GraphicsDevice, mem);
-                                }
-                                catch
-                                {
-                                    result.LotTexture = new Texture2D(GameFacade.GraphicsDevice, 1, 1);
-                                }
-                            }
+                            result.LoadTextureAsync(data);
+                            result.Loading = true;
                         }
                     };
 
@@ -242,7 +233,33 @@ namespace FSO.Client.Rendering.City
         public FSOF LotFacade;
         public int Held;
         public bool Loaded;
+        public bool Loading;
         public bool Dead;
         public bool FacadeEntry;
+
+        public void LoadTextureAsync(byte[] data)
+        {
+            Task.Run(() =>
+            {
+                using (var mem = new MemoryStream(data))
+                {
+                    Func<Texture2D> loader;
+                    try
+                    {
+                        loader = ImageLoader.NonUIFromStream(GameFacade.GraphicsDevice, mem);
+                    }
+                    catch
+                    {
+                        loader = () => new Texture2D(GameFacade.GraphicsDevice, 1, 1);
+                    }
+
+                    GameThread.InUpdate(() =>
+                    {
+                        LotTexture = loader?.Invoke() ?? new Texture2D(GameFacade.GraphicsDevice, 1, 1);
+                        Loaded = true;
+                    });
+                }
+            });
+        }
     }
 }
