@@ -72,9 +72,18 @@ namespace FSO.LotView.Components
             try
             {
                 TexRescale = 0.2f;
-                using (var strm = File.OpenRead($"Content/Textures/roof/{searchName}.png"))
+                var path = $"Content/Textures/roof/{searchName}.png";
+                if (File.Exists(path))
                 {
-                    Texture = Texture2D.FromStream(device, strm);
+                    using (var strm = File.OpenRead(path))
+                    {
+                        Texture = Texture2D.FromStream(device, strm);
+                    }
+                }
+                else
+                {
+                    TexRescale = 1f;
+                    Texture = roofs.Get(name).Get(device);
                 }
             }
             catch

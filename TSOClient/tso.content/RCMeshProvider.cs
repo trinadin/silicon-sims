@@ -170,19 +170,24 @@ namespace FSO.Content
                 //load from meshreplace folder
                 try
                 {
-                    using (var file = File.OpenRead(Path.Combine(dir, name)))
+                    var path = Path.Combine(dir, name);
+
+                    if (File.Exists(path))
                     {
-                        result = ImageLoader.FromStream(GD, file);
-                        if (FSOEnvironment.EnableNPOTMip)
+                        using (var file = File.OpenRead(path))
                         {
-                            var data = new Color[result.Width * result.Height];
-                            result.GetData(data);
-                            var n = new Texture2D(GD, result.Width, result.Height, true, SurfaceFormat.Color);
-                            TextureUtils.UploadWithAvgMips(n, GD, data);
-                            result.Dispose();
-                            result = n;
+                            result = ImageLoader.FromStream(GD, file);
+                            if (FSOEnvironment.EnableNPOTMip)
+                            {
+                                var data = new Color[result.Width * result.Height];
+                                result.GetData(data);
+                                var n = new Texture2D(GD, result.Width, result.Height, true, SurfaceFormat.Color);
+                                TextureUtils.UploadWithAvgMips(n, GD, data);
+                                result.Dispose();
+                                result = n;
+                            }
                         }
-                    };
+                    }
                 }
                 catch (Exception)
                 {

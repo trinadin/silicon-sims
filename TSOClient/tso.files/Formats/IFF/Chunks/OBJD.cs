@@ -517,29 +517,43 @@ namespace FSO.Files.Formats.IFF.Chunks
                     this.RatingBladder = io.ReadInt16();
                     this.RatingEnergy = io.ReadInt16();
                     this.RatingFun = io.ReadInt16();
-                    this.RatingRoom = io.ReadInt16();
+                    this.RatingRoom = io.ReadInt16(); // field 86
                     this.RatingSkillFlags = io.ReadUInt16();
                     if (numFields > 90)
                     {
-                        this.NumTypeAttributes = io.ReadUInt16();
-                        this.MiscFlags = io.ReadUInt16();
-                        this.TypeAttrGUID = io.ReadUInt32();
-                        try
+                        this.NumTypeAttributes = io.ReadUInt16(); // field 88
+                        this.MiscFlags = io.ReadUInt16(); // field 89
+                        this.TypeAttrGUID = io.ReadUInt32(); // field 90, 91
+
+                        if (numFields > 92)
                         {
-                            this.FunctionSubsort = io.ReadUInt16();
-                            this.DTSubsort = io.ReadUInt16();
-                            this.KeepBuying = io.ReadUInt16();
-                            this.VacationSubsort = io.ReadUInt16();
-                            this.ResetLotAction = io.ReadUInt16();
-                            this.CommunitySubsort = io.ReadUInt16();
-                            this.DreamFlags = io.ReadUInt16();
-                            this.RenderFlags = io.ReadUInt16();
-                            this.VitaboyFlags = io.ReadUInt16();
-                            this.STSubsort = io.ReadUInt16();
-                            this.MTSubsort = io.ReadUInt16();
-                        } catch (Exception)
-                        {
-                            //past this point if these fields are here is really a mystery
+                            try
+                            {
+                                this.FunctionSubsort = io.ReadUInt16();
+                                if (numFields > 93)
+                                {
+                                    this.DTSubsort = io.ReadUInt16();
+                                    if (numFields > 94)
+                                    {
+                                        this.KeepBuying = io.ReadUInt16();
+                                        if (numFields > 95)
+                                        {
+                                            this.VacationSubsort = io.ReadUInt16(); // fails with numFields 95
+                                            this.ResetLotAction = io.ReadUInt16();
+                                            this.CommunitySubsort = io.ReadUInt16();
+                                            this.DreamFlags = io.ReadUInt16();
+                                            this.RenderFlags = io.ReadUInt16();
+                                            this.VitaboyFlags = io.ReadUInt16();
+                                            this.STSubsort = io.ReadUInt16();
+                                            this.MTSubsort = io.ReadUInt16();
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                //past this point if these fields are here is really a mystery
+                            }
                         }
                     }
                     if (this.TypeAttrGUID == 0) this.TypeAttrGUID = GUID;
