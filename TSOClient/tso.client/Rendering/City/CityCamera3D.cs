@@ -164,6 +164,7 @@ namespace FSO.Client.Rendering.City
 
         private float TargRX;
         private float TargRY;
+        private float InheritElevation;
         public void InheritPosition(Terrain parent, World lotWorld, CoreGameScreenController controller, bool instant)
         {
             if (controller != null)
@@ -182,10 +183,16 @@ namespace FSO.Client.Rendering.City
                     }
 
                     float elev = parent.GetElevationAt((int)x, (int)y);
+                    InheritElevation = elev / 12f;
 
                     var tile = (lotWorld.State.CenterTile - new Vector2(2, 2)) / 72; //72 is the base lot size
 
                     parent.LotPosition = new Vector3((float)(x + 1), elev / 12.0f, (float)(y + 0));
+
+                    if (LotZoomProgress == 1)
+                    {
+                        instant = true;
+                    }
 
                     if (instant)
                     {
@@ -363,7 +370,8 @@ namespace FSO.Client.Rendering.City
 
             var relative = ComputeCenterRelative();
             terrainHeight = (city.InterpElevationAt(CenterTile));
-            var targHeight = terrainHeight;
+            var heightBias = (float)Math.Pow(LotZoomProgress, 0.1); // Float to the target lot's height.
+            var targHeight = InheritElevation * heightBias + terrainHeight * (1 - heightBias);
             var heightAtCam = city.InterpElevationAt(new Vector2(Position.X, Position.Z));
             if (relative.Y + targHeight < heightAtCam + 0.5f) targHeight = (heightAtCam + 0.5f) - relative.Y;
             //targHeight = Math.Max(heightAtCam, terrainHeight);
