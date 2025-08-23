@@ -7,6 +7,7 @@ using FSO.Common.Rendering.Framework.IO;
 using FSO.Client;
 using FSO.Client.UI.Panels;
 using System.Windows.Forms;
+using System.Runtime.CompilerServices;
 
 namespace FSO.Windows
 {
@@ -140,18 +141,55 @@ namespace FSO.Windows
                 Marshal.Copy(bitmapData.Scan0, data, 0, data.Length);
                 image.UnlockBits(bitmapData);
 
-                for (int i = 0; i < data.Length; i += 4)
-                {
-                    var temp = data[i];
-                    data[i] = data[i + 2];
-                    data[i + 2] = temp;
-                }
+                RGBToBGRSoft(data);
 
                 return new Tuple<byte[], int, int>(data, image.Width, image.Height);
             }
             finally
             {
                 image.Dispose();
+            }
+        }
+
+        private static void RGBToBGROld(byte[] data)
+        {
+            for (int i = 0; i < data.Length; i += 4)
+            {
+                var temp = data[i];
+                data[i] = data[i + 2];
+                data[i + 2] = temp;
+            }
+        }
+
+        private const ulong MaskR = 0x000000FF000000FF;
+        private const ulong MaskB = 0x00FF000000FF0000;
+        private const ulong MaskElse = 0xFF00FF00FF00FF00;
+
+        private unsafe static void RGBToBGRSoft(byte[] data)
+        {
+            // Do 8 bytes at a time with ulong.
+            // Could do this with an SSE shuffle, but .NET 4 doesn't have intrinsics.
+
+            fixed (void* dataPtr = data)
+            {
+                ulong* longPtr = (ulong*)dataPtr;
+
+                int longCount = data.Length / 8;
+
+                for (int i = 0; i < longCount; i++)
+                {
+                    ulong px = longPtr[i];
+                    longPtr[i] = ((px >> 16) & MaskR) | ((px << 16) & MaskB) | (px & MaskElse);
+                }
+            }
+
+            if (data.Length % 8 != 0)
+            {
+                // Deal with the remainder.
+                int i = data.Length - 4;
+                var temp = data[i];
+                data[i] = data[i + 2];
+                data[i + 2] = temp;
             }
         }
 

@@ -20,6 +20,7 @@ namespace FSO.Files
         };
 
         public static Func<GraphicsDevice, Stream, Texture2D> BaseFunction = WinFromStream;
+        public static Func<GraphicsDevice, Stream, Func<Texture2D>> BaseNonUIFunction = WinNonUIFromStream;
 
 
         public static Texture2D FromStream(GraphicsDevice gd, Stream str)
@@ -27,12 +28,103 @@ namespace FSO.Files
             return BaseFunction(gd, str);
         }
 
+        /// <summary>
+        /// Get a Texture2D factory for the given stream.
+        /// This runs the decoder work on the calling thread, and returns a function
+        /// that creates the texture that should be called on the main thread.
+        /// </summary>
+        /// <param name="gd"></param>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static Func<Texture2D> NonUIFromStream(GraphicsDevice gd, Stream str)
+        {
+            return BaseNonUIFunction(gd, str);
+        }
+
         private static Texture2D WinFromStream(GraphicsDevice gd, Stream str)
         {
             return WinFromStreamP(gd, str, 0);
         }
 
-        public static Texture2D WinFromStreamP(GraphicsDevice gd, Stream str, int premult)
+        private static Func<Texture2D> WinNonUIFromStream(GraphicsDevice gd, Stream str)
+        {
+            return WinNonUIFromStreamP(gd, str, 0);
+        }
+
+        public static bool Premultiply(Color[] buffer, int premult)
+        {
+            if (premult == 1)
+            {
+                for (int i = 0; i < buffer.Length; i++)
+                {
+                    var a = buffer[i].A;
+                    if (a != 255)
+                    {
+                        buffer[i] = new Color((byte)((buffer[i].R * a) / 255), (byte)((buffer[i].G * a) / 255), (byte)((buffer[i].B * a) / 255), a);
+                    }
+                }
+
+                return true;
+            }
+            else if (premult == -1) //divide out a premultiply... currently needed for dx since it premultiplies pngs without reason
+            {
+                for (int i = 0; i < buffer.Length; i++)
+                {
+                    var rawA = buffer[i].A;
+
+                    if (rawA != 255)
+                    {
+                        var a = rawA / 255f;
+                        buffer[i] = new Color((byte)(buffer[i].R / a), (byte)(buffer[i].G / a), (byte)(buffer[i].B / a), buffer[i].A);
+                    }
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool Premultiply(byte[] buffer, int premult)
+        {
+            if (premult == 1)
+            {
+                for (int i = 0; i < buffer.Length; i += 4)
+                {
+                    var a = buffer[i + 3];
+                    if (a != 255)
+                    {
+                        buffer[i] = (byte)((buffer[i] * a) / 255);
+                        buffer[i+1] = (byte)((buffer[i+1] * a) / 255);
+                        buffer[i+2] = (byte)((buffer[i+2] * a) / 255);
+                    }
+                }
+
+                return true;
+            }
+            else if (premult == -1) //divide out a premultiply... currently needed for dx since it premultiplies pngs without reason
+            {
+                for (int i = 0; i < buffer.Length; i += 4)
+                {
+                    var rawA = buffer[i];
+
+                    if (rawA != 255)
+                    {
+                        var a = rawA / 255f;
+
+                        buffer[i] = (byte)(buffer[i] / a);
+                        buffer[i+1] = (byte)(buffer[i+1] / a);
+                        buffer[i+2] = (byte)(buffer[i+2] / a);
+                    }
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public static Func<Texture2D> WinNonUIFromStreamP(GraphicsDevice gd, Stream str, int premult)
         {
             //if (!UseSoftLoad)
             //{
@@ -46,20 +138,28 @@ namespace FSO.Files
                 try
                 {
                     //it's a bitmap. 
-                    Texture2D tex;
                     if (ImageLoaderHelpers.BitmapFunction != null)
                     {
                         var bmp = ImageLoaderHelpers.BitmapFunction(str);
                         if (bmp == null) return null;
-                        tex = new Texture2D(gd, bmp.Item2, bmp.Item3);
-                        tex.SetData(bmp.Item1);
+                        return () =>
+                        {
+                            Texture2D tex = new Texture2D(gd, bmp.Item2, bmp.Item3);
+                            tex.SetData(bmp.Item1);
+                            ManualTextureMaskSingleThreaded(ref tex, MASK_COLORS.ToArray());
+                            return tex;
+                        };
                     }
                     else
                     {
-                        tex = Texture2D.FromStream(gd, str);
+                        return () =>
+                        {
+                            Texture2D tex = Texture2D.FromStream(gd, str);
+
+                            ManualTextureMaskSingleThreaded(ref tex, MASK_COLORS.ToArray());
+                            return tex;
+                        };
                     }
-                    ManualTextureMaskSingleThreaded(ref tex, MASK_COLORS.ToArray());
-                    return tex;
                 }
                 catch (Exception)
                 {
@@ -78,9 +178,13 @@ namespace FSO.Files
                     try
                     {
                         var tga = new TargaImagePCL.TargaImage(str);
-                        var tex = new Texture2D(gd, tga.Image.Width, tga.Image.Height);
-                        tex.SetData(tga.Image.ToBGRA(true));
-                        return tex;
+
+                        return () =>
+                        {
+                            var tex = new Texture2D(gd, tga.Image.Width, tga.Image.Height);
+                            tex.SetData(tga.Image.ToBGRA(true));
+                            return tex;
+                        };
                     }
                     catch (Exception)
                     {
@@ -92,62 +196,54 @@ namespace FSO.Files
                     //anything else
                     try
                     {
-                        Texture2D tex;
-                        Color[] buffer = null;
+                        premult += PremultiplyPNG;
+
                         if (ImageLoaderHelpers.BitmapFunction != null)
                         {
                             var bmp = ImageLoaderHelpers.BitmapFunction(str);
                             if (bmp == null) return null;
-                            tex = new Texture2D(gd, bmp.Item2, bmp.Item3);
-                            tex.SetData(bmp.Item1);
+
+                            Premultiply(bmp.Item1, premult);
+
+                            return () =>
+                            {
+                                Texture2D tex = new Texture2D(gd, bmp.Item2, bmp.Item3);
+                                tex.SetData(bmp.Item1);
+                                return tex;
+                            };
 
                             //buffer = bmp.Item1;
                         }
                         else
                         {
-                            tex = Texture2D.FromStream(gd, str);
-                        }
+                            return () =>
+                            {
+                                Texture2D tex = Texture2D.FromStream(gd, str);
 
-                        premult += PremultiplyPNG;
-                        if (premult == 1)
-                        {
-                            if (buffer == null)
-                            {
-                                buffer = new Color[tex.Width * tex.Height];
-                                tex.GetData<Color>(buffer);
-                            }
+                                if (premult != 0)
+                                {
+                                    var buffer = new Color[tex.Width * tex.Height];
+                                    tex.GetData(buffer);
+                                    Premultiply(buffer, premult);
+                                    tex.SetData(buffer);
+                                }
 
-                            for (int i = 0; i < buffer.Length; i++)
-                            {
-                                var a = buffer[i].A;
-                                buffer[i] = new Color((byte)((buffer[i].R * a) / 255), (byte)((buffer[i].G * a) / 255), (byte)((buffer[i].B * a) / 255), a);
-                            }
-                            tex.SetData(buffer);
+                                return tex;
+                            };
                         }
-                        else if (premult == -1) //divide out a premultiply... currently needed for dx since it premultiplies pngs without reason
-                        {
-                            if (buffer == null)
-                            {
-                                buffer = new Color[tex.Width * tex.Height];
-                                tex.GetData<Color>(buffer);
-                            }
-
-                            for (int i = 0; i < buffer.Length; i++)
-                            {
-                                var a = buffer[i].A / 255f;
-                                buffer[i] = new Color((byte)(buffer[i].R / a), (byte)(buffer[i].G / a), (byte)(buffer[i].B / a), buffer[i].A);
-                            }
-                            tex.SetData(buffer);
-                        }
-                        return tex;
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("error: " + e.ToString());
-                        return new Texture2D(gd, 1, 1);
+                        return () => new Texture2D(gd, 1, 1);
                     }
                 }
             }
+        }
+
+        public static Texture2D WinFromStreamP(GraphicsDevice gd, Stream str, int premult)
+        {
+            return WinNonUIFromStreamP(gd, str, premult)();
         }
 
         public static void ManualTextureMaskSingleThreaded(ref Texture2D Texture, uint[] ColorsFrom)
