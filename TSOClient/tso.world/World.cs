@@ -1113,6 +1113,12 @@ namespace FSO.LotView
                     Blueprint.Avatars[i].Preload(gd, State);
                 }
 
+                State._2D.PreciseZoom = State.PreciseZoom;
+                State.OutsideColor = Blueprint.OutsideColor;
+                State.PrepareLighting();
+                State._2D.Begin(this.State.Camera2D);
+                Blueprint.Changes.PreDraw(gd, State);
+
                 PreloadProgress = 1;
                 PreloadObjProgress = 0;
             }
@@ -1131,6 +1137,8 @@ namespace FSO.LotView
                         return false;
                     }
                 }
+
+                world.PreDraw(gd, State);
 
                 PreloadProgress++;
                 PreloadObjProgress = 0;

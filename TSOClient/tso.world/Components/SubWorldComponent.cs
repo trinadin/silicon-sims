@@ -101,6 +101,13 @@ namespace FSO.LotView.Components
             state.SilentLevel = State.Level;
             state.SilentBuildMode = 0;
             State._2D = state._2D;
+
+            if ((Blueprint.Changes.Dirty & (BlueprintGlobalChanges.LIGHTING_ANY | BlueprintGlobalChanges.ROOM_CHANGED)) != 0)
+            {
+                State.OutsideColor = state.OutsideColor;
+                Blueprint.OutsideColor = state.OutsideColor;
+            }
+
             Blueprint.Changes.PreDraw(gd, State);
 
             state.SilentBuildMode = oldBuild;
@@ -112,11 +119,6 @@ namespace FSO.LotView.Components
              * We use the same BlueprintChanges for simplicity, though after load it won't really change. (and static/dynamic distinction is ignored)
              */
 
-            if (Blueprint.Changes.UpdateColor)
-            {
-                State.OutsideColor = state.OutsideColor;
-                Blueprint.OutsideColor = state.OutsideColor;
-            }
             State.LightingAdjust = state.OutsideColor.ToVector3() / State.OutsideColor.ToVector3();
 
             /*

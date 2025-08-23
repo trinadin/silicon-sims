@@ -31,7 +31,6 @@ namespace FSO.LotView
         public bool StaticObjectDirty;
 
         public bool DrawImmediate;
-        public bool UpdateColor;
 
         public bool Arch2D;
 
@@ -47,7 +46,6 @@ namespace FSO.LotView
         public void PreDraw(GraphicsDevice gd, WorldState state)
         {
             DrawImmediate = state.ForceImmediate;
-            UpdateColor = false;
             if (state.CameraMode < CameraRenderMode._3D)
             {
                 state.CameraMode = (state.Cameras.Safe2D) ? CameraRenderMode._2D : CameraRenderMode._2DRotate;
@@ -97,7 +95,6 @@ namespace FSO.LotView
 
                 if ((Dirty & BlueprintGlobalChanges.LIGHTING_ANY) > 0)
                 {
-                    UpdateColor = true;
                     Blueprint.GenerateRoomLights();
                     state.OutsideColor = Blueprint.RoomColors[1];
                     state.OutsidePx.SetData(new Color[] { new Color(Blueprint.OutsideColor, (Blueprint.OutsideColor.R + Blueprint.OutsideColor.G + Blueprint.OutsideColor.B) / (255 * 3f)) });
@@ -167,7 +164,6 @@ namespace FSO.LotView
                         }
                         if (state.Light != null)
                         {
-                            UpdateColor = true;
                             state.Light.InvalidateAll();
                         }
                         Blueprint.Indoors = null;
