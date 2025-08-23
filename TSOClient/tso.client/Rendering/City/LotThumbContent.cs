@@ -62,22 +62,10 @@ namespace FSO.Client.Rendering.City
 
                     Action<byte[]> callback = (data) =>
                     {
-                        if (data != null && !result.Dead && !result.Loaded)
+                        if (data != null && !result.Dead && !result.Loading)
                         {
-                            using (var mem = new MemoryStream(data))
-                            {
-                                result.Loaded = true;
-                                try
-                                {
-                                    result.LotFacade = new FSOF();
-                                    result.LotFacade.Read(mem);
-                                    result.LotFacade.LoadGPU(GameFacade.GraphicsDevice);
-                                }
-                                catch
-                                {
-                                    result.LotFacade = null;
-                                }
-                            }
+                            result.Loading = true;
+                            result.LoadFSOFAsync(data);
                         }
                     };
 
@@ -98,8 +86,8 @@ namespace FSO.Client.Rendering.City
                     {
                         if (data != null && !result.Dead && !result.Loading)
                         {
-                            result.LoadTextureAsync(data);
                             result.Loading = true;
+                            result.LoadTextureAsync(data);
                         }
                     };
 
@@ -255,7 +243,45 @@ namespace FSO.Client.Rendering.City
 
                     GameThread.InUpdate(() =>
                     {
+                        if (Dead || Loaded)
+                        {
+                            // If we're already loaded, then the thumbnail has an override.
+                            return;
+                        }
+
                         LotTexture = loader?.Invoke() ?? new Texture2D(GameFacade.GraphicsDevice, 1, 1);
+                        Loaded = true;
+                    });
+                }
+            });
+        }
+
+        public void LoadFSOFAsync(byte[] data)
+        {
+            Task.Run(() =>
+            {
+                using (var mem = new MemoryStream(data))
+                {
+                    FSOF facade;
+                    try
+                    {
+                        facade = new FSOF();
+                        facade.Read(mem);
+                    }
+                    catch
+                    {
+                        facade = null;
+                    }
+
+                    GameThread.InUpdate(() =>
+                    {
+                        if (Dead)
+                        {
+                            return;
+                        }
+
+                        LotFacade = facade;
+                        LotFacade?.LoadGPU(GameFacade.GraphicsDevice);
                         Loaded = true;
                     });
                 }
