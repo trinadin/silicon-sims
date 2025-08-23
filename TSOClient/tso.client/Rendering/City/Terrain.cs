@@ -1,28 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections;
-using System.IO;
+﻿using FSO.Client.Controllers;
+using FSO.Client.Rendering.City.Plugins;
+using FSO.Client.UI.Framework;
+using FSO.Client.UI.Panels;
+using FSO.Client.UI.Screens;
+using FSO.Common;
+using FSO.Common.Rendering;
+using FSO.Common.Rendering.Framework;
+using FSO.Common.Rendering.Framework.Camera;
+using FSO.Common.Rendering.Framework.IO;
+using FSO.Common.Rendering.Framework.Model;
+using FSO.Files;
+using FSO.Files.RC;
+using FSO.LotView;
+using FSO.LotView.Components;
+using FSO.LotView.Model;
+using FSO.LotView.RC;
+using FSO.LotView.Utils.Camera;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using FSO.Client.UI.Screens;
-using FSO.Common.Rendering.Framework;
-using FSO.Common.Rendering.Framework.Model;
-using FSO.Files;
-using FSO.Client.UI.Framework;
-using FSO.Client.Controllers;
-using FSO.LotView;
-using FSO.Client.Rendering.City.Plugins;
-using FSO.Common;
-using FSO.LotView.RC;
-using FSO.Common.Rendering.Framework.Camera;
-using FSO.LotView.Components;
-using FSO.LotView.Model;
-using FSO.Files.RC;
-using FSO.Common.Rendering.Framework.IO;
-using FSO.Client.UI.Panels;
-using FSO.Common.Rendering;
-using FSO.LotView.Utils.Camera;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 
 namespace FSO.Client.Rendering.City
 {
@@ -849,6 +849,8 @@ namespace FSO.Client.Rendering.City
             VertexShader.Parameters["ObjModel"].SetValue(Matrix.Identity);
             VertexShader.CurrentTechnique.Passes[passIndex].Apply();
 
+            m_GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+
             if (LotOfflineInds != null)
             {
                 PixelShader.Parameters["ObjTex"].SetValue(Content.LotOffline);
@@ -936,9 +938,14 @@ namespace FSO.Client.Rendering.City
 		    float treeHeight = treeWidth*(80/128);
 
 		    Vector2 mid = Camera.CalculateR(); //determine approximate tile position at center of screen
-		    mid.X -= 6;
+            var isoScale = GetIsoScale();
+            var range = Math.Min(50, 10 + (int)(isoScale * 2500));
+
+            mid.X -= 6;
 		    mid.Y += 6;
-            float[] bounds = new float[] { (float)Math.Round(mid.X - 19), (float)Math.Round(mid.Y - 19), (float)Math.Round(mid.X + 19), (float)Math.Round(mid.Y + 19) };
+            float[] bounds = new float[] { (float)Math.Round(mid.X - range), (float)Math.Round(mid.Y - range), (float)Math.Round(mid.X + range), (float)Math.Round(mid.Y + range) };
+
+
     		
 		    Texture2D img = Content.Forest;
 		    float fade = Math.Max(0, Math.Min(1, (m_ZoomProgress - 0.4f) * 2));
@@ -1001,7 +1008,12 @@ namespace FSO.Client.Rendering.City
                             if (!(fType == -1 || fDens == 0))
                             {
                                 double scale = treeWidth * iScale / 128.0;
-                                spriteBatch.Draw(Content.Forest, new Rectangle((int)(xy.X - 64.0 * scale), (int)(xy.Y - 56.0 * scale), (int)(scale * 128), (int)(scale * 80)), new Rectangle((int)(128 * (fDens - 1)), (int)(80 * fType), 128, 80), m_TintColorSprite);
+                                spriteBatch.Draw(
+                                    Content.Forest,
+                                    new Rectangle((int)(xy.X - 64.0 * scale), (int)(xy.Y - 56.0 * scale), (int)(scale * 128), (int)(scale * 80)),
+                                    new Rectangle((int)(128 * (fDens - 1)),
+                                    (int)(80 * fType), 128, 80),
+                                    m_TintColorSprite);
                                 //draw correct forest from forest atlas
                             }
                         }

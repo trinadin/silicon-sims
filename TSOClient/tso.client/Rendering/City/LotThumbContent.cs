@@ -231,6 +231,12 @@ namespace FSO.Client.Rendering.City
             {
                 using (var mem = new MemoryStream(data))
                 {
+                    if (Dead || Loaded)
+                    {
+                        // If we're already loaded, then the thumbnail has an override.
+                        return;
+                    }
+
                     Func<Texture2D> loader;
                     try
                     {
@@ -241,7 +247,7 @@ namespace FSO.Client.Rendering.City
                         loader = () => new Texture2D(GameFacade.GraphicsDevice, 1, 1);
                     }
 
-                    GameThread.InUpdate(() =>
+                    GameThread.InStreamUpdate(() =>
                     {
                         if (Dead || Loaded)
                         {
@@ -262,6 +268,11 @@ namespace FSO.Client.Rendering.City
             {
                 using (var mem = new MemoryStream(data))
                 {
+                    if (Dead)
+                    {
+                        return;
+                    }
+
                     FSOF facade;
                     try
                     {
@@ -273,7 +284,7 @@ namespace FSO.Client.Rendering.City
                         facade = null;
                     }
 
-                    GameThread.InUpdate(() =>
+                    GameThread.InStreamUpdate(() =>
                     {
                         if (Dead)
                         {

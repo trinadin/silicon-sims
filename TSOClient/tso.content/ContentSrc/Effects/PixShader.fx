@@ -254,7 +254,7 @@ sampler2D ObjSampler = sampler_state
 
 float4 GetObjColor(ObjVertexOut Input) {
 	float4 objCol = tex2D(ObjSampler, Input.texCoord);
-	objCol.xyz /= objCol.w;
+	// City graphics are non-premultiplied.
 	return objCol;
 }
 
@@ -266,7 +266,7 @@ float4 CityObjPS(ObjVertexOut Input) : COLOR0
 	float diffuse = 1;//dot(normalize(Input.normal.xyz), LightVec.xyz);
 	if (diffuse < 0) diffuse *= 0.5;
 
-	return gammaMul(float4(BCol.xyz, 1), float4(LightCol.xyz*lerp(ShadowMult, 1, min(diffuse, shadowLerp(ShadSampler, ShadSize, Input.shadPos.xy, depth + 0.003*(2048.0 / ShadSize.x)))), 1)) * BCol.a;
+	return gammaMul(float4(BCol.xyz, 1), float4(LightCol.xyz*lerp(ShadowMult, 1, min(diffuse, shadowLerp(ShadSampler, ShadSize, Input.shadPos.xy, depth + 0.003*(2048.0 / ShadSize.x)))), 1));
 }
 
 float4 CityObjPSNoShad(ObjVertexOut Input) : COLOR0
@@ -275,7 +275,7 @@ float4 CityObjPSNoShad(ObjVertexOut Input) : COLOR0
 	if (BCol.a < 0.01) discard;
 	float diffuse = 1;//dot(normalize(Input.normal.xyz), LightVec.xyz);
 	if (diffuse < 0) diffuse *= 0.5;
-	return float4(gammaMul(float4(BCol.xyz, 1), float4(LightCol.xyz*lerp(ShadowMult, 1, diffuse),1)).rgb*BCol.a, BCol.a);
+	return float4(gammaMul(float4(BCol.xyz, 1), float4(LightCol.xyz*lerp(ShadowMult, 1, diffuse),1)).rgb, BCol.a);
 }
 
 float4 CityObjPSFog(ObjVertexOut Input) : COLOR0
@@ -287,7 +287,7 @@ float4 CityObjPSFog(ObjVertexOut Input) : COLOR0
 
 	float fogDistance = min(1, length(Input.vPos) / FogMaxDist);
 	BCol = float4(gammaMul(float4(BCol.xyz, 1), float4(LightCol.xyz*lerp(ShadowMult, 1, diffuse), 1)).rgb, BCol.a);
-	BCol.xyz = lerp(BCol.xyz, FogColor.xyz, fogDistance) * BCol.a;
+	BCol.xyz = lerp(BCol.xyz, FogColor.xyz, fogDistance);
 	return BCol;
 }
 
@@ -302,7 +302,7 @@ float4 CityObjPSFogShad(ObjVertexOut Input) : COLOR0
 	BCol = float4(gammaMul(float4(BCol.xyz, 1), float4(LightCol.xyz * lerp(ShadowMult, 1, min(diffuse, shadowLerp(ShadSampler, ShadSize, Input.shadPos.xy, depth + 0.003*(2048.0 / ShadSize.x)))), 1)).rgb, BCol.a);
 
 	float fogDistance = min(1, length(Input.vPos) / FogMaxDist);
-	BCol.xyz = lerp(BCol.xyz, FogColor.xyz, fogDistance) * BCol.a;
+	BCol.xyz = lerp(BCol.xyz, FogColor.xyz, fogDistance);
 	return BCol;
 }
 
