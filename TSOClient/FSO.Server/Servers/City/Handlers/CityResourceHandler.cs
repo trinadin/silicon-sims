@@ -115,7 +115,13 @@ namespace FSO.Server.Servers.City.Handlers
 
             try
             {
-                var ndat = File.ReadAllBytes(Path.Combine(Config.SimNFS, "Lots/" + lot.Value.ToString("x8") + "/thumb.png"));
+                var path = Path.Combine(Config.SimNFS, "Lots/" + lot.Value.ToString("x8") + "/thumb.png");
+                if (!File.Exists(path))
+                {
+                    return new byte[0];
+                }
+
+                var ndat = File.ReadAllBytes(path);
                 MemoryCacher.Add("lt" + shardid + ":" + id, ndat, DateTime.Now.Add(new TimeSpan(1, 0, 0)));
 
                 return ndat;
@@ -139,7 +145,13 @@ namespace FSO.Server.Servers.City.Handlers
 
             try
             {
-                var ndat = File.ReadAllBytes(Path.Combine(Config.SimNFS, "Lots/" + lot.Value.ToString("x8") + "/thumb.fsof"));
+                string path = Path.Combine(Config.SimNFS, "Lots/" + lot.Value.ToString("x8") + "/thumb.fsof");
+                if (!File.Exists(path))
+                {
+                    return new byte[0];
+                }
+
+                var ndat = File.ReadAllBytes(path);
                 MemoryCacher.Add("lf" + shardid + ":" + id, ndat, DateTime.Now.Add(new TimeSpan(1, 0, 0)));
 
                 return ndat;
