@@ -29,7 +29,7 @@ namespace FSO.Client.UI.Panels
 
             var f1 = terrain.Get2DFromTile(x, y);
             var f2 = terrain.Get2DFromTile(x+1, y+1);
-            if (f1.X == float.MaxValue || f2.X == float.MaxValue) return Vector2.Zero;
+            if (f1.X == float.MaxValue || f2.X == float.MaxValue) return null;
             var to = (terrain.Get2DFromTile(x, y) + terrain.Get2DFromTile(x+1, y+1)) / 2;
             return to;
         } 
