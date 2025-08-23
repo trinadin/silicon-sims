@@ -1,4 +1,5 @@
-﻿using FSO.Server.Clients;
+﻿using FSO.Common.Utils;
+using FSO.Server.Clients;
 using FSO.Server.Clients.Framework;
 using FSO.Server.Protocol.Electron.Model;
 using FSO.Server.Protocol.Electron.Packets;
@@ -10,6 +11,7 @@ namespace FSO.Client.Regulators
         public T CurrentRequest;
         private Network.Network Network;
         public NhoodCandidateList CandidateList;
+        public event Callback<object> OnMessage;
 
         public GenericActionRegulator(Network.Network network)
         {
@@ -120,6 +122,10 @@ namespace FSO.Client.Regulators
             else if (message is NhoodCandidateList)
             {
                 CandidateList = (NhoodCandidateList)message;
+            }
+            else
+            {
+                OnMessage?.Invoke(message);
             }
         }
     }

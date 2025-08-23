@@ -37,6 +37,7 @@ namespace FSO.Server.Protocol.Electron
         ArchiveAvatarSelectResponse,
         ArchiveClientList,
         ArchiveModerationRequest,
+        VerificationNotification,
         Unknown = 0xFFFF
     }
 

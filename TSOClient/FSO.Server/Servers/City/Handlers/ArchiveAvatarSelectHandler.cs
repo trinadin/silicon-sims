@@ -45,6 +45,12 @@ namespace FSO.Server.Servers.City.Handlers
             if (session.UserId == 0 || session.AvatarId != 0)
                 return;
 
+
+            if (session is VoltronSession vSession && vSession.Unverified)
+            {
+                return;
+            }
+
             uint avatarId = packet.AvatarId;
             uint userId = session.UserId;
 
@@ -141,11 +147,11 @@ namespace FSO.Server.Servers.City.Handlers
                         }
                     }
 
-                    if (session is VoltronSession vSession)
+                    if (session is VoltronSession vSession2)
                     {
-                        da.Avatars.UpdateModerationLevel(avatarId, (int)vSession.ModerationLevel);
-                        vSession.AvatarId = avatarId;
-                        vSession.AvatarClaimId = claim.Value;
+                        da.Avatars.UpdateModerationLevel(avatarId, (int)vSession2.ModerationLevel);
+                        vSession2.AvatarId = avatarId;
+                        vSession2.AvatarClaimId = claim.Value;
                     }
                     else
                     {

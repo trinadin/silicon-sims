@@ -18,6 +18,7 @@ namespace FSO.Client.UI.Archive
         public UIButton SelectButton;
         public UIImage ListBackground;
         public UIArchivePersonButton AvatarButton;
+        public UILabel StatusLabel;
 
         private UIListBoxTextStyle ListBoxColors;
 
@@ -100,6 +101,19 @@ namespace FSO.Client.UI.Archive
 
             AvatarListBox.InitDefaultSlider();
 
+            var statusStyle = TextStyle.DefaultLabel.Clone();
+            statusStyle.Shadow = true;
+
+            Add(StatusLabel = new UILabel()
+            {
+                Caption = "Loading...",
+                Position = AvatarListBox.Position,
+                Size = AvatarListBox.Size,
+                Wrapped = true,
+                Alignment = TextAlignment.Center | TextAlignment.Middle,
+                CaptionStyle = statusStyle,
+            });
+
             SetSize((int)vbox.Size.X + 40 + 130, (int)vbox.Size.Y + 70);
 
             AvatarButton = new UIArchivePersonButton();
@@ -149,6 +163,17 @@ namespace FSO.Client.UI.Archive
         public void SetData(ArchiveAvatarsResponse data)
         {
             Data = data;
+
+            if (!data.IsVerified)
+            {
+                StatusLabel.Visible = true;
+                StatusLabel.Caption = "Waiting for verification...";
+            }
+            else
+            {
+                StatusLabel.Visible = false;
+            }
+
             RefreshList();
         }
 

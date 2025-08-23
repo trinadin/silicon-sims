@@ -41,12 +41,14 @@ namespace FSO.Server.Protocol.Electron.Packets
         public bool Success => true;
 
         public object OCode => 0;
-
+        public bool IsVerified;
         public ArchiveAvatar[] UserAvatars;
         public ArchiveAvatar[] SharedAvatars;
 
         public override void Deserialize(IoBuffer input, ISerializationContext context)
         {
+            IsVerified = input.GetBool();
+
             int userCount = input.GetInt32();
 
             if (userCount > 8192)
@@ -83,6 +85,8 @@ namespace FSO.Server.Protocol.Electron.Packets
 
         public override void Serialize(IoBuffer output, ISerializationContext context)
         {
+            output.PutBool(IsVerified);
+
             output.PutInt32(UserAvatars.Length);
 
             foreach (var user in UserAvatars)

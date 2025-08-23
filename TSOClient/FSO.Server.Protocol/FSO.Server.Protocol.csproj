@@ -144,6 +144,7 @@
     <Compile Include="Electron\Packets\NhoodResponse.cs" />
     <Compile Include="Electron\Packets\PurchaseLotRequest.cs" />
     <Compile Include="Electron\Packets\PurchaseLotResponse.cs" />
+    <Compile Include="Electron\Packets\VerificationNotification.cs" />
     <Compile Include="Gluon\AbstractElectronPacket.cs" />
     <Compile Include="Gluon\GluonPackets.cs" />
     <Compile Include="Gluon\GluonPacketType.cs" />

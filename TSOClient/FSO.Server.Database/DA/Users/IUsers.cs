@@ -10,6 +10,7 @@ namespace FSO.Server.Database.DA.Users
         void UpdateConnectIP(uint id, string ip);
         void UpdateBanned(uint id, bool banned);
         void UpdateClientID(uint id, string cid);
+        void UpdateVerified(uint id, bool verified);
         User GetByUsername(string username);
         UserAuthenticate GetAuthenticationSettings(uint userId);
         PagedList<User> All(int offset = 0, int limit = 20, string orderBy = "register_date");

@@ -16,8 +16,17 @@ namespace FSO.Client.Controllers
             View = view;
             regulator.OnError += Regulator_OnError;
             regulator.OnTransition += Regulator_OnTransition;
+            regulator.OnMessage += Regulator_OnMessage;
 
             ConnectionReg = regulator;
+        }
+
+        private void Regulator_OnMessage(object data)
+        {
+            if (data is VerificationNotification verification && verification.IsVerified)
+            {
+                Refresh();
+            }
         }
 
         public void Dispose()

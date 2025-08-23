@@ -153,6 +153,7 @@ namespace FSO.Server.Servers.City
                 {
                     // Must be 32 character hash
                     session.Close();
+                    return;
                 }
 
                 // TODO: check IP ban
@@ -161,6 +162,8 @@ namespace FSO.Server.Servers.City
                 var ip = (session.IoSession.RemoteEndPoint as IPEndPoint).Address.ToString();
 
                 bool forceAdmin = ip == "127.0.0.1";
+
+                bool needsVerification = Config.Archive.Flags.HasFlag(FSO.Common.ArchiveConfigFlags.Verification) && !forceAdmin;
 
                 if (user == null)
                 {
@@ -178,7 +181,7 @@ namespace FSO.Server.Servers.City
                         register_ip = ip,
                         last_ip = ip,
                         shared_user = false,
-                        is_verified = true, // TODO: verification mode
+                        is_verified = !needsVerification,
                         display_name = "",
                     };
 
@@ -198,6 +201,7 @@ namespace FSO.Server.Servers.City
                 if (!ValidDisplayName(packet.User))
                 {
                     session.Close();
+                    return;
                 }
 
                 if (packet.User != user.display_name)
@@ -209,6 +213,7 @@ namespace FSO.Server.Servers.City
                     {
                         // TODO: report username is taken
                         session.Close();
+                        return;
                     }
 
                     da.ArchiveUsers.UpdateDisplayName(user.user_id, packet.User);
@@ -224,7 +229,6 @@ namespace FSO.Server.Servers.City
                 }
 
                 // We're authenticated by this point. Upgrade the session to voltron.
-                // TODO: special mode where unverified users can stay connected but not access most endpoints
 
                 var newSession = Sessions.UpgradeSession<VoltronSession>(session, x => {
                     x.UserId = user.user_id;
@@ -235,11 +239,10 @@ namespace FSO.Server.Servers.City
                     session.IsAuthenticated = true;
                     x.Authenticate(packet.Password);
                     x.AvatarClaimId = 0;
+                    x.Unverified = !user.is_verified;
                 });
 
                 BroadcastUserList(false);
-
-                // TODO: verification mode
             }
         }
 

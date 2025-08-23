@@ -133,7 +133,20 @@ namespace FSO.Server.Servers.City.Handlers
                         if (approval)
                         {
                             // Allow session to continue, record in database
-                            // TODO
+
+                            da.Users.UpdateVerified(target.user_id, true);
+
+                            foreach (var targSession in sessions)
+                            {
+                                if (targSession is VoltronSession vSession)
+                                {
+                                    vSession.Unverified = false;
+                                    vSession.Write(new VerificationNotification()
+                                    {
+                                        IsVerified = true
+                                    });
+                                }
+                            }
 
                             Context.BroadcastUserList(false);
                         }
@@ -142,6 +155,11 @@ namespace FSO.Server.Servers.City.Handlers
                             // Close session...
                             foreach (var targSession in sessions)
                             {
+                                targSession.Write(new VerificationNotification()
+                                {
+                                    IsVerified = false
+                                });
+
                                 targSession?.Close();
                             }
                         }

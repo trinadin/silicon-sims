@@ -47,6 +47,19 @@ namespace FSO.Server.Servers.City.Handlers
 
             try
             {
+                if (session is VoltronSession vSession && vSession.Unverified)
+                {
+                    // User must be verified first.
+                    session.Write(new ArchiveAvatarsResponse()
+                    {
+                        IsVerified = false,
+                        UserAvatars = new ArchiveAvatar[0],
+                        SharedAvatars = new ArchiveAvatar[0],
+                    });
+
+                    return;
+                }
+
                 using (var da = DA.Get())
                 {
                     var forUser = da.Avatars.GetByUserId(session.UserId);
@@ -60,6 +73,7 @@ namespace FSO.Server.Servers.City.Handlers
 
                     session.Write(new ArchiveAvatarsResponse()
                     {
+                        IsVerified = true,
                         UserAvatars = userAvatars,
                         SharedAvatars = sharedAvatars
                     });
