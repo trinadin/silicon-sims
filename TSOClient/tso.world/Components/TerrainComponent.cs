@@ -11,6 +11,7 @@ using FSO.Common.Utils;
 using FSO.LotView.LMap;
 using FSO.LotView.Effects;
 using FSO.Common.Model;
+using FSO.LotView.Utils.Camera;
 
 namespace FSO.LotView.Components
 {
@@ -452,7 +453,8 @@ namespace FSO.LotView.Components
             }
             if (VertexBuffer == null) return;
             if (world.Light != null) LightVec = world.Light.LightVec;
-            var transitionIntensity = (world.Camera as WorldCamera3D)?.FromIntensity ?? 0f;
+            var weights = (world.Camera as CameraControllers)?.TransitionWeights;
+            var transitionIntensity = weights?.Count == 1 ? weights[0].Percent : 0f;
             Alpha = 1 - (float)Math.Pow(transitionIntensity, 150f);
 
             device.DepthStencilState = DepthStencilState.Default;

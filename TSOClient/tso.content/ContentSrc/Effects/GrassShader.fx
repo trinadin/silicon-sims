@@ -236,6 +236,14 @@ float4 SimpleLight(float2 uv) {
 	return tex2D(RoomLightSampler, RoomIDToUV(GetRoomID(uv / 3)));
 }
 
+float4 FadeRectangle;
+float FadeWidth;
+float RectangleFade(float2 xz, float extend) {
+	float dx = max(abs(xz.x - FadeRectangle.x) - (FadeRectangle.z + extend), 0.0);
+	float dy = max(abs(xz.y - FadeRectangle.y) - (FadeRectangle.w + extend), 0.0);
+	return min(sqrt(dx * dx + dy * dy) / (FadeWidth - extend), 1.0);
+}
+
 GrassPSVTX GrassVS(GrassVTX input)
 {
     GrassPSVTX output = (GrassPSVTX)0;
@@ -358,6 +366,8 @@ void BladesPS3D(GrassPSVTX input, out float4 color:COLOR0)
 	float4 brown = lerp(LightBrown, DarkBrown, bladeCol);
 	color = gammaMad(lerp(green, brown, input.GrassInfo.x), lightProcessFloor(input.ModelPos) * LightDot(input.Normal), LightSpecular(input.Normal, input.ModelPos));
 	color.a = a;
+	float fade = (1 - RectangleFade(input.ModelPos.xz, 0.0)); // Since it works with stacked layers, the fade needs to be a bit stronger.
+	color.a *= fade * fade;
 	color.a *= Alpha;
 }
 
@@ -475,6 +485,7 @@ void BladesParallaxPS3D(GrassParallaxPSVTX input, out float4 color:COLOR0)
 	float4 brown = lerp(LightBrown, DarkBrown, bladeCol);
 	color = gammaMad(lerp(green, brown, input.GrassInfo.x), lightProcessFloor(input.ModelPos) * LightDot(input.Normal), LightSpecular(input.Normal, input.ModelPos));
 	color.a = a;
+	color.a *= (1 - RectangleFade(input.ModelPos.xz, 0.0));
 	color.a *= Alpha;
 }
 
@@ -701,14 +712,6 @@ void BasePSMul(GrassPSVTX input, out float4 color:COLOR0)
 	c = gammaMul(input.Color, c * (light / DiffuseColor));
 	float diff = length(expected - c.rgb);
 	color = float4(1, 1, 1, 1)*max(0, min(1, (diff - MulBase) * MulRange)) * edgeDist;
-}
-
-float4 FadeRectangle;
-float FadeWidth;
-float RectangleFade(float2 xz, float extend) {
-	float dx = max(abs(xz.x - FadeRectangle.x) - (FadeRectangle.z + extend), 0.0);
-	float dy = max(abs(xz.y - FadeRectangle.y) - (FadeRectangle.w + extend), 0.0);
-	return min(sqrt(dx * dx + dy * dy) / (FadeWidth-extend), 1.0);
 }
 
 void BasePS3D(GrassPSVTX input, out float4 color:COLOR0)
