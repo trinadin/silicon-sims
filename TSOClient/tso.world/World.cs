@@ -894,6 +894,11 @@ namespace FSO.LotView
 
             //fall back to base positioning
             var bplane = new Plane(new Vector3(0, 0, 0), new Vector3(Blueprint.Width * 3, 0, 0), new Vector3(0, 0, Blueprint.Height * 3));
+            if (ray.Position.Y < 0)
+            {
+                ray.Direction *= -1;
+            }
+
             var cast = ray.Intersects(bplane);
             if (cast != null)
             {
@@ -921,7 +926,10 @@ namespace FSO.LotView
         public Vector3 EstTileAtPosWithScrollHeight(Vector2 pos, sbyte startFloor = -1)
         {
             var result = EstTileAtPosWithScroll3D(pos, startFloor);
-            result.Z = Blueprint.InterpAltitude(result) + (result.Z-1) * 2.95f;
+
+            float altitude = Blueprint.TileInbounds(new Vector2(result.X, result.Y)) ? Blueprint.InterpAltitude(result) : 0;
+
+            result.Z = altitude + (result.Z-1) * 2.95f;
             return result;
         }
 

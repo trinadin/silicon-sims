@@ -489,9 +489,11 @@ namespace FSO.LotView.Components
             Effect.ScreenMatrix = smat;
             var anchor = cam2d.RotationAnchor;
             var ctr = new Vector2();
+
+            var altOff = Bp.BaseAlt * Bp.TerrainFactor * 3;
             if (anchor != null)
             {
-                ctr = world.WorldSpace.GetScreenFromTile(new Vector2(anchor.Value.X, anchor.Value.Y));
+                ctr = world.WorldSpace.GetScreenFromTile(new Vector3(anchor.Value.X, anchor.Value.Y, -altOff / 3));
                 ctr -= world.WorldSpace.GetScreenFromTile(new Vector2(cam2d.CenterTile.X, cam2d.CenterTile.Y));
             }
             ctr += world.WorldSpace.WorldPx / 2;
@@ -505,7 +507,6 @@ namespace FSO.LotView.Components
             var translation = ((world.Zoom == WorldZoom.Far) ? -7 : ((world.Zoom == WorldZoom.Medium) ? -5 : -3)) * (20 / 522f);
             if (world.PreciseZoom < 1) translation /= world.PreciseZoom;
             else translation *= world.PreciseZoom;
-            var altOff = Bp.BaseAlt * Bp.TerrainFactor * 3;
             var worldmat = Matrix.Identity * Matrix.CreateTranslation(0, translation - altOff, 0);
             Effect.World = worldmat;
             if (_3d) Effect.CamPos = world.Camera.Position + (world.Cameras.ModelTranslation ?? new Vector3());

@@ -173,13 +173,23 @@ namespace FSO.LotView.Model
         public float InterpAltitude(Vector3 Position)
         {
             if (Altitude == null) return 0f;
-            var baseX = (int)Math.Max(1, Math.Min(Width-1, Position.X));
-            var baseY = (int)Math.Max(1, Math.Min(Height-1, Position.Y));
+            var baseX = (int)Math.Max(1, Math.Min(Width-1, Math.Floor(Position.X)));
+            var baseY = (int)Math.Max(1, Math.Min(Height-1, Math.Floor(Position.Y)));
             if (baseX < 0 || baseY < 0) return 0;
             var nextX = (int)Math.Max(1, Math.Min(Width - 1, Math.Ceiling(Position.X)));
             var nextY = (int)Math.Max(1, Math.Min(Height - 1, Math.Ceiling(Position.Y)));
             var xLerp = Position.X % 1f;
             var yLerp = Position.Y % 1f;
+
+            if (xLerp < 0)
+            {
+                xLerp = -xLerp;
+            }
+
+            if (yLerp < 0)
+            {
+                yLerp = -yLerp;
+            }
 
             var by = (baseY % Height) * Width;
             var bx = (baseX % Width);

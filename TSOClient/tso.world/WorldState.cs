@@ -374,6 +374,8 @@ namespace FSO.LotView
         {
             var ray = CameraRayAtScreenPos(WorldSpace.WorldPx / 2);
             ray.Position = new Vector3(pos.X, pos.Z, pos.Y);
+
+            if (pos.Z < 0) ray.Direction *= -1;
             var groundPlane = new Plane(new Vector3(0, 1, 0), 0);
             var t = ray.Intersects(groundPlane);
             if (t == null) return new Vector2(pos.X, pos.Y);
