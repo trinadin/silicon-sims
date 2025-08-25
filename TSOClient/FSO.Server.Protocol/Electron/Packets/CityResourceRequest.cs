@@ -36,6 +36,7 @@ namespace FSO.Server.Protocol.Electron.Packets
     public enum CityResourceRequestType : byte
     {
         LOT_THUMBNAIL = 0,
-        LOT_FACADE = 1
+        LOT_FACADE = 1,
+        AVATAR_DESCRIPTION = 2
     }
 }

@@ -24,13 +24,15 @@ namespace FSO.Server.Servers.City.Handlers
             Kernel = kernel;
         }
 
-        private static ArchiveAvatar ToArchiveAvatar(DbAvatar ava)
+        private static ArchiveAvatar ToArchiveAvatar(DbAvatarSummary ava)
         {
             return new ArchiveAvatar()
             {
                 AvatarId = ava.avatar_id,
                 UserId = ava.user_id,
+                LotId = ava.lot_location ?? 0,
                 Name = ava.name,
+                LotName = ava.lot_name,
                 Type = (AvatarAppearanceType)ava.skin_tone,
                 Head = ava.head,
                 Body = ava.body
@@ -62,13 +64,13 @@ namespace FSO.Server.Servers.City.Handlers
 
                 using (var da = DA.Get())
                 {
-                    var forUser = da.Avatars.GetByUserId(session.UserId);
+                    var forUser = da.Avatars.GetSummaryByUserId(session.UserId);
 
                     var userAvatars = forUser.Select(ToArchiveAvatar).ToArray();
 
                     // TODO: cache?
 
-                    var shared = da.Avatars.GetByUserId(1);
+                    var shared = da.Avatars.GetSummaryByUserId(1);
                     var sharedAvatars = shared.Select(ToArchiveAvatar).ToArray();
 
                     session.Write(new ArchiveAvatarsResponse()

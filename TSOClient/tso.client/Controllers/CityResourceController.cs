@@ -24,7 +24,7 @@ namespace FSO.Client.Controllers
 
         private Network.Network Network;
         private ConcurrentDictionary<uint, CityResourceCallback> Callbacks;
-        private int CallbackID = 0;
+        private static int CallbackID = 0;
 
         public CityResourceController(Network.Network network)
         {
@@ -75,6 +75,21 @@ namespace FSO.Client.Controllers
                 Type = CityResourceRequestType.LOT_FACADE,
                 RequestID = requestId,
                 ResourceID = location,
+            });
+
+            Callbacks.TryAdd(requestId, new CityResourceCallback(requestId, callback));
+        }
+
+        public void GetAvatarDescriptionAsync(uint shardID, uint avatarId, Action<byte[]> callback)
+        {
+            callback = CallbackOnMainThread(callback);
+            var requestId = GetRequestID();
+
+            Network.CityClient.Write(new CityResourceRequest()
+            {
+                Type = CityResourceRequestType.AVATAR_DESCRIPTION,
+                RequestID = requestId,
+                ResourceID = avatarId,
             });
 
             Callbacks.TryAdd(requestId, new CityResourceCallback(requestId, callback));

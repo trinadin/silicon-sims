@@ -9,7 +9,9 @@ namespace FSO.Server.Protocol.Electron.Packets
     {
         public uint UserId;
         public uint AvatarId;
+        public uint LotId;
         public string Name;
+        public string LotName;
         public AvatarAppearanceType Type;
         public ulong Head;
         public ulong Body;
@@ -20,7 +22,9 @@ namespace FSO.Server.Protocol.Electron.Packets
             {
                 UserId = input.GetUInt32(),
                 AvatarId = input.GetUInt32(),
+                LotId = input.GetUInt32(),
                 Name = input.GetPascalVLCString(),
+                LotName = input.GetPascalVLCString(),
                 Head = input.GetUInt64(),
                 Body = input.GetUInt64(),
             };
@@ -30,7 +34,9 @@ namespace FSO.Server.Protocol.Electron.Packets
         {
             output.PutUInt32(UserId);
             output.PutUInt32(AvatarId);
+            output.PutUInt32(LotId);
             output.PutPascalVLCString(Name);
+            output.PutPascalVLCString(LotName);
             output.PutUInt64(Head);
             output.PutUInt64(Body);
         }

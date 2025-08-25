@@ -162,6 +162,23 @@ namespace FSO.Server.Servers.City.Handlers
             }
         }
 
+        private byte[] GetAvatarDescription(int shardId, uint avatarId)
+        {
+            string data = "";
+
+            using (var da = DA.Get())
+            {
+                var ava = da.Avatars.Get(avatarId);
+
+                if (ava != null)
+                {
+                    data = ava.description;
+                }
+            }
+
+            return Encoding.UTF8.GetBytes(data);
+        }
+
         public void Handle(IVoltronSession session, CityResourceRequest packet)
         {
             byte[] data = null;
@@ -178,6 +195,9 @@ namespace FSO.Server.Servers.City.Handlers
                             break;
                         case CityResourceRequestType.LOT_FACADE:
                             data = GetLotFacade(shard, packet.ResourceID);
+                            break;
+                        case CityResourceRequestType.AVATAR_DESCRIPTION:
+                            data = GetAvatarDescription(shard, packet.ResourceID);
                             break;
                     }
 

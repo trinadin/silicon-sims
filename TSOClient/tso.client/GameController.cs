@@ -38,6 +38,7 @@ namespace FSO.Client
 
         private EmbeddedServer Server;
         private UIDialog ShutdownDialog;
+        private uint? ArchiveLotId;
 
         public GameController(IKernel kernel)
         {
@@ -255,10 +256,16 @@ namespace FSO.Client
             });
         }
 
+        public void SetArchiveLot(uint lotId)
+        {
+            ArchiveLotId = lotId;
+        }
+
         public void ConnectToArchive(string displayName, string address, bool selfHost)
         {
+            ArchiveLotId = null;
             var controller = CurrentController as ConnectArchiveController;
-            controller.Connect(displayName, address, selfHost, () => { GotoCity(controller.AvatarData, null); }, new Common.Utils.Callback(Disconnect));
+            controller.Connect(displayName, address, selfHost, () => { GotoCity(controller.AvatarData, ArchiveLotId); }, new Common.Utils.Callback(Disconnect));
         }
 
         public void RetireAvatar(string cityName, uint avatarId)

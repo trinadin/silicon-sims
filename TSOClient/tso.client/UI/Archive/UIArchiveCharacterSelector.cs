@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace FSO.Client.UI.Archive
 {
-    internal class UIArchiveCharacterSelector : UIDialog
+    internal class UIArchiveCharacterSelector : UIDialog, IArchiveCharacterSelector
     {
         public UITextBox SearchBox;
         public UIButton SearchButton;

@@ -6,14 +6,21 @@ using System;
 
 namespace FSO.Client.Controllers
 {
+    public interface IArchiveCharacterSelector
+    {
+        void SetData(ArchiveAvatarsResponse data);
+    }
+
     internal class ArchiveCharactersSelectorController : IDisposable
     {
-        private UIArchiveCharacterSelector View;
+        private IArchiveCharacterSelector View;
         private GenericActionRegulator<ArchiveAvatarsRequest, ArchiveAvatarsResponse> ConnectionReg;
+        public CityResourceController CityResource;
 
-        public ArchiveCharactersSelectorController(UIArchiveCharacterSelector view, GenericActionRegulator<ArchiveAvatarsRequest, ArchiveAvatarsResponse> regulator)
+        public ArchiveCharactersSelectorController(IArchiveCharacterSelector view, Network.Network network, GenericActionRegulator<ArchiveAvatarsRequest, ArchiveAvatarsResponse> regulator)
         {
             View = view;
+            CityResource = new CityResourceController(network);
             regulator.OnError += Regulator_OnError;
             regulator.OnTransition += Regulator_OnTransition;
             regulator.OnMessage += Regulator_OnMessage;
@@ -33,6 +40,8 @@ namespace FSO.Client.Controllers
         {
             ConnectionReg.OnError -= Regulator_OnError;
             ConnectionReg.OnTransition -= Regulator_OnTransition;
+
+            CityResource.Dispose();
         }
 
         public void Refresh()

@@ -9,6 +9,7 @@ using FSO.Common.DatabaseService.Model;
 using FSO.Common.Utils;
 using FSO.HIT;
 using FSO.Server.Embedded;
+using FSO.Server.Protocol.CitySelector;
 using FSO.Server.Protocol.Electron.Packets;
 using System;
 
@@ -27,10 +28,12 @@ namespace FSO.Client.Controllers
         private CityConnectionRegulator CityConnectionRegulator;
         private Callback onConnect;
         private Callback onError;
-        private UIDialog Dialog;
+        private UIElement Dialog;
         public LoadAvatarByIDResponse AvatarData;
 
         private ConnectArchiveMode LastMode;
+
+        public ShardSelectorServletRequest Shard => CityConnectionRegulator.CurrentShard;
 
         public ConnectArchiveController(TransitionScreen view,
                                      CityConnectionRegulator cityConnectionRegulator)
@@ -98,8 +101,13 @@ namespace FSO.Client.Controllers
             CityConnectionRegulator.AsyncTransition("AskForAvatarData");
         }
 
-        public void SelectAvatar(uint avatarId)
+        public void SelectAvatar(uint avatarId, uint lotId = 0)
         {
+            if (lotId != 0)
+            {
+                FSOFacade.Controller.SetArchiveLot(lotId);
+            }
+
             CityConnectionRegulator.AsyncProcessMessage(new ArchiveAvatarSelectRequest()
             {
                 AvatarId = avatarId
@@ -128,7 +136,7 @@ namespace FSO.Client.Controllers
             onError();
         }
 
-        private void ShowMainDialog(UIDialog dialog)
+        private void ShowMainDialog(UIElement dialog)
         {
             // if there's currently a dialog, dispose of it
             if (Dialog != null)
@@ -181,7 +189,7 @@ namespace FSO.Client.Controllers
                         View.SetProgressArchive((5.0f / 14.0f) * 100, "Connected, awaiting avatar selection");
 
                         // Show the avatar selection UI.
-                        ShowMainDialog(new UIArchiveCharacterSelector());
+                        ShowMainDialog(new ArchivePersonSelection());
 
                         break;
                     case "ArchiveSelectAvatar":
