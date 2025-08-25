@@ -309,6 +309,104 @@ namespace FSO.Client.Rendering.City.Graph
         public IndexBuffer Indices;
         public float Size;
 
+        /// <summary>
+        /// Clip the voronoi cell against the given line.
+        /// Points are considered in-bounds if they're to the right of the line.
+        /// </summary>
+        /// <param name="clipFrom">Clipping line start</param>
+        /// <param name="clipTo">Clipping line end</param>
+        public void Clip(Vector2 clipFrom, Vector2 clipTo)
+        {
+            if (Cycle.Length <= 1)
+            {
+                return;
+            }
+
+            var dir = Vector2.Normalize(clipTo - clipFrom);
+            var normal = new Vector2(-dir.Y, dir.X);
+            var clipDot = Vector2.Dot(normal, clipFrom);
+
+            // A positive 
+
+            var result = new List<Vector2>();
+
+            for (int i = 1; i < Cycle.Length + 1; i++)
+            {
+                Vector2 lFrom = Cycle[i - 1];
+                Vector2 lTo = Cycle[i % Cycle.Length];
+                Vector2 lVec = lTo - lFrom;
+
+                float fromDist = Vector2.Dot(normal, lFrom) - clipDot;
+                float toDist = Vector2.Dot(normal, lTo) - clipDot;
+
+                bool partialClip = fromDist > 0 != toDist > 0;
+                if (partialClip)
+                {
+                    float totalDist = Math.Abs(fromDist) + Math.Abs(toDist);
+                    float clipFraction = Math.Abs(fromDist) / totalDist;
+
+                    if (fromDist > 0)
+                    {
+                        // The "from" part of the line is in bounds.
+                        if (result.Count == 0)
+                        {
+                            result.Add(lFrom);
+                        }
+
+                        result.Add(lFrom + lVec * clipFraction);
+                    }
+                    else
+                    {
+                        // The "to" part of the line is in bounds.
+
+                        result.Add(lFrom + lVec * clipFraction);
+
+                        result.Add(lTo);
+                    }
+                }
+                else if (fromDist <= 0)
+                {
+                    // The whole line is clipped - don't include it.
+                }
+                else
+                {
+                    if (result.Count == 0)
+                    {
+                        result.Add(lFrom);
+                    }
+
+                    result.Add(lTo);
+                }
+            }
+
+            for (int i = 1; i < result.Count; i++)
+            {
+                if (result[i] == result[i-1])
+                {
+                    result.RemoveAt(i--);
+                }
+            }
+
+            if (result.Count > 1 && result[0] == result[result.Count - 1])
+            {
+                result.RemoveAt(result.Count - 1);
+            }
+
+            Cycle = result.ToArray();
+        }
+
+        public void RecalculateCenter()
+        {
+            // Not completely accurate, but it serves its purpose.
+            var total = new Vector2();
+            foreach (Vector2 vec in Cycle)
+            {
+                total += vec;
+            }
+
+            Center = total / Cycle.Length;
+        }
+
         public void Dispose()
         {
             Vertices?.Dispose();

@@ -93,11 +93,22 @@ namespace FSO.Client.Rendering.City
             pts.Add(new Vector2(-margin, mapSize + margin));
             pts.Add(new Vector2(mapSize + margin, mapSize + margin));
 
+            int tLOffset = 306;
+            int brOffset = 205;
+
             Cells = new VoronoiCellGraph(pts).Result;
             NHoodToCell.Clear();
             var index = 0;
             foreach (var cell in Cells)
             {
+                // Clip against the map boundaries
+                cell.Clip(new Vector2(0, tLOffset), new Vector2(tLOffset, 0));
+                cell.Clip(new Vector2(tLOffset, 0), new Vector2(mapSize, brOffset));
+                cell.Clip(new Vector2(mapSize, brOffset), new Vector2(brOffset, mapSize));
+                cell.Clip(new Vector2(brOffset, mapSize), new Vector2(0, tLOffset));
+
+                cell.RecalculateCenter();
+
                 //follow cell vertices, making them into a mesh.
                 var cV = new List<DGRP3DVert>();
                 var cI = new List<int>();
