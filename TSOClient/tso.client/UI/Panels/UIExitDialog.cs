@@ -25,7 +25,10 @@ namespace FSO.Client.UI.Panels
 
         private void ExitButton_OnButtonClick(UIElement button)
         {
-            GameFacade.Kill();
+            if (FSOFacade.Controller.CloseAttempt())
+            {
+                GameFacade.Kill();
+            }
         }
 
         private void CancelButton_OnButtonClick(UIElement button)

@@ -39,6 +39,8 @@ namespace FSO.Server.Servers.City.Handlers
                 // All requests are against users for now
                 var target = da.Users.GetById(packet.EntityId);
 
+                if (target == null) return;
+
                 int userLevel = target.is_admin ? 2 : (target.is_moderator ? 1 : 0);
 
                 if (userLevel >= myLevel)

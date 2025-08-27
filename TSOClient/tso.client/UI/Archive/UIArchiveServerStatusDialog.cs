@@ -51,7 +51,14 @@ namespace FSO.Client.UI.Archive
                 {
                     GameThread.NextUpdate((state) =>
                     {
-                        GameFacade.Kill();
+                        if (onComplete != null)
+                        {
+                            onComplete();
+                        }
+                        else
+                        {
+                            GameFacade.Kill();
+                        }
                     });
                 });
             }

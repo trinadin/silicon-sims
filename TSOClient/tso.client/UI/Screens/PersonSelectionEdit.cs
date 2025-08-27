@@ -280,7 +280,10 @@ namespace FSO.Client.UI.Screens
 
         private void m_ExitButton_OnButtonClick(UIElement button)
         {
-            GameFacade.Kill();
+            if (FSOFacade.Controller.CloseAttempt())
+            {
+                GameFacade.Kill();
+            }
         }
 
         private void CancelButton_OnButtonClick(UIElement button)

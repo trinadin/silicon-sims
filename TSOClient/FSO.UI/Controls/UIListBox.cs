@@ -454,7 +454,7 @@ namespace FSO.Client.UI.Controls
                 var rowY = i * RowHeight;
                 var columnX = 0;
 
-                var selected = rowIndex == m_SelectedRow;
+                var selected = rowIndex == m_SelectedRow || ValuePointer.Get<Boolean>(row.UseSelectedStyleByDefault);
                 var hover = rowIndex == m_HoverRow;
                 if (selected)
                 {
@@ -701,6 +701,7 @@ namespace FSO.Client.UI.Controls
         public object Disabled = false;
         public UIListBoxTextStyle CustomStyle;
         public object UseDisabledStyleByDefault = false; //Offline avatars and properties use the disabled style without the row being disabled
+        public object UseSelectedStyleByDefault = false;
 
         public UIListBoxItem(object data, params object[] columns)
         {

@@ -71,6 +71,18 @@ namespace FSO.Client.Controllers
             View.SetSandboxVisibility(sandboxVisible);
         }
 
+        public void ReturnToSAS(Callback onConnect, Callback onError)
+        {
+            this.onConnect = onConnect;
+            this.onError = onError;
+
+            if (!CityConnectionRegulator.ReturnToSASArchive())
+            {
+                // If we can't do this, re-initialize archive mode.
+                Initialize();
+            }
+        }
+
         public void Connect(string displayName, string address, bool selfHost, Callback onConnect, Callback onError)
         {
             this.onConnect = onConnect;

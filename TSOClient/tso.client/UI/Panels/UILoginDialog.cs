@@ -160,7 +160,10 @@ namespace FSO.Client.UI.Panels
 
         void exitBtn_OnButtonClick(UIElement button)
         {
-            GameFacade.Kill();
+            if (FSOFacade.Controller.CloseAttempt())
+            {
+                GameFacade.Kill();
+            }
             /*var exitDialog = new UIExitDialog();
             Parent.Add(exitDialog);*/
         }

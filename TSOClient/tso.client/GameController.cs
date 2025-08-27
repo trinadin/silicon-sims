@@ -307,6 +307,15 @@ namespace FSO.Client
             });
         }
 
+        public void ReturnToSASArchive()
+        {
+            // Change back to the archive transition screen and reconnect.
+            ChangeState<TransitionScreen, ConnectArchiveController>((view, controller) =>
+            {
+                controller.ReturnToSAS(() => { GotoCity(controller.AvatarData, ArchiveLotId); }, new Common.Utils.Callback(Disconnect));
+            });
+        }
+
         public void GotoCAS(bool archive = false){
             ChangeState<PersonSelectionEdit, PersonSelectionEditController>((view, controller) => {
                 controller.Archive = true;
@@ -347,7 +356,7 @@ namespace FSO.Client
             //to SAS or login screen
             if (forceLogin)
                 ShowLogin();
-            else 
+            else
                 ShowPersonSelection();
         }
 

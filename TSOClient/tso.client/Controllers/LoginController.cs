@@ -152,7 +152,11 @@ namespace FSO.Client.Controllers
                     System.Diagnostics.Process.Start(args);
                 }
             }
-            GameFacade.Kill();
+
+            if (FSOFacade.Controller.CloseAttempt())
+            {
+                GameFacade.Kill();
+            }
         }
 
         public void Dispose()

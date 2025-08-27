@@ -81,7 +81,7 @@ namespace FSO.Server.Protocol.Electron.Packets
                 throw new System.Exception($"Too many pending verifications: {verificationCount}");
             }
 
-            Pending = new ArchivePendingVerification[clientCount];
+            Pending = new ArchivePendingVerification[verificationCount];
             for (int i = 0; i < verificationCount; i++)
             {
                 Pending[i] = ArchivePendingVerification.Deserialize(input);

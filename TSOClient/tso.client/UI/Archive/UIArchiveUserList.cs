@@ -2,6 +2,7 @@
 using FSO.Client.UI.Controls;
 using FSO.Client.UI.Framework;
 using FSO.Client.UI.Panels;
+using FSO.Common;
 using FSO.Common.Rendering.Framework.Model;
 using FSO.Server.Protocol.Electron.Model;
 using FSO.Server.Protocol.Electron.Packets;
@@ -18,11 +19,26 @@ namespace FSO.Client.UI.Archive
         private UIListBoxTextStyle ListBoxColors;
         private UIListBox UserListBox;
 
-        private Texture2D AdminActionsButtonTexture = GetTexture(0x0000034200000001);
+        private Texture2D AdminActionsButtonTexture;
+
+        private Texture2D UserAdminIcon;
+        private Texture2D UserModIcon;
+        private Texture2D UserVerifyIcon;
+
+        private int FrameCount;
 
         public UIArchiveUserList() : base(UIDialogStyle.Close, true)
         {
             Caption = "User List";
+
+            var gd = GameFacade.GraphicsDevice;
+
+            var ui = Content.Content.Get().CustomUI;
+            AdminActionsButtonTexture = ui.Get("archive_burgermenu.png").Get(gd);
+
+            UserAdminIcon = ui.Get("archive_useradmin.png").Get(gd);
+            UserModIcon = ui.Get("archive_usermod.png").Get(gd);
+            UserVerifyIcon = ui.Get("archive_userverify.png").Get(gd);
 
             var vbox = new UIVBoxContainer();
 
@@ -37,7 +53,7 @@ namespace FSO.Client.UI.Archive
                 DisabledColor = new Color(150, 150, 150)
             };
 
-            ListBackground = new UIImage(GetTexture((ulong)0x7A400000001)).With9Slice(13, 13, 13, 13);
+            ListBackground = new UIImage(ui.Get("archive_translist.png").Get(gd)).With9Slice(13, 13, 13, 13);
             ListBackground.SetSize(180, 300);
             vbox.Add(ListBackground);
 
@@ -55,8 +71,8 @@ namespace FSO.Client.UI.Archive
                 {
                     new UIListBoxColumn() { Width = 25, Alignment = TextAlignment.Left }, // Avatar button
                     new UIListBoxColumn() { Width = 100, Alignment = TextAlignment.Left | TextAlignment.Middle }, // Display name, unique ID
-                    new UIListBoxColumn() { Width = 16, Alignment = TextAlignment.Left | TextAlignment.Middle }, // Admin status
-                    new UIListBoxColumn() { Width = 16, Alignment = TextAlignment.Left | TextAlignment.Middle }, // Admin actions
+                    new UIListBoxColumn() { Width = 20, Alignment = TextAlignment.Left | TextAlignment.Middle }, // Admin status
+                    new UIListBoxColumn() { Width = 14, Alignment = TextAlignment.Left | TextAlignment.Middle }, // Admin actions
                 },
                 RowHeight = 20,
                 FontStyle = searchFont,
@@ -70,6 +86,11 @@ namespace FSO.Client.UI.Archive
             SetSize((int)vbox.Size.X + 30 + 16, (int)vbox.Size.Y + 60);
 
             CloseButton.OnButtonClick += Close;
+        }
+
+        private bool FlashActive()
+        {
+            return (FrameCount % FSOEnvironment.RefreshRate) < FSOEnvironment.RefreshRate / 2;
         }
 
         private void Close(UIElement button)
@@ -88,18 +109,29 @@ namespace FSO.Client.UI.Archive
                 {
                     UpdateList(list);
                 }
+
+                FrameCount++;
+                if (FrameCount % (FSOEnvironment.RefreshRate / 2) == 0)
+                {
+                    bool flash = FlashActive();
+                    foreach (var item in UserListBox.Items)
+                    {
+                        if (item.Data is ArchivePendingVerification) { }
+                        item.UseSelectedStyleByDefault = flash;
+                    }
+                }
             }
 
             base.Update(state);
         }
 
-        private void Approve(ArchiveClient client)
+        private void Approve(ArchivePendingVerification client)
         {
             var controller = FindController<FSO.Client.Controllers.CoreGameScreenController>();
             controller?.ArchiveModRequest(client.UserId, ArchiveModerationRequestType.APPROVE_USER);
         }
 
-        private void Reject(ArchiveClient client)
+        private void Reject(ArchivePendingVerification client)
         {
             var controller = FindController<FSO.Client.Controllers.CoreGameScreenController>();
             controller?.ArchiveModRequest(client.UserId, ArchiveModerationRequestType.REJECT_USER);
@@ -127,6 +159,33 @@ namespace FSO.Client.UI.Archive
                     controller?.ArchiveModRequest(client.UserId, ArchiveModerationRequestType.BAN_USER);
                 }
             });
+        }
+
+        private void Ban(ArchivePendingVerification client)
+        {
+            UIAlert.YesNo($"Ban {client.DisplayName}", $"Are you sure you want to ban {client.DisplayName} from the server? They won't be able to apply for verification from the same client or IP, until they are manually unbanned from the users list.", true, (bool result) =>
+            {
+                if (result)
+                {
+                    var controller = FindController<FSO.Client.Controllers.CoreGameScreenController>();
+                    controller?.ArchiveModRequest(client.UserId, ArchiveModerationRequestType.BAN_USER);
+                }
+            });
+        }
+
+        private Texture2D GetModIcon(uint level)
+        {
+            switch (level)
+            {
+                case 0:
+                    return null;
+                case 1:
+                    return UserModIcon;
+                case 2:
+                    return UserAdminIcon;
+            }
+
+            return null;
         }
 
         private string GetModString(int level)
@@ -161,49 +220,51 @@ namespace FSO.Client.UI.Archive
             });
         }
 
+        private void OpenActions(UIElement anchor, ArchivePendingVerification client)
+        {
+            int myLevel = 2;
+            var items = new List<UIContextMenuItem>();
+
+            if (myLevel > 0)
+            {
+                items.Add(new UIContextMenuItem("Approve", () => { Approve(client); }));
+                items.Add(new UIContextMenuItem("Reject", () => { Reject(client); }));
+                items.Add(new UIContextMenuItem("Ban", () => { Ban(client); }));
+            }
+
+            new UIContextMenu(anchor, items, this);
+        }
+
         private void OpenActions(UIElement anchor, ArchiveClient client)
         {
             int myLevel = 2;
             int theirLevel = (int)client.ModerationLevel;
-            bool verify = false;
 
             var items = new List<UIContextMenuItem>();
 
-            if (verify)
+            if (myLevel == 2)
             {
-                if (myLevel > 0)
+                // Change moderation level for this user
+                if (theirLevel != 2)
                 {
-                    items.Add(new UIContextMenuItem("Approve", () => { Approve(client); }));
-                    items.Add(new UIContextMenuItem("Reject", () => { Reject(client); }));
-                    items.Add(new UIContextMenuItem("Ban", () => { Ban(client); }));
+                    items.Add(new UIContextMenuItem("Make Admin", () => { ChangePermissions(client, theirLevel, 2); }));
+                }
+
+                if (theirLevel != 1)
+                {
+                    items.Add(new UIContextMenuItem("Make Moderator", () => { ChangePermissions(client, theirLevel, 1); }));
+                }
+
+                if (theirLevel != 0)
+                {
+                    items.Add(new UIContextMenuItem("Revoke Admin/Mod", () => { ChangePermissions(client, theirLevel, 0); }));
                 }
             }
-            else
+
+            if (myLevel > 0 && myLevel > theirLevel)
             {
-                if (myLevel == 2)
-                {
-                    // Change moderation level for this user
-                    if (theirLevel != 2)
-                    {
-                        items.Add(new UIContextMenuItem("Make Admin", () => { ChangePermissions(client, theirLevel, 2); }));
-                    }
-
-                    if (theirLevel != 1)
-                    {
-                        items.Add(new UIContextMenuItem("Make Moderator", () => { ChangePermissions(client, theirLevel, 1); }));
-                    }
-
-                    if (theirLevel != 0)
-                    {
-                        items.Add(new UIContextMenuItem("Revoke Admin/Mod", () => { ChangePermissions(client, theirLevel, 0); }));
-                    }
-                }
-
-                if (myLevel > 0 && myLevel > theirLevel)
-                {
-                    items.Add(new UIContextMenuItem("Kick", () => { Kick(client); }));
-                    items.Add(new UIContextMenuItem("Ban", () => { Ban(client); }));
-                }
+                items.Add(new UIContextMenuItem("Kick", () => { Kick(client); }));
+                items.Add(new UIContextMenuItem("Ban", () => { Ban(client); }));
             }
 
             new UIContextMenu(anchor, items, this);
@@ -215,10 +276,33 @@ namespace FSO.Client.UI.Archive
 
             Caption = $"User List ({list?.Clients?.Length ?? 0})";
 
+            bool flash = FlashActive();
+
             var items = new List<UIListBoxItem>();
 
             if (list != null)
             {
+                foreach (var client in list.Pending)
+                {
+                    var actionButton = new UIButton(AdminActionsButtonTexture);
+
+                    actionButton.OnButtonClick += (UIElement element) =>
+                    {
+                        OpenActions(element, client);
+                    };
+
+                    items.Add(new UIListBoxItem(
+                        client,
+                        "",
+                        client.DisplayName,
+                        null,
+                        actionButton)
+                    {
+                        CustomStyle = ListBoxColors,
+                        UseSelectedStyleByDefault = flash
+                    });
+                }
+
                 foreach (var client in list.Clients)
                 {
                     var actionButton = new UIButton(AdminActionsButtonTexture);
@@ -234,10 +318,11 @@ namespace FSO.Client.UI.Archive
                             ? (object)""
                             : new UIPersonButton() { FrameSize = UIPersonButtonSize.SMALL, AvatarId = client.AvatarId },
                         client.DisplayName,
-                        client.ModerationLevel,
+                        GetModIcon(client.ModerationLevel),
                         actionButton)
                     {
                         CustomStyle = ListBoxColors,
+                        UseSelectedStyleByDefault = flash
                     });
                 }
             }

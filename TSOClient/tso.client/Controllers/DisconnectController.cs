@@ -69,7 +69,18 @@ namespace FSO.Client.Controllers
             CityConnectionRegulator.Disconnect();
             LotConnectionRegulator.Disconnect();
 
-            if (!forceLogin) LoginRegulator.AsyncTransition("AvatarData");
+            if (!forceLogin)
+            {
+                if (CityConnectionRegulator.Mode != CityConnectionMode.ARCHIVE)
+                {
+                    LoginRegulator.AsyncTransition("AvatarData");
+                }
+                else
+                {
+                    targetComplete = 1;
+                    this.onDisconnected = (_) => FSOFacade.Controller.ReturnToSASArchive();
+                }
+            }
         }
 
         public void Dispose()

@@ -247,6 +247,17 @@ namespace FSO.Client.Regulators
             }
         }
 
+        public bool ReturnToSASArchive()
+        {
+            if (ArchiveSettings != null)
+            {
+                ConnectArchive(ArchiveSettings);
+                return true;
+            }
+
+            return false;
+        }
+
         public void Disconnect(){
             AsyncTransition("Disconnect");
         }
