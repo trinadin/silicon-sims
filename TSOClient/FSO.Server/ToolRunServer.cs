@@ -144,7 +144,7 @@ namespace FSO.Server
             if (Config.Services.UserApi != null &&
                 Config.Services.UserApi.Enabled)
             {
-                if (Config.Archive == null)
+                if (Config.Archive == null || Config.Archive.AllowUserApi)
                 {
                     var childKernel = new ChildKernel(
                         Kernel

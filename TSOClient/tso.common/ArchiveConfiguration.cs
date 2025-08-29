@@ -29,6 +29,7 @@ namespace FSO.Common
         public ushort LotPort { get; set; }
         public string ServerKey { get; set; }
         public float GameScale { get; set; } = 1;
+        public bool AllowUserApi { get; set; }
 
         // Runtime
         public IDisposable[] Disposables;

