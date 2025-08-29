@@ -79,6 +79,7 @@ namespace FSO.Client.UI.Archive
                 SelectionFillColor = new Color(250, 200, 140),
                 ScrollbarImage = GetTexture(0x31000000001),
                 ScrollbarGutter = 12,
+                UseChildElements = true,
             });
 
             UserListBox.InitDefaultSlider();

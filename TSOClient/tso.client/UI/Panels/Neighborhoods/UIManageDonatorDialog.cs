@@ -61,6 +61,7 @@ namespace FSO.Client.UI.Panels.Neighborhoods
             Add(Dropdown);
 
             RoommateListSlider.AttachButtons(RoommateListScrollUpButton, RoommateScrollDownButton, 1);
+            RoommateListBox.UseChildElements = true;
             RoommateListBox.AttachSlider(RoommateListSlider);
             RoommateListBox.Columns[1].Alignment = Framework.TextAlignment.Left | Framework.TextAlignment.Middle;
 

@@ -174,7 +174,7 @@ namespace FSO.Client.UI.Controls
             }
         }
 
-
+        public bool UseChildElements { get; set; }
 
         #endregion
 
@@ -245,29 +245,35 @@ namespace FSO.Client.UI.Controls
         public override void Update(UpdateState state)
         {
             base.Update(state);
-            var i = 0;
-            foreach (var item in Items)
+
+            if (UseChildElements)
             {
-                foreach (var col in item.Columns)
+                var i = 0;
+                foreach (var item in Items)
                 {
-                    if (col is UIElement)
+                    foreach (var col in item.Columns)
                     {
-                        var container = ((UIElement)col);
-                        container.Visible = i >= ScrollOffset && i < ScrollOffset + NumVisibleRows;
-                        if (container.Visible)
+                        if (col is UIElement)
                         {
-                            container.Parent = this.Parent;
-                            container.InvalidateMatrix();
-                            container.Update(state);
-                            container.Parent = null;
-                        } else
-                        {
-                            container.Update(state);
+                            var container = ((UIElement)col);
+                            container.Visible = i >= ScrollOffset && i < ScrollOffset + NumVisibleRows;
+                            if (container.Visible)
+                            {
+                                container.Parent = this.Parent;
+                                container.InvalidateMatrix();
+                                container.Update(state);
+                                container.Parent = null;
+                            }
+                            else
+                            {
+                                container.Update(state);
+                            }
                         }
                     }
+                    i++;
                 }
-                i++;
             }
+
             if (m_MouseOver)
             {
                 var overRow = GetRowUnderMouse(state);

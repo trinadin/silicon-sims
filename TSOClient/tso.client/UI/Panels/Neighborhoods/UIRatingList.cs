@@ -55,7 +55,8 @@ namespace FSO.Client.UI.Panels.Neighborhoods
             RatingList = new UIListBox()
             {
                 RowHeight = 69,
-                Size = new Vector2(475, 352)
+                Size = new Vector2(475, 352),
+                UseChildElements = true
             };
             RatingList.Columns.Add(new UIListBoxColumn() { Width = 475 });
             RatingList.ScrollbarGutter = 5;

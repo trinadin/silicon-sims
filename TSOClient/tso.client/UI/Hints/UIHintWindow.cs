@@ -56,6 +56,7 @@ namespace FSO.Client.UI.Hints
 
             ListBox = new UIListBox() { Position = new Vector2(15 + 7, 45 + 6) };
             ListBox.SetSize(227, 530 - 12);
+            ListBox.UseChildElements = true;
             ListBox.RowHeight = 24;
             ListBox.Columns = new UIListBoxColumnCollection();
             ListBox.Columns.Add(new UIListBoxColumn() { Width = 227 });
