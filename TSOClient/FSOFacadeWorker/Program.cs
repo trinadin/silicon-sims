@@ -169,7 +169,6 @@ namespace FSOFacadeWorker
                         //{
                         //    LotQueue.RemoveAt(0);
                         //}
-                        RenderLot();
                             RenderLot();
                         });
                     }
@@ -195,6 +194,8 @@ namespace FSOFacadeWorker
 
         private static void RenderStandaloneDebug(uint shard, uint location)
         {
+            GD.Present();
+
             Console.WriteLine("===== Trying standalone render for " + location + "! =====");
             api.GetFSOV((uint)shard, location, (bt) =>
             {
@@ -206,7 +207,9 @@ namespace FSOFacadeWorker
                     }
                     else
                     {
-                        var fsof = RenderFSOF(bt, GD, false);
+                        bool compressed = true;
+                        byte[] thumbData = null;
+                        var fsof = RenderFSOF(bt, GD, compressed, (data) => thumbData = data);
                         Directory.CreateDirectory("test/");
                         using (var mem = new MemoryStream())
                         {
@@ -214,10 +217,14 @@ namespace FSOFacadeWorker
                             File.WriteAllBytes("test/" + location + ".fsof", mem.ToArray());
                         }
                         //save the images
-                        SaveRawImage(fsof.FloorTextureData, fsof.FloorWidth, fsof.FloorHeight, "test/" + location + "_floor.png");
-                        SaveRawImage(fsof.WallTextureData, fsof.WallWidth, fsof.WallHeight, "test/" + location + "_wall.png");
-                        SaveRawImage(fsof.NightFloorTextureData, fsof.FloorWidth, fsof.FloorHeight, "test/" + location + "_nfloor.png");
-                        SaveRawImage(fsof.NightWallTextureData, fsof.WallWidth, fsof.WallHeight, "test/" + location + "n_wall.png");
+                        File.WriteAllBytes("test/" + location + "_thumb.png", thumbData);
+                        if (!compressed)
+                        {
+                            SaveRawImage(fsof.FloorTextureData, fsof.FloorWidth, fsof.FloorHeight, "test/" + location + "_floor.png");
+                            SaveRawImage(fsof.WallTextureData, fsof.WallWidth, fsof.WallHeight, "test/" + location + "_wall.png");
+                            SaveRawImage(fsof.NightFloorTextureData, fsof.FloorWidth, fsof.FloorHeight, "test/" + location + "_nfloor.png");
+                            SaveRawImage(fsof.NightWallTextureData, fsof.WallWidth, fsof.WallHeight, "test/" + location + "n_wall.png");
+                        }
                         Console.WriteLine("===== Done! =====");
                     }
                 }
@@ -267,12 +274,14 @@ namespace FSOFacadeWorker
                     {
                         if (bt == null)
                         {
+                            Console.WriteLine("Missing FSOV for " + location + "...");
                             RenderLot();
                         }
                         else
                         {
                             Console.WriteLine("Rendering lot " + location + "...");
-                            var fsof = RenderFSOF(bt, GD, true);
+                            byte[] thumbData = null;
+                            var fsof = RenderFSOF(bt, GD, true, (data) => thumbData = data);
                             using (var mem = new MemoryStream())
                             {
                                 fsof.Save(mem);
@@ -294,6 +303,14 @@ namespace FSOFacadeWorker
                                         return;
                                     }
                                     RenderLot();
+                                });
+
+                                api.UploadThumb(1, location, thumbData, (success) =>
+                                {
+                                    if (!success)
+                                    {
+                                        Console.WriteLine("Uploading thumb for " + location + " did not succeed.");
+                                    }
                                 });
                             }
                         }
@@ -326,7 +343,7 @@ namespace FSOFacadeWorker
             
         }
 
-        public static FSOF RenderFSOF(byte[] fsov, GraphicsDevice gd, bool compressed)
+        public static FSOF RenderFSOF(byte[] fsov, GraphicsDevice gd, bool compressed, Action<byte[]> thumbAction = null)
         {
             var marshal = new VMMarshal();
             using (var mem = new MemoryStream(fsov))
@@ -354,6 +371,20 @@ namespace FSOFacadeWorker
             facade.FLOOR_RES_PER_TILE = 2;
 
             SetAllLights(vm, world, 0.5f, 0);
+ 
+            if (thumbAction != null)
+            {
+                var bigThumb = world.GetLotThumb(gd, null);
+                byte[] data;
+                using (var stream = new MemoryStream())
+                {
+                    var tex = TextureUtils.Decimate(bigThumb, gd, 2, false);
+                    tex.SaveAsPng(stream, bigThumb.Width / 2, bigThumb.Height / 2);
+                    data = stream.ToArray();
+                    tex.Dispose();
+                }
+                thumbAction(data);
+            }
 
             var result = facade.GetFSOF(gd, world, vm.Context.Blueprint, () => { SetAllLights(vm, world, 0.0f, 100); }, compressed);
 

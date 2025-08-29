@@ -1298,7 +1298,10 @@ namespace FSO.Client.UI.Panels
                                     vm.Context.Architecture.SignalAllDirty();
                                     vm.Context.Architecture.Tick();
                                 }
+                                var oldFloor = World.State.Level;
+                                World.State.SilentLevel = World.Stories;
                                 SetOutsideTime(GameFacade.GraphicsDevice, vm, World, (1-i)*0.5f, false);
+                                World.State.SilentLevel = oldFloor;
 
                                 var facade = new LotFacadeGenerator();
                                 if (toObject)

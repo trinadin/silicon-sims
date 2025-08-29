@@ -229,6 +229,8 @@ namespace FSO.LotView.Components
 
             //var view = view;state.Camera.View;
             view.M41 = 0; view.M42 = 0; view.M43 = 0;
+            var scaleVec = Vector3.TransformNormal(new Vector3(1, 0, 0), view);
+            view = Matrix.CreateScale(1 / scaleVec.Length()) * view;
             effect.View = view;
             effect.Projection = projection;// (state.Camera as WorldCamera3D)?.BaseProjection() ?? state.Camera.Projection;
             effect.World = Matrix.CreateScale(5f * scale);

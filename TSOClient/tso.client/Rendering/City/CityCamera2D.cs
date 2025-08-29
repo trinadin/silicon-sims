@@ -252,7 +252,12 @@ namespace FSO.Client.Rendering.City
 
             return Matrix.CreateOrthographicOffCenter(-HB + m_ViewOffX, HB + m_ViewOffX, -VB + m_ViewOffY, VB + m_ViewOffY, 0.1f, 524);
         }
-        
+
+        public void CalculateLotSquish(Matrix view)
+        {
+
+        }
+
         private bool PDirty = true;
         public void ProjectionDirty()
         {

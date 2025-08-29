@@ -735,10 +735,20 @@ namespace FSO.Client.Rendering.City
             }
         }
 
+        public Vector2 Get2DFromTile(float x, float y)
+        {
+            float iScale = (float)(1 / (m_LastIsoScale * 2));
+            if (x < 0 || y < 0 || x >= 512 || y >= 512) return new Vector2();
+
+            var transform = transformSpr3(new Vector3(x, InterpElevationAt(new Vector2(x, y)), y));
+            return (transform.Z > 0) ? new Vector2(transform.X, transform.Y) : new Vector2(float.MaxValue, 0);
+        }
+
         public Vector2 Get2DFromTile(int x, int y)
         {
             float iScale = (float)(1/(m_LastIsoScale * 2));
             if (x < 0 || y < 0 || x >= 512 || y >= 512) return new Vector2();
+
             var transform = transformSpr3(new Vector3(x, MapData.ElevationData[(y * 512 + x)] / 12.0f, y));
             return (transform.Z > 0)?new Vector2(transform.X, transform.Y):new Vector2(float.MaxValue, 0);
         }
@@ -1430,6 +1440,12 @@ namespace FSO.Client.Rendering.City
         private Matrix m_LightMatrix;
         public override void Draw(GraphicsDevice gfx)
         {
+            bool is2D = Camera is CityCamera2D;
+            if (m_LotZoomProgress > 0 && !is2D)
+            {
+                return;
+            }
+
             m_GraphicsDevice = gfx;
 
             ShadowRes = GlobalSettings.Default.ShadowQuality;
@@ -1571,7 +1587,7 @@ namespace FSO.Client.Rendering.City
 
             if (m_Zoomed == TerrainZoomMode.Far) Draw3DHouses(pass); //DrawHouses(HB); //draw far view house icons
 
-            if (Camera is CityCamera2D)
+            if (is2D)
             {
                 m_2DVerts = new ArrayList(); //refresh list for tris under houses
                 DrawSprites(HB, VB); //draw near view trees and houses
@@ -1686,6 +1702,8 @@ namespace FSO.Client.Rendering.City
             var v = camera.View;
             var p = camera.Projection;
 
+            Camera.CalculateLotSquish(v);
+
             if (ViewMatrixN != null)
             {
                 var dummy = ((camera as CameraControllers)?.GetExternalTransition()?.Camera as DummyCamera);
@@ -1706,6 +1724,7 @@ namespace FSO.Client.Rendering.City
             VertexShader.CurrentTechnique = VertexShader.Techniques[2];
             var mv = world * v;
             var mvp = mv * p * Matrix.CreateScale(1f, 1f, 0.3f);
+            m_MovMatrix = mvp;
             VertexShader.Parameters["BaseMatrix"].SetValue(mvp);
             VertexShader.Parameters["MV"].SetValue(mv);
             var frustum = new BoundingFrustum(mvp);
@@ -1816,11 +1835,11 @@ namespace FSO.Client.Rendering.City
             }
         }
 
-        private void DrawFacade(FSOF fsof, Vector3 position, int passIndex, bool drawNight)
+        private void DrawFacade(FSOF fsof, ref Matrix baseMat, Vector3 position, int passIndex, bool drawNight)
         {
             if (fsof == null) return;
-            var b = 1 / 77f;
-            var mat = Matrix.CreateScale(b, b*Camera.LotSquish, b) * Matrix.CreateRotationY((float)Math.PI / -2f) * Matrix.CreateTranslation(position + new Vector3(1, 0, 0)) ;
+            var b = (1 / 75f);
+            var mat = baseMat * Matrix.CreateTranslation(position + new Vector3(1 + b, b * 0.75f, -b));
             var gfx = m_GraphicsDevice;
             VertexShader.Parameters["ObjModel"].SetValue(mat);
             VertexShader.Parameters["DepthBias"].SetValue(-0.18f * Camera.DepthBiasScale);
@@ -1862,6 +1881,9 @@ namespace FSO.Client.Rendering.City
         private void DrawFacades(Vector2 mid, int passIndex, bool useLocked, BoundingFrustum frustum)
         {
             float[] bounds = new float[] { (float)Math.Round(mid.X - 19), (float)Math.Round(mid.Y - 19), (float)Math.Round(mid.X + 19), (float)Math.Round(mid.Y + 19) };
+
+            var b = 1 / 75f;
+            var baseMat = Matrix.CreateScale(b, b * Camera.LotSquish, b) * Matrix.CreateRotationY((float)Math.PI / -2f);
 
             float fade = Math.Max(0, Math.Min(1, (m_ZoomProgress - 0.4f) * 2));
 
@@ -1929,7 +1951,7 @@ namespace FSO.Client.Rendering.City
 
                                 if (lotImg != null)
                                 {
-                                    DrawFacade(lotImg, new Vector3(x, elev / 12.0f, y), passIndex, night && online);
+                                    DrawFacade(lotImg, ref baseMat, new Vector3(x, elev / 12.0f, y), passIndex, night && online);
                                 }
                             }
                         }
@@ -1955,7 +1977,7 @@ namespace FSO.Client.Rendering.City
                         if (LotTileLookup.ContainsKey(house.Location)) lhouse = LotTileLookup[house.Location];
                         var online = ((lhouse?.flags ?? 0) & LotTileFlags.Online) > 0;
 
-                        DrawFacade(house.LotImg.LotFacade, house.Position, passIndex, night && online);
+                        DrawFacade(house.LotImg.LotFacade, ref baseMat, house.Position, passIndex, night && online);
                     }
                 }
             }

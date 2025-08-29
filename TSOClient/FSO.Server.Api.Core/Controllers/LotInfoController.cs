@@ -489,11 +489,28 @@ namespace FSO.Server.Api.Core.Controllers
                 FileStream stream;
                 try
                 {
-                    var path = Path.Combine(api.Config.NFSdir, "Lots/" + lot.lot_id.ToString("x8") + "/state_" + lot.ring_backup_num.ToString() + ".fsov");
-                    
+                    int backupNum = lot.ring_backup_num;
 
-                    stream = System.IO.File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    return File(stream, "application/octet-stream");
+                    // TODO: more or less backups
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var path = Path.Combine(api.Config.NFSdir, "Lots/" + lot.lot_id.ToString("x8") + "/state_" + lot.ring_backup_num.ToString() + ".fsov");
+                        if (System.IO.File.Exists(path))
+                        {
+                            stream = System.IO.File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+                            return File(stream, "application/octet-stream");
+                        }
+                        else
+                        {
+                            lot.ring_backup_num--;
+                            if (lot.ring_backup_num < 0)
+                            {
+                                lot.ring_backup_num += 10;
+                            }
+                        }
+                    }
+
+                    return NotFound();
                 }
                 catch (Exception e)
                 {
@@ -577,48 +594,49 @@ namespace FSO.Server.Api.Core.Controllers
                     return NotFound();
                 }
             }
+        }
 
-            /*
+        [HttpPost]
+        [Route("userapi/city/{shardid}/uploadthumb/{id}")]
+        public IActionResult UploadThumb(int shardid, uint id, List<IFormFile> files)
+        {
             var api = Api.INSTANCE;
             api.DemandModerator(Request);
 
-            if (!Request.Content.IsMimeMultipartContent())
-                return new HttpResponseMessage(HttpStatusCode.UnsupportedMediaType);
-
-            var provider = new MultipartMemoryStreamProvider();
-            var files = Request.Content.ReadAsMultipartAsync(provider).Result;
+            if (files == null)
+                return NotFound();
 
             byte[] data = null;
-            foreach (var file in provider.Contents)
+            foreach (var file in files)
             {
-                var filename = file.Headers.ContentDisposition.FileName.Trim('\"');
-                data = file.ReadAsByteArrayAsync().Result;
+                var filename = file.FileName.Trim('\"');
+                using (var memoryStream = new MemoryStream())
+                {
+                    file.CopyTo(memoryStream);
+                    data = memoryStream.ToArray();
+                }
             }
 
-            if (data == null) return new HttpResponseMessage(HttpStatusCode.NotFound);
+            if (data == null) return NotFound();
 
             using (var da = api.DAFactory.Get())
             {
                 var lot = da.Lots.GetByLocation(shardid, id);
-                if (lot == null) return new HttpResponseMessage(HttpStatusCode.NotFound);
+                if (lot == null) return NotFound();
 
                 FileStream stream;
                 try
                 {
-                    var path = Path.Combine(api.Config.NFSdir, "Lots/" + lot.lot_id.ToString("x8") + "/thumb.fsof");
+                    var path = Path.Combine(api.Config.NFSdir, "Lots/" + lot.lot_id.ToString("x8") + "/thumb.png");
                     stream = System.IO.File.Open(path, FileMode.Create, FileAccess.Write, FileShare.Write);
                     stream.Write(data, 0, data.Length);
-
-                    HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
-                    response.Content = new StringContent("", Encoding.UTF8, "text/plain");
-                    return response;
+                    return Ok();
                 }
                 catch (Exception e)
                 {
-                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+                    return NotFound();
                 }
             }
-            */
         }
     }
 

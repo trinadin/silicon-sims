@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FSO.Common;
 using FSO.LotView.Components;
-using FSO.LotView.Utils;
-using Microsoft.Xna.Framework;
+using FSO.LotView.Effects;
 using FSO.LotView.LMap;
 using FSO.LotView.RC;
-using FSO.Common;
-using FSO.LotView.Effects;
+using FSO.LotView.Utils;
+using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
 
 namespace FSO.LotView.Model
 {
@@ -464,6 +464,44 @@ namespace FSO.LotView.Model
                 }
             }
             return Indoors;
+        }
+
+        public bool IsIndoorsPrecise(Vector2 pos, int floor)
+        {
+            Point testPos = pos.ToPoint();
+
+            if (testPos.X >= 0 && testPos.X < Width && testPos.Y >= 0 && testPos.Y < Height)
+            {
+                int offset = testPos.X + testPos.Y * Width;
+                var room = RoomMap[floor][offset];
+
+                if ((ushort)room != (ushort)((room >> 16) & 0x7FFF))
+                {
+                    // Need to evaluate the diagonal orientation. It's stored in the wall segments in TS1.
+                    var wall = Walls[floor][offset];
+                    float xFrac = pos.X - testPos.X;
+                    float yFrac = pos.Y - testPos.Y;
+
+                    if (wall.Segments == WallSegments.HorizontalDiag)
+                    {
+                        if (xFrac + yFrac > 1)
+                        {
+                            room = ((room >> 16) & 0x7FFF);
+                        }
+                    }
+                    else if (wall.Segments == WallSegments.VerticalDiag)
+                    {
+                        if (xFrac - yFrac < 0)
+                        {
+                            room = ((room >> 16) & 0x7FFF);
+                        }
+                    }
+                }
+
+                return !Rooms[Rooms[(ushort)room].Base].IsOutside;
+            }
+
+            return false;
         }
 
         private byte[] GrassMask;

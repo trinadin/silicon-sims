@@ -386,16 +386,15 @@ namespace FSO.LotView
             }
         }
 
-        public bool ZeroWallOffset = false;
+        public Matrix? WallOffsetView;
         public Vector2 GetWallOffset()
         {
-            if (ZeroWallOffset) return Vector2.Zero;
             if (CameraMode == CameraRenderMode._2D)
             {
                 var fd = Camera2D.FrontDirection();
                 return new Vector2(fd.X, fd.Z) / -6;
             }
-            var vd = View;
+            var vd = WallOffsetView ?? View;
             vd.M41 = 0; vd.M42 = 0; vd.M43 = 0;
 
             var transform = Vector3.Transform(new Vector3(1, 0, 0), vd);

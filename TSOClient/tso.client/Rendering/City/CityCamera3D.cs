@@ -75,7 +75,7 @@ namespace FSO.Client.Rendering.City
         {
             get
             {
-                return 1f / (0.33f + (float)(1.0 - LotZoomProgress) / 1.5f);
+                return LotZoomProgress > 0 ? _lotSquish : 1f;
             }
         }
 
@@ -83,7 +83,7 @@ namespace FSO.Client.Rendering.City
         {
             get
             {
-                return 1f;
+                return LotZoomProgress > 0 ? 20f * LotZoomProgress + 0.05f : 1f;
             }
         }
 
@@ -155,6 +155,18 @@ namespace FSO.Client.Rendering.City
         public Vector2 CalculateRShadow()
         {
             return new Vector2(256, 256);
+        }
+
+        private float _lotSquish;
+
+        public void CalculateLotSquish(Matrix view)
+        {
+            var yProbe = new Vector3(0, 1, 0);
+            var xProbe = new Vector3(1, 0, 0);
+            var transformedY = Vector3.TransformNormal(yProbe, view);
+            var transformedX = Vector3.TransformNormal(xProbe, view);
+
+            _lotSquish = 3 / (transformedY.Length() / transformedX.Length());
         }
 
         public float GetIsoScale()

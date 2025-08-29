@@ -24,6 +24,7 @@ namespace FSO.Client.Rendering.City
         Vector2 CalculateR();
         Vector2 CalculateRShadow();
         void InheritPosition(Terrain parent, World lotWorld, CoreGameScreenController controller, bool instant);
+        void CalculateLotSquish(Matrix view);
 
         void CenterCamera(CityCameraCenter center);
         void ClearCenter();

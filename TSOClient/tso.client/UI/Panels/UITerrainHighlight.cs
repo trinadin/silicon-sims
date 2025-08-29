@@ -27,11 +27,8 @@ namespace FSO.Client.UI.Panels
 
             if (x > 511 || y > 511) return null;
 
-            var f1 = terrain.Get2DFromTile(x, y);
-            var f2 = terrain.Get2DFromTile(x+1, y+1);
-            if (f1.X == float.MaxValue || f2.X == float.MaxValue) return null;
-            var to = (terrain.Get2DFromTile(x, y) + terrain.Get2DFromTile(x+1, y+1)) / 2;
-            return to;
+            var to = terrain.Get2DFromTile(x + 0.5f, y + 0.5f);
+            return to.X == float.MaxValue ? null : (Vector2?)to;
         } 
 
         public static void DrawArrow(UISpriteBatch batch, Terrain terrain, Vector2 from, int location, Color tint)

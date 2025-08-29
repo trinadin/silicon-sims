@@ -28,6 +28,7 @@ namespace FSO.LotView.Facade
         public static int WALL_HEIGHT = 22;
         public static int MAX_WALL_WIDTH = 64; //above this tile width the pixel width for the wall will not increase.
         public static int GAP = 1;
+        public static int SUPERSAMPLE_COUNT = 2;
 
         public int FLOOR_RES_PER_TILE = 2;
         public int FLOOR_TILES = 64;//98;
@@ -40,7 +41,7 @@ namespace FSO.LotView.Facade
         private List<LotFacadeWallBin> WallBins = new List<LotFacadeWallBin>();
         public RasterizerState Scissor = new RasterizerState() { ScissorTestEnable = true, CullMode = CullMode.None };
 
-        public RenderTarget2D WallTarget;
+        public Texture2D WallTarget;
         public VertexPositionTexture[] WallVerts;
         public int[] WallIndices;
 
@@ -54,6 +55,11 @@ namespace FSO.LotView.Facade
 
         public bool RoofOnFloor;
         public sbyte FloorsUsed;
+
+        private Rectangle MulRect(Rectangle rect, int factor)
+        {
+            return new Rectangle(rect.X * factor, rect.Y * factor, rect.Width * factor, rect.Height * factor);
+        }
 
         public void GenerateWalls(GraphicsDevice gd, World world, Blueprint bp, bool justTexture)
         {
@@ -77,7 +83,7 @@ namespace FSO.LotView.Facade
             }
 
             //ok, allocate the texture for the wall.
-            var tex = new RenderTarget2D(gd, MAX_WALL_WIDTH * WALL_WIDTH, CeilToFour(Math.Max(1, WallBins.Count * (WALL_HEIGHT + GAP * 2) - GAP * 2)), false, SurfaceFormat.Color, DepthFormat.Depth24);
+            var tex = new RenderTarget2D(gd, MAX_WALL_WIDTH * WALL_WIDTH * SUPERSAMPLE_COUNT, CeilToFour(Math.Max(1, WallBins.Count * (WALL_HEIGHT + GAP * 2) - GAP * 2)) * SUPERSAMPLE_COUNT, false, SurfaceFormat.Color, DepthFormat.Depth24);
             gd.SetRenderTarget(tex);
             gd.DepthStencilState = DepthStencilState.Default;
             gd.Clear(Color.TransparentBlack);
@@ -86,7 +92,6 @@ namespace FSO.LotView.Facade
 
             var oldLevel = world.State.Level;
             state.SilentLevel = bp.Stories;
-            state.ZeroWallOffset = true;
             var cuts = bp.Cutaway;
             bp.Cutaway = new bool[cuts.Length];
             bp.WCRC?.Generate(gd, world.State, false);
@@ -111,15 +116,10 @@ namespace FSO.LotView.Facade
                     var xFlip = 1f;
                     //which side is "outside"?
                     //check one side. assume the other is outside if we fail
-                    var testPos = (ctr + rNorm * 0.6f).ToPoint();
-                    if (testPos.X >= 0 && testPos.X < bp.Width && testPos.Y >= 0 && testPos.Y < bp.Height)
+                    if (bp.IsIndoorsPrecise(ctr + rNorm * 0.1f, wall.Room.Floor))
                     {
-                        var room = bp.RoomMap[wall.Room.Floor][testPos.X + testPos.Y * bp.Width];
-                        if (!bp.Rooms[bp.Rooms[(ushort)room].Base].IsOutside)
-                        {
-                            rNorm *= -1;
-                            xFlip *= -1;
-                        }
+                        rNorm *= -1;
+                        xFlip *= -1;
                     }
 
                     var height = (wall.Room.Floor + 0.5f) * 2.95f * 3 + bp.InterpAltitude(new Vector3(ctr, 0)) * 3f + 0.2f;
@@ -131,11 +131,12 @@ namespace FSO.LotView.Facade
 
                     //rescale our camera matrix to render to the correct part of the render target. Apply scissor test for that area.
                     var rect = new Rectangle(xPos + (wall.EffectiveLength - (wall.Length + GAP)), yPos, wall.Length, WALL_HEIGHT);
+                    rect = MulRect(rect, SUPERSAMPLE_COUNT);
                     gd.RasterizerState = Scissor;
                     gd.ScissorRectangle = rect;
 
                     var trans = Matrix.CreateScale((rect.Width / ((float)tex.Width)), (rect.Height / ((float)tex.Height)), 1) *
-                        Matrix.CreateTranslation((-(rect.X * -2 - wall.Length) / (float)tex.Width) - 1f, (-(rect.Y * 2 + WALL_HEIGHT - 2) / (float)tex.Height) + 1f, 0);
+                        Matrix.CreateTranslation((-(rect.X * -2 - wall.Length * SUPERSAMPLE_COUNT) / (float)tex.Width) - 1f, (-(rect.Y * 2 + (WALL_HEIGHT - 2) * SUPERSAMPLE_COUNT) / (float)tex.Height) + 1f, 0);
 
                     var frustrum = new BoundingFrustum(lookat * ortho);
                     ortho = ortho * trans;
@@ -147,6 +148,9 @@ namespace FSO.LotView.Facade
                     effect.ViewProjection = vp;
                     state.ViewProjection = vp;
                     state.Frustum = frustrum;
+                    state.WallOffsetView = lookat;
+
+                    state.PrepareLighting();
 
                     bp.WCRC?.Draw(gd, world.State);
 
@@ -167,12 +171,19 @@ namespace FSO.LotView.Facade
 
             bp.Cutaway = cuts;
             bp.WCRC?.Generate(gd, world.State, false);
-            world.State.ZeroWallOffset = false;
+            world.State.WallOffsetView = null;
             world.State.SilentLevel = oldLevel;
 
+            Texture2D result = tex;
+
+            if (SUPERSAMPLE_COUNT > 1)
+            {
+                result = TextureUtils.Decimate(result, gd, SUPERSAMPLE_COUNT, true);
+            }
+
             //generate wall geometry
-            var data = new Color[tex.Width * tex.Height];
-            tex.GetData(data);
+            var data = new Color[result.Width * result.Height];
+            result.GetData(data);
 
             var verts = new VertexPositionTexture[wallCount * 4];
             var indices = new int[wallCount * 6];
@@ -184,25 +195,25 @@ namespace FSO.LotView.Facade
             {
                 var xInt = 0;
                 var yInt = bini * (WALL_HEIGHT + GAP * 2);
-                var yPos = bini * (WALL_HEIGHT + GAP * 2) / (float)tex.Height;
+                var yPos = bini * (WALL_HEIGHT + GAP * 2) / (float)result.Height;
                 var xPos = 0f;
-                var div = WALL_HEIGHT / (float)tex.Height;
+                var div = WALL_HEIGHT / (float)result.Height;
                 foreach (var wall in bin.Walls)
                 {
                     var rect = new Rectangle(xInt + (wall.EffectiveLength - (wall.Length + GAP)), yInt, wall.Length, WALL_HEIGHT);
-                    BleedRect(data, rect, tex.Width, tex.Height);
+                    BleedRect(data, rect, result.Width, result.Height);
 
                     if (!justTexture)
                     {
                         var ctr = (wall.Points[0] + wall.Points[1]) / (2 * 16);
-                        var off = (wall.EffectiveLength - (wall.Length + GAP)) / (float)tex.Width;
+                        var off = (wall.EffectiveLength - (wall.Length + GAP)) / (float)result.Width;
                         var height1 = ((wall.Room.Floor) * 2.95f + bp.InterpAltitude(new Vector3(ctr, 0)));
                         var height2 = height1 + 2.95f;
                         var pt1 = wall.Points[0] / 16f;
                         var pt2 = wall.Points[1] / 16f;
                         verts[verti++] = new VertexPositionTexture(new Vector3(pt1.X, height2, pt1.Y), new Vector2(xPos + off, yPos));
-                        verts[verti++] = new VertexPositionTexture(new Vector3(pt2.X, height2, pt2.Y), new Vector2(xPos + off + wall.Length / (float)tex.Width, yPos));
-                        verts[verti++] = new VertexPositionTexture(new Vector3(pt2.X, height1, pt2.Y), new Vector2(xPos + off + wall.Length / (float)tex.Width, (yPos + div)));
+                        verts[verti++] = new VertexPositionTexture(new Vector3(pt2.X, height2, pt2.Y), new Vector2(xPos + off + wall.Length / (float)result.Width, yPos));
+                        verts[verti++] = new VertexPositionTexture(new Vector3(pt2.X, height1, pt2.Y), new Vector2(xPos + off + wall.Length / (float)result.Width, (yPos + div)));
                         verts[verti++] = new VertexPositionTexture(new Vector3(pt1.X, height1, pt1.Y), new Vector2(xPos + off, (yPos + div)));
 
                         indices[indi++] = verti - 2;
@@ -214,7 +225,7 @@ namespace FSO.LotView.Facade
                         indices[indi++] = verti - 2;
 
                         xInt += wall.EffectiveLength;
-                        xPos += wall.EffectiveLength / (float)tex.Width;
+                        xPos += wall.EffectiveLength / (float)result.Width;
                     }
                 }
                 bini++;
@@ -223,11 +234,11 @@ namespace FSO.LotView.Facade
             //using (var fs = new FileStream(@"C:\Users\Rhys\Desktop\walls.png", FileMode.Create, FileAccess.Write))
             //    tex.SaveAsPng(fs, tex.Width, tex.Height);
 
-            tex.SetData(data);
+            result.SetData(data);
 
             if (!justTexture)
             {
-                WallTarget = tex;
+                WallTarget = result;
                 WallVerts = verts;
                 WallIndices = indices;
             }
@@ -264,7 +275,7 @@ namespace FSO.LotView.Facade
             FloorsUsed = floorsNum;
             var state = world.State;
             var dim = FLOOR_RES_PER_TILE * FLOOR_TILES;
-            var tex = new RenderTarget2D(gd, dim * 3, dim * 2, false, SurfaceFormat.Color, DepthFormat.Depth24);
+            var tex = new RenderTarget2D(gd, dim * 3 * SUPERSAMPLE_COUNT, dim * 2 * SUPERSAMPLE_COUNT, false, SurfaceFormat.Color, DepthFormat.Depth24);
             gd.SetRenderTarget(tex);
             gd.Clear(Color.TransparentBlack);
             var lookat = Matrix.CreateLookAt(new Vector3(bp.Width * 1.5f, 200, bp.Height * 1.5f), new Vector3(bp.Width * 1.5f, 0, bp.Height * 1.5f), new Vector3(0, 0, 1));
@@ -278,7 +289,7 @@ namespace FSO.LotView.Facade
                 var offMat = Matrix.CreateScale(1 / 3f, 1 / 2f, 1f) * Matrix.CreateTranslation(-1 + ((x + 0.5f) * 2 / 3f), 1 - ((y + 0.5f) * 2 / 2f), 0);
 
                 gd.RasterizerState = Scissor;
-                gd.ScissorRectangle = new Rectangle(dim * x + 1, dim * y + 1, dim - 2, dim - 2);
+                gd.ScissorRectangle = MulRect(new Rectangle(dim * x + 1, dim * y + 1, dim - 2, dim - 2), SUPERSAMPLE_COUNT);
 
                 if (i == bp.Stories)
                 {
@@ -408,7 +419,7 @@ namespace FSO.LotView.Facade
                 }
 
             }
-            FloorTexture = tex;
+            FloorTexture = SUPERSAMPLE_COUNT > 1 ? TextureUtils.Decimate(tex, gd, SUPERSAMPLE_COUNT, true) : tex;
             gd.SetRenderTarget(null);
         }
 

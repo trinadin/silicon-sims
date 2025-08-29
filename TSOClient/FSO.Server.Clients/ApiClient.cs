@@ -132,6 +132,24 @@ namespace FSO.Server.Clients
             });
         }
 
+        public void UploadThumb(uint shardID, uint lotLocation, byte[] data, Action<bool> callback)
+        {
+            var client = Client();
+            var request = new RestRequest("userapi/city/" + shardID + "/uploadthumb/" + lotLocation, Method.POST);
+            request.AddFile("files", data, lotLocation + ".png", "application/octet-stream");
+            request.AddHeader("authorization", "bearer " + AuthKey);
+
+            client.ExecuteAsync(request, (resp, h) =>
+            {
+                var ok = resp.StatusCode == System.Net.HttpStatusCode.OK;
+                Console.WriteLine(resp.StatusCode);
+                GameThread.NextUpdate(x =>
+                {
+                    callback(ok);
+                });
+            });
+        }
+
         public void GetLotList(uint shardID, Action<uint[]> callback)
         {
             var client = Client();
