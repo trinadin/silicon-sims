@@ -125,8 +125,13 @@ namespace FSO.LotView.Components
 
                 if (bounds == null)
                 {
-                    _BoundsDirty = false;
-                    return new BoundingBox(); //don't cache
+                    if (!dgrp.CanHaveBounds)
+                    {
+                        // No need to keep checking this.
+                        _BoundsDirty = false;
+                    }
+
+                    return new BoundingBox(); //don't cache, but also check again next time.
                 }
                 else
                 {

@@ -118,6 +118,8 @@ namespace FSO.LotView.Utils
             }
         }
 
+        public bool CanHaveBounds => DGRP != null && Mesh != null && Mesh.Geoms.Count > 0;
+
         public void InvalidateRotation()
         {
             _TextureDirty = true;
