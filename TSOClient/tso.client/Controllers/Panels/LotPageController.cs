@@ -1,5 +1,6 @@
 ﻿using FSO.Client.Network;
 using FSO.Client.UI.Panels;
+using FSO.Common;
 using FSO.Common.DataService;
 using FSO.Common.DataService.Model;
 using FSO.Server.DataService.Model;
@@ -12,13 +13,18 @@ namespace FSO.Client.Controllers.Panels
         private UILotPage View;
         private IClientDataService DataService;
         private ITopicSubscription Topic;
+        private Network.Network Network;
         private uint LotId;
 
-        public LotPageController(UILotPage view, IClientDataService dataService)
+        // TODO: also allow if admin/mod
+        public bool CanOpenAnyLot => Network.Mode == Regulators.CityConnectionMode.ARCHIVE && Network.ArchiveConfig.HasFlag(ArchiveConfigFlags.AllOpenable);
+
+        public LotPageController(UILotPage view, IClientDataService dataService, Network.Network network)
         {
             this.View = view;
             this.DataService = dataService;
             this.Topic = dataService.CreateTopicSubscription();
+            this.Network = network;
         }
 
         ~LotPageController(){

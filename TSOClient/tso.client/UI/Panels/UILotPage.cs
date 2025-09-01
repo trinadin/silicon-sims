@@ -380,6 +380,7 @@ namespace FSO.Client.UI.Panels
 
         private void RefreshUI()
         {
+            var controller = FindController<LotPageController>();
             var isOpen = _Open == true;
             var isClosed = _Open == false;
             var isMyProperty = false;
@@ -418,7 +419,7 @@ namespace FSO.Client.UI.Panels
             }
 
             bool inBounds = CurrentLot.Value == null || CurrentLot.Value.Lot_Location_Packed < 0x10200 || CurrentLot.Value.Lot_Location_Packed >= 0x20000;
-            var canJoin = isMyProperty || isRoommate || (inBounds && (isOnline || isCommunity)) || GameFacade.EnableMod;
+            var canJoin = isMyProperty || isRoommate || (inBounds && (isOnline || isCommunity)) || (controller?.CanOpenAnyLot ?? false) || GameFacade.EnableMod;
 
             HouseNameButton.Disabled = !isMyProperty;
 

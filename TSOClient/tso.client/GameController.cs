@@ -216,7 +216,7 @@ namespace FSO.Client
                 new LotAdmitController(null, null, null),
                 new GizmoController(null, null, null),
                 new PersonPageController(null,null,null),
-                new LotPageController(null, null),
+                new LotPageController(null, null, null),
                 new BookmarksController(null, null, null),
                 new RelationshipDialogController(null, null, null, null),
                 new InboxController(null, null, null, null),

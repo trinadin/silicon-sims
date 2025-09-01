@@ -1,6 +1,7 @@
 ﻿using FSO.Client.Model;
 using FSO.Client.UI.Controls;
 using FSO.Client.UI.Framework;
+using FSO.Common;
 using FSO.Common.DatabaseService;
 using FSO.Common.DatabaseService.Model;
 using FSO.Common.DataService;
@@ -37,6 +38,7 @@ namespace FSO.Client.Regulators
 
         private ConnectArchiveRequest ArchiveSettings;
         private string ArchiveToken;
+        public ArchiveConfigFlags ArchiveConfig { get; private set; }
 
         private CityClient CityApi;
         private ShardSelectorServletResponse ShardSelectResponse;
@@ -365,6 +367,7 @@ namespace FSO.Client.Regulators
                             ShardName = serverRequest.ShardName,
                         };
 
+                        ArchiveConfig = serverRequest.ArchiveConfig;
                         ArchiveToken = ArchiveHash(GlobalSettings.Default.ArchiveClientGUID, serverRequest.ServerKey);
 
                         Client.Write(new RequestClientSessionResponse

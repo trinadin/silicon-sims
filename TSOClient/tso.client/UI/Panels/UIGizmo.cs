@@ -496,21 +496,6 @@ namespace FSO.Client.UI.Panels
             }
         }
 
-        private bool ShownWelcome;
-        public uint SimAge
-        {
-            set
-            {
-                if (value < 14 && !ShownWelcome)
-                {
-                    ShownWelcome = true;
-                    GameThread.NextUpdate(e => {
-                        FiltersProperty.FilterClicked(FiltersProperty.GetChildren().FirstOrDefault(x => (x.ID?.IndexOf("Welcome") ?? -1) > -1));
-                        });
-                }
-            }
-        }
-
         private List<UILotButton> Btns = new List<UILotButton>();
         public void RegisterFilters()
         {
@@ -638,7 +623,6 @@ namespace FSO.Client.UI.Panels
                 .WithBinding(PIP, "SimBox.Avatar.BodyOutfitId", "Avatar_Appearance.AvatarAppearance_BodyOutfitID")
                 .WithBinding(PIP, "SimBox.Avatar.HeadOutfitId", "Avatar_Appearance.AvatarAppearance_HeadOutfitID")
                 .WithBinding(PIP, "SimBox.Avatar.Appearance", "Avatar_Appearance.AvatarAppearance_SkinTone", (x) => (Vitaboy.AppearanceType)((byte)x))
-                .WithBinding(this, "SimAge", "Avatar_Age")
                 .WithBinding(this, "FilterList", "Avatar_Top100ListFilter.Top100ListFilter_ResultsVec");
 
             Tab = UIGizmoTab.Property;

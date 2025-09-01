@@ -62,6 +62,7 @@ namespace FSO.Client.UI.Screens
 
         public Texture2D SimIconShared;
         public Texture2D SimIconOwned;
+        public Texture2D SimIconRecent;
 
         public UILabel TitleLabel { get; set; }
 
@@ -75,6 +76,7 @@ namespace FSO.Client.UI.Screens
 
             SimIconShared = custom.Get("archive_simshared.png").Get(gd);
             SimIconOwned = custom.Get("archive_simowned.png").Get(gd);
+            SimIconRecent = custom.Get("archive_simrecent.png").Get(gd);
 
             //Arrange UI
             Api = new ApiClient(ApiClient.CDNUrl ?? GlobalSettings.Default.GameEntryUrl);
@@ -338,6 +340,8 @@ namespace FSO.Client.UI.Screens
             }
             else
             {
+                var recentIds = new HashSet<uint>(Data.RecentAvatars);
+
                 var myItems = Data.UserAvatars
                     .Where(x => x.Name.ToLower().Contains(query) || x.LotName.ToLower().Contains(query))
                     .Select((ArchiveAvatar x) =>
@@ -348,8 +352,18 @@ namespace FSO.Client.UI.Screens
                         };
                     });
 
+                var recentItems = Data.SharedAvatars
+                    .Where(x => recentIds.Contains(x.AvatarId) && (x.Name.ToLower().Contains(query) || x.LotName.ToLower().Contains(query)))
+                    .Select((ArchiveAvatar x) =>
+                    {
+                        return new UIListBoxItem(x, new object[] { SimIconRecent, x.Name, x.LotName })
+                        {
+                            CustomStyle = ListBoxColors,
+                        };
+                    });
+
                 var sharedItems = Data.SharedAvatars
-                    .Where(x => x.Name.ToLower().Contains(query) || x.LotName.ToLower().Contains(query))
+                    .Where(x => !recentIds.Contains(x.AvatarId) && (x.Name.ToLower().Contains(query) || x.LotName.ToLower().Contains(query)))
                     .Select((ArchiveAvatar x) =>
                     {
                         return new UIListBoxItem(x, new object[] { SimIconShared, x.Name, x.LotName })
@@ -361,6 +375,7 @@ namespace FSO.Client.UI.Screens
                 AvatarListBox.Items.Clear();
 
                 AvatarListBox.Items.AddRange(myItems);
+                AvatarListBox.Items.AddRange(recentItems);
                 AvatarListBox.Items.AddRange(sharedItems);
             }
 

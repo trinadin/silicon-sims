@@ -28,6 +28,15 @@ namespace FSO.Client.Controllers
                 if (!x.IsFaulted){
                     Gizmo.CurrentAvatar.Value = x.Result;
                     FSO.UI.Model.DiscordRpcEngine.SendFSOPresence(x.Result.Avatar_Name, null, 0, 0, 0, 0, null, x.Result.Avatar_PrivacyMode > 0);
+
+                    if (Network.Mode == Regulators.CityConnectionMode.ARCHIVE)
+                    {
+                        RequestFilter(LotCategory.archive_welcome);
+                    }
+                    else if (x.Result.Avatar_Age < 14)
+                    {
+                        RequestFilter(LotCategory.welcome);
+                    }
                 }
             });
         }

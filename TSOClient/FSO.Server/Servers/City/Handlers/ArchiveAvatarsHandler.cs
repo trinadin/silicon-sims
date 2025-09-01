@@ -55,6 +55,7 @@ namespace FSO.Server.Servers.City.Handlers
                     session.Write(new ArchiveAvatarsResponse()
                     {
                         IsVerified = false,
+                        RecentAvatars = new uint[0],
                         UserAvatars = new ArchiveAvatar[0],
                         SharedAvatars = new ArchiveAvatar[0],
                     });
@@ -73,11 +74,15 @@ namespace FSO.Server.Servers.City.Handlers
                     var shared = da.Avatars.GetSummaryByUserId(1);
                     var sharedAvatars = shared.Select(ToArchiveAvatar).ToArray();
 
+                    // TODO: database
+                    var recentAvatars = sharedAvatars.Where(x => x.Name == "burglar cop").Select(x => x.AvatarId).ToArray();
+
                     session.Write(new ArchiveAvatarsResponse()
                     {
                         IsVerified = true,
                         UserAvatars = userAvatars,
-                        SharedAvatars = sharedAvatars
+                        SharedAvatars = sharedAvatars,
+                        RecentAvatars = recentAvatars
                     });
                 }
             }

@@ -1,5 +1,6 @@
 ﻿using FSO.Client.Model;
 using FSO.Client.Regulators;
+using FSO.Common;
 using FSO.Common.Domain.Shards;
 using FSO.Server.Clients;
 using FSO.Server.Protocol.CitySelector;
@@ -13,6 +14,9 @@ namespace FSO.Client.Network
         private LotConnectionRegulator LotRegulator;
         private LoginRegulator LoginRegulator;
         private IShardsDomain Shards;
+
+        public CityConnectionMode Mode => CityRegulator.Mode;
+        public ArchiveConfigFlags ArchiveConfig => CityRegulator.ArchiveConfig;
 
         public Network(LoginRegulator loginReg, CityConnectionRegulator cityReg, LotConnectionRegulator lotReg, IShardsDomain shards)
         {

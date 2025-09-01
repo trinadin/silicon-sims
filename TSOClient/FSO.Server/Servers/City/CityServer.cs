@@ -41,6 +41,7 @@ namespace FSO.Server.Servers.City
         protected override RequestClientSessionArchive ArchiveHandshake => new RequestClientSessionArchive()
         {
             ServerKey = Config.Archive.ServerKey,
+            ArchiveConfig = Config.Archive.Flags,
             ShardId = (uint)Config.ID,
             ShardName = ShardName,
             ShardMap = ShardMap,

@@ -48,12 +48,26 @@ namespace FSO.Server.Protocol.Electron.Packets
 
         public object OCode => 0;
         public bool IsVerified;
+        public uint[] RecentAvatars;
         public ArchiveAvatar[] UserAvatars;
         public ArchiveAvatar[] SharedAvatars;
 
         public override void Deserialize(IoBuffer input, ISerializationContext context)
         {
             IsVerified = input.GetBool();
+
+            int recentCount = input.GetInt32();
+
+            if (recentCount > 5)
+            {
+                throw new System.Exception($"Too many recent avatars: {recentCount}");
+            }
+
+            RecentAvatars = new uint[recentCount];
+            for (int i = 0; i < recentCount; i++)
+            {
+                RecentAvatars[i] = input.GetUInt32();
+            }
 
             int userCount = input.GetInt32();
 
@@ -92,6 +106,13 @@ namespace FSO.Server.Protocol.Electron.Packets
         public override void Serialize(IoBuffer output, ISerializationContext context)
         {
             output.PutBool(IsVerified);
+
+            output.PutInt32(RecentAvatars.Length);
+
+            foreach (var recent in RecentAvatars)
+            {
+                output.PutUInt32(recent);
+            }
 
             output.PutInt32(UserAvatars.Length);
 
