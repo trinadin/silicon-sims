@@ -117,8 +117,10 @@ namespace FSO.Client.UI.Archive
                     bool flash = FlashActive();
                     foreach (var item in UserListBox.Items)
                     {
-                        if (item.Data is ArchivePendingVerification) { }
-                        item.UseSelectedStyleByDefault = flash;
+                        if (item.Data is ArchivePendingVerification)
+                        {
+                            item.UseSelectedStyleByDefault = flash;
+                        }
                     }
                 }
             }
@@ -322,8 +324,7 @@ namespace FSO.Client.UI.Archive
                         GetModIcon(client.ModerationLevel),
                         actionButton)
                     {
-                        CustomStyle = ListBoxColors,
-                        UseSelectedStyleByDefault = flash
+                        CustomStyle = ListBoxColors
                     });
                 }
             }

@@ -376,19 +376,28 @@ namespace FSO.Server.Servers.City
                     {
                         if (vSession.UserId != 0)
                         {
-                            clients.Add(new ArchiveClient()
+                            if (vSession.Unverified)
                             {
-                                DisplayName = vSession.DisplayName,
-                                ModerationLevel = vSession.ModerationLevel,
-                                AvatarId = vSession.AvatarId,
-                                UserId = vSession.UserId,
-                                SessionUID = vSession.SessionUID
-                            });
+                                pendingVerification.Add(new ArchivePendingVerification()
+                                {
+                                    DisplayName = vSession.DisplayName,
+                                    UserId = vSession.UserId,
+                                });
+                            }
+                            else
+                            {
+                                clients.Add(new ArchiveClient()
+                                {
+                                    DisplayName = vSession.DisplayName,
+                                    ModerationLevel = vSession.ModerationLevel,
+                                    AvatarId = vSession.AvatarId,
+                                    UserId = vSession.UserId,
+                                    SessionUID = vSession.SessionUID
+                                });
+                            }
                         }
                     }
                 }
-
-                // TODO: verification
 
                 var clientPacket = new ArchiveClientList()
                 {

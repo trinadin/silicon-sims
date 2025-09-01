@@ -31,6 +31,10 @@ namespace FSO.Server
             HelpText = "Convert the database for use as an archive server.")]
         public DataTrimOptions ArchiveConvertVerb { get; set; }
 
+        [VerbOption("import-archive-featured",
+            HelpText = "Import the featured lots in the given JSON file to the specified shard.")]
+        public ImportArchiveFeaturedOptions ImportArchiveFeaturedVerb { get; set; }
+
         [HelpVerbOption]
         public string GetUsage(string verb)
         {
@@ -63,6 +67,14 @@ namespace FSO.Server
 
     public class ArchiveConvertOptions
     {
+    }
+
+    public class ImportArchiveFeaturedOptions
+    {
+        [ValueOption(0)]
+        public int ShardId { get; set; }
+        [ValueOption(1)]
+        public string JSON { get; set; }
     }
 
     public class ImportNhoodOptions

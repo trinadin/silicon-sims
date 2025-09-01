@@ -15,6 +15,10 @@
         residence = 10,
         community = 11, //cannot be set by users
 
+        archive_design = 251,
+        archive_playerschoice = 252,
+        archive_momichoice = 253,
+        archive_welcome = 254,
         recent = 255 //for filter searches
     }
 }

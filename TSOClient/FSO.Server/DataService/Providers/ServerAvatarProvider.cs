@@ -22,12 +22,14 @@ namespace FSO.Server.DataService.Providers
     {
         private static Logger LOG = LogManager.GetCurrentClassLogger();
         private int ShardId;
+        private ServerConfiguration Config;
         private IDAFactory DAFactory;
 
-        public ServerAvatarProvider([Named("ShardId")] int shardId, IDAFactory factory)
+        public ServerAvatarProvider([Named("ShardId")] int shardId, IDAFactory factory, ServerConfiguration config)
         {
             this.ShardId = shardId;
             this.DAFactory = factory;
+            Config = config;
         }
 
         public override void PersistMutation(object entity, MutationType type, string path, object value)
@@ -146,6 +148,11 @@ namespace FSO.Server.DataService.Providers
                         {
                             var filter = db.Lots.GetCommunityLocations(ShardId);
                             avatar.Avatar_Top100ListFilter.Top100ListFilter_ResultsVec = ImmutableList.ToImmutableList(filter);
+                        }
+                        else if (Config.Archive != null)
+                        {
+                            var filter = db.ArchiveFeatured.GetByCategory(ShardId, cat);
+                            avatar.Avatar_Top100ListFilter.Top100ListFilter_ResultsVec = ImmutableList.ToImmutableList(filter.Select(x => (uint)x.location));
                         }
                         else
                         {

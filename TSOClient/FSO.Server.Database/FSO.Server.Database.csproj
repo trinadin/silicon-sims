@@ -106,6 +106,9 @@
   <ItemGroup>
     <Compile Include="DatabaseConfiguration.cs" />
     <Compile Include="DatabaseModule.cs" />
+    <Compile Include="DA\ArchiveFeatured\DbArchiveFeatured.cs" />
+    <Compile Include="DA\ArchiveFeatured\IArchiveFeatured.cs" />
+    <Compile Include="DA\ArchiveFeatured\SqlArchiveFeatured.cs" />
     <Compile Include="DA\ArchiveUsers\ArchiveUser.cs" />
     <Compile Include="DA\ArchiveUsers\IArchiveUsers.cs" />
     <Compile Include="DA\ArchiveUsers\SqlArchiveUsers.cs" />

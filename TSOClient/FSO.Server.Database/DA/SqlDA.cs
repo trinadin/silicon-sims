@@ -30,6 +30,7 @@ using FSO.Server.Database.DA.Bulletin;
 using FSO.Server.Database.DA.Updates;
 using FSO.Server.Database.DA.GlobalCooldowns;
 using FSO.Server.Database.DA.ArchiveUsers;
+using FSO.Server.Database.DA.ArchiveFeatured;
 
 namespace FSO.Server.Database.DA
 {
@@ -434,6 +435,16 @@ namespace FSO.Server.Database.DA
                     _ArchiveUsers = new SqlArchiveUsers(Context);
                 }
                 return _ArchiveUsers;
+            }
+        }
+
+        private IArchiveFeatured _ArchiveFeatured;
+        public IArchiveFeatured ArchiveFeatured
+        {
+            get
+            {
+                if (_ArchiveFeatured == null) _ArchiveFeatured = new SqlArchiveFeatured(Context);
+                return _ArchiveFeatured;
             }
         }
 

@@ -30,17 +30,26 @@ namespace FSO.Client.Controllers
             HIT.HITVM.Get().PlaySoundEvent(UISounds.LetterQueueFull);
         }
 
+        private void SignalNoVerifications()
+        {
+            FlashCallback?.Invoke(false);
+        }
+
         private void UpdateUserList(ArchiveClientList newList)
         {
             if (UserList != null && newList != null)
             {
                 // Try determine the difference. If there are new verifications pending, play a sound and notify the user list button.
 
-                if (newList.Pending.Length != UserList.Pending.Length)
+                if (newList.Pending.Length == 0)
+                {
+                    SignalNoVerifications();
+                }
+                else if (newList.Pending.Length != UserList.Pending.Length)
                 {
                     SignalNewVerification();
                 }
-                else if (newList.Pending.Length != 0)
+                else
                 {
                     // Are any new pending verifications not in the last?
 

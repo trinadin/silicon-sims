@@ -51,6 +51,10 @@ namespace FSO.Server
                             toolType = typeof(ToolArchiveConvert);
                             toolOptions = subOptions;
                             break;
+                        case "import-archive-featured":
+                            toolType = typeof(ToolImportArchiveFeatured);
+                            toolOptions = subOptions;
+                            break;
                         default:
                             Console.Write(options.GetUsage(verb));
                             break;

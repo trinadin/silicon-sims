@@ -18,6 +18,19 @@ ALTER TABLE `fso_users`
 ADD COLUMN `shared_user` tinyint(3) NOT NULL DEFAULT 1;
 CREATE INDEX `fso_users_display_name` ON `fso_users`(`display_name`);";
 
+        private string ArchiveFeaturedCreate = @"CREATE TABLE `fso_archive_featured` (
+	`id` INTEGER,
+	`name` TEXT NOT NULL,
+	`lot_id` INTEGER NOT NULL,
+	`category` INTEGER NOT NULL,
+	`description` TEXT NOT NULL,
+	`shard_id` INTEGER NOT NULL,
+	PRIMARY KEY(`id` AUTOINCREMENT)
+	CONSTRAINT `fso_featured_shard_fk` FOREIGN KEY(`shard_id`) REFERENCES `fso_shards`(`shard_id`) ON DELETE CASCADE
+);
+CREATE INDEX fso_archive_featured_category_shard_idx ON fso_archive_featured (category, shard_id);
+";
+
         private string User1Update = "UPDATE `fso_users` SET username='archive', register_date=0, email='unused', register_ip='0', last_ip='0', client_id='0', last_login=0 WHERE user_id=1;";
 
         public ToolArchiveConvert(IDAFactory factory)
@@ -50,6 +63,10 @@ CREATE INDEX `fso_users_display_name` ON `fso_users`(`display_name`);";
                 LOG.Info("Adding archive columns to fso_users");
 
                 RunCommand(da, ArchiveUsersCreate);
+
+                LOG.Info("Adding featured lots table");
+
+                RunCommand(da, ArchiveFeaturedCreate);
 
                 LOG.Info("Removing avatar limit triggers");
 
