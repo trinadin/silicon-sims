@@ -186,6 +186,9 @@ namespace FSO.Client.UI.Screens
                 };
                 Add(TS1NeighPanel);
             }
+
+            var status = new UINetStatusTray();
+            Add(status);
         }
 
         public override void GameResized()
