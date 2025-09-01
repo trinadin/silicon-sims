@@ -14,9 +14,21 @@ namespace FSO.Common.MeshSimplify
 {
     public class Simplify
     {
-        public List<MSTriangle> triangles = new List<MSTriangle>();
-        public List<MSVertex> vertices = new List<MSVertex>();
+        public MSTriangle[] triangles;
+        private int triangleCount;
+
+        public MSVertex[] vertices;
+        private int vertexCount;
+
         public List<MSRef> refs = new List<MSRef>();
+
+        public Simplify(MSTriangle[] triangles, MSVertex[] vertices)
+        {
+            this.triangles = triangles;
+            this.triangleCount = triangles.Length;
+            this.vertices = vertices;
+            this.vertexCount = vertices.Length;
+        }
 
         public void simplify_mesh(int target_count, double agressiveness = 7, int iterations = 100)
         {
@@ -27,7 +39,7 @@ namespace FSO.Common.MeshSimplify
             int deleted_triangles = 0;
             var deleted0 = new List<int>(); 
             var deleted1 = new List<int>();
-            int triangle_count = triangles.Count;
+            int triangle_count = triangleCount;
 
             for (int iteration=0; iteration<iterations; iteration++)
             {
@@ -41,7 +53,7 @@ namespace FSO.Common.MeshSimplify
                 }
 
                 // clear dirty flag
-                for (var i=0; i < triangles.Count; i++)
+                for (var i=0; i < triangleCount; i++)
                     triangles[i].dirty = false;
 
                 //
@@ -53,20 +65,20 @@ namespace FSO.Common.MeshSimplify
                 double threshold = 0.000000001 * Math.Pow((double)iteration + 3, agressiveness);
 
                 // remove vertices & mark deleted triangles			
-                for (var i = 0; i < triangles.Count; i++)
+                for (var i = 0; i < triangleCount; i++)
 
             {
-                    var t = triangles[i];
-                    if (t.err[3] > threshold) continue;
+                    ref var t = ref triangles[i]; //readonly
+                    if (t.err.e3 > threshold) continue;
                     if (t.deleted) continue;
                     if (t.dirty) continue;
 
                     for (int j = 0; j < 3; j++)
                     {
-                        if (t.err[j] < threshold)
+                        if (t.err.GetRef(j) < threshold)
                         {
-                            int i0 = t.v[j]; var v0 = vertices[i0];
-                            int i1 = t.v[(j + 1) % 3]; var v1 = vertices[i1];
+                            int i0 = t.v.GetRef(j); ref var v0 = ref vertices[i0];
+                            int i1 = t.v.GetRef((j + 1) % 3); ref var v1 = ref vertices[i1];
 
                             // Border check
                             if (v0.border != v1.border) continue;
@@ -81,8 +93,8 @@ namespace FSO.Common.MeshSimplify
                             for (int n = 0; n < v1.tcount; n++) deleted1.Add(0);
 
                             // dont remove if flipped
-                            if (flipped(p, i0, i1, v0, v1, deleted0)) continue;
-                            if (flipped(p, i1, i0, v1, v0, deleted1)) continue;
+                            if (flipped(in p, i0, i1, in v0, in v1, deleted0)) continue;
+                            if (flipped(in p, i1, i0, in v1, in v0, deleted1)) continue;
 
                             // not flipped, so remove edge
                             
@@ -96,8 +108,8 @@ namespace FSO.Common.MeshSimplify
                             v0.q = v1.q + v0.q;
                             int tstart = refs.Count;
 
-                            update_triangles(i0, v0, deleted0, ref deleted_triangles);
-                            update_triangles(i0, v1, deleted1, ref deleted_triangles);
+                            update_triangles(i0, in v0, deleted0, ref deleted_triangles);
+                            update_triangles(i0, in v1, deleted1, ref deleted_triangles);
 
                             int tcount = refs.Count - tstart;
 
@@ -128,17 +140,17 @@ namespace FSO.Common.MeshSimplify
 
         // Check if a triangle flips when this edge is removed
 
-        bool flipped(Vector3 p, int i0, int i1, MSVertex v0, MSVertex v1, List<int> deleted)
+        bool flipped(in Vector3 p, int i0, int i1, in MSVertex v0, in MSVertex v1, List<int> deleted)
         {
             int bordercount = 0;
             for (int k=0; k<v0.tcount; k++)
             {
-                var t = triangles[refs[v0.tstart + k].tid];
+                ref var t = ref triangles[refs[v0.tstart + k].tid]; //readonly
                 if (t.deleted) continue;
 
                 int s = refs[v0.tstart + k].tvertex;
-                int id1 = t.v[(s + 1) % 3];
-                int id2 = t.v[(s + 2) % 3];
+                int id1 = t.v.GetRef((s + 1) % 3);
+                int id2 = t.v.GetRef((s + 2) % 3);
 
                 if (id1 == i1 || id2 == i1) // delete ?
                 {
@@ -160,13 +172,13 @@ namespace FSO.Common.MeshSimplify
 
         // Update triangle connections and edge error after a edge is collapsed
 
-        void update_triangles(int i0, MSVertex v, List<int> deleted, ref int deleted_triangles)
+        void update_triangles(int i0, in MSVertex v, List<int> deleted, ref int deleted_triangles)
         {
             Vector3 p = Vector3.Zero;
             for (int k = 0; k < v.tcount; k++)
             {
                 var r = refs[v.tstart + k];
-                var t = triangles[r.tid];
+                ref var t = ref triangles[r.tid];
                 if (t.deleted) continue;
                 if (k < deleted.Count && deleted[k] > 0)
                 {
@@ -174,12 +186,12 @@ namespace FSO.Common.MeshSimplify
                     deleted_triangles++;
                     continue;
                 }
-                t.v[r.tvertex] = i0;
+                t.v.GetRef(r.tvertex) = i0;
                 t.dirty = true;
-                t.err[0] = calculate_error(t.v[0], t.v[1], ref p);
-                t.err[1] = calculate_error(t.v[1], t.v[2], ref p);
-                t.err[2] = calculate_error(t.v[2], t.v[0], ref p);
-                t.err[3] = Math.Min(t.err[0], Math.Min(t.err[1], t.err[2]));
+                t.err.e0 = calculate_error(t.v.i0, t.v.i1, ref p);
+                t.err.e1 = calculate_error(t.v.i1, t.v.i2, ref p);
+                t.err.e2 = calculate_error(t.v.i2, t.v.i0, ref p);
+                t.err.e3 = Math.Min(t.err.e0, Math.Min(t.err.e1, t.err.e2));
                 refs.Add(r);
             }
         }
@@ -191,14 +203,14 @@ namespace FSO.Common.MeshSimplify
             if (iteration > 0) // compact triangles
             {
                 int dst = 0;
-                for (int i = 0; i<triangles.Count; i++) {
+                for (int i = 0; i<triangleCount; i++) {
                     if (!triangles[i].deleted)
                     {
                         triangles[dst++] = triangles[i];
                     }
                 }
-                var c = triangles.Count;
-                triangles.RemoveRange(dst, c - dst);
+
+                triangleCount = dst;
             }
             //
             // Init Quadrics by Plane & Edge Errors
@@ -209,46 +221,49 @@ namespace FSO.Common.MeshSimplify
             //
             if (iteration == 0)
             {
-                for (int i=0; i<vertices.Count; i++)
-                    vertices[i].q = new SymmetricMatrix(0.0);
+                for (int i=0; i<vertexCount; i++)
+                    vertices[i].q = new SymmetricMatrix();
 
-                for (int i=0; i<triangles.Count; i++)
+                for (int i=0; i<triangleCount; i++)
                 {
-                    var t = triangles[i];
+                    ref var t = ref triangles[i];
                     Vector3 n;
-                    Vector3[] p = new Vector3[3];
-                    for (int j=0; j<3; j++) p[j] = vertices[t.v[j]].p;
-                    n = Vector3.Cross(p[1] - p[0], p[2] - p[0]);
+
+                    Vector3 p0 = vertices[t.v.i0].p;
+                    Vector3 p1 = vertices[t.v.i1].p;
+                    Vector3 p2 = vertices[t.v.i2].p;
+
+                    n = Vector3.Cross(p1 - p0, p2 - p0);
                     n.Normalize();
                     t.n = n;
-                    for (int j = 0; j < 3; j++) vertices[t.v[j]].q =
-                         vertices[t.v[j]].q + new SymmetricMatrix(n.X, n.Y, n.Z, -Vector3.Dot(n,p[0]));
+                    for (int j = 0; j < 3; j++) vertices[t.v.GetRef(j)].q =
+                         vertices[t.v.GetRef(j)].q + new SymmetricMatrix(n.X, n.Y, n.Z, -Vector3.Dot(n,p0));
                 }
 
-                for (int i = 0; i < triangles.Count; i++)
+                for (int i = 0; i < triangleCount; i++)
                 {
                     // Calc Edge Error
-                    var t = triangles[i]; Vector3 p = Vector3.Zero;
-                    for (int j = 0; j < 3; j++) t.err[j] = calculate_error(t.v[j], t.v[(j + 1) % 3], ref p);
-                    t.err[3] = Math.Min(t.err[0], Math.Min(t.err[1], t.err[2]));
+                    ref var t = ref triangles[i]; Vector3 p = Vector3.Zero;
+                    for (int j = 0; j < 3; j++) t.err.GetRef(j) = calculate_error(t.v.GetRef(j), t.v.GetRef((j + 1) % 3), ref p);
+                    t.err.e3 = Math.Min(t.err.e0, Math.Min(t.err.e1, t.err.e2));
                 }
             }
 
             // Init Reference ID list	
-            for (int i = 0; i < vertices.Count; i++)
+            for (int i = 0; i < vertexCount; i++)
             {
                 vertices[i].tstart = 0;
                 vertices[i].tcount = 0;
             }
-            for (int i = 0; i < triangles.Count; i++)
+            for (int i = 0; i < triangleCount; i++)
             {
-                var t = triangles[i];
-                for (int j = 0; j < 3; j++) vertices[t.v[j]].tcount++;
+                ref var t = ref triangles[i]; //readonly
+                for (int j = 0; j < 3; j++) vertices[t.v.GetRef(j)].tcount++;
             }
             int tstart = 0;
-            for (int i = 0; i < vertices.Count; i++)
+            for (int i = 0; i < vertexCount; i++)
             {
-                var v = vertices[i];
+                ref var v = ref vertices[i];
                 v.tstart = tstart;
                 tstart += v.tcount;
                 v.tcount = 0;
@@ -256,14 +271,14 @@ namespace FSO.Common.MeshSimplify
 
             // Write References
             refs.Clear();
-            for (int i = 0; i < triangles.Count * 3; i++)
+            for (int i = 0; i < triangleCount * 3; i++)
                 refs.Add(new MSRef());
-            for (int i = 0; i < triangles.Count; i++)
+            for (int i = 0; i < triangleCount; i++)
             {
-                var t = triangles[i];
+                ref var t = ref triangles[i]; //readonly
                 for (int j = 0; j < 3; j++)
                 {
-                    var v = vertices[t.v[j]];
+                    ref var v = ref vertices[t.v.GetRef(j)];
                     refs[v.tstart + v.tcount] = new MSRef()
                     {
                         tid = i,
@@ -279,21 +294,21 @@ namespace FSO.Common.MeshSimplify
                 List<int> vcount = new List<int>();
                 List<int> vids = new List<int>();
 
-                for (int i = 0; i < vertices.Count; i++)
+                for (int i = 0; i < vertexCount; i++)
                     vertices[i].border = false;
 
-                for (int i = 0; i < vertices.Count; i++)
+                for (int i = 0; i < vertexCount; i++)
                 {
-                    var v = vertices[i];
+                    ref var v = ref vertices[i];
                     vcount.Clear();
                     vids.Clear();
                     for (int j = 0; j < v.tcount; j++)
                     {
                         int k = refs[v.tstart + j].tid;
-                        var t = triangles[k];
+                        ref var t = ref triangles[k]; //readonly
                         for (k = 0; k < 3; k++)
                         {
-                            int ofs = 0, id = t.v[k];
+                            int ofs = 0, id = t.v.GetRef(k);
                             while (ofs < vcount.Count)
                             {
                                 if (vids[ofs] == id) break;
@@ -322,22 +337,24 @@ namespace FSO.Common.MeshSimplify
         void compact_mesh()
         {
             int dst = 0;
-            for (int i = 0; i < vertices.Count; i++)
+            for (int i = 0; i < vertexCount; i++)
             {
                 vertices[i].tcount = 0;
             }
-            for (int i = 0; i < triangles.Count; i++)
+            for (int i = 0; i < triangleCount; i++)
             {
                 if (!triangles[i].deleted)
                 {
                     var t = triangles[i];
                     triangles[dst++] = t;
-                    for (int j = 0; j < 3; j++) vertices[t.v[j]].tcount = 1;
+                    for (int j = 0; j < 3; j++) vertices[t.v.GetRef(j)].tcount = 1;
                 }
             }
-            triangles.RemoveRange(dst, triangles.Count - dst);
+            triangleCount = dst;
+            Array.Resize(ref triangles, triangleCount);
+
             dst = 0;
-            for (int i = 0; i < vertices.Count; i++)
+            for (int i = 0; i < vertexCount; i++)
             {
                 if (vertices[i].tcount > 0)
                 {
@@ -347,12 +364,13 @@ namespace FSO.Common.MeshSimplify
                     dst++;
                 }
             }
-            for (int i = 0; i < triangles.Count; i++)
+            for (int i = 0; i < triangleCount; i++)
             {
-                var t = triangles[i];
-                for (int j = 0; j < 3; j++) t.v[j] = vertices[t.v[j]].tstart;
+                ref var t = ref triangles[i];
+                for (int j = 0; j < 3; j++) t.v.GetRef(j) = vertices[t.v.GetRef(j)].tstart;
             }
-            vertices.RemoveRange(dst, vertices.Count - dst);
+            vertexCount = dst;
+            Array.Resize(ref vertices, vertexCount);
         }
 
         // Error between vertex and Quadric

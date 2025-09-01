@@ -2,7 +2,7 @@
 
 namespace FSO.Common.MeshSimplify
 {
-    public class MSVertex
+    public struct MSVertex
     {
         public Vector3 p;
         public Vector2 t; //texcoord

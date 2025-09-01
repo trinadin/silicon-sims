@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace FSO.Files.RC
 {
@@ -29,6 +30,8 @@ namespace FSO.Files.RC
         public IndexBuffer Indices;
         public int PrimCount;
 
+        public int RefCount = 1;
+
         public void SComplete(GraphicsDevice gd)
         {
             Rendered = true;
@@ -46,8 +49,7 @@ namespace FSO.Files.RC
 
             if (!IffFile.RETAIN_CHUNK_DATA)
             {
-                SVerts = null;
-                SIndices = null;
+                DecrementDataRef();
             }
         }
 
@@ -193,8 +195,11 @@ namespace FSO.Files.RC
             DGRP3DVert.GenerateNormals(invert, SVerts, SIndices);
         }
 
-        public void Save(IoWriter io)
+        public void Save(IoWriter io, List<DGRP3DVert> verts = null, List<int> indices = null)
         {
+            if (verts == null) verts = SVerts;
+            if (indices == null) indices = SIndices;
+
             io.WriteUInt16(PixelSPR);
             io.WriteUInt16(PixelDir);
             io.WriteInt32(SVerts.Count);
@@ -310,6 +315,20 @@ namespace FSO.Files.RC
             var result = new byte[input.Length * Marshal.SizeOf(typeof(T))];
             Buffer.BlockCopy(input, 0, result, 0, result.Length);
             return result;
+        }
+
+        public void IncrementDataRef()
+        {
+            Interlocked.Increment(ref RefCount);
+        }
+
+        public void DecrementDataRef()
+        {
+            if (Interlocked.Decrement(ref RefCount) == 0)
+            {
+                SVerts = null;
+                SIndices = null;
+            }
         }
     }
 }

@@ -444,15 +444,20 @@ namespace FSO.LotView.Facade
 
         public void SimplifyFloor()
         {
-            var simple = new Simplify();
-            simple.vertices = FloorVerts.Select(x => new MSVertex() { p = x.Position, t = x.TextureCoordinate }).ToList();
+            var vertices = FloorVerts.Select(x => new MSVertex() { p = x.Position, t = x.TextureCoordinate }).ToArray();
+            var triangles = new MSTriangle[FloorIndices.Length / 3];
+
+            int i = 0;
             for (int t = 0; t < FloorIndices.Length; t += 3)
             {
-                simple.triangles.Add(new MSTriangle()
+                triangles[i++] = new MSTriangle()
                 {
-                    v = new int[] { FloorIndices[t], FloorIndices[t + 1], FloorIndices[t + 2] }
-                });
+                    v = new MSTriangleIndices(FloorIndices[t], FloorIndices[t + 1], FloorIndices[t + 2])
+                };
             }
+
+            var simple = new Simplify(triangles, vertices);
+
             simple.simplify_mesh(2, agressiveness: 3, iterations: 300);
 
             FloorVerts = simple.vertices.Select(x =>
@@ -463,9 +468,9 @@ namespace FSO.LotView.Facade
             var indices = new List<int>();
             foreach (var t in simple.triangles)
             {
-                indices.Add(t.v[0]);
-                indices.Add(t.v[1]);
-                indices.Add(t.v[2]);
+                indices.Add(t.v.i0);
+                indices.Add(t.v.i1);
+                indices.Add(t.v.i2);
             }
             FloorIndices = indices.ToArray();
         }

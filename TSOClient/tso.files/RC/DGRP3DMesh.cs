@@ -117,6 +117,16 @@ namespace FSO.Files.RC
             }
         }
 
+        public static void SaveAsync(DGRP3DMesh mesh)
+        {
+            mesh.IncrementDataRef();
+            QueueWork(() =>
+            {
+                mesh.Save();
+                mesh.DecrementDataRef();
+            });
+        }
+
         //END STATIC
 
         public int Version = CURRENT_VERSION;
@@ -254,6 +264,8 @@ namespace FSO.Files.RC
 
                     var depthB = sprite.GetDepth();
 
+                    if (depthB == null) continue;
+
                     var useDequantize = false;
                     float[] depth = null;
                     int iterations = 125;
@@ -272,15 +284,17 @@ namespace FSO.Files.RC
                     }
                     else if (depthB != null)
                     {
-                        depth = depthB.Select(x => x / 255f).ToArray();
                         iterations = 125;
                         aggressiveness = 3.5f;
                     }
 
-                    if (depth == null) continue;
-
                     QueueWork(() =>
                     {
+                        if (depth == null && depthB != null)
+                        {
+                            depth = depthB.Select(x => x / 255f).ToArray();
+                        }
+
                         var boundPts = new List<Vector3>();
                         //begin async part
                         var w = ((TextureInfo)tex.Tag).Size.X;
@@ -483,16 +497,20 @@ namespace FSO.Files.RC
 
                         if (useSimplification)
                         {
-                            var simple = new Simplify();
-                            simple.vertices = verts.Select(x => new MSVertex() { p = x.Position, t = x.TextureCoordinate }).ToList();
+                            var vertices = verts.Select(x => new MSVertex() { p = x.Position, t = x.TextureCoordinate }).ToArray();
+                            var triangles = new MSTriangle[indices.Count / 3];
+                            int ind = 0;
                             for (int t = 0; t < indices.Count; t += 3)
                             {
-                                simple.triangles.Add(new MSTriangle()
+                                triangles[ind++] = (new MSTriangle()
                                 {
-                                    v = new int[] { indices[t], indices[t + 1], indices[t + 2] }
+                                    v = new MSTriangleIndices(indices[t], indices[t + 1], indices[t + 2])
                                 });
                             }
-                            simple.simplify_mesh(simple.triangles.Count / triDivisor, agressiveness: aggressiveness, iterations: iterations);
+
+                            var simple = new Simplify(triangles, vertices);
+
+                            simple.simplify_mesh(triangles.Length / triDivisor, agressiveness: aggressiveness, iterations: iterations);
 
                             verts = simple.vertices.Select(x =>
                             {
@@ -507,12 +525,15 @@ namespace FSO.Files.RC
                             indices.Clear();
                             foreach (var t in simple.triangles)
                             {
-                                indices.Add(t.v[0]);
-                                indices.Add(t.v[1]);
-                                indices.Add(t.v[2]);
+                                indices.Add(t.v.i0);
+                                indices.Add(t.v.i1);
+                                indices.Add(t.v.i2);
                             }
 
-                            GameThread.NextUpdate(x =>
+                            var verts2 = verts.Select(v => new DGRP3DVert(v.Position, Vector3.Zero, v.TextureCoordinate)).ToList();
+                            DGRP3DVert.GenerateNormals(!sprite.Flip, verts2, indices);
+
+                            GameThread.InStreamUpdate(() =>
                             {
                                 if (geom.SVerts == null)
                                 {
@@ -522,8 +543,6 @@ namespace FSO.Files.RC
 
                                 var bID = geom.SVerts.Count;
                                 foreach (var id in indices) geom.SIndices.Add(id + bID);
-                                var verts2 = verts.Select(v => new DGRP3DVert(v.Position, Vector3.Zero, v.TextureCoordinate)).ToList();
-                                DGRP3DVert.GenerateNormals(!sprite.Flip, verts2, indices);
                                 geom.SVerts.AddRange(verts2);
 
                                 lock (this)
@@ -534,7 +553,10 @@ namespace FSO.Files.RC
                         }
                         else
                         {
-                            GameThread.NextUpdate(x =>
+                            var verts2 = verts.Select(v => new DGRP3DVert(v.Position, Vector3.Zero, v.TextureCoordinate)).ToList();
+                            DGRP3DVert.GenerateNormals(!sprite.Flip, verts2, indices);
+
+                            GameThread.InStreamUpdate(() =>
                             {
                                 if (geom.SVerts == null)
                                 {
@@ -544,8 +566,6 @@ namespace FSO.Files.RC
 
                                 var baseID = geom.SVerts.Count;
                                 foreach (var id in indices) geom.SIndices.Add(id + baseID);
-                                var verts2 = verts.Select(v => new DGRP3DVert(v.Position, Vector3.Zero, v.TextureCoordinate)).ToList();
-                                DGRP3DVert.GenerateNormals(!sprite.Flip, verts2, indices);
                                 geom.SVerts.AddRange(verts2);
                                 lock (this)
                                 {
@@ -612,7 +632,7 @@ namespace FSO.Files.RC
         {
             Bounds = (BoundPts.Count == 0) ? new BoundingBox() : BoundingBox.CreateFromPoints(BoundPts);
             BoundPts = null;
-            Save();
+            SaveAsync(this);
             foreach (var g in Geoms)
                 foreach (var e in g)
                 {
@@ -627,8 +647,14 @@ namespace FSO.Files.RC
             Directory.CreateDirectory(SaveDirectory);
             using (var stream = File.Open(dir, FileMode.Create))
             {
-                using (var cstream = new GZipStream(stream, CompressionMode.Compress))
-                    Save(cstream);
+                using (var memstream = new MemoryStream())
+                {
+                    Save(memstream);
+
+                    memstream.Position = 0;
+                    using (var cstream = new GZipStream(stream, CompressionMode.Compress))
+                        memstream.CopyTo(cstream);
+                }
             }
         }
 
@@ -714,6 +740,28 @@ namespace FSO.Files.RC
                         m.SaveMTL(io, dyn, path);
                     }
                     dyn++;
+                }
+            }
+        }
+
+        public void IncrementDataRef()
+        {
+            foreach (var geom in Geoms)
+            {
+                foreach (var texGeom in geom.Values)
+                {
+                    texGeom.IncrementDataRef();
+                }
+            }
+        }
+
+        public void DecrementDataRef()
+        {
+            foreach (var geom in Geoms)
+            {
+                foreach (var texGeom in geom.Values)
+                {
+                    texGeom.DecrementDataRef();
                 }
             }
         }

@@ -1,9 +1,22 @@
-﻿namespace FSO.Common.MeshSimplify
+﻿using System;
+using System.Runtime.CompilerServices;
+
+namespace FSO.Common.MeshSimplify
 {
-    public class SymmetricMatrix
+    public struct SymmetricMatrix
     {
-        public SymmetricMatrix(double c) {
-            for (int i=0; i<10; i++) m[i] = c;
+        public double m11;
+        public double m12;
+        public double m13;
+        public double m14;
+        public double m22;
+        public double m23;
+        public double m24;
+        public double m33;
+        public double m34;
+        public double m44;
+
+        public SymmetricMatrix(double c) : this(c, c, c, c, c, c, c, c, c, c) {
         }
 
 
@@ -12,45 +25,63 @@
                                                        double m33, double m34,
                                                                    double m44)
         {
-            m[0] = m11; m[1] = m12; m[2] = m13; m[3] = m14;
-                        m[4] = m22; m[5] = m23; m[6] = m24;
-                                    m[7] = m33; m[8] = m34;
-                                                m[9] = m44;
+            this.m11 = m11; this.m12 = m12; this.m13 = m13; this.m14 = m14;
+                            this.m22 = m22; this.m23 = m23; this.m24 = m24;
+                                            this.m33 = m33; this.m34 = m34;
+                                                            this.m44 = m44;
         }
 
         // Make plane
 
         public SymmetricMatrix(double a, double b, double c, double d)
         {
-            m[0] = a * a; m[1] = a * b; m[2] = a * c; m[3] = a * d;
-            m[4] = b * b; m[5] = b * c; m[6] = b * d;
-            m[7] = c * c; m[8] = c * d;
-            m[9] = d * d;
+            this.m11 = a * a; this.m12 = a * b; this.m13 = a * c; this.m14 = a * d;
+                              this.m22 = b * b; this.m23 = b * c; this.m24 = b * d;
+                                                this.m33 = c * c; this.m34 = c * d;
+                                                                  this.m44 = d * d;
         }
 
         public double this[int c] {
-            get { return m[c]; }
-            set { m[c] = value; }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (c < 0 || c > 9)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+
+                return Unsafe.Add(ref m11, c);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set
+            {
+                if (c < 0 || c > 9)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+
+                Unsafe.Add(ref m11, c) = value;
+            }
         }
 
-        public double[] m = new double[10];
-
         //determinant
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double det(int a11, int a12, int a13,
                    int a21, int a22, int a23,
                    int a31, int a32, int a33)
         {
-            double det = m[a11] * m[a22] * m[a33] + m[a13] * m[a21] * m[a32] + m[a12] * m[a23] * m[a31]
-                        - m[a13] * m[a22] * m[a31] - m[a11] * m[a23] * m[a32] - m[a12] * m[a21] * m[a33];
+            double det = this[a11] * this[a22] * this[a33] + this[a13] * this[a21] * this[a32] + this[a12] * this[a23] * this[a31]
+                        - this[a13] * this[a22] * this[a31] - this[a11] * this[a23] * this[a32] - this[a12] * this[a21] * this[a33];
             return det;
         }
 
         public static SymmetricMatrix operator +(SymmetricMatrix m, SymmetricMatrix n)
         {
-            return new SymmetricMatrix(m[0] + n[0], m[1] + n[1], m[2] + n[2], m[3] + n[3],
-                                                    m[4] + n[4], m[5] + n[5], m[6] + n[6],
-                                                                 m[7] + n[7], m[8] + n[8],
-                                                                              m[9] + n[9]);
+            return new SymmetricMatrix(m.m11 + n.m11, m.m12 + n.m12, m.m13 + n.m13, m.m14 + n.m14,
+                                                      m.m22 + n.m22, m.m23 + n.m23, m.m24 + n.m24,
+                                                                     m.m33 + n.m33, m.m34 + n.m34,
+                                                                                    m.m44 + n.m44);
         }
     }
 }
