@@ -34,7 +34,8 @@ namespace FSO.Server.Database.DA.Bans
                     user_id = userid,
                     ip_address = ip,
                     banreason = reason,
-                    end_date = enddate
+                    end_date = enddate,
+                    client_id
                 }
             );
         }

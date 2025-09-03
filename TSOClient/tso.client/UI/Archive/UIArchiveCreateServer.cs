@@ -112,7 +112,7 @@ namespace FSO.Client.UI.Archive
                     var flagHbox = new UIHBoxContainer();
 
                     var check = new UIButton(GetTexture(0x0000083600000001));
-                    check.Selected = flag.DefaultValue;
+                    check.Selected = Config.Flags.HasFlag(flag.Value);
 
                     if (flag.Indentation > 0)
                     {
