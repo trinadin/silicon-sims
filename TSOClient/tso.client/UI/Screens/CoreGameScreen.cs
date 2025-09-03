@@ -459,9 +459,13 @@ namespace FSO.Client.UI.Screens
                         World.Opacity = (CityRenderer.m_Zoomed == TerrainZoomMode.Lot)?1f:0f;
                     }
                 }
+                else if (CityRenderer.m_LotZoomProgress > 0)
+                {
+                    CityRenderer.m_LotZoomProgress = 0;
+                }
 
                 if (InLot) //if we're in a lot, use the VM's more accurate time!
-                    CityRenderer.SetTimeOfDay((vm.Context.Clock.Hours / 24.0) + (vm.Context.Clock.Minutes / 1440.0) + (vm.Context.Clock.Seconds / 86400.0));                
+                    CityRenderer.SetTimeOfDay((vm.Context.Clock.Hours / 24.0) + (vm.Context.Clock.Minutes / 1440.0) + (vm.Context.Clock.Seconds / 86400.0));
                 else
                 {
                     var time = DateTime.UtcNow;
