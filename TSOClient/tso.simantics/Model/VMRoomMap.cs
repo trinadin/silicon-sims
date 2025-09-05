@@ -216,6 +216,8 @@ namespace FSO.SimAntics.Model
                             minRoom = room.LightBaseRoom;
                         }
                         room.AdjRooms.Add(myRoom);
+
+                        // This might not be working recursively in certain situations.
                         if (outside) MakeOutside(rooms, room);
                         else if (room.IsOutside) outside = true;
                     }

@@ -621,10 +621,11 @@ namespace FSO.SimAntics
             }
 
             var visited = new HashSet<ushort>();
-            for (ushort i=0; i<RoomInfo.Length; i++)
+            for (ushort i = 0; i < RoomInfo.Length; i++)
             {
-                RefreshLighting(i, i==(RoomInfo.Length-1), visited);
+                RefreshLighting(i, i == (RoomInfo.Length - 1), visited);
             }
+
             if (VM.UseWorld) World.InvalidateZoom();
         }
 
@@ -705,11 +706,11 @@ namespace FSO.SimAntics
 
                 foreach (var rm in info.Room.SupportRooms)
                 {
-                    info = RoomInfo[rm];
-                    light.Bounds = Rectangle.Union(light.Bounds, info.Room.Bounds);
+                    var info2 = RoomInfo[rm];
+                    light.Bounds = Rectangle.Union(light.Bounds, info2.Room.Bounds);
                     RoomInfo[room].Light = light; //adjacent rooms share a light object.
-                    area += info.Room.Area;
-                    foreach (var ent in info.Entities)
+                    area += info2.Room.Area;
+                    foreach (var ent in info2.Entities)
                     {
                         // This roughly attempts to avoid allocations by using and clearing a list...
                         objs.Clear();
@@ -742,7 +743,7 @@ namespace FSO.SimAntics
                                 {
                                     light.Lights.Add(new LotView.LMap.LightData(
                                         new Vector2(subent.Position.x, subent.Position.y), 
-                                        true, 160, room, info.Room.Floor, subent.LightColor, 
+                                        true, 160, room, info2.Room.Floor, subent.LightColor, 
                                         subent.WorldUI as ObjectComponent));
                                     outside += (ushort)subent.GetValue(VMStackObjectVariable.LightingContribution);
                                 }
@@ -759,7 +760,7 @@ namespace FSO.SimAntics
                                         inside += (ushort)subent.GetValue(VMStackObjectVariable.LightingContribution);
                                     }
                                     avg /= objs.Count;
-                                    light.Lights.Add(new LotView.LMap.LightData(avg, false, 160, room, info.Room.Floor, ent.LightColor, ent.WorldUI as ObjectComponent));
+                                    light.Lights.Add(new LotView.LMap.LightData(avg, false, 160, room, info2.Room.Floor, ent.LightColor, ent.WorldUI as ObjectComponent));
                                 }
                                 else
                                 {
@@ -770,7 +771,7 @@ namespace FSO.SimAntics
                                         {
                                             light.Lights.Add(new LotView.LMap.LightData(
                                                 new Vector2(subent.Position.x, subent.Position.y),
-                                                false, 160, room, info.Room.Floor, subent.LightColor, 
+                                                false, 160, room, info2.Room.Floor, subent.LightColor, 
                                                 subent.WorldUI as ObjectComponent));
                                             inside += cont;
                                         }
@@ -791,11 +792,11 @@ namespace FSO.SimAntics
                         if (roomImpact != 0) roomScore += roomImpact;
                     }
 
-                    foreach (var portal in info.WindowPortals)
+                    foreach (var portal in info2.WindowPortals)
                     {
                         if (RoomInfo[RoomInfo[portal.TargetRoom].Room.LightBaseRoom].Room.IsOutside) continue;
                         var ent = VM.GetObjectById(portal.ObjectID);
-                        var wlight = new LotView.LMap.LightData(new Vector2(ent.Position.x, ent.Position.y), false, 100, room, info.Room.Floor, ent.LightColor);
+                        var wlight = new LotView.LMap.LightData(new Vector2(ent.Position.x, ent.Position.y), false, 100, room, info2.Room.Floor, ent.LightColor);
                         wlight.WindowRoom = portal.TargetRoom;
                         var bRoom = RoomInfo[portal.TargetRoom].Room.LightBaseRoom;
                         affected.Add(bRoom);
