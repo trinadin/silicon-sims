@@ -175,10 +175,13 @@ namespace FSO.LotView
 
             //foreach (var sub in Blueprint.SubWorlds) sub.DrawObjects(gd, state);
 
-            _2d.SetScroll(pxOffset);
-            _2d.OffsetPixel(new Vector2());
-            _2d.OffsetTile(new Vector3());
-            _2d.PrepareImmediate(Effects.WorldBatchTechniques.drawZSpriteDepthChannel);
+            if (state.CameraMode == CameraRenderMode._2D)
+            {
+                _2d.SetScroll(pxOffset);
+                _2d.OffsetPixel(new Vector2());
+                _2d.OffsetTile(new Vector3());
+                _2d.PrepareImmediate(Effects.WorldBatchTechniques.drawZSpriteDepthChannel);
+            }
             
             var size = new Vector2(state._2D.LastWidth, state._2D.LastHeight);
             var mainBd = state.WorldSpace.GetScreenFromTile(state.CenterTile);
