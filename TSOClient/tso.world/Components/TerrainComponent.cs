@@ -27,7 +27,6 @@ namespace FSO.LotView.Components
         private int GridPrimitives;
         private int TGridPrimitives;
         private IndexBuffer IndexBuffer;
-        private IndexBuffer BladeIndexBuffer;
         private IndexBuffer GridIndexBuffer;
         private IndexBuffer TGridIndexBuffer;
         public VertexBuffer VertexBuffer;
@@ -202,7 +201,6 @@ namespace FSO.LotView.Components
             if (VertexBuffer != null)
             {
                 IndexBuffer.Dispose();
-                BladeIndexBuffer.Dispose();
                 VertexBuffer.Dispose();
                 GridIndexBuffer?.Dispose();
                 TGridIndexBuffer?.Dispose();
@@ -218,12 +216,10 @@ namespace FSO.LotView.Components
 
             TerrainParallaxVertex[] Geom = new TerrainParallaxVertex[numQuads * 4];
             int[] Indexes = new int[numQuads * 6];
-            int[] BladeIndexes = new int[numQuads * 6];
             NumPrimitives = (numQuads * 2);
 
             int geomOffset = 0;
             int indexOffset = 0;
-            int bindexOffset = 0;
 
             var offsetX = WorldSpace.GetWorldFromTile(Size.X);
             var offsetY = WorldSpace.GetWorldFromTile(Size.Y);
@@ -252,18 +248,6 @@ namespace FSO.LotView.Components
 
                     short tx = (short)x, ty = (short)y;
 
-                    if (blueprint.GetFloor(tx, ty, 1).Pattern == 0 &&
-                        (blueprint.GetWall(tx, ty, 1).Segments & (WallSegments.HorizontalDiag | WallSegments.VerticalDiag)) == 0)
-                    {
-                        BladeIndexes[bindexOffset++] = geomOffset;
-                        BladeIndexes[bindexOffset++] = (geomOffset + 1);
-                        BladeIndexes[bindexOffset++] = (geomOffset + 2);
-
-                        BladeIndexes[bindexOffset++] = (geomOffset + 2);
-                        BladeIndexes[bindexOffset++] = (geomOffset + 3);
-                        BladeIndexes[bindexOffset++] = geomOffset;
-                    }
-
                     Color tlCol = Color.Lerp(LightGreen, LightBrown, GetGrassState(x, y));
                     Color trCol = Color.Lerp(LightGreen, LightBrown, GetGrassState(x + 1, y));
                     Color blCol = Color.Lerp(LightGreen, LightBrown, GetGrassState(x, y + 1));
@@ -285,10 +269,6 @@ namespace FSO.LotView.Components
             IndexBuffer = new IndexBuffer(device, IndexElementSize.ThirtyTwoBits, sizeof(int) * Indexes.Length, BufferUsage.None);
             IndexBuffer.SetData(Indexes);
 
-            BladePrimitives = (bindexOffset / 3);
-
-            BladeIndexBuffer = new IndexBuffer(device, IndexElementSize.ThirtyTwoBits, sizeof(int) * Indexes.Length, BufferUsage.None);
-            BladeIndexBuffer.SetData(BladeIndexes);
             GeomLength = Geom.Length;
 
             var primLength = (GridAsTexture) ? 3 : 2;
@@ -585,6 +565,7 @@ namespace FSO.LotView.Components
                 if (parallax) { 
                     grassScale *= grassNum;
                     grassNum = 1;
+                    Effect.ParallaxUVTexMat = new Vector4(0, -1, 0, 1);
                     }
                 for (int i = 1; i <= grassNum; i++)
                 {
@@ -880,7 +861,6 @@ namespace FSO.LotView.Components
             if (VertexBuffer != null)
             {
                 IndexBuffer.Dispose();
-                BladeIndexBuffer.Dispose();
                 VertexBuffer.Dispose();
                 GridIndexBuffer?.Dispose();
                 TGridIndexBuffer?.Dispose();

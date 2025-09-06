@@ -144,6 +144,7 @@ namespace FSO.Client.Controllers
 
                     foreach (var lot in x.Result)
                     {
+                        // This is a slow lookup...
                         var mapItem = mapData.FirstOrDefault(y => y.packed_pos == lot.Id);
                         if (mapItem != null) {
                             lot.Lot_IsOnline = (mapItem.flags & LotTileFlags.Online) == LotTileFlags.Online;

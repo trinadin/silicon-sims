@@ -51,11 +51,17 @@ namespace FSO.LotView.Effects
                 pMapLayout.SetValue(value);
             }
         }
+
+        private float _CurrentLevel;
         public float Level
         {
             set
             {
-                pLevel.SetValue(value);
+                if (value != _CurrentLevel)
+                {
+                    _CurrentLevel = value;
+                    pLevel.SetValue(value);
+                }
             }
         }
 

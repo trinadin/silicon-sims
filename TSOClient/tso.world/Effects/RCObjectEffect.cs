@@ -45,11 +45,18 @@ namespace FSO.LotView.Effects
                 pObjectID.SetValue(value);
             }
         }
+
+        private Vector2 _CurrentUVScale = new Vector2();
         public Vector2 UVScale
         {
             set
             {
-                pUVScale.SetValue(value);
+                // Avoid redundant updates for this parameter.
+                if (value != _CurrentUVScale)
+                {
+                    _CurrentUVScale = value;
+                    pUVScale.SetValue(value);
+                }
             }
         }
         public Vector4 AmbientLight

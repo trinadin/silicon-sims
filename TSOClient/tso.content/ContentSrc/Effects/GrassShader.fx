@@ -440,8 +440,7 @@ float2 GrassParallaxMapping(float2 texCoords, float3 viewDir, float probability)
 	float2 P = viewDir.xy * ParallaxHeight;
 	float2 deltaTexCoords = P / layers;
 
-	//correction since grass repeats at a diagonal
-	deltaTexCoords = float2(deltaTexCoords.x*0.7071 - deltaTexCoords.y*0.7071, deltaTexCoords.y*0.7071 + deltaTexCoords.x*0.7071);
+	deltaTexCoords = float2(deltaTexCoords.x*ParallaxUVTexMat.x + deltaTexCoords.y*ParallaxUVTexMat.y, deltaTexCoords.y*ParallaxUVTexMat.z + deltaTexCoords.x*ParallaxUVTexMat.w);
 
 	float2 currentTexCoords = texCoords;
 
