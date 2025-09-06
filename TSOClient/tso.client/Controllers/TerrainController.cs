@@ -133,27 +133,29 @@ namespace FSO.Client.Controllers
             if (CurrentCity.Value != null)
             {
                 var mapData = LotTileEntry.GenFromCity(CurrentCity.Value);
+                var mapDataFlat = mapData.Values.ToArray();
                 var neighJSON = CurrentCity.Value.City_NeighJSON;
 
                 //We know if lots are online, we can update the data service
-                DataService.GetMany<Lot>(mapData.Select(x => (object)(uint)x.packed_pos).ToArray()).ContinueWith(x =>
+                DataService.GetMany<Lot>(mapDataFlat.Select(x => (object)(uint)x.packed_pos).ToArray()).ContinueWith(x =>
                 {
-                    if (!x.IsCompleted){
+                    if (!x.IsCompleted)
+                    {
                         return;
                     }
 
                     foreach (var lot in x.Result)
                     {
-                        // This is a slow lookup...
-                        var mapItem = mapData.FirstOrDefault(y => y.packed_pos == lot.Id);
-                        if (mapItem != null) {
+                        if (mapData.TryGetValue(lot.Id, out var mapItem))
+                        {
                             lot.Lot_IsOnline = (mapItem.flags & LotTileFlags.Online) == LotTileFlags.Online;
                         }
                     }
                 });
 
-                GameThread.NextUpdate((state) => {
-                    View.populateCityLookup(mapData);
+                GameThread.NextUpdate((state) =>
+                {
+                    View.populateCityLookup(mapDataFlat);
                     if (neighJSON != LastLotJSON)
                     {
                         try
@@ -169,8 +171,7 @@ namespace FSO.Client.Controllers
 
                         LastLotJSON = neighJSON;
                     }
-
-                    });        
+                });        
             }
         }
 

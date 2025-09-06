@@ -26,7 +26,7 @@ namespace FSO.Client.Rendering.City
             this.flags = Flags;
         }
 
-        public static LotTileEntry[] GenFromCity(Common.DataService.Model.City city)
+        public static Dictionary<uint, LotTileEntry> GenFromCity(Common.DataService.Model.City city)
         {
             var entries = new Dictionary<uint, LotTileEntry>();
             foreach (var property in city.City_ReservedLotInfo)
@@ -42,7 +42,7 @@ namespace FSO.Client.Rendering.City
 
             }
 
-            return entries.Values.ToArray();
+            return entries;
         }
     }
 
