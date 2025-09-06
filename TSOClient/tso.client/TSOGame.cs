@@ -48,6 +48,11 @@ namespace FSO.Client
             Content.RootDirectory = FSOEnvironment.GFXContentDir;
             Graphics.SynchronizeWithVerticalRetrace = true;
 
+            if (GraphicsAdapter.DefaultAdapter.IsProfileSupported(GraphicsProfile.HiDef))
+            {
+                Graphics.GraphicsProfile = GraphicsProfile.HiDef;
+            }
+
             FSOEnvironment.DPIScaleFactor = GlobalSettings.Default.DPIScaleFactor;
             if (!FSOEnvironment.SoftwareDepth)
             {
