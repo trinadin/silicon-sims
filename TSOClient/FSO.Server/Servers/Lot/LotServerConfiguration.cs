@@ -1,4 +1,5 @@
-﻿using FSO.Server.Framework.Aries;
+﻿using FSO.Common;
+using FSO.Server.Framework.Aries;
 
 namespace FSO.Server.Servers.Lot
 {
@@ -16,6 +17,8 @@ namespace FSO.Server.Servers.Lot
 
         //How often to reconnect lost connections to city servers and report capacity
         public int CityReportingInterval = 10000;
+
+        public ArchiveConfiguration Archive;
     }
 
     public class LotServerConfigurationCity

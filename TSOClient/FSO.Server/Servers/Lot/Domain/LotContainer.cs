@@ -87,6 +87,8 @@ namespace FSO.Server.Servers.Lot.Domain
         private bool ActiveYet;
         private Queue<Action> LotThreadActions = new Queue<Action>();
 
+        private bool AllowGuestOpening => Config.Archive != null && Config.Archive.Flags.HasFlag(FSO.Common.ArchiveConfigFlags.AllOpenable);
+
         private static HashSet<uint> ValidOOWGUIDs = new HashSet<uint>()
         {
             0x37EB32F3, //skill controller
@@ -1002,7 +1004,7 @@ namespace FSO.Server.Servers.Lot.Domain
                     //this works around that possibility. 
                     var preTickAvatars = Lot.Context.ObjectQueries.AvatarsByPersist.Values.Select(x => x).ToList();
                     var noRoomies = !(preTickAvatars.Any(x => ((VMTSOAvatarState)x.TSOState).Permissions > VMTSOAvatarPermissions.Visitor)) 
-                        && (LotPersist.admit_mode < 4 && LotPersist.category != LotCategory.community);
+                        && (LotPersist.admit_mode < 4 && LotPersist.category != LotCategory.community) && !AllowGuestOpening;
 
                     try
                     {

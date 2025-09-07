@@ -188,6 +188,8 @@ namespace FSO.Server
             i = 0;
             foreach (var lotServer in Config.Services.Lots)
             {
+                if (lotServer.Archive == null) lotServer.Archive = Config.Archive;
+
                 if (lotServer.SimNFS == null) lotServer.SimNFS = Config.SimNFS;
                 var childKernel = new ChildKernel(
                     Kernel,

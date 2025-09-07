@@ -23,6 +23,8 @@ namespace FSO.Server.Servers.City.Domain
         private CityServerContext Context;
         private JobMatchmaker Matchmaker;
 
+        private bool AllowGuestOpening => Context.Config.Archive != null && Context.Config.Archive.Flags.HasFlag(FSO.Common.ArchiveConfigFlags.AllOpenable);
+
         public LotAllocations(LotServerPicker PickingEngine, IDAFactory daFactory, CityServerContext context, IKernel kernel)
         {
             this.PickingEngine = PickingEngine;
@@ -198,7 +200,7 @@ namespace FSO.Server.Servers.City.Domain
                                     });
                                 }
 
-                                if (avatarId != 0)
+                                if (avatarId != 0 && !AllowGuestOpening)
                                 {
                                     var roomies = db.Roommates.GetLotRoommates(lot.lot_id);
                                     var modState = db.Avatars.GetModerationLevel(avatarId);
