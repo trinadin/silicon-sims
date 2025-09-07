@@ -464,12 +464,15 @@ namespace FSO.Client.Controllers
                     else
                     {
                         //we don't have a lot
-                        _LotBuyAlert = null;
-                        ShowNormalLotBuy("$"+price.ToString(), "$" + ourCash.ToString());
-                        var canBuy = price <= ourCash;
-                        UIButton toDisable;
-                        if (_LotBuyAlert.ButtonMap.TryGetValue(UIAlertButtonType.Yes, out toDisable)) toDisable.Disabled = !canBuy;
-                        GameFacade.Cursor.SetCursor(Common.Rendering.Framework.CursorType.Normal);
+                        GameThread.InUpdate(() =>
+                        {
+                            _LotBuyAlert = null;
+                            ShowNormalLotBuy("$" + price.ToString(), "$" + ourCash.ToString());
+                            var canBuy = price <= ourCash;
+                            UIButton toDisable;
+                            if (_LotBuyAlert.ButtonMap.TryGetValue(UIAlertButtonType.Yes, out toDisable)) toDisable.Disabled = !canBuy;
+                            GameFacade.Cursor.SetCursor(Common.Rendering.Framework.CursorType.Normal);
+                        });
                     }
                 });
             });
