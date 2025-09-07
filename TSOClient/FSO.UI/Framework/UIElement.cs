@@ -405,13 +405,13 @@ namespace FSO.Client.UI.Framework
             //Otherwise, assume our matrix is IDENTITY (aka no scale & positioned at 0,0)
             if (_Parent != null)
             {
-                _Mtx = _Parent.Matrix.CloneMatrix();
+                _Parent.Matrix.CopyMatrix(_Mtx);
                 _ScaleParent = _Parent.Scale;
             }
             else
             {
+                Matrix2D.IDENTITY.CopyMatrix(_Mtx);
                 _ScaleParent = Vector2.One;
-                _Mtx = Matrix2D.IDENTITY.CloneMatrix();
             }
 
             //Translate by our x and y coordinates

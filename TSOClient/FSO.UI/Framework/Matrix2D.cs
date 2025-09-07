@@ -99,7 +99,14 @@ namespace FSO.Client.UI.Framework
             return new float[6] { M[0], M[1], M[2], M[3], M[4], M[5] };
         }
 
-
-
+        public static void CopyMatrix(this float[] M, float[] to)
+        {
+            to[0] = M[0];
+            to[1] = M[1];
+            to[2] = M[2];
+            to[3] = M[3];
+            to[4] = M[4];
+            to[5] = M[5];
+        }
     }
 }
