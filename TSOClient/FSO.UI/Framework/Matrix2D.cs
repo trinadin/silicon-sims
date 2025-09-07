@@ -80,18 +80,12 @@ namespace FSO.Client.UI.Framework
             );
         }
 
-        public static float[] ExtractScale(this float[] M)
-        {
-            return new float[2]{
-                (float)Math.Sqrt(M[0] * M[0] + M[1] * M[1]),
-                (float)Math.Sqrt(M[2] * M[2] + M[3] * M[3])
-            };
-        }
-
         public static Vector2 ExtractScaleVector(this float[] M)
         {
-            float[] result = ExtractScale(M);
-            return new Vector2(result[0], result[1]);
+            return new Vector2(
+                (float)Math.Sqrt(M[0] * M[0] + M[1] * M[1]),
+                (float)Math.Sqrt(M[2] * M[2] + M[3] * M[3])
+            );
         }
 
         public static float[] CloneMatrix(this float[] M)

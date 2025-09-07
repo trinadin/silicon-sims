@@ -94,11 +94,14 @@ namespace FSO.Common.DataService
             return GetMany(typeof(T), keys).ContinueWith<T[]>(x =>
             {
                 if (x.IsFaulted) { throw x.Exception; }
-                var result = new List<T>();
-                foreach(var item in x.Result){
-                    result.Add((T)item);
+                var result = new T[x.Result.Length];
+
+                for (int i = 0; i < x.Result.Length; i++)
+                {
+                    result[i] = (T)x.Result[i];
                 }
-                return result.ToArray();
+
+                return result;
             });
         }
 
