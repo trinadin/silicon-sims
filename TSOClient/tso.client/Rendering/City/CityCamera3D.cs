@@ -11,6 +11,7 @@ using FSO.Client.UI.Framework;
 using FSO.Client.UI.Panels;
 using FSO.Common.Rendering.Framework.IO;
 using FSO.LotView.Model;
+using FSO.Common.Utils;
 
 namespace FSO.Client.Rendering.City
 {
@@ -224,8 +225,12 @@ namespace FSO.Client.Rendering.City
                     }
                     else if (LotZoomProgress != 1)
                     {
-                        RotationX += (TargRX - RotationX) / 10;
-                        RotationY += (TargRY - RotationY) / 10;
+                        var speed = 60.0 / FSOEnvironment.RefreshRate;
+                        var interpPercent = 1 - (float)Math.Pow(0.9, speed);
+
+                        var dirDiff = (float)DirectionUtils.Difference(RotationX, TargRX);
+                        RotationX += dirDiff * interpPercent;
+                        RotationY += (TargRY - RotationY) * interpPercent;
                     }
                     else
                     {
