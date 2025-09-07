@@ -199,6 +199,7 @@
     <Compile Include="AtlasBuilder.cs" />
     <Compile Include="FieldFontImporter.cs" />
     <Compile Include="FieldFontProcessor.cs" />
+    <Compile Include="FieldFontWriter.cs" />
     <Compile Include="FloatHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

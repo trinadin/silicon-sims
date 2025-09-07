@@ -1,24 +1,15 @@
 ﻿using Microsoft.Xna.Framework.Content;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MSDFData
 {
-    public class FieldAtlas
+    public readonly struct FieldAtlas
     {
-        [ContentSerializer] private readonly int WidthBackend;
-        [ContentSerializer] private readonly int HeightBackend;
-        [ContentSerializer] private readonly int GlyphSizeBackend;
-        [ContentSerializer] private readonly byte[] PNGDataBackend;
-        [ContentSerializer] private readonly char[] CharMapBackend;
-
-        public FieldAtlas()
-        {
-        }
+        private readonly int WidthBackend;
+        private readonly int HeightBackend;
+        private readonly int GlyphSizeBackend;
+        private readonly byte[] PNGDataBackend;
+        private readonly char[] CharMapBackend;
 
         public FieldAtlas(int width, int height, int glyphSize, byte[] pngData, char[] charMap)
         {
@@ -26,7 +17,6 @@ namespace MSDFData
             HeightBackend = height;
             GlyphSizeBackend = glyphSize;
             PNGDataBackend = pngData;
-            File.WriteAllBytes("test.png", pngData);
             CharMapBackend = charMap;
         }
 

@@ -1,17 +1,10 @@
-﻿using Microsoft.Xna.Framework.Content;
-
-namespace MSDFData
+﻿namespace MSDFData
 {    
-    public class FieldGlyph
+    public readonly struct FieldGlyph
     {        
-        [ContentSerializer] private readonly char CharacterBackend;
-        [ContentSerializer] private readonly int AtlasIndexBackend;
-        [ContentSerializer] private readonly Metrics MetricsBackend;
-
-        public FieldGlyph()
-        {
-           
-        }
+        private readonly char CharacterBackend;
+        private readonly int AtlasIndexBackend;
+        private readonly Metrics MetricsBackend;
 
         public FieldGlyph(char character, int atlasIndex, Metrics metrics)
         {

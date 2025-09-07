@@ -41,7 +41,7 @@ namespace MSDFExtension
 
             if (File.Exists(msdfgen))
             {
-                var glyphs = new FieldGlyph[input.Characters.Count];
+                var glyphs = new FieldGlyph?[input.Characters.Count];
 
                 Atlas = new AtlasBuilder(input.Characters.Count, (int)Resolution);
                 // Generate a distance field for each character using msdfgen
@@ -55,7 +55,7 @@ namespace MSDFExtension
                     });
                 
                 var kerning = ReadKerningInformation(input.Path, input.Characters);
-                return new FieldFont(input.Path, glyphs.Where(x => x != null).ToArray(), kerning, this.Range, Atlas.Finish());
+                return new FieldFont(input.Path, glyphs.Where(x => x != null).Select(x => x.Value).ToArray(), kerning, this.Range, Atlas.Finish());
             }
 
             throw new FileNotFoundException(
@@ -63,7 +63,7 @@ namespace MSDFExtension
                 msdfgen);
         }
 
-        private FieldGlyph CreateFieldGlyphForCharacter(char c, FontDescription input, string msdfgen, string objPath)
+        private FieldGlyph? CreateFieldGlyphForCharacter(char c, FontDescription input, string msdfgen, string objPath)
         {            
             var metrics = CreateDistanceFieldForCharacter(input, msdfgen, objPath, c);
             var path = GetOuputPath(objPath, input, c);

@@ -21,6 +21,7 @@
 /processorParam:ExternalPath=msdfgen.exe
 /processorParam:Resolution=32
 /processorParam:Range=4
+/outputDir:../Content
 /build:Fonts/simdialogue.ini
 
 #begin Fonts/mobile.ini
@@ -29,6 +30,7 @@
 /processorParam:ExternalPath=msdfgen.exe
 /processorParam:Resolution=32
 /processorParam:Range=4
+/outputDir:../Content
 /build:Fonts/mobile.ini
 
 #begin Fonts/trebuchet.ini
@@ -37,6 +39,7 @@
 /processorParam:ExternalPath=msdfgen.exe
 /processorParam:Resolution=32
 /processorParam:Range=4
+/outputDir:../Content
 /build:Fonts/trebuchet.ini
 
 #begin Effects/2DWorldBatch.fx

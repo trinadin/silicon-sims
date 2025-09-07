@@ -237,7 +237,11 @@ namespace FSO.Files.Utils
         /// <returns>A string.</returns>
         public string ReadNullTerminatedString()
         {
+            var first = (char)Reader.ReadByte();
+            if (first == '\0') return "";
+
             var sb = new StringBuilder();
+            sb.Append(first);
             while (true){
                 char ch = (char)Reader.ReadByte();
                 if (ch == '\0'){
@@ -250,7 +254,11 @@ namespace FSO.Files.Utils
 
         public string ReadNullTerminatedUTF8()
         {
+            var first = Reader.ReadByte();
+            if (first == 0) return "";
+
             var sb = new List<byte>();
+            sb.Add(first);
             while (true)
             {
                 var b = Reader.ReadByte();

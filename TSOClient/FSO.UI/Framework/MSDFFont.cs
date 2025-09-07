@@ -167,10 +167,9 @@ namespace FSO.UI.Framework
                     inds = mdata.Indices;
                 }
 
-                var fglyph = glyph.Glyph;
+                var fglyph = glyph.Glyph.Value;
                 var mscale = fglyph.Metrics.Scale;
 
-                
                 var left = point.X - (fglyph.Metrics.Translation.X - 1/mscale) * subScale;
                 var bottom = point.Y + (fglyph.Metrics.Translation.Y + activeFont.YOff/ activeFont.VectorScale - 1 / mscale) * subScale;
 
@@ -201,7 +200,7 @@ namespace FSO.UI.Framework
                     if (next.Glyph != null)
                     {
                         KerningPair pair;
-                        if (pairs.TryGetValue(fglyph.Character | (next.Glyph.Character << 16), out pair))
+                        if (pairs.TryGetValue(fglyph.Character | (next.Glyph.Value.Character << 16), out pair))
                         {
                             point.X += pair.Advance * subScale;
                         }
@@ -274,7 +273,7 @@ namespace FSO.UI.Framework
                     subScale = (activeFont != this) ? activeFont.VectorScale / VectorScale : 1f;
                 }
 
-                size.X += glyph.Glyph.Metrics.Advance * subScale;
+                size.X += glyph.Glyph.Value.Metrics.Advance * subScale;
 
                 if (i < text.Length - 1)
                 {
@@ -284,7 +283,7 @@ namespace FSO.UI.Framework
                     if (next.Glyph != null)
                     {
                         KerningPair pair;
-                        if (pairs.TryGetValue(glyph.Glyph.Character | (next.Glyph.Character << 16), out pair))
+                        if (pairs.TryGetValue(glyph.Glyph.Value.Character | (next.Glyph.Value.Character << 16), out pair))
                         {
                             size.X += pair.Advance * subScale;
                         }
@@ -312,10 +311,10 @@ namespace FSO.UI.Framework
 
     public struct MSDFGlyph
     {
-        public FieldGlyph Glyph;
+        public FieldGlyph? Glyph;
         public MSDFFont Font;
 
-        public MSDFGlyph(FieldGlyph glyph, MSDFFont font)
+        public MSDFGlyph(FieldGlyph? glyph, MSDFFont font)
         {
             Glyph = glyph;
             Font = font;

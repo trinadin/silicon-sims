@@ -6,11 +6,11 @@ namespace MSDFData
 {
     public class FieldFont
     {
-        [ContentSerializer] private readonly Dictionary<char, FieldGlyph> Glyphs;
-        [ContentSerializer] private readonly string NameBackend;
-        [ContentSerializer] private readonly float PxRangeBackend;
-        [ContentSerializer] private readonly List<KerningPair> KerningPairsBackend;
-        [ContentSerializer] private readonly FieldAtlas AtlasBackend;
+        private readonly Dictionary<char, FieldGlyph> Glyphs;
+        private readonly string NameBackend;
+        private readonly float PxRangeBackend;
+        private readonly List<KerningPair> KerningPairsBackend;
+        private readonly FieldAtlas AtlasBackend;
 
         public FieldFont()
         {
@@ -33,6 +33,15 @@ namespace MSDFData
             {
                 this.Glyphs['\u00A0'] = space;
             }
+        }
+
+        public FieldFont(string name, Dictionary<char, FieldGlyph> glyphs, IReadOnlyCollection<KerningPair> kerningPairs, float pxRange, FieldAtlas atlas)
+        {
+            this.NameBackend = name;
+            this.PxRangeBackend = pxRange;
+            this.KerningPairsBackend = kerningPairs.ToList();
+            this.AtlasBackend = atlas;
+            this.Glyphs = glyphs;
         }
 
         /// <summary>
@@ -74,11 +83,13 @@ namespace MSDFData
         /// Characters supported by this font
         /// </summary>
         public FieldAtlas Atlas => AtlasBackend;
+
+        public Dictionary<char, FieldGlyph> GlyphsRaw => Glyphs;
        
         /// <summary>
         /// Returns the glyph for the given character, or returns null when the glyph is not supported by this font
         /// </summary>        
-        public FieldGlyph GetGlyph(char c)
+        public FieldGlyph? GetGlyph(char c)
         {
             if (this.Glyphs.TryGetValue(c, out FieldGlyph glyph))
             {

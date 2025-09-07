@@ -2,16 +2,11 @@
 
 namespace MSDFData
 {
-    public class KerningPair
+    public readonly struct KerningPair
     {
-        [ContentSerializer] private readonly char LeftBackend;
-        [ContentSerializer] private readonly char RightBackend;
-        [ContentSerializer] private readonly float AdvanceBackend;
-
-        public KerningPair()
-        {
-            
-        }
+        private readonly char LeftBackend;
+        private readonly char RightBackend;
+        private readonly float AdvanceBackend;
 
         public KerningPair(char left, char right, float advance)
         {

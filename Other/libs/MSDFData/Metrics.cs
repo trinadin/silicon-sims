@@ -3,16 +3,11 @@ using Microsoft.Xna.Framework.Content;
 
 namespace MSDFData
 {
-    public class Metrics
+    public readonly struct Metrics
     {
-        [ContentSerializer] private readonly float AdvanceBackend;
-        [ContentSerializer] private readonly float ScaleBackend;
-        [ContentSerializer] private readonly Vector2 TranslationBackend;
-
-        public Metrics()
-        {
-            
-        }
+        private readonly float AdvanceBackend;
+        private readonly float ScaleBackend;
+        private readonly Vector2 TranslationBackend;
 
         public Metrics(float advance, float scale, Vector2 translation)
         {

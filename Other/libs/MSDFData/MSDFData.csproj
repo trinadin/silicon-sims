@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="FieldAtlas.cs" />
     <Compile Include="FieldFont.cs" />
+    <Compile Include="FieldFontReader.cs" />
     <Compile Include="FieldGlyph.cs" />
     <Compile Include="FontDescription.cs" />
     <Compile Include="KerningPair.cs" />

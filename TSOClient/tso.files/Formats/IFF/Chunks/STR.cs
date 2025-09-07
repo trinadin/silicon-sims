@@ -300,12 +300,21 @@ namespace FSO.Files.Formats.IFF.Chunks
                 else if (formatCode == -4)
                 {
                     var numLanguageSets = io.ReadByte();
-                    this.LanguageSets = new STRLanguageSet[numLanguageSets];
+                    if (LanguageSets.Length != numLanguageSets)
+                    {
+                        this.LanguageSets = new STRLanguageSet[numLanguageSets];
+                    }
 
                     for(var i=0; i < numLanguageSets; i++)
                     {
                         var item = new STRLanguageSet();
                         var numStringPairs = io.ReadUInt16();
+
+                        if (numStringPairs == 0)
+                        {
+                            continue;
+                        }
+
                         item.Strings = new STRItem[numStringPairs];
                         for (var x = 0; x < numStringPairs; x++)
                         {
