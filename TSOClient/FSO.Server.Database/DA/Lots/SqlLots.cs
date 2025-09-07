@@ -5,6 +5,7 @@ using FSO.Server.Database.DA.Roommates;
 using FSO.Server.Database.DA.Utils;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Linq;
 
 namespace FSO.Server.Database.DA.Lots
@@ -268,29 +269,60 @@ namespace FSO.Server.Database.DA.Lots
             return success;
         }
 
-        private static string NHoodQuery = 
-                "UPDATE fso.fso_lots l " +
+        private static string NHoodQuery =
+                "UPDATE fso_lots l" +
                 "SET neighborhood_id = " +
                 "COALESCE((SELECT neighborhood_id " +
-                "FROM fso.fso_neighborhoods n " +
+                "FROM fso_neighborhoods n " +
+                "ORDER BY(POWER(((l.location & 65535) + 0.0) - ((n.location & 65535) + 0.0), 2) + " +
+                "POWER((FLOOR(l.location / 65536) + 0.0) - (FLOOR(n.location / 65536) + 0.0), 2)) " +
+                "LIMIT 1), 0) ";
+
+
+        private static string NHoodSqliteQuery =
+                "UPDATE fso_lots " +
+                "SET neighborhood_id = " +
+                "COALESCE((SELECT n.neighborhood_id " +
+                "FROM fso_neighborhoods n JOIN fso_lots l " +
+                "WHERE l.lot_id = fso_lots.lot_id " +
                 "ORDER BY(POWER(((l.location & 65535) + 0.0) - ((n.location & 65535) + 0.0), 2) + " +
                 "POWER((FLOOR(l.location / 65536) + 0.0) - (FLOOR(n.location / 65536) + 0.0), 2)) " +
                 "LIMIT 1), 0) ";
 
         public int UpdateAllNeighborhoods(int shard_id)
         {
-            return Context.Connection.Execute(
-                NHoodQuery +
-                "WHERE l.shard_id = @shard_id"
-                , new { shard_id = shard_id });
+            if (Context.Connection is SQLiteConnection)
+            {
+                return Context.Connection.Execute(
+                    NHoodSqliteQuery +
+                    "WHERE shard_id = @shard_id"
+                    , new { shard_id = shard_id });
+            }
+            else
+            {
+                return Context.Connection.Execute(
+                    NHoodQuery +
+                    "WHERE l.shard_id = @shard_id"
+                    , new { shard_id = shard_id });
+            }
         }
 
         public bool UpdateNeighborhood(int lot_id)
         {
-            return (Context.Connection.Execute(
-                NHoodQuery +
-                "WHERE l.lot_id = @lot_id"
-                , new { lot_id = lot_id })) > 0;
+            if (Context.Connection is SQLiteConnection)
+            {
+                return (Context.Connection.Execute(
+                    NHoodSqliteQuery +
+                    "WHERE lot_id = @lot_id"
+                    , new { lot_id = lot_id })) > 0;
+            }
+            else
+            {
+                return (Context.Connection.Execute(
+                    NHoodQuery +
+                    "WHERE l.lot_id = @lot_id"
+                    , new { lot_id = lot_id })) > 0;
+            }
         }
     }
 }
