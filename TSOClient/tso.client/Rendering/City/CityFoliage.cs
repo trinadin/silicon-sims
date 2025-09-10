@@ -143,7 +143,7 @@ namespace FSO.Client.Rendering.City
             VertexShader.CurrentTechnique = VertexShader.Techniques[1];
             VertexShader.CurrentTechnique.Passes[5].Apply();
 
-            var copy = new HashSet<int>(terrain.LotTileLookup.Keys.Select(i => (int)i.Y*512+(int)i.X));
+            var copy = terrain.OccupiedTiles;
 
             for (int y = Math.Max(0, cy-size); y<= Math.Min(31, cy + size); y++)
             {

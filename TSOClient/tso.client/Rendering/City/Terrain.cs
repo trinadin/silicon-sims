@@ -52,6 +52,7 @@ namespace FSO.Client.Rendering.City
         public IndexBuffer LotOnlineInds;
 
         public Dictionary<Vector2, LotTileEntry> LotTileLookup = new Dictionary<Vector2, LotTileEntry>();
+        public HashSet<int> OccupiedTiles = new HashSet<int>();
 
         public bool HandleMouse = false;
         public CityMapData MapData { get
@@ -233,9 +234,12 @@ namespace FSO.Client.Rendering.City
             LotTileData = TileData;
             var oldLookup = new HashSet<Vector2>(LotTileLookup.Keys);
             LotTileLookup = new Dictionary<Vector2, LotTileEntry>();
+            OccupiedTiles = new HashSet<int>();
             for (int i = 0; i < TileData.Length; i++)
             {
-                LotTileLookup[new Vector2(TileData[i].x, TileData[i].y)] = TileData[i];
+                var tile = TileData[i];
+                LotTileLookup[new Vector2(tile.x, tile.y)] = tile;
+                OccupiedTiles.Add((int)tile.y * 512 + (int)tile.x);
             }
             oldLookup.ExceptWith(new HashSet<Vector2>(LotTileLookup.Keys));
             foreach (var deleted in oldLookup)
