@@ -35,6 +35,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FSO.Server.Servers.Lot.Domain
 {
@@ -61,7 +62,7 @@ namespace FSO.Server.Servers.Lot.Domain
         private VM Lot;
         private VMServerDriver VMDriver;
         private LotServerGlobalLink VMGlobalLink;
-        private byte[][] HollowLots;
+        private Task<byte[][]> HollowLots;
         public int ClientCount = 0;
         public int TimeToShutdown = -1;
         public int LotSaveTicker = 0;
@@ -296,10 +297,10 @@ namespace FSO.Server.Servers.Lot.Domain
             return "Failed to obtain trace! (100 times)";
         }
 
-        public void LoadAdj()
+        public byte[][] LoadAdj()
         {
             LOG.Info("Loading adj lots for lot with dbid = " + Context.DbId);
-            HollowLots = new byte[9][];
+            var result = new byte[9][];
             var myPos = MapCoordinates.Unpack(LotPersist.location);
             foreach (var lot in LotAdj)
             {
@@ -317,7 +318,7 @@ namespace FSO.Server.Servers.Lot.Domain
                         int numBytesToRead = Convert.ToInt32(fs.Length);
                         var file = new byte[(numBytesToRead)];
                         fs.Read(file, 0, numBytesToRead);
-                        HollowLots[y * 3 + x] = file;
+                        result[y * 3 + x] = file;
                     }
                 }
                 catch (Exception e)
@@ -327,6 +328,8 @@ namespace FSO.Server.Servers.Lot.Domain
                     //don't bother
                 }
             }
+
+            return result;
         }
 
         public bool AttemptLoadRing()
@@ -715,7 +718,7 @@ namespace FSO.Server.Servers.Lot.Domain
 
             bool isNew = false;
             bool isMoved = (LotPersist.move_flags > 0);
-            LoadAdj();
+            HollowLots = Task.Run(LoadAdj);
             if (!JobLot && LotPersist.ring_backup_num > -1 && AttemptLoadRing())
             {
                 LOG.Info("Successfully loaded and cleaned fsov for dbid = " + Context.DbId);
@@ -1261,7 +1264,7 @@ namespace FSO.Server.Servers.Lot.Domain
                 Host.RecordStartVisit(session, visitorType);
 
                 VMDriver.ConnectClient(client);
-                VMDriver.SendDirectCommand(client, new VMNetAdjHollowSyncCmd { HollowAdj = HollowLots });
+                VMDriver.SendDirectCommand(client, new VMNetAdjHollowSyncCmd { HollowAdj = HollowLots.Result });
 
                 var vmInventory = new List<VMInventoryItem>();
                 foreach (var item in inventory)
