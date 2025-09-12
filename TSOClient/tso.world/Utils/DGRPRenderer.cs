@@ -409,7 +409,7 @@ namespace FSO.LotView.Utils
 
         public virtual void Preload(WorldState world, ComponentRenderMode mode)
         {
-            if (mode.IsSet(ComponentRenderMode._2D))
+            if (mode.IsSet(ComponentRenderMode._2D) && world.CameraMode != CameraRenderMode._3D)
                 ValidateSprite(world);
 
             if (mode.IsSet(ComponentRenderMode._3D) || world.CameraMode != CameraRenderMode._2D || WorldConfig.Current.UltraLighting)

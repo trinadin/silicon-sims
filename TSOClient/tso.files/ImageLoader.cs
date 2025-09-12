@@ -1,31 +1,153 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
-using System.IO;
+﻿using FSO.Files.Formats.IFF.Chunks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace FSO.Files
 {
+    public struct ImageData
+    {
+        private Color[] ColorData;
+        public Color[] Data => ColorData ?? GetColorData();
+        public readonly byte[] ByteData;
+        public readonly int Width;
+        public readonly int Height;
+
+        public ImageData(Color[] data, int width, int height)
+        {
+            ColorData = data;
+            ByteData = null;
+            Width = width;
+            Height = height;
+        }
+
+        public ImageData(byte[] data, int width, int height)
+        {
+            ColorData = null;
+            ByteData = data;
+            Width = width;
+            Height = height;
+        }
+
+        public Texture2D GetTexture(GraphicsDevice gd)
+        {
+            if (ColorData == null && ByteData == null)
+            {
+                return null;
+            }
+
+            var tex = new Texture2D(gd, Width, Height);
+            if (ColorData != null)
+            {
+                tex.SetData(ColorData);
+            }
+            else
+            {
+                tex.SetData(ByteData);
+            }
+
+            return tex;
+        }
+
+        private unsafe Color[] GetColorData()
+        {
+            var data = ByteData;
+            Color[] colorData = new Color[data.Length / 4];
+
+            fixed (void* ptr = colorData)
+            {
+                Marshal.Copy(data, 0, (IntPtr)ptr, data.Length);
+            }
+
+            ColorData = colorData;
+
+            return colorData;
+        }
+    }
+
+    public readonly struct ImageDataOrTextureProducer
+    {
+        public readonly ImageData? Data;
+        public readonly Func<Texture2D> Producer;
+
+        public ImageDataOrTextureProducer(ImageData data)
+        {
+            Data = data;
+            Producer = null;
+        }
+
+        public ImageDataOrTextureProducer(Func<Texture2D> producer)
+        {
+            Producer = producer;
+            Data = null;
+        }
+
+        public Texture2D GetTexture(GraphicsDevice gd)
+        {
+            if (Producer != null)
+            {
+                return Producer();
+            }
+            else if (Data != null)
+            {
+                return Data.Value.GetTexture(gd);
+            }
+
+            return null;
+        }
+
+        public Func<Texture2D> GetProducer(GraphicsDevice gd)
+        {
+            if (Producer != null)
+            {
+                return Producer;
+            }
+            else if (Data != null)
+            {
+                var data = Data.Value;
+                return () =>
+                {
+                    return data.GetTexture(gd);
+                };
+            }
+            else
+            {
+                return () => null;
+            }
+        }
+    }
+
     public class ImageLoader
     {
         public static bool UseSoftLoad = true;
         public static int PremultiplyPNG = 0;
 
-        public static HashSet<uint> MASK_COLORS = new HashSet<uint>{
-            new Microsoft.Xna.Framework.Color(0xFF, 0x00, 0xFF, 0xFF).PackedValue,
-            new Microsoft.Xna.Framework.Color(0xFE, 0x02, 0xFE, 0xFF).PackedValue,
-            new Microsoft.Xna.Framework.Color(0xFF, 0x01, 0xFF, 0xFF).PackedValue
-        };
-
         public static Func<GraphicsDevice, Stream, Texture2D> BaseFunction = WinFromStream;
         public static Func<GraphicsDevice, Stream, Func<Texture2D>> BaseNonUIFunction = WinNonUIFromStream;
+        public static Func<GraphicsDevice, Stream, ImageDataOrTextureProducer?> BaseDataFunction = WinDataFromStream;
 
 
         public static Texture2D FromStream(GraphicsDevice gd, Stream str)
         {
             return BaseFunction(gd, str);
+        }
+
+        /// <summary>
+        /// Gets data or a Texture2D factory for the given stream.
+        /// This runs the decoder work on the calling thread, and may return the raw image data,
+        /// or returns a function that creates the texture that should be called on the main thread.
+        /// </summary>
+        /// <param name="gd"></param>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static ImageDataOrTextureProducer? DataFromStream(GraphicsDevice gd, Stream str)
+        {
+            return BaseDataFunction(gd, str);
         }
 
         /// <summary>
@@ -49,6 +171,11 @@ namespace FSO.Files
         private static Func<Texture2D> WinNonUIFromStream(GraphicsDevice gd, Stream str)
         {
             return WinNonUIFromStreamP(gd, str, 0);
+        }
+
+        private static ImageDataOrTextureProducer? WinDataFromStream(GraphicsDevice gd, Stream str)
+        {
+            return WinDataFromStreamP(gd, str, 0);
         }
 
         public static bool Premultiply(Color[] buffer, int premult)
@@ -126,6 +253,11 @@ namespace FSO.Files
 
         public static Func<Texture2D> WinNonUIFromStreamP(GraphicsDevice gd, Stream str, int premult)
         {
+            return WinDataFromStreamP(gd, str, premult)?.GetProducer(gd);
+        }
+
+        public static ImageDataOrTextureProducer? WinDataFromStreamP(GraphicsDevice gd, Stream str, int premult)
+        {
             //if (!UseSoftLoad)
             //{
             //attempt monogame load of image
@@ -142,23 +274,20 @@ namespace FSO.Files
                     {
                         var bmp = ImageLoaderHelpers.BitmapFunction(str);
                         if (bmp == null) return null;
-                        return () =>
-                        {
-                            Texture2D tex = new Texture2D(gd, bmp.Item2, bmp.Item3);
-                            tex.SetData(bmp.Item1);
-                            ManualTextureMaskSingleThreaded(ref tex, MASK_COLORS.ToArray());
-                            return tex;
-                        };
+
+                        ManualTextureMaskData(bmp.Item1);
+
+                        return new ImageDataOrTextureProducer(new ImageData(bmp.Item1, bmp.Item2, bmp.Item3));
                     }
                     else
                     {
-                        return () =>
+                        return new ImageDataOrTextureProducer(() =>
                         {
                             Texture2D tex = Texture2D.FromStream(gd, str);
 
-                            ManualTextureMaskSingleThreaded(ref tex, MASK_COLORS.ToArray());
+                            ManualTextureMaskSingleThreaded(ref tex);
                             return tex;
-                        };
+                        });
                     }
                 }
                 catch (Exception)
@@ -179,12 +308,7 @@ namespace FSO.Files
                     {
                         var tga = new TargaImagePCL.TargaImage(str);
 
-                        return () =>
-                        {
-                            var tex = new Texture2D(gd, tga.Image.Width, tga.Image.Height);
-                            tex.SetData(tga.Image.ToBGRA(true));
-                            return tex;
-                        };
+                        return new ImageDataOrTextureProducer(new ImageData(tga.Image.ToBGRA(true), tga.Image.Width, tga.Image.Height));
                     }
                     catch (Exception)
                     {
@@ -205,18 +329,13 @@ namespace FSO.Files
 
                             Premultiply(bmp.Item1, premult);
 
-                            return () =>
-                            {
-                                Texture2D tex = new Texture2D(gd, bmp.Item2, bmp.Item3);
-                                tex.SetData(bmp.Item1);
-                                return tex;
-                            };
+                            return new ImageDataOrTextureProducer(new ImageData(bmp.Item1, bmp.Item2, bmp.Item3));
 
                             //buffer = bmp.Item1;
                         }
                         else
                         {
-                            return () =>
+                            return new ImageDataOrTextureProducer(() =>
                             {
                                 Texture2D tex = Texture2D.FromStream(gd, str);
 
@@ -229,13 +348,13 @@ namespace FSO.Files
                                 }
 
                                 return tex;
-                            };
+                            });
                         }
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("error: " + e.ToString());
-                        return () => new Texture2D(gd, 1, 1);
+                        return new ImageDataOrTextureProducer(new ImageData(new Color[1], 1, 1));
                     }
                 }
             }
@@ -246,18 +365,11 @@ namespace FSO.Files
             return WinNonUIFromStreamP(gd, str, premult)();
         }
 
-        public static void ManualTextureMaskSingleThreaded(ref Texture2D Texture, uint[] ColorsFrom)
+        public static bool ManualTextureMaskData(byte[] buffer)
         {
-            var ColorTo = Microsoft.Xna.Framework.Color.Transparent.PackedValue;
-
-            var size = Texture.Width * Texture.Height * 4;
-            byte[] buffer = new byte[size];
-
-            Texture.GetData<byte>(buffer);
-
             var didChange = false;
 
-            for (int i = 0; i < size; i += 4)
+            for (int i = 0; i < buffer.Length; i += 4)
             {
                 if (buffer[i] >= 248 && buffer[i + 2] >= 248 && buffer[i + 1] <= 4)
                 {
@@ -266,11 +378,20 @@ namespace FSO.Files
                 }
             }
 
-            if (didChange)
+            return didChange;
+        }
+
+        public static void ManualTextureMaskSingleThreaded(ref Texture2D Texture)
+        {
+            var size = Texture.Width * Texture.Height * 4;
+            byte[] buffer = new byte[size];
+
+            Texture.GetData<byte>(buffer);
+
+            if (ManualTextureMaskData(buffer))
             {
                 Texture.SetData(buffer);
             }
-            else return;
         }
 
     }

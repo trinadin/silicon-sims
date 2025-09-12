@@ -6,6 +6,7 @@ using FSO.Files.RC;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,7 +40,7 @@ namespace FSO.Content
         }
         public Dictionary<DGRP, DGRP3DMesh> Cache = new Dictionary<DGRP, DGRP3DMesh>();
         public HashSet<DGRP> IgnoreRCCache = new HashSet<DGRP>();
-        public Dictionary<string, Texture2D> ReplacementTex = new Dictionary<string, Texture2D>();
+        public ConcurrentDictionary<string, MTEX> ReplacementTex = new ConcurrentDictionary<string, MTEX>();
         public Dictionary<string, DGRP3DMesh> NameCache = new Dictionary<string, DGRP3DMesh>();
 
         public DGRP3DMesh Get(DGRP dgrp, OBJD obj)
@@ -55,10 +56,7 @@ namespace FSO.Content
                 {
                     try
                     {
-                        using (var file = File.OpenRead(Path.Combine(repldir, name)))
-                        {
-                            result = new DGRP3DMesh(dgrp, file, GD);
-                        }
+                        result = new DGRP3DMesh(dgrp, Path.Combine(repldir, name), GD);
                     }
                     catch (Exception)
                     {
@@ -86,10 +84,7 @@ namespace FSO.Content
                         //does it exist in rc cache
                         try
                         {
-                            using (var file = File.OpenRead(Path.Combine(dir, name)))
-                            {
-                                result = new DGRP3DMesh(dgrp, file, GD);
-                            }
+                            result = new DGRP3DMesh(dgrp, Path.Combine(dir, name), GD);
                         }
                         catch (Exception)
                         {
@@ -121,10 +116,7 @@ namespace FSO.Content
                 //does it exist in replacements
                 try
                 {
-                    using (var file = File.OpenRead(Path.Combine(repldir, name)))
-                    {
-                        result = new DGRP3DMesh(null, file, GD);
-                    }
+                    result = new DGRP3DMesh(null, Path.Combine(repldir, name), GD);
                 }
                 catch (Exception)
                 {
@@ -155,9 +147,10 @@ namespace FSO.Content
             Cache[dgrp] = mesh;
         }
 
-        public Texture2D GetTex(string name)
+        public DGRP3DTextureSource? GetTex(string name)
         {
-            Texture2D result = null;
+            MTEX result = null;
+            // TODO: Could have load the same texture multiple times due to a race condition?
             if (!ReplacementTex.TryGetValue(name, out result))
             {
                 string dir;
@@ -174,19 +167,7 @@ namespace FSO.Content
 
                     if (File.Exists(path))
                     {
-                        using (var file = File.OpenRead(path))
-                        {
-                            result = ImageLoader.FromStream(GD, file);
-                            if (FSOEnvironment.EnableNPOTMip)
-                            {
-                                var data = new Color[result.Width * result.Height];
-                                result.GetData(data);
-                                var n = new Texture2D(GD, result.Width, result.Height, true, SurfaceFormat.Color);
-                                TextureUtils.UploadWithAvgMips(n, GD, data);
-                                result.Dispose();
-                                result = n;
-                            }
-                        }
+                        result = new MTEX(File.OpenRead(path));
                     }
                 }
                 catch (Exception)
@@ -195,7 +176,8 @@ namespace FSO.Content
                 }
                 ReplacementTex[name] = result;
             }
-            return result;
+
+            return DGRP3DTextureSource.WithDecoded(result, GD);
         }
     }
 }

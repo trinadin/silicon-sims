@@ -247,7 +247,7 @@ namespace FSO.Client.Rendering.City
                         loader = () => new Texture2D(GameFacade.GraphicsDevice, 1, 1);
                     }
 
-                    GameThread.InStreamUpdate(() =>
+                    AssetStreaming.InStreamUpdate(() =>
                     {
                         if (Dead || Loaded)
                         {
@@ -284,7 +284,7 @@ namespace FSO.Client.Rendering.City
                         facade = null;
                     }
 
-                    GameThread.InStreamUpdate(() =>
+                    AssetStreaming.InStreamUpdate(() =>
                     {
                         if (Dead)
                         {

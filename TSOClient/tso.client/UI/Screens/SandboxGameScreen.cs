@@ -580,6 +580,14 @@ namespace FSO.Client.UI.Screens
             }
             vm.MyUID = myState.PersistID;
             ZoomLevel = 1;
+
+            AssetStreaming.BeginStreaming(AssetStreamingMode.Lot);
+            while (!World.Preload(GameFacade.GraphicsDevice))
+            {
+                // Don't show anything until preloading completes.
+                AssetStreaming.DigestStreamUpdate();
+            }
+            AssetStreaming.EndStreaming();
         }
 
         public void BlueprintReset(string path)

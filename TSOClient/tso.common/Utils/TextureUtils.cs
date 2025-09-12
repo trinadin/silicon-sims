@@ -7,6 +7,20 @@ using System.IO;
 
 namespace FSO.Common.Utils
 {
+    public readonly struct TextureData<T> where T : struct
+    {
+        public readonly int Level;
+        public readonly T[] Data;
+        public readonly int ElemMultiplier;
+
+        public TextureData(int level, T[] data, int elemMultiplier = 1)
+        {
+            Level = level;
+            Data = data;
+            ElemMultiplier = elemMultiplier;
+        }
+    }
+
     public class TextureUtils
     {
         public static Texture2D TextureFromFile(GraphicsDevice gd, string filePath)
@@ -32,9 +46,9 @@ namespace FSO.Common.Utils
 
         public static Texture2D TextureFromColor(GraphicsDevice gd, Color color)
         {
-            if (_TextureColors.ContainsKey(color.PackedValue))
+            if (_TextureColors.TryGetValue(color.PackedValue, out Texture2D result) && !result.IsDisposed)
             {
-                return _TextureColors[color.PackedValue];
+                return result;
             }
 
             var tex = new Texture2D(gd, 1, 1);
@@ -55,22 +69,8 @@ namespace FSO.Common.Utils
             return tex;
         }
 
-        /**
-         * Because the buffers can be fairly big, its much quicker to just keep some
-         * in memory and reuse them for resampling textures
-         * 
-         * rhy: yeah, maybe, if the code actually did that. i'm also not sure about keeping ~32MB 
-         * of texture buffers in memory at all times when the game is largely single threaded.
-         */
-        private static List<uint[]> ResampleBuffers = new List<uint[]>();
-        private static ulong MaxResampleBufferSize = 1024 * 768;
-
         static TextureUtils()
         {
-            /*for (var i = 0; i < 10; i++)
-            {
-                ResampleBuffers.Add(new uint[MaxResampleBufferSize]);
-            }*/
         }
 
         private static uint[] GetBuffer(int size) //todo: maybe implement something like described, old implementation was broken
@@ -264,7 +264,6 @@ namespace FSO.Common.Utils
                 }
         }
 
-        private static uint[] SINGLE_THREADED_TEXTURE_BUFFER = new uint[MaxResampleBufferSize];
         public static void ManualTextureMaskSingleThreaded(ref Texture2D Texture, uint[] ColorsFrom)
         {
             var ColorTo = Color.Transparent.PackedValue;
@@ -278,7 +277,6 @@ namespace FSO.Common.Utils
 
             for (int i = 0; i < size; i++)
             {
-                
                 if (ColorsFrom.Contains(buffer[i]))
                 {
                     didChange = true;
@@ -337,32 +335,76 @@ namespace FSO.Common.Utils
             return outTex;
         }
 
+        private static int MipDimension(int size)
+        {
+            int count = 0;
+
+            while (size > 0)
+            {
+                count++;
+                size >>= 1;
+            }
+
+            return count;
+        }
+
+        public static int CalculateMipCount(int width, int height)
+        {
+            return Math.Max(MipDimension(width), MipDimension(height));
+        }
+
         public static void UploadWithMips(Texture2D Texture, GraphicsDevice gd, Color[] data)
         {
-            int level = 0;
-            int w = Texture.Width;
-            int h = Texture.Height;
-            while (data != null)
-            {
-                Texture.SetData(level++, null, data, 0, data.Length);
-                data = Decimate(data, w, h);
-                w /= 2;
-                h /= 2;
-            }
+            UploadTexData(Texture, GenerateMips(Texture, data));
         }
 
         public static void UploadWithAvgMips(Texture2D Texture, GraphicsDevice gd, Color[] data)
         {
+            UploadTexData(Texture, GenerateAvgMips(Texture, data));
+        }
+
+        public static TextureData<Color>[] GenerateMips(Texture2D Texture, Color[] data)
+        {
+            return GenerateMips(Texture.Width, Texture.Height, Texture.LevelCount, data);
+        }
+
+        public static TextureData<Color>[] GenerateMips(int w, int h, int mips, Color[] data)
+        {
+            int level = 0;
+
+            var result = new TextureData<Color>[mips];
+            while (data != null)
+            {
+                result[level] = new TextureData<Color>(level, data);
+                level++;
+
+                data = Decimate(data, w, h);
+                w /= 2;
+                h /= 2;
+            }
+
+            return result;
+        }
+
+        public static TextureData<Color>[] GenerateAvgMips(Texture2D Texture, Color[] data)
+        {
             int level = 0;
             int w = Texture.Width;
             int h = Texture.Height;
+            int mips = Texture.LevelCount;
+
+            var result = new TextureData<Color>[mips];
             while (data != null)
             {
-                Texture.SetData(level++, null, data, 0, data.Length);
+                result[level] = new TextureData<Color>(level, data);
+                level++;
+
                 data = AvgDecimate(data, w, h);
                 w /= 2;
                 h /= 2;
             }
+
+            return result;
         }
 
         private static bool IsPowerOfTwo(int x)
@@ -377,39 +419,28 @@ namespace FSO.Common.Utils
 
         public static void UploadDXT5WithMips(Texture2D Texture, int w, int h, GraphicsDevice gd, Color[] data)
         {
-            int level = 0;
-            int dw = ((w + 3) / 4) * 4;
-            int dh = ((h + 3) / 4) * 4;
-            Tuple<byte[], Point> dxt = null;
-            while (data != null)
-            {
-                dxt = DXT5Compress(data, Math.Max(1,w), Math.Max(1,h), Math.Max(1, (dw+3)/4), Math.Max(1, (dh+3)/4));
-                Texture.SetData(level++, null, dxt.Item1, 0, dxt.Item1.Length);
-                data = Decimate(data, w, h);
-                w /= 2;
-                h /= 2;
-                dw /= 2;
-                dh /= 2;
-            }
-
-            while (dw > 0 || dh > 0)
-            {
-                Texture.SetData(level++, null, dxt.Item1, 0, dxt.Item1.Length);
-                dw /= 2;
-                dh /= 2;
-            }
+            UploadTexData(Texture, GenerateDXT5WithMips(Texture, w, h, data));
         }
 
         public static void UploadDXT1WithMips(Texture2D Texture, int w, int h, GraphicsDevice gd, Color[] data)
         {
+            UploadTexData(Texture, GenerateDXT1WithMips(Texture, w, h, data));
+        }
+
+        public static TextureData<byte>[] GenerateDXT5WithMips(Texture2D Texture, int w, int h, Color[] data)
+        {
             int level = 0;
             int dw = ((w + 3) / 4) * 4;
             int dh = ((h + 3) / 4) * 4;
+            int mips = Texture.LevelCount;
+
+            var result = new TextureData<byte>[mips];
             Tuple<byte[], Point> dxt = null;
             while (data != null)
             {
-                dxt = DXT1Compress(data, Math.Max(1, w), Math.Max(1, h), Math.Max(1, (dw + 3) / 4), Math.Max(1, (dh + 3) / 4));
-                Texture.SetData<byte>(level++, null, dxt.Item1, 0, dxt.Item1.Length*2);
+                dxt = DXT5Compress(data, Math.Max(1, w), Math.Max(1, h), Math.Max(1, (dw + 3) / 4), Math.Max(1, (dh + 3) / 4));
+                result[level] = new TextureData<byte>(level, dxt.Item1);
+                level++;
                 data = Decimate(data, w, h);
                 w /= 2;
                 h /= 2;
@@ -419,9 +450,55 @@ namespace FSO.Common.Utils
 
             while (dw > 0 || dh > 0)
             {
-                Texture.SetData<byte>(level++, null, dxt.Item1, 0, dxt.Item1.Length*2);
+                result[level] = new TextureData<byte>(level, dxt.Item1);
+                level++;
                 dw /= 2;
                 dh /= 2;
+            }
+
+            return result;
+        }
+
+        public static TextureData<byte>[] GenerateDXT1WithMips(Texture2D Texture, int w, int h, Color[] data)
+        {
+            int level = 0;
+            int dw = ((w + 3) / 4) * 4;
+            int dh = ((h + 3) / 4) * 4;
+            int mips = Texture.LevelCount;
+
+            var result = new TextureData<byte>[mips];
+            Tuple<byte[], Point> dxt = null;
+            while (data != null)
+            {
+                dxt = DXT1Compress(data, Math.Max(1, w), Math.Max(1, h), Math.Max(1, (dw + 3) / 4), Math.Max(1, (dh + 3) / 4));
+                result[level] = new TextureData<byte>(level, dxt.Item1, 2);
+                level++;
+
+                data = Decimate(data, w, h);
+                w /= 2;
+                h /= 2;
+                dw /= 2;
+                dh /= 2;
+            }
+
+            while (dw > 0 || dh > 0)
+            {
+                result[level] = new TextureData<byte>(level, dxt.Item1, 2);
+                level++;
+                dw /= 2;
+                dh /= 2;
+            }
+
+            return result;
+        }
+
+        public static void UploadTexData<T>(Texture2D texture, TextureData<T>[] data) where T : struct
+        {
+            for (int i = 0; i < data.Length; i++)
+            {
+                ref var item = ref data[i];
+
+                texture.SetData<T>(item.Level, null, item.Data, 0, item.Data.Length * item.ElemMultiplier);
             }
         }
 

@@ -239,7 +239,7 @@ namespace FSOFacadeWorker
         private static void RenderLot()
         {
             GD.Present();
-            Console.WriteLine("Requesting work...");
+            Console.WriteLine($"Requesting work... ({Done} so far)");
 
             api.GetWork((shard, location) =>
             {

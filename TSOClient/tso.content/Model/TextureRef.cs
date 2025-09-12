@@ -51,6 +51,8 @@ namespace FSO.Content.Model
             var texture = base.Process(device, stream);
             if (Mipmap)
             {
+                // TODO: get data, mip that and then upload instead of using a temporary texture
+
                 var data = new Color[texture.Width * texture.Height];
                 texture.GetData(data);
                 texture.Dispose();

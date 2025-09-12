@@ -526,6 +526,7 @@ namespace FSO.Client.UI.Screens
                     {
                         WorldLoaded = true;
                         ClientStateChange(6, 1);
+                        AssetStreaming.EndStreaming();
                     }
                     else
                     {
@@ -557,6 +558,9 @@ namespace FSO.Client.UI.Screens
         public void CleanupLastWorld()
         {
             if (vm == null) return;
+
+            // Might be mid-load.
+            AssetStreaming.EndStreaming();
 
             //clear our cache too, if the setting lets us do that
             DiscordRpcEngine.SendFSOPresence(gizmo.CurrentAvatar.Value.Avatar_Name, null, 0, 0, 0, 0, null, gizmo.CurrentAvatar.Value.Avatar_PrivacyMode > 0);
@@ -680,6 +684,7 @@ namespace FSO.Client.UI.Screens
                 case 6: //done world load
                     GameFacade.Cursor.SetCursor(CursorType.Normal);
                     UIScreen.RemoveDialog(JoinLotProgress);
+                    CursorManager.INSTANCE.SetCursorPriority(0);
                     ZoomLevel = 1;
                     ucp.SetInLot(true);
                     break;
@@ -709,6 +714,7 @@ namespace FSO.Client.UI.Screens
             Driver.OnShutdown += VMShutdown;
 
             vm = new VM(new VMContext(World), Driver, new UIHeadlineRendererProvider());
+            AssetStreaming.BeginStreaming(AssetStreamingMode.Lot);
             vm.FSOVDoAsyncLoad = true;
             vm.ListenBHAVChanges();
             vm.Init();

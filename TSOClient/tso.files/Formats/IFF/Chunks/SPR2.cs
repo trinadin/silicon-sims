@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using FSO.Common.Utils;
 using FSO.Common.Rendering;
 using FSO.Common;
+using System.Threading;
 
 namespace FSO.Files.Formats.IFF.Chunks
 {
@@ -204,6 +205,7 @@ namespace FSO.Files.Formats.IFF.Chunks
         private SPR2 Parent;
         private uint Version;
         private byte[] ToDecode;
+        private PALT Palette;
         public bool Decoded
         {
             get
@@ -212,7 +214,7 @@ namespace FSO.Files.Formats.IFF.Chunks
             }
         }
         public bool ContainsNothing = false;
-        public bool ContainsNoZ = false;
+        public bool ContainsNoZ => (Flags & 0x02) != 0x02;
 
         public SPR2Frame(SPR2 parent)
         {
@@ -231,17 +233,20 @@ namespace FSO.Files.Formats.IFF.Chunks
             {
                 var spriteVersion = io.ReadUInt32();
                 var spriteSize = io.ReadUInt32();
+                ReadHead(version, io);
                 if (IffFile.RETAIN_CHUNK_DATA) ReadDeferred(1001, io);
-                else ToDecode = io.ReadBytes(spriteSize);
+                else ToDecode = io.ReadBytes(spriteSize - 10);
             } else
             {
+                ReadHead(version, io);
                 if (IffFile.RETAIN_CHUNK_DATA) ReadDeferred(1000, io);
-                else ToDecode = io.ReadBytes(guessedSize);
+                else ToDecode = io.ReadBytes(guessedSize - 10);
             }
         }
 
-        public void ReadDeferred(uint version, IoBuffer io)
+        private void ReadHead(uint version, IoBuffer io)
         {
+            // Useful to read these early for async loading
             this.Width = io.ReadUInt16();
             this.Height = io.ReadUInt16();
             this.Flags = io.ReadUInt32();
@@ -252,6 +257,27 @@ namespace FSO.Files.Formats.IFF.Chunks
                 this.PaletteID = (ushort)Parent.DefaultPaletteID;
             }
 
+            UpdatePalette();
+        }
+
+        private void UpdatePalette()
+        {
+            Palette = Parent.ChunkParent.Get<PALT>(this.PaletteID);
+            if (Palette == null) Palette = new PALT() { Colors = new Color[256] };
+        }
+
+        private PALT EnsurePalette()
+        {
+            if (Palette == null)
+            {
+                UpdatePalette();
+            }
+
+            return Palette;
+        }
+
+        public void ReadDeferred(uint version, IoBuffer io)
+        {
             TransparentColorIndex = io.ReadUInt16();
 
             var y = io.ReadInt16();
@@ -261,16 +287,34 @@ namespace FSO.Files.Formats.IFF.Chunks
             this.Decode(io);
         }
 
+        private int _decoding = 0;
+
         public void DecodeIfRequired(bool z)
         {
-            if (ToDecode != null && (((this.Flags & 0x02) == 0x02 && z && ZBufferData == null) || (!z && PixelData == null)))
+            if (ToDecode != null && ((!ContainsNoZ && ZBufferData == null) || (!z && PixelData == null)))
             {
-                using (IoBuffer buf = IoBuffer.FromStream(new MemoryStream(ToDecode), ByteOrder.LITTLE_ENDIAN))
+                if (Interlocked.CompareExchange(ref _decoding, 1, 0) > 0)
                 {
-                    ReadDeferred(Version, buf);
-                }
+                    // If another thread is already decoding the sprite, spin until it's done.
+                    SpinWait w = default;
+                    while (Volatile.Read(ref _decoding) > 0)
+                    {
+                        w.SpinOnce();
+                    }
 
-                if (TimedReferenceController.CurrentType == CacheType.PERMANENT) ToDecode = null;
+                    DecodeIfRequired(z);
+                }
+                else
+                {
+                    using (IoBuffer buf = IoBuffer.FromStream(new MemoryStream(ToDecode), ByteOrder.LITTLE_ENDIAN))
+                    {
+                        ReadDeferred(Version, buf);
+                    }
+
+                    if (TimedReferenceController.CurrentType == CacheType.PERMANENT) ToDecode = null;
+
+                    Interlocked.Exchange(ref _decoding, 0);
+                }
             }
         }
 
@@ -314,21 +358,25 @@ namespace FSO.Files.Formats.IFF.Chunks
             var numPixels = this.Width * this.Height;
             var ow = Width;
             var fc = Parent.FloorCopy;
-            if (fc > 0)
+            if (fc > 0 && Width % 2 != 0)
             {
                 numPixels += Height;
                 Width++;
             }
+
+            Color[] pixelData = null;
+            byte[] palData = null;
+            byte[] zData = null;
+
             if (hasPixels){
-                this.PixelData = new Color[numPixels];
-                this.PalData = new byte[numPixels];
+                pixelData = new Color[numPixels];
+                palData = new byte[numPixels];
             }
             if (hasZBuffer){
-                this.ZBufferData = new byte[numPixels];
+                zData = new byte[numPixels];
             }
 
-            var palette = Parent.ChunkParent.Get<PALT>(this.PaletteID);
-            if (palette == null) palette = new PALT() { Colors = new Color[256] };
+            var palette = EnsurePalette();
             palette.References++;
             var transparentPixel = palette.Colors[TransparentColorIndex];
             transparentPixel.A = 0;
@@ -376,9 +424,9 @@ namespace FSO.Files.Formats.IFF.Chunks
                                         //this mode draws the transparent colour as solid for some reason.
                                         //fixes backdrop theater
                                         var offset = (y * Width) + x;
-                                        this.PixelData[offset] = pxColor;
-                                        this.PalData[offset] = pxValue;
-                                        this.ZBufferData[offset] = zValue;
+                                        pixelData[offset] = pxColor;
+                                        palData[offset] = pxValue;
+                                        zData[offset] = zValue;
                                         x++;
                                     }
                                     if (pxWithAlpha)
@@ -394,11 +442,11 @@ namespace FSO.Files.Formats.IFF.Chunks
                                     for (var col = 0; col < pxCount; col++)
                                     {
                                         var offset = (y * Width) + x;
-                                        this.PixelData[offset] = transparentPixel;
-                                        this.PalData[offset] = (byte)TransparentColorIndex;
-                                        this.PixelData[offset].A = 0;
+                                        pixelData[offset] = transparentPixel;
+                                        palData[offset] = (byte)TransparentColorIndex;
+                                        pixelData[offset].A = 0;
                                         if (hasZBuffer){
-                                            this.ZBufferData[offset] = 255;
+                                            zData[offset] = 255;
                                         }
                                         x++;
                                     }
@@ -418,11 +466,11 @@ namespace FSO.Files.Formats.IFF.Chunks
                                             pxColor.A = 0;
                                             z = 255;
                                         }*/
-                                        this.PixelData[offset] = pxColor;
-                                        this.PalData[offset] = pxIndex;
+                                        pixelData[offset] = pxColor;
+                                        palData[offset] = pxIndex;
                                         if (hasZBuffer)
                                         {
-                                            this.ZBufferData[offset] = z;
+                                            zData[offset] = z;
                                         }
                                         x++;
                                     }
@@ -441,7 +489,7 @@ namespace FSO.Files.Formats.IFF.Chunks
                             var offset = (y * Width) + x;
                             if (hasZBuffer)
                             {
-                                this.ZBufferData[offset] = 255;
+                                zData[offset] = 255;
                             }
                             x++;
                         }
@@ -456,16 +504,16 @@ namespace FSO.Files.Formats.IFF.Chunks
                                 var offset = ((y+row) * Width) + col;
                                 if (hasPixels) 
                                 {
-                                    this.PixelData[offset] = transparentPixel;
-                                    this.PalData[offset] = (byte)TransparentColorIndex;
+                                    pixelData[offset] = transparentPixel;
+                                    palData[offset] = (byte)TransparentColorIndex;
                                 }
                                 if (hasAlpha)
                                 {
-                                    this.PixelData[offset].A = 0;
+                                    pixelData[offset].A = 0;
                                 }
                                 if (hasZBuffer)
                                 {
-                                    ZBufferData[offset] = 255;
+                                    zData[offset] = 255;
                                 }
                             }
                         }
@@ -477,6 +525,11 @@ namespace FSO.Files.Formats.IFF.Chunks
                 }
                 y++;
             }
+
+            this.PixelData = pixelData;
+            this.PalData = palData;
+            this.ZBufferData = zData;
+
             if (!IffFile.RETAIN_CHUNK_DATA) PalData = null;
             if (Parent.ZAsAlpha) CopyZToAlpha();
             if (Parent.FloorCopy == 1) FloorCopy();
@@ -624,40 +677,73 @@ namespace FSO.Files.Formats.IFF.Chunks
             Texture2D result = null;
             if (!PixelCache.TryGetTarget(out result) || ((CachableTexture2D)result).BeingDisposed || result.IsDisposed)
             {
-                DecodeIfRequired(false);
                 if (this.Width == 0 || this.Height == 0)
                 {
                     ContainsNothing = true;
                     return null;
                 }
+
+                var effectiveWidth = Parent.FloorCopy > 0 ? ((Width + 1) & ~1) : Width;
+
                 var tc = FSOEnvironment.TexCompress;
-                var mip = FSOEnvironment.Enable3D && (FSOEnvironment.EnableNPOTMip || (Width == 128 && Height == 64));
-                if (mip && TextureUtils.OverrideCompression(Width, Height)) tc = false;
+                var mip = FSOEnvironment.Enable3D && (FSOEnvironment.EnableNPOTMip || (effectiveWidth == 128 && Height == 64));
+                if (mip && TextureUtils.OverrideCompression(effectiveWidth, Height)) tc = false;
                 if (tc)
                 {
                     
-                    result = new CachableTexture2D(device, ((Width+3)/4)*4, ((Height + 3) / 4) * 4, mip, SurfaceFormat.Dxt5);
-                    if (mip) TextureUtils.UploadDXT5WithMips(result, Width, Height, device, this.PixelData);
-                    else
-                    {
-                        var dxt = TextureUtils.DXT5Compress(this.PixelData, this.Width, this.Height);
-                        result.SetData<byte>(dxt.Item1);
-                    }
+                    result = new CachableTexture2D(device, ((effectiveWidth + 3)/4)*4, ((Height + 3) / 4) * 4, mip, SurfaceFormat.Dxt5);
+
+                    AssetStreaming.LoadTexture(result, AssetStreamingMode.Lot,
+                        () => {
+                            DecodeIfRequired(false);
+                            TextureData<byte>[] data;
+                            if (mip) data = TextureUtils.GenerateDXT5WithMips(result, effectiveWidth, Height, this.PixelData);
+                            else
+                            {
+                                data = new TextureData<byte>[]
+                                {
+                                    new TextureData<byte>(0, TextureUtils.DXT5Compress(this.PixelData, effectiveWidth, this.Height).Item1, 1)
+                                };
+                            }
+
+                            if (!IffFile.RETAIN_CHUNK_DATA)
+                            {
+                                PixelData = null;
+                            }
+
+                            return data;
+                        });
                 }
                 else
                 {
-                    result = new CachableTexture2D(device, this.Width, this.Height, mip, SurfaceFormat.Color);
-                    if (mip) TextureUtils.UploadWithMips(result, device, this.PixelData);
-                    else result.SetData<Color>(this.PixelData);
+                    result = new CachableTexture2D(device, effectiveWidth, this.Height, mip, SurfaceFormat.Color);
+                    AssetStreaming.LoadTexture(result, AssetStreamingMode.Lot,
+                        () =>
+                        {
+                            DecodeIfRequired(false);
+
+                            TextureData<Color>[] data;
+                            if (mip) data = TextureUtils.GenerateMips(result, this.PixelData);
+                            else
+                            {
+                                data = new TextureData<Color>[]
+                                {
+                                    new TextureData<Color>(0, this.PixelData)
+                                };
+                            }
+
+                            if (!IffFile.RETAIN_CHUNK_DATA)
+                            {
+                                PixelData = null;
+                            }
+
+                            return data;
+                        });
                 }
-                result.Tag = new TextureInfo(result, Width, Height);
+
+                result.Tag = new TextureInfo(result, effectiveWidth, Height);
                 PixelCache = new WeakReference<Texture2D>(result);
                 if (TimedReferenceController.CurrentType == CacheType.PERMANENT) PermaRefP = result;
-                if (!IffFile.RETAIN_CHUNK_DATA)
-                {
-                    PixelData = null;
-                    //if (onlyThis && !FSOEnvironment.Enable3D) ZBufferData = null;
-                }
             }
             if (TimedReferenceController.CurrentType != CacheType.PERMANENT) TimedReferenceController.KeepAlive(result, KeepAliveType.ACCESS);
             return result;
@@ -688,36 +774,55 @@ namespace FSO.Files.Formats.IFF.Chunks
             if (ContainsNothing || ContainsNoZ) return null;
             if (!ZCache.TryGetTarget(out result) || ((CachableTexture2D)result).BeingDisposed || result.IsDisposed)
             {
-                DecodeIfRequired(true);
                 if (this.Width == 0 || this.Height == 0)
                 {
                     ContainsNothing = true;
                     return null;
                 }
-                if (ZBufferData == null)
+                if (ContainsNoZ)
                 {
-                    ContainsNoZ = true;
                     return null;
                 }
+
+                var effectiveWidth = Parent.FloorCopy > 0 ? ((Width + 1) & ~1) : Width;
+
                 if (FSOEnvironment.TexCompress)
                 {
-                    result = new CachableTexture2D(device, ((Width+3)/4)*4, ((Height+3)/4)*4, false, SurfaceFormat.Alpha8);
-                    var tempZ = new byte[result.Width * result.Height];
-                    var dind = 0;
-                    var sind = 0;
-                    for (int i=0; i<Height; i++)
-                    {
-                        Array.Copy(ZBufferData, sind, tempZ, dind, Width);
-                        sind += Width;
-                        dind += result.Width;
-                    }
-                    
-                    result.SetData<byte>(tempZ);
+                    result = new CachableTexture2D(device, ((effectiveWidth+3)/4)*4, ((Height+3)/4)*4, false, SurfaceFormat.Alpha8);
+                    AssetStreaming.LoadTexture(result, AssetStreamingMode.Lot,
+                        () =>
+                        {
+                            DecodeIfRequired(true);
+
+                            var tempZ = new byte[result.Width * result.Height];
+                            var dind = 0;
+                            var sind = 0;
+                            for (int i = 0; i < Height; i++)
+                            {
+                                Array.Copy(ZBufferData, sind, tempZ, dind, effectiveWidth);
+                                sind += effectiveWidth;
+                                dind += result.Width;
+                            }
+
+                            if (!IffFile.RETAIN_CHUNK_DATA)
+                            {
+                                if (!FSOEnvironment.Enable3D) ZBufferData = null;
+                            }
+
+                            return new TextureData<byte>[] { new TextureData<byte>(0, tempZ) };
+                        });
                 }
                 else
                 {
-                    result = new CachableTexture2D(device, this.Width, this.Height, false, SurfaceFormat.Alpha8);
-                    result.SetData<byte>(this.ZBufferData);
+                    result = new CachableTexture2D(device, effectiveWidth, this.Height, false, SurfaceFormat.Alpha8);
+
+                    AssetStreaming.LoadTexture(result, AssetStreamingMode.Lot,
+                        () =>
+                        {
+                            DecodeIfRequired(true);
+
+                            return new TextureData<byte>[] { new TextureData<byte>(0, this.ZBufferData) };
+                        });
                 }
                 ZCache = new WeakReference<Texture2D>(result);
                 if (TimedReferenceController.CurrentType == CacheType.PERMANENT) PermaRefZ = result;
@@ -740,11 +845,6 @@ namespace FSO.Files.Formats.IFF.Chunks
                 Pixel = this.GetTexture(device, false)
             };
             result.ZBuffer = this.GetZTexture(device, false);
-            if (!IffFile.RETAIN_CHUNK_DATA)
-            {
-                PixelData = null;
-                if (!FSOEnvironment.Enable3D) ZBufferData = null;
-            }
             return result;
         }
 
@@ -781,6 +881,8 @@ namespace FSO.Files.Formats.IFF.Chunks
                 if (old != null) old.References--;
             }
             PaletteID = p.ChunkID;
+            Palette = p;
+
             p.References++;
         }
     }

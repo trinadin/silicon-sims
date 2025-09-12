@@ -62,7 +62,11 @@ namespace FSO.Client.UI.Panels
         public override void Update(UpdateState state)
         {
             base.Update(state);
-            if (Visible) GameFacade.Cursor.SetCursor(CursorType.Hourglass);
+            if (Visible)
+            {
+                CursorManager.INSTANCE.SetCursorPriority(1);
+                GameFacade.Cursor.SetCursor(CursorType.Hourglass, 1);
+            }
         }
 
         public float Progress

@@ -1,7 +1,7 @@
 ﻿using FSO.Common.Rendering.Framework.Model;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -116,10 +116,6 @@ namespace FSO.Common.Utils
         private static Queue<Callback<UpdateState>> _UpdateCallbacks = new Queue<Callback<UpdateState>>();
         private static Queue<Callback<UpdateState>> _UpdateCallbacksSwap = new Queue<Callback<UpdateState>>();
 
-        private static object _StreamCallbacksLock = new object();
-        private static Queue<Callback> _StreamUpdateCallbacks = new Queue<Callback>();
-        private static Queue<Callback> _StreamUpdateCallbacksSwap = new Queue<Callback>();
-
         public static void SetKilled()
         {
             Killed = true;
@@ -154,14 +150,6 @@ namespace FSO.Common.Utils
             }
 
             return newHook;
-        }
-
-        public static void InStreamUpdate(Callback callback)
-        {
-            lock (_StreamCallbacksLock)
-            {
-                _StreamUpdateCallbacks.Enqueue(callback);
-            }
         }
 
         public static void NextUpdate(Callback<UpdateState> callback)
@@ -223,53 +211,6 @@ namespace FSO.Common.Utils
             }
         }
 
-        public static void DigestStreamUpdate(UpdateState state)
-        {
-            Queue<Callback> _callbacks;
-
-            lock (_StreamCallbacksLock)
-            {
-                // Swap the active callbacks queue with the second one, so we can
-                // process entries without fear of more being added.
-
-                _callbacks = _StreamUpdateCallbacks;
-                _StreamUpdateCallbacks = _StreamUpdateCallbacksSwap;
-                _StreamUpdateCallbacksSwap = _callbacks;
-            }
-
-            // These callbacks have a frametime budget. If it's exceeded, the callbacks are pushed onto the next frame.
-            float frameAllowance = 0.002f;
-            float budgetSeconds = Math.Max(1f / FSOEnvironment.RefreshRate - frameAllowance, 0.005f);
-            long budgetTicks = (long)(Stopwatch.Frequency * budgetSeconds);
-
-            long startTime = Stopwatch.GetTimestamp();
-
-            while (_callbacks.Count > 0)
-            {
-                _callbacks.Dequeue()();
-
-                long now = Stopwatch.GetTimestamp();
-
-                if ((now - startTime) > budgetTicks)
-                {
-                    break;
-                }
-            }
-
-            if (_callbacks.Count > 0)
-            {
-                lock (_StreamCallbacksLock)
-                {
-                    // Push remaining callbacks onto the next frame.
-                    
-                    while (_callbacks.Count > 0)
-                    {
-                        _StreamUpdateCallbacks.Enqueue(_callbacks.Dequeue());
-                    }
-                }
-            }
-        }
-
         public static void DigestUpdate(UpdateState state)
         {
             Queue<Callback<UpdateState>> _callbacks;
@@ -289,7 +230,7 @@ namespace FSO.Common.Utils
                 _callbacks.Dequeue()(state);
             }
 
-            DigestStreamUpdate(state);
+            AssetStreaming.DigestStreamUpdate();
 
             int hookCount;
             UpdateHook[] _hooks;

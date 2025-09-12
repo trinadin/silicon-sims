@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace FSO.LotView
 {
@@ -1095,25 +1096,64 @@ namespace FSO.LotView
 
         public int PreloadProgress;
         public int PreloadObjProgress;
+        private Queue<PreloadCheckpoint> PreloadCheckpoints = new Queue<PreloadCheckpoint>();
+
+        private struct PreloadCheckpoint
+        {
+            public int Checkpoint;
+            public Action Action;
+
+            public PreloadCheckpoint(Action action)
+            {
+                Checkpoint = AssetStreaming.GetCheckpoint();
+                Action = action;
+            }
+
+            public bool TryRun()
+            {
+                if (AssetStreaming.IsCheckpointMet(Checkpoint))
+                {
+                    Action();
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        private void ProcessPreloadCheckpoints(Func<bool> shouldReturn)
+        {
+            while (PreloadCheckpoints.Count > 0 && !shouldReturn() && PreloadCheckpoints.Peek().TryRun())
+            {
+                PreloadCheckpoints.Dequeue();
+            }
+        }
 
         public bool Preload(GraphicsDevice gd)
         {
             var watch = new Stopwatch();
             watch.Start();
 
-            if (PreloadProgress == 0) {
+            bool shouldReturn()
+            {
+                if (watch.ElapsedMilliseconds > 16)
+                {
+                    watch.Stop();
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (PreloadProgress == 0)
+            {
                 var done = 0;
                 for (int i = PreloadObjProgress; i < Blueprint.Objects.Count; i++)
                 {
                     var obj = Blueprint.Objects[i];
                     obj.Preload(gd, State);
                     PreloadObjProgress++;
-                    if (watch.ElapsedMilliseconds > 16 && done >= 6)
-                    {
-                        watch.Stop();
-                        return false;
-                    }
-                    done++;
+                    if (done++ >= 6 && shouldReturn()) return false;
                 }
 
                 for (int i=0; i<Blueprint.Avatars.Count; i++)
@@ -1125,7 +1165,14 @@ namespace FSO.LotView
                 State.OutsideColor = Blueprint.OutsideColor;
                 State.PrepareLighting();
                 State._2D.Begin(this.State.Camera2D);
-                Blueprint.Changes.PreDraw(gd, State);
+
+                Blueprint.Changes.Preload(gd, State);
+
+                PreloadCheckpoints.Enqueue(new PreloadCheckpoint(() =>
+                {
+                    State.PrepareLighting();
+                    Blueprint.Changes.PreDraw(gd, State);
+                }));
 
                 PreloadProgress = 1;
                 PreloadObjProgress = 0;
@@ -1133,26 +1180,32 @@ namespace FSO.LotView
 
             for (int i= PreloadProgress-1; i<Blueprint.SubWorlds.Count; i++)
             {
+                ProcessPreloadCheckpoints(shouldReturn);
                 var world = Blueprint.SubWorlds[i];
                 for (int j = PreloadObjProgress; j < world.Blueprint.Objects.Count; j++)
                 {
                     var obj = world.Blueprint.Objects[j];
                     obj.Preload(gd, State);
                     PreloadObjProgress++;
-                    if (watch.ElapsedMilliseconds > 16)
-                    {
-                        watch.Stop();
-                        return false;
-                    }
+                    if (shouldReturn()) return false;
                 }
 
-                world.PreDraw(gd, State);
+
+                world.State._2D = State._2D;
+                world.Blueprint.Changes.Preload(gd, world.State);
+
+                PreloadCheckpoints.Enqueue(new PreloadCheckpoint(() =>
+                {
+                    world.PreDraw(gd, State);
+                }));
 
                 PreloadProgress++;
                 PreloadObjProgress = 0;
             }
 
-            return true;
+            ProcessPreloadCheckpoints(shouldReturn);
+
+            return PreloadCheckpoints.Count == 0;
         }
 
         public override void Dispose()

@@ -103,8 +103,6 @@ namespace FSO.LotView.LMap
 
             this.GradEffect = WorldContent.Grad2DEffect;
             this.LightEffect = WorldContent.Light2DEffect;
-
-            InitBasicData();
         }
 
         public void SetMapLayout(int width, int height)
@@ -160,6 +158,7 @@ namespace FSO.LotView.LMap
 
             Dispose();
 
+            InitBasicData();
             ShadowTarg = new RenderTarget2D(GD, wl, wh, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             ObjShadowTarg = new RenderTarget2D(GD, (ultra)?(wl*2):wl, (ultra)?(wh*2):wh, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             LightMap = new RenderTarget2D(GD, (wl * 3), (wh * 2), false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents); //just ground floor for now.

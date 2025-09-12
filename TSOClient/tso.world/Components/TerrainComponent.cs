@@ -19,6 +19,9 @@ namespace FSO.LotView.Components
     {
         private Rectangle Size;
 
+        private static Matrix RotToNormalXY = Matrix.CreateRotationZ((float)(Math.PI / 2));
+        private static Matrix RotToNormalZY = Matrix.CreateRotationX(-(float)(Math.PI / 2));
+
         private int GeomLength;
         private byte[] GrassState; //0 = green, 255 = brown. to start with, should be randomly distriuted in range 0-128.
         private short[] GroundHeight;
@@ -141,8 +144,6 @@ namespace FSO.LotView.Components
         private Vector3 GetNormalAt(int x, int y)
         {
             var sum = new Vector3();
-            var rotToNormalXY = Matrix.CreateRotationZ((float)(Math.PI / 2));
-            var rotToNormalZY = Matrix.CreateRotationX(-(float)(Math.PI / 2));
             var limit = (Size.Width - 1);
 
             if (x < limit)
@@ -150,7 +151,7 @@ namespace FSO.LotView.Components
                 var vec = new Vector3();
                 vec.X = 1;
                 vec.Y = GetElevationPoint(x + 1, y) - GetElevationPoint(x, y);
-                vec = Vector3.Transform(vec, rotToNormalXY);
+                vec = Vector3.Transform(vec, RotToNormalXY);
                 sum += vec;
             }
 
@@ -159,7 +160,7 @@ namespace FSO.LotView.Components
                 var vec = new Vector3();
                 vec.X = 1;
                 vec.Y = GetElevationPoint(x, y) - GetElevationPoint(x - 1, y);
-                vec = Vector3.Transform(vec, rotToNormalXY);
+                vec = Vector3.Transform(vec, RotToNormalXY);
                 sum += vec;
             }
 
@@ -168,7 +169,7 @@ namespace FSO.LotView.Components
                 var vec = new Vector3();
                 vec.Z = 1;
                 vec.Y = GetElevationPoint(x, y + 1) - GetElevationPoint(x, y);
-                vec = Vector3.Transform(vec, rotToNormalZY);
+                vec = Vector3.Transform(vec, RotToNormalZY);
                 sum += vec;
             }
 
@@ -177,7 +178,7 @@ namespace FSO.LotView.Components
                 var vec = new Vector3();
                 vec.Z = 1;
                 vec.Y = GetElevationPoint(x, y) - GetElevationPoint(x, y - 1);
-                vec = Vector3.Transform(vec, rotToNormalZY);
+                vec = Vector3.Transform(vec, RotToNormalZY);
                 sum += vec;
             }
             if (sum != Vector3.Zero) sum.Normalize();

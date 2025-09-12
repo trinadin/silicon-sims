@@ -5,6 +5,6 @@
   "api_url": "https://api.freeso.org",
   "user": "admin",
   "password": "yourpassword",
-  "limit": 1000,
+  "limit": 1000000,
   "sleep_time": 30000
 }

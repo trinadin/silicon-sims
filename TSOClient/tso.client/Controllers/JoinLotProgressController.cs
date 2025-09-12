@@ -35,6 +35,7 @@ namespace FSO.Client.Controllers
             //UIScreen.RemoveDialog(View);
             GameThread.InUpdate(() =>
             {
+                GameFacade.Cursor.SetCursorPriority(0);
                 GameFacade.Cursor.SetCursor(CursorType.Normal);
 
                 var errorTitle = GameFacade.Strings.GetString("211", "45");

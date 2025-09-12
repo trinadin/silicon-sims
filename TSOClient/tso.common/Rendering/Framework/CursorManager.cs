@@ -52,6 +52,7 @@ namespace FSO.Common.Rendering.Framework
         private Dictionary<CursorType, CursorGroup> m_CursorMap;
         private GraphicsDevice GD;
         public CursorType CurrentCursor { get; internal set;} = CursorType.Normal;
+        public int CurrentPriority { get; private set; } = 0;
 
         public CursorManager(GraphicsDevice gd)
         {
@@ -60,9 +61,14 @@ namespace FSO.Common.Rendering.Framework
             this.GD = gd;
         }
 
-        public void SetCursor(CursorType type)
+        public void SetCursorPriority(int priority)
         {
-            if (m_CursorMap.ContainsKey(type))
+            CurrentPriority = priority;
+        }
+
+        public void SetCursor(CursorType type, int priority = 0)
+        {
+            if (CurrentCursor != type && priority >= CurrentPriority && m_CursorMap.ContainsKey(type))
             {
                 CurrentCursor = type;
                 Mouse.SetCursor(m_CursorMap[type].MouseCursor);

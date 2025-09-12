@@ -48,7 +48,7 @@ namespace FSO.Common.Utils
 
             //if (color != null && depth != null) depth.InheritDepthStencil(color);
             var gd = GD;
-            gd.SetRenderTarget(color); //can be null
+            gd.SetRenderTarget(color); //can have null subresource when switching to 2d with supersampling enabled, which is odd since the texture is not disposed
             if (clear)
             {
                 StencilValue = 1;

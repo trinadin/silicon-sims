@@ -231,14 +231,11 @@ namespace FSO.LotView.Facade
                 bini++;
             }
 
-            //using (var fs = new FileStream(@"C:\Users\Rhys\Desktop\walls.png", FileMode.Create, FileAccess.Write))
-            //    tex.SaveAsPng(fs, tex.Width, tex.Height);
-
             result.SetData(data);
 
+            WallTarget = result;
             if (!justTexture)
             {
-                WallTarget = result;
                 WallVerts = verts;
                 WallIndices = indices;
             }
@@ -495,6 +492,8 @@ namespace FSO.LotView.Facade
             result.FloorTextureData = TexToData(FloorTexture, compressed);
             result.WallTextureData = TexToData(WallTarget, compressed);
 
+            FloorTexture.Dispose();
+            WallTarget.Dispose();
             
             var tVerts = new List<DGRP3DVert>();
             var tInd = new List<int>();
@@ -541,6 +540,9 @@ namespace FSO.LotView.Facade
             result.NightFloorTextureData = TexToData(FloorTexture, compressed);
             result.NightWallTextureData = TexToData(WallTarget, compressed);
             result.NightLightColor = world.State.OutsideColor;
+
+            FloorTexture.Dispose();
+            WallTarget.Dispose();
 
             return result;
         }

@@ -432,6 +432,7 @@ namespace FSO.Vitaboy
             effect.CurrentTechnique = oldTech;
         }
 
+        // TODO: memory leak
         private static VertexBuffer ShadBuf;
         private static IndexBuffer ShadIBuf;
 

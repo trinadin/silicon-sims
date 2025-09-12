@@ -198,6 +198,8 @@ namespace FSO.Client.UI
         /// <param name="Screen">The UIScreen instance to be added.</param>
         public void AddScreen(UIScreen Screen)
         {
+            AssetStreaming.EndStreaming();
+
             /*if (currentScreen != null)
             {
                 mainUI.Remove(currentScreen);

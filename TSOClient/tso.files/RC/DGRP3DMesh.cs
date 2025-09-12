@@ -12,6 +12,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FSO.Files.RC
 {
@@ -144,13 +145,135 @@ namespace FSO.Files.RC
         private float MaxAllowedSq = 0.065f * 0.065f;
         public List<Vector3> BoundPts = new List<Vector3>();
 
+        private List<List<DGRP3DGeometry>> UnloadedGeoms;
 
+        /// <summary>
+        /// Create a DGRP3DMesh from FSOM data.
+        /// </summary>
+        /// <remarks>The source stream will be disposed by this method, either immediately or when asset streaming completes.</remarks>
+        /// <param name="dgrp">The DGRP this mesh represents</param>
+        /// <param name="source">Source stream containing FSOM mesh data</param>
+        /// <param name="gd">Graphics device</param>
         public DGRP3DMesh(DGRP dgrp, Stream source, GraphicsDevice gd)
+        {
+            Geoms = new List<Dictionary<Texture2D, DGRP3DGeometry>>();
+            if (AssetStreaming.LoadingType > AssetStreamingMode.None)
+            {
+                ReconstructVersion = CURRENT_RECONSTRUCT;
+                Name = "Loading";
+
+                AssetStreaming.AddLoadingResource();
+
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        LoadData(dgrp, source, gd);
+                    }
+                    catch
+                    {
+                        AssetStreaming.InStreamUpdate(() =>
+                        {
+                            CleanupFailedLoad(dgrp, gd, null);
+                            AssetStreaming.RemoveLoadingResource();
+                        });
+                    }
+                    finally
+                    {
+                        source.Dispose();
+                    }
+
+                    AssetStreaming.InStreamUpdate(() =>
+                    {
+                        CompleteFSOMLoad(gd);
+
+                        AssetStreaming.RemoveLoadingResource();
+                    });
+                });
+            }
+            else
+            {
+                try
+                {
+                    LoadData(dgrp, source, gd);
+                }
+                finally
+                {
+                    source.Dispose();
+                }
+
+                CompleteFSOMLoad(gd);
+            }
+        }
+
+        /// <summary>
+        /// Create a DGRP3DMesh from FSOM data.
+        /// </summary>
+        /// <param name="dgrp">The DGRP this mesh represents</param>
+        /// <param name="filePath">Path to a file containing FSOM mesh data</param>
+        /// <param name="gd">Graphics device</param>
+        public DGRP3DMesh(DGRP dgrp, string filePath, GraphicsDevice gd)
+        {
+            Geoms = new List<Dictionary<Texture2D, DGRP3DGeometry>>();
+            if (AssetStreaming.LoadingType > AssetStreamingMode.None)
+            {
+                ReconstructVersion = CURRENT_RECONSTRUCT;
+                Name = "Loading";
+
+                AssetStreaming.AddLoadingResource();
+
+                Task.Run(() =>
+                {
+                    // Open the stream in the task, as the file ctor can be a bit expensive.
+                    try
+                    {
+                        using (var source = File.OpenRead(filePath))
+                        {
+                            LoadData(dgrp, source, gd);
+                        }
+                    }
+                    catch
+                    {
+                        AssetStreaming.InStreamUpdate(() =>
+                        {
+                            CleanupFailedLoad(dgrp, gd, filePath);
+                            AssetStreaming.RemoveLoadingResource();
+                        });
+                    }
+
+                    AssetStreaming.InStreamUpdate(() =>
+                    {
+                        CompleteFSOMLoad(gd);
+
+                        AssetStreaming.RemoveLoadingResource();
+                    });
+                });
+            }
+            else
+            {
+                using (var source = File.OpenRead(filePath))
+                {
+                    LoadData(dgrp, source, gd);
+                }
+
+                CompleteFSOMLoad(gd);
+            }
+        }
+
+        private void CleanupFailedLoad(DGRP dgrp, GraphicsDevice gd, string filePath)
+        {
+            // TODO: force reconstruction to run
+            UnloadedGeoms.Clear();
+            CompleteFSOMLoad(gd);
+        }
+
+        private void LoadData(DGRP dgrp, Stream source, GraphicsDevice gd)
         {
             using (var cstream = new GZipStream(source, CompressionMode.Decompress))
             {
                 using (var io = IoBuffer.FromStream(cstream, ByteOrder.LITTLE_ENDIAN))
                 {
+
                     var fsom = io.ReadCString(4);
                     Version = io.ReadInt32();
                     ReconstructVersion = io.ReadInt32();
@@ -159,18 +282,18 @@ namespace FSO.Files.RC
                     Name = io.ReadPascalString();
 
                     var geomCount = io.ReadInt32();
-                    Geoms = new List<Dictionary<Texture2D, DGRP3DGeometry>>();
+                    UnloadedGeoms = new List<List<DGRP3DGeometry>>();
                     for (int i = 0; i < geomCount; i++)
                     {
-                        var d = new Dictionary<Texture2D, DGRP3DGeometry>();
+                        var d = new List<DGRP3DGeometry>();
                         var subCount = io.ReadInt32();
                         for (int j = 0; j < subCount; j++)
                         {
                             var geom = new DGRP3DGeometry(io, dgrp, gd, Version);
-                            if (geom.Pixel == null && geom.PrimCount > 0) throw new Exception("Invalid Mesh! (old format)");
-                            d.Add(geom.Pixel, geom);
+                            //if (geom.Pixel == null && geom.PrimCount > 0) throw new Exception("Invalid Mesh! (old format)"); //TODO?
+                            d.Add(geom);
                         }
-                        Geoms.Add(d);
+                        UnloadedGeoms.Add(d);
                     }
 
                     if (Version > 2)
@@ -189,6 +312,27 @@ namespace FSO.Files.RC
                     Bounds = new BoundingBox(new Vector3(x, y, z), new Vector3(x2, y2, z2));
                 }
             }
+        }
+
+        private void CompleteFSOMLoad(GraphicsDevice gd)
+        {
+            foreach (var group in UnloadedGeoms)
+            {
+                var d = new Dictionary<Texture2D, DGRP3DGeometry>();
+                foreach (var geom in group)
+                {
+                    geom.CompleteFSOMLoad(gd);
+
+                    if (geom.Pixel != null)
+                    {
+                        d.Add(geom.Pixel, geom);
+                    }
+                }
+
+                Geoms.Add(d);
+            }
+
+            DepthMask?.CompleteFSOMLoad(gd);
         }
 
         public string SaveDirectory;
@@ -533,7 +677,7 @@ namespace FSO.Files.RC
                             var verts2 = verts.Select(v => new DGRP3DVert(v.Position, Vector3.Zero, v.TextureCoordinate)).ToList();
                             DGRP3DVert.GenerateNormals(!sprite.Flip, verts2, indices);
 
-                            GameThread.InStreamUpdate(() =>
+                            AssetStreaming.InStreamUpdate(() =>
                             {
                                 if (geom.SVerts == null)
                                 {
@@ -556,7 +700,7 @@ namespace FSO.Files.RC
                             var verts2 = verts.Select(v => new DGRP3DVert(v.Position, Vector3.Zero, v.TextureCoordinate)).ToList();
                             DGRP3DVert.GenerateNormals(!sprite.Flip, verts2, indices);
 
-                            GameThread.InStreamUpdate(() =>
+                            AssetStreaming.InStreamUpdate(() =>
                             {
                                 if (geom.SVerts == null)
                                 {

@@ -39,10 +39,10 @@ namespace FSO.Files.Formats.IFF.Chunks
 
         public DGRP3DMesh Get(DGRP dgrp, GraphicsDevice device)
         {
-            if (Cached == null) {
-                using (var stream = new MemoryStream(data)) {
-                    Cached = new DGRP3DMesh(dgrp, stream, device);
-                }
+            if (Cached == null)
+            {
+                var stream = new MemoryStream(data);
+                Cached = new DGRP3DMesh(dgrp, stream, device);
             }
             data = null;
             return Cached;

@@ -1,4 +1,5 @@
-﻿using FSO.Files.Formats.IFF;
+﻿using FSO.Common.Utils;
+using FSO.Files.Formats.IFF;
 using FSO.Files.Formats.IFF.Chunks;
 using FSO.Files.Utils;
 using Microsoft.Xna.Framework;
@@ -13,15 +14,57 @@ using System.Threading;
 
 namespace FSO.Files.RC
 {
+    public struct DGRP3DTextureSource
+    {
+        public Texture2D Literal;
+        public IDGRP3DTextureHolder Holder;
+        public DGRPSprite Sprite;
+
+        public DGRP3DTextureSource(Texture2D literal)
+        {
+            Literal = literal;
+            Holder = null;
+            Sprite = null;
+        }
+
+        public DGRP3DTextureSource(IDGRP3DTextureHolder holder)
+        {
+            Literal = null;
+            Holder = holder;
+            Sprite = null;
+        }
+
+        public DGRP3DTextureSource(DGRPSprite sprite)
+        {
+            Literal = null;
+            Holder = null;
+            Sprite = sprite;
+        }
+
+        public static DGRP3DTextureSource? WithDecoded(IDGRP3DTextureHolder holder, GraphicsDevice gd)
+        {
+            if (holder == null)
+            {
+                return null;
+            }
+
+            holder.Decode(gd);
+
+            return new DGRP3DTextureSource(holder);
+        }
+    }
+
     public class DGRP3DGeometry
     {
+
         public bool Rendered = false;
         public Texture2D Pixel;
+        private DGRP3DTextureSource PixelSource;
         public ushort PixelSPR;
         public ushort PixelDir;
 
         public ushort CustomTexture;
-        public static Func<string, Texture2D> ReplTextureProvider;
+        public static Func<string, DGRP3DTextureSource?> ReplTextureProvider;
 
         public List<DGRP3DVert> SVerts; //simplified vertices
         public List<int> SIndices; //simplified indices
@@ -54,6 +97,12 @@ namespace FSO.Files.RC
         }
 
         public DGRP3DGeometry() { }
+        /// <summary>
+        /// Initializes DGRP3DGeometry from an FSOM. CompleteFSOMLoad should be called from the GPU thread to make it renderable.
+        /// </summary>
+        /// <param name="io"></param>
+        /// <param name="source"></param>
+        /// <param name="Version"></param>
         public DGRP3DGeometry(IoBuffer io, DGRP source, GraphicsDevice gd, int Version)
         {
             PixelSPR = io.ReadUInt16();
@@ -64,22 +113,19 @@ namespace FSO.Files.RC
                 if (source == null)
                 {
                     //temporary system for models without DGRP
-                    Pixel = ReplTextureProvider("FSO_TEX_" + PixelSPR + ".png");
+                    PixelSource = ReplTextureProvider("FSO_TEX_" + PixelSPR + ".png") ?? default;
                 }
                 else
                 {
                     var name = source.ChunkParent.Filename.Replace('.', '_').Replace("spf", "iff");
                     name += "_TEX_" + PixelSPR + ".png";
-                    Pixel = ReplTextureProvider(name);
-                    if (Pixel == null)
-                    {
-                        Pixel = source.ChunkParent.Get<MTEX>(PixelSPR)?.GetTexture(gd);
-                    }
+                    var pxSource = ReplTextureProvider(name) ?? DGRP3DTextureSource.WithDecoded(source.ChunkParent.Get<MTEX>(PixelSPR), gd);
+                    PixelSource = pxSource ?? default;
                 }
             }
             else
             {
-                Pixel = source.GetImage(1, 3, PixelDir).Sprites[PixelSPR].GetTexture(gd);
+                PixelSource = new DGRP3DTextureSource(source.GetImage(1, 3, PixelDir).Sprites[PixelSPR]);
             }
 
             var vertCount = io.ReadInt32();
@@ -122,6 +168,25 @@ namespace FSO.Files.RC
 
 
             if (Version < 2) GenerateNormals(false);
+        }
+
+        private void GetPixelFromSource(GraphicsDevice gd)
+        {
+            if (PixelSource.Holder != null)
+            {
+                Pixel = PixelSource.Holder.GetTexture(gd);
+            }
+            else if (PixelSource.Sprite != null)
+            {
+                Pixel = PixelSource.Sprite.GetTexture(gd);
+            }
+
+            PixelSource = default;
+        }
+
+        public void CompleteFSOMLoad(GraphicsDevice gd)
+        {
+            GetPixelFromSource(gd);
 
             SComplete(gd);
         }
@@ -142,12 +207,16 @@ namespace FSO.Files.RC
 
                 var name = source.ChunkParent.Filename.Replace('.', '_').Replace("spf", "iff");
                 name += "_TEX_" + PixelSPR + ".png";
-                Pixel = ReplTextureProvider(name);
-                if (Pixel == null)
+                var pxSource = ReplTextureProvider(name);
+                if (pxSource == null)
                 {
-                    Pixel = source.ChunkParent.Get<MTEX>(PixelSPR)?.GetTexture(gd);
+                    pxSource = DGRP3DTextureSource.WithDecoded(source.ChunkParent.Get<MTEX>(PixelSPR), gd);
                 }
+
+                PixelSource = pxSource ?? default;
             }
+
+            GetPixelFromSource(gd);
 
             SVerts = new List<DGRP3DVert>();
             SIndices = new List<int>();

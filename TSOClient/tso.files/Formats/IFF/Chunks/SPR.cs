@@ -1,12 +1,13 @@
-﻿using System;
+﻿using FSO.Common;
+using FSO.Common.Rendering;
+using FSO.Common.Utils;
+using FSO.Files.Utils;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using FSO.Files.Utils;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using FSO.Common.Utils;
-using FSO.Common;
-using FSO.Common.Rendering;
+using System.Threading;
 
 namespace FSO.Files.Formats.IFF.Chunks
 {
@@ -94,6 +95,8 @@ namespace FSO.Files.Formats.IFF.Chunks
         private Texture2D ZCache;
         private byte[] ToDecode;
 
+        private PALT Palette;
+
         /// <summary>
         /// Constructs a new SPRFrame instance.
         /// </summary>
@@ -101,7 +104,29 @@ namespace FSO.Files.Formats.IFF.Chunks
         public SPRFrame(SPR parent)
         {
             this.Parent = parent;
+
+            UpdatePalette();
         }
+
+        private void UpdatePalette()
+        {
+            Palette = Parent.ChunkParent.Get<PALT>(Parent.PaletteID);
+            if (Palette == null)
+            {
+                Palette = DEFAULT_PALT;
+            }
+        }
+
+        private PALT EnsurePalette()
+        {
+            if (Palette == null)
+            {
+                UpdatePalette();
+            }
+
+            return Palette;
+        }
+
 
         /// <summary>
         /// Reads a SPRFrame from a stream.
@@ -117,36 +142,63 @@ namespace FSO.Files.Formats.IFF.Chunks
                 var size = io.ReadUInt32();
                 this.Version = spriteFersion;
 
+                ReadHead(io);
+
                 if (IffFile.RETAIN_CHUNK_DATA) ReadDeferred(1001, io);
-                else ToDecode = io.ReadBytes(size);
+                else ToDecode = io.ReadBytes(size - 8);
             }
             else
             {
+                ReadHead(io);
+
                 this.Version = version;
                 if (IffFile.RETAIN_CHUNK_DATA) ReadDeferred(1000, io);
-                else ToDecode = io.ReadBytes(guessedSize);
+                else ToDecode = io.ReadBytes(guessedSize - 8);
             }
+        }
+
+        private void ReadHead(IoBuffer io)
+        {
+            // Useful to read these early for async loading
+            var reserved = io.ReadUInt32();
+            Height = io.ReadUInt16();
+            Width = io.ReadUInt16();
         }
 
         public void ReadDeferred(uint version, IoBuffer io)
         {
-            var reserved = io.ReadUInt32();
-            var height = io.ReadUInt16();
-            var width = io.ReadUInt16();
-            this.Init(width, height);
+            this.Init();
             this.Decode(io);
         }
+
+        private int _decoding = 0;
 
         public void DecodeIfRequired()
         {
             if (ToDecode != null)
             {
-                using (IoBuffer buf = IoBuffer.FromStream(new MemoryStream(ToDecode), Parent.ByteOrd))
+                if (Interlocked.CompareExchange(ref _decoding, 1, 0) > 0)
                 {
-                    ReadDeferred(Version, buf);
-                }
+                    // If another thread is already decoding the sprite, spin until it's done.
+                    SpinWait w = default;
+                    while (Volatile.Read(ref _decoding) > 0)
+                    {
+                        w.SpinOnce();
+                    }
 
-                ToDecode = null;
+                    DecodeIfRequired();
+                }
+                else
+                {
+                    using (IoBuffer buf = IoBuffer.FromStream(new MemoryStream(ToDecode), Parent.ByteOrd))
+                    {
+                        ReadDeferred(Version, buf);
+                    }
+
+                    ToDecode = null;
+
+                    Interlocked.Exchange(ref _decoding, 0);
+                }
             }
         }
 
@@ -156,12 +208,7 @@ namespace FSO.Files.Formats.IFF.Chunks
         /// <param name="io">IOBuffer used to read a SPRFrame.</param>
         private void Decode(IoBuffer io)
         {
-            var palette = Parent.ChunkParent.Get<PALT>(Parent.PaletteID);
-            if (palette == null)
-            {
-                palette = DEFAULT_PALT;
-            }
-
+            var palette = EnsurePalette();
             var y = 0;
             var endmarker = false;
 
@@ -238,10 +285,8 @@ namespace FSO.Files.Formats.IFF.Chunks
         public int Width { get; internal set; }
         public int Height { get; internal set; }
 
-        protected void Init(int width, int height)
+        protected void Init()
         {
-            this.Width = width;
-            this.Height = height;
             Data = new Color[Width * Height];
         }
 
@@ -257,7 +302,6 @@ namespace FSO.Files.Formats.IFF.Chunks
 
         public Texture2D GetTexture(GraphicsDevice device)
         {
-            DecodeIfRequired();
             if (PixelCache == null)
             {
                 var mip = !Parent.WallStyle && FSOEnvironment.Enable3D && FSOEnvironment.EnableNPOTMip;
@@ -271,18 +315,50 @@ namespace FSO.Files.Formats.IFF.Chunks
                     if (tc)
                     {
                         PixelCache = new Texture2D(device, ((w+3)/4)*4, ((h+3)/4)*4, mip, SurfaceFormat.Dxt5);
-                        if (mip)
-                            TextureUtils.UploadDXT5WithMips(PixelCache, w, h, device, Data);
-                        else
-                            PixelCache.SetData<byte>(TextureUtils.DXT5Compress(Data, w, h).Item1);
+
+                        AssetStreaming.LoadTexture(PixelCache, AssetStreamingMode.Lot, () =>
+                        {
+                            DecodeIfRequired();
+
+                            TextureData<byte>[] data;
+                            if (mip)
+                                data = TextureUtils.GenerateDXT5WithMips(PixelCache, w, h, Data);
+                            else
+                            {
+                                data = new TextureData<byte>[]
+                                {
+                                    new TextureData<byte>(0, TextureUtils.DXT5Compress(Data, w, h).Item1, 1)
+                                };
+                            }
+
+                            if (!IffFile.RETAIN_CHUNK_DATA) Data = null;
+
+                            return data;
+                        });
                     }
                     else
                     {
                         PixelCache = new Texture2D(device, w, h, mip, SurfaceFormat.Color);
-                        if (mip)
-                            TextureUtils.UploadWithMips(PixelCache, device, Data);
-                        else
-                            PixelCache.SetData<Color>(this.Data);
+
+                        AssetStreaming.LoadTexture(PixelCache, AssetStreamingMode.Lot, () =>
+                        {
+                            DecodeIfRequired();
+
+                            TextureData<Color>[] data;
+                            if (mip)
+                                data = TextureUtils.GenerateMips(PixelCache, Data);
+                            else
+                            {
+                                data = new TextureData<Color>[]
+                                {
+                                    new TextureData<Color>(0, Data)
+                                };
+                            }
+
+                            if (!IffFile.RETAIN_CHUNK_DATA) Data = null;
+
+                            return data;
+                        });
                     }
                 }
                 else
@@ -292,7 +368,6 @@ namespace FSO.Files.Formats.IFF.Chunks
                 }
 
                 PixelCache.Tag = new TextureInfo(PixelCache, Width, Height);
-                if (!IffFile.RETAIN_CHUNK_DATA) Data = null;
             }
             return PixelCache;
         }

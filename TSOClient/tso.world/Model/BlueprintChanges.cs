@@ -235,6 +235,22 @@ namespace FSO.LotView
         {
             Dirty |= flag;
         }
+
+        public void Preload(GraphicsDevice gd, WorldState state)
+        {
+            if ((Dirty & BlueprintGlobalChanges.FLOOR_CHANGED) > 0)
+            {
+                Blueprint.FloorGeom.FullReset(gd, state.BuildMode > 1);
+                Dirty &= ~BlueprintGlobalChanges.FLOOR_CHANGED;
+            }
+
+            if ((Dirty & BlueprintGlobalChanges.WALL_CHANGED) > 0)
+            {
+                state.Platform.RecacheWalls(gd, state, false);
+                StaticSurfaceDirty = true;
+                Dirty &= ~BlueprintGlobalChanges.WALL_CHANGED;
+            }
+        }
     }
 
     [Flags]

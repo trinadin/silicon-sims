@@ -202,6 +202,7 @@
     <Compile Include="RC\DGRP3DVert.cs" />
     <Compile Include="RC\DGRPRCParams.cs" />
     <Compile Include="RC\FSOF.cs" />
+    <Compile Include="RC\IDGRP3DTextureHolder.cs" />
     <Compile Include="RC\NBHm.cs" />
     <Compile Include="RC\OBJReader.cs" />
     <Compile Include="RC\Utils\DepthTreatment.cs" />
