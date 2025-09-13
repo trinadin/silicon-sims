@@ -36,7 +36,7 @@ namespace FSO.Client.Regulators
         public CityConnectionMode Mode { get; internal set; } = CityConnectionMode.NORMAL;
         public ArchiveClientList UserList { get; internal set; }
 
-        private ConnectArchiveRequest ArchiveSettings;
+        public ConnectArchiveRequest ArchiveSettings { get; private set; }
         private string ArchiveToken;
         public ArchiveConfigFlags ArchiveConfig { get; private set; }
 

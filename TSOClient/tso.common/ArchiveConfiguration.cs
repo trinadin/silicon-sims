@@ -18,6 +18,8 @@ namespace FSO.Common
         AllowSimCreation = 1 << 7,
         LockArchivedSims = 1 << 8,
 
+        DedicatedServer = 1 << 16,
+
         Default = UPnP | AllOpenable | AllowLotCreation | AllowSimCreation
     }
 

@@ -3,6 +3,7 @@ using FSO.Client.Model;
 using FSO.Client.Regulators;
 using FSO.Client.UI.Framework;
 using FSO.Client.UI.Screens;
+using FSO.Common;
 using FSO.Common.DataService;
 using FSO.Common.DataService.Model;
 using FSO.Common.Enum;
@@ -40,8 +41,13 @@ namespace FSO.Client.Controllers
         public BulletinActionController BulletinProtocol;
         public CityResourceController CityResource;
 
+        public CityConnectionMode Mode => Network.Mode;
+        public ArchiveConfigFlags ArchiveConfig => Network.ArchiveConfig;
+        public ConnectArchiveRequest ArchiveHost => Network.ArchiveHost;
+
         public CoreGameScreenController(CoreGameScreen view, Network.Network network, IClientDataService dataService, IKernel kernel, LotConnectionRegulator joinLotRegulator)
         {
+            view.Controller = this; // Set this early so all FindController<> calls work.
             this.Screen = view;
             this.Network = network;
             this.DataService = dataService;

@@ -170,6 +170,7 @@
     <Compile Include="Rendering\City\TLayerVertex.cs" />
     <Compile Include="UI\Archive\UIArchiveCharacterSelector.cs" />
     <Compile Include="UI\Archive\UIArchiveCreateServer.cs" />
+    <Compile Include="UI\Archive\UIArchiveHostInformation.cs" />
     <Compile Include="UI\Archive\UIArchiveJoinDialog.cs" />
     <Compile Include="UI\Archive\UIArchiveLandingDialog.cs" />
     <Compile Include="UI\Archive\UIArchiveServerPorts.cs" />
