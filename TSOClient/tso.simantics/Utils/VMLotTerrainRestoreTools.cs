@@ -478,6 +478,8 @@ namespace FSO.SimAntics.Utils
             var xn = VMArchitectureTerrain.TerrainXNoise;
             var yn = VMArchitectureTerrain.TerrainYNoise;
 
+            bool isWater = terrain.BlendN[1, 1].Base == TerrainType.WATER;
+
             for (int oy = 1; oy < target.Height; oy++)
             {
 
@@ -487,13 +489,13 @@ namespace FSO.SimAntics.Utils
                     int index = (target.Height - oy) * target.Width + (target.Height - ox);
 
                     float fracy = (oy - 1f) / (target.Height - 2f);
-                    fracy -= (yn[index]-0.5f)/5f;
+                    if (isWater) fracy -= (yn[index]-0.5f)/5f;
                     float y1 = Cubic(sr[0, 0], sr[0, 1], sr[0, 2], sr[0, 3], fracy);
                     float y2 = Cubic(sr[1, 0], sr[1, 1], sr[1, 2], sr[1, 3], fracy);
                     float y3 = Cubic(sr[2, 0], sr[2, 1], sr[2, 2], sr[2, 3], fracy);
                     float y4 = Cubic(sr[3, 0], sr[3, 1], sr[3, 2], sr[3, 3], fracy);
                     float fracx = (ox - 1f) / (target.Width - 2f);
-                    fracx -= (xn[index] - 0.5f) / 5f;
+                    if (isWater) fracx -= (xn[index] - 0.5f) / 5f;
 
                     var h = Cubic(y1, y2, y3, y4, fracx);
                     target.Heights[index] = (short)(((h * 100f) - baseLevel));
