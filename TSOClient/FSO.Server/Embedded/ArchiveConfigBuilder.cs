@@ -15,8 +15,8 @@ namespace FSO.Server.Embedded
             // TODO: server directory (build nfs and db string from this), server public host/ports
 
             string publicHost = "0.0.0.0"; // city connection is up to the user, lot connection automatically uses city
-            int cityPort = 33;
-            int lotPort = 34;
+            int cityPort = config.CityPort;
+            int lotPort = config.LotPort;
 
             string binding = config.Flags.HasFlag(ArchiveConfigFlags.Offline) ? "127.0.0.1" : "0.0.0.0";
 
@@ -38,9 +38,10 @@ namespace FSO.Server.Embedded
                     {
                         Enabled = true,
                         Call_Sign = "callisto",
-                        Binding = "127.0.0.1:35100",
-                        Internal_Host = "127.0.0.1:35",
-                        Public_Host = "127.0.0.1:35",
+                        Binding = "127.0.0.1:35101",
+                        Internal_Host = "127.0.0.1:35101",
+                        Public_Host = "127.0.0.1:35101",
+                        Use_SSL = false,
                         Schedule = new List<Servers.Tasks.ScheduledTaskRunOptions>()
                         {
                             new Servers.Tasks.ScheduledTaskRunOptions()
@@ -125,9 +126,11 @@ namespace FSO.Server.Embedded
                         {
                             Call_Sign = "ganymede",
                             ID = 1,
-                            Binding = $"{binding}:{cityPort}100",
+                            Binding = $"{binding}:{cityPort}",
                             Internal_Host = $"127.0.0.1:{cityPort}",
                             Public_Host = $"{publicHost}:{cityPort}",
+                            Use_SSL = false,
+                            
                             Neighborhoods = new Servers.City.CityServerNhoodConfiguration()
                             {
                                 Mayor_Elegibility_Limit = 4,
@@ -149,16 +152,17 @@ namespace FSO.Server.Embedded
                         new Servers.Lot.LotServerConfiguration()
                         {
                             Call_Sign = "europa",
-                            Binding = $"{binding}:{lotPort}100",
+                            Binding = $"{binding}:{lotPort}",
                             Internal_Host = $"127.0.0.1:{lotPort}",
                             Public_Host = $"{publicHost}:{lotPort}",
                             Max_Lots = 100,
+                            Use_SSL = false,
                             Cities = new Servers.Lot.LotServerConfigurationCity[]
                             {
                                 new Servers.Lot.LotServerConfigurationCity()
                                 {
                                     ID = 1,
-                                    Host = $"127.0.0.1:{cityPort}100"
+                                    Host = $"127.0.0.1:{cityPort}"
                                 }
                             }
                         }

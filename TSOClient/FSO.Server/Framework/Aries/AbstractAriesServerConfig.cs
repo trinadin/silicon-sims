@@ -7,5 +7,6 @@
         public string Binding;
         public string Internal_Host;
         public string Public_Host;
+        public bool? Use_SSL;
     }
 }

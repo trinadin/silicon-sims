@@ -100,6 +100,10 @@ namespace FSO.Server.Framework.Aries
             Acceptor = new AsyncSocketAcceptor();
 
             try {
+                // "old mode" attempts to open an SSL acceptor on xx100 and plain on xx101
+                // The new mode is either one or the other, and makes no assumptions about the port shape
+                bool oldMode = Config.Use_SSL == null;
+
                 if (Config.Certificate != null)
                 {
                     var ssl = new SslFilter(new System.Security.Cryptography.X509Certificates.X509Certificate2(Config.Certificate));
@@ -117,16 +121,29 @@ namespace FSO.Server.Framework.Aries
                     LOG.Info("Listening on " + Acceptor.LocalEndPoint + " with TLS");
                 }
 
-                //Bind in the plain too as a workaround until we can get Mina.NET to work nice for TLS in the AriesClient
-                PlainAcceptor = new AsyncSocketAcceptor();
-                if (Debugger != null){
-                    PlainAcceptor.FilterChain.AddLast("packetLogger", new AriesProtocolLogger(Debugger.GetPacketLogger(), Kernel.Get<ISerializationContext>()));
+                if (!oldMode)
+                {
+                    if (Config.Use_SSL.Value && Config.Certificate == null)
+                    {
+                        throw new NotSupportedException("Can't currently use SSL without a certificate.");
+                    }
                 }
 
-                PlainAcceptor.FilterChain.AddLast("protocol", new ProtocolCodecFilter(Kernel.Get<AriesProtocol>()));
-                PlainAcceptor.Handler = this;
-                PlainAcceptor.Bind(IPEndPointUtils.CreateIPEndPoint(Config.Binding.Replace("100", "101")));
-                LOG.Info("Listening on " + PlainAcceptor.LocalEndPoint + " in the plain");
+                if (oldMode || !Config.Use_SSL.Value)
+                {
+                    //Bind in the plain too as a workaround until we can get Mina.NET to work nice for TLS in the AriesClient
+                    PlainAcceptor = new AsyncSocketAcceptor();
+                    if (Debugger != null)
+                    {
+                        PlainAcceptor.FilterChain.AddLast("packetLogger", new AriesProtocolLogger(Debugger.GetPacketLogger(), Kernel.Get<ISerializationContext>()));
+                    }
+
+                    PlainAcceptor.FilterChain.AddLast("protocol", new ProtocolCodecFilter(Kernel.Get<AriesProtocol>()));
+                    PlainAcceptor.Handler = this;
+                    // TODO: mode where only one is available and it doesn't do the port replace
+                    PlainAcceptor.Bind(IPEndPointUtils.CreateIPEndPoint(oldMode ? Config.Binding.Replace("100", "101") : Config.Binding));
+                    LOG.Info("Listening on " + PlainAcceptor.LocalEndPoint + " in the plain");
+                }
             }
             catch(Exception ex)
             {

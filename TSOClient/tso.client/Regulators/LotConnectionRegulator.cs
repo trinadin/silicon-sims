@@ -5,6 +5,7 @@ using FSO.Server.Clients;
 using FSO.Server.Clients.Framework;
 using FSO.Server.Protocol.Aries.Packets;
 using FSO.Server.Protocol.Electron.Packets;
+using FSO.Server.Protocol.Utils;
 using FSO.Server.Protocol.Voltron.Packets;
 using Ninject;
 using System;
@@ -162,7 +163,7 @@ namespace FSO.Client.Regulators
                     else
                     {
                         //101 is plain
-                        Client.Connect(address + "101");
+                        Client.Connect(PortTransformer.TransformAddress(address));
                     }
                     break;
 
@@ -214,7 +215,7 @@ namespace FSO.Client.Regulators
 
                 case "Reestablish":
                     ReestablishAttempt++;
-                    Client.Connect(LastAddress + "101");
+                    Client.Connect(PortTransformer.TransformAddress(LastAddress));
                     break;
 
                 case "Reestablishing":

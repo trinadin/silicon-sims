@@ -331,7 +331,7 @@ namespace FSO.Server.Utils
             {
                 Status = GluonHostStatus.CONNECTING;
                 //TODO: TLS
-                var endpoint = InternalHost + "101";
+                var endpoint = PortTransformer.TransformAddress(InternalHost);
                 Client.Connect(endpoint);
             }
         }

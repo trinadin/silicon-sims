@@ -37,6 +37,8 @@ namespace FSO.Client.UI.Archive
         private TextStyle InterfaceStyle;
         private TextStyle CopyStyle;
 
+        private string Port;
+
         public UIArchiveHostInformation(CoreGameScreenController controller) : base(UIDialogStyle.Close, false)
         {
             Caption = GameFacade.Strings.GetString("f128", "19");
@@ -54,6 +56,10 @@ namespace FSO.Client.UI.Archive
             CopyStyle = TextStyle.DefaultLabel.Clone();
             CopyStyle.Size = 8;
             CopyStyle.Shadow = true;
+
+            var addr = controller.ArchiveHost.CityAddress;
+            int colonInd = addr.LastIndexOf(':');
+            Port = colonInd == -1 ? ":33101" : addr.Substring(colonInd);
 
             var warningStyle = TextStyle.DefaultLabel.Clone();
             warningStyle.Size--;
@@ -263,7 +269,7 @@ namespace FSO.Client.UI.Archive
         {
             // When the port is different from the default,
             // append it to the IP.
-            return ip;
+            return Port == ":33101" ? ip : (ip + Port);
         }
 
         private void DetermineMyPublicIp()

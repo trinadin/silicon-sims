@@ -14,6 +14,7 @@ using FSO.Server.DataService.Model;
 using FSO.Server.Protocol.Aries.Packets;
 using FSO.Server.Protocol.CitySelector;
 using FSO.Server.Protocol.Electron.Packets;
+using FSO.Server.Protocol.Utils;
 using FSO.Server.Protocol.Voltron.Packets;
 using Ninject;
 using System;
@@ -316,7 +317,7 @@ namespace FSO.Client.Regulators
                     }else{
                         //101 is plain
                         LastSettings = settings;
-                        Client.Connect(settings.ExplicitPort ? settings.Address : (settings.Address + "101"));
+                        Client.Connect(settings.ExplicitPort ? settings.Address : PortTransformer.TransformAddress(settings.Address));
                     }
                     break;
 
@@ -484,7 +485,7 @@ namespace FSO.Client.Regulators
 
                 case "Reestablish":
                     ReestablishAttempt++;
-                    Client.Connect(LastSettings.ExplicitPort ? LastSettings.Address : (LastSettings.Address + "101"));
+                    Client.Connect(LastSettings.ExplicitPort ? LastSettings.Address : PortTransformer.TransformAddress(LastSettings.Address));
                     break;
 
                 case "Reestablishing":
