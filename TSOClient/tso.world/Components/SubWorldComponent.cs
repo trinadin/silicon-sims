@@ -293,7 +293,7 @@ namespace FSO.LotView.Components
             float maxAlt = 0;
             foreach (var height in Blueprint.Altitude)
             {
-                var alt = height * Blueprint.TerrainFactor - Blueprint.BaseAlt;
+                var alt = (height - Blueprint.BaseAlt) * Blueprint.TerrainFactor * 3;
                 if (alt < minAlt)
                 {
                     minAlt = alt;

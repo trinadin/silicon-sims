@@ -438,7 +438,7 @@ namespace FSO.SimAntics.Utils
             //take center of lotstate
             RestoreTerrain(vm, vm.TSOState.Terrain.BlendN[1, 1], vm.TSOState.Terrain.Roads[1, 1], type);
 
-            RestoreHeight(vm, vm.TSOState.Terrain, 1, 1);
+            RestoreHeight(vm, vm.TSOState.Terrain, 1, 1, type != RestoreLotType.Blank);
         }
 
         public static int GetBaseLevel(VM vm, VMTSOSurroundingTerrain terrain, int x, int y)
@@ -458,7 +458,7 @@ namespace FSO.SimAntics.Utils
             return (int)(((sr[1, 1] + sr[1, 2] + sr[2, 2] + sr[2, 1]) / 4) * 100);
         }
 
-        public static int RestoreHeight(VM vm, VMTSOSurroundingTerrain terrain, int x, int y)
+        public static int RestoreHeight(VM vm, VMTSOSurroundingTerrain terrain, int x, int y, bool flatten = true)
         {
             var sr = new float[4, 4];
 
@@ -478,24 +478,22 @@ namespace FSO.SimAntics.Utils
             var xn = VMArchitectureTerrain.TerrainXNoise;
             var yn = VMArchitectureTerrain.TerrainYNoise;
 
-            bool isWater = terrain.BlendN[1, 1].Base == TerrainType.WATER;
+            bool isWater = terrain.BlendN[x, y].Base == TerrainType.WATER;
 
             for (int oy = 1; oy < target.Height; oy++)
             {
-
-
                 for (int ox = 1; ox < target.Width; ox++)
                 {
                     int index = (target.Height - oy) * target.Width + (target.Height - ox);
 
                     float fracy = (oy - 1f) / (target.Height - 2f);
-                    if (isWater) fracy -= (yn[index]-0.5f)/5f;
+                    if (!isWater) fracy -= (yn[index]-0.5f)/5f;
                     float y1 = Cubic(sr[0, 0], sr[0, 1], sr[0, 2], sr[0, 3], fracy);
                     float y2 = Cubic(sr[1, 0], sr[1, 1], sr[1, 2], sr[1, 3], fracy);
                     float y3 = Cubic(sr[2, 0], sr[2, 1], sr[2, 2], sr[2, 3], fracy);
                     float y4 = Cubic(sr[3, 0], sr[3, 1], sr[3, 2], sr[3, 3], fracy);
                     float fracx = (ox - 1f) / (target.Width - 2f);
-                    if (isWater) fracx -= (xn[index] - 0.5f) / 5f;
+                    if (!isWater) fracx -= (xn[index] - 0.5f) / 5f;
 
                     var h = Cubic(y1, y2, y3, y4, fracx);
                     target.Heights[index] = (short)(((h * 100f) - baseLevel));
@@ -511,7 +509,7 @@ namespace FSO.SimAntics.Utils
 
             var mailbox = vm.Entities.FirstOrDefault(m => (m.Object.OBJ.GUID == 0xEF121974 || m.Object.OBJ.GUID == 0x1D95C9B0));
 
-            if (mailbox != null && mailbox.Position != LotTilePos.OUT_OF_WORLD)
+            if (mailbox != null && mailbox.Position != LotTilePos.OUT_OF_WORLD && flatten)
             {
                 var mailheight = target.Heights[mailbox.Position.TileY * target.Width + mailbox.Position.TileX];
 
@@ -586,7 +584,7 @@ namespace FSO.SimAntics.Utils
             var baseB = blend.Base;
             arch.Terrain.LightType = (baseB == TerrainType.WATER) ? TerrainType.SAND : blend.Base;
             arch.Terrain.DarkType = (blend.Blend == TerrainType.WATER) ? blend.Base : blend.Blend;
-            arch.Terrain.GenerateGrassStates();
+            arch.Terrain.GenerateGrassStates(type);
 
             //clear all previous roads/sea
             VMArchitectureTools.FloorPatternRect(arch, new Rectangle(0, 0, arch.Width, 5), 0, 0, 1);
@@ -596,7 +594,15 @@ namespace FSO.SimAntics.Utils
 
             if (baseB == TerrainType.WATER)
             {
-                //...
+                //Move everything out of world.
+                foreach (var obj in vm.Entities)
+                {
+                    if (obj.Position != LotTilePos.OUT_OF_WORLD)
+                    {
+                        obj.SetPosition(LotTilePos.OUT_OF_WORLD, obj.Direction, vm.Context);
+                    }
+                }
+
                 VMArchitectureTools.FloorPatternRect(arch, new Rectangle(1, 1, arch.Width - 3, arch.Height - 3), 0, 65534, 1);
             }
 
@@ -663,7 +669,7 @@ namespace FSO.SimAntics.Utils
                 new float[] { (15f / 180f) * (float)Math.PI, (-15f / 180f) * (float)Math.PI });
 
             RestoreRoad(vm, roads);
-            if (vm.GetGlobalValue(11) == -1)
+            if (vm.GetGlobalValue(11) == -1 || vm.TSOState.ObjectLimit == 0)
             {
                 //set road dir. should only really do this FIRST EVER time, then road dir changes after are manual and rotate the contents of the lot.
                 vm.TSOState.Size &= 0xFFFF;
@@ -797,6 +803,14 @@ namespace FSO.SimAntics.Utils
                         // if we can't place the object, put it oow.
                         ent.MultitileGroup.BaseObject.SetPosition(LotTilePos.OUT_OF_WORLD, (Direction)(1 << ((lotDir * 2 + pos.DirOff) % 8)), vm.Context);
                     }
+
+                    if (type == RestoreLotType.Blank)
+                    {
+                        // Hide all landmark objects and make them intangible.
+
+                        ent.SetValue(VMStackObjectVariable.Hidden, 1);
+                        ent.SetFlag(VMEntityFlags.HasZeroExtent, true);
+                    }
                 }
             }
 
@@ -813,7 +827,7 @@ namespace FSO.SimAntics.Utils
             if (ped != null) ped.SetPosition(LotTilePos.FromBigTile((short)ctr.X, (short)ctr.Y, 1), (Direction)(1 << ((lotDir * 2 + 0) % 8)), vm.Context);
 
             var rPos = ctr + (-13 * xperp) + (2 * yperp);
-            if (ped != null)
+            if (ped != null && type != RestoreLotType.Blank)
             {
                 StampTerrainmap(arch, CarDirtRoad, (short)rPos.X, (short)rPos.Y, xperp, yperp);
             }
@@ -966,7 +980,7 @@ namespace FSO.SimAntics.Utils
             var arch = vm.Context.Architecture;
             var objs = BlankTerrainObjects[(int)arch.Terrain.LightType];
 
-            var random = new Random();
+            var random = new Random((int)vm.TSOState.LotID);
             var toPlace = 15 + random.Next(20);
 
             for (int i=0; i<toPlace; i++)
@@ -1000,12 +1014,19 @@ namespace FSO.SimAntics.Utils
             //vm.Context.Blueprint.BaseAlt = 0;// 128;
             //vm.Context.World.State.BaseHeight = 0;// (128 * 3) / 16f;
 
+            uint baseLocation = vm.TSOState.LotID;
+            uint baseX = baseLocation >> 16;
+            uint baseY = baseLocation & 0xFFFF;
+
             if (lotsMode == 0) return;
             for (int y=0; y<3; y++)
             {
                 for (int x=0; x<3; x++)
                 {
                     if (x == 1 & y == 1) continue; //that's us...
+
+                    uint newLocation = (uint)(((baseX + x - 1) << 16) | ((baseY + y - 1) & 0xFFFF));
+
                     var gd = vm.Context.World.State.Device;
                     var subworld = vm.Context.World.MakeSubWorld(gd);
                     subworld.Initialize(gd);
@@ -1058,6 +1079,7 @@ namespace FSO.SimAntics.Utils
                         var blueprint = new Blueprint(size, size);
                         tempVM.Context.Blueprint = blueprint;
                         subworld.InitBlueprint(blueprint);
+                        tempVM.TSOState.LotID = newLocation;
                         tempVM.Context.Architecture = new VMArchitecture(size, size, blueprint, tempVM.Context);
 
                         tempVM.Context.Architecture.EmptyRoomMap();
@@ -1067,7 +1089,6 @@ namespace FSO.SimAntics.Utils
                         terrainC.Initialize(subworld.State.Device, subworld.State);
                         blueprint.Terrain = terrainC;
 
-                        tempVM.Context.Architecture.Terrain.LowQualityGrassState = true;
                         RestoreTerrain(tempVM, terrain.BlendN[x, y], terrain.Roads[x, y], RestoreLotType.Blank);
                         height = RestoreHeight(tempVM, terrain, x, y);
                         tempVM.Context.Blueprint.BaseAlt = (int)((baseHeight - height));

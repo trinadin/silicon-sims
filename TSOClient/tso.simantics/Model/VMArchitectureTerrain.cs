@@ -1,5 +1,6 @@
 ﻿using FSO.Content.Model;
 using FSO.SimAntics.NetPlay.Model;
+using FSO.SimAntics.Utils;
 using System;
 using System.IO;
 
@@ -9,7 +10,6 @@ namespace FSO.SimAntics.Model
     {
         public int Width;
         public int Height;
-        public bool LowQualityGrassState;
 
         public short[] Heights;
         public short[] Centers;
@@ -155,13 +155,13 @@ namespace FSO.SimAntics.Model
             return result;
         }
 
-        public void GenerateGrassStates() //generates a set of grass states for a lot.
+        public void GenerateGrassStates(RestoreLotType type) //generates a set of grass states for a lot.
         {
             //right now only works for square lots, but that's all tso has!
             var random = new Random();
             int width = Width;
 
-            if (LowQualityGrassState)
+            if (type == RestoreLotType.Blank)
             {
                 GrassState = new byte[Width * Height];
                 return;
