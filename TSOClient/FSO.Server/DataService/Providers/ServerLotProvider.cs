@@ -189,6 +189,7 @@ namespace FSO.Server.DataService.Providers
             {
                 Id = key,
 
+                Lot_Name = $"({location.X}, {location.Y})",
                 Lot_IsOnline = false,
                 Lot_Location = new Location { Location_X = location.X, Location_Y = location.Y },
                 //Lot_Price = 0,
@@ -267,7 +268,18 @@ namespace FSO.Server.DataService.Providers
         public override void DemandMutation(object entity, MutationType type, string path, object value, ISecurityContext context)
         {
             var lot = entity as Lot;
-            if (lot.DbId == 0) { throw new SecurityException("Unclaimed lots cannot be mutated"); }
+            if (lot.DbId == 0) {
+                switch (path) {
+                    case "Lot_IsOnline":
+                    case "Lot_NumOccupants":
+                    case "Lot_RoommateVec":
+                    case "Lot_SpotLightText":
+                        context.DemandInternalSystem();
+                        return;
+                    default:
+                        throw new SecurityException("Unclaimed lots cannot be mutated");
+                }
+            }
 
             var roomies = lot.Lot_RoommateVec;
             switch (path)

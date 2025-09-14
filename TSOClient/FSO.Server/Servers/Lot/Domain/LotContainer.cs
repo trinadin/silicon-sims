@@ -13,6 +13,7 @@ using FSO.Server.Database.DA.Objects;
 using FSO.Server.Database.DA.Relationships;
 using FSO.Server.Database.DA.Roommates;
 using FSO.Server.Database.DA.Users;
+using FSO.Server.Domain;
 using FSO.Server.Framework.Voltron;
 using FSO.Server.Protocol.Electron.Packets;
 using FSO.Server.Protocol.Gluon.Model;
@@ -31,6 +32,7 @@ using Ninject;
 using NLog;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -83,6 +85,8 @@ namespace FSO.Server.Servers.Lot.Domain
 
         private IShardRealestateDomain Realestate;
         private VMTSOSurroundingTerrain Terrain;
+        private bool TransientLot;
+        private bool UnownedLot;
         private bool JobLot;
         private ManualResetEvent LotActive = new ManualResetEvent(false);
         private bool ActiveYet;
@@ -165,7 +169,9 @@ namespace FSO.Server.Servers.Lot.Domain
             Kernel = kernel;
             Config = config;
 
-            JobLot = (context.Id & 0x40000000) > 0;
+            TransientLot = context.SpecialLot;
+            UnownedLot = context.UnownedLot;
+            JobLot = context.JobLot;
             if (JobLot) {
                 var jobPacked = Context.DbId - 0x200;
                 var jobLevel = (short)((jobPacked - 1) & 0xF);
@@ -175,7 +181,7 @@ namespace FSO.Server.Servers.Lot.Domain
                     lot_id = Context.DbId,
                     location = Context.Id,
                     category = LotCategory.money,
-                    name = "{job:"+jobType+":"+jobLevel+"}",
+                    name = "{job:" + jobType + ":" + jobLevel + "}",
                     admit_mode = 4
                 };
                 LotAdj = new List<DbLot>();
@@ -198,7 +204,35 @@ namespace FSO.Server.Servers.Lot.Domain
                         Terrain.Roads[x, y] = 0xF; //crossroads everywhere
                     }
                 }
-            } else {
+            }
+            else if (UnownedLot)
+            {
+                var location = Context.Id & (uint)LotIdFlags.NormalMask;
+                var coords = MapCoordinates.Unpack(location);
+                LotPersist = new DbLot
+                {
+                    lot_id = 0,
+                    shard_id = context.ShardId,
+                    location = location,
+                    category = LotCategory.none,
+                    name = $"({coords.X}, {coords.Y})",
+                    skill_mode = 2,
+                    admit_mode = 4,
+                };
+
+                using (var db = DAFactory.Get())
+                {
+                    LotAdj = db.Lots.GetAdjToLocation(context.ShardId, LotPersist.location);
+                    Tuning = new DynamicTuning(db.Tuning.All());
+                }
+
+                LotRoommates = new List<DbRoommate>();
+
+                Realestate = realestate.GetByShard(LotPersist.shard_id);
+                GenerateTerrain();
+            }
+            else
+            {
                 using (var db = DAFactory.Get())
                 {
                     LotPersist = db.Lots.Get(context.DbId);
@@ -396,7 +430,7 @@ namespace FSO.Server.Servers.Lot.Domain
 
         public bool SaveRing()
         {
-            if (JobLot) return true; //job lots never get saved.
+            if (TransientLot) return true; //transient lots never get saved.
             var newBackup = (sbyte)((LotPersist.ring_backup_num + 1) % Config.RingBufferSize);
             var lotStr = LotPersist.lot_id.ToString("x8");
             Directory.CreateDirectory(Path.Combine(Config.SimNFS, "Lots/" + lotStr + "/"));
@@ -582,7 +616,7 @@ namespace FSO.Server.Servers.Lot.Domain
                 }
             }
             
-            if (objectsOnLot.Count != 0 && !JobLot)
+            if (objectsOnLot.Count != 0 && !TransientLot)
             {
                 using (var da = DAFactory.Get())
                 {
@@ -719,7 +753,7 @@ namespace FSO.Server.Servers.Lot.Domain
             bool isNew = false;
             bool isMoved = (LotPersist.move_flags > 0);
             HollowLots = Task.Run(LoadAdj);
-            if (!JobLot && LotPersist.ring_backup_num > -1 && AttemptLoadRing())
+            if (!TransientLot && LotPersist.ring_backup_num > -1 && AttemptLoadRing())
             {
                 LOG.Info("Successfully loaded and cleaned fsov for dbid = " + Context.DbId);
             }
@@ -727,6 +761,12 @@ namespace FSO.Server.Servers.Lot.Domain
             {
                 isNew = true;
                 BlueprintReset();
+            }
+
+            if (UnownedLot)
+            {
+                // Maximum size (for admin placement)
+                Lot.TSOState.Size |= 10 | (3 << 8);
             }
 
             Lot.TSOState.Terrain = Terrain;
@@ -780,7 +820,7 @@ namespace FSO.Server.Servers.Lot.Domain
             ReturnInvalidObjects();
             if (!JobLot) ReturnOOWObjects();
 
-            var restoreType = isCommunity ? RestoreLotType.Community : RestoreLotType.Normal;
+            var restoreType = UnownedLot ? RestoreLotType.Blank : (isCommunity ? RestoreLotType.Community : RestoreLotType.Normal);
             if (isMoved || isNew) VMLotTerrainRestoreTools.RestoreTerrain(Lot, restoreType);
             VMLotTerrainRestoreTools.EnsureCoreObjects(Lot, restoreType);
             if (isNew) VMLotTerrainRestoreTools.PopulateBlankTerrain(Lot);
@@ -1617,7 +1657,7 @@ namespace FSO.Server.Servers.Lot.Domain
 
             //if we have a null owner, this lot needs to be deleted.
 
-            if (!(JobLot || LotPersist.category == LotCategory.community)) {
+            if (!(TransientLot || LotPersist.category == LotCategory.community)) {
                 using (var da = DAFactory.Get())
                 {
                     var lot = da.Lots.Get(Context.DbId);

@@ -175,6 +175,7 @@
     <Compile Include="DataService\ServerNFSProvider.cs" />
     <Compile Include="DataService\ShardDataServiceModule.cs" />
     <Compile Include="Discord\DiscordConfiguration.cs" />
+    <Compile Include="Domain\LotIdFlags.cs" />
     <Compile Include="Domain\ServerDomainModule.cs" />
     <Compile Include="Domain\ServerTop100Domain.cs" />
     <Compile Include="Embedded\ArchiveConfigBuilder.cs" />

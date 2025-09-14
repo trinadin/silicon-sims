@@ -3,6 +3,7 @@ using FSO.Server.Common;
 using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.LotVisitors;
 using FSO.Server.DataService;
+using FSO.Server.Domain;
 using FSO.Server.Framework.Gluon;
 using FSO.Server.Framework.Voltron;
 using FSO.Server.Protocol.Electron.Packets;
@@ -277,13 +278,15 @@ namespace FSO.Server.Servers.Lot.Domain
         public bool TryAcceptClaim(int lotId, uint claimId, uint specialId, string previousOwner, ClaimAction openAction)
         {
             if (claimId == 0)
-            { //job lot
+            { //special lot
+                var unowned = (lotId & (uint)LotIdFlags.Unowned) != 0;
+
                 GetLot(lotId).Bootstrap(new LotContext
                 {
-                    DbId = (int)specialId, //contains job type/grade
-                    Id = (uint)lotId, //lotId contains a "job lot location", not a DbId.
+                    DbId = unowned ? lotId : (int)specialId, //contains job type/grade or location
+                    Id = (uint)lotId, //lotId contains a "job lot / unowned location", not a DbId.
                     ClaimId = claimId,
-                    ShardId = 0,
+                    ShardId = unowned ? (int)specialId : 0,
                     Action = openAction
                 });
                 return true;
@@ -618,7 +621,7 @@ namespace FSO.Server.Servers.Lot.Domain
                     using (var da = DAFactory.Get())
                     {
                         var avatar = da.Avatars.Get(session.AvatarId);
-                        if (avatar.moderation_level == 0 && !Context.JobLot)
+                        if (avatar.moderation_level == 0 && !Context.SpecialLot)
                         {
                             if (da.Roommates.Get(session.AvatarId, Context.DbId) == null)
                             {
@@ -629,7 +632,7 @@ namespace FSO.Server.Servers.Lot.Domain
                     }
                 }
 
-                session.SetAttribute("currentLot", ((Context.Id & 0x40000000) > 0)?(int)Context.Id:Context.DbId);
+                session.SetAttribute("currentLot", ((Context.Id & (uint)LotIdFlags.SpecialMask) > 0)?(int)Context.Id:Context.DbId);
                 _Visitors.Add(session.AvatarId, session);
 
                 SyncNumVisitors();
@@ -670,7 +673,7 @@ namespace FSO.Server.Servers.Lot.Domain
                 {
                     Mode = MatchmakerNotifyType.RemoveAvatar,
                     AvatarID = session.AvatarId,
-                    LotID = Context.Id & 0x3FFFFFFF
+                    LotID = Context.Id & (uint)LotIdFlags.NormalMask
                 });
             }
 
@@ -700,7 +703,7 @@ namespace FSO.Server.Servers.Lot.Domain
         public void Shutdown()
         {
             if (!ShuttingDown) ForceShutdown(true);
-            Host.RemoveLot(((Context.Id & 0x40000000) > 0)?(int)Context.Id:Context.DbId);
+            Host.RemoveLot(((Context.Id & (uint)LotIdFlags.SpecialMask) > 0)?(int)Context.Id:Context.DbId);
             SetOnline(false);
             SetSpotlight(false);
             ReleaseLotClaim();
@@ -751,7 +754,7 @@ namespace FSO.Server.Servers.Lot.Domain
                     {
                         Type = Protocol.Gluon.Model.ClaimType.LOT,
                         ClaimId = Context.ClaimId,
-                        EntityId = ((Context.Id & 0x40000000) > 0) ? (int)Context.Id : Context.DbId,
+                        EntityId = ((Context.Id & (uint)LotIdFlags.SpecialMask) > 0) ? (int)Context.Id : Context.DbId,
                         FromOwner = Config.Call_Sign
                     });
                 }catch(Exception ex)
@@ -796,7 +799,7 @@ namespace FSO.Server.Servers.Lot.Domain
 
         public void RecordStartVisit(IVoltronSession session, DbLotVisitorType visitorType)
         {
-            if (Context.JobLot) return;
+            if (Context.SpecialLot) return;
             using (var da = DAFactory.Get())
             {
                 var id = da.LotVisits.Visit(session.AvatarId, visitorType, Context.DbId);
@@ -808,7 +811,7 @@ namespace FSO.Server.Servers.Lot.Domain
 
         public void UpdateActiveVisitRecords()
         {
-            if (Context.JobLot) return;
+            if (Context.SpecialLot) return;
 
             var visitIds = new List<int>();
             lock (_Visitors)

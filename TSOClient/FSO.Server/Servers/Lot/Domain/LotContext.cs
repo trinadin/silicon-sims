@@ -1,4 +1,5 @@
-﻿using FSO.Server.Protocol.Gluon.Model;
+﻿using FSO.Server.Domain;
+using FSO.Server.Protocol.Gluon.Model;
 
 namespace FSO.Server.Servers.Lot.Domain
 {
@@ -9,13 +10,29 @@ namespace FSO.Server.Servers.Lot.Domain
         public int ShardId;
         public uint ClaimId;
         public ClaimAction Action;
-        public bool HighMax; 
+        public bool HighMax;
+
+        public bool SpecialLot
+        {
+            get
+            {
+                return (Id & (uint)LotIdFlags.SpecialMask) != 0;
+            }
+        }
+
+        public bool UnownedLot
+        {
+            get
+            {
+                return (Id & (uint)LotIdFlags.Unowned) != 0;
+            }
+        }
 
         public bool JobLot
         {
             get
             {
-                return (Id & 0x40000000) > 0;
+                return (Id & (uint)LotIdFlags.JobLot) != 0;
             }
         }
     }

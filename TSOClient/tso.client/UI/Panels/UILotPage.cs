@@ -387,6 +387,7 @@ namespace FSO.Client.UI.Panels
             var isRoommate = false;
             var isOnline = false;
             var isCommunity = false;
+            var isEmpty = false;
 
             NeighborhoodNameButton.Size = new Vector2(173, 18);
 
@@ -395,6 +396,7 @@ namespace FSO.Client.UI.Panels
                 isOnline = CurrentLot.Value.Lot_IsOnline || (CurrentLot.Value.Lot_LotAdmitInfo?.LotAdmitInfo_AdmitMode >= 4);
                 isMyProperty = FindController<CoreGameScreenController>().IsMe(CurrentLot.Value.Lot_LeaderID);
                 isCommunity = CurrentLot.Value.Lot_Category == 11;
+                isEmpty = CurrentLot.Value.Lot_Category == 0 && CurrentLot.Value.Lot_LeaderID == 0;
                     
                 var roomies = new List<uint>();
                 if (CurrentLot.Value.Lot_RoommateVec != null) roomies.AddRange(CurrentLot.Value.Lot_RoommateVec);
@@ -415,6 +417,11 @@ namespace FSO.Client.UI.Panels
                 {
                     OriginalDescription = CurrentLot.Value.Lot_Description;
                     HouseDescriptionTextEdit.CurrentText = OriginalDescription;
+                }
+
+                if (isEmpty)
+                {
+                    LotThumbnail.SetThumbnail(null, CurrentLot.Value.Id);
                 }
             }
 

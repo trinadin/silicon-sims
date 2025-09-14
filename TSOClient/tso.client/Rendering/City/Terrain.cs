@@ -1152,7 +1152,7 @@ namespace FSO.Client.Rendering.City
                 {
                     if (m_SelTile[0] != -1 && m_SelTile[1] != -1)
                     {
-                        FindController<TerrainController>().ClickLot(m_SelTile[0], m_SelTile[1]);
+                        FindController<TerrainController>().ClickLot(m_SelTile[0], m_SelTile[1], state.ShiftDown);
                     }
                 }
             }

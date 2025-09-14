@@ -303,6 +303,11 @@ namespace FSO.Client.UI.Screens
 
         public void SelectAvatar(Framework.UIElement button, bool gotoHouse)
         {
+            if (AvatarListBox.SelectedItem == null)
+            {
+                return;
+            }
+
             var ava = (ArchiveAvatar)AvatarListBox.SelectedItem.Data;
             FindController<ConnectArchiveController>().SelectAvatar(ava.AvatarId, gotoHouse ? ava.LotId : 0u);
         }

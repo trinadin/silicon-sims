@@ -33,16 +33,19 @@ namespace FSO.Server.Servers.City.Handlers
             }
 
             Lots.TryClose(request.EntityId, request.ClaimId);
-            try
+            if (request.ClaimId != 0)
             {
-                using (var db = DAFactory.Get())
+                try
                 {
-                    db.LotClaims.Delete(request.ClaimId, request.FromOwner);
+                    using (var db = DAFactory.Get())
+                    {
+                        db.LotClaims.Delete(request.ClaimId, request.FromOwner);
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                //probably already unclaimed. do nothing.
+                catch (Exception e)
+                {
+                    //probably already unclaimed. do nothing.
+                }
             }
         }
     }

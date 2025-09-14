@@ -192,7 +192,7 @@ namespace FSO.Client.Controllers
                     switch (loc.Status)
                     {
                         case FindAvatarResponseStatus.FOUND:
-                            View.FindController<CoreGameScreenController>()?.ShowLotPage(loc.LotId & 0x3FFFFFFF); //ignore transient part
+                            View.FindController<CoreGameScreenController>()?.ShowLotPage(loc.LotId & 0x1FFFFFFF); //ignore transient part
                             break;
                         default:
                             if (loc.Status == FindAvatarResponseStatus.PRIVACY_ENABLED) loc.Status = FindAvatarResponseStatus.NOT_ON_LOT;

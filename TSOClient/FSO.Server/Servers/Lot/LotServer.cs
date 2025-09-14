@@ -1,20 +1,21 @@
 ﻿using FSO.Server.Database.DA;
+using FSO.Server.Database.DA.Hosts;
 using FSO.Server.Database.DA.Lots;
+using FSO.Server.Domain;
 using FSO.Server.Framework.Aries;
 using FSO.Server.Framework.Voltron;
 using FSO.Server.Protocol.Aries.Packets;
+using FSO.Server.Protocol.Electron.Packets;
+using FSO.Server.Protocol.Voltron.Packets;
 using FSO.Server.Servers.Lot.Domain;
 using FSO.Server.Servers.Lot.Handlers;
 using FSO.Server.Servers.Lot.Lifecycle;
+using FSO.Server.Servers.Shared.Handlers;
 using Ninject;
 using NLog;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using FSO.Server.Database.DA.Hosts;
-using FSO.Server.Servers.Shared.Handlers;
-using FSO.Server.Protocol.Voltron.Packets;
-using FSO.Server.Protocol.Electron.Packets;
 
 namespace FSO.Server.Servers.Lot
 {
@@ -130,7 +131,7 @@ namespace FSO.Server.Servers.Lot
                     if (ticket != null)
                     {
                         uint location = 0;
-                        if ((ticket.lot_id & 0x40000000) > 0) location = (uint)ticket.lot_id;
+                        if ((ticket.lot_id & (uint)LotIdFlags.SpecialMask) > 0) location = (uint)ticket.lot_id; // job lot or unowned
                         else
                         {
                             var lot = da.Lots.Get(ticket.lot_id);

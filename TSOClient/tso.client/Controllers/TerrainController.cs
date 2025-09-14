@@ -266,13 +266,12 @@ namespace FSO.Client.Controllers
             LotThumbs.ReleaseLotThumb(ShardId, location, true);
         }
 
-        public void ClickLot(int x, int y)
+        public void ClickLot(int x, int y, bool forceLotPage)
         {
             var id = MapCoordinates.Pack((ushort)x, (ushort)y);
             var occupied = IsTileOccupied(x, y);
             DataService.Get<Lot>(id).ContinueWith(result =>
             {
-
                 if (occupied)
                 {
                     GameThread.InUpdate(() =>
@@ -281,6 +280,13 @@ namespace FSO.Client.Controllers
                             UIAlert.Alert("", GameFacade.Strings.GetString("f115", "51"), true);
                         else
                             Parent.ShowLotPage(id);
+                    });
+                }
+                else if (forceLotPage && Realestate.IsOpenable((ushort)x, (ushort)y))
+                {
+                    GameThread.InUpdate(() =>
+                    {
+                        Parent.ShowLotPage(id);
                     });
                 }
                 else if (!Realestate.IsPurchasable((ushort)x, (ushort)y))

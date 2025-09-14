@@ -1,6 +1,7 @@
 ﻿using FSO.Server.Common;
 using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.Lots;
+using FSO.Server.Domain;
 using FSO.Server.Framework.Gluon;
 using FSO.Server.Framework.Voltron;
 using FSO.Server.Protocol.Electron.Packets;
@@ -87,7 +88,7 @@ namespace FSO.Server.Servers.City.Handlers
                             lot_owner = find.Server.CallSign,
                             date = Epoch.Now,
                             ip = session.IpAddress,
-                            lot_id = find.LotDbId,
+                            lot_id = find.LotDbId == 0 ? (int)find.LotId | (int)LotIdFlags.Unowned : find.LotDbId,
                             avatar_claim_id = session.AvatarClaimId,
                             avatar_claim_owner = Context.Config.Call_Sign
                         };

@@ -82,6 +82,28 @@ namespace FSO.Common.Domain.Realestate
             return _Pricing.GetPrice(_Map, x, y);
         }
 
+        public bool IsOpenable(ushort x, ushort y)
+        {
+            // Can't open lots out of bounds.
+            if (!MapCoordinates.InBounds(x, y, 1))
+            {
+                //Out of bounds!
+                return false;
+            }
+
+            // All-water lots have nowhere for players to stand.
+            var terrain = _Map.GetTerrain(x, y);
+            if (terrain == TerrainType.WATER) {
+                // Only openable if any side of the terrain has a road.
+                // TODO: When the terrain restore supports putting the mailbox on corners, allow those too.
+
+                var road = _Map.GetRoad(x, y);
+                return (road & 0xF) != 0;
+            }
+
+            return true;
+        }
+
         public bool IsPurchasable(ushort x, ushort y)
         {
             //Cant buy lots on the very edge

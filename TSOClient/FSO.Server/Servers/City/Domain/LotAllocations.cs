@@ -1,7 +1,10 @@
-﻿using FSO.Common.Enum;
+﻿using FSO.Common.Domain.Realestate;
+using FSO.Common.Domain.RealestateDomain;
+using FSO.Common.Enum;
 using FSO.Common.Security;
 using FSO.Server.Database.DA;
 using FSO.Server.Database.DA.Lots;
+using FSO.Server.Domain;
 using FSO.Server.Framework.Gluon;
 using FSO.Server.Protocol.Electron.Model;
 using FSO.Server.Protocol.Gluon.Model;
@@ -22,6 +25,7 @@ namespace FSO.Server.Servers.City.Domain
         private IDAFactory DAFactory;
         private CityServerContext Context;
         private JobMatchmaker Matchmaker;
+        private IShardRealestateDomain Realestate;
 
         private bool AllowGuestOpening => Context.Config.Archive != null && Context.Config.Archive.Flags.HasFlag(FSO.Common.ArchiveConfigFlags.AllOpenable);
 
@@ -31,6 +35,7 @@ namespace FSO.Server.Servers.City.Domain
             this.DAFactory = daFactory;
             this.Context = context;
             this.Matchmaker = kernel.Get<JobMatchmaker>();
+            this.Realestate = kernel.Get<IRealestateDomain>().GetByShard(Context.ShardId);
         }
 
         public Task<TryFindLotResult> TryFindOrOpen(uint lotId, uint avatarId, ISecurityContext security)
@@ -56,7 +61,9 @@ namespace FSO.Server.Servers.City.Domain
                 }
             } else
             {
-                location = (uint)response.EntityId;
+                // To the lot server, unowned lots are known by their location |'d with a flag.
+                // To the city server allocations, it's just known by the raw location. Remove the flag.
+                location = (uint)response.EntityId & (uint)(~LotIdFlags.Unowned);
             }
             if (location == null) return;
 
@@ -98,8 +105,8 @@ namespace FSO.Server.Servers.City.Domain
             }
             else
             {
-                //job lot. there is no claim, no db lot. Id is the location.
-                location = (uint)lotId;
+                //special lot. there is no claim, no db lot. Id is the location.
+                location = (uint)lotId & (uint)(~LotIdFlags.Unowned);
             }
 
             if (location == null)
@@ -147,7 +154,7 @@ namespace FSO.Server.Servers.City.Domain
                 //special: join available job lot instance
                 var result = Matchmaker.TryGetJobLot(lotId, avatarId);
                 lotId = result.Item1 ?? 0;
-                lotId |= 0x40000000;
+                lotId |= (uint)LotIdFlags.JobLot;
                 originalId = result.Item2;
                 jobLot = true;
                 if (lotId == 0) return Immediate(new TryFindLotResult
@@ -164,7 +171,7 @@ namespace FSO.Server.Servers.City.Domain
                         Status = FindLotResponseStatus.NO_ADMIT
                     });
                 }
-                lotId |= 0x40000000;
+                lotId |= (uint)LotIdFlags.JobLot;
                 jobLot = true;
             }
 
@@ -186,6 +193,8 @@ namespace FSO.Server.Servers.City.Domain
 
                         if (!jobLot)
                         {
+                            var coords = MapCoordinates.Unpack(lotId);
+
                             DbLot lot = null;
                             using (var db = DAFactory.Get())
                             {
@@ -193,49 +202,72 @@ namespace FSO.Server.Servers.City.Domain
                                 lot = db.Lots.GetByLocation(Context.ShardId, lotId);
                                 if (lot == null)
                                 {
-                                    Remove(lotId);
-                                    return Immediate(new TryFindLotResult
+                                    if (AllowGuestOpening)
                                     {
-                                        Status = FindLotResponseStatus.NO_SUCH_LOT
-                                    });
-                                }
+                                        // Empty lots can be opened, as long as the location is valid.
 
-                                if (avatarId != 0 && !AllowGuestOpening)
-                                {
-                                    var roomies = db.Roommates.GetLotRoommates(lot.lot_id);
-                                    var modState = db.Avatars.GetModerationLevel(avatarId);
-                                    var avatars = new List<uint>();
-                                    foreach (var roomie in roomies)
-                                    {
-                                        if (roomie.is_pending == 0) avatars.Add(roomie.avatar_id);
-                                    }
+                                        if (!Realestate.IsOpenable(coords.X, coords.Y))
+                                        {
+                                            return Immediate(new TryFindLotResult
+                                            {
+                                                Status = FindLotResponseStatus.NO_SUCH_LOT
+                                            });
+                                        }
 
-                                    try
-                                    {
-                                        if (lot.admit_mode < 4 && modState == 0 && lot.category != FSO.Common.Enum.LotCategory.community)
-                                            security.DemandAvatars(avatars, AvatarPermissions.WRITE);
+                                        lot = new DbLot()
+                                        {
+                                            lot_id = 0,
+                                            location = lotId,
+                                            admit_mode = 4,
+                                        };
                                     }
-                                    catch (Exception ex)
+                                    else
                                     {
                                         Remove(lotId);
                                         return Immediate(new TryFindLotResult
                                         {
-                                            Status = FindLotResponseStatus.NOT_PERMITTED_TO_OPEN
+                                            Status = FindLotResponseStatus.NO_SUCH_LOT
                                         });
+                                    }
+                                }
+                                else
+                                {
+                                    if (avatarId != 0 && !AllowGuestOpening)
+                                    {
+                                        var roomies = db.Roommates.GetLotRoommates(lot.lot_id);
+                                        var modState = db.Avatars.GetModerationLevel(avatarId);
+                                        var avatars = new List<uint>();
+                                        foreach (var roomie in roomies)
+                                        {
+                                            if (roomie.is_pending == 0) avatars.Add(roomie.avatar_id);
+                                        }
+
+                                        try
+                                        {
+                                            if (lot.admit_mode < 4 && modState == 0 && lot.category != FSO.Common.Enum.LotCategory.community)
+                                                security.DemandAvatars(avatars, AvatarPermissions.WRITE);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Remove(lotId);
+                                            return Immediate(new TryFindLotResult
+                                            {
+                                                Status = FindLotResponseStatus.NOT_PERMITTED_TO_OPEN
+                                            });
+                                        }
                                     }
                                 }
                             }
 
                             if (!allocation.TryClaim(lot))
                             {
-
                                 Remove(lotId);
                                 return Immediate(new TryFindLotResult
                                 {
                                     Status = FindLotResponseStatus.CLAIM_FAILED
                                 });
                             }
-                            allocation.SetLot(lot, 0,
+                            allocation.SetLot(lot, (uint)Context.ShardId,
                                 (avatarId == 0) ? ClaimAction.LOT_CLEANUP : ClaimAction.LOT_HOST);
                         }
                         else { 
@@ -359,7 +391,7 @@ namespace FSO.Server.Servers.City.Domain
         private LotAllocation Remove(uint lotId)
         {
             LotAllocation removed = null;
-            if ((lotId & 0x40000000) > 0) Matchmaker.RemoveJobLot(lotId & 0x3FFFFFFF);
+            if ((lotId & (uint)LotIdFlags.JobLot) > 0) Matchmaker.RemoveJobLot(lotId & (uint)LotIdFlags.NormalMask);
             _Locks.TryRemove(lotId, out removed);
             return removed;
         }
@@ -387,6 +419,8 @@ namespace FSO.Server.Servers.City.Domain
         private DbLot Lot;
         private uint SpecialId;
         private ClaimAction OpenAction;
+
+        public bool Unowned => Lot.lot_id == 0;
 
         public LotAllocation(IDAFactory da, CityServerContext context)
         {
@@ -446,6 +480,11 @@ namespace FSO.Server.Servers.City.Domain
         public bool TryClaim(DbLot lot)
         {
             Lot = lot;
+
+            if (Unowned)
+            {
+                return true;
+            }
 
             //Write a db record to claim the lot
             using (var db = DAFactory.Get())
@@ -532,7 +571,7 @@ namespace FSO.Server.Servers.City.Domain
                     Type = ClaimType.LOT,
                     Action = OpenAction,
                     //x,y used as id for lots
-                    EntityId = Lot.lot_id,
+                    EntityId = Unowned ? (int)(Lot.location | (uint)LotIdFlags.Unowned) : Lot.lot_id,
                     SpecialId = SpecialId,
                     ClaimId = ClaimId ?? 0,
                     FromOwner = Context.Config.Call_Sign
