@@ -1126,15 +1126,6 @@ namespace FSO.Server.Servers.Lot.Domain
                         SaveAvatars(beingKilled, true);
                     }
 
-                    foreach (var avatar in Lot.Context.ObjectQueries.AvatarsByPersist)
-                    {
-                        if (avatar.Value.KillTimeout == 1)
-                        {
-                            //this avatar has begun being killed. Save them immediately.
-                            SaveAvatar(avatar.Value);
-                        }
-                    }
-
                     if (--AvatarSaveTicker <= 0)
                     {
                         //save all avatars
