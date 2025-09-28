@@ -98,7 +98,7 @@ namespace FSO.IDE
                     Framebuffer = new Bitmap(FSOUI.Width, FSOUI.Height, PixelFormat.Format32bppArgb);
                 }
 
-                var bmpData = Framebuffer.LockBits(new Rectangle(0, 0, Framebuffer.Width, Framebuffer.Height), ImageLockMode.WriteOnly, Framebuffer.PixelFormat);
+                var bmpData = Framebuffer.LockBits(new System.Drawing.Rectangle(0, 0, Framebuffer.Width, Framebuffer.Height), ImageLockMode.WriteOnly, Framebuffer.PixelFormat);
                 IntPtr ptr = bmpData.Scan0;
 
                 Marshal.Copy(FSOUI.RawImage, 0, ptr, bmpData.Stride * bmpData.Height);
@@ -187,7 +187,7 @@ namespace FSO.IDE
             {
                 lock (FrameLock)
                 {
-                    if (Framebuffer != null) e.Graphics.DrawImage(Framebuffer, new Point());
+                    if (Framebuffer != null) e.Graphics.DrawImage(Framebuffer, new System.Drawing.Point());
                 }
             }
             if (FSOUI != null) FSOUI.NeedFrames = 5;

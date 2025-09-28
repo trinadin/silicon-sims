@@ -1,274 +1,312 @@
-﻿using Mp3Sharp;
-using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework.Audio;
+﻿using Microsoft.Xna.Framework.Audio;
+using MP3Sharp;
+using System.Buffers;
+using System.Collections.Concurrent;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace FSO.Common.Audio
 {
-    public class MP3Player : ISFXInstanceLike
+    /// <summary>
+    /// An MP3 audio player that streams and decodes MP3 files into 
+    /// MonoGame's DynamicSoundEffectInstance for playback.
+    /// </summary>
+    public class MP3Player : ISFXInstanceLike, IDisposable
     {
         public static bool NewMode = true;
 
-        private Mp3Stream Stream;
-        public DynamicSoundEffectInstance Inst;
-        private int LastChunkSize = 1; //don't die immediately..
-        private Thread DecoderThread;
+        private MP3Stream? _stream;
+        private DynamicSoundEffectInstance? _inst;
 
-        private List<byte[]> NextBuffers = new List<byte[]>();
-        private List<int> NextSizes = new List<int>();
-        private int Requests;
-        private AutoResetEvent DecodeNext;
-        private AutoResetEvent BufferDone;
-        private bool EndOfStream;
-        private bool Active = true;
-        private Thread MainThread; //keep track of this, terminate when it closes.
+        /// <summary>
+        /// Queue holding decoded audio buffers ready for playback.
+        /// </summary>
+        private readonly ConcurrentQueue<(byte[] Buffer, int Size)> _nextBuffers = new();
 
-        private SoundState _State = SoundState.Stopped;
-        private bool Disposed = false;
+        /// <summary>
+        /// Semaphore controlling the number of available buffers.
+        /// </summary>
+        private readonly SemaphoreSlim _bufferCount = new(0);
 
-        private float _Volume = 1f;
-        private float _Pan;
+        private CancellationTokenSource? _cts;
+        private Task? _decoderTask;
 
-        private object ControlLock = new object();
-        private string Path;
         public int SendExtra = 2;
 
-        private static byte[] Blank = new byte[65536];
+        private bool _endOfStream;
+        private bool _disposed;
 
+        private SoundState _state = SoundState.Stopped;
+        private float _volume = 1f;
+        private float _pan;
+
+        /// <summary>
+        /// Lock object for synchronizing access to control properties and state changes.
+        /// </summary>
+        private readonly object _controlLock = new();
+
+        private readonly string _path;
+
+        /// <summary>
+        /// Blank buffer used when no audio data is available.
+        /// </summary>
+        private static readonly byte[] _blank = new byte[65536];
+
+        // Tunables
+        private readonly int _bufferSize;
+        private readonly int _initialBuffers;
+        private readonly int _maxBuffers;
+
+        private readonly ArrayPool<byte> _pool = ArrayPool<byte>.Shared;
+        private readonly bool _preload;
+
+
+        /// <summary>
+        /// Initializes a new MP3Player instance with default buffering options.
+        /// </summary>
+        /// <param name="path">Path to the MP3 file.</param>
+        /// </param>
         public MP3Player(string path)
+            : this(path, preload: false, bufferSize: 262144, initialBuffers: 6, maxBuffers: 12) { }
+
+
+        /// <summary>
+        /// Initializes a new MP3Player instance with custom buffering and preload options.
+        /// </summary>
+        /// <param name="path">Path to the MP3 file.</param>
+        /// <param name="preload">If true, loads the entire MP3 into memory.</param>
+        /// <param name="bufferSize">Size of each buffer chunk in bytes.</param>
+        /// <param name="initialBuffers">Number of buffers to prefill before playback.</param>
+        /// <param name="maxBuffers">Maximum number of buffers in the queue.</param>
+        public MP3Player(string path, bool preload = false, int bufferSize = 262144, int initialBuffers = 6, int maxBuffers = 12)
         {
-            Path = path;
-            // //let's get started...
+            _path = path;
+            _preload = preload;
+            _bufferSize = Math.Max(16384, bufferSize);
+            _initialBuffers = Math.Max(1, initialBuffers);
+            _maxBuffers = Math.Max(_initialBuffers, maxBuffers);
 
-            DecodeNext = new AutoResetEvent(true);
-            BufferDone = new AutoResetEvent(false);
-            MainThread = Thread.CurrentThread;
-
-            Task.Run((Action)Start);
+            Task.Run(Start);
         }
 
-        public void Start()
+        /// <summary>
+        /// Starts decoding the MP3 file and prepares the DynamicSoundEffectInstance.
+        /// Runs on a background task and manages buffers asynchronously.
+        /// </summary>
+        private void Start()
         {
-            Stream = new Mp3Stream(Path);
-            Stream.DecodeFrames(1);
-            var freq = Stream.Frequency;
-            lock (ControlLock)
+            try
             {
-                if (Disposed) return;
-                Inst = new DynamicSoundEffectInstance(freq, AudioChannels.Stereo);
-                Inst.IsLooped = false;
-                Inst.BufferNeeded += SubmitBufferAsync;
-                if (_State == SoundState.Playing) Inst.Play();
-                else if (_State == SoundState.Paused)
-                {
-                    Inst.Play();
-                    Inst.Pause();
-                }
-                Inst.Volume = _Volume;
-                Inst.Pan = _Pan;
-                Requests = 2;
-            }
+                _cts = new CancellationTokenSource();
+                var token = _cts.Token;
 
-            //SubmitBuffer(null, null);
-            //SubmitBuffer(null, null);
+                _stream = new MP3Stream(new FileStream(_path, FileMode.Open, FileAccess.Read, FileShare.Read));
+                _stream.DecodeFrames(1);
+                var freq = _stream.Frequency;
 
-            DecoderThread = new Thread(() =>
-            {
-                try
+                lock (_controlLock)
                 {
-                    while (Active && MainThread.IsAlive)
+                    if (_disposed) return;
+
+                    _inst = new DynamicSoundEffectInstance(freq, AudioChannels.Stereo)
                     {
-                        DecodeNext.WaitOne(128);
-                        bool go;
-                        lock (this) go = Requests > 0;
-                        while (go)
-                        {
-                            var buf = new byte[262144];// 524288];
-                            var read = Stream.Read(buf, 0, buf.Length);
-                            lock (this)
-                            {
-                                Requests--;
-                                NextBuffers.Add(buf);
-                                NextSizes.Add(read);
-                                if (read == 0)
-                                {
-                                    EndOfStream = true;
-                                    BufferDone.Set();
-                                    return;
-                                }
-                                BufferDone.Set();
-                            }
-                            lock (this) go = Requests > 0;
-                        }
+                        IsLooped = false,
+                        Volume = _volume,
+                        Pan = _pan
+                    };
+                    _inst.BufferNeeded += SubmitBufferAsync;
+
+                    switch (_state)
+                    {
+                        case SoundState.Playing:
+                            _inst.Play();
+                            break;
+                        case SoundState.Paused:
+                            _inst.Play();
+                            _inst.Pause();
+                            break;
                     }
                 }
-                catch (Exception e) { }
-            });
-            DecoderThread.Start();
-            DecodeNext.Set();
-        }
 
-        public void Play()
-        {
-            lock (ControlLock)
+                if (_preload)
+                {
+                    PreloadStream();
+                    return;
+                }
+
+                PrefillBuffers(token);
+
+                _decoderTask = Task.Run(async () =>
+                {
+                    try
+                    {
+                        while (!token.IsCancellationRequested && !_endOfStream)
+                        {
+                            if (_nextBuffers.Count < _maxBuffers)
+                            {
+                                var rent = _pool.Rent(_bufferSize);
+                                int read = _stream.Read(rent, 0, rent.Length);
+
+                                if (read <= 0)
+                                {
+                                    _pool.Return(rent);
+                                    _endOfStream = true;
+                                    break;
+                                }
+
+                                _nextBuffers.Enqueue((rent, read));
+                                _bufferCount.Release();
+                                continue; // fill aggressively
+                            }
+
+                            await Task.Delay(12, token).ConfigureAwait(false);
+                        }
+                    }
+                    catch (OperationCanceledException) { }
+                }, token);
+            }
+            catch
             {
-                _State = SoundState.Playing;
-                Inst?.Play();
+                _endOfStream = true;
             }
         }
 
-        public void Stop()
+        private void PreloadStream()
         {
-            lock (ControlLock)
+            using var ms = new MemoryStream();
+            var tmp = _pool.Rent(_bufferSize);
+            try
             {
-                _State = SoundState.Stopped;
-                Inst?.Stop();
+                int read;
+                while ((read = _stream!.Read(tmp, 0, tmp.Length)) > 0)
+                {
+                    ms.Write(tmp, 0, read);
+                }
+            }
+            finally
+            {
+                _pool.Return(tmp);
+            }
+
+            if (ms.Length > 0)
+            {
+                _inst?.SubmitBuffer(ms.ToArray(), 0, (int)ms.Length);
+                _endOfStream = true;
             }
         }
 
-        public void Pause()
+        private void PrefillBuffers(CancellationToken token)
         {
-            lock (ControlLock)
+            for (int i = 0; i < _initialBuffers && !token.IsCancellationRequested; i++)
             {
-                _State = SoundState.Paused;
-                Inst?.Pause();
+                var buf = _pool.Rent(_bufferSize);
+                int bytesRead = _stream!.Read(buf, 0, _bufferSize);
+
+                if (bytesRead <= 0)
+                {
+                    _pool.Return(buf);
+                    _endOfStream = true;
+                    break;
+                }
+
+                _nextBuffers.Enqueue((buf, bytesRead));
+                _bufferCount.Release();
             }
         }
 
-        public void Resume()
+        public void Play() { SetState(SoundState.Playing, s => s.Play()); }
+        public void Stop() { SetState(SoundState.Stopped, s => s.Stop()); }
+        public void Pause() { SetState(SoundState.Paused, s => s.Pause()); }
+        public void Resume() { SetState(SoundState.Playing, s => s.Resume()); }
+
+        private void SetState(SoundState state, Action<DynamicSoundEffectInstance> action)
         {
-            lock (ControlLock)
+            lock (_controlLock)
             {
-                _State = SoundState.Playing;
-                Inst?.Resume();
+                _state = state;
+                if (_inst != null) action(_inst);
             }
         }
 
+        /// <summary>
+        /// Disposes the MP3Player, releasing all buffers, stopping playback, and canceling decoding.
+        /// </summary>
         public void Dispose()
         {
-            lock (ControlLock)
+            lock (_controlLock)
             {
-                Disposed = true;
-                Inst?.Dispose();
-                Stream?.Dispose();
+                if (_disposed) return;
 
-                Active = false;
-                DecodeNext.Set(); //end the mp3 thread immediately
-
-                EndOfStream = true;
+                _disposed = true;
+                _cts?.Cancel();
+                _inst?.Dispose();
+                _stream?.Dispose();
             }
+
+            while (_nextBuffers.TryDequeue(out var tuple))
+            {
+                _pool.Return(tuple.Buffer);
+            }
+
+            while (_bufferCount.CurrentCount > 0) _bufferCount.Wait(0);
+            try { _decoderTask?.Wait(50); } catch { }
+
+            GC.SuppressFinalize(this);
         }
 
-        public bool IsEnded()
-        {
-            return EndOfStream && Inst.PendingBufferCount == 0;
-        }
+        public bool IsEnded() => _endOfStream && _inst?.PendingBufferCount == 0;
 
         public float Volume
         {
-            get
-            {
-                lock (ControlLock)
-                {
-                    if (Inst != null) return Inst.Volume;
-                    else return _Volume;
-                }
-            }
-            set
-            {
-                lock (ControlLock)
-                {
-                    _Volume = value;
-                    if (Inst != null) Inst.Volume = value;
-                }
-            }
+            get { lock (_controlLock) return _inst?.Volume ?? _volume; }
+            set { SetControlProperty(ref _volume, value, (inst, v) => inst.Volume = v); }
         }
 
         public float Pan
         {
-            get
+            get { lock (_controlLock) return _inst?.Pan ?? _pan; }
+            set { SetControlProperty(ref _pan, value, (inst, v) => inst.Pan = v); }
+        }
+
+        private void SetControlProperty(ref float backingField, float value, Action<DynamicSoundEffectInstance, float> setter)
+        {
+            lock (_controlLock)
             {
-                lock (ControlLock)
-                {
-                    if (Inst != null) return Inst.Pan;
-                    else return _Pan;
-                }
-            }
-            set
-            {
-                lock (ControlLock)
-                {
-                    _Pan = value;
-                    if (Inst != null) Inst.Pan = value;
-                }
+                backingField = value;
+                if (_inst != null) setter(_inst, value);
             }
         }
 
-        public SoundState State
-        {
-            get
-            {
-                lock (ControlLock)
-                {
-                    if (Inst != null) return Inst.State;
-                    else return _State;
-                }
-            }
-        }
+        public SoundState State { get { lock (_controlLock) return _inst?.State ?? _state; } }
 
         public bool IsLooped { get; set; }
 
-        private void SubmitBuffer(object sender, EventArgs e)
+        private void SubmitBufferAsync(object? sender, EventArgs e)
         {
-            byte[] buffer = new byte[524288];
-            lock (this)
+            if (_endOfStream && _bufferCount.CurrentCount == 0) return;
+
+            if (!_bufferCount.Wait(50))
             {
-                var read = Stream.Read(buffer, 0, buffer.Length);
-                LastChunkSize = read;
-                if (read == 0)
-                {
-                    return;
-                }
-                Inst.SubmitBuffer(buffer, 0, read);
+                _inst?.SubmitBuffer(_blank, 0, _blank.Length);
+                return;
             }
-        }
 
-        private void SubmitBufferAsync(object sender, EventArgs e)
-        {
-            while (true)
+            if (_nextBuffers.TryDequeue(out var tuple))
             {
-                if (EndOfStream) return;
-                var gotData = false;
-                lock (this)
+                try
                 {
-                    if (NextBuffers.Count > 0)
-                    {
-                        if (NextSizes[0] > 0) Inst.SubmitBuffer(NextBuffers[0], 0, NextSizes[0]);
-                        gotData = true;
-                        NextBuffers.RemoveAt(0);
-                        NextSizes.RemoveAt(0);
-                        Requests++;
-                        DecodeNext.Set();
-                        if (SendExtra > 0)
-                        {
-                            SendExtra--;
-                            continue;
-                        }
-                        return;
-                    }
-
-                    if (EndOfStream) return;
+                    if (tuple.Size > 0)
+                        _inst?.SubmitBuffer(tuple.Buffer, 0, tuple.Size);
                 }
-                if (!gotData)
+                finally
                 {
-                    Inst.SubmitBuffer(Blank, 0, Blank.Length);
-                    Requests++;
-                    DecodeNext.Set();
-                    return;
-                    //if (NewMode) BufferDone.WaitOne(128);
+                    _pool.Return(tuple.Buffer);
                 }
+            }
+            else
+            {
+                _inst?.SubmitBuffer(_blank, 0, _blank.Length);
             }
         }
     }

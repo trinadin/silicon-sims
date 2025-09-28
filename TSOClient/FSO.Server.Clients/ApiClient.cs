@@ -2,8 +2,6 @@
 using FSO.Server.Clients.Framework;
 using Newtonsoft.Json;
 using RestSharp;
-using System;
-using System.Linq;
 
 namespace FSO.Server.Clients
 {
@@ -14,202 +12,268 @@ namespace FSO.Server.Clients
 
         public static string AuthKey;
 
-        public ApiClient(string baseUrl) : base(baseUrl) {
+        public ApiClient(string baseUrl) : base(baseUrl)
+        {
             client = Client();
         }
 
-        public void GetThumbnailAsync(uint shardID, uint location, Action<byte[]> callback)
-        {
-            //var client = Client();
-            var request = new RestRequest("userapi/city/" + shardID + "/" + location + ".png");
-
-            client.ExecuteAsync(request, (resp, h) =>
-            {
-                GameThread.NextUpdate(x =>
-                {
-                    if (resp.StatusCode != System.Net.HttpStatusCode.OK)
-                        callback(null);
-                    else
-                        callback(resp.RawBytes);
-                });
-            });
-        }
-
-        public void GetFacadeAsync(uint shardID, uint location, Action<byte[]> callback)
-        {
-            //var client = Client();
-            var request = new RestRequest("userapi/city/" + shardID + "/" + location + ".fsof");
-
-            client.ExecuteAsync(request, (resp, h) =>
-            {
-                GameThread.NextUpdate(x =>
-                {
-                    if (resp.StatusCode != System.Net.HttpStatusCode.OK)
-                        callback(null);
-                    else
-                        callback(resp.RawBytes);
-                });
-            });
-        }
-
-
-        public void AdminLogin(string username, string password, Action<bool> callback)
+        public async Task GetThumbnailAsync(uint shardID, uint location, Action<byte[]> callback)
         {
             var client = Client();
-            var request = new RestRequest("admin/oauth/token", Method.POST);
+            var request = new RestRequest($"userapi/city/{shardID}/{location}.png", Method.Get);
+
+            try
+            {
+                var response = await client.ExecuteAsync(request); // no lambda, returns RestResponse
+
+                GameThread.NextUpdate(_ =>
+                {
+                    if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                        callback(null);
+                    else
+                        callback(response.RawBytes);
+                });
+            }
+            catch
+            {
+                GameThread.NextUpdate(_ => callback(null));
+            }
+        }
+
+        public async Task GetFacadeAsync(uint shardID, uint location, Action<byte[]> callback)
+        {
+            var client = Client();
+            var request = new RestRequest($"userapi/city/{shardID}/{location}.fsof", Method.Get);
+
+            try
+            {
+                var response = await client.ExecuteAsync(request);
+
+                GameThread.NextUpdate(_ =>
+                {
+                    if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                        callback(null);
+                    else
+                        callback(response.RawBytes);
+                });
+            }
+            catch
+            {
+                GameThread.NextUpdate(_ => callback(null));
+            }
+        }
+
+
+        public async Task AdminLoginAsync(string username, string password, Action<bool> callback)
+        {
+            var client = Client();
+            var request = new RestRequest("admin/oauth/token", Method.Post);
+
             request.AddParameter("application/x-www-form-urlencoded",
-                "grant_type=password&username="+username+"&password="+password,
+                $"grant_type=password&username={username}&password={password}",
                 ParameterType.RequestBody);
 
-            client.ExecuteAsync(request, (resp, h) =>
+            try
             {
-                var ok = resp.StatusCode == System.Net.HttpStatusCode.OK;
-                if (ok) { 
-                    dynamic obj = JsonConvert.DeserializeObject(resp.Content);
+                var response = await client.ExecuteAsync(request);
+
+                bool ok = response.StatusCode == System.Net.HttpStatusCode.OK;
+
+                if (ok)
+                {
+                    // Deserialize the token
+                    dynamic obj = JsonConvert.DeserializeObject(response.Content);
                     AuthKey = obj.access_token;
                 }
-                GameThread.NextUpdate(x =>
-                {
-                    callback(ok);
-                });
-            });
+
+                // Call back on the game thread
+                GameThread.NextUpdate(_ => callback(ok));
+            }
+            catch
+            {
+                GameThread.NextUpdate(_ => callback(false));
+            }
         }
 
-        public void GetWork(Action<int, uint> callback)
+        public async Task GetWork(Action<int, uint> callback)
         {
             var client = Client();
-            var request = new RestRequest("userapi/city/thumbwork.json", Method.GET);
+            var request = new RestRequest("userapi/city/thumbwork.json", Method.Get);
             request.AddHeader("authorization", "bearer " + AuthKey);
 
-            client.ExecuteAsync(request, (resp, h) =>
+            try
             {
-                var ok = resp.StatusCode == System.Net.HttpStatusCode.OK;
-                
-                GameThread.NextUpdate(x =>
+                var response = await client.ExecuteAsync(request);
+                bool ok = response.StatusCode == System.Net.HttpStatusCode.OK;
+
+                GameThread.NextUpdate(_ =>
                 {
-                    if (!ok || resp.Content == "") callback(-1, (ok)?0:uint.MaxValue);
+                    if (!ok || string.IsNullOrEmpty(response.Content))
+                        callback(-1, ok ? 0 : uint.MaxValue);
                     else
                     {
-                        dynamic obj = JsonConvert.DeserializeObject(resp.Content);
+                        dynamic obj = JsonConvert.DeserializeObject(response.Content);
                         callback(Convert.ToInt32(obj.shard_id), Convert.ToUInt32(obj.location));
                     }
                 });
-            });
+            }
+            catch
+            {
+                GameThread.NextUpdate(_ => callback(-1, uint.MaxValue));
+            }
         }
 
-        public void GetFSOV(uint shardID, uint lotLocation, Action<byte[]> callback)
+        public async Task GetFSOV(uint shardID, uint lotLocation, Action<byte[]> callback)
         {
             var client = Client();
-            var request = new RestRequest("userapi/city/"+shardID+"/"+lotLocation+".fsov", Method.GET);
+            var request = new RestRequest($"userapi/city/{shardID}/{lotLocation}.fsov", Method.Get);
             request.AddHeader("authorization", "bearer " + AuthKey);
 
-            client.ExecuteAsync(request, (resp, h) =>
+            try
             {
-                var ok = resp.StatusCode == System.Net.HttpStatusCode.OK;
-                byte[] dat = resp.RawBytes;
-                GameThread.NextUpdate(x =>
+                var response = await client.ExecuteAsync(request);
+                bool ok = response.StatusCode == System.Net.HttpStatusCode.OK;
+                byte[] dat = response.RawBytes;
+
+                GameThread.NextUpdate(_ =>
                 {
-                    callback(ok?dat:null);
+                    callback(ok ? dat : null);
                 });
-            });
+            }
+            catch
+            {
+                GameThread.NextUpdate(_ => callback(null));
+            }
         }
 
-        public void UploadFSOF(uint shardID, uint lotLocation, byte[] data, Action<bool> callback)
+        public async Task UploadFSOF(uint shardID, uint lotLocation, byte[] data, Action<bool> callback)
         {
             var client = Client();
-            var request = new RestRequest("userapi/city/" + shardID + "/uploadfacade/" + lotLocation, Method.POST);
-            request.AddFile("files", data, lotLocation + ".fsof", "application/octet-stream");
+            var request = new RestRequest($"userapi/city/{shardID}/uploadfacade/{lotLocation}", Method.Post);
+
+            request.AddFile("files", data, $"{lotLocation}.fsof", "application/octet-stream");
             request.AddHeader("authorization", "bearer " + AuthKey);
 
-            client.ExecuteAsync(request, (resp, h) =>
+            try
             {
-                var ok = resp.StatusCode == System.Net.HttpStatusCode.OK;
-                Console.WriteLine(resp.StatusCode);
-                GameThread.NextUpdate(x =>
-                {
-                    callback(ok);
-                });
-            });
+                var response = await client.ExecuteAsync(request); // returns RestResponse
+                bool ok = response.StatusCode == System.Net.HttpStatusCode.OK;
+                Console.WriteLine(response.StatusCode);
+
+                GameThread.NextUpdate(_ => callback(ok));
+            }
+            catch
+            {
+                GameThread.NextUpdate(_ => callback(false));
+            }
         }
 
-        public void UploadThumb(uint shardID, uint lotLocation, byte[] data, Action<bool> callback)
+        public async Task UploadThumb(uint shardID, uint lotLocation, byte[] data, Action<bool> callback)
         {
             var client = Client();
-            var request = new RestRequest("userapi/city/" + shardID + "/uploadthumb/" + lotLocation, Method.POST);
-            request.AddFile("files", data, lotLocation + ".png", "application/octet-stream");
+            var request = new RestRequest($"userapi/city/{shardID}/uploadthumb/{lotLocation}", Method.Post);
+
+            request.AddFile("files", data, $"{lotLocation}.png", "application/octet-stream");
             request.AddHeader("authorization", "bearer " + AuthKey);
 
-            client.ExecuteAsync(request, (resp, h) =>
+            try
             {
-                var ok = resp.StatusCode == System.Net.HttpStatusCode.OK;
-                Console.WriteLine(resp.StatusCode);
-                GameThread.NextUpdate(x =>
-                {
-                    callback(ok);
-                });
-            });
+                var response = await client.ExecuteAsync(request); // returns RestResponse
+                bool ok = response.StatusCode == System.Net.HttpStatusCode.OK;
+                Console.WriteLine(response.StatusCode);
+
+                GameThread.NextUpdate(_ => callback(ok));
+            }
+            catch
+            {
+                GameThread.NextUpdate(_ => callback(false));
+            }
         }
 
-        public void GetLotList(uint shardID, Action<uint[]> callback)
+        public async Task GetLotList(uint shardID, Action<uint[]> callback)
         {
             var client = Client();
-            var request = new RestRequest("userapi/city/" + shardID + "/city.json");
+            var request = new RestRequest($"userapi/city/{shardID}/city.json", Method.Get);
 
-            client.ExecuteAsync(request, (resp, h) =>
+            try
             {
-                GameThread.NextUpdate(x =>
+                var response = await client.ExecuteAsync(request); // returns RestResponse
+
+                GameThread.NextUpdate(_ =>
                 {
-                    if (resp.StatusCode != System.Net.HttpStatusCode.OK)
+                    if (response.StatusCode != System.Net.HttpStatusCode.OK || string.IsNullOrEmpty(response.Content))
+                    {
                         callback(null);
+                    }
                     else
                     {
-                        dynamic obj = JsonConvert.DeserializeObject(resp.Content);
+                        dynamic obj = JsonConvert.DeserializeObject(response.Content);
                         Newtonsoft.Json.Linq.JArray data = obj.reservedLots;
                         uint[] result = data.Select(y => Convert.ToUInt32(y)).ToArray();
                         callback(result);
                     }
                 });
-            });
+            }
+            catch
+            {
+                GameThread.NextUpdate(_ => callback(null));
+            }
         }
 
-        public void GetUpdateList(Action<ApiUpdate[]> callback)
+        public async Task GetUpdateList(Action<ApiUpdate[]> callback)
         {
             var client = Client();
-            var request = new RestRequest("userapi/update");
+            var request = new RestRequest("userapi/update", Method.Get);
 
-            client.ExecuteAsync(request, (resp, h) =>
+            try
             {
-                GameThread.NextUpdate(x =>
+                var response = await client.ExecuteAsync(request); // returns RestResponse
+
+                GameThread.NextUpdate(_ =>
                 {
-                    if (resp.StatusCode != System.Net.HttpStatusCode.OK)
+                    if (response.StatusCode != System.Net.HttpStatusCode.OK || string.IsNullOrEmpty(response.Content))
+                    {
                         callback(null);
+                    }
                     else
                     {
-                        var obj = JsonConvert.DeserializeObject<ApiUpdate[]>(resp.Content);
+                        var obj = JsonConvert.DeserializeObject<ApiUpdate[]>(response.Content);
                         callback(obj);
                     }
                 });
-            });
+            }
+            catch
+            {
+                GameThread.NextUpdate(_ => callback(null));
+            }
         }
 
-        public void GetUpdateList(string branchName, Action<ApiUpdate[]> callback)
+        public async Task GetUpdateList(string branchName, Action<ApiUpdate[]> callback)
         {
             var client = Client();
-            var request = new RestRequest("userapi/updates/" + branchName);
+            var request = new RestRequest($"userapi/updates/{branchName}", Method.Get);
 
-            client.ExecuteAsync(request, (resp, h) =>
+            try
             {
-                GameThread.NextUpdate(x =>
+                var response = await client.ExecuteAsync(request); // returns RestResponse
+
+                GameThread.NextUpdate(_ =>
                 {
-                    if (resp.StatusCode != System.Net.HttpStatusCode.OK)
+                    if (response.StatusCode != System.Net.HttpStatusCode.OK || string.IsNullOrEmpty(response.Content))
+                    {
                         callback(null);
+                    }
                     else
                     {
-                        var obj = JsonConvert.DeserializeObject<ApiUpdate[]>(resp.Content);
+                        var obj = JsonConvert.DeserializeObject<ApiUpdate[]>(response.Content);
                         callback(obj);
                     }
                 });
-            });
+            }
+            catch
+            {
+                GameThread.NextUpdate(_ => callback(null));
+            }
         }
     }
 }

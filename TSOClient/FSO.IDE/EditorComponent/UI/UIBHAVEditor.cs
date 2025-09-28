@@ -15,6 +15,9 @@ using FSO.SimAntics.Engine;
 using FSO.IDE.EditorComponent.DataView;
 using FSO.Client;
 using FSO.Common.Utils;
+using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace FSO.IDE.EditorComponent.UI
 {
@@ -618,7 +621,7 @@ namespace FSO.IDE.EditorComponent.UI
             End.Y += lineWidth / 2;
             double length = Math.Sqrt(Math.Pow(End.X - Start.X, 2) + Math.Pow(End.Y - Start.Y, 2));
             float direction = (float)Math.Atan2(End.Y - Start.Y, End.X - Start.X);
-            spriteBatch.Draw(Fill, new Rectangle((int)Start.X, (int)Start.Y - (int)(lineWidth / 2), (int)length, lineWidth), null, tint, direction, new Vector2(0, 0.5f), SpriteEffects.None, 0); //
+            spriteBatch.Draw(Fill, new Microsoft.Xna.Framework.Rectangle((int)Start.X, (int)Start.Y - (int)(lineWidth / 2), (int)length, lineWidth), null, tint, direction, new Vector2(0, 0.5f), SpriteEffects.None, 0); //
         }
 
     }

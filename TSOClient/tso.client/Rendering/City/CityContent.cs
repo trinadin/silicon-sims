@@ -5,8 +5,6 @@ using FSO.Common.Utils;
 using FSO.Files;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.IO;
 
 namespace FSO.Client.Rendering.City
 {
@@ -80,7 +78,7 @@ namespace FSO.Client.Rendering.City
 
             MapData = new CityMapData();
             MapData.Load(CityStr, LoadTex, ext);
-            
+
             //special tuning from server
             var terrainTuning = DynamicTuning.Global?.GetTable("city", 0);
             float forceSnow = 0f;
@@ -92,12 +90,12 @@ namespace FSO.Client.Rendering.City
             if (forceSnow == 2)
             {
                 TerrainTextures[0] = RTToMip(LoadTex(terrainpath + "autumn.png"), gd);
-            } 
+            }
             else
             {
                 TerrainTextures[0] = RTToMip(LoadTex(gamepath + "gamedata/terrain/newformat/gr.tga"), gd);
             }
-            
+
             TerrainTextures[1] = RTToMip(LoadTex(gamepath + "gamedata/terrain/newformat/sd.tga"), gd);
             TerrainTextures[2] = RTToMip(LoadTex(gamepath + "gamedata/terrain/newformat/rk.tga"), gd);
             TerrainTextures[3] = RTToMip(LoadTex(gamepath + "gamedata/terrain/newformat/sn.tga"), gd);
@@ -111,7 +109,7 @@ namespace FSO.Client.Rendering.City
             LotOffline = UIElement.GetTexture(0x0000033100000001);
 
             //fills used for line drawing
-            
+
             WhiteLine = TextureUtils.TextureFromColor(GameFacade.GraphicsDevice, Color.White);
             stpWhiteLine = TextureUtils.TextureFromColor(GameFacade.GraphicsDevice, new Color(255, 255, 255, 128));
 
@@ -157,15 +155,15 @@ namespace FSO.Client.Rendering.City
                 if (FSOEnvironment.EnableNPOTMip)
                     TreeTex = RTToMip(TreeTex, gd);
             }
-                
 
-            for (int i=0; i<3; i++)
+
+            for (int i = 0; i < 3; i++)
             {
                 NeighTextures[i] = RTToMip(LoadTex("Content/Textures/" + NeighTexNames[i]), gd);
             }
 
             var batch = new SpriteBatch(GameFacade.GraphicsDevice);
-            for (int i=0; i<4; i++) CreateTransparencyAtlas(gd, batch, i);
+            for (int i = 0; i < 4; i++) CreateTransparencyAtlas(gd, batch, i);
             CreateRoadAtlas(gd, batch);
 
             for (int x = 0; x < 30; x++) TransA[x].Dispose();
@@ -219,7 +217,7 @@ namespace FSO.Client.Rendering.City
         {
             var data = new Color[texture.Width * texture.Height];
             texture.GetData(data);
-            
+
             Texture2D newTex = null;
             try
             {
@@ -227,12 +225,14 @@ namespace FSO.Client.Rendering.City
                 TextureUtils.UploadWithAvgMips(newTex, device, data);
                 texture.Dispose();
                 texture = newTex;
-            } catch
+            }
+            catch
             {
                 try
                 {
                     newTex?.Dispose();
-                } catch
+                }
+                catch
                 {
 
                 }
@@ -264,24 +264,24 @@ namespace FSO.Client.Rendering.City
 
         public void CreateTransparencyAtlas(GraphicsDevice gd, SpriteBatch spriteBatch, int type)
         {
-            var source = (type > 1)?TransB:TransA;
+            var source = (type > 1) ? TransB : TransA;
             var index = type % 2;
 
             var sizeX = source[index].Width;
             var sizeY = source[index].Height;
 
-            RenderTarget2D RTarget = new RenderTarget2D(gd, sizeX*7, sizeY*3, false, SurfaceFormat.Color, DepthFormat.Depth16, 0, RenderTargetUsage.PreserveContents);
+            RenderTarget2D RTarget = new RenderTarget2D(gd, sizeX * 7, sizeY * 3, false, SurfaceFormat.Color, DepthFormat.Depth16, 0, RenderTargetUsage.PreserveContents);
             gd.SetRenderTarget(RTarget);
 
             gd.Clear(Color.Black);
 
             spriteBatch.Begin();
 
-            for (int i=0; i<15; i++)
+            for (int i = 0; i < 15; i++)
             {
                 var x = FlagLayout[i] % 7;
                 var y = FlagLayout[i] / 7;
-                spriteBatch.Draw(source[index+i*2], new Rectangle(x * sizeX, y*sizeY, sizeX, sizeY), Color.White);
+                spriteBatch.Draw(source[index + i * 2], new Rectangle(x * sizeX, y * sizeY, sizeX, sizeY), Color.White);
             }
 
             Texture2D black = new Texture2D(gd, 1, 1);
@@ -306,7 +306,7 @@ namespace FSO.Client.Rendering.City
             RenderTarget2D RTarget = new RenderTarget2D(gd, sizeX * RoadWidth, sizeY * RoadHeight, false, SurfaceFormat.Color, DepthFormat.Depth16, 0, RenderTargetUsage.PreserveContents);
             gd.SetRenderTarget(RTarget);
 
-            gd.Clear(Color.TransparentBlack);
+            gd.Clear(Color.Transparent);
 
             spriteBatch.Begin();
 

@@ -28,7 +28,7 @@ namespace FSO.Client.Regulators
             this.Shards = domain;
             this.AuthClient = authClient;
             this.CityClient = cityClient;
-            
+
             AddState("NotLoggedIn")
                 .Default()
                     .Transition()
@@ -76,9 +76,11 @@ namespace FSO.Client.Regulators
                     }
                     break;
                 case "InitialConnect":
-                    try {
+                    try
+                    {
                         var connectResult = CityClient.InitialConnectServlet(
-                            new InitialConnectServletRequest {
+                            new InitialConnectServletRequest
+                            {
                                 Ticket = AuthResult.Ticket,
                                 Version = "Version 1.1097.1.0"
                             });
@@ -102,7 +104,8 @@ namespace FSO.Client.Regulators
                         {
                             base.ThrowErrorAndReset(ErrorMessage.FromLiteral(connectResult.Error.Code, connectResult.Error.Message));
                         }
-                    }catch(Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         base.ThrowErrorAndReset(ex);
                     }
@@ -110,7 +113,8 @@ namespace FSO.Client.Regulators
                 case "UpdateRequired":
                     break;
                 case "AvatarData":
-                    try {
+                    try
+                    {
                         Avatars = CityClient.AvatarDataServlet();
                         AsyncTransition("ShardStatus");
                     }
@@ -121,7 +125,8 @@ namespace FSO.Client.Regulators
                     break;
 
                 case "ShardStatus":
-                    try {
+                    try
+                    {
                         ((ClientShards)Shards).All = CityClient.ShardStatus();
                         AsyncTransition("LoggedIn");
                     }
@@ -156,7 +161,8 @@ namespace FSO.Client.Regulators
         {
         }
 
-        public void Login(AuthRequest request){
+        public void Login(AuthRequest request)
+        {
             this.AsyncProcessMessage(request);
         }
 

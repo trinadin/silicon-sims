@@ -7,6 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Color = Microsoft.Xna.Framework.Color;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
+
 namespace FSO.IDE.EditorComponent.UI
 {
     public class BHAVContainer : UIContainer

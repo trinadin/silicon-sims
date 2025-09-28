@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -40,38 +41,45 @@ namespace FSO.Server.Watchdog
 
             while (restart)
             {
-                var setup = AppDomain.CurrentDomain.SetupInformation;
-                setup.ConfigurationFile = Path.Combine(Path.GetDirectoryName(setup.ConfigurationFile), "server.exe.config");
-                var childDomain = AppDomain.CreateDomain("serverDomain", null, setup);
                 int result = 3;
                 try
                 {
-                    result = childDomain.ExecuteAssembly("server.exe", args);
+                    // Use Process instead of AppDomain
+                    var process = new Process();
+                    process.StartInfo.FileName = "server.exe";
+                    process.StartInfo.Arguments = string.Join(" ", args.Select(a => $"\"{a}\""));
+                    process.StartInfo.UseShellExecute = false;
+                    process.Start();
+                    process.WaitForExit();
+                    result = process.ExitCode;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Unhandled exception occurred!");
                     Console.WriteLine(e.ToString());
-                    e.ToString();
                 }
-                AppDomain.Unload(childDomain);
 
                 if (result > 1)
                 {
-                    //safe exit.
                     switch (result)
                     {
                         case 2:
-                            restart = false; break;
+                            restart = false;
+                            break;
                         case 4:
-                            Update(new string[0]); break;
+                            Update(new string[0]);
+                            break;
                     }
                 }
-                return result; 
                 //was trying to do something smart here with appdomains to reload the app without closing it
                 //but it breaks mono... so to loop running the application you need to use a shell script.
                 //just loop while this watcher doesn't return 2 (shutdown)
+                else
+                {
+                    restart = false; // exit loop if normal
+                }
             }
+
             return 0;
         }
 

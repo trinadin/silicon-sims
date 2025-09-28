@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 
@@ -35,8 +36,13 @@ namespace FSO.LotView.Model
 
         public static XmlHouseData Parse(Stream reader)
         {
-            XmlSerializer serialize = new XmlSerializer(typeof(XmlHouseData));
-            return (XmlHouseData)serialize.Deserialize(reader);
+            XmlSerializer serializer = new XmlSerializer(typeof(XmlHouseData));
+            var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Parse };
+
+            using (var xmlReader = XmlReader.Create(reader, settings))
+            {
+                return (XmlHouseData)serializer.Deserialize(xmlReader);
+            }
         }
 
         public static void Save(string xmlFilePath, XmlHouseData data)

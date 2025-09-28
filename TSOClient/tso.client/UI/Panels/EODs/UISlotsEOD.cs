@@ -1,11 +1,10 @@
-﻿using FSO.Content.Model;
-using FSO.Client.UI.Controls;
+﻿using FSO.Client.UI.Controls;
 using FSO.Client.UI.Framework;
 using FSO.Client.UI.Framework.Parser;
 using FSO.Client.UI.Panels.EODs.Utils;
+using FSO.Content.Model;
 using FSO.SimAntics.NetPlay.EODs.Handlers;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Timers;
 
 namespace FSO.Client.UI.Panels.EODs
@@ -116,9 +115,9 @@ namespace FSO.Client.UI.Panels.EODs
         public const int WHEEL_FRAME_CONSTANT = 5;
 
         // timers for animations
-        private Timer OfflineMessageTimer;
-        private Timer LightsTimer;
-        private Timer WheelsSpinTimer;
+        private System.Timers.Timer OfflineMessageTimer;
+        private System.Timers.Timer LightsTimer;
+        private System.Timers.Timer WheelsSpinTimer;
 
         public UISlotsEOD(UIEODController controller) : base(controller)
         {
@@ -427,15 +426,15 @@ namespace FSO.Client.UI.Panels.EODs
                 MachineTypeInit(0);
 
             // create a timer to animate the lights, milliseconds
-            LightsTimer = new Timer(666 + (2 / 3));
+            LightsTimer = new System.Timers.Timer(666 + (2 / 3));
             LightsTimer.Elapsed += new ElapsedEventHandler(LightsHandler);
 
             // create a timer to change offline messages
-            OfflineMessageTimer = new Timer(3000);
+            OfflineMessageTimer = new System.Timers.Timer(3000);
             OfflineMessageTimer.Elapsed += new ElapsedEventHandler(OfflineMessageHandler);
 
             // create a timer to handle the spinning of the wheels
-            WheelsSpinTimer = new Timer(25);
+            WheelsSpinTimer = new System.Timers.Timer(25);
             WheelsSpinTimer.Elapsed += new ElapsedEventHandler(AnimateWheelsHandler);
         }
 
@@ -490,7 +489,7 @@ namespace FSO.Client.UI.Panels.EODs
                     else if (payBack > 110)
                         payBack = 110;
                     MachineOdds = payBack;
-                    
+
                     MachineBalance = machineBalance;
 
                     // on/off button
@@ -572,7 +571,7 @@ namespace FSO.Client.UI.Panels.EODs
         {
             if (OwnerPanel != null)
             {
-                OwnerPanel.InputFailHandler(evt.Remove(0,6), message); // truncate "slots_"
+                OwnerPanel.InputFailHandler(evt.Remove(0, 6), message); // truncate "slots_"
             }
         }
         private void NewGameHandler(string evt, string message)
@@ -721,7 +720,7 @@ namespace FSO.Client.UI.Panels.EODs
                 if (EODController.EODMessage.Equals(GameFacade.Strings["UIText", "259", "22"])) // "Closed for Maintenance"
                     SetTip(GameFacade.Strings["UIText", "259", "23"]); // "Please play another machine"
                 else
-                SetTip(GameFacade.Strings["UIText", "259", "22"]); // "Closed for Maintenance"
+                    SetTip(GameFacade.Strings["UIText", "259", "22"]); // "Closed for Maintenance"
             }
         }
         private void DrawWheelStops(bool wheelOneAlreadyDone, bool wheelTwoAlreadyDone, bool wheelThreeAlreadyDone)

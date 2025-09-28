@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Timers;
-using FSO.Client.UI.Controls;
+﻿using FSO.Client.UI.Controls;
 using FSO.Client.UI.Framework;
 using FSO.Client.UI.Framework.Parser;
 using FSO.Client.UI.Panels.EODs.Utils;
 using FSO.SimAntics.NetPlay.EODs.Handlers;
 using FSO.SimAntics.NetPlay.EODs.Handlers.Data;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.Timers;
 
 namespace FSO.Client.UI.Panels.EODs
 {
@@ -32,8 +29,8 @@ namespace FSO.Client.UI.Panels.EODs
         private bool IsBettingAllowed;
         private List<string[]> CardsToDeal;
         private int DealingIndex;
-        private Timer DealTimer;
-        private Timer InvalidateTimer;
+        private System.Timers.Timer DealTimer;
+        private System.Timers.Timer InvalidateTimer;
         private Random Random = new Random();
         private UIAlert InsuranceAlert;
         private short DealersID;
@@ -277,10 +274,10 @@ namespace FSO.Client.UI.Panels.EODs
             PlaintextHandlers["blackjack_resume_manage"] = ResumeManageHandler;
 
             // other
-            DealTimer = new Timer(1400);
+            DealTimer = new System.Timers.Timer(1400);
             DealTimer.Elapsed += new ElapsedEventHandler(DealTimerHandler);
             DealersName = "MOMI";
-            InvalidateTimer = new Timer(1000);
+            InvalidateTimer = new System.Timers.Timer(1000);
             /*
              * NOTE: If you haven't noticed how bad the EOD invalidateion problem is, just disable this timer and see how impossible it is to keep up
              * with the flow of the game due to message (tips) not showing on time or at all.
@@ -301,10 +298,10 @@ namespace FSO.Client.UI.Panels.EODs
         private void PlayerShowUIHandler(string evt, byte[] playerSlotMinBetMaxBet)
         {
             if (playerSlotMinBetMaxBet == null) return;
-            
+
             MainPlayerCardContainers = new List<CardHand>();
             MainPlayerCardTotals = new List<UITextEdit>();
-            
+
             string[] data = VMEODGameCompDrawACardData.DeserializeStrings(playerSlotMinBetMaxBet);
             byte playerSlot = 5;
             int minBet = -1;
@@ -394,7 +391,7 @@ namespace FSO.Client.UI.Panels.EODs
             labelTotalBet.Visible = false;
             EODTallBack.Visible = false;
             EODTallBackEnd.Visible = false;
-            
+
             playerPos1.Visible = false;
             Player1Head.Visible = false;
             Player1CardContainer.Visible = false;
@@ -412,13 +409,13 @@ namespace FSO.Client.UI.Panels.EODs
             Player3CardContainer.Visible = false;
             Player3TotalBack.Visible = false;
             Player3CardTotal.Visible = false;
-            
+
             playerPos4.Visible = false;
             Player4Head.Visible = false;
             Player4CardContainer.Visible = false;
             Player4TotalBack.Visible = false;
             Player4CardTotal.Visible = false;
-            
+
             DealerPos.Visible = false;
             DealerHead.Visible = false;
             DealerCardContainer.Visible = false;
@@ -435,7 +432,7 @@ namespace FSO.Client.UI.Panels.EODs
             Player4BetAmount.Visible = false;
             DealerBetBack.Visible = false;
             DealerBetAmount.Visible = false;
-            
+
             int tempBalance;
             int tempMinBet;
             int tempMaxBet;
@@ -1038,10 +1035,10 @@ namespace FSO.Client.UI.Panels.EODs
                 // play the ka-ching sound
                 HIT.HITVM.Get().PlaySoundEvent("ui_object_place");
             }
-                // other option is 'a' for "blackjack_late_comer"
+            // other option is 'a' for "blackjack_late_comer"
 
-                // set the correct active hand
-                SetActiveOtherPlayerHand(player[0]);
+            // set the correct active hand
+            SetActiveOtherPlayerHand(player[0]);
 
             if (player[0] == MyPlayerNumber)
                 SetNewTip(GameFacade.Strings["UIText", "263", "3"].Replace(".", appendix)); // "Your turn."
@@ -1675,7 +1672,7 @@ namespace FSO.Client.UI.Panels.EODs
                 Int32.TryParse(handSizesAndCards[2], out player3NumCardsInHand) &&
                 Int32.TryParse(handSizesAndCards[3], out player4NumCardsInHand) &&
                 Int32.TryParse(handSizesAndCards[4], out dealerNumCardsInHand))
-                {
+            {
 
                 handSizesAndCards.RemoveAt(4);
                 handSizesAndCards.RemoveAt(3);
@@ -2014,19 +2011,23 @@ namespace FSO.Client.UI.Panels.EODs
         {
             CardHand playerHand = null;
             UILabel playertotal = null;
-            if (player == 0) {
+            if (player == 0)
+            {
                 playerHand = Player1CardContainer;
                 playertotal = Player1CardTotal;
             }
-            else if (player == 1) {
+            else if (player == 1)
+            {
                 playerHand = Player2CardContainer;
                 playertotal = Player2CardTotal;
             }
-            else if (player == 2) {
+            else if (player == 2)
+            {
                 playerHand = Player3CardContainer;
                 playertotal = Player3CardTotal;
             }
-            else if (player == 3) {
+            else if (player == 3)
+            {
                 playerHand = Player4CardContainer;
                 playertotal = Player4CardTotal;
             }
@@ -2104,7 +2105,7 @@ namespace FSO.Client.UI.Panels.EODs
                 return;
             if (player == 0)
             {
-                Player1BetCaption = amountString; 
+                Player1BetCaption = amountString;
                 Player1BetAmount.Caption = Player1BetCaption;
                 Player1BetAmount.X = Player1BetBack.X + offsetX;
             }
@@ -2189,7 +2190,7 @@ namespace FSO.Client.UI.Panels.EODs
             btnChip5.Disabled = true;
         }
     }
-#endregion
+    #endregion
     internal class CardHand : UIContainer
     {
         private float CurrentOpacity = 1f;
@@ -2403,7 +2404,7 @@ namespace FSO.Client.UI.Panels.EODs
         {
             var cardList = GetChildren();
             foreach (var card in cardList)
-                card.X -= 4* _CurrentScale;
+                card.X -= 4 * _CurrentScale;
         }
         private void HideFirstCard()
         {
@@ -2433,9 +2434,9 @@ namespace FSO.Client.UI.Panels.EODs
                         softAce = true;
                     }
                 }
-                else 
+                else
                     if (VMEODBlackjackPlugin.PlayingCardBlackjackValues.TryGetValue(split[0], out value))
-                        _TotalValueOfCards += value;
+                    _TotalValueOfCards += value;
             }
             if (_TotalValueOfCards > 21)
             {

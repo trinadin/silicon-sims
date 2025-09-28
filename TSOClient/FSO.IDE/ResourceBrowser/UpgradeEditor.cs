@@ -332,7 +332,7 @@ namespace FSO.IDE.ResourceBrowser
             else
             {
                 UpgradeContainer.Parent = LevelsTabControl.SelectedTab;
-                UpgradeContainer.BackColor = Color.White;
+                UpgradeContainer.BackColor = System.Drawing.Color.White;
 
                 int parsedLevelName;
                 if (int.TryParse(ActiveLevel.Name, out parsedLevelName))

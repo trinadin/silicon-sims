@@ -32,6 +32,8 @@ namespace FSO.Debug.Controls
         }
 
         private VMRoutine _Routine;
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public VMRoutine Routine
         {
             get{

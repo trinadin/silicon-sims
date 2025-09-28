@@ -7,6 +7,9 @@ using FSO.Common.Rendering.Framework.Model;
 using FSO.Common.Rendering.Framework.IO;
 using FSO.IDE.EditorComponent.Commands;
 
+using Color = Microsoft.Xna.Framework.Color;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
+
 namespace FSO.IDE.EditorComponent.UI
 {
     public class PrimitiveNode : UIContainer

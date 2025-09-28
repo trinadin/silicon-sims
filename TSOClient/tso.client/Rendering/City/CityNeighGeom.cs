@@ -6,13 +6,8 @@ using FSO.Common;
 using FSO.Common.Rendering.Framework.Model;
 using FSO.Common.Utils;
 using FSO.Files;
-using MIConvexHull;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace FSO.Client.Rendering.City
 {
@@ -63,7 +58,7 @@ namespace FSO.Client.Rendering.City
                 {
                     Name = "Rand" + i,
                     Location = new Point(random.Next(512), random.Next(512))
-                } 
+                }
             );
             }
 
@@ -120,13 +115,13 @@ namespace FSO.Client.Rendering.City
                     cV.Add(new DGRP3DVert(
                         new Vector3((float)vert.X, -1, (float)vert.Y),
                         Vector3.Zero,
-                        new Vector2(0, ((-1)-City.InterpElevationAt(vert))/10)
+                        new Vector2(0, ((-1) - City.InterpElevationAt(vert)) / 10)
                         ));
 
                     cV.Add(new DGRP3DVert(
                         new Vector3((float)vert.X, 100, (float)vert.Y),
                         Vector3.Zero,
-                        new Vector2(0, (100 - City.InterpElevationAt(vert))/10)
+                        new Vector2(0, (100 - City.InterpElevationAt(vert)) / 10)
                         ));
 
                     //i mod
@@ -160,12 +155,13 @@ namespace FSO.Client.Rendering.City
 
                 //add top and bottom tri fans
 
-                
+
                 i = 0;
                 foreach (var vert in cell.Cycle)
                 {
-                    if (i > 3) {
-                        cI.Add(i-2); //bottom cap
+                    if (i > 3)
+                    {
+                        cI.Add(i - 2); //bottom cap
                         cI.Add(i);
                         cI.Add(0);
 
@@ -259,8 +255,8 @@ namespace FSO.Client.Rendering.City
                 {
                     var cell = Cells[cid];
                     var nhood = Data[id];
-                    EdgeCell(gd, VertexShader, PixelShader, content, cell, (nhood.Color ?? Color.White) * f*0.6f);
-                    FillCell(gd, VertexShader, PixelShader, content, cell, (nhood.Color ?? Color.White) * f*0.15f);
+                    EdgeCell(gd, VertexShader, PixelShader, content, cell, (nhood.Color ?? Color.White) * f * 0.6f);
+                    FillCell(gd, VertexShader, PixelShader, content, cell, (nhood.Color ?? Color.White) * f * 0.15f);
                     DrawCellBanner(cell, toDraw, bannerContainer, f);
                 }
             }
@@ -278,7 +274,7 @@ namespace FSO.Client.Rendering.City
                 }
                 FillEdges(gd, VertexShader, PixelShader, content, Color.Black * 0.5f * BannerPct);
             }
-            
+
 
             var toDelete = Banners.Except(toDraw).ToList();
             foreach (var del in toDelete)
@@ -485,21 +481,24 @@ namespace FSO.Client.Rendering.City
 
         public void Update(UpdateState state)
         {
-            if (City.m_Zoomed == TerrainZoomMode.Far) {
+            if (City.m_Zoomed == TerrainZoomMode.Far)
+            {
                 //find the nhood we're hovering
                 var pos = City.EstTileAtPosWithScroll(state.MouseState.Position.ToVector2() / FSOEnvironment.DPIScaleFactor, null);
-                
+
                 // Neighbourhoods are only interactive if there's more than one.
                 if (City.HandleMouse && City.NeighGeom.Cells.Count > 1)
                 {
                     HoverNHood = NhoodNearest(pos);
                     if (HoverNHood > -1 && !HoverPct.ContainsKey(HoverNHood))
                         HoverPct.Add(HoverNHood, 0f);
-                } else
+                }
+                else
                 {
                     HoverNHood = -1;
                 }
-            } else
+            }
+            else
             {
                 HoverNHood = -1;
             }
@@ -584,21 +583,22 @@ namespace FSO.Client.Rendering.City
             VertexShader.Parameters["ObjModel"].SetValue(Matrix.Identity);
             VertexShader.Parameters["DepthBias"].SetValue(0f);
 
-            for (int i=0; i<Cells.Count; i++)
+            for (int i = 0; i < Cells.Count; i++)
             {
                 var cell = Cells[i];
                 var nhood = Data[cell.Ind];
                 FillCell(gd, VertexShader, PixelShader, content, Cells[i], (nhood.Color ?? Color.White) * 0.2f);
             }
 
-            
+
             VertexShader.CurrentTechnique = VertexShader.Techniques[2];
             PixelShader.CurrentTechnique = PixelShader.Techniques[2];
         }
 
         public void Dispose()
         {
-            if (Cells != null) {
+            if (Cells != null)
+            {
                 foreach (var cell in Cells)
                 {
                     cell.Dispose();
@@ -608,11 +608,11 @@ namespace FSO.Client.Rendering.City
         }
     }
 
-    public class Vtx : IVertex
+    public class Vtx
     {
         public double[] Position
         {
-            get;set;
+            get; set;
         }
         public int Index;
         public Vtx(double[] d)

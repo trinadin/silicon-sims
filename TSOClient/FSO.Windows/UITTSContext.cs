@@ -1,7 +1,6 @@
 ﻿using FSO.Client.UI.Panels;
 using FSO.Common.Utils;
 using Microsoft.Xna.Framework.Audio;
-using System;
 
 namespace FSO.Windows
 {
@@ -26,7 +25,8 @@ namespace FSO.Windows
             try
             {
                 Synth.SelectVoiceByHints((gender) ? System.Speech.Synthesis.VoiceGender.Female : System.Speech.Synthesis.VoiceGender.Male);
-            } catch
+            }
+            catch
             {
                 //couldnt find any tts voices...
                 return;
@@ -34,9 +34,9 @@ namespace FSO.Windows
             if (text == "") return;
             var voci = Synth.GetInstalledVoices();
             var stream = new System.IO.MemoryStream();
-            var pitch = Math.Max(0.1f, ipitch/100f + 1f); //below 0.1 is just stupid, so just clamp there.
+            var pitch = Math.Max(0.1f, ipitch / 100f + 1f); //below 0.1 is just stupid, so just clamp there.
             if (pitch < 1f)
-                Synth.Rate = 10-(int)(pitch*10);
+                Synth.Rate = 10 - (int)(pitch * 10);
             else
                 Synth.Rate = (int)(10 / pitch) - 10;
             Synth.SetOutputToWaveStream(stream);

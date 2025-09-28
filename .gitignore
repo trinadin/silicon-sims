@@ -85,4 +85,7 @@ TSOClient/tso.client/GlobalSettings1.Designer.cs
 TSOClient/.vs/config/applicationhost.config
 *.nvuser
 
+# Rider IDE
+.idea/
+
 TSOClient/Mario

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using FSO.SimAntics.NetPlay.EODs.Model;
+﻿using FSO.SimAntics.NetPlay.EODs.Model;
 using System.Timers;
 
 namespace FSO.SimAntics.NetPlay.EODs.Handlers
@@ -14,8 +12,8 @@ namespace FSO.SimAntics.NetPlay.EODs.Handlers
         private List<VMEODWarGamePlayerPieces> Players;
         private VMEODWarGamePiece ChosenBluePiece;
         private VMEODWarGamePiece ChosenRedPiece;
-        private Timer GameMessageTimer;
-        private Timer RoundMessageTimer;
+        private System.Timers.Timer GameMessageTimer;
+        private System.Timers.Timer RoundMessageTimer;
 
         public VMEODWarGamePlugin(VMEODServer server) : base(server)
         {
@@ -24,9 +22,9 @@ namespace FSO.SimAntics.NetPlay.EODs.Handlers
             PlaintextHandlers["WarGame_Close_UI"] = OnCloseUIHandler;
             SimanticsHandlers[(short)VMEODWarGameEvents.NextRound] = NextRoundHandler;
             SimanticsHandlers[(short)VMEODWarGameEvents.NextGame] = NextGameHandler;
-            GameMessageTimer = new Timer(5000);
+            GameMessageTimer = new System.Timers.Timer(5000);
             GameMessageTimer.Elapsed += GameTieMessageHandler;
-            RoundMessageTimer = new Timer(5000);
+            RoundMessageTimer = new System.Timers.Timer(5000);
             RoundMessageTimer.Elapsed += RoundTieMessageHandler;
         }
 
@@ -268,7 +266,8 @@ namespace FSO.SimAntics.NetPlay.EODs.Handlers
         private VMEODWarGamePieceTypes m_PieceType;
         public List<VMEODWarGamePiece> Defeats;
 
-        public VMEODWarGamePiece(VMEODWarGamePieceTypes type) {
+        public VMEODWarGamePiece(VMEODWarGamePieceTypes type)
+        {
             m_PieceType = type;
         }
 

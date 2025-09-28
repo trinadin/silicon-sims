@@ -1,8 +1,5 @@
 ﻿using FSO.Common.Utils;
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace FSO.LotView.LMap
 {
@@ -40,7 +37,8 @@ namespace FSO.LotView.LMap
             foreach (var i in walls)
             {
                 if (i.Contains(pointLight.LightPos)) topDown.Add(i);
-                else {
+                else
+                {
                     projWalls.Add(ClosestPtsClockwise(i, pointLight.LightPos));
                     var ctr = i.Center;
                     ctrWidths.Add(new Vector3(ctr.X, ctr.Y, (float)Math.Sqrt(i.Width * i.Width + i.Height * i.Height) / 2.5f));
@@ -104,13 +102,15 @@ namespace FSO.LotView.LMap
                 if (light.LightType == LightType.OUTDOORS)
                 {
                     leftNorm = midNorm = rightNorm = light.LightDir;
-                } else { 
+                }
+                else
+                {
                     leftNorm = pts.Pt0 - pointLight; leftNorm.Normalize();
                     midNorm = mid - pointLight; midNorm.Normalize();
                     rightNorm = pts.Pt2 - pointLight; rightNorm.Normalize();
                 }
 
-                leftFac = leftNorm* distM; rightFac = rightNorm* distM; midFac = midNorm * distM;
+                leftFac = leftNorm * distM; rightFac = rightNorm * distM; midFac = midNorm * distM;
 
                 EllipseDesc ellipse;
                 if (ctrWidths != null)
@@ -119,7 +119,7 @@ namespace FSO.LotView.LMap
                     var ctW = ctrWidths[j++];
                     var mid2 = new Vector2(ctW.X, ctW.Y);
                     float height;
-                    if (light.LightType == LightType.OUTDOORS) height = 16*light.FalloffMultiplier;
+                    if (light.LightType == LightType.OUTDOORS) height = 16 * light.FalloffMultiplier;
                     else height = (mid2 - pointLight).Length() * 16 / ((16 * 3) - 16);
                     var midNorm2 = mid2 - pointLight; midNorm2.Normalize();
                     var largeDim = (ctW.Z + height) * midNorm2;
@@ -140,11 +140,11 @@ namespace FSO.LotView.LMap
                     var midN2 = light.LightDir;
 
                     var dot = Vector2.Dot(perp, midN2);
-//if (Math.Abs(dot) < 0.35) continue;
+                    //if (Math.Abs(dot) < 0.35) continue;
                     var length = distM * (dot);
                     var spos = pts.Pt0;// - ((dot>0)?perp:(-perp))*2;
                     perp *= length;
-                    ellipse = new EllipseDesc { pos = spos, dimensions = new Vector4(length*length, 0, perp.X, perp.Y) };
+                    ellipse = new EllipseDesc { pos = spos, dimensions = new Vector4(length * length, 0, perp.X, perp.Y) };
                 }
                 else ellipse = basicDesc;
 
@@ -174,9 +174,9 @@ namespace FSO.LotView.LMap
                         //yes
                         //continue;
                         var conectr = pts.Pt2 + rightNorm;
-                        vertices[vert++] = GradVertex.ConeVert(pts.Pt2, pts.Pt2, conectr, Color.TransparentBlack, hc, p/2, ellipse);
-                        vertices[vert++] = GradVertex.ConeVert(rightpen1, pts.Pt2, conectr, Color.TransparentBlack, hc, p/2, ellipse);
-                        vertices[vert++] = GradVertex.ConeVert(rightpen2, pts.Pt2, conectr, Color.TransparentBlack, hc, p/2, ellipse);
+                        vertices[vert++] = GradVertex.ConeVert(pts.Pt2, pts.Pt2, conectr, ColorExtensions.TransparentBlack, hc, p / 2, ellipse);
+                        vertices[vert++] = GradVertex.ConeVert(rightpen1, pts.Pt2, conectr, ColorExtensions.TransparentBlack, hc, p / 2, ellipse);
+                        vertices[vert++] = GradVertex.ConeVert(rightpen2, pts.Pt2, conectr, ColorExtensions.TransparentBlack, hc, p / 2, ellipse);
                         for (int i = 0; i < 3; i++) indices[index++] = baseIdx + i;
                         continue;
                     }
@@ -189,9 +189,9 @@ namespace FSO.LotView.LMap
                         //yes
                         //continue;
                         var conectr = pts.Pt0 + leftNorm;
-                        vertices[vert++] = GradVertex.ConeVert(pts.Pt0, pts.Pt0, conectr, Color.TransparentBlack, hc, p, ellipse);
-                        vertices[vert++] = GradVertex.ConeVert(leftpen1, pts.Pt0, conectr, Color.TransparentBlack, hc, p, ellipse);
-                        vertices[vert++] = GradVertex.ConeVert(leftpen2, pts.Pt0, conectr, Color.TransparentBlack, hc, p, ellipse);
+                        vertices[vert++] = GradVertex.ConeVert(pts.Pt0, pts.Pt0, conectr, ColorExtensions.TransparentBlack, hc, p, ellipse);
+                        vertices[vert++] = GradVertex.ConeVert(leftpen1, pts.Pt0, conectr, ColorExtensions.TransparentBlack, hc, p, ellipse);
+                        vertices[vert++] = GradVertex.ConeVert(leftpen2, pts.Pt0, conectr, ColorExtensions.TransparentBlack, hc, p, ellipse);
                         for (int i = 0; i < 3; i++) indices[index++] = baseIdx + i;
                         continue;
                     }
@@ -225,13 +225,13 @@ namespace FSO.LotView.LMap
 
                     //penumbras
 
-                    vertices[vert++] = GradVertex.ConeVert(pts.Pt0, pts.Pt0, leftpen2, Color.TransparentBlack, Color.White, p, ellipse);
-                    vertices[vert++] = GradVertex.ConeVert(leftpen1, pts.Pt0, leftpen2, Color.TransparentBlack, Color.White, p, ellipse);
-                    vertices[vert++] = GradVertex.ConeVert(leftpen2, pts.Pt0, leftpen2, Color.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(pts.Pt0, pts.Pt0, leftpen2, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(leftpen1, pts.Pt0, leftpen2, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(leftpen2, pts.Pt0, leftpen2, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
 
-                    vertices[vert++] = GradVertex.ConeVert(pts.Pt2, pts.Pt2, rightpen1, Color.TransparentBlack, Color.White, p, ellipse);
-                    vertices[vert++] = GradVertex.ConeVert(rightpen1, pts.Pt2, rightpen1, Color.TransparentBlack, Color.White, p, ellipse);
-                    vertices[vert++] = GradVertex.ConeVert(rightpen2, pts.Pt2, rightpen1, Color.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(pts.Pt2, pts.Pt2, rightpen1, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(rightpen1, pts.Pt2, rightpen1, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(rightpen2, pts.Pt2, rightpen1, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
 
                     for (int i = 0; i < 6; i++) indices[index++] = baseIdx + i;
                 }
@@ -240,7 +240,7 @@ namespace FSO.LotView.LMap
                     var inter = pts.Pt0 + a * t;
                     var distant = mid + Vector2.Normalize(inter - pointLight) * distM;
                     vertices[vert++] = GradVertex.SolidVert(pts.Pt0, Color.White, ellipse);
-                    vertices[vert++] = GradVertex.SolidVert(pts.Pt0 + a*t, Color.White, ellipse);
+                    vertices[vert++] = GradVertex.SolidVert(pts.Pt0 + a * t, Color.White, ellipse);
                     vertices[vert++] = GradVertex.SolidVert(pts.Pt2, Color.White, ellipse);
                     vertices[vert++] = GradVertex.SolidVert(pts.Pt1, Color.White, ellipse);
 
@@ -251,15 +251,15 @@ namespace FSO.LotView.LMap
 
                     //penumbras: each penumbra becomes two tris as they intersect
 
-                    vertices[vert++] = GradVertex.ConeVert(pts.Pt0, pts.Pt0, leftpen2, Color.TransparentBlack, Color.White, p, ellipse);
-                    vertices[vert++] = GradVertex.ConeVert(leftpen1, pts.Pt0, leftpen2, Color.TransparentBlack, Color.White, p, ellipse);
-                    vertices[vert++] = GradVertex.ConeVert(inter, pts.Pt0, leftpen2, Color.TransparentBlack, Color.White, p, ellipse);
-                    vertices[vert++] = GradVertex.ConeVert(distant, pts.Pt0, leftpen2, Color.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(pts.Pt0, pts.Pt0, leftpen2, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(leftpen1, pts.Pt0, leftpen2, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(inter, pts.Pt0, leftpen2, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(distant, pts.Pt0, leftpen2, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
 
-                    vertices[vert++] = GradVertex.ConeVert(pts.Pt2, pts.Pt2, rightpen1, Color.TransparentBlack, Color.White, p, ellipse);
-                    vertices[vert++] = GradVertex.ConeVert(rightpen2, pts.Pt2, rightpen1, Color.TransparentBlack, Color.White, p, ellipse);
-                    vertices[vert++] = GradVertex.ConeVert(inter, pts.Pt2, rightpen1, Color.TransparentBlack, Color.White, p, ellipse);
-                    vertices[vert++] = GradVertex.ConeVert(distant, pts.Pt2, rightpen1, Color.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(pts.Pt2, pts.Pt2, rightpen1, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(rightpen2, pts.Pt2, rightpen1, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(inter, pts.Pt2, rightpen1, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
+                    vertices[vert++] = GradVertex.ConeVert(distant, pts.Pt2, rightpen1, ColorExtensions.TransparentBlack, Color.White, p, ellipse);
 
                     indices[index++] = baseIdx; indices[index++] = baseIdx + 1; indices[index++] = baseIdx + 2;
                     indices[index++] = baseIdx + 1; indices[index++] = baseIdx + 3; indices[index++] = baseIdx + 2;
@@ -298,25 +298,31 @@ namespace FSO.LotView.LMap
             diff = pt - point;
             ccwPts.Pt1 = pt;
             var dir = (float)DirectionUtils.Difference(Math.Atan2(diff.Y, diff.X), dir1);
-            if (dir > bestDir) { bestDir = dir; bestInd = 1; };
-            if (dir < bestDirO) { bestDirO = dir; bestIndO = 1; };
+            if (dir > bestDir) { bestDir = dir; bestInd = 1; }
+            ;
+            if (dir < bestDirO) { bestDirO = dir; bestIndO = 1; }
+            ;
 
             pt = new Vector2(rect.Right, rect.Bottom);
             diff = pt - point;
             ccwPts.Pt2 = pt;
             dir = (float)DirectionUtils.Difference(Math.Atan2(diff.Y, diff.X), dir1);
-            if (dir > bestDir) { bestDir = dir; bestInd = 2; };
-            if (dir < bestDirO) { bestDirO = dir; bestIndO = 2; };
+            if (dir > bestDir) { bestDir = dir; bestInd = 2; }
+            ;
+            if (dir < bestDirO) { bestDirO = dir; bestIndO = 2; }
+            ;
 
             pt = new Vector2(rect.Right, rect.Top);
             diff = pt - point;
             ccwPts.Pt3 = pt;
             dir = (float)DirectionUtils.Difference(Math.Atan2(diff.Y, diff.X), dir1);
-            if (dir > bestDir) { bestDir = dir; bestInd = 3; };
-            if (dir < bestDirO) { bestDirO = dir; bestIndO = 3; };
+            if (dir > bestDir) { bestDir = dir; bestInd = 3; }
+            ;
+            if (dir < bestDirO) { bestDirO = dir; bestIndO = 3; }
+            ;
 
             var result = new ClockwisePoints();
-            for (int i=0; i<3; i++)
+            for (int i = 0; i < 3; i++)
             {
                 result[i] = ccwPts[bestInd];
                 if (bestInd != bestIndO)

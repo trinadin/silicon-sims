@@ -1,9 +1,6 @@
 ﻿using FSO.Common.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net;
 
 namespace FSO.Common.Rendering.Emoji
@@ -13,7 +10,7 @@ namespace FSO.Common.Rendering.Emoji
         public string Source = "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/";
         public int DefaultRes = 24;
         public int Width = 32;
-        
+
         public int NextIndex = 0;
         public List<string> Emojis = new List<string>();
         public Dictionary<string, int> EmojiToIndex = new Dictionary<string, int>();
@@ -28,10 +25,10 @@ namespace FSO.Common.Rendering.Emoji
         {
             GD = gd;
             EmojiBatch = new SpriteBatch(gd);
-            
+
             EmojiTex = new RenderTarget2D(gd, Width * DefaultRes, Width * DefaultRes, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-            ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
+            //ServicePointManager.Expect100Continue = true;
+            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
         }
 
         public void ExpandIfNeeded()
@@ -39,13 +36,15 @@ namespace FSO.Common.Rendering.Emoji
             //todo
         }
 
-        public Rectangle GetEmoji(string emojiID) {
+        public Rectangle GetEmoji(string emojiID)
+        {
 
             int index;
             if (EmojiToIndex.TryGetValue(emojiID, out index))
             {
                 return RectForIndex(index);
-            } else
+            }
+            else
             {
                 index = NextIndex++;
                 ExpandIfNeeded();
@@ -56,7 +55,8 @@ namespace FSO.Common.Rendering.Emoji
                     if (e.Cancelled || e.Error != null || e.Result == null)
                     {
                         lock (ErrorSpaces) ErrorSpaces.Add(index);
-                    } else
+                    }
+                    else
                     {
                         GameThread.NextUpdate(x =>
                         {
@@ -71,7 +71,7 @@ namespace FSO.Common.Rendering.Emoji
                                     GD.SetRenderTarget(EmojiTex);
                                     if (needClear)
                                     {
-                                        GD.Clear(Color.TransparentBlack);
+                                        GD.Clear(ColorExtensions.TransparentBlack);
                                         needClear = false;
                                     }
                                     EmojiBatch.Begin(blendState: BlendState.NonPremultiplied, sortMode: SpriteSortMode.Immediate);
@@ -88,7 +88,7 @@ namespace FSO.Common.Rendering.Emoji
                     }
                     lock (IncompleteSpaces) IncompleteSpaces.Remove(index);
                 };
-                client.DownloadDataAsync(new Uri((emojiID[0] == '!')?(emojiID.Substring(1)):(Source + emojiID + ".png")));
+                client.DownloadDataAsync(new Uri((emojiID[0] == '!') ? (emojiID.Substring(1)) : (Source + emojiID + ".png")));
                 Emojis.Add(emojiID);
                 EmojiToIndex[emojiID] = index;
                 return RectForIndex(index);

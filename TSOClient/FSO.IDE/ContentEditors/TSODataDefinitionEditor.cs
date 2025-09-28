@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 using FSO.Files.Formats.tsodata;
+using System.ComponentModel;
 
 namespace FSO.IDE.ContentEditors
 {
@@ -14,6 +15,8 @@ namespace FSO.IDE.ContentEditors
     {
         public TSODataDefinition Data;
         private object _CurrentSelection;
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public object CurrentSelection
         {
             get

@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FSO.Client.UI.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
+﻿using FSO.Client.UI.Framework;
+using FSO.Client.UI.Framework.Parser;
 using FSO.Client.UI.Model;
 using FSO.Client.Utils;
-using FSO.Client.UI.Framework.Parser;
-using FSO.Common.Rendering.Framework.Model;
-using FSO.Common.Rendering.Framework.IO;
-using FSO.Common.Utils;
-using FSO.Common.Rendering.Framework;
 using FSO.Common;
-using Microsoft.Xna.Framework.GamerServices;
+using FSO.Common.Rendering.Framework;
+using FSO.Common.Rendering.Framework.IO;
+using FSO.Common.Rendering.Framework.Model;
+using FSO.Common.Utils;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System.Text;
+//using Microsoft.Xna.Framework.GamerServices;
 
 namespace FSO.Client.UI.Controls
 {
@@ -28,7 +25,8 @@ namespace FSO.Client.UI.Controls
          */
         public static UITextEdit CreateTextBox()
         {
-            return new UITextEdit {
+            return new UITextEdit
+            {
                 MaxLines = 1,
                 BackgroundTextureReference = UITextBox.StandardBackground,
                 TextMargin = new Rectangle(8, 2, 8, 3)
@@ -201,7 +199,7 @@ namespace FSO.Client.UI.Controls
         /**
          * Properties
          */
-        
+
         /// <summary>
         /// Background texture
         /// </summary>
@@ -247,7 +245,7 @@ namespace FSO.Client.UI.Controls
         {
             get { return m_Width; }
         }
-        
+
         /// <summary>
         /// Component height
         /// </summary>
@@ -279,7 +277,7 @@ namespace FSO.Client.UI.Controls
                 NineSliceMargins.CalculateScales(m_Width, m_Height);
             }
             m_Bounds = new Rectangle(0, 0, (int)m_Width, (int)m_Height);
-            
+
             if (m_MouseEvent != null)
             {
                 m_MouseEvent.Region = new Rectangle(0, 0, (int)m_Width, (int)m_Height);
@@ -302,7 +300,7 @@ namespace FSO.Client.UI.Controls
         /**
          * Interaction Functionality
          */
-         
+
         public void OnMouseEvent(UIMouseEventType evt, UpdateState state)
         {
             if (m_IsReadOnly) { return; }
@@ -366,21 +364,21 @@ namespace FSO.Client.UI.Controls
             {
                 m_cursorBlink = true;
                 m_cursorBlinkLastTime = GameFacade.LastUpdateState.Time.TotalGameTime.Ticks;
-                if (FSOEnvironment.SoftwareKeyboard && FSOEnvironment.SoftwareDepth)
-                {
-                    try
-                    {
-                        Guide.BeginShowKeyboardInput(PlayerIndex.One, "", "", CurrentText, (ar) =>
-                        {
-                            var str = Guide.EndShowKeyboardInput(ar);
-                            lock (this)
-                            {
-                                QueuedChange = str;
-                            }
-                        }, null);
-                    }
-                    catch (Exception e) { }
-                }
+                //if (FSOEnvironment.SoftwareKeyboard && FSOEnvironment.SoftwareDepth)
+                //{
+                //    try
+                //    {
+                //        Guide.BeginShowKeyboardInput(PlayerIndex.One, "", "", CurrentText, (ar) =>
+                //        {
+                //            var str = Guide.EndShowKeyboardInput(ar);
+                //            lock (this)
+                //            {
+                //                QueuedChange = str;
+                //            }
+                //        }, null);
+                //    }
+                //    catch (Exception e) { }
+                //}
             }
             else
             {
@@ -585,8 +583,8 @@ namespace FSO.Client.UI.Controls
         [UIAttribute("lines")]
         public int MaxLines
         {
-            get{ return m_MaxLines; }
-            set { m_MaxLines = (value<0)?int.MaxValue:value;  }
+            get { return m_MaxLines; }
+            set { m_MaxLines = (value < 0) ? int.MaxValue : value; }
         }
         [UIAttribute("capacity")]
         public int MaxChars
@@ -821,10 +819,12 @@ namespace FSO.Client.UI.Controls
              */
             string txt = null;
 
-            if (m_Password){
+            if (m_Password)
+            {
                 /** Use * instead **/
                 txt = "";
-                for(int i=0; i < m_SBuilder.Length; i++){
+                for (int i = 0; i < m_SBuilder.Length; i++)
+                {
                     txt += "*";
                 }
             }
@@ -842,7 +842,7 @@ namespace FSO.Client.UI.Controls
             m_Lines.Clear();
             //txt = txt.Replace("\r", "");
             var words = txt.Split(' ').ToList();
-	        var spaceWidth = TextStyle.MeasureString(" ").X;
+            var spaceWidth = TextStyle.MeasureString(" ").X;
 
             /**
              * Modify the array to make manual line breaks their own segment
@@ -884,7 +884,8 @@ namespace FSO.Client.UI.Controls
                 if (Alignment.HasFlag(TextAlignment.Center))
                 {
                     xPosition += (int)Math.Round((lineWidth - thisLineWidth) / 2);
-                } else if (Alignment.HasFlag(TextAlignment.Right))
+                }
+                else if (Alignment.HasFlag(TextAlignment.Right))
                 {
                     xPosition += (int)Math.Round((lineWidth - thisLineWidth));
                 }
@@ -982,8 +983,9 @@ namespace FSO.Client.UI.Controls
             }
 
             /** No cursor in read only mode **/
-            if (m_IsReadOnly) {
-                m_DrawCmds.ForEach(x => x.Init()); 
+            if (m_IsReadOnly)
+            {
+                m_DrawCmds.ForEach(x => x.Init());
                 return;
             }
 
@@ -1053,7 +1055,7 @@ namespace FSO.Client.UI.Controls
                     if (!selected)
                     {
                         //look for selection start. is it before our next bbcommand?
-                        if (start >= lastMod+lineStart && start <= nextBB)
+                        if (start >= lastMod + lineStart && start <= nextBB)
                         {
                             selected = true;
                             if (start != nextBB || nextBB == lineEnd)
@@ -1072,7 +1074,7 @@ namespace FSO.Client.UI.Controls
                     {
                         //look for selection end. is it before our next bbcommand?
                         var selE = end - lineStart;
-                        if (end >= lastMod+lineStart && end <= nextBB)
+                        if (end >= lastMod + lineStart && end <= nextBB)
                         {
                             selected = false;
                             if (end != nextBB || nextBB == lineEnd)
@@ -1112,7 +1114,8 @@ namespace FSO.Client.UI.Controls
                         });
                         lastMod = (bbcmds[bbind - 1].Index - lineStart);
                     }
-                } else
+                }
+                else
                 {
                     //remainder of the line
                     result.Add(new UITextEditLineSegment
@@ -1125,7 +1128,7 @@ namespace FSO.Client.UI.Controls
             }
             return result;
 
-            
+
         }
 
         /// <summary>
@@ -1159,7 +1162,7 @@ namespace FSO.Client.UI.Controls
             {
                 DrawingUtils.DrawBorder(batch, LocalRect(0, 0, m_Width, m_Height), 1, m_FrameTexture, m_FrameColor);
             }
-            
+
             /**
              * Draw text
              */
@@ -1444,14 +1447,14 @@ namespace FSO.Client.UI.Controls
         public virtual void Draw(UIElement ui, SpriteBatch batch)
         {
             batch.Draw(
-                EmojiTarget, 
-                Position.ToPoint().ToVector2() + new Vector2(1, 0), 
-                Slice, 
-                (Shadow?Color.Black:Color.White) * (Style.Color.A / 255f), 
-                0f, 
-                Vector2.Zero, 
-                Scale * (Style.Size / 12f), 
-                SpriteEffects.None, 
+                EmojiTarget,
+                Position.ToPoint().ToVector2() + new Vector2(1, 0),
+                Slice,
+                (Shadow ? Color.Black : Color.White) * (Style.Color.A / 255f),
+                0f,
+                Vector2.Zero,
+                Scale * (Style.Size / 12f),
+                SpriteEffects.None,
                 0f);
         }
 

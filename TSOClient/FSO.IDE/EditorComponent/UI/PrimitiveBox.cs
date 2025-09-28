@@ -13,6 +13,9 @@ using FSO.SimAntics.Engine;
 using FSO.IDE.EditorComponent.Primitives;
 using FSO.IDE.EditorComponent.Commands;
 using Microsoft.Xna.Framework.Input;
+using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace FSO.IDE.EditorComponent.UI
 {
@@ -106,7 +109,7 @@ namespace FSO.IDE.EditorComponent.UI
             TreeBox = new TREEBox(null);
             Master = master;
             Instruction = inst;
-            HitTest = ListenForMouse(new Rectangle(0, 0, Width, Height), new UIMouseEvent(MouseEvents));
+            HitTest = ListenForMouse(new Microsoft.Xna.Framework.Rectangle(0, 0, Width, Height), new UIMouseEvent(MouseEvents));
             PreparePrimitive();
         }
 
@@ -116,7 +119,7 @@ namespace FSO.IDE.EditorComponent.UI
             Master = master;
             Nodes = new PrimitiveNode[0];
             ApplyBoxPosition();
-            HitTest = ListenForMouse(new Rectangle(0, 0, Width, Height), new UIMouseEvent(MouseEvents));
+            HitTest = ListenForMouse(new Microsoft.Xna.Framework.Rectangle(0, 0, Width, Height), new UIMouseEvent(MouseEvents));
             Texture2D sliceTex = null;
             switch (Type)
             {
@@ -358,7 +361,7 @@ namespace FSO.IDE.EditorComponent.UI
             BodyText = Descriptor.GetBody(Master.Scope);
             BodyTextStyle.Color = Style.Body;
 
-            BodyTextLabels = TextRenderer.ComputeText(BodyText, new TextRendererOptions
+            BodyTextLabels = Client.UI.Framework.TextRenderer.ComputeText(BodyText, new TextRendererOptions
             {
                 Alignment = TextAlignment.Center,
                 MaxWidth = 300,
@@ -398,7 +401,7 @@ namespace FSO.IDE.EditorComponent.UI
             }
         }
 
-        private void DrawSliceShadow(UISpriteBatch batch, Color color, Vector2 offset)
+        private void DrawSliceShadow(UISpriteBatch batch, Microsoft.Xna.Framework.Color color, Vector2 offset)
         {
             var blend = SliceBg.BlendColor;
             color.A = (byte)(blend.A * (color.A / 255f));
@@ -419,7 +422,7 @@ namespace FSO.IDE.EditorComponent.UI
                 DrawSliceShadow(batch, new Color(0, 0, 0, 51), new Vector2(5));
             }
             else if (Style == null || Style.Background.A > 200) DrawLocalTexture(batch, res.WhiteTex, null, new Vector2(5,5), new Vector2(Width, Height), ShadCol);
-            else DrawTiledTexture(batch, res.DiagTile, new Rectangle(5, 5, Width, Height), ShadCol);
+            else DrawTiledTexture(batch, res.DiagTile, new Microsoft.Xna.Framework.Rectangle(5, 5, Width, Height), ShadCol);
 
             if (Type == TREEBoxType.Primitive)
             {
@@ -453,7 +456,7 @@ namespace FSO.IDE.EditorComponent.UI
 
             if (Type == TREEBoxType.Primitive)
             {
-                BodyTextLabels = TextRenderer.ComputeText(BodyText, new TextRendererOptions
+                BodyTextLabels = Client.UI.Framework.TextRenderer.ComputeText(BodyText, new TextRendererOptions
                 {
                     Alignment = TextAlignment.Center,
                     MaxWidth = 300,
@@ -507,14 +510,14 @@ namespace FSO.IDE.EditorComponent.UI
                 {
                     if (Style.Background.A > 200) DrawLocalTexture(batch, res.WhiteTex, null, new Vector2(), new Vector2(Width, Height), Master.Selected.Contains(this) ? Color.Red : Color.White); //white outline
                     DrawLocalTexture(batch, res.WhiteTex, null, new Vector2(1, 1), new Vector2(Width - 2, Height - 2), Style.Background); //background
-                    DrawTiledTexture(batch, res.DiagTile, new Rectangle(1, 1, Width - 2, Height - 2), Color.White * Style.DiagBrightness);
+                    DrawTiledTexture(batch, res.DiagTile, new Microsoft.Xna.Framework.Rectangle(1, 1, Width - 2, Height - 2), Color.White * Style.DiagBrightness);
                     DrawLocalTexture(batch, res.WhiteTex, null, new Vector2(1, 1), new Vector2(Width - 2, 20), Color.White * 0.66f); //title bg
                 }
 
                 Index?.Draw(batch);
                 Title?.Draw(batch);
                 TextEdit?.Draw(batch);
-                if (BodyTextLabels != null) TextRenderer.DrawText(BodyTextLabels.DrawingCommands, this, batch);
+                if (BodyTextLabels != null) Client.UI.Framework.TextRenderer.DrawText(BodyTextLabels.DrawingCommands, this, batch);
 
                 int topInd = 0;
                 if (Instruction?.Breakpoint == true)
@@ -647,7 +650,7 @@ namespace FSO.IDE.EditorComponent.UI
             {
                 if (prim == this)
                     continue;
-                Rectangle r = new Rectangle((int)(prim.X - hitboxMarginX),
+                Microsoft.Xna.Framework.Rectangle r = new Microsoft.Xna.Framework.Rectangle((int)(prim.X - hitboxMarginX),
                                             (int)(prim.Y - hitboxMarginY),
                                             (int)(prim.Width + hitboxMarginX * 2),
                                             (int)(prim.Height + hitboxMarginY * 2)); // create a hitbox around the prim to test if the mouse is inside it

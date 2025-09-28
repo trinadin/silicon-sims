@@ -32,679 +32,644 @@ namespace FSO.IDE
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BHAVEditor));
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("CT - Notify Current Object Social Occurred");
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveToFilebhavToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openParentResourceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pasteStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.removeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.setFirstToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.snapPrimitivesToGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.insertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.trueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.falseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.labelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.commentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.MainTable = new System.Windows.Forms.TableLayoutPanel();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.PrimitivesGroup = new System.Windows.Forms.GroupBox();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.SearchBox = new System.Windows.Forms.TextBox();
-            this.PrimitiveList = new System.Windows.Forms.ListBox();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.DebugBtn = new System.Windows.Forms.Button();
-            this.SimBtn = new System.Windows.Forms.Button();
-            this.ObjectBtn = new System.Windows.Forms.Button();
-            this.PositionBtn = new System.Windows.Forms.Button();
-            this.MathBtn = new System.Windows.Forms.Button();
-            this.ControlBtn = new System.Windows.Forms.Button();
-            this.LooksBtn = new System.Windows.Forms.Button();
-            this.SubroutineBtn = new System.Windows.Forms.Button();
-            this.TSOBtn = new System.Windows.Forms.Button();
-            this.AllBtn = new System.Windows.Forms.Button();
-            this.OperandGroup = new System.Windows.Forms.GroupBox();
-            this.OperandScroller = new System.Windows.Forms.FlowLayoutPanel();
-            this.OperandEditTable = new System.Windows.Forms.TableLayoutPanel();
-            this.EditorControl = new FSO.IDE.EditorComponent.BHAVViewControl();
-            this.DebugTable = new System.Windows.Forms.TableLayoutPanel();
-            this.ObjectDataGrid = new System.Windows.Forms.PropertyGrid();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.StackView = new System.Windows.Forms.ListView();
-            this.StackTreeNameCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.StackSourceCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.menuStrip1.SuspendLayout();
-            this.MainTable.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            this.PrimitivesGroup.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.tableLayoutPanel2.SuspendLayout();
-            this.OperandGroup.SuspendLayout();
-            this.OperandScroller.SuspendLayout();
-            this.DebugTable.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.SuspendLayout();
+            ListViewItem listViewItem1 = new ListViewItem("CT - Notify Current Object Social Occurred");
+            menuStrip1 = new MenuStrip();
+            fileToolStripMenuItem = new ToolStripMenuItem();
+            saveToFilebhavToolStripMenuItem = new ToolStripMenuItem();
+            loadFromFileToolStripMenuItem = new ToolStripMenuItem();
+            openParentResourceToolStripMenuItem = new ToolStripMenuItem();
+            editToolStripMenuItem = new ToolStripMenuItem();
+            undoToolStripMenuItem = new ToolStripMenuItem();
+            redoToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
+            copyToolStripMenuItem = new ToolStripMenuItem();
+            pasteStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator2 = new ToolStripSeparator();
+            removeToolStripMenuItem = new ToolStripMenuItem();
+            setFirstToolStripMenuItem = new ToolStripMenuItem();
+            viewToolStripMenuItem = new ToolStripMenuItem();
+            snapPrimitivesToGridToolStripMenuItem = new ToolStripMenuItem();
+            insertToolStripMenuItem = new ToolStripMenuItem();
+            trueToolStripMenuItem = new ToolStripMenuItem();
+            falseToolStripMenuItem = new ToolStripMenuItem();
+            labelToolStripMenuItem = new ToolStripMenuItem();
+            commentToolStripMenuItem = new ToolStripMenuItem();
+            MainTable = new TableLayoutPanel();
+            splitContainer1 = new SplitContainer();
+            PrimitivesGroup = new GroupBox();
+            pictureBox1 = new PictureBox();
+            SearchBox = new TextBox();
+            PrimitiveList = new ListBox();
+            tableLayoutPanel2 = new TableLayoutPanel();
+            DebugBtn = new Button();
+            SimBtn = new Button();
+            ObjectBtn = new Button();
+            PositionBtn = new Button();
+            MathBtn = new Button();
+            ControlBtn = new Button();
+            LooksBtn = new Button();
+            SubroutineBtn = new Button();
+            TSOBtn = new Button();
+            AllBtn = new Button();
+            OperandGroup = new GroupBox();
+            OperandScroller = new FlowLayoutPanel();
+            OperandEditTable = new TableLayoutPanel();
+            EditorControl = new FSO.IDE.EditorComponent.BHAVViewControl();
+            DebugTable = new TableLayoutPanel();
+            ObjectDataGrid = new PropertyGrid();
+            groupBox1 = new GroupBox();
+            StackView = new ListView();
+            StackTreeNameCol = new ColumnHeader();
+            StackSourceCol = new ColumnHeader();
+            menuStrip1.SuspendLayout();
+            MainTable.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
+            splitContainer1.Panel1.SuspendLayout();
+            splitContainer1.Panel2.SuspendLayout();
+            splitContainer1.SuspendLayout();
+            PrimitivesGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            tableLayoutPanel2.SuspendLayout();
+            OperandGroup.SuspendLayout();
+            OperandScroller.SuspendLayout();
+            DebugTable.SuspendLayout();
+            groupBox1.SuspendLayout();
+            SuspendLayout();
             // 
             // menuStrip1
             // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem,
-            this.editToolStripMenuItem,
-            this.viewToolStripMenuItem,
-            this.insertToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1014, 24);
-            this.menuStrip1.TabIndex = 1;
-            this.menuStrip1.Text = "menuStrip1";
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, editToolStripMenuItem, viewToolStripMenuItem, insertToolStripMenuItem });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new Size(1014, 24);
+            menuStrip1.TabIndex = 1;
+            menuStrip1.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem
             // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveToFilebhavToolStripMenuItem,
-            this.loadFromFileToolStripMenuItem,
-            this.openParentResourceToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "File";
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { saveToFilebhavToolStripMenuItem, loadFromFileToolStripMenuItem, openParentResourceToolStripMenuItem });
+            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            fileToolStripMenuItem.Size = new Size(37, 20);
+            fileToolStripMenuItem.Text = "File";
             // 
             // saveToFilebhavToolStripMenuItem
             // 
-            this.saveToFilebhavToolStripMenuItem.Enabled = false;
-            this.saveToFilebhavToolStripMenuItem.Name = "saveToFilebhavToolStripMenuItem";
-            this.saveToFilebhavToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.saveToFilebhavToolStripMenuItem.Text = "Save to File (.bhav)";
+            saveToFilebhavToolStripMenuItem.Enabled = false;
+            saveToFilebhavToolStripMenuItem.Name = "saveToFilebhavToolStripMenuItem";
+            saveToFilebhavToolStripMenuItem.Size = new Size(191, 22);
+            saveToFilebhavToolStripMenuItem.Text = "Save to File (.bhav)";
             // 
             // loadFromFileToolStripMenuItem
             // 
-            this.loadFromFileToolStripMenuItem.Enabled = false;
-            this.loadFromFileToolStripMenuItem.Name = "loadFromFileToolStripMenuItem";
-            this.loadFromFileToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.loadFromFileToolStripMenuItem.Text = "Load from File";
+            loadFromFileToolStripMenuItem.Enabled = false;
+            loadFromFileToolStripMenuItem.Name = "loadFromFileToolStripMenuItem";
+            loadFromFileToolStripMenuItem.Size = new Size(191, 22);
+            loadFromFileToolStripMenuItem.Text = "Load from File";
             // 
             // openParentResourceToolStripMenuItem
             // 
-            this.openParentResourceToolStripMenuItem.Name = "openParentResourceToolStripMenuItem";
-            this.openParentResourceToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.openParentResourceToolStripMenuItem.Text = "Open Parent Resource";
-            this.openParentResourceToolStripMenuItem.Click += new System.EventHandler(this.openParentResourceToolStripMenuItem_Click);
+            openParentResourceToolStripMenuItem.Name = "openParentResourceToolStripMenuItem";
+            openParentResourceToolStripMenuItem.Size = new Size(191, 22);
+            openParentResourceToolStripMenuItem.Text = "Open Parent Resource";
+            openParentResourceToolStripMenuItem.Click += openParentResourceToolStripMenuItem_Click;
             // 
             // editToolStripMenuItem
             // 
-            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.undoToolStripMenuItem,
-            this.redoToolStripMenuItem,
-            this.toolStripSeparator1,
-            this.copyToolStripMenuItem,
-            this.pasteStripMenuItem,
-            this.toolStripSeparator2,
-            this.removeToolStripMenuItem,
-            this.setFirstToolStripMenuItem});
-            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
-            this.editToolStripMenuItem.Text = "Edit";
+            editToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { undoToolStripMenuItem, redoToolStripMenuItem, toolStripSeparator1, copyToolStripMenuItem, pasteStripMenuItem, toolStripSeparator2, removeToolStripMenuItem, setFirstToolStripMenuItem });
+            editToolStripMenuItem.Name = "editToolStripMenuItem";
+            editToolStripMenuItem.Size = new Size(39, 20);
+            editToolStripMenuItem.Text = "Edit";
             // 
             // undoToolStripMenuItem
             // 
-            this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
-            this.undoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-            this.undoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.undoToolStripMenuItem.Text = "Undo";
-            this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
+            undoToolStripMenuItem.Name = "undoToolStripMenuItem";
+            undoToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Z;
+            undoToolStripMenuItem.Size = new Size(180, 22);
+            undoToolStripMenuItem.Text = "Undo";
+            undoToolStripMenuItem.Click += undoToolStripMenuItem_Click;
             // 
             // redoToolStripMenuItem
             // 
-            this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
-            this.redoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
-            this.redoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.redoToolStripMenuItem.Text = "Redo";
-            this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
+            redoToolStripMenuItem.Name = "redoToolStripMenuItem";
+            redoToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Y;
+            redoToolStripMenuItem.Size = new Size(180, 22);
+            redoToolStripMenuItem.Text = "Redo";
+            redoToolStripMenuItem.Click += redoToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(177, 6);
             // 
             // copyToolStripMenuItem
             // 
-            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.copyToolStripMenuItem.Text = "Copy";
-            this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
+            copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            copyToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.C;
+            copyToolStripMenuItem.Size = new Size(180, 22);
+            copyToolStripMenuItem.Text = "Copy";
+            copyToolStripMenuItem.Click += copyToolStripMenuItem_Click;
             // 
             // pasteStripMenuItem
             // 
-            this.pasteStripMenuItem.Name = "pasteStripMenuItem";
-            this.pasteStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.pasteStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.pasteStripMenuItem.Text = "Paste";
-            this.pasteStripMenuItem.Click += new System.EventHandler(this.pasteToolStripMenuItem_Click);
+            pasteStripMenuItem.Name = "pasteStripMenuItem";
+            pasteStripMenuItem.ShortcutKeys = Keys.Control | Keys.V;
+            pasteStripMenuItem.Size = new Size(180, 22);
+            pasteStripMenuItem.Text = "Paste";
+            pasteStripMenuItem.Click += pasteToolStripMenuItem_Click;
             // 
             // toolStripSeparator2
             // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(177, 6);
             // 
             // removeToolStripMenuItem
             // 
-            this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
-            this.removeToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.removeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.removeToolStripMenuItem.Text = "Remove";
-            this.removeToolStripMenuItem.Click += new System.EventHandler(this.removeToolStripMenuItem_Click);
+            removeToolStripMenuItem.Name = "removeToolStripMenuItem";
+            removeToolStripMenuItem.ShortcutKeys = Keys.Delete;
+            removeToolStripMenuItem.Size = new Size(180, 22);
+            removeToolStripMenuItem.Text = "Remove";
+            removeToolStripMenuItem.Click += removeToolStripMenuItem_Click;
             // 
             // setFirstToolStripMenuItem
             // 
-            this.setFirstToolStripMenuItem.Name = "setFirstToolStripMenuItem";
-            this.setFirstToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D1)));
-            this.setFirstToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.setFirstToolStripMenuItem.Text = "Set as First";
-            this.setFirstToolStripMenuItem.Click += new System.EventHandler(this.setFirstToolStripMenuItem_Click);
+            setFirstToolStripMenuItem.Name = "setFirstToolStripMenuItem";
+            setFirstToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.D1;
+            setFirstToolStripMenuItem.Size = new Size(180, 22);
+            setFirstToolStripMenuItem.Text = "Set as First";
+            setFirstToolStripMenuItem.Click += setFirstToolStripMenuItem_Click;
             // 
             // viewToolStripMenuItem
             // 
-            this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.snapPrimitivesToGridToolStripMenuItem});
-            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.viewToolStripMenuItem.Text = "View";
+            viewToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { snapPrimitivesToGridToolStripMenuItem });
+            viewToolStripMenuItem.Name = "viewToolStripMenuItem";
+            viewToolStripMenuItem.Size = new Size(44, 20);
+            viewToolStripMenuItem.Text = "View";
             // 
             // snapPrimitivesToGridToolStripMenuItem
             // 
-            this.snapPrimitivesToGridToolStripMenuItem.Name = "snapPrimitivesToGridToolStripMenuItem";
-            this.snapPrimitivesToGridToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.snapPrimitivesToGridToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
-            this.snapPrimitivesToGridToolStripMenuItem.Text = "Snap Primitives To Grid";
-            this.snapPrimitivesToGridToolStripMenuItem.Click += new System.EventHandler(this.SnapPrimitivesToGridToolStripMenuItem_Click);
+            snapPrimitivesToGridToolStripMenuItem.Name = "snapPrimitivesToGridToolStripMenuItem";
+            snapPrimitivesToGridToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.S;
+            snapPrimitivesToGridToolStripMenuItem.Size = new Size(236, 22);
+            snapPrimitivesToGridToolStripMenuItem.Text = "Snap Primitives To Grid";
+            snapPrimitivesToGridToolStripMenuItem.Click += SnapPrimitivesToGridToolStripMenuItem_Click;
             // 
             // insertToolStripMenuItem
             // 
-            this.insertToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.trueToolStripMenuItem,
-            this.falseToolStripMenuItem,
-            this.labelToolStripMenuItem,
-            this.commentToolStripMenuItem});
-            this.insertToolStripMenuItem.Name = "insertToolStripMenuItem";
-            this.insertToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
-            this.insertToolStripMenuItem.Text = "Insert";
+            insertToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { trueToolStripMenuItem, falseToolStripMenuItem, labelToolStripMenuItem, commentToolStripMenuItem });
+            insertToolStripMenuItem.Name = "insertToolStripMenuItem";
+            insertToolStripMenuItem.Size = new Size(48, 20);
+            insertToolStripMenuItem.Text = "Insert";
             // 
             // trueToolStripMenuItem
             // 
-            this.trueToolStripMenuItem.Name = "trueToolStripMenuItem";
-            this.trueToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T)));
-            this.trueToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.trueToolStripMenuItem.Text = "True";
-            this.trueToolStripMenuItem.Click += new System.EventHandler(this.trueToolStripMenuItem_Click);
+            trueToolStripMenuItem.Name = "trueToolStripMenuItem";
+            trueToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.T;
+            trueToolStripMenuItem.Size = new Size(180, 22);
+            trueToolStripMenuItem.Text = "True";
+            trueToolStripMenuItem.Click += trueToolStripMenuItem_Click;
             // 
             // falseToolStripMenuItem
             // 
-            this.falseToolStripMenuItem.Name = "falseToolStripMenuItem";
-            this.falseToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.falseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.falseToolStripMenuItem.Text = "False";
-            this.falseToolStripMenuItem.Click += new System.EventHandler(this.falseToolStripMenuItem_Click);
+            falseToolStripMenuItem.Name = "falseToolStripMenuItem";
+            falseToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.F;
+            falseToolStripMenuItem.Size = new Size(180, 22);
+            falseToolStripMenuItem.Text = "False";
+            falseToolStripMenuItem.Click += falseToolStripMenuItem_Click;
             // 
             // labelToolStripMenuItem
             // 
-            this.labelToolStripMenuItem.Name = "labelToolStripMenuItem";
-            this.labelToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
-            this.labelToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.labelToolStripMenuItem.Text = "Label";
-            this.labelToolStripMenuItem.Click += new System.EventHandler(this.labelToolStripMenuItem_Click);
+            labelToolStripMenuItem.Name = "labelToolStripMenuItem";
+            labelToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.L;
+            labelToolStripMenuItem.Size = new Size(180, 22);
+            labelToolStripMenuItem.Text = "Label";
+            labelToolStripMenuItem.Click += labelToolStripMenuItem_Click;
             // 
             // commentToolStripMenuItem
             // 
-            this.commentToolStripMenuItem.Name = "commentToolStripMenuItem";
-            this.commentToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.OemQuestion)));
-            this.commentToolStripMenuItem.ShowShortcutKeys = false;
-            this.commentToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.commentToolStripMenuItem.Text = "Comment         Ctrl+/";
-            this.commentToolStripMenuItem.Click += new System.EventHandler(this.commentToolStripMenuItem_Click);
+            commentToolStripMenuItem.Name = "commentToolStripMenuItem";
+            commentToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Oem2;
+            commentToolStripMenuItem.ShowShortcutKeys = false;
+            commentToolStripMenuItem.Size = new Size(180, 22);
+            commentToolStripMenuItem.Text = "Comment         Ctrl+/";
+            commentToolStripMenuItem.Click += commentToolStripMenuItem_Click;
             // 
             // MainTable
             // 
-            this.MainTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.MainTable.ColumnCount = 3;
-            this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 260F));
-            this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 260F));
-            this.MainTable.Controls.Add(this.splitContainer1, 0, 0);
-            this.MainTable.Controls.Add(this.EditorControl, 1, 0);
-            this.MainTable.Controls.Add(this.DebugTable, 2, 0);
-            this.MainTable.Location = new System.Drawing.Point(0, 27);
-            this.MainTable.Name = "MainTable";
-            this.MainTable.RowCount = 1;
-            this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.MainTable.Size = new System.Drawing.Size(1014, 569);
-            this.MainTable.TabIndex = 2;
+            MainTable.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            MainTable.ColumnCount = 3;
+            MainTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 260F));
+            MainTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            MainTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 260F));
+            MainTable.Controls.Add(splitContainer1, 0, 0);
+            MainTable.Controls.Add(EditorControl, 1, 0);
+            MainTable.Controls.Add(DebugTable, 2, 0);
+            MainTable.Location = new Point(0, 27);
+            MainTable.Name = "MainTable";
+            MainTable.RowCount = 1;
+            MainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            MainTable.Size = new Size(1014, 569);
+            MainTable.TabIndex = 2;
             // 
             // splitContainer1
             // 
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.Location = new System.Drawing.Point(3, 3);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            splitContainer1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            splitContainer1.Location = new Point(3, 3);
+            splitContainer1.Name = "splitContainer1";
+            splitContainer1.Orientation = Orientation.Horizontal;
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.PrimitivesGroup);
+            splitContainer1.Panel1.Controls.Add(PrimitivesGroup);
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.OperandGroup);
-            this.splitContainer1.Size = new System.Drawing.Size(254, 563);
-            this.splitContainer1.SplitterDistance = 314;
-            this.splitContainer1.TabIndex = 2;
+            splitContainer1.Panel2.Controls.Add(OperandGroup);
+            splitContainer1.Size = new Size(254, 563);
+            splitContainer1.SplitterDistance = 314;
+            splitContainer1.TabIndex = 2;
             // 
             // PrimitivesGroup
             // 
-            this.PrimitivesGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.PrimitivesGroup.Controls.Add(this.pictureBox1);
-            this.PrimitivesGroup.Controls.Add(this.SearchBox);
-            this.PrimitivesGroup.Controls.Add(this.PrimitiveList);
-            this.PrimitivesGroup.Controls.Add(this.tableLayoutPanel2);
-            this.PrimitivesGroup.Location = new System.Drawing.Point(3, -1);
-            this.PrimitivesGroup.Name = "PrimitivesGroup";
-            this.PrimitivesGroup.Size = new System.Drawing.Size(248, 312);
-            this.PrimitivesGroup.TabIndex = 5;
-            this.PrimitivesGroup.TabStop = false;
-            this.PrimitivesGroup.Text = "Primitives";
+            PrimitivesGroup.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            PrimitivesGroup.Controls.Add(pictureBox1);
+            PrimitivesGroup.Controls.Add(SearchBox);
+            PrimitivesGroup.Controls.Add(PrimitiveList);
+            PrimitivesGroup.Controls.Add(tableLayoutPanel2);
+            PrimitivesGroup.Location = new Point(3, -1);
+            PrimitivesGroup.Name = "PrimitivesGroup";
+            PrimitivesGroup.Size = new Size(248, 312);
+            PrimitivesGroup.TabIndex = 5;
+            PrimitivesGroup.TabStop = false;
+            PrimitivesGroup.Text = "Primitives";
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = global::FSO.IDE.Properties.Resources.search;
-            this.pictureBox1.Location = new System.Drawing.Point(11, 142);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(18, 19);
-            this.pictureBox1.TabIndex = 3;
-            this.pictureBox1.TabStop = false;
+            pictureBox1.Image = Properties.Resources.search;
+            pictureBox1.Location = new Point(11, 142);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(18, 19);
+            pictureBox1.TabIndex = 3;
+            pictureBox1.TabStop = false;
             // 
             // SearchBox
             // 
-            this.SearchBox.Location = new System.Drawing.Point(32, 141);
-            this.SearchBox.Name = "SearchBox";
-            this.SearchBox.Size = new System.Drawing.Size(208, 20);
-            this.SearchBox.TabIndex = 4;
-            this.SearchBox.TextChanged += new System.EventHandler(this.SearchBox_TextChanged);
+            SearchBox.Location = new Point(32, 141);
+            SearchBox.Name = "SearchBox";
+            SearchBox.Size = new Size(208, 22);
+            SearchBox.TabIndex = 4;
+            SearchBox.TextChanged += SearchBox_TextChanged;
             // 
             // PrimitiveList
             // 
-            this.PrimitiveList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.PrimitiveList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.PrimitiveList.FormattingEnabled = true;
-            this.PrimitiveList.Location = new System.Drawing.Point(10, 166);
-            this.PrimitiveList.Name = "PrimitiveList";
-            this.PrimitiveList.Size = new System.Drawing.Size(230, 132);
-            this.PrimitiveList.TabIndex = 3;
-            this.PrimitiveList.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            PrimitiveList.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            PrimitiveList.BorderStyle = BorderStyle.FixedSingle;
+            PrimitiveList.FormattingEnabled = true;
+            PrimitiveList.Location = new Point(10, 166);
+            PrimitiveList.Name = "PrimitiveList";
+            PrimitiveList.Size = new Size(230, 132);
+            PrimitiveList.TabIndex = 3;
+            PrimitiveList.SelectedIndexChanged += listBox1_SelectedIndexChanged;
             // 
             // tableLayoutPanel2
             // 
-            this.tableLayoutPanel2.ColumnCount = 2;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.Controls.Add(this.DebugBtn, 0, 3);
-            this.tableLayoutPanel2.Controls.Add(this.SimBtn, 1, 2);
-            this.tableLayoutPanel2.Controls.Add(this.ObjectBtn, 0, 2);
-            this.tableLayoutPanel2.Controls.Add(this.PositionBtn, 1, 1);
-            this.tableLayoutPanel2.Controls.Add(this.MathBtn, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.ControlBtn, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.LooksBtn, 0, 1);
-            this.tableLayoutPanel2.Controls.Add(this.SubroutineBtn, 0, 4);
-            this.tableLayoutPanel2.Controls.Add(this.TSOBtn, 1, 3);
-            this.tableLayoutPanel2.Controls.Add(this.AllBtn, 1, 4);
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(7, 18);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 5;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(236, 118);
-            this.tableLayoutPanel2.TabIndex = 2;
+            tableLayoutPanel2.ColumnCount = 2;
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel2.Controls.Add(DebugBtn, 0, 3);
+            tableLayoutPanel2.Controls.Add(SimBtn, 1, 2);
+            tableLayoutPanel2.Controls.Add(ObjectBtn, 0, 2);
+            tableLayoutPanel2.Controls.Add(PositionBtn, 1, 1);
+            tableLayoutPanel2.Controls.Add(MathBtn, 1, 0);
+            tableLayoutPanel2.Controls.Add(ControlBtn, 0, 0);
+            tableLayoutPanel2.Controls.Add(LooksBtn, 0, 1);
+            tableLayoutPanel2.Controls.Add(SubroutineBtn, 0, 4);
+            tableLayoutPanel2.Controls.Add(TSOBtn, 1, 3);
+            tableLayoutPanel2.Controls.Add(AllBtn, 1, 4);
+            tableLayoutPanel2.Location = new Point(7, 18);
+            tableLayoutPanel2.Name = "tableLayoutPanel2";
+            tableLayoutPanel2.RowCount = 5;
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            tableLayoutPanel2.Size = new Size(236, 118);
+            tableLayoutPanel2.TabIndex = 2;
             // 
             // DebugBtn
             // 
-            this.DebugBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(115)))), ((int)(((byte)(115)))));
-            this.DebugBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("DebugBtn.BackgroundImage")));
-            this.DebugBtn.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.DebugBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.DebugBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DebugBtn.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.DebugBtn.Location = new System.Drawing.Point(1, 70);
-            this.DebugBtn.Margin = new System.Windows.Forms.Padding(1);
-            this.DebugBtn.Name = "DebugBtn";
-            this.DebugBtn.Size = new System.Drawing.Size(112, 20);
-            this.DebugBtn.TabIndex = 7;
-            this.DebugBtn.Text = "Debug";
-            this.DebugBtn.UseVisualStyleBackColor = false;
+            DebugBtn.BackColor = Color.FromArgb(255, 115, 115);
+            DebugBtn.BackgroundImage = (Image)resources.GetObject("DebugBtn.BackgroundImage");
+            DebugBtn.FlatAppearance.BorderColor = Color.White;
+            DebugBtn.FlatStyle = FlatStyle.Popup;
+            DebugBtn.Font = new Font("Segoe UI", 8.25F);
+            DebugBtn.ForeColor = Color.FromArgb(102, 0, 0);
+            DebugBtn.Location = new Point(1, 70);
+            DebugBtn.Margin = new Padding(1);
+            DebugBtn.Name = "DebugBtn";
+            DebugBtn.Size = new Size(112, 20);
+            DebugBtn.TabIndex = 7;
+            DebugBtn.Text = "Debug";
+            DebugBtn.UseVisualStyleBackColor = false;
             // 
             // SimBtn
             // 
-            this.SimBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(151)))), ((int)(((byte)(253)))));
-            this.SimBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("SimBtn.BackgroundImage")));
-            this.SimBtn.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.SimBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.SimBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SimBtn.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(105)))), ((int)(((byte)(0)))), ((int)(((byte)(140)))));
-            this.SimBtn.Location = new System.Drawing.Point(122, 47);
-            this.SimBtn.Margin = new System.Windows.Forms.Padding(4, 1, 1, 1);
-            this.SimBtn.Name = "SimBtn";
-            this.SimBtn.Size = new System.Drawing.Size(112, 20);
-            this.SimBtn.TabIndex = 6;
-            this.SimBtn.Text = "Sim";
-            this.SimBtn.UseVisualStyleBackColor = false;
+            SimBtn.BackColor = Color.FromArgb(255, 151, 253);
+            SimBtn.BackgroundImage = (Image)resources.GetObject("SimBtn.BackgroundImage");
+            SimBtn.FlatAppearance.BorderColor = Color.White;
+            SimBtn.FlatStyle = FlatStyle.Popup;
+            SimBtn.Font = new Font("Segoe UI", 8.25F);
+            SimBtn.ForeColor = Color.FromArgb(105, 0, 140);
+            SimBtn.Location = new Point(122, 47);
+            SimBtn.Margin = new Padding(4, 1, 1, 1);
+            SimBtn.Name = "SimBtn";
+            SimBtn.Size = new Size(112, 20);
+            SimBtn.TabIndex = 6;
+            SimBtn.Text = "Sim";
+            SimBtn.UseVisualStyleBackColor = false;
             // 
             // ObjectBtn
             // 
-            this.ObjectBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(105)))), ((int)(((byte)(0)))), ((int)(((byte)(140)))));
-            this.ObjectBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ObjectBtn.BackgroundImage")));
-            this.ObjectBtn.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.ObjectBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.ObjectBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ObjectBtn.ForeColor = System.Drawing.Color.White;
-            this.ObjectBtn.Location = new System.Drawing.Point(1, 47);
-            this.ObjectBtn.Margin = new System.Windows.Forms.Padding(1);
-            this.ObjectBtn.Name = "ObjectBtn";
-            this.ObjectBtn.Size = new System.Drawing.Size(112, 20);
-            this.ObjectBtn.TabIndex = 5;
-            this.ObjectBtn.Text = "Object";
-            this.ObjectBtn.UseVisualStyleBackColor = false;
+            ObjectBtn.BackColor = Color.FromArgb(105, 0, 140);
+            ObjectBtn.BackgroundImage = (Image)resources.GetObject("ObjectBtn.BackgroundImage");
+            ObjectBtn.FlatAppearance.BorderColor = Color.White;
+            ObjectBtn.FlatStyle = FlatStyle.Popup;
+            ObjectBtn.Font = new Font("Segoe UI", 8.25F);
+            ObjectBtn.ForeColor = Color.White;
+            ObjectBtn.Location = new Point(1, 47);
+            ObjectBtn.Margin = new Padding(1);
+            ObjectBtn.Name = "ObjectBtn";
+            ObjectBtn.Size = new Size(112, 20);
+            ObjectBtn.TabIndex = 5;
+            ObjectBtn.Text = "Object";
+            ObjectBtn.UseVisualStyleBackColor = false;
             // 
             // PositionBtn
             // 
-            this.PositionBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(89)))), ((int)(((byte)(178)))));
-            this.PositionBtn.BackgroundImage = global::FSO.IDE.Properties.Resources.diagbg10;
-            this.PositionBtn.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.PositionBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.PositionBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PositionBtn.ForeColor = System.Drawing.Color.White;
-            this.PositionBtn.Location = new System.Drawing.Point(122, 24);
-            this.PositionBtn.Margin = new System.Windows.Forms.Padding(4, 1, 1, 1);
-            this.PositionBtn.Name = "PositionBtn";
-            this.PositionBtn.Size = new System.Drawing.Size(112, 20);
-            this.PositionBtn.TabIndex = 4;
-            this.PositionBtn.Text = "Position";
-            this.PositionBtn.UseVisualStyleBackColor = false;
+            PositionBtn.BackColor = Color.FromArgb(0, 89, 178);
+            PositionBtn.BackgroundImage = Properties.Resources.diagbg10;
+            PositionBtn.FlatAppearance.BorderColor = Color.White;
+            PositionBtn.FlatStyle = FlatStyle.Popup;
+            PositionBtn.Font = new Font("Segoe UI", 8.25F);
+            PositionBtn.ForeColor = Color.White;
+            PositionBtn.Location = new Point(122, 24);
+            PositionBtn.Margin = new Padding(4, 1, 1, 1);
+            PositionBtn.Name = "PositionBtn";
+            PositionBtn.Size = new Size(112, 20);
+            PositionBtn.TabIndex = 4;
+            PositionBtn.Text = "Position";
+            PositionBtn.UseVisualStyleBackColor = false;
             // 
             // MathBtn
             // 
-            this.MathBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(140)))), ((int)(((byte)(0)))));
-            this.MathBtn.BackgroundImage = global::FSO.IDE.Properties.Resources.diagbg10;
-            this.MathBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.MathBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MathBtn.ForeColor = System.Drawing.Color.White;
-            this.MathBtn.Location = new System.Drawing.Point(122, 1);
-            this.MathBtn.Margin = new System.Windows.Forms.Padding(4, 1, 1, 1);
-            this.MathBtn.Name = "MathBtn";
-            this.MathBtn.Size = new System.Drawing.Size(112, 20);
-            this.MathBtn.TabIndex = 2;
-            this.MathBtn.Text = "Math";
-            this.MathBtn.UseVisualStyleBackColor = false;
+            MathBtn.BackColor = Color.FromArgb(70, 140, 0);
+            MathBtn.BackgroundImage = Properties.Resources.diagbg10;
+            MathBtn.FlatStyle = FlatStyle.Popup;
+            MathBtn.Font = new Font("Segoe UI", 8.25F);
+            MathBtn.ForeColor = Color.White;
+            MathBtn.Location = new Point(122, 1);
+            MathBtn.Margin = new Padding(4, 1, 1, 1);
+            MathBtn.Name = "MathBtn";
+            MathBtn.Size = new Size(112, 20);
+            MathBtn.TabIndex = 2;
+            MathBtn.Text = "Math";
+            MathBtn.UseVisualStyleBackColor = false;
             // 
             // ControlBtn
             // 
-            this.ControlBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(191)))), ((int)(((byte)(0)))));
-            this.ControlBtn.BackgroundImage = global::FSO.IDE.Properties.Resources.diagbg20;
-            this.ControlBtn.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.ControlBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.ControlBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ControlBtn.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(76)))), ((int)(((byte)(0)))));
-            this.ControlBtn.Location = new System.Drawing.Point(1, 1);
-            this.ControlBtn.Margin = new System.Windows.Forms.Padding(1);
-            this.ControlBtn.Name = "ControlBtn";
-            this.ControlBtn.Size = new System.Drawing.Size(112, 20);
-            this.ControlBtn.TabIndex = 1;
-            this.ControlBtn.Text = "Control";
-            this.ControlBtn.UseVisualStyleBackColor = false;
+            ControlBtn.BackColor = Color.FromArgb(255, 191, 0);
+            ControlBtn.BackgroundImage = Properties.Resources.diagbg20;
+            ControlBtn.FlatAppearance.BorderColor = Color.White;
+            ControlBtn.FlatStyle = FlatStyle.Popup;
+            ControlBtn.Font = new Font("Segoe UI", 8.25F);
+            ControlBtn.ForeColor = Color.FromArgb(102, 76, 0);
+            ControlBtn.Location = new Point(1, 1);
+            ControlBtn.Margin = new Padding(1);
+            ControlBtn.Name = "ControlBtn";
+            ControlBtn.Size = new Size(112, 20);
+            ControlBtn.TabIndex = 1;
+            ControlBtn.Text = "Control";
+            ControlBtn.UseVisualStyleBackColor = false;
             // 
             // LooksBtn
             // 
-            this.LooksBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(115)))), ((int)(((byte)(220)))), ((int)(((byte)(255)))));
-            this.LooksBtn.BackgroundImage = global::FSO.IDE.Properties.Resources.diagbg20;
-            this.LooksBtn.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.LooksBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.LooksBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LooksBtn.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(105)))), ((int)(((byte)(140)))));
-            this.LooksBtn.Location = new System.Drawing.Point(1, 24);
-            this.LooksBtn.Margin = new System.Windows.Forms.Padding(1);
-            this.LooksBtn.Name = "LooksBtn";
-            this.LooksBtn.Size = new System.Drawing.Size(112, 20);
-            this.LooksBtn.TabIndex = 3;
-            this.LooksBtn.Text = "Looks";
-            this.LooksBtn.UseVisualStyleBackColor = false;
+            LooksBtn.BackColor = Color.FromArgb(115, 220, 255);
+            LooksBtn.BackgroundImage = Properties.Resources.diagbg20;
+            LooksBtn.FlatAppearance.BorderColor = Color.White;
+            LooksBtn.FlatStyle = FlatStyle.Popup;
+            LooksBtn.Font = new Font("Segoe UI", 8.25F);
+            LooksBtn.ForeColor = Color.FromArgb(0, 105, 140);
+            LooksBtn.Location = new Point(1, 24);
+            LooksBtn.Margin = new Padding(1);
+            LooksBtn.Name = "LooksBtn";
+            LooksBtn.Size = new Size(112, 20);
+            LooksBtn.TabIndex = 3;
+            LooksBtn.Text = "Looks";
+            LooksBtn.UseVisualStyleBackColor = false;
             // 
             // SubroutineBtn
             // 
-            this.SubroutineBtn.BackgroundImage = global::FSO.IDE.Properties.Resources.diagbg;
-            this.SubroutineBtn.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.SubroutineBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.SubroutineBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SubroutineBtn.Location = new System.Drawing.Point(1, 93);
-            this.SubroutineBtn.Margin = new System.Windows.Forms.Padding(1);
-            this.SubroutineBtn.Name = "SubroutineBtn";
-            this.SubroutineBtn.Size = new System.Drawing.Size(112, 20);
-            this.SubroutineBtn.TabIndex = 9;
-            this.SubroutineBtn.Text = "Subroutine";
-            this.SubroutineBtn.UseVisualStyleBackColor = true;
+            SubroutineBtn.BackgroundImage = Properties.Resources.diagbg;
+            SubroutineBtn.FlatAppearance.BorderColor = Color.White;
+            SubroutineBtn.FlatStyle = FlatStyle.Popup;
+            SubroutineBtn.Font = new Font("Segoe UI", 8.25F);
+            SubroutineBtn.Location = new Point(1, 93);
+            SubroutineBtn.Margin = new Padding(1);
+            SubroutineBtn.Name = "SubroutineBtn";
+            SubroutineBtn.Size = new Size(112, 20);
+            SubroutineBtn.TabIndex = 9;
+            SubroutineBtn.Text = "Subroutine";
+            SubroutineBtn.UseVisualStyleBackColor = true;
             // 
             // TSOBtn
             // 
-            this.TSOBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(140)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.TSOBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("TSOBtn.BackgroundImage")));
-            this.TSOBtn.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.TSOBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.TSOBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TSOBtn.ForeColor = System.Drawing.Color.White;
-            this.TSOBtn.Location = new System.Drawing.Point(122, 70);
-            this.TSOBtn.Margin = new System.Windows.Forms.Padding(4, 1, 1, 1);
-            this.TSOBtn.Name = "TSOBtn";
-            this.TSOBtn.Size = new System.Drawing.Size(112, 20);
-            this.TSOBtn.TabIndex = 8;
-            this.TSOBtn.Text = "TSO";
-            this.TSOBtn.UseVisualStyleBackColor = false;
+            TSOBtn.BackColor = Color.FromArgb(140, 0, 0);
+            TSOBtn.BackgroundImage = (Image)resources.GetObject("TSOBtn.BackgroundImage");
+            TSOBtn.FlatAppearance.BorderColor = Color.White;
+            TSOBtn.FlatStyle = FlatStyle.Popup;
+            TSOBtn.Font = new Font("Segoe UI", 8.25F);
+            TSOBtn.ForeColor = Color.White;
+            TSOBtn.Location = new Point(122, 70);
+            TSOBtn.Margin = new Padding(4, 1, 1, 1);
+            TSOBtn.Name = "TSOBtn";
+            TSOBtn.Size = new Size(112, 20);
+            TSOBtn.TabIndex = 8;
+            TSOBtn.Text = "TSO";
+            TSOBtn.UseVisualStyleBackColor = false;
             // 
             // AllBtn
             // 
-            this.AllBtn.BackColor = System.Drawing.Color.Black;
-            this.AllBtn.BackgroundImage = global::FSO.IDE.Properties.Resources.diagbg20;
-            this.AllBtn.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.AllBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.AllBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.AllBtn.ForeColor = System.Drawing.Color.White;
-            this.AllBtn.Location = new System.Drawing.Point(122, 93);
-            this.AllBtn.Margin = new System.Windows.Forms.Padding(4, 1, 1, 1);
-            this.AllBtn.Name = "AllBtn";
-            this.AllBtn.Size = new System.Drawing.Size(112, 20);
-            this.AllBtn.TabIndex = 10;
-            this.AllBtn.Text = "All";
-            this.AllBtn.UseVisualStyleBackColor = false;
+            AllBtn.BackColor = Color.Black;
+            AllBtn.BackgroundImage = Properties.Resources.diagbg20;
+            AllBtn.FlatAppearance.BorderColor = Color.White;
+            AllBtn.FlatStyle = FlatStyle.Popup;
+            AllBtn.Font = new Font("Segoe UI", 8.25F);
+            AllBtn.ForeColor = Color.White;
+            AllBtn.Location = new Point(122, 93);
+            AllBtn.Margin = new Padding(4, 1, 1, 1);
+            AllBtn.Name = "AllBtn";
+            AllBtn.Size = new Size(112, 20);
+            AllBtn.TabIndex = 10;
+            AllBtn.Text = "All";
+            AllBtn.UseVisualStyleBackColor = false;
             // 
             // OperandGroup
             // 
-            this.OperandGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.OperandGroup.Controls.Add(this.OperandScroller);
-            this.OperandGroup.Location = new System.Drawing.Point(3, 0);
-            this.OperandGroup.Name = "OperandGroup";
-            this.OperandGroup.Size = new System.Drawing.Size(248, 239);
-            this.OperandGroup.TabIndex = 5;
-            this.OperandGroup.TabStop = false;
-            this.OperandGroup.Text = "Operand";
+            OperandGroup.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            OperandGroup.Controls.Add(OperandScroller);
+            OperandGroup.Location = new Point(3, 0);
+            OperandGroup.Name = "OperandGroup";
+            OperandGroup.Size = new Size(248, 239);
+            OperandGroup.TabIndex = 5;
+            OperandGroup.TabStop = false;
+            OperandGroup.Text = "Operand";
             // 
             // OperandScroller
             // 
-            this.OperandScroller.AutoScroll = true;
-            this.OperandScroller.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.OperandScroller.Controls.Add(this.OperandEditTable);
-            this.OperandScroller.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.OperandScroller.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.OperandScroller.Location = new System.Drawing.Point(3, 16);
-            this.OperandScroller.Name = "OperandScroller";
-            this.OperandScroller.Size = new System.Drawing.Size(242, 220);
-            this.OperandScroller.TabIndex = 6;
-            this.OperandScroller.WrapContents = false;
-            this.OperandScroller.Resize += new System.EventHandler(this.OperandScroller_Resize);
+            OperandScroller.AutoScroll = true;
+            OperandScroller.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            OperandScroller.Controls.Add(OperandEditTable);
+            OperandScroller.Dock = DockStyle.Fill;
+            OperandScroller.FlowDirection = FlowDirection.TopDown;
+            OperandScroller.Location = new Point(3, 18);
+            OperandScroller.Name = "OperandScroller";
+            OperandScroller.Size = new Size(242, 218);
+            OperandScroller.TabIndex = 6;
+            OperandScroller.WrapContents = false;
+            OperandScroller.Resize += OperandScroller_Resize;
             // 
             // OperandEditTable
             // 
-            this.OperandEditTable.AutoSize = true;
-            this.OperandEditTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.OperandEditTable.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.OperandEditTable.ColumnCount = 1;
-            this.OperandEditTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.OperandEditTable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.OperandEditTable.Location = new System.Drawing.Point(0, 0);
-            this.OperandEditTable.Margin = new System.Windows.Forms.Padding(0);
-            this.OperandEditTable.MaximumSize = new System.Drawing.Size(236, 0);
-            this.OperandEditTable.Name = "OperandEditTable";
-            this.OperandEditTable.RowCount = 1;
-            this.OperandEditTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.OperandEditTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1F));
-            this.OperandEditTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1F));
-            this.OperandEditTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1F));
-            this.OperandEditTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1F));
-            this.OperandEditTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1F));
-            this.OperandEditTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1F));
-            this.OperandEditTable.Size = new System.Drawing.Size(0, 0);
-            this.OperandEditTable.TabIndex = 8;
+            OperandEditTable.AutoSize = true;
+            OperandEditTable.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            OperandEditTable.BackgroundImageLayout = ImageLayout.None;
+            OperandEditTable.ColumnCount = 1;
+            OperandEditTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            OperandEditTable.Dock = DockStyle.Fill;
+            OperandEditTable.Location = new Point(0, 0);
+            OperandEditTable.Margin = new Padding(0);
+            OperandEditTable.MaximumSize = new Size(236, 0);
+            OperandEditTable.Name = "OperandEditTable";
+            OperandEditTable.RowCount = 1;
+            OperandEditTable.RowStyles.Add(new RowStyle());
+            OperandEditTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 1F));
+            OperandEditTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 1F));
+            OperandEditTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 1F));
+            OperandEditTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 1F));
+            OperandEditTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 1F));
+            OperandEditTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 1F));
+            OperandEditTable.Size = new Size(0, 0);
+            OperandEditTable.TabIndex = 8;
             // 
             // EditorControl
             // 
-            this.EditorControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.EditorControl.Location = new System.Drawing.Point(260, 0);
-            this.EditorControl.Margin = new System.Windows.Forms.Padding(0);
-            this.EditorControl.Name = "EditorControl";
-            this.EditorControl.Size = new System.Drawing.Size(494, 569);
-            this.EditorControl.TabIndex = 0;
+            EditorControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            EditorControl.Location = new Point(260, 0);
+            EditorControl.Margin = new Padding(0);
+            EditorControl.Name = "EditorControl";
+            EditorControl.Size = new Size(494, 569);
+            EditorControl.TabIndex = 0;
             // 
             // DebugTable
             // 
-            this.DebugTable.ColumnCount = 1;
-            this.DebugTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.DebugTable.Controls.Add(this.ObjectDataGrid, 0, 1);
-            this.DebugTable.Controls.Add(this.groupBox1, 0, 0);
-            this.DebugTable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DebugTable.Location = new System.Drawing.Point(757, 3);
-            this.DebugTable.Name = "DebugTable";
-            this.DebugTable.RowCount = 2;
-            this.DebugTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 200F));
-            this.DebugTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.DebugTable.Size = new System.Drawing.Size(254, 563);
-            this.DebugTable.TabIndex = 3;
+            DebugTable.ColumnCount = 1;
+            DebugTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            DebugTable.Controls.Add(ObjectDataGrid, 0, 1);
+            DebugTable.Controls.Add(groupBox1, 0, 0);
+            DebugTable.Dock = DockStyle.Fill;
+            DebugTable.Location = new Point(757, 3);
+            DebugTable.Name = "DebugTable";
+            DebugTable.RowCount = 2;
+            DebugTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 200F));
+            DebugTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            DebugTable.Size = new Size(254, 563);
+            DebugTable.TabIndex = 3;
             // 
             // ObjectDataGrid
             // 
-            this.ObjectDataGrid.CategoryForeColor = System.Drawing.SystemColors.InactiveCaptionText;
-            this.ObjectDataGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ObjectDataGrid.Location = new System.Drawing.Point(3, 203);
-            this.ObjectDataGrid.Name = "ObjectDataGrid";
-            this.ObjectDataGrid.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.ObjectDataGrid.Size = new System.Drawing.Size(248, 357);
-            this.ObjectDataGrid.TabIndex = 0;
-            this.ObjectDataGrid.ToolbarVisible = false;
+            ObjectDataGrid.BackColor = SystemColors.Control;
+            ObjectDataGrid.CategoryForeColor = SystemColors.InactiveCaptionText;
+            ObjectDataGrid.Dock = DockStyle.Fill;
+            ObjectDataGrid.Location = new Point(3, 203);
+            ObjectDataGrid.Name = "ObjectDataGrid";
+            ObjectDataGrid.PropertySort = PropertySort.Categorized;
+            ObjectDataGrid.Size = new Size(248, 357);
+            ObjectDataGrid.TabIndex = 0;
+            ObjectDataGrid.ToolbarVisible = false;
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.StackView);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox1.Location = new System.Drawing.Point(3, 3);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(248, 194);
-            this.groupBox1.TabIndex = 1;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Stack";
+            groupBox1.Controls.Add(StackView);
+            groupBox1.Dock = DockStyle.Fill;
+            groupBox1.Location = new Point(3, 3);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(248, 194);
+            groupBox1.TabIndex = 1;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Stack";
             // 
             // StackView
             // 
-            this.StackView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.StackTreeNameCol,
-            this.StackSourceCol});
-            this.StackView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.StackView.HideSelection = false;
-            this.StackView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
-            this.StackView.Location = new System.Drawing.Point(3, 16);
-            this.StackView.Margin = new System.Windows.Forms.Padding(6);
-            this.StackView.MultiSelect = false;
-            this.StackView.Name = "StackView";
-            this.StackView.Size = new System.Drawing.Size(242, 175);
-            this.StackView.TabIndex = 0;
-            this.StackView.UseCompatibleStateImageBehavior = false;
-            this.StackView.View = System.Windows.Forms.View.Details;
-            this.StackView.SelectedIndexChanged += new System.EventHandler(this.StackView_SelectedIndexChanged);
+            StackView.Columns.AddRange(new ColumnHeader[] { StackTreeNameCol, StackSourceCol });
+            StackView.Dock = DockStyle.Fill;
+            StackView.Items.AddRange(new ListViewItem[] { listViewItem1 });
+            StackView.Location = new Point(3, 18);
+            StackView.Margin = new Padding(6);
+            StackView.MultiSelect = false;
+            StackView.Name = "StackView";
+            StackView.Size = new Size(242, 173);
+            StackView.TabIndex = 0;
+            StackView.UseCompatibleStateImageBehavior = false;
+            StackView.View = View.Details;
+            StackView.SelectedIndexChanged += StackView_SelectedIndexChanged;
             // 
             // StackTreeNameCol
             // 
-            this.StackTreeNameCol.Text = "Tree Name";
-            this.StackTreeNameCol.Width = 150;
+            StackTreeNameCol.Text = "Tree Name";
+            StackTreeNameCol.Width = 150;
             // 
             // StackSourceCol
             // 
-            this.StackSourceCol.Text = "Source";
-            this.StackSourceCol.Width = 88;
+            StackSourceCol.Text = "Source";
+            StackSourceCol.Width = 88;
             // 
             // BHAVEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1014, 592);
-            this.Controls.Add(this.MainTable);
-            this.Controls.Add(this.menuStrip1);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MainMenuStrip = this.menuStrip1;
-            this.Name = "BHAVEditor";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "BHAV Editor";
-            this.Activated += new System.EventHandler(this.BHAVEditor_Activated);
-            this.Deactivate += new System.EventHandler(this.BHAVEditor_Deactivate);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.BHAVEditor_FormClosing);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BHAVEditor_KeyDown);
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.BHAVEditor_KeyPress);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
-            this.MainTable.ResumeLayout(false);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            this.PrimitivesGroup.ResumeLayout(false);
-            this.PrimitivesGroup.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.OperandGroup.ResumeLayout(false);
-            this.OperandScroller.ResumeLayout(false);
-            this.OperandScroller.PerformLayout();
-            this.DebugTable.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(6F, 13F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(1014, 592);
+            Controls.Add(MainTable);
+            Controls.Add(menuStrip1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MainMenuStrip = menuStrip1;
+            Name = "BHAVEditor";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "BHAV Editor";
+            Activated += BHAVEditor_Activated;
+            Deactivate += BHAVEditor_Deactivate;
+            FormClosing += BHAVEditor_FormClosing;
+            KeyDown += BHAVEditor_KeyDown;
+            KeyPress += BHAVEditor_KeyPress;
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
+            MainTable.ResumeLayout(false);
+            splitContainer1.Panel1.ResumeLayout(false);
+            splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
+            splitContainer1.ResumeLayout(false);
+            PrimitivesGroup.ResumeLayout(false);
+            PrimitivesGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            tableLayoutPanel2.ResumeLayout(false);
+            OperandGroup.ResumeLayout(false);
+            OperandScroller.ResumeLayout(false);
+            OperandScroller.PerformLayout();
+            DebugTable.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
+            ResumeLayout(false);
+            PerformLayout();
 
-        }        
+        }
 
         #endregion
         private System.Windows.Forms.MenuStrip menuStrip1;

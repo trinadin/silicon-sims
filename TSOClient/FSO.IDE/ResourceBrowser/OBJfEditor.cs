@@ -129,7 +129,7 @@ namespace FSO.IDE.ResourceBrowser
                     (func.ActionFunction == 0)?"":((action == null)?("#"+func.ActionFunction):action.ChunkLabel),
                     (func.ConditionFunction == 0)?"":((check == null)?("#"+func.ConditionFunction):check.ChunkLabel),
                 });
-                if (i < 2 && func.ActionFunction == 0) item.BackColor = Color.IndianRed;
+                if (i < 2 && func.ActionFunction == 0) item.BackColor = System.Drawing.Color.IndianRed;
                 itemToOffset.Add(item, i++);
                 
                 FunctionList.Items.Add(item);

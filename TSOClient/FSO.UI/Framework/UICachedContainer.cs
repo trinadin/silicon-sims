@@ -1,8 +1,8 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using FSO.Common;
 using FSO.Common.Rendering.Framework.Model;
-using FSO.Common;
+using FSO.Common.Utils;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace FSO.Client.UI.Framework
 {
@@ -13,7 +13,7 @@ namespace FSO.Client.UI.Framework
         protected RenderTarget2D Target;
         public UIContainer DynamicOverlay = new UIContainer();
         public Point BackOffset;
-        public Color ClearColor = Color.TransparentBlack;
+        public Color ClearColor = ColorExtensions.TransparentBlack;
         public bool UseMip;
         public bool UseZ;
         public bool InternalBefore;
@@ -44,7 +44,7 @@ namespace FSO.Client.UI.Framework
                 if (Target == null || (int)size.X != Target.Width || (int)size.Y != Target.Height)
                 {
                     Target?.Dispose();
-                    Target = new RenderTarget2D(gd, (int)size.X, (int)size.Y, UseMip, SurfaceFormat.Color, (UseZ)?DepthFormat.Depth24:DepthFormat.None, (UseMultisample && !FSOEnvironment.DirectX)?4:0, RenderTargetUsage.PreserveContents);
+                    Target = new RenderTarget2D(gd, (int)size.X, (int)size.Y, UseMip, SurfaceFormat.Color, (UseZ) ? DepthFormat.Depth24 : DepthFormat.None, (UseMultisample && !FSOEnvironment.DirectX) ? 4 : 0, RenderTargetUsage.PreserveContents);
                 }
 
                 lock (Children)
@@ -65,7 +65,7 @@ namespace FSO.Client.UI.Framework
                 var mat = Microsoft.Xna.Framework.Matrix.CreateTranslation(-(pos.X), -(pos.Y), 0) *
                     Microsoft.Xna.Framework.Matrix.CreateScale(1f) *
                     Microsoft.Xna.Framework.Matrix.CreateTranslation(
-                        BackOffset.X * FSOEnvironment.DPIScaleFactor, 
+                        BackOffset.X * FSOEnvironment.DPIScaleFactor,
                         BackOffset.Y * FSOEnvironment.DPIScaleFactor, 0);
 
                 batch.BatchMatrixStack.Push(mat);
@@ -121,7 +121,7 @@ namespace FSO.Client.UI.Framework
             if (!Visible) return;
             if (Target != null)
             {
-                DrawLocalTexture(batch, Target, null, -BackOffset.ToVector2(), new Vector2(1/(Scale.X), 1/(Scale.Y)));
+                DrawLocalTexture(batch, Target, null, -BackOffset.ToVector2(), new Vector2(1 / (Scale.X), 1 / (Scale.Y)));
             }
             DynamicOverlay.Draw(batch);
         }

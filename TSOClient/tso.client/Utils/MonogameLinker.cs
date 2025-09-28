@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace FSO.Client.Utils
+﻿namespace FSO.Client.Utils
 {
     public class MonogameLinker
     {
@@ -24,7 +21,8 @@ namespace FSO.Client.Utils
                 preferDX11 = false;
             }
 
-            try {
+            try
+            {
                 string contentDir = "Content/OGL/";
                 string monogameDir = "Monogame/WindowsGL/";
                 if (!linux)
@@ -47,12 +45,13 @@ namespace FSO.Client.Utils
                     return false;
                 }
 
-                if (File.Exists("Monogame.Framework.dll")) File.Delete("Monogame.Framework.dll");
+                //if (File.Exists("Monogame.Framework.dll")) File.Delete("Monogame.Framework.dll");
 
                 AssemblyDir = monogameDir;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
-                FSOProgram.ShowDialog("Unable to link Monogame. Continuing... ("+e.ToString()+")");
+                FSOProgram.ShowDialog("Unable to link Monogame. Continuing... (" + e.ToString() + ")");
             }
 
             return preferDX11;

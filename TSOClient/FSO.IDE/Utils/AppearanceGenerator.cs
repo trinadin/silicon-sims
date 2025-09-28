@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Binding = FSO.Vitaboy.Binding;
 
 namespace FSO.IDE.Utils
 {
@@ -72,7 +73,7 @@ namespace FSO.IDE.Utils
                 };
             });
 
-            var apr = new Appearance()
+            var apr = new Vitaboy.Appearance()
             {
                 Bindings = bindings.ToArray(),
                 Name = name,
@@ -85,7 +86,7 @@ namespace FSO.IDE.Utils
                 apr.Write(mem);
                 appearanceData = mem.ToArray();
             }
-            var aprID = (Content.Content.Get().AvatarAppearances as TSOAvatarContentProvider<Appearance>).CreateFile(name + ".apr", apr, appearanceData, runtime);
+            var aprID = (Content.Content.Get().AvatarAppearances as TSOAvatarContentProvider<Vitaboy.Appearance>).CreateFile(name + ".apr", apr, appearanceData, runtime);
 
             return aprID;
         }

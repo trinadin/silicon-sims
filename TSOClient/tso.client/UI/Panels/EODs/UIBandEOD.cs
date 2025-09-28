@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Timers;
-using FSO.Client.UI.Controls;
+﻿using FSO.Client.UI.Controls;
 using FSO.Client.UI.Framework;
 using FSO.Client.UI.Framework.Parser;
 using FSO.Client.UI.Model;
 using FSO.Client.UI.Panels.EODs.Utils;
 using FSO.Content.Model;
 using FSO.SimAntics.NetPlay.EODs.Handlers;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.Timers;
 
 namespace FSO.Client.UI.Panels.EODs
 {
@@ -18,8 +16,8 @@ namespace FSO.Client.UI.Panels.EODs
         private static bool NoteSent;
         private UIScript Script;
         private UIEODLobby Lobby;
-        private Timer SequenceNoteTimer;
-        private Timer SyncTimer;
+        private System.Timers.Timer SequenceNoteTimer;
+        private System.Timers.Timer SyncTimer;
         private byte[] CurrentSequence;
         private int CurrentNote;
 
@@ -60,7 +58,7 @@ namespace FSO.Client.UI.Panels.EODs
         private int Creative2Skill;
         private int CurrentDisplayedCreative2Level;
         private List<UIElement> UpperUIElements;
-        private Timer LevelTimer;
+        private System.Timers.Timer LevelTimer;
         private int LevelTimerTicks;
 
         // buttons
@@ -140,11 +138,11 @@ namespace FSO.Client.UI.Panels.EODs
             Remove(CONTINUE);
             Remove(CASHOUT);
 
-            SequenceNoteTimer = new Timer(VMEODBandPlugin.MILLISECONDS_PER_NOTE_IN_SEQUENCE);
+            SequenceNoteTimer = new System.Timers.Timer(VMEODBandPlugin.MILLISECONDS_PER_NOTE_IN_SEQUENCE);
             SequenceNoteTimer.Elapsed += NextNoteHandler;
-            SyncTimer = new Timer(VMEODBandPlugin.MILLISECONDS_PER_NOTE_IN_SEQUENCE);
+            SyncTimer = new System.Timers.Timer(VMEODBandPlugin.MILLISECONDS_PER_NOTE_IN_SEQUENCE);
             SyncTimer.Elapsed += SyncTimerElapsedHandler;
-            LevelTimer = new Timer(250);
+            LevelTimer = new System.Timers.Timer(250);
             LevelTimer.Elapsed += SkillLevelHandler;
 
             // get the buttons and put into array in order to recover their references when the client connects
@@ -185,7 +183,8 @@ namespace FSO.Client.UI.Panels.EODs
                 .WithPlayerUI(new UIEODLobbyPlayer(1, WaitPlayer2, Player2Wait))
                 .WithPlayerUI(new UIEODLobbyPlayer(2, WaitPlayer3, Player3Wait))
                 .WithPlayerUI(new UIEODLobbyPlayer(3, WaitPlayer4, Player4Wait))
-                .WithCaptionProvider((player, avatar) => {
+                .WithCaptionProvider((player, avatar) =>
+                {
                     switch (player.Slot)
                     {
                         case (int)VMEODBandInstrumentTypes.Trumpet:

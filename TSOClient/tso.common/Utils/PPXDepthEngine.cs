@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 
 namespace FSO.Common.Utils
 {
@@ -26,7 +25,7 @@ namespace FSO.Common.Utils
             if (Backbuffer != null) Backbuffer.Dispose();
             var scale = 1;//FSOEnvironment.DPIScaleFactor;
             if (!FSOEnvironment.Enable3D)
-                BackbufferDepth = CreateRenderTarget(GD, 1, MSAA, SurfaceFormat.Color, SSAA*GD.Viewport.Width/scale, SSAA * GD.Viewport.Height / scale, DepthFormat.None);
+                BackbufferDepth = CreateRenderTarget(GD, 1, MSAA, SurfaceFormat.Color, SSAA * GD.Viewport.Width / scale, SSAA * GD.Viewport.Height / scale, DepthFormat.None);
             Backbuffer = CreateRenderTarget(GD, 1, MSAA, SurfaceFormat.Color, SSAA * GD.Viewport.Width / scale, SSAA * GD.Viewport.Height / scale, DepthFormat.Depth24Stencil8);
         }
 
@@ -36,7 +35,7 @@ namespace FSO.Common.Utils
 
         public static void SetPPXTarget(RenderTarget2D color, RenderTarget2D depth, bool clear)
         {
-            SetPPXTarget(color, depth, clear, Color.TransparentBlack);
+            SetPPXTarget(color, depth, clear, ColorExtensions.TransparentBlack);
         }
 
         public static void SetPPXTarget(RenderTarget2D color, RenderTarget2D depth, bool clear, Color clearColor)
@@ -206,7 +205,7 @@ namespace FSO.Common.Utils
 
             // Create our render target
             return new RenderTarget2D(device,
-                width, height, (numberLevels>1), surface,
+                width, height, (numberLevels > 1), surface,
                 DepthFormat.Depth24Stencil8, multisample, RenderTargetUsage.PreserveContents);
         }
     }

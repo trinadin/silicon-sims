@@ -2,14 +2,13 @@
 using FSO.Server.Clients.Framework;
 using FSO.Server.Protocol.CitySelector;
 using RestSharp;
-using System;
-using System.Collections.Generic;
 
 namespace FSO.Server.Clients
 {
     public class CityClient : AbstractHttpClient
     {
-        public CityClient(string baseUrl) : base(baseUrl) {
+        public CityClient(string baseUrl) : base(baseUrl)
+        {
         }
 
         public ShardSelectorServletResponse ShardSelectorServlet(ShardSelectorServletRequest input)
@@ -19,9 +18,10 @@ namespace FSO.Server.Clients
             var request = new RestRequest("cityselector/app/ShardSelectorServlet")
                             .AddQueryParameter("shardName", input.ShardName)
                             .AddQueryParameter("avatarId", input.AvatarID);
-            
+
             var response = client.Execute(request);
-            if(response.StatusCode != System.Net.HttpStatusCode.OK){
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
                 throw new Exception("Unknown error during ShardSelectorServlet");
             }
 

@@ -100,13 +100,13 @@ namespace FSO.IDE.ResourceBrowser
                 if (relativeIndex == 0)
                 {
                     baseG = DGRPList.Items.Count;
-                    listItem.BackColor = Color.LightSeaGreen;
+                    listItem.BackColor = System.Drawing.Color.LightSeaGreen;
                 }
                 else if (relativeIndex == ActiveObject.OBJ.NumGraphics - 1)
-                    listItem.BackColor = Color.LightSalmon;
+                    listItem.BackColor = System.Drawing.Color.LightSalmon;
 
                 if (notUsed)
-                    listItem.BackColor = Color.LightGray;
+                    listItem.BackColor = System.Drawing.Color.LightGray;
                 else
                     lastG = DGRPList.Items.Count;
 

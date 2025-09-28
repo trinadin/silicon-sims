@@ -1,30 +1,28 @@
-using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.Threading;
-using FSO.Common.Rendering.Framework;
-using FSO.LotView;
-using FSO.HIT;
-using FSO.Client.Network;
-using FSO.Client.UI;
 using FSO.Client.GameContent;
-using Ninject;
+using FSO.Client.Network;
 using FSO.Client.Regulators;
-using FSO.Server.Protocol.Voltron.DataService;
-using FSO.Common.DataService;
-using FSO.Server.DataService.Providers.Client;
-using FSO.Common.Domain;
-using FSO.Common.Utils;
+using FSO.Client.UI;
 using FSO.Common;
-using Microsoft.Xna.Framework.Audio;
-using FSO.HIT.Model;
-using FSO.UI.Model;
-using FSO.Files.RC;
-using FSO.Files.Formats.IFF;
-using FSO.UI.Framework;
-using MSDFData;
 using FSO.Common.Audio;
+using FSO.Common.DataService;
+using FSO.Common.Domain;
+using FSO.Common.Rendering.Framework;
+using FSO.Common.Utils;
+using FSO.Files.Formats.IFF;
+using FSO.Files.RC;
+using FSO.HIT;
+using FSO.HIT.Model;
+using FSO.LotView;
 using FSO.LotView.Model;
+using FSO.Server.DataService.Providers.Client;
+using FSO.Server.Protocol.Voltron.DataService;
+using FSO.UI.Framework;
+using FSO.UI.Model;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+using MSDFData;
+using Ninject;
 
 namespace FSO.Client
 {
@@ -36,13 +34,13 @@ namespace FSO.Client
         public UILayer uiLayer;
         public _3DLayer SceneMgr;
 
-		public TSOGame() : base()
+        public TSOGame() : base()
         {
             /*
             var test = new Utils.TestFunctions.ProjectionTest();
             test.TestCombo();
             */
-            
+
             GameFacade.Game = this;
             //if (GameFacade.DirectX) TimedReferenceController.SetMode(CacheType.PERMANENT);
             Content.RootDirectory = FSOEnvironment.GFXContentDir;
@@ -73,7 +71,8 @@ namespace FSO.Client
             {
                 GameThread.Game = Thread.CurrentThread;
                 Thread.CurrentThread.Name = "Game";
-            } catch
+            }
+            catch
             {
                 //fails on android
             }
@@ -111,7 +110,6 @@ namespace FSO.Client
         /// </summary>
         protected override void Initialize()
         {
-            System.Net.ServicePointManager.DefaultConnectionLimit = 32;
             var kernel = new StandardKernel(
                 new RegulatorsModule(),
                 new NetworkModule(),
@@ -221,10 +219,12 @@ namespace FSO.Client
 
             GraphicsDevice.RasterizerState = new RasterizerState() { CullMode = CullMode.None };
 
-            try {
+            try
+            {
                 var audioTest = new SoundEffect(new byte[2], 44100, AudioChannels.Mono); //initialises XAudio.
                 audioTest.CreateInstance().Play();
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 FSOProgram.ShowDialog("Failed to initialize audio: \r\n\r\n" + e.StackTrace);
             }
@@ -272,7 +272,7 @@ namespace FSO.Client
         /// </summary>
         public new void Run()
         {
-             Run(GameRunBehavior.Synchronous);
+            Run(GameRunBehavior.Synchronous);
         }
 
         /// <summary>
@@ -293,7 +293,7 @@ namespace FSO.Client
             GameFacade.Focus = false;
         }
 
-        protected override void OnExiting(object sender, EventArgs args)
+        protected override void OnExiting(object sender, ExitingEventArgs args)
         {
             base.OnExiting(sender, args);
             var kernel = FSOFacade.Kernel;
@@ -303,6 +303,8 @@ namespace FSO.Client
                 kernel.Get<CityConnectionRegulator>()?.Disconnect();
             }
             GameThread.SetKilled();
+
+            args.Cancel = !(FSOFacade.Controller?.CloseAttempt() ?? true);
         }
 
         /// <summary>
@@ -325,7 +327,7 @@ namespace FSO.Client
                 GameFacade.EdithFont.AddSize(12, Content.Load<SpriteFont>("Fonts/Trebuchet_12px"));
                 GameFacade.EdithFont.AddSize(14, Content.Load<SpriteFont>("Fonts/Trebuchet_14px"));
                 */
-                
+
                 GameFacade.VectorFont = new MSDFFont(Content.Load<FieldFont>("../Fonts/simdialogue"));
 
                 GameFacade.EdithVectorFont = new MSDFFont(Content.Load<FieldFont>("../Fonts/trebuchet"));
@@ -334,16 +336,16 @@ namespace FSO.Client
                 GameFacade.EdithVectorFont.YOff = 11;
                 MSDFFont.MSDFEffect = Content.Load<Effect>("Effects/MSDFFont");
 
-                vitaboyEffect = Content.Load<Effect>((FSOEnvironment.GLVer == 2)?"Effects/VitaboyiOS":"Effects/Vitaboy");
+                vitaboyEffect = Content.Load<Effect>((FSOEnvironment.GLVer == 2) ? "Effects/VitaboyiOS" : "Effects/Vitaboy");
                 uiLayer = new UILayer(this);
             }
             catch (Exception e)
             {
-                FSOProgram.ShowDialog("Content could not be loaded. Make sure that the FreeSO content has been compiled! (ContentSrc/TSOClientContent.mgcb) \r\n\r\n"+e.ToString());
+                FSOProgram.ShowDialog("Content could not be loaded. Make sure that the FreeSO content has been compiled! (ContentSrc/TSOClientContent.mgcb) \r\n\r\n" + e.ToString());
                 Exit();
                 Environment.Exit(0);
             }
-            
+
             FSO.Vitaboy.Avatar.setVitaboyEffect(vitaboyEffect);
         }
 
@@ -355,7 +357,7 @@ namespace FSO.Client
         {
             // TODO: Unload any non ContentManager content here
         }
-       
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.

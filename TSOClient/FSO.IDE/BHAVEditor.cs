@@ -23,18 +23,18 @@ namespace FSO.IDE
     public partial class BHAVEditor : Form
     {
         private Dictionary<Button, PrimitiveGroup> ButtonGroups;
-        private Dictionary<PrimitiveGroup, Color> ButtonColors;
-        private Dictionary<PrimitiveGroup, Color> ButtonSelectedText = new Dictionary<PrimitiveGroup, Color>()
+        private Dictionary<PrimitiveGroup, System.Drawing.Color> ButtonColors;
+        private Dictionary<PrimitiveGroup, System.Drawing.Color> ButtonSelectedText = new Dictionary<PrimitiveGroup, System.Drawing.Color>()
             {
-                {PrimitiveGroup.Subroutine, Color.White},
-                {PrimitiveGroup.Control, Color.FromArgb(0x22,0x22,0x22)},
-                {PrimitiveGroup.Debug, Color.FromArgb(0x40,0x00,0x00)},
-                {PrimitiveGroup.Math, Color.FromArgb(0x00,0x66,0x33)},
-                {PrimitiveGroup.Sim, Color.FromArgb(0x4C,0x00,0x66)},
-                {PrimitiveGroup.Object, Color.FromArgb(0x4C,0x00,0x66)},
-                {PrimitiveGroup.Looks, Color.FromArgb(0x00,0x33,0x66)},
-                {PrimitiveGroup.Position, Color.FromArgb(0x00,0x20,0x40)},
-                {PrimitiveGroup.TSO, Color.FromArgb(0x3F,0x00,0x00)},
+                {PrimitiveGroup.Subroutine, System.Drawing.Color.White},
+                {PrimitiveGroup.Control, System.Drawing.Color.FromArgb(0x22,0x22,0x22)},
+                {PrimitiveGroup.Debug, System.Drawing.Color.FromArgb(0x40,0x00,0x00)},
+                {PrimitiveGroup.Math, System.Drawing.Color.FromArgb(0x00,0x66,0x33)},
+                {PrimitiveGroup.Sim, System.Drawing.Color.FromArgb(0x4C,0x00,0x66)},
+                {PrimitiveGroup.Object, System.Drawing.Color.FromArgb(0x4C,0x00,0x66)},
+                {PrimitiveGroup.Looks, System.Drawing.Color.FromArgb(0x00,0x33,0x66)},
+                {PrimitiveGroup.Position, System.Drawing.Color.FromArgb(0x00,0x20,0x40)},
+                {PrimitiveGroup.TSO, System.Drawing.Color.FromArgb(0x3F,0x00,0x00)},
             };
         private PrimitiveGroup SelectedGroup = PrimitiveGroup.Control;
 
@@ -71,7 +71,7 @@ namespace FSO.IDE
                 {AllBtn, PrimitiveGroup.All }
             };
 
-            ButtonColors = new Dictionary<PrimitiveGroup, Color>();
+            ButtonColors = new Dictionary<PrimitiveGroup, System.Drawing.Color>();
             foreach (var btn in ButtonGroups)
             {
                 ButtonColors.Add(btn.Value, btn.Key.BackColor);
@@ -119,7 +119,7 @@ namespace FSO.IDE
                 if (stack[i] is VMRoutingFrame)
                 {
                     item.Tag = "route";
-                    item.ForeColor = Color.Gray;
+                    item.ForeColor = System.Drawing.Color.Gray;
                 }
                 else lastFrame = i;
                 StackView.Items.Add(item);
@@ -205,7 +205,7 @@ namespace FSO.IDE
             foreach (var cbtn in ButtonGroups)
             {
                 var col = ButtonColors[cbtn.Value];
-                if (cbtn.Key == btn) cbtn.Key.BackColor = Color.FromArgb((col.R * 128) / 255 + 127, (col.G * 128) / 255 + 127, (col.B * 128) / 255 + 127);
+                if (cbtn.Key == btn) cbtn.Key.BackColor = System.Drawing.Color.FromArgb((col.R * 128) / 255 + 127, (col.G * 128) / 255 + 127, (col.B * 128) / 255 + 127);
                 else cbtn.Key.BackColor = col;
             }
 

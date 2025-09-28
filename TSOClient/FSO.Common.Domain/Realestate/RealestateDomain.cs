@@ -2,8 +2,6 @@
 using FSO.Common.Domain.Shards;
 using FSO.Content.Model;
 using FSO.Server.Protocol.CitySelector;
-using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace FSO.Common.Domain.Realestate
@@ -27,8 +25,9 @@ namespace FSO.Common.Domain.Realestate
             _Shards = shards;
             _Content = content;
             _ByShard = new Dictionary<int, ShardRealestateDomain>();
-            
-            foreach(var item in shards.All){
+
+            foreach (var item in shards.All)
+            {
                 GetByShard(item.Id);
             }
         }
@@ -107,7 +106,8 @@ namespace FSO.Common.Domain.Realestate
         public bool IsPurchasable(ushort x, ushort y)
         {
             //Cant buy lots on the very edge
-            if(!MapCoordinates.InBounds(x, y, 1)){
+            if (!MapCoordinates.InBounds(x, y, 1))
+            {
                 //Out of bounds!
                 return false;
             }

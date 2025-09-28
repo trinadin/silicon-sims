@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using System.IO;
 
 namespace FSO.Common.Utils
 {
@@ -127,7 +123,7 @@ namespace FSO.Common.Utils
                 var texBuf = GetBuffer(texture.Width * texture.Height);
                 texture.GetData(texBuf);
                 var destOff = 0;
-                for (int y=source.Y; y<source.Bottom; y++)
+                for (int y = source.Y; y < source.Bottom; y++)
                 {
                     int offset = y * texture.Width + source.X;
                     for (int x = 0; x < source.Width; x++)
@@ -152,7 +148,7 @@ namespace FSO.Common.Utils
             var old = gd.GetRenderTargets();
             var rt = new RenderTarget2D(gd, texture.Width, texture.Height);
             gd.SetRenderTarget(rt);
-            gd.Clear(Color.TransparentBlack);
+            gd.Clear(ColorExtensions.TransparentBlack);
             if (CopyBatch == null) CopyBatch = new SpriteBatch(gd);
             CopyBatch.Begin();
             CopyBatch.Draw(texture, Vector2.Zero, Color.White);
@@ -239,35 +235,35 @@ namespace FSO.Common.Utils
 
             //lock (TEXTURE_MASK_BUFFER)
             //{
-                
-                var size = Texture.Width * Texture.Height;
-                uint[] buffer = GetBuffer(size);
-                //uint[] buffer = new uint[size];
 
-                //var buffer = TEXTURE_MASK_BUFFER;
-                Texture.GetData(buffer, 0, size);
+            var size = Texture.Width * Texture.Height;
+            uint[] buffer = GetBuffer(size);
+            //uint[] buffer = new uint[size];
 
-                var didChange = false;
+            //var buffer = TEXTURE_MASK_BUFFER;
+            Texture.GetData(buffer, 0, size);
 
-                for (int i = 0; i < size; i++)
+            var didChange = false;
+
+            for (int i = 0; i < size; i++)
+            {
+                if (ColorsFrom.Contains(buffer[i]))
                 {
-                    if (ColorsFrom.Contains(buffer[i]))
-                    {
-                        didChange = true;
-                        buffer[i] = ColorTo;
-                    }
+                    didChange = true;
+                    buffer[i] = ColorTo;
                 }
+            }
 
-                if (didChange)
-                {
-                    Texture.SetData(buffer, 0, size);
-                }
+            if (didChange)
+            {
+                Texture.SetData(buffer, 0, size);
+            }
         }
 
         public static void ManualTextureMaskSingleThreaded(ref Texture2D Texture, uint[] ColorsFrom)
         {
             var ColorTo = Color.Transparent.PackedValue;
-            
+
             var size = Texture.Width * Texture.Height;
             uint[] buffer = new uint[size];
 
@@ -294,7 +290,7 @@ namespace FSO.Common.Utils
         public static Texture2D Decimate(Texture2D Texture, GraphicsDevice gd, int factor, bool disposeOld)
         {
             if (Texture.Width < factor || Texture.Height < factor) return Texture;
-            var size = Texture.Width * Texture.Height*4;
+            var size = Texture.Width * Texture.Height * 4;
             byte[] buffer = new byte[size];
 
             Texture.GetData(buffer);
@@ -303,7 +299,7 @@ namespace FSO.Common.Utils
             var newHeight = Texture.Height / factor;
             var target = new byte[newWidth * newHeight * 4];
 
-            for (int y=0; y<Texture.Height; y += factor)
+            for (int y = 0; y < Texture.Height; y += factor)
             {
                 for (int x = 0; x < Texture.Width; x += factor)
                 {
@@ -314,17 +310,17 @@ namespace FSO.Common.Utils
                         if (targy >= newHeight || targx >= newWidth) continue;
                         int avg = 0;
                         int total = 0;
-                        for (int yo = y; yo < y+factor && yo < Texture.Height; yo++)
+                        for (int yo = y; yo < y + factor && yo < Texture.Height; yo++)
                         {
-                            for (int xo = x; xo < x+factor && xo < Texture.Width; xo++)
+                            for (int xo = x; xo < x + factor && xo < Texture.Width; xo++)
                             {
-                                avg += (int)buffer[(yo * Texture.Width + xo)*4 + c];
+                                avg += (int)buffer[(yo * Texture.Width + xo) * 4 + c];
                                 total++;
                             }
                         }
 
                         avg /= total;
-                        target[(targy * newWidth + targx)*4 + c] = (byte)avg;
+                        target[(targy * newWidth + targx) * 4 + c] = (byte)avg;
                     }
                 }
             }
@@ -537,8 +533,8 @@ namespace FSO.Common.Utils
 
                     var minCI = (uint)data[blockI++];
                     minCI |= (uint)data[blockI++] << 8;
-                    
-                    var maxCol = new Color((int)((maxCI >> 11) & 31), (int)((maxCI >> 6) & 31), (int)(maxCI & 31)) * (255f/31f);
+
+                    var maxCol = new Color((int)((maxCI >> 11) & 31), (int)((maxCI >> 6) & 31), (int)(maxCI & 31)) * (255f / 31f);
                     var minCol = new Color((int)((minCI >> 11) & 31), (int)((minCI >> 6) & 31), (int)(minCI & 31)) * (255f / 31f);
 
                     uint col = data[blockI++];
@@ -547,20 +543,20 @@ namespace FSO.Common.Utils
                     col |= (uint)data[blockI++] << 24;
 
                     var i = 0;
-                    for (int y=0; y<4; y++)
+                    for (int y = 0; y < 4; y++)
                     {
-                        for (int x=0; x<4; x++)
+                        for (int x = 0; x < 4; x++)
                         {
-                            var abit = (alpha >> (i*3)) & 0x7;
+                            var abit = (alpha >> (i * 3)) & 0x7;
                             var cbit = (col >> (i * 2)) & 0x3;
                             i++;
                             Color col2;
                             switch (cbit)
                             {
                                 case 1:
-                                    col2 = minCol;break;
+                                    col2 = minCol; break;
                                 case 2:
-                                    col2 = Color.Lerp(minCol, maxCol, 2/3f); break;
+                                    col2 = Color.Lerp(minCol, maxCol, 2 / 3f); break;
                                 case 3:
                                     col2 = Color.Lerp(minCol, maxCol, 1 / 3f); break;
                                 default:
@@ -571,9 +567,9 @@ namespace FSO.Common.Utils
                             else
                             {
                                 var a = (8 - abit) / 7f;
-                                col2.A = (byte)(maxA*a + minA * (1-a));
+                                col2.A = (byte)(maxA * a + minA * (1 - a));
                             }
-                            
+
                             result[targ2I++] = col2;
                         }
                         targ2I += width - 4;
@@ -592,7 +588,8 @@ namespace FSO.Common.Utils
             var blockI = 0;
             for (int by = 0; by < blockH; by++)
             {
-                for (int bx = 0; bx < blockW; bx++) {
+                for (int bx = 0; bx < blockW; bx++)
+                {
                     var block = new Color[16];
 
                     var ti = 0;
@@ -600,9 +597,9 @@ namespace FSO.Common.Utils
                     {
                         var realy = ((by << 2) + y);
                         if (realy >= height) break;
-                        var i = realy * width + (bx<<2);
+                        var i = realy * width + (bx << 2);
 
-                        
+
                         for (int x = 0; x < 4; x++)
                         {
                             if ((x + (bx << 2)) >= width)
@@ -641,7 +638,7 @@ namespace FSO.Common.Utils
 
                     result[blockI++] = (byte)(colorBin1 & 0xFF);
                     result[blockI++] = (byte)((colorBin1 >> 8) & 0xFF);
-                       
+
                     var indices = GetColorIndices(block, color0, color1);
                     result[blockI++] = (byte)indices;
                     result[blockI++] = (byte)(indices >> 8);
@@ -708,7 +705,7 @@ namespace FSO.Common.Utils
                         // Transparent
                         indices = GetA1ColorIndices(block, color0, color1);
                     }
-                    
+
                     result[blockI++] = (byte)indices;
                     result[blockI++] = (byte)(indices >> 8);
                     result[blockI++] = (byte)(indices >> 16);
@@ -909,24 +906,24 @@ namespace FSO.Common.Utils
             if (nw == 0 && nh == 0) return null;
             if (nw == 0) { nw = 1; liney = true; }
             if (nh == 0) { nh = 1; linex = true; }
-            var size = nw*nh;
+            var size = nw * nh;
             Color[] buffer = new Color[size];
 
             int tind = 0;
             int fyind = 0;
-            for (int y = 0; y < nh; y ++)
+            for (int y = 0; y < nh; y++)
             {
                 var yb = y * 2 == h || linex;
                 int find = fyind;
-                for (int x = 0; x < nw; x ++)
+                for (int x = 0; x < nw; x++)
                 {
                     var xb = x * 2 == h || liney;
                     var c1 = old[find];
-                    var c2 = (xb)?Color.Transparent:old[find + 1];
-                    var c3 = (yb)?Color.Transparent:old[find + w];
-                    var c4 = (xb || yb)?Color.Transparent:old[find + 1 + w];
+                    var c2 = (xb) ? Color.Transparent : old[find + 1];
+                    var c3 = (yb) ? Color.Transparent : old[find + w];
+                    var c4 = (xb || yb) ? Color.Transparent : old[find + 1 + w];
 
-                    int r=0, g=0, b=0, t=0;
+                    int r = 0, g = 0, b = 0, t = 0;
                     if (c1.A > 0)
                     {
                         r += c1.R; g += c1.G; b += c1.B; t++;
@@ -983,7 +980,7 @@ namespace FSO.Common.Utils
                     var c3 = (yb) ? Color.Transparent : old[find + w];
                     var c4 = (xb || yb) ? Color.Transparent : old[find + 1 + w];
 
-                    int r = 0, g = 0, b = 0, a=0, t = 0;
+                    int r = 0, g = 0, b = 0, a = 0, t = 0;
                     if (c1.A > 0)
                     {
                         r += c1.R; g += c1.G; b += c1.B; a += c1.A; t++;
@@ -1081,12 +1078,12 @@ namespace FSO.Common.Utils
                 gd,
                 newWidth, newHeight, false,
                 SurfaceFormat.Color, DepthFormat.None);
-           
+
             Rectangle destinationRectangle = new Rectangle(0, 0, newWidth, newHeight);
             lock (gd)
             {
                 gd.SetRenderTarget(renderTarget);
-                gd.Clear(Color.TransparentBlack);
+                gd.Clear(ColorExtensions.TransparentBlack);
                 SpriteBatch batch = new SpriteBatch(gd);
                 batch.Begin();
                 batch.Draw(texture, destinationRectangle, Color.White);

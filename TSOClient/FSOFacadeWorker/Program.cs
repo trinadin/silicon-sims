@@ -18,11 +18,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
 
 namespace FSOFacadeWorker
 {
@@ -145,7 +140,7 @@ namespace FSOFacadeWorker
         public static void Login()
         {
             api = new ApiClient(Config.Api_Url);
-            api.AdminLogin(Config.User, Config.Password, (result) =>
+            _ = api.AdminLoginAsync(Config.User, Config.Password, (result) =>
             {
                 if (!result)
                 {
@@ -160,15 +155,15 @@ namespace FSOFacadeWorker
                     }
                     else
                     {
-                        api.GetLotList(1, (lots) =>
+                        _ = api.GetLotList(1, (lots) =>
                         {
                             Console.WriteLine("Got a lot list for full thumbnail rebake.");
-                        //LotQueue.AddRange(lots);
-                        //TotalLotNum += lots.Length;
-                        //for (int i = 0; i < 4000; i++)
-                        //{
-                        //    LotQueue.RemoveAt(0);
-                        //}
+                            //LotQueue.AddRange(lots);
+                            //TotalLotNum += lots.Length;
+                            //for (int i = 0; i < 4000; i++)
+                            //{
+                            //    LotQueue.RemoveAt(0);
+                            //}
                             RenderLot();
                         });
                     }
@@ -187,7 +182,8 @@ namespace FSOFacadeWorker
             }
 
             var image = Image.LoadPixelData<Rgba32>(data, width, height);
-            using (var stream = File.Open(path, FileMode.Create, FileAccess.Write, FileShare.None)) {
+            using (var stream = File.Open(path, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
                 image.SaveAsPng(stream);
             }
         }
@@ -252,7 +248,8 @@ namespace FSOFacadeWorker
                         LoginSent = false;
                         GameThread.OnWork.Set();
                         return;
-                    } else
+                    }
+                    else
                     {
                         if (Config.Sleep_Time == 0)
                         {
@@ -334,13 +331,13 @@ namespace FSOFacadeWorker
                 if (!LoginSent)
                 {
                     LoginSent = true;
-                    Console.WriteLine("Attempting Login... ("+(loginAttempts++)+")");
+                    Console.WriteLine("Attempting Login... (" + (loginAttempts++) + ")");
                     Login();
                 }
                 GameThread.OnWork.WaitOne(1000);
                 GameThread.DigestUpdate(null);
             }
-            
+
         }
 
         public static FSOF RenderFSOF(byte[] fsov, GraphicsDevice gd, bool compressed, Action<byte[]> thumbAction = null)
@@ -371,7 +368,7 @@ namespace FSOFacadeWorker
             facade.FLOOR_RES_PER_TILE = 2;
 
             SetAllLights(vm, world, 0.5f, 0);
- 
+
             if (thumbAction != null)
             {
                 var bigThumb = world.GetLotThumb(gd, null);

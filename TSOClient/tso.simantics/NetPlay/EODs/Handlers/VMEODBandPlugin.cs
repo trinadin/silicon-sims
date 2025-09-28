@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Timers;
-using FSO.SimAntics.Model;
+﻿using FSO.SimAntics.Model;
 using FSO.SimAntics.NetPlay.EODs.Model;
 using FSO.SimAntics.NetPlay.EODs.Utils;
+using System.Timers;
 
 namespace FSO.SimAntics.NetPlay.EODs.Handlers
 {
@@ -16,7 +14,7 @@ namespace FSO.SimAntics.NetPlay.EODs.Handlers
         private EODLobby<VMEODBandSlot> Lobby;
         private Random IsBuzzNoteRandom = new Random();
         private Random NonBuzzNoteRandom = new Random();
-        private Timer SequenceTimer;
+        private System.Timers.Timer SequenceTimer;
         private List<byte> Song;
         private short CurrentSongLength;
         private int CurrentNote;
@@ -24,7 +22,7 @@ namespace FSO.SimAntics.NetPlay.EODs.Handlers
         private int TimerFrames;
         private decimal CombinedSkillAmount;
         private int[] PayoutScheme;
-        
+
         public const int PRESHOW_TIMER_DEFAULT = 10;
         public const int DECISION_TIMER_DEFAULT = 10;
         public const int NOTE_TIMER_DEFAULT = 10;
@@ -42,7 +40,7 @@ namespace FSO.SimAntics.NetPlay.EODs.Handlers
                     .OnFailedToJoinDisconnect();
 
             State = VMEODBandStates.Lobby;
-            SequenceTimer = new Timer(MILLISECONDS_PER_NOTE_IN_SEQUENCE);
+            SequenceTimer = new System.Timers.Timer(MILLISECONDS_PER_NOTE_IN_SEQUENCE);
             SequenceTimer.Elapsed += SequenceTimerElapsedHandler;
 
             InitPayoutScheme();
@@ -269,7 +267,7 @@ namespace FSO.SimAntics.NetPlay.EODs.Handlers
             var slot = Lobby.GetSlotData(client);
             if (slot == null)
                 return;
-            
+
             byte note = 9;
 
             lock (NoteDecision)
@@ -388,7 +386,7 @@ namespace FSO.SimAntics.NetPlay.EODs.Handlers
 
         private void SendTime()
         {
-            Lobby.Broadcast("Band_Timer", ""  + UITimer);
+            Lobby.Broadcast("Band_Timer", "" + UITimer);
         }
         private void InitGame(int Timer)
         {

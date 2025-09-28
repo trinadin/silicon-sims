@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
+using Color = Microsoft.Xna.Framework.Color;
+
 namespace FSO.IDE.EditorComponent.Model
 {
     public static class PGroupStyles

@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 
+using Color = Microsoft.Xna.Framework.Color;
+
 namespace FSO.IDE.EditorComponent
 {
     public class EditorResource

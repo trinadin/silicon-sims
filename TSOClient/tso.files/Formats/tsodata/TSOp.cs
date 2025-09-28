@@ -1,9 +1,5 @@
-﻿using FSO.Files.Utils;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using deltaq;
+﻿using DeltaQ.BsDiff;
+using FSO.Files.Utils;
 
 namespace TSOVersionPatcher
 {
@@ -95,7 +91,7 @@ namespace TSOVersionPatcher
             var rel = Uri.UnescapeDataString(uri.MakeRelativeUri(new Uri(path)).ToString()).Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
             if (rel.Contains(Path.DirectorySeparatorChar.ToString()) == false)
             {
-                rel = $".{ Path.DirectorySeparatorChar }{ rel }";
+                rel = $".{Path.DirectorySeparatorChar}{rel}";
             }
             return rel;
         }
@@ -137,7 +133,7 @@ namespace TSOVersionPatcher
 
                     Str.Seek(patch.Offset, SeekOrigin.Begin);
                     var patchd = reader.ReadBytes(patch.Length);
-                    BsPatch.Apply(data, patchd, File.Open(dpath, FileMode.Create, FileAccess.Write, FileShare.None));
+                    Patch.Apply(data, patchd, File.Open(dpath, FileMode.Create, FileAccess.Write, FileShare.None));
                     fileNum++;
                 }
 

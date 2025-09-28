@@ -12,6 +12,8 @@ using System.Linq;
 using FSO.Common.Rendering.Framework.Shapes;
 using FSO.LotView.Debug;
 
+using Color = Microsoft.Xna.Framework.Color;
+
 namespace FSO.IDE.Common.Debug
 {
     public class UI3DDGRP : UIInteractiveDGRP
@@ -44,7 +46,7 @@ namespace FSO.IDE.Common.Debug
         private float RotationX;
         private float RotationY;
         private bool MouseDown;
-        private Point LastMouse;
+        private Microsoft.Xna.Framework.Point LastMouse;
         public override void Update(UpdateState state)
         {
             Scene.Update(state);

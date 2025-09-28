@@ -1,21 +1,21 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content.Pipeline;
+using MSDFData;
+using RoyT.TrueType.Helpers;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content.Pipeline;
-using MSDFData;
-using RoyT.TrueType.Helpers;
 
 namespace MSDFExtension
 {
-    
+
     [ContentProcessor(DisplayName = "Field Font Processor")]
     public class FieldFontProcessor : ContentProcessor<FontDescription, FieldFont>
-    {        
+    {
         [DisplayName("msdfgen path")]
         [Description("Path to the msdfgen binary used to generate the multi-spectrum signed distance field")]
         [DefaultValue("msdfgen.exe")]
@@ -51,9 +51,9 @@ namespace MSDFExtension
                     i =>
                     {
                         var c = input.Characters[i];
-                        glyphs[i] = CreateFieldGlyphForCharacter(c, input, msdfgen, objPath);                                               
+                        glyphs[i] = CreateFieldGlyphForCharacter(c, input, msdfgen, objPath);
                     });
-                
+
                 var kerning = ReadKerningInformation(input.Path, input.Characters);
                 return new FieldFont(input.Path, glyphs.Where(x => x != null).Select(x => x.Value).ToArray(), kerning, this.Range, Atlas.Finish());
             }
@@ -64,7 +64,7 @@ namespace MSDFExtension
         }
 
         private FieldGlyph? CreateFieldGlyphForCharacter(char c, FontDescription input, string msdfgen, string objPath)
-        {            
+        {
             var metrics = CreateDistanceFieldForCharacter(input, msdfgen, objPath, c);
             var path = GetOuputPath(objPath, input, c);
             int atlasIndex = 0;
@@ -72,7 +72,8 @@ namespace MSDFExtension
             {
                 using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                     atlasIndex = Atlas.AddChar(c, stream);
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 return null;
             }
@@ -80,7 +81,7 @@ namespace MSDFExtension
             var glyph = new FieldGlyph(c, atlasIndex, metrics);
 
             return glyph;
-        }    
+        }
 
         private Metrics CreateDistanceFieldForCharacter(FontDescription font, string msdfgen, string objPath, char c)
         {
@@ -90,9 +91,9 @@ namespace MSDFExtension
             {
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
-                Arguments = $"-font \"{font.Path}\" {(int)c} -o \"{outputPath}\" -size {res} {res} -pxrange {this.Range} -autoframe -printmetrics"                
+                Arguments = $"-font \"{font.Path}\" {(int)c} -o \"{outputPath}\" -size {res} {res} -pxrange {this.Range} -autoframe -printmetrics"
             };
-          
+
             var process = System.Diagnostics.Process.Start(startInfo);
             if (process == null)
             {
@@ -100,7 +101,7 @@ namespace MSDFExtension
             }
 
             var output = process.StandardOutput.ReadToEnd();
-            return ParseOutput(output);            
+            return ParseOutput(output);
         }
 
         private static Metrics ParseOutput(string output)
@@ -130,36 +131,42 @@ namespace MSDFExtension
             var args = text.Split(',');
             return new Vector2(FloatHelper.ParseInvariant(args[0]), FloatHelper.ParseInvariant(args[1]));
         }
-        
-        private static void ParseLine<T>(string line, string match, Func<string ,T> resultParser, ref T result)
+
+        private static void ParseLine<T>(string line, string match, Func<string, T> resultParser, ref T result)
         {
             if (line.StartsWith(match, StringComparison.InvariantCultureIgnoreCase))
             {
                 var value = line.Substring(match.Length).Trim();
-                result = resultParser(value);                
-            }            
+                result = resultParser(value);
+            }
         }
 
         private static List<KerningPair> ReadKerningInformation(string path, IReadOnlyList<char> characters)
         {
             var pairs = new List<KerningPair>();
-
             var font = RoyT.TrueType.TrueTypeFont.FromFile(path);
 
             foreach (var left in characters)
             {
                 foreach (var right in characters)
                 {
-                    var kerning = KerningHelper.GetHorizontalKerning(left, right, font);                          
-                    if (kerning > 0 || kerning < 0)
+                    try
                     {
-                        // Scale the kerning by the same factor MSDFGEN scales it
-                        pairs.Add(new KerningPair(left, right, kerning / 64.0f));
+                        var kerning = KerningHelper.GetHorizontalKerning(left, right, font);
+
+                        if (kerning != 0)
+                        {
+                            pairs.Add(new KerningPair(left, right, kerning / 64.0f));
+                        }
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        continue;
                     }
                 }
             }
 
             return pairs;
         }
-    }   
+    }
 }

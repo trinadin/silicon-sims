@@ -1,7 +1,7 @@
-﻿using System.Timers;
-using FSO.Client.UI.Framework;
+﻿using FSO.Client.GameContent;
 using FSO.Client.UI.Controls;
-using FSO.Client.GameContent;
+using FSO.Client.UI.Framework;
+using System.Timers;
 
 namespace FSO.Client.UI.Screens
 {
@@ -9,7 +9,7 @@ namespace FSO.Client.UI.Screens
     {
         private UIImage m_EALogo;
         private UIContainer BackgroundCtnr;
-        private Timer m_CheckProgressTimer;
+        private System.Timers.Timer m_CheckProgressTimer;
 
         public EALogo()
             : base()
@@ -27,7 +27,7 @@ namespace FSO.Client.UI.Screens
 
             this.Add(BackgroundCtnr);
 
-            m_CheckProgressTimer = new Timer();
+            m_CheckProgressTimer = new System.Timers.Timer();
             m_CheckProgressTimer.Interval = 5000;
             m_CheckProgressTimer.Elapsed += new ElapsedEventHandler(m_CheckProgressTimer_Elapsed);
             m_CheckProgressTimer.Start();

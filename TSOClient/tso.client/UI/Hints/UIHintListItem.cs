@@ -1,10 +1,9 @@
 ﻿using FSO.Client.UI.Controls;
 using FSO.Client.UI.Framework;
+using FSO.Common.Rendering.Framework.Model;
 using FSO.Common.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using FSO.Common.Rendering.Framework.Model;
 
 namespace FSO.Client.UI.Hints
 {
@@ -16,7 +15,7 @@ namespace FSO.Client.UI.Hints
         public bool Category;
         public string Name;
 
-        public Color Col = Color.TransparentBlack;
+        public Color Col = Color.Transparent;
         public int Index;
 
         public List<UIHintListItem> ChildItems;
@@ -41,13 +40,14 @@ namespace FSO.Client.UI.Hints
                 Label.CaptionStyle.Color = Color.White;
                 Label.CaptionStyle.Size = 11;
                 Col = new Color(31, 46, 63);
-            } else
+            }
+            else
             {
                 if (Index % 2 == 1) Col = new Color(31, 46, 63) * 0.25f;
                 Label.CaptionStyle.Size = 9;
             }
-            Label.Size = new Vector2(227-Indent, 24);
-            Label.X += 7+Indent;
+            Label.Size = new Vector2(227 - Indent, 24);
+            Label.X += 7 + Indent;
             Label.Alignment = TextAlignment.Middle | TextAlignment.Left;
             Add(Label);
 
@@ -87,7 +87,7 @@ namespace FSO.Client.UI.Hints
 
         public void Deselect()
         {
-            Label.CaptionStyle.Color = (FSOFacade.Hints.ShownGUIDs.Contains(Hint.GUID))?Color.LightBlue:TextStyle.DefaultLabel.Color;
+            Label.CaptionStyle.Color = (FSOFacade.Hints.ShownGUIDs.Contains(Hint.GUID)) ? Color.LightBlue : TextStyle.DefaultLabel.Color;
             Selected = false;
         }
     }

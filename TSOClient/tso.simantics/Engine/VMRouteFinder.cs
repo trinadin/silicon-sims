@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using FSO.Files.Formats.IFF.Chunks;
 using Microsoft.Xna.Framework;
-using TSO.Files.formats.iff.chunks;
 
 namespace TSO.Simantics.engine
 {
@@ -27,18 +23,20 @@ namespace TSO.Simantics.engine
              * Then pick the one nearest to the optimal value
              */
             var result = new List<VMFindLocationResult>();
-            
+
             var proximity = minProximity;
             var proximityIncrement = 16;
             var proximityNudge = proximityIncrement * 0.25f;
             var currentDepth = 1.0f;
 
-            while (proximity <= maxProximity){
+            while (proximity <= maxProximity)
+            {
                 var angle = 0.0f;
                 /** Every time we move out by 1 tile in proximity, there will be more tiles to look at **/
                 var angleIncrement = 360.0f / (currentDepth * 8);
 
-                while (angle < 360.0f){
+                while (angle < 360.0f)
+                {
                     var radians = angle * (Math.PI / 180.0f);
                     var radius = proximity + proximityNudge;
 
@@ -50,12 +48,13 @@ namespace TSO.Simantics.engine
 
                     var direction = GetDirection(center, new Vector2(tileX, tileY));
 
-                    if ((flags&direction) == direction)
+                    if ((flags & direction) == direction)
                     {
                         //TODO: Check if slot is occupied or out of bounds
 
                         /** This is acceptible to the slot :) **/
-                        result.Add(new VMFindLocationResult {
+                        result.Add(new VMFindLocationResult
+                        {
                             Direction = direction,
                             Position = new Vector2(tileX, tileY),
                             Proximity = proximity
@@ -80,21 +79,31 @@ namespace TSO.Simantics.engine
         /// <param name="center"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        public static SLOTFlags GetDirection(Vector2 center, Vector2 target){
+        public static SLOTFlags GetDirection(Vector2 center, Vector2 target)
+        {
             target.X -= center.X;
             target.Y -= center.Y;
 
-            if (target.Y < 0){
-                if (target.X > 0){
+            if (target.Y < 0)
+            {
+                if (target.X > 0)
+                {
                     return SLOTFlags.NORTH_EAST;
-                }else if (target.X < 0){
+                }
+                else if (target.X < 0)
+                {
                     return SLOTFlags.NORTH_WEST;
                 }
                 return SLOTFlags.NORTH;
-            }else if (target.Y > 0){
-                if (target.X > 0){
+            }
+            else if (target.Y > 0)
+            {
+                if (target.X > 0)
+                {
                     return SLOTFlags.SOUTH_EAST;
-                }else if (target.Y < 0){
+                }
+                else if (target.Y < 0)
+                {
                     return SLOTFlags.SOUTH_WEST;
                 }
                 return SLOTFlags.SOUTH;
@@ -116,7 +125,8 @@ namespace TSO.Simantics.engine
     {
         private int DesiredProximity;
 
-        public VMProximitySorter(int desiredProximity){
+        public VMProximitySorter(int desiredProximity)
+        {
             this.DesiredProximity = desiredProximity;
         }
 
@@ -128,12 +138,15 @@ namespace TSO.Simantics.engine
             var distanceX = Math.Abs(x.Proximity - DesiredProximity);
             var distanceY = Math.Abs(y.Proximity - DesiredProximity);
 
-            if (distanceX < distanceY){
-                return -1;
-            }else if (distanceX > distanceY)
+            if (distanceX < distanceY)
             {
                 return -1;
-            }else
+            }
+            else if (distanceX > distanceY)
+            {
+                return -1;
+            }
+            else
             {
                 return ((int)x.Direction).CompareTo((int)y.Direction);
             }

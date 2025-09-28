@@ -75,9 +75,9 @@ namespace FSO.IDE.ResourceBrowser
             new OBJDSelector[] { }
         };
 
-        private ContextMenu ResRightClick;
-        private MenuItem ResRCAlpha;
-        private MenuItem ResRCShowID;
+        private ContextMenuStrip ResRightClick;
+        private ToolStripMenuItem ResRCAlpha;
+        private ToolStripMenuItem ResRCShowID;
         private List<ObjectResourceEntry> VisibleChunks;
         private OBJDSelector[] ActiveSelectors;
 
@@ -88,15 +88,15 @@ namespace FSO.IDE.ResourceBrowser
         {
             InitializeComponent();
 
-            ResRightClick = new ContextMenu();
-            ResRCAlpha = new MenuItem() { Text = "Alphabetical Order", Index = 0, Checked = true };
+            ResRightClick = new ContextMenuStrip();
+            ResRCAlpha = new ToolStripMenuItem() { Text = "Alphabetical Order", MergeIndex = 0, Checked = true };
             ResRCAlpha.Click += ResRCAlpha_Select;
 
-            ResRCShowID = new MenuItem() { Text = "Show IDs", Index = 1, Checked = true };
+            ResRCShowID = new ToolStripMenuItem() { Text = "Show IDs", MergeIndex = 1, Checked = true };
             ResRCShowID.Click += ResRCShowID_Select;
 
-            ResRightClick.MenuItems.AddRange(new MenuItem[]{ ResRCAlpha, ResRCShowID });
-            ResList.ContextMenu = ResRightClick;
+            ResRightClick.Items.AddRange(new ToolStripItem[] { ResRCAlpha, ResRCShowID });
+            ResList.ContextMenuStrip = ResRightClick;
             ResList.DrawMode = DrawMode.OwnerDrawFixed;
             ResList.DrawItem += ResList_DrawItem;
         }

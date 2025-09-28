@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Timers;
-using FSO.Client.UI.Controls;
+﻿using FSO.Client.UI.Controls;
 using FSO.Client.UI.Framework;
 using FSO.Client.UI.Panels.EODs.Utils;
 using FSO.SimAntics.NetPlay.EODs.Handlers;
 using FSO.SimAntics.NetPlay.EODs.Handlers.Data;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.Timers;
 
 namespace FSO.Client.UI.Panels.EODs
 {
@@ -23,16 +20,16 @@ namespace FSO.Client.UI.Panels.EODs
         private string DealersName;
         private int DealingIndex;
         private UIVMPersonButton DealerPersonButton;
-        private Timer DealTimer;
+        private System.Timers.Timer DealTimer;
         private bool DecisionIsAllowed;
-        private Timer InvalidateTimer;
+        private System.Timers.Timer InvalidateTimer;
         private UIEODLobby Lobby;
         private int MaxAnteBet;
         private int MaxSideBet;
         private int MinAnteBet;
         private int MyPlayerNumber;
         private UIManageEODObjectPanel OwnerPanel;
-        
+
         // lower buttons
         private UIButton Ante1ChipButton;
         private UIButton Ante5ChipButton;
@@ -164,7 +161,7 @@ namespace FSO.Client.UI.Panels.EODs
             { (byte)VMEODHoldEmCasinoAlerts.Side_Bet_Too_High, GameFacade.Strings.GetString("f111", "53") }, // sidebet
             { (byte)VMEODHoldEmCasinoAlerts.Object_Broken, GameFacade.Strings.GetString("f111", "90") }
         };
-        
+
         public UIHoldEmCasinoEOD(UIEODController controller) : base(controller)
         {
             InitLowerUI();
@@ -226,10 +223,10 @@ namespace FSO.Client.UI.Panels.EODs
             PlaintextHandlers["holdemcasino_resume_manage"] = ResumeManageHandler;
 
             // other
-            DealTimer = new Timer(1400);
+            DealTimer = new System.Timers.Timer(1400);
             DealTimer.Elapsed += new ElapsedEventHandler(DealTimerHandler);
             DealersName = "MOMI";
-            InvalidateTimer = new Timer(1000);
+            InvalidateTimer = new System.Timers.Timer(1000);
             InvalidateTimer.Elapsed += new ElapsedEventHandler((obj, args) => { Parent.Invalidate(); });
             InvalidateTimer.Start();
         }
@@ -372,7 +369,7 @@ namespace FSO.Client.UI.Panels.EODs
                 Player4SideBetLabel.Visible = false;
                 DealerBetBack.Visible = false;
                 DealerBetAmount.Visible = false;
-                
+
                 // parse the data and add owner panel
                 int tempBalance;
                 int tempMinAnte;
@@ -593,7 +590,7 @@ namespace FSO.Client.UI.Panels.EODs
             {
                 // update AnteBet and the Bets for the (upper) fields pertaining to MyPlayerNumber
                 var betStrings = VMEODGameCompDrawACardData.DeserializeStrings(bets);
-                
+
                 SetMyAnteBet(betStrings[0]);
                 SetMySideBet(betStrings[1]);
             }
@@ -665,7 +662,8 @@ namespace FSO.Client.UI.Panels.EODs
         {
             if (playersPlaying != null & playersPlaying.Length == 4)
             {
-                for (int index = 0; index < 4; index++) {
+                for (int index = 0; index < 4; index++)
+                {
                     if (playersPlaying[index] == 1)
                     {
                         UpdateUpperPlayerHand(index + 1, "Back", "Back");
@@ -1018,7 +1016,7 @@ namespace FSO.Client.UI.Panels.EODs
             {
                 CardsToDeal.Add(new string[] { "6", cardName });
             }
-            
+
             // set the index for dealing and start the timer
             DealingIndex = -1;
 
@@ -1105,7 +1103,8 @@ namespace FSO.Client.UI.Panels.EODs
             CallButton.Disabled = !isAllowed;
             FoldButton.Disabled = !isAllowed;
         }
-        private void UpdateUserInput(bool allowed) {
+        private void UpdateUserInput(bool allowed)
+        {
             Ante1ChipButton.Disabled = !allowed;
             Ante5ChipButton.Disabled = !allowed;
             Ante10ChipButton.Disabled = !allowed;
@@ -1216,7 +1215,7 @@ namespace FSO.Client.UI.Panels.EODs
                 Disabled = true
             };
             Add(Ante100ChipButton);
-            
+
 
             // buttons for side bets
             Side1ChipButton = new UIButton(Chip1ButtonTexture)
@@ -1259,7 +1258,7 @@ namespace FSO.Client.UI.Panels.EODs
             };
             Side100ChipButton.Y = Ante100ChipButton.Y + 47;
             Add(Side100ChipButton);
-            
+
 
             // diving line
             var horizontalDivider = new UIHighlightSprite(107, 1, 0.25f);
@@ -1419,10 +1418,16 @@ namespace FSO.Client.UI.Panels.EODs
             SideBet.OnChange += MySideBetHandler;
             SubmitBetsButton.OnButtonClick += (btn) => { SubmitBetsHandler(); };
             CallAndFoldHelpButton.OnButtonClick += (btn) => { ShowUIAlert(Holdem, AlertStrings[(byte)VMEODHoldEmCasinoAlerts.Call_Fold_Help], null); };
-            HelpAnteBetButton.OnButtonClick += (btn) => { ShowUIAlert(Holdem,
-                AlertStrings[(byte)VMEODHoldEmCasinoAlerts.Ante_Bet_Help].Replace("%n", "" + MinAnteBet).Replace("%x", "" + MaxAnteBet), null); };
-            HelpSideBetButton.OnButtonClick += (btn) => { ShowUIAlert(Holdem,
-                AlertStrings[(byte)VMEODHoldEmCasinoAlerts.Side_Bet_Help].Replace("Min: $%n ", "").Replace("%x", "" + MaxSideBet), null); };
+            HelpAnteBetButton.OnButtonClick += (btn) =>
+            {
+                ShowUIAlert(Holdem,
+                AlertStrings[(byte)VMEODHoldEmCasinoAlerts.Ante_Bet_Help].Replace("%n", "" + MinAnteBet).Replace("%x", "" + MaxAnteBet), null);
+            };
+            HelpSideBetButton.OnButtonClick += (btn) =>
+            {
+                ShowUIAlert(Holdem,
+                AlertStrings[(byte)VMEODHoldEmCasinoAlerts.Side_Bet_Help].Replace("Min: $%n ", "").Replace("%x", "" + MaxSideBet), null);
+            };
             ClearAnteBetButton.OnButtonClick += (btn) => { ClearAnteBet(); };
             ClearSideBetButton.OnButtonClick += (btn) => { ClearSideBet(); };
             CallButton.OnButtonClick += (btn) => { CallOrFoldHandler(1); };
@@ -1460,7 +1465,7 @@ namespace FSO.Client.UI.Panels.EODs
             // community and player cards
             CommunityHand = new FiveCardHand(1.25f)
             {
-                Position = (new Vector2 (503, 321) - new Vector2(CommunityCardsWidth * 1.25f, 0)) / 2
+                Position = (new Vector2(503, 321) - new Vector2(CommunityCardsWidth * 1.25f, 0)) / 2
             };
             CommunityHand.X += 64;
             Add(CommunityHand);
@@ -1967,7 +1972,7 @@ namespace FSO.Client.UI.Panels.EODs
         private UIImage Card3 = new UIImage();
         private UIImage Card4 = new UIImage();
         private UIImage Card5 = new UIImage();
-        
+
         public FiveCardHand(float targetScale)
         {
             // add the background
@@ -1976,7 +1981,7 @@ namespace FSO.Client.UI.Panels.EODs
             _CurrentScale = Background.ScaleX = Background.ScaleY = targetScale;
             Background.Reset();
             Add(Background);
-            
+
             // add the cards
             Card1.ScaleX = Card1.ScaleY = _CurrentScale;
             Card1.Position = _CurrentScale * CardStartOffset;

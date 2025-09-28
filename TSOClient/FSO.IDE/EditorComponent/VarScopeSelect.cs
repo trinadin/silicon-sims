@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace FSO.IDE.EditorComponent
 {
@@ -155,6 +156,8 @@ namespace FSO.IDE.EditorComponent
                 return SelectedDef.ID;
             }
         }
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public short SelectedData {
             set { DataValue.Value = value; }
             get { return (short)DataValue.Value; }

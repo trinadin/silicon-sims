@@ -1,23 +1,20 @@
-﻿using FSO.Client.UI.Controls;
+﻿using FSO.Client.Controllers;
+using FSO.Client.Controllers.Panels;
+using FSO.Client.UI.Controls;
 using FSO.Client.UI.Framework;
+using FSO.Client.UI.Model;
+using FSO.Client.UI.Screens;
+using FSO.Client.Utils;
+using FSO.Common.DataService.Model;
+using FSO.Common.Rendering.Framework.Model;
 using FSO.Common.Utils;
+using FSO.HIT;
 using FSO.SimAntics.Model;
+using FSO.SimAntics.Model.TSOPlatform;
+using FSO.SimAntics.NetPlay.Model.Commands;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using FSO.Common.Rendering.Framework.Model;
-using FSO.SimAntics.NetPlay.Model.Commands;
-using FSO.HIT;
-using FSO.Client.UI.Model;
-using FSO.SimAntics.Model.TSOPlatform;
-using FSO.Client.Utils;
-using FSO.Client.Controllers.Panels;
-using FSO.Client.Controllers;
-using FSO.Common.DataService.Model;
-using FSO.Client.UI.Screens;
 
 namespace FSO.Client.UI.Panels
 {
@@ -187,7 +184,7 @@ namespace FSO.Client.UI.Panels
             this.RenderScript("statisticspanel.uis");
         }
     }
-    
+
     /// <summary>
     /// Set roommate build permissions. Check buttons disabled as anything but owner.
     /// </summary>
@@ -214,7 +211,7 @@ namespace FSO.Client.UI.Panels
             TitleLabel.Y -= 8;
 
             var buildico = new UIImage(BuildIconImage);
-            buildico.Position = new Vector2(30-18, 30+34+8); //to the left of all the checkboxes
+            buildico.Position = new Vector2(30 - 18, 30 + 34 + 8); //to the left of all the checkboxes
             buildico.Tooltip = GameFacade.Strings.GetString("178", "2");
             UIUtils.GiveTooltip(buildico);
             Add(buildico);
@@ -255,7 +252,7 @@ namespace FSO.Client.UI.Panels
     {
         private List<UIPersonButton> RoommateButtons = new List<UIPersonButton>();
         private List<UIButton> CheckButtons = new List<UIButton>();
-        public event Callback<int> OnCheckChange; 
+        public event Callback<int> OnCheckChange;
         public bool Disabled = false;
         public UIRoommateCheckList() : base()
         {
@@ -293,8 +290,8 @@ namespace FSO.Client.UI.Panels
                 if (RoommateButtons[i].AvatarId != id)
                     RoommateButtons[i].AvatarId = id;
                 var builder = buildRoommates.Contains(id);
-                CheckButtons[i].ForceState = (Disabled) ? (builder ? 5 : 4) : (builder?3:-1);
-                CheckButtons[i].Tooltip = GameFacade.Strings.GetString("178", builder?"3":"4");
+                CheckButtons[i].ForceState = (Disabled) ? (builder ? 5 : 4) : (builder ? 3 : -1);
+                CheckButtons[i].Tooltip = GameFacade.Strings.GetString("178", builder ? "3" : "4");
             }
         }
     }
@@ -380,7 +377,7 @@ namespace FSO.Client.UI.Panels
                     cg.PersonPage.FindController<PersonPageController>()?.Show(id);
                 }
             };
-            
+
             if (lotController.vm.TSOState.OwnerID != lotController.vm.MyUID)
             {
                 AdmitAllButton.Disabled = true;
@@ -392,10 +389,10 @@ namespace FSO.Client.UI.Panels
 
         public void ChangePage(int delta)
         {
-            if (delta != 0) AdmitList.SetPage(Math.Max(0, Math.Min(AdmitList.Page + delta, AdmitList.TotalPages-1)));
+            if (delta != 0) AdmitList.SetPage(Math.Max(0, Math.Min(AdmitList.Page + delta, AdmitList.TotalPages - 1)));
 
             PreviousPageButton.Disabled = (AdmitList.Page == 0);
-            NextPageButton.Disabled = (AdmitList.Page == AdmitList.TotalPages-1);
+            NextPageButton.Disabled = (AdmitList.Page == AdmitList.TotalPages - 1);
         }
 
         public void SetResults(List<Avatar> avas)
@@ -503,12 +500,12 @@ namespace FSO.Client.UI.Panels
             if (page >= TotalPages || page < 0) return;
             List1.SelectedIndex = -1;
             List2.SelectedIndex = -1;
-            var sublist1 = Data.GetRange(page*8, Math.Min(4,Data.Count-page*8));
+            var sublist1 = Data.GetRange(page * 8, Math.Min(4, Data.Count - page * 8));
             List1.Items = sublist1.ConvertAll(x => new UIListBoxItem(x, new ValuePointer(x, "Avatar_Name")));
 
             if (page * 8 + 4 < Data.Count)
             {
-                var sublist2 = Data.GetRange(page * 8 + 4, Math.Min(4, Data.Count - (page * 8+4)));
+                var sublist2 = Data.GetRange(page * 8 + 4, Math.Min(4, Data.Count - (page * 8 + 4)));
                 List2.Items = sublist2.ConvertAll(x => new UIListBoxItem(x, new ValuePointer(x, "Avatar_Name")));
             }
             else List2.Items = new List<UIListBoxItem>();
@@ -660,7 +657,7 @@ namespace FSO.Client.UI.Panels
 
             OldLotSize = lotInfo.Size;
 
-            UpdateSizeTarget = Math.Min(Math.Max(lotSize, UpdateSizeTarget), VMBuildableAreaInfo.BuildableSizes.Length-1);
+            UpdateSizeTarget = Math.Min(Math.Max(lotSize, UpdateSizeTarget), VMBuildableAreaInfo.BuildableSizes.Length - 1);
             UpdateFloorsTarget = Math.Min(Math.Max(lotFloors, UpdateFloorsTarget), 3);
             var totalTarget = UpdateFloorsTarget + UpdateSizeTarget;
             var totalOld = lotSize + lotFloors;
@@ -673,7 +670,7 @@ namespace FSO.Client.UI.Panels
             if (baseCost + roomieCost > (LotControl.ActiveEntity?.TSOState.Budget.Value ?? 0)) AcceptButton.Disabled = true; //can't afford
 
             //TODO: read from uiscript
-            TotalCostLabel.CaptionStyle.Color = (AcceptButton.Disabled)?new Color(255, 125, 125):TextStyle.DefaultLabel.Color;
+            TotalCostLabel.CaptionStyle.Color = (AcceptButton.Disabled) ? new Color(255, 125, 125) : TextStyle.DefaultLabel.Color;
 
             var targetTiles = VMBuildableAreaInfo.BuildableSizes[UpdateSizeTarget];
 
@@ -688,7 +685,7 @@ namespace FSO.Client.UI.Panels
                 new string[] { (UpdateSizeTarget+1) + "+" + UpdateFloorsTarget }
             };
 
-            for (int i=0; i<Labels.Count; i++)
+            for (int i = 0; i < Labels.Count; i++)
             {
                 Labels[i].Caption = GetArgsString(SavedInitialText[i], applyText[i]);
             }
@@ -714,7 +711,7 @@ namespace FSO.Client.UI.Panels
         {
             var gd = GameFacade.GraphicsDevice;
             gd.SetRenderTarget(PreviewTarget);
-            gd.Clear(Color.TransparentBlack);
+            gd.Clear(Color.Transparent);
             Batch.Begin();
 
             //64x32 base lot with a 4px border from bottom, left and right edges.
@@ -726,12 +723,12 @@ namespace FSO.Client.UI.Panels
 
             var shadO = new Vector2(1, 1); //shadow offset
             var left = new Vector2(4, (72 - 4) - 16);
-            var bottom = new Vector2(72/2, (72 - 4));
+            var bottom = new Vector2(72 / 2, (72 - 4));
             var right = new Vector2(72 - 4, (72 - 4) - 16);
-            var top = new Vector2(72/2, (72 - 4) - 32);
+            var top = new Vector2(72 / 2, (72 - 4) - 32);
 
             var ctrBase = (left + bottom) / 2;
-            var ltc = (bottom - left)/2;
+            var ltc = (bottom - left) / 2;
 
             DrawPath(Color.Black, Batch, 2, true, left + shadO, bottom + shadO, right + shadO, top + shadO);
             DrawPath(baseCol, Batch, 2, true, left, bottom, right, top);
@@ -745,7 +742,7 @@ namespace FSO.Client.UI.Panels
 
             if (newFloors > oldFloors || newSize > oldSize)
             {
-                DrawLineStack(Color.Black, nTop+shadO, nRight+shadO, 5, newFloors, Batch, newT);
+                DrawLineStack(Color.Black, nTop + shadO, nRight + shadO, 5, newFloors, Batch, newT);
                 DrawLineStack(newCol, nTop, nRight, 5, newFloors, Batch, newT);
             }
 
@@ -788,7 +785,7 @@ namespace FSO.Client.UI.Panels
 
         public override void Draw(UISpriteBatch batch)
         {
-            DrawLocalTexture(batch, BuildableAreaBackground.Texture, new Rectangle(138, 0, 46, 51), 
+            DrawLocalTexture(batch, BuildableAreaBackground.Texture, new Rectangle(138, 0, 46, 51),
                 BuildableAreaBackground.Position + new Vector2(138, 39), new Vector2(1));
             base.Draw(batch);
         }
@@ -797,7 +794,7 @@ namespace FSO.Client.UI.Panels
 
         private void DrawPath(Color tint, SpriteBatch batch, int lineWidth, bool complete, params Vector2[] path)
         {
-            for (int i=0; i<path.Length; i++)
+            for (int i = 0; i < path.Length; i++)
             {
                 if (i == path.Length - 1 && !complete) return;
                 DrawLine(tint, path[i], path[(i + 1) % path.Length], batch, lineWidth);
@@ -808,7 +805,7 @@ namespace FSO.Client.UI.Panels
         {
             DrawLine(tint, pt1, pt1 - new Vector2(0, height * levels), spriteBatch, lineWidth);
             DrawLine(tint, pt2, pt2 - new Vector2(0, height * levels), spriteBatch, lineWidth);
-            for (int i=1; i<=levels; i++)
+            for (int i = 1; i <= levels; i++)
             {
                 DrawLine(tint, pt1 - new Vector2(0, height * (i)), pt2 - new Vector2(0, height * (i)), spriteBatch, lineWidth);
             }
@@ -818,8 +815,8 @@ namespace FSO.Client.UI.Panels
         {
             double length = Math.Sqrt(Math.Pow(End.X - Start.X, 2) + Math.Pow(End.Y - Start.Y, 2));
             float direction = (float)Math.Atan2(End.Y - Start.Y, End.X - Start.X);
-            spriteBatch.Draw(TextureGenerator.GetPxWhite(spriteBatch.GraphicsDevice), new Rectangle((int)Start.X, (int)Start.Y - (int)(lineWidth / 2), (int)length, lineWidth), 
-                null, tint, direction, new Vector2(0, 0.5f), SpriteEffects.None, 0); 
+            spriteBatch.Draw(TextureGenerator.GetPxWhite(spriteBatch.GraphicsDevice), new Rectangle((int)Start.X, (int)Start.Y - (int)(lineWidth / 2), (int)length, lineWidth),
+                null, tint, direction, new Vector2(0, 0.5f), SpriteEffects.None, 0);
         }
 
         private string GetArgsString(string argsStr, string[] args)

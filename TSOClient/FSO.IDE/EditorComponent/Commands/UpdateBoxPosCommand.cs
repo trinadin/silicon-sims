@@ -2,6 +2,8 @@
 using FSO.IDE.EditorComponent.UI;
 using Microsoft.Xna.Framework;
 
+using Point = Microsoft.Xna.Framework.Point;
+
 namespace FSO.IDE.EditorComponent.Commands
 {
     public class UpdateBoxPosCommand : BHAVCommand

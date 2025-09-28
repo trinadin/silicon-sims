@@ -8,85 +8,80 @@ namespace MSDFExtension
 {
     public class AtlasBuilder
     {
-        public int Width;
-        public int Height;
-        public char[] CharMap;
-        private Rgba32[] RawData;
-        public int GlyphSize;
+        public int Width { get; }
+        public int Height { get; }
+        public char[] CharMap { get; }
+        private readonly Rgba32[] RawData;
+        public int GlyphSize { get; }
         private int Progress;
 
         public AtlasBuilder(int totalChars, int size)
         {
-            Progress = 0;
             int width = 1;
             int height = 1;
             while (width * height < totalChars)
             {
                 width *= 2;
                 if (width * height < totalChars)
-                {
                     height *= 2;
-                }
             }
 
             Width = width;
             Height = height;
             GlyphSize = size;
             CharMap = new char[totalChars];
+            RawData = new Rgba32[Width * Height * GlyphSize * GlyphSize];
             Progress = 0;
-
-            RawData = new Rgba32[width * height * size * size];
         }
 
         public int AddChar(char c, Stream imageData)
         {
-            var image = Image.Load(imageData);
+            using var image = Image.Load<Rgba32>(imageData);
+
+            if (image.Width != GlyphSize || image.Height != GlyphSize)
+            {
+                throw new ArgumentException($"Glyph image size must be {GlyphSize}x{GlyphSize} pixels.");
+            }
+
             var buf = new Rgba32[image.Width * image.Height];
-            image.SavePixelData(buf);
+            image.CopyPixelDataTo(buf);
+
             return AddChar(c, buf);
         }
 
         public int AddChar(char c, Rgba32[] imageData)
         {
+            if (imageData.Length != GlyphSize * GlyphSize)
+                throw new ArgumentException($"Pixel array length must be {GlyphSize * GlyphSize}.");
+
             lock (this)
             {
+                if (Progress >= CharMap.Length)
+                    throw new InvalidOperationException("Atlas is already full.");
+
                 CharMap[Progress] = c;
-                var x = (Progress % Width) * GlyphSize;
-                var y = (Progress / Width) * GlyphSize;
-                var lineWidth = (Width * GlyphSize);
-                var lineInd = x + y * lineWidth;
-                var ind = lineInd;
-                var srcInd = 0;
-                for (int oy = 0; oy < GlyphSize; oy++)
+
+                int xOffset = (Progress % Width) * GlyphSize;
+                int yOffset = (Progress / Width) * GlyphSize;
+                int lineWidth = Width * GlyphSize;
+
+                for (int y = 0; y < GlyphSize; y++)
                 {
-                    for (int ox = 0; ox < GlyphSize; ox++)
-                    {
-                        if (ind >= RawData.Length || ind < 0)
-                        {
-                            throw new Exception("dst oob: " + ind + "/" + RawData.Length);
-                        }
-                        if (srcInd >= imageData.Length || srcInd < 0)
-                        {
-                            throw new Exception("src oob: " + srcInd + "/" + imageData.Length);
-                        }
-                        RawData[ind++] = imageData[srcInd++];
-                    }
-                    lineInd += lineWidth;
-                    ind = lineInd;
+                    int dstIndex = (yOffset + y) * lineWidth + xOffset;
+                    int srcIndex = y * GlyphSize;
+                    Array.Copy(imageData, srcIndex, RawData, dstIndex, GlyphSize);
                 }
+
                 return Progress++;
             }
         }
 
         public byte[] Save()
         {
-            Image<Rgba32> result = Image.LoadPixelData<Rgba32>(RawData, Width * GlyphSize, Height * GlyphSize);
-
-            using (var str = new MemoryStream())
-            {
-                result.SaveAsPng(str);
-                return str.ToArray();
-            }
+            using var result = Image.LoadPixelData<Rgba32>(RawData, Width * GlyphSize, Height * GlyphSize);
+            using var ms = new MemoryStream();
+            result.SaveAsPng(ms);
+            return ms.ToArray();
         }
 
         public FieldAtlas Finish()

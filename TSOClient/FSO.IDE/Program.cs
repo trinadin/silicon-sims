@@ -68,6 +68,8 @@ namespace FSO.IDE
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Application.SetDefaultFont(new Font(new FontFamily("Segoe UI"), 8.25f));
+            Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             Files.Formats.IFF.Chunks.SPR2FrameEncoder.QuantizeFrame = SpriteEncoderUtils.QuantizeFrame;
             FSO.Files.Formats.IFF.IffFile.RETAIN_CHUNK_DATA = true;
             FSO.SimAntics.VM.SignalBreaks = true;

@@ -13,6 +13,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
 
+using Color = Microsoft.Xna.Framework.Color;
+
 namespace FSO.IDE.Common
 {
     public class UIInteractiveDGRP : UIContainer

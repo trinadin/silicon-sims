@@ -1,10 +1,5 @@
-﻿using FSO.Files.Formats.IFF.Chunks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -222,8 +217,8 @@ namespace FSO.Files
                     if (a != 255)
                     {
                         buffer[i] = (byte)((buffer[i] * a) / 255);
-                        buffer[i+1] = (byte)((buffer[i+1] * a) / 255);
-                        buffer[i+2] = (byte)((buffer[i+2] * a) / 255);
+                        buffer[i + 1] = (byte)((buffer[i + 1] * a) / 255);
+                        buffer[i + 2] = (byte)((buffer[i + 2] * a) / 255);
                     }
                 }
 
@@ -240,8 +235,8 @@ namespace FSO.Files
                         var a = rawA / 255f;
 
                         buffer[i] = (byte)(buffer[i] / a);
-                        buffer[i+1] = (byte)(buffer[i+1] / a);
-                        buffer[i+2] = (byte)(buffer[i+2] / a);
+                        buffer[i + 1] = (byte)(buffer[i + 1] / a);
+                        buffer[i + 2] = (byte)(buffer[i + 2] / a);
                     }
                 }
 

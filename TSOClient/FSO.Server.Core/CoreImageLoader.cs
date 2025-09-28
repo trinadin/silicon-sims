@@ -13,17 +13,21 @@ namespace FSO.Server.Core
             Image<Rgba32> result = null;
             try
             {
-                result = Image.Load(stream);
+                result = Image.Load<Rgba32>(stream);
             }
             catch (Exception)
             {
                 return new TexBitmap() { Data = new byte[0] };
             }
             stream.Close();
-            
-            if (result == null) return null;
-            var data = result.SavePixelData();
 
+            if (result == null) return null;
+
+            // Get pixel data
+            var data = new byte[result.Width * result.Height * 4];
+            result.CopyPixelDataTo(data);
+
+            // Swap red and blue channels
             for (int i = 0; i < data.Length; i += 4)
             {
                 var temp = data[i];

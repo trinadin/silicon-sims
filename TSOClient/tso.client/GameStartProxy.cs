@@ -1,6 +1,5 @@
 ﻿using FSO.LotView;
 using FSO.UI;
-using System;
 
 namespace FSO.Client
 {
@@ -15,26 +14,19 @@ namespace FSO.Client
         public void Start(bool useDX)
         {
             GameFacade.DirectX = useDX;
-			World.DirectX = useDX;
+            World.DirectX = useDX;
             TSOGame game = new TSOGame();
-
-            BindClosingHandler?.Invoke(HandleClosing, game.Window.Handle);
 
             game.Run();
             game.Dispose();
         }
 
-        public bool HandleClosing()
+        public void SetPath(string path)
         {
-            return FSOFacade.Controller?.CloseAttempt() ?? true;
+            GlobalSettings.Default.StartupPath = path;
+            GlobalSettings.Default.Windowed = false;
         }
 
-		public void SetPath(string path)
-		{
-			GlobalSettings.Default.StartupPath = path;
-            GlobalSettings.Default.Windowed = false;
-		}
 
-
-	}
+    }
 }

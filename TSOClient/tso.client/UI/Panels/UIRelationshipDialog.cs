@@ -1,15 +1,12 @@
-﻿using FSO.Client.UI.Controls;
-using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using FSO.Common.Rendering.Framework.Model;
+﻿using FSO.Client.Controllers;
+using FSO.Client.Controllers.Panels;
+using FSO.Client.UI.Controls;
 using FSO.Client.UI.Framework;
 using FSO.Common.DataService.Model;
-using System.Collections.Immutable;
-using FSO.Client.Controllers;
+using FSO.Common.Rendering.Framework.Model;
 using FSO.Common.Utils;
-using FSO.Client.Controllers.Panels;
+using Microsoft.Xna.Framework;
+using System.Collections.Immutable;
 
 namespace FSO.Client.UI.Panels
 {
@@ -65,7 +62,7 @@ namespace FSO.Client.UI.Panels
             ResultsBox.SetSize(510, 230);
             ResultsBox.RowHeight = 40;
             ResultsBox.NumVisibleRows = 6;
-            ResultsBox.SelectionFillColor = Color.TransparentBlack;
+            ResultsBox.SelectionFillColor = Color.Transparent;
             ResultsBox.UseChildElements = true;
             Add(ResultsBox);
 
@@ -221,7 +218,7 @@ namespace FSO.Client.UI.Panels
             IncomingButton.Visible = mode;
             OutgoingButton.Visible = !mode;
 
-            IncomingLabel.Caption = GameFacade.Strings.GetString("f106", ((mode)?"9":"8"));
+            IncomingLabel.Caption = GameFacade.Strings.GetString("f106", ((mode) ? "9" : "8"));
             OutgoingMode = mode;
             RedrawRels();
         }
@@ -251,7 +248,7 @@ namespace FSO.Client.UI.Panels
 
         private int OrderAlmostFriendly(Relationship rel)
         {
-            return Math.Abs(60-rel.Relationship_LTR);
+            return Math.Abs(60 - rel.Relationship_LTR);
         }
 
         private int OrderAlmostEnemy(Relationship rel)
@@ -373,7 +370,7 @@ namespace FSO.Client.UI.Panels
             Color bgcol = new Color((byte)(57 * p + 214 * (1 - p)), (byte)(97 * p), (byte)(90 * p));
 
             var Filler = TextureGenerator.GetPxWhite(batch.GraphicsDevice);
-            batch.Draw(Filler, LocalRect(x+1, y+1, 80, 6), new Color(23,38,55));
+            batch.Draw(Filler, LocalRect(x + 1, y + 1, 80, 6), new Color(23, 38, 55));
             batch.Draw(Filler, LocalRect(x, y, 80, 6), bgcol);
             batch.Draw(Filler, LocalRect(x, y, (int)(80 * p), 6), barcol);
             batch.Draw(Filler, LocalRect(x + (int)(80 * p), y, 1, 6), Color.Black);
@@ -392,7 +389,7 @@ namespace FSO.Client.UI.Panels
 
             DrawRel(batch, 40, 18, Rel.Relationship_STR);
             DrawRel(batch, 40, 26, Rel.Relationship_LTR);
-            if (Indicator != null) DrawLocalTexture(batch, Indicator, new Rectangle(Indicator.Width / 4, 0, Indicator.Width/4, Indicator.Height), new Vector2(142, 17));
+            if (Indicator != null) DrawLocalTexture(batch, Indicator, new Rectangle(Indicator.Width / 4, 0, Indicator.Width / 4, Indicator.Height), new Vector2(142, 17));
 
             if (Icon.Tooltip != null)
             {

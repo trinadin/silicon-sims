@@ -10,8 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:..\..\..\other\libs\MSDFExtension\bin\Debug\MSDFData.dll
-/reference:..\..\..\other\libs\MSDFExtension\bin\Debug\MSDFExtension.dll
+/reference:..\..\..\Other\libs\MSDFExtension\bin\Release\net8.0\MSDFExtension.dll
 
 #---------------------------------- Content ---------------------------------#
 

@@ -12,6 +12,8 @@ using FSO.LotView.Components;
 using Microsoft.Xna.Framework;
 using FSO.SimAntics.Engine.TSOTransaction;
 
+using Color = Microsoft.Xna.Framework.Color;
+
 namespace FSO.IDE.Common
 {
     public class UIThumbnailRenderer : UIContainer

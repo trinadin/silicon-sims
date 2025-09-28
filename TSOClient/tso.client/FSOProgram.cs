@@ -2,11 +2,7 @@
 using FSO.Client.Utils.GameLocator;
 using FSO.Common;
 using FSO.UI;
-using System;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading;
 
 namespace FSO.Client
 {
@@ -120,7 +116,7 @@ namespace FSO.Client
                 //check if this path has tso in it. tuning.dat should be a good indication.
                 if (!File.Exists(Path.Combine(path, "tuning.dat")))
                 {
-                    ShowDialog("The Sims Online appears to be missing. The game expects TSO at directory '"+path+"', but some core files are missing from that folder. If you know you installed TSO into a different directory, please move it into the directory specified.");
+                    ShowDialog("The Sims Online appears to be missing. The game expects TSO at directory '" + path + "', but some core files are missing from that folder. If you know you installed TSO into a different directory, please move it into the directory specified.");
                     return false;
                 }
 

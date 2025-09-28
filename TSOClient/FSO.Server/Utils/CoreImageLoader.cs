@@ -1,8 +1,6 @@
 ﻿using FSO.Content.Model;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.IO;
 
 namespace FSO.Server.Utils
 {
@@ -19,13 +17,19 @@ namespace FSO.Server.Utils
             {
                 return new TexBitmap() { Data = new byte[0] };
             }
-            stream.Close();
-            
+            finally
+            {
+                stream.Close();
+            }
+
             if (result == null) return null;
+
+            var pixels = new byte[result.Width * result.Height * 4];
+            result.CopyPixelDataTo(pixels);
 
             return new TexBitmap
             {
-                Data = result.SavePixelData(),
+                Data = pixels,
                 Width = result.Width,
                 Height = result.Height,
                 PixelSize = 4

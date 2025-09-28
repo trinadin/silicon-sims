@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 
+using Color = Microsoft.Xna.Framework.Color;
+
 namespace FSO.IDE.EditorComponent.UI
 {
     public class CommentContainer : UIContainer
@@ -109,7 +111,7 @@ namespace FSO.IDE.EditorComponent.UI
                     { "InvalidationDummy", 1 },
                 }, TweenQuad.EaseOut);
                 if (Collapsed) {
-                    AddCommentListener = ListenForMouse(new Rectangle(-5, -30, 35, 35), MouseEvent);
+                    AddCommentListener = ListenForMouse(new Microsoft.Xna.Framework.Rectangle(-5, -30, 35, 35), MouseEvent);
                 }
             }
         }
@@ -170,7 +172,7 @@ namespace FSO.IDE.EditorComponent.UI
             ClickLabel.Caption = (CommentEmpty) ? "+" : "..";
             ClickLabel.Visible = Collapsed;
             TextEdit.Visible = !Collapsed;
-            if (Collapsed) SetSize(new Rectangle());
+            if (Collapsed) SetSize(new Microsoft.Xna.Framework.Rectangle());
             else ResizeBasedOnTextEdit();
         }
 
@@ -203,7 +205,7 @@ namespace FSO.IDE.EditorComponent.UI
             SetSize(bounds);
         }
 
-        public void SetSize(Rectangle rect)
+        public void SetSize(Microsoft.Xna.Framework.Rectangle rect)
         {
             if (BgTween != null) BgTween.Complete();
             var margin = 7;
