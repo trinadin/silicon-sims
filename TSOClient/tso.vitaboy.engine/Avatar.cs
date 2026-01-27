@@ -537,7 +537,7 @@ namespace FSO.Vitaboy
             if (screenPos.Z < 0 || screenPos.Z > 1) return;
 
             // Calculate size based on projected world-space distance (proper perspective scaling)
-            float projectedSize = Math.Abs(screenPosOffset.Y - screenPos.Y) * 1.5f;
+            float projectedSize = Math.Abs(screenPosOffset.Y - screenPos.Y) * 2.5f;
             int censorSize = Math.Max(16, Math.Min(200, (int)projectedSize)); // Clamp to reasonable range
             int halfSize = censorSize / 2;
 
