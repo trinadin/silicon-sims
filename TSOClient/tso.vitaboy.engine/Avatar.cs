@@ -324,8 +324,42 @@ namespace FSO.Vitaboy
 
         // Censorship pixelation effect resources
         private static SpriteBatch _censorSpriteBatch;
-        private static RenderTarget2D _censorRenderTarget;
-        private static int _censorTargetSize = 8; // Small = more pixelated (8x8 pixels)
+
+        // Simple procedural mosaic texture for censorship
+        private static Texture2D _mosaicTexture;
+
+        private static void EnsureMosaicTexture(GraphicsDevice device)
+        {
+            if (_mosaicTexture != null && !_mosaicTexture.IsDisposed) return;
+
+            int size = 64; // 64x64 texture
+            int gridSize = 8; // 8x8 grid of squares
+            var colors = new Color[] {
+                new Color(255, 220, 180), // skin tone 1
+                new Color(240, 200, 160), // skin tone 2
+                new Color(220, 180, 140), // skin tone 3
+                new Color(200, 160, 120)  // skin tone 4
+            };
+
+            var data = new Color[size * size];
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    int gridX = x / (size / gridSize);
+                    int gridY = y / (size / gridSize);
+                    // Deterministic pattern based on grid position
+                    int colorIndex = (gridX + gridY * gridSize) % colors.Length;
+                    // Add some variation per grid cell
+                    colorIndex = (colorIndex + (gridX * 3 + gridY * 7)) % colors.Length;
+                    data[y * size + x] = colors[colorIndex];
+                }
+            }
+
+            _mosaicTexture = new Texture2D(device, size, size);
+            _mosaicTexture.SetData(data);
+        }
 
         /// <summary>
         /// Draws the meshes making up this Avatar instance.
@@ -487,136 +521,60 @@ namespace FSO.Vitaboy
         }
 
         /// <summary>
-        /// Draws a pixelated censor blur at the pelvis position.
-        /// Renders avatar to a small target, then scales up for pixelation effect.
+        /// Draws a simple procedural mosaic at the pelvis position.
+        /// Uses fixed sizes based on zoom level for consistent appearance.
         /// </summary>
         private void DrawCensoredMeshesPixelated(GraphicsDevice device, Effect effect, int censorshipFlags)
         {
-            // Initialize sprite batch if needed
-            if (_censorSpriteBatch == null || _censorSpriteBatch.IsDisposed ||
-                _censorSpriteBatch.GraphicsDevice != device)
-            {
-                _censorSpriteBatch?.Dispose();
+            EnsureMosaicTexture(device);
+
+            if (_censorSpriteBatch == null || _censorSpriteBatch.IsDisposed)
                 _censorSpriteBatch = new SpriteBatch(device);
-            }
 
-            // Create small render target for pixelation effect
-            if (_censorRenderTarget == null || _censorRenderTarget.IsDisposed ||
-                _censorRenderTarget.GraphicsDevice != device)
-            {
-                _censorRenderTarget?.Dispose();
-                _censorRenderTarget = new RenderTarget2D(device, _censorTargetSize, _censorTargetSize,
-                    false, SurfaceFormat.Color, DepthFormat.Depth24);
-            }
-
-            // Get the View and Projection matrices from the effect
+            // Get pelvis screen position
             var viewMatrix = effect.Parameters["View"].GetValueMatrix();
             var projMatrix = effect.Parameters["Projection"].GetValueMatrix();
             var worldMatrix = effect.Parameters["World"].GetValueMatrix();
 
-            // Find the pelvis bone position for centering the censor blur
             Vector3 pelvisWorld = Vector3.Zero;
-            Vector3 pelvisOffset = Vector3.Zero;
             if (Skeleton != null)
             {
                 var pelvisBone = Skeleton.GetBone("PELVIS");
                 if (pelvisBone != null)
-                {
                     pelvisWorld = Vector3.Transform(pelvisBone.AbsolutePosition, worldMatrix);
-                    // Get a point above pelvis to calculate screen-space size
-                    pelvisOffset = Vector3.Transform(pelvisBone.AbsolutePosition + new Vector3(0, 2.5f, 0), worldMatrix);
-                }
             }
 
-            // Project pelvis to screen space
             var viewport = device.Viewport;
             var screenPos = viewport.Project(pelvisWorld, projMatrix, viewMatrix, Matrix.Identity);
-            var screenPosOffset = viewport.Project(pelvisOffset, projMatrix, viewMatrix, Matrix.Identity);
 
-            // Don't draw if behind camera
             if (screenPos.Z < 0 || screenPos.Z > 1) return;
 
-            // Calculate size based on projected world-space distance (proper perspective scaling)
-            float projectedSize = Math.Abs(screenPosOffset.Y - screenPos.Y) * 2.5f;
-            int censorSize = Math.Max(16, Math.Min(200, (int)projectedSize)); // Clamp to reasonable range
-            int halfSize = censorSize / 2;
+            // Fixed size - simple and reliable
+            // Use projection diagonal to estimate zoom (works for both 2D and 3D)
+            int censorSize = 50; // default
+            bool isPerspective = Math.Abs(projMatrix.M34) > 0.0001f;
 
-            // Define the destination rectangle on screen
+            if (!isPerspective)
+            {
+                // 2D orthographic - use projection scale
+                float scale = Math.Abs(projMatrix.M11);
+                if (scale > 0.015f) censorSize = 70;       // Near
+                else if (scale > 0.008f) censorSize = 50;  // Medium
+                else censorSize = 35;                       // Far
+            }
+
+            int halfSize = censorSize / 2;
             var destRect = new Rectangle(
                 (int)screenPos.X - halfSize,
-                (int)screenPos.Y - halfSize - (censorSize / 6),
+                (int)screenPos.Y - halfSize - (censorSize / 5),
                 censorSize,
                 censorSize
             );
 
-            // Save current state
-            var originalRenderTargets = device.GetRenderTargets();
-            var originalViewport = device.Viewport;
-            var originalBlendState = device.BlendState;
-            var originalDepthState = device.DepthStencilState;
-            var originalRasterState = device.RasterizerState;
-
-            // Render avatar body to small target (creates pixelation by low-res rendering)
-            device.SetRenderTarget(_censorRenderTarget);
-            device.Viewport = new Viewport(0, 0, _censorTargetSize, _censorTargetSize);
-            device.Clear(Color.Transparent);
-
-            // Adjust projection to focus on pelvis area
-            // Create a modified projection that zooms into the pelvis region
-            float aspect = 1.0f; // Square render target
-            float fov = 0.4f; // Narrow FOV to zoom in
-            var censorProjMatrix = Matrix.CreatePerspectiveFieldOfView(fov, aspect, 0.1f, 1000f);
-
-            // Create view matrix looking at pelvis
-            var cameraPos = Matrix.Invert(viewMatrix).Translation;
-            var censorViewMatrix = Matrix.CreateLookAt(cameraPos, pelvisWorld, Vector3.Up);
-
-            effect.Parameters["View"].SetValue(censorViewMatrix);
-            effect.Parameters["Projection"].SetValue(censorProjMatrix);
-
-            foreach (var pass in effect.CurrentTechnique.Passes)
-            {
-                foreach (var binding in Bindings)
-                {
-                    if (HideHead && binding.Mesh.BoneBindings.Any(meshBind => meshBind.BoneName == "HEAD"))
-                        continue;
-
-                    if (binding.Texture != null)
-                    {
-                        effect.Parameters["MeshTex"].SetValue(binding.Texture.Get(device));
-                    }
-                    else
-                    {
-                        effect.Parameters["MeshTex"].SetValue((Texture2D)null);
-                    }
-                    pass.Apply();
-                    binding.Mesh.Draw(device);
-                }
-            }
-
-            // Restore original matrices
-            effect.Parameters["View"].SetValue(viewMatrix);
-            effect.Parameters["Projection"].SetValue(projMatrix);
-
-            // Restore original render target and viewport
-            if (originalRenderTargets.Length > 0)
-                device.SetRenderTargets(originalRenderTargets);
-            else
-                device.SetRenderTarget(null);
-            device.Viewport = originalViewport;
-
-            // Draw the small (pixelated) render target back at the pelvis position
             _censorSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
                 SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-
-            _censorSpriteBatch.Draw(_censorRenderTarget, destRect, Color.White);
-
+            _censorSpriteBatch.Draw(_mosaicTexture, destRect, Color.White);
             _censorSpriteBatch.End();
-
-            // Restore graphics state
-            device.BlendState = originalBlendState;
-            device.DepthStencilState = originalDepthState;
-            device.RasterizerState = originalRasterState;
         }
 
         public void DrawHeadObject(GraphicsDevice device, Effect effect)
