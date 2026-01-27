@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using FSO.Files.Utils;
 using FSO.Common.Content;
 
@@ -9,6 +10,24 @@ namespace FSO.Vitaboy
     /// </summary>
     public class Appearance
     {
+        // Debug logging for censorship system
+        private static string _logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "simitone_censor_debug.log");
+        private static object _logLock = new object();
+        public static bool CensorDebugEnabled = true;
+
+        public static void LogCensor(string message)
+        {
+            if (!CensorDebugEnabled) return;
+            try
+            {
+                lock (_logLock)
+                {
+                    File.AppendAllText(_logPath, $"[{DateTime.Now:HH:mm:ss.fff}] {message}\n");
+                }
+            }
+            catch { }
+        }
+
         public string Name;
 
         public uint ThumbnailTypeID;
@@ -50,6 +69,12 @@ namespace FSO.Vitaboy
                 bnd.MeshName = io.ReadPascalString();
                 bnd.CensorFlagBits = io.ReadInt32();
                 bnd.Zero = io.ReadInt32();
+
+                // Debug log when non-zero CensorFlagBits are read
+                if (bnd.CensorFlagBits != 0)
+                {
+                    LogCensor($"ReadBCF: appearance={Name} mesh={bnd.MeshName} CensorFlagBits={bnd.CensorFlagBits} (0x{bnd.CensorFlagBits:X})");
+                }
 
                 Bindings[i] = new AppearanceBinding
                 {
