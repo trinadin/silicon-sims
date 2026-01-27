@@ -75,6 +75,12 @@ namespace FSO.Vitaboy
         public bool HideHead;
         protected Matrix[] SkelBones;
 
+        /// <summary>
+        /// Virtual property for skin tone access in censorship rendering.
+        /// Override in SimAvatar to return the actual skin tone.
+        /// </summary>
+        protected virtual AppearanceType? SkinToneForCensor => null;
+
         public static void setVitaboyEffect(Effect e) {
             Effect = e;
         }
@@ -325,22 +331,45 @@ namespace FSO.Vitaboy
         // Censorship pixelation effect resources
         private static SpriteBatch _censorSpriteBatch;
 
-        // Simple procedural mosaic texture for censorship
-        private static Texture2D _mosaicTexture;
+        // Per-skin-tone mosaic textures for censorship
+        private static Dictionary<AppearanceType, Texture2D> _mosaicTextures = new Dictionary<AppearanceType, Texture2D>();
 
-        private static void EnsureMosaicTexture(GraphicsDevice device)
+        private static Texture2D GetMosaicTexture(GraphicsDevice device, AppearanceType skinTone)
         {
-            if (_mosaicTexture != null && !_mosaicTexture.IsDisposed) return;
+            if (_mosaicTextures.TryGetValue(skinTone, out var tex) && !tex.IsDisposed)
+                return tex;
 
-            int size = 64; // 64x64 texture
-            int gridSize = 8; // 8x8 grid of squares
-            var colors = new Color[] {
-                new Color(255, 220, 180), // skin tone 1
-                new Color(240, 200, 160), // skin tone 2
-                new Color(220, 180, 140), // skin tone 3
-                new Color(200, 160, 120)  // skin tone 4
+            // Color palettes per skin tone (base + variations, opaque)
+            Color[] colors = skinTone switch
+            {
+                AppearanceType.Light => new Color[] {
+                    new Color(255, 224, 196),  // light base
+                    new Color(255, 210, 180),
+                    new Color(248, 216, 188),
+                    new Color(255, 200, 170)
+                },
+                AppearanceType.Medium => new Color[] {
+                    new Color(224, 172, 132),  // medium base
+                    new Color(210, 160, 120),
+                    new Color(200, 150, 110),
+                    new Color(215, 165, 125)
+                },
+                AppearanceType.Dark => new Color[] {
+                    new Color(140, 90, 60),    // dark base
+                    new Color(130, 80, 50),
+                    new Color(150, 95, 65),
+                    new Color(120, 75, 45)
+                },
+                _ => new Color[] {  // fallback = Dark
+                    new Color(140, 90, 60),
+                    new Color(130, 80, 50),
+                    new Color(150, 95, 65),
+                    new Color(120, 75, 45)
+                }
             };
 
+            // Generate 64x64 texture with 8x8 grid
+            int size = 64, gridSize = 8;
             var data = new Color[size * size];
 
             for (int y = 0; y < size; y++)
@@ -349,16 +378,15 @@ namespace FSO.Vitaboy
                 {
                     int gridX = x / (size / gridSize);
                     int gridY = y / (size / gridSize);
-                    // Deterministic pattern based on grid position
-                    int colorIndex = (gridX + gridY * gridSize) % colors.Length;
-                    // Add some variation per grid cell
-                    colorIndex = (colorIndex + (gridX * 3 + gridY * 7)) % colors.Length;
+                    int colorIndex = (gridX * 3 + gridY * 7) % colors.Length;
                     data[y * size + x] = colors[colorIndex];
                 }
             }
 
-            _mosaicTexture = new Texture2D(device, size, size);
-            _mosaicTexture.SetData(data);
+            var texture = new Texture2D(device, size, size);
+            texture.SetData(data);
+            _mosaicTextures[skinTone] = texture;
+            return texture;
         }
 
         /// <summary>
@@ -526,7 +554,9 @@ namespace FSO.Vitaboy
         /// </summary>
         private void DrawCensoredMeshesPixelated(GraphicsDevice device, Effect effect, int censorshipFlags)
         {
-            EnsureMosaicTexture(device);
+            // Get skin tone (default to Dark if unknown, per user request)
+            var skinTone = SkinToneForCensor ?? AppearanceType.Dark;
+            var mosaicTexture = GetMosaicTexture(device, skinTone);
 
             if (_censorSpriteBatch == null || _censorSpriteBatch.IsDisposed)
                 _censorSpriteBatch = new SpriteBatch(device);
@@ -573,7 +603,7 @@ namespace FSO.Vitaboy
 
             _censorSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
                 SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-            _censorSpriteBatch.Draw(_mosaicTexture, destRect, Color.White);
+            _censorSpriteBatch.Draw(mosaicTexture, destRect, Color.White);
             _censorSpriteBatch.End();
         }
 
