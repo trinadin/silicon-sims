@@ -593,12 +593,15 @@ namespace FSO.Vitaboy
                 else censorSize = 35;                       // Far
             }
 
-            int halfSize = censorSize / 2;
+            int censorWidth = censorSize;
+            int censorHeight = (int)(censorSize * 1.4f);
+            int halfWidth = censorWidth / 2;
+            int halfHeight = censorHeight / 2;
             var destRect = new Rectangle(
-                (int)screenPos.X - halfSize,
-                (int)screenPos.Y - halfSize - (censorSize / 5),
-                censorSize,
-                censorSize
+                (int)screenPos.X - halfWidth,
+                (int)screenPos.Y - halfHeight,
+                censorWidth,
+                censorHeight
             );
 
             _censorSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
