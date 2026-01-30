@@ -745,7 +745,18 @@ namespace FSO.SimAntics
             //TODO: if this gets changed to run at variable framerate need to "remember" visual position
             avatar.Avatar.ReloadSkeleton();
             if (VisualPositionStart != null) VisualPosition = VisualPositionStart.Value + fraction * Velocity;
-            if (UseWorld) ((AvatarComponent)WorldUI).RadianDirection = (double)(_RadianDirection - TurnVelocity * fraction);
+            if (UseWorld)
+            {
+                ((AvatarComponent)WorldUI).RadianDirection = (double)(_RadianDirection - TurnVelocity * fraction);
+                var censorFlags = GetPersonData(VMPersonDataVariable.CensorshipFlags);
+                ((AvatarComponent)WorldUI).CensorshipFlags = censorFlags;
+
+                // Debug log censorship flags
+                if (censorFlags != 0)
+                {
+                    FSO.Vitaboy.Avatar.LogCensor($"VMAvatar.FractionalAnim: CensorshipFlags={censorFlags} (0x{censorFlags:X}) for avatar {ObjectID}");
+                }
+            }
         }
 
         public virtual short GetPersonData(VMPersonDataVariable variable)
@@ -940,6 +951,10 @@ namespace FSO.SimAntics
                     {
                         ((AvatarComponent)WorldUI).Gender = value;
                     }
+                    break;
+                case VMPersonDataVariable.CensorshipFlags:
+                    // Debug log when censorship flags are set by game scripts
+                    FSO.Vitaboy.Avatar.LogCensor($"SetPersonData: CensorshipFlags set to {value} (0x{value:X}) for avatar {ObjectID}");
                     break;
             }
             PersonData[(ushort)variable] = value;

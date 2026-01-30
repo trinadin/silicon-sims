@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using FSO.Common.Rendering.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
@@ -12,8 +13,57 @@ namespace FSO.Vitaboy
     /// <summary>
     /// The base class for all avatars in the game.
     /// </summary>
-    public abstract class Avatar : _3DComponent 
+    public abstract class Avatar : _3DComponent
     {
+        // Debug logging for censorship system
+        private static string _logPath;
+        private static object _logLock = new object();
+        public static bool CensorDebugEnabled = true;
+        private static bool _logInitialized = false;
+
+        // DEBUG: Set to true to force censorship on ALL body parts for testing
+        // This will make ALL avatars show the mosaic blur - just for testing!
+        public static bool FORCE_CENSOR_TEST = false;
+
+        private static void InitLog()
+        {
+            if (_logInitialized) return;
+            _logInitialized = true;
+
+            // Try desktop first, fall back to current directory
+            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            if (string.IsNullOrEmpty(desktop) || !Directory.Exists(desktop))
+            {
+                desktop = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            }
+            if (string.IsNullOrEmpty(desktop) || !Directory.Exists(desktop))
+            {
+                desktop = ".";
+            }
+            _logPath = Path.Combine(desktop, "simitone_censor_debug.log");
+
+            try
+            {
+                File.AppendAllText(_logPath, $"\n\n=== Simitone Censor Debug Log Started {DateTime.Now} ===\n");
+                File.AppendAllText(_logPath, $"Log path: {_logPath}\n");
+            }
+            catch { }
+        }
+
+        public static void LogCensor(string message)
+        {
+            if (!CensorDebugEnabled) return;
+            try
+            {
+                InitLog();
+                lock (_logLock)
+                {
+                    File.AppendAllText(_logPath, $"[{DateTime.Now:HH:mm:ss.fff}] {message}\n");
+                }
+            }
+            catch { }
+        }
+
         public List<AvatarBindingInstance> Bindings = new List<AvatarBindingInstance>();
         public static Effect Effect;
         public Skeleton Skeleton { get; set; }
@@ -24,6 +74,12 @@ namespace FSO.Vitaboy
         public float HeadObjectSpeedyVel;
         public bool HideHead;
         protected Matrix[] SkelBones;
+
+        /// <summary>
+        /// Virtual property for skin tone access in censorship rendering.
+        /// Override in SimAvatar to return the actual skin tone.
+        /// </summary>
+        protected virtual AppearanceType? SkinToneForCensor => null;
 
         public static void setVitaboyEffect(Effect e) {
             Effect = e;
@@ -49,7 +105,8 @@ namespace FSO.Vitaboy
                 Bindings.Add(new AvatarBindingInstance()
                 {
                     Mesh = oldb.Mesh,
-                    Texture = oldb.Texture
+                    Texture = oldb.Texture,
+                    CensorFlagBits = oldb.CensorFlagBits
                 });
             }
             for (int i = 0; i < old.Accessories.Count(); i++)
@@ -203,14 +260,20 @@ namespace FSO.Vitaboy
             }*/
 
             instance.Mesh.Prepare(Skeleton.RootBone);
+            instance.CensorFlagBits = binding.CensorFlagBits; // Preserve censorship flags for rendering
 
-            
+            // Debug log binding CensorFlagBits
+            if (binding.CensorFlagBits != 0)
+            {
+                LogCensor($"AddBinding: mesh={binding.MeshName ?? "?"} CensorFlagBits={binding.CensorFlagBits} (0x{binding.CensorFlagBits:X})");
+            }
+
             /*if (GPUMode)
             {
                 instance.Mesh.StoreOnGPU(GPUDevice);
                 instance.Texture.Get(GPUDevice);
             }*/
-            
+
             lock (Bindings)
             {
                 Bindings.Add(instance);
@@ -265,6 +328,67 @@ namespace FSO.Vitaboy
         public static int DefaultTechnique = 0;
         public Vector4 AmbientLight = Vector4.One;
 
+        // Censorship pixelation effect resources
+        private static SpriteBatch _censorSpriteBatch;
+
+        // Per-skin-tone mosaic textures for censorship
+        private static Dictionary<AppearanceType, Texture2D> _mosaicTextures = new Dictionary<AppearanceType, Texture2D>();
+
+        private static Texture2D GetMosaicTexture(GraphicsDevice device, AppearanceType skinTone)
+        {
+            if (_mosaicTextures.TryGetValue(skinTone, out var tex) && !tex.IsDisposed)
+                return tex;
+
+            // Color palettes per skin tone (base + variations, opaque)
+            Color[] colors = skinTone switch
+            {
+                AppearanceType.Light => new Color[] {
+                    new Color(255, 224, 196),  // light base
+                    new Color(255, 210, 180),
+                    new Color(248, 216, 188),
+                    new Color(255, 200, 170)
+                },
+                AppearanceType.Medium => new Color[] {
+                    new Color(224, 172, 132),  // medium base
+                    new Color(210, 160, 120),
+                    new Color(200, 150, 110),
+                    new Color(215, 165, 125)
+                },
+                AppearanceType.Dark => new Color[] {
+                    new Color(140, 90, 60),    // dark base
+                    new Color(130, 80, 50),
+                    new Color(150, 95, 65),
+                    new Color(120, 75, 45)
+                },
+                _ => new Color[] {  // fallback = Dark
+                    new Color(140, 90, 60),
+                    new Color(130, 80, 50),
+                    new Color(150, 95, 65),
+                    new Color(120, 75, 45)
+                }
+            };
+
+            // Generate 64x64 texture with 8x8 grid
+            int size = 64, gridSize = 8;
+            var data = new Color[size * size];
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    int gridX = x / (size / gridSize);
+                    int gridY = y / (size / gridSize);
+                    int colorIndex = (gridX * 3 + gridY * 7) % colors.Length;
+                    data[y * size + x] = colors[colorIndex];
+                }
+            }
+
+            var texture = new Texture2D(device, size, size);
+            texture.SetData(data);
+            _mosaicTextures[skinTone] = texture;
+            return texture;
+        }
+
         /// <summary>
         /// Draws the meshes making up this Avatar instance.
         /// </summary>
@@ -318,14 +442,38 @@ namespace FSO.Vitaboy
             }
         }
 
-        public void DrawGeometry(Microsoft.Xna.Framework.Graphics.GraphicsDevice device, Effect effect)
+        private static int _lastLoggedCensorFlags = -1;
+        private static DateTime _lastCensorLog = DateTime.MinValue;
+
+        public void DrawGeometry(Microsoft.Xna.Framework.Graphics.GraphicsDevice device, Effect effect, int censorshipFlags = 0)
         {
-            //Effect.CurrentTechnique = Effect.Techniques[0];
+            // DEBUG: Force censorship test mode - censor ALL body parts
+            if (FORCE_CENSOR_TEST)
+            {
+                censorshipFlags = 0xFF; // All flags on - Pelvis, Spine, Head, Hands, Feet, FullBody
+            }
+
+            // Debug log censorship flags (throttled to avoid spam)
+            if (censorshipFlags != 0 && (censorshipFlags != _lastLoggedCensorFlags || (DateTime.Now - _lastCensorLog).TotalSeconds > 2))
+            {
+                _lastLoggedCensorFlags = censorshipFlags;
+                _lastCensorLog = DateTime.Now;
+                LogCensor($"DrawGeometry: censorshipFlags={censorshipFlags} (0x{censorshipFlags:X}), Bindings.Count={Bindings.Count}");
+                foreach (var b in Bindings)
+                {
+                    LogCensor($"  - Binding CensorFlagBits={b.CensorFlagBits} (0x{b.CensorFlagBits:X}), match={(b.CensorFlagBits & censorshipFlags) != 0}");
+                }
+            }
+
             if (SkelBones == null) ReloadSkeleton();
             effect.Parameters["SkelBindings"].SetValue(SkelBones);
 
+            // Check if censorship is active (either from game or forced for testing)
+            bool showCensorBlur = censorshipFlags != 0 || FORCE_CENSOR_TEST;
+
             lock (Bindings)
             {
+                // Draw all meshes normally
                 foreach (var pass in effect.CurrentTechnique.Passes)
                 {
                     foreach (var binding in Bindings)
@@ -347,6 +495,12 @@ namespace FSO.Vitaboy
                         pass.Apply();
                         binding.Mesh.Draw(device);
                     }
+                }
+
+                // If censorship is active, draw mosaic overlay at pelvis position
+                if (showCensorBlur)
+                {
+                    DrawCensoredMeshesPixelated(device, effect, censorshipFlags);
                 }
             }
 
@@ -392,6 +546,68 @@ namespace FSO.Vitaboy
             }
 
             DrawHeadObject(device, effect);
+        }
+
+        /// <summary>
+        /// Draws a simple procedural mosaic at the pelvis position.
+        /// Uses fixed sizes based on zoom level for consistent appearance.
+        /// </summary>
+        private void DrawCensoredMeshesPixelated(GraphicsDevice device, Effect effect, int censorshipFlags)
+        {
+            // Get skin tone (default to Dark if unknown, per user request)
+            var skinTone = SkinToneForCensor ?? AppearanceType.Dark;
+            var mosaicTexture = GetMosaicTexture(device, skinTone);
+
+            if (_censorSpriteBatch == null || _censorSpriteBatch.IsDisposed)
+                _censorSpriteBatch = new SpriteBatch(device);
+
+            // Get pelvis screen position
+            var viewMatrix = effect.Parameters["View"].GetValueMatrix();
+            var projMatrix = effect.Parameters["Projection"].GetValueMatrix();
+            var worldMatrix = effect.Parameters["World"].GetValueMatrix();
+
+            Vector3 pelvisWorld = Vector3.Zero;
+            if (Skeleton != null)
+            {
+                var pelvisBone = Skeleton.GetBone("PELVIS");
+                if (pelvisBone != null)
+                    pelvisWorld = Vector3.Transform(pelvisBone.AbsolutePosition, worldMatrix);
+            }
+
+            var viewport = device.Viewport;
+            var screenPos = viewport.Project(pelvisWorld, projMatrix, viewMatrix, Matrix.Identity);
+
+            if (screenPos.Z < 0 || screenPos.Z > 1) return;
+
+            // Fixed size - simple and reliable
+            // Use projection diagonal to estimate zoom (works for both 2D and 3D)
+            int censorSize = 50; // default
+            bool isPerspective = Math.Abs(projMatrix.M34) > 0.0001f;
+
+            if (!isPerspective)
+            {
+                // 2D orthographic - use projection scale
+                float scale = Math.Abs(projMatrix.M11);
+                if (scale > 0.015f) censorSize = 70;       // Near
+                else if (scale > 0.008f) censorSize = 50;  // Medium
+                else censorSize = 35;                       // Far
+            }
+
+            int censorWidth = censorSize;
+            int censorHeight = (int)(censorSize * 1.4f);
+            int halfWidth = censorWidth / 2;
+            int halfHeight = censorHeight / 2;
+            var destRect = new Rectangle(
+                (int)screenPos.X - halfWidth,
+                (int)screenPos.Y - halfHeight,
+                censorWidth,
+                censorHeight
+            );
+
+            _censorSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
+                SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
+            _censorSpriteBatch.Draw(mosaicTexture, destRect, Color.White);
+            _censorSpriteBatch.End();
         }
 
         public void DrawHeadObject(GraphicsDevice device, Effect effect)
@@ -453,9 +669,10 @@ namespace FSO.Vitaboy
     /// <summary>
     /// Holds a mesh and texture for an avatar.
     /// </summary>
-    public class AvatarBindingInstance 
+    public class AvatarBindingInstance
     {
         public Mesh Mesh;
         public ITextureRef Texture;
+        public int CensorFlagBits; // Which body parts this mesh covers (for censorship blur)
     }
 }

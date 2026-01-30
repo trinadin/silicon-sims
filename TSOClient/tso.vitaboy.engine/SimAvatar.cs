@@ -416,6 +416,11 @@ namespace FSO.Vitaboy
         private AppearanceType m_Appearance = AppearanceType.Light;
 
         /// <summary>
+        /// Override to provide the sim's actual skin tone for censorship rendering.
+        /// </summary>
+        protected override AppearanceType? SkinToneForCensor => m_Appearance;
+
+        /// <summary>
         /// Gets or sets the ApperanceType of this SimAvatar.
         /// </summary>
         public AppearanceType Appearance
