@@ -197,15 +197,6 @@ namespace FSO.LotView.Components
 
         public void DrawAvatarMesh(GraphicsDevice device, WorldState state, Matrix world, Color baseCol)
         {
-            // Debug: periodic log (every 5 seconds) to show censorship state
-            _drawCount++;
-            if ((DateTime.Now - _lastPeriodicLog).TotalSeconds > 5)
-            {
-                _lastPeriodicLog = DateTime.Now;
-                var bindingsWithCensor = Avatar?.Bindings?.Count(b => b.CensorFlagBits != 0) ?? 0;
-                Avatar.LogCensor($"[PERIODIC] DrawAvatarMesh: ObjectID={ObjectID}, CensorshipFlags={CensorshipFlags}, Bindings={Avatar?.Bindings?.Count ?? 0}, BindingsWithCensorBits={bindingsWithCensor}, TechniqueCount={WorldContent.AvatarEffect?.Techniques?.Count ?? 0}");
-            }
-
             var effect = WorldContent.AvatarEffect;
             var technique = effect.CurrentTechnique;
             var room = (Room > 65530 || Room == 0) ? Room : blueprint.Rooms[Room].Base;
