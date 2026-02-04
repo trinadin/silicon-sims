@@ -50,20 +50,6 @@ namespace FSO.Vitaboy
             catch { }
         }
 
-        public static void LogCensor(string message)
-        {
-            if (!CensorDebugEnabled) return;
-            try
-            {
-                InitLog();
-                lock (_logLock)
-                {
-                    File.AppendAllText(_logPath, $"[{DateTime.Now:HH:mm:ss.fff}] {message}\n");
-                }
-            }
-            catch { }
-        }
-
         public List<AvatarBindingInstance> Bindings = new List<AvatarBindingInstance>();
         public static Effect Effect;
         public Skeleton Skeleton { get; set; }
@@ -262,12 +248,6 @@ namespace FSO.Vitaboy
             instance.Mesh.Prepare(Skeleton.RootBone);
             instance.CensorFlagBits = binding.CensorFlagBits; // Preserve censorship flags for rendering
 
-            // Debug log binding CensorFlagBits
-            if (binding.CensorFlagBits != 0)
-            {
-                LogCensor($"AddBinding: mesh={binding.MeshName ?? "?"} CensorFlagBits={binding.CensorFlagBits} (0x{binding.CensorFlagBits:X})");
-            }
-
             /*if (GPUMode)
             {
                 instance.Mesh.StoreOnGPU(GPUDevice);
@@ -458,11 +438,6 @@ namespace FSO.Vitaboy
             {
                 _lastLoggedCensorFlags = censorshipFlags;
                 _lastCensorLog = DateTime.Now;
-                LogCensor($"DrawGeometry: censorshipFlags={censorshipFlags} (0x{censorshipFlags:X}), Bindings.Count={Bindings.Count}");
-                foreach (var b in Bindings)
-                {
-                    LogCensor($"  - Binding CensorFlagBits={b.CensorFlagBits} (0x{b.CensorFlagBits:X}), match={(b.CensorFlagBits & censorshipFlags) != 0}");
-                }
             }
 
             if (SkelBones == null) ReloadSkeleton();

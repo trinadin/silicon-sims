@@ -751,11 +751,6 @@ namespace FSO.SimAntics
                 var censorFlags = GetPersonData(VMPersonDataVariable.CensorshipFlags);
                 ((AvatarComponent)WorldUI).CensorshipFlags = censorFlags;
 
-                // Debug log censorship flags
-                if (censorFlags != 0)
-                {
-                    FSO.Vitaboy.Avatar.LogCensor($"VMAvatar.FractionalAnim: CensorshipFlags={censorFlags} (0x{censorFlags:X}) for avatar {ObjectID}");
-                }
             }
         }
 
@@ -953,8 +948,6 @@ namespace FSO.SimAntics
                     }
                     break;
                 case VMPersonDataVariable.CensorshipFlags:
-                    // Debug log when censorship flags are set by game scripts
-                    FSO.Vitaboy.Avatar.LogCensor($"SetPersonData: CensorshipFlags set to {value} (0x{value:X}) for avatar {ObjectID}");
                     break;
             }
             PersonData[(ushort)variable] = value;
