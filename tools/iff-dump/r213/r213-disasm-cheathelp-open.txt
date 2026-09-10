@@ -1,0 +1,101 @@
+0050da20: bf61ffec  stmw     r27, -0x14(r1)
+0050da24: 7c0802a6  mflr     r0
+0050da28: 3b830000  addi     r28, r3, 0
+0050da2c: 3ba40000  addi     r29, r4, 0
+0050da30: 90010008  stw      r0, 8(r1)
+0050da34: 9421ff90  stwu     r1, -0x70(r1)
+0050da38: 81830000  lwz      r12, 0(r3)
+0050da3c: 818c009c  lwz      r12, 0x9c(r12)
+0050da40: 48094fa1  bl       0x5a29e0
+0050da44: 80410014  lwz      r2, 0x14(r1)
+0050da48: 807c0100  lwz      r3, 0x100(r28)
+0050da4c: 28030000  cmplwi   r3, 0
+0050da50: 41820150  beq      0x50dba0
+0050da54: 48028edd  bl       0x536930
+0050da58: 387c011c  addi     r3, r28, 0x11c
+0050da5c: 4bc9c465  bl       0x1a9ec0
+0050da60: 38000000  li       r0, 0
+0050da64: 38610048  addi     r3, r1, 0x48
+0050da68: 90010044  stw      r0, 0x44(r1)
+0050da6c: 3bc00000  li       r30, 0
+0050da70: 809c0110  lwz      r4, 0x110(r28)
+0050da74: 38840004  addi     r4, r4, 4
+0050da78: 48000179  bl       0x50dbf0
+0050da7c: 80010048  lwz      r0, 0x48(r1)
+0050da80: 90010040  stw      r0, 0x40(r1)
+0050da84: 480000ac  b        0x50db30
+0050da88: 60000000  nop      
+0050da8c: 281d0000  cmplwi   r29, 0
+0050da90: 4182002c  beq      0x50dabc
+0050da94: 7fa3eb78  mr       r3, r29
+0050da98: 4808f299  bl       0x59cd30
+0050da9c: 38c30000  addi     r6, r3, 0
+0050daa0: 387b000c  addi     r3, r27, 0xc
+0050daa4: 389d0000  addi     r4, r29, 0
+0050daa8: 38a00000  li       r5, 0
+0050daac: 4bbed7b5  bl       0xfb260
+0050dab0: 3c030001  addis    r0, r3, 1
+0050dab4: 2800ffff  cmplwi   r0, 0xffff
+0050dab8: 41820064  beq      0x50db1c
+0050dabc: 807c0100  lwz      r3, 0x100(r28)
+0050dac0: 480292d1  bl       0x536d90
+0050dac4: 80a10040  lwz      r5, 0x40(r1)
+0050dac8: 7c641b78  mr       r4, r3
+0050dacc: 807c0100  lwz      r3, 0x100(r28)
+0050dad0: 38a5000c  addi     r5, r5, 0xc
+0050dad4: 48028eed  bl       0x5369c0
+0050dad8: 387c011c  addi     r3, r28, 0x11c
+0050dadc: 38810044  addi     r4, r1, 0x44
+0050dae0: 4bcf8df1  bl       0x2068d0
+0050dae4: 281d0000  cmplwi   r29, 0
+0050dae8: 41820034  beq      0x50db1c
+0050daec: 80610040  lwz      r3, 0x40(r1)
+0050daf0: 3863000c  addi     r3, r3, 0xc
+0050daf4: 4bb2758d  bl       0x35080
+0050daf8: 38830000  addi     r4, r3, 0
+0050dafc: 387d0000  addi     r3, r29, 0
+0050db00: 4808f341  bl       0x59ce40
+0050db04: 2c030000  cmpwi    r3, 0
+0050db08: 40820014  bne      0x50db1c
+0050db0c: 807c0100  lwz      r3, 0x100(r28)
+0050db10: 3bc00001  li       r30, 1
+0050db14: 4802927d  bl       0x536d90
+0050db18: 3be3ffff  addi     r31, r3, -1
+0050db1c: 38610040  addi     r3, r1, 0x40
+0050db20: 4bb80001  bl       0x8db20
+0050db24: 80610044  lwz      r3, 0x44(r1)
+0050db28: 38030001  addi     r0, r3, 1
+0050db2c: 90010044  stw      r0, 0x44(r1)
+0050db30: 809c0110  lwz      r4, 0x110(r28)
+0050db34: 3861004c  addi     r3, r1, 0x4c
+0050db38: 38840004  addi     r4, r4, 4
+0050db3c: 4bf916b5  bl       0x49f1f0
+0050db40: 83610040  lwz      r27, 0x40(r1)
+0050db44: 8001004c  lwz      r0, 0x4c(r1)
+0050db48: 7c1b0040  cmplw    r27, r0
+0050db4c: 4082ff40  bne      0x50da8c
+0050db50: 57c0063f  clrlwi.  r0, r30, 0x18
+0050db54: 41820014  beq      0x50db68
+0050db58: 807c0100  lwz      r3, 0x100(r28)
+0050db5c: 7fe4fb78  mr       r4, r31
+0050db60: 48028881  bl       0x5363e0
+0050db64: 4800003c  b        0x50dba0
+0050db68: 807c0100  lwz      r3, 0x100(r28)
+0050db6c: 48029225  bl       0x536d90
+0050db70: 28030000  cmplwi   r3, 0
+0050db74: 41820014  beq      0x50db88
+0050db78: 807c0100  lwz      r3, 0x100(r28)
+0050db7c: 38800000  li       r4, 0
+0050db80: 48028861  bl       0x5363e0
+0050db84: 4800001c  b        0x50dba0
+0050db88: 807c010c  lwz      r3, 0x10c(r28)
+0050db8c: 8082bc24  lwz      r4, -0x43dc(r2)
+0050db90: 81830000  lwz      r12, 0(r3)
+0050db94: 818c01d4  lwz      r12, 0x1d4(r12)
+0050db98: 48094e49  bl       0x5a29e0
+0050db9c: 80410014  lwz      r2, 0x14(r1)
+0050dba0: 80010078  lwz      r0, 0x78(r1)
+0050dba4: 38210070  addi     r1, r1, 0x70
+0050dba8: bb61ffec  lmw      r27, -0x14(r1)
+0050dbac: 7c0803a6  mtlr     r0
+0050dbb0: 4e800020  blr      

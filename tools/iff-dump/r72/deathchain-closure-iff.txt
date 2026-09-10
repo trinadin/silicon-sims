@@ -1,0 +1,5 @@
+canon ids in bhavs: True
+closure size: 35
+external targets from canon: [8194, 8197, 8198, 8199, 8200, 8202, 8216, 8218, 8219, 8220, 8221, 8222, 8224, 8225, 8226, 8289, 8290, 8292, 8305, 8307, 8309, 8310, 8341, 8343, 8638, 8639, 8640, 8642]
+unresolved targets: []
+closure self-contained: True

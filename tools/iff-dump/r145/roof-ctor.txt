@@ -1,0 +1,41 @@
+                ; ==== .__ct__13cWinRoofPanelFP7CPState ====
+0029e770: 93e1fffc  stw      r31, -4(r1)
+0029e774: 7c0802a6  mflr     r0
+0029e778: 3be40000  addi     r31, r4, 0
+0029e77c: 93c1fff8  stw      r30, -8(r1)
+0029e780: 3bc30000  addi     r30, r3, 0
+0029e784: 90010008  stw      r0, 8(r1)
+0029e788: 9421ffb0  stwu     r1, -0x50(r1)
+0029e78c: 4826ae85  bl       0x509610   ; .__ct__6cTSWinFv
+0029e790: 80029690  lwz      r0, -0x6970(r2)
+0029e794: 387e00e4  addi     r3, r30, 0xe4
+0029e798: 901e0000  stw      r0, 0(r30)
+0029e79c: 4bff9475  bl       0x297c10
+0029e7a0: 387e00f0  addi     r3, r30, 0xf0
+0029e7a4: 4bfaa73d  bl       0x248ee0
+0029e7a8: 387e00fc  addi     r3, r30, 0xfc
+0029e7ac: 48000145  bl       0x29e8f0
+0029e7b0: 387e00cc  addi     r3, r30, 0xcc
+0029e7b4: 38800000  li       r4, 0
+0029e7b8: 38a00018  li       r5, 0x18
+0029e7bc: 482f85b5  bl       0x596d70
+0029e7c0: 38000000  li       r0, 0
+0029e7c4: 901e0108  stw      r0, 0x108(r30)
+0029e7c8: 7fc3f378  mr       r3, r30
+0029e7cc: 901e010c  stw      r0, 0x10c(r30)
+0029e7d0: 93fe0110  stw      r31, 0x110(r30)
+0029e7d4: 901e0114  stw      r0, 0x114(r30)
+0029e7d8: 901e0118  stw      r0, 0x118(r30)
+0029e7dc: 901e011c  stw      r0, 0x11c(r30)
+0029e7e0: 901e0120  stw      r0, 0x120(r30)
+0029e7e4: 901e0124  stw      r0, 0x124(r30)
+0029e7e8: 80010058  lwz      r0, 0x58(r1)
+0029e7ec: 38210050  addi     r1, r1, 0x50
+0029e7f0: 7c0803a6  mtlr     r0
+0029e7f4: 83e1fffc  lwz      r31, -4(r1)
+0029e7f8: 83c1fff8  lwz      r30, -8(r1)
+0029e7fc: 4e800020  blr      
+0029e800: 00000000  .long    0x00000000
+0029e804: 00092041  .long    0x00092041
+0029e808: 80020000  lwz      r0, 0(r2)
+0029e80c: 00000090  .long    0x00000090

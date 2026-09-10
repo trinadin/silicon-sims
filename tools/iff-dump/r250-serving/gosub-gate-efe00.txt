@@ -1,0 +1,100 @@
+000efe00: 93e1fffc  stw      r31, -4(r1)
+000efe04: 7c0802a6  mflr     r0
+000efe08: 3be60000  addi     r31, r6, 0
+000efe0c: 93c1fff8  stw      r30, -8(r1)
+000efe10: 3bc50000  addi     r30, r5, 0
+000efe14: 93a1fff4  stw      r29, -0xc(r1)
+000efe18: 3ba40000  addi     r29, r4, 0
+000efe1c: 9381fff0  stw      r28, -0x10(r1)
+000efe20: 3b830000  addi     r28, r3, 0
+000efe24: 90010008  stw      r0, 8(r1)
+000efe28: 9421ffb0  stwu     r1, -0x50(r1)
+000efe2c: 806300dc  lwz      r3, 0xdc(r3)
+000efe30: a89c00f0  lha      r4, 0xf0(r28)
+000efe34: 4bff20fd  bl       0xe1f30   ; .ClearIdleStatus__12ObjectModuleFi
+000efe38: 809d011c  lwz      r4, 0x11c(r29)
+000efe3c: 387c0000  addi     r3, r28, 0
+000efe40: 38be0000  addi     r5, r30, 0
+000efe44: 8084000c  lwz      r4, 0xc(r4)
+000efe48: 7fe6fb78  mr       r6, r31
+000efe4c: 48064285  bl       0x1540d0
+000efe50: 5460063f  clrlwi.  r0, r3, 0x18
+000efe54: 4182001c  beq      0xefe70
+000efe58: abfd00f0  lha      r31, 0xf0(r29)
+000efe5c: 7f83e378  mr       r3, r28
+000efe60: 480637f1  bl       0x153650   ; .GetCurElem__7TreeSimFv
+000efe64: b3e30004  sth      r31, 4(r3)
+000efe68: 38600001  li       r3, 1
+000efe6c: 48000008  b        0xefe74
+000efe70: 38600000  li       r3, 0
+000efe74: 80010058  lwz      r0, 0x58(r1)
+000efe78: 38210050  addi     r1, r1, 0x50
+000efe7c: 83e1fffc  lwz      r31, -4(r1)
+000efe80: 83c1fff8  lwz      r30, -8(r1)
+000efe84: 7c0803a6  mtlr     r0
+000efe88: 83a1fff4  lwz      r29, -0xc(r1)
+000efe8c: 8381fff0  lwz      r28, -0x10(r1)
+000efe90: 4e800020  blr      
+000efe94: 00000000  .long    0x00000000
+000efe98: 00092041  .long    0x00092041
+000efe9c: 80040000  lwz      r0, 0(r4)
+000efea0: 00000094  .long    0x00000094
+000efea4: 002a2e47  .long    0x002a2e47
+000efea8: 6f737562  xoris    r19, r27, 0x7562
+000efeac: 4f626a65  .long    0x4f626a65
+000efeb0: 63745472  ori      r20, r27, 0x5472
+000efeb4: 65655f5f  oris     r5, r11, 0x5f5f
+000efeb8: 3863584f  addi     r3, r3, 0x584f
+000efebc: 626a6563  ori      r10, r19, 0x6563
+000efec0: 74465038  andis.   r6, r2, 0x5038
+000efec4: 63584f62  ori      r24, r26, 0x4f62
+000efec8: 6a656374  xori     r5, r19, 0x6374
+000efecc: 50737362  rlwimi   r19, r3, 0xe, 0xd, 0x11
+000efed0: be41ffc8  stmw     r18, -0x38(r1)
+000efed4: 7c0802a6  mflr     r0
+000efed8: 83428eb8  lwz      r26, -0x7148(r2)
+000efedc: 7c721b78  mr       r18, r3
+000efee0: 83628c60  lwz      r27, -0x73a0(r2)
+000efee4: 83828cc0  lwz      r28, -0x7340(r2)
+000efee8: 3a640000  addi     r19, r4, 0
+000efeec: 83a28874  lwz      r29, -0x778c(r2)
+000efef0: 83c2a6a8  lwz      r30, -0x5958(r2)
+000efef4: 90010008  stw      r0, 8(r1)
+000efef8: 9421fa30  stwu     r1, -0x5d0(r1)
+000efefc: 88050004  lbz      r0, 4(r5)
+000eff00: aaa50000  lha      r21, 0(r5)
+000eff04: 280000ff  cmplwi   r0, 0xff
+000eff08: 4082000c  bne      0xeff14
+000eff0c: aa9200f0  lha      r20, 0xf0(r18)
+000eff10: 4800001c  b        0xeff2c
+000eff14: 88050004  lbz      r0, 4(r5)
+000eff18: 540007bd  rlwinm.  r0, r0, 0, 0x1e, 0x1e
+000eff1c: 4182000c  beq      0xeff28
+000eff20: aa930004  lha      r20, 4(r19)
+000eff24: 48000008  b        0xeff2c
+000eff28: aa9200f0  lha      r20, 0xf0(r18)
+000eff2c: 7e800735  extsh.   r0, r20
+000eff30: 80b200dc  lwz      r5, 0xdc(r18)
+000eff34: 3b000000  li       r24, 0
+000eff38: 40810028  ble      0xeff60
+000eff3c: 8065001c  lwz      r3, 0x1c(r5)
+000eff40: 7e840734  extsh    r4, r20
+000eff44: 38030001  addi     r0, r3, 1
+000eff48: 7c040040  cmplw    r4, r0
+000eff4c: 40800014  bge      0xeff60
+000eff50: 3804ffff  addi     r0, r4, -1
+000eff54: 80650020  lwz      r3, 0x20(r5)
+000eff58: 5400103a  slwi     r0, r0, 2
+000eff5c: 7f03002e  lwzx     r24, r3, r0
+000eff60: 8073000c  lwz      r3, 0xc(r19)
+000eff64: 4bf50ccd  bl       0x40c30   ; .GetPrivFile__8BehaviorFv
+000eff68: 7c601b78  mr       r0, r3
+000eff6c: 8073000c  lwz      r3, 0xc(r19)
+000eff70: 7c160378  mr       r22, r0
+000eff74: 4bf50c7d  bl       0x40bf0   ; .GetGlobFile__8BehaviorFv
+000eff78: 80bd0000  lwz      r5, 0(r29)
+000eff7c: 7c771b78  mr       r23, r3
+000eff80: 80828ebc  lwz      r4, -0x7144(r2)
+000eff84: 38610040  addi     r3, r1, 0x40
+000eff88: 83250010  lwz      r25, 0x10(r5)
+000eff8c: 8be40000  lbz      r31, 0(r4)

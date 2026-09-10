@@ -1,0 +1,130 @@
+# R166 TS1 Generic Sims Call mode 12 corpus scan
+# corpus: /Users/nathannoom/Developer/Games/The Sims/simitone-fork/game-data/The Sims
+# match law: BHAV opcode == 1 and first operand byte == 12
+# files walked: 8871; IFFs scanned: 2238; BHAV chunks: 28246
+# call sites: 47 instances; 22 unique call-site signatures; 21 unique routine instruction payload hashes
+
+## unique call-site signatures
+[1] BHAV 4098 'Send Downtown' instruction[5] T=6 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=27 sha256=63b89d2d706287cd66c94ffdd8dd057a076aac9bb869f86fd6ac51eaddc85e65
+    instances=4
+      ExpansionPack4/ExpansionPack4.far!CarVacationWagon.iff
+      ExpansionPack4/ExpansionPack4.far!CarVIVan.iff
+      ExpansionPack5/ExpansionPack5.FAR!carpublictransit.iff
+      ExpansionPack5/ExpansionPack5.FAR!carvisitortrolley.iff
+[2] BHAV 4098 'Send Downtown' instruction[5] T=6 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=27 sha256=75f4cd2dc60d892ef9870b18015ea3ed2442d690308df6fd225fd329f41b057b
+    instances=1
+      ExpansionPack3/ExpansionPack3.far!CarTaxi.iff
+[3] BHAV 4098 'Send to Studio' instruction[5] T=6 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=27 sha256=76d9d3111bfb7a42bc3bf26add389b4c5a96162cb47f8490a0bbd15b9f495f0d
+    instances=2
+      ExpansionPack6/ExpansionPack6.far!CarLimoPink.iff
+      ExpansionPack6/ExpansionPack6.far!CarStudio.iff
+[4] BHAV 4098 'Send to Studio' instruction[5] T=6 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=27 sha256=8c95df681e7d3213c7092d96937543f3e68202758894c86f60db71216950a332
+    instances=3
+      ExpansionPack6/ExpansionPack6.far!CarLimoBlack.iff
+      ExpansionPack6/ExpansionPack6.far!CarLimoWhite.iff
+      ExpansionPack6/ExpansionPack6.far!CarStudioCarpool.iff
+[5] BHAV 4105 'Get In Cab' instruction[4] T=5 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=13 sha256=5c2812fd0e5410cf9220ea8e7fd709665b133f384a63700c9aa8e68d49b1dc61
+    instances=6
+      ExpansionPack3/ExpansionPack3.far!CarTaxi.iff
+      ExpansionPack6/ExpansionPack6.far!CarLimoBlack.iff
+      ExpansionPack6/ExpansionPack6.far!CarLimoPink.iff
+      ExpansionPack6/ExpansionPack6.far!CarLimoWhite.iff
+      ExpansionPack6/ExpansionPack6.far!CarStudio.iff
+      ExpansionPack6/ExpansionPack6.far!CarStudioCarpool.iff
+[6] BHAV 4105 'Get In Wagon' instruction[4] T=5 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=15 sha256=0a9f11f10da359ce6ba3ec884ace3b22bdbd16ee7b915aeeb87c21d2ec674ff2
+    instances=1
+      ExpansionPack4/ExpansionPack4.far!CarVIVan.iff
+[7] BHAV 4105 'Get In Wagon' instruction[4] T=5 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=26 sha256=850b2ac09f56b186bbd6ad9709889c09da772ba623348059bf3f3ff89264f725
+    instances=1
+      ExpansionPack4/ExpansionPack4.far!CarVacationWagon.iff
+[8] BHAV 4105 'Get In Wagon' instruction[4] T=5 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=23 sha256=96dba7fb32faee9b1922bdad489cc51cf668217bf37acd04ae80f645ae18047d
+    instances=2
+      ExpansionPack5/ExpansionPack5.FAR!carpublictransit.iff
+      ExpansionPack5/ExpansionPack5.FAR!carvisitortrolley.iff
+[9] BHAV 4105 'Get In Wagon' instruction[4] T=5 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=29 sha256=efd74d8f64accbd935828a51dda849ef378233e0f8d8ef8a7d62fa75a9c383ea
+    instances=1
+      ExpansionPack7/ExpansionPack7.far!carmagicwagon.iff
+[10] BHAV 4108 'Get In Cab - Follower' instruction[4] T=5 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=13 sha256=733c1a275f956a523f38b2e2707f71240782936ab484f35470cc5988c5486248
+    instances=6
+      ExpansionPack3/ExpansionPack3.far!CarTaxi.iff
+      ExpansionPack6/ExpansionPack6.far!CarLimoBlack.iff
+      ExpansionPack6/ExpansionPack6.far!CarLimoPink.iff
+      ExpansionPack6/ExpansionPack6.far!CarLimoWhite.iff
+      ExpansionPack6/ExpansionPack6.far!CarStudio.iff
+      ExpansionPack6/ExpansionPack6.far!CarStudioCarpool.iff
+[11] BHAV 4108 'Get In Wagon - Follower' instruction[4] T=5 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=18 sha256=08a12090370f95b8ac363d9952bdd144548afa02e9cdf6209c0a6b028f55f42b
+    instances=2
+      ExpansionPack4/ExpansionPack4.far!CarVacationWagon.iff
+      ExpansionPack7/ExpansionPack7.far!carmagicwagon.iff
+[12] BHAV 4108 'Get In Wagon - Follower' instruction[4] T=5 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=13 sha256=733c1a275f956a523f38b2e2707f71240782936ab484f35470cc5988c5486248
+    instances=1
+      ExpansionPack4/ExpansionPack4.far!CarVIVan.iff
+[13] BHAV 4108 'Get In Wagon - Follower' instruction[4] T=5 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=18 sha256=cb735e41fcbca8cadca615fa4b10440e4daf67e0055ee615c8be071298a684ef
+    instances=2
+      ExpansionPack5/ExpansionPack5.FAR!carpublictransit.iff
+      ExpansionPack5/ExpansionPack5.FAR!carvisitortrolley.iff
+[14] BHAV 4121 'send person to work' instruction[9] T=10 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=26 sha256=04828c61a01411c98cfd80ea866f9560073e450839eb50ef871d5a2c249dbc74
+    instances=1
+      GameData/Objects/Objects.far!CarSquad.iff
+[15] BHAV 4121 'send person to work' instruction[9] T=10 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=26 sha256=182a19987f93186e8a513b1f6c75102f502a43574b418558145b2b9a3a976a64
+    instances=1
+      GameData/Objects/Objects.far!SchoolBus.iff
+[16] BHAV 4121 'send person to work' instruction[9] T=10 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=26 sha256=217c2ba9e9d52c015323972f767add7ebd3d33c5f71e769d92e1f8bd156aca19
+    instances=4
+      ExpansionShared/ExpansionShared.far!CarCircus.iff
+      ExpansionShared/ExpansionShared.far!CarClown.iff
+      ExpansionShared/ExpansionShared.far!CarTruck.iff
+      GameData/Objects/Objects.far!CarStd.iff
+[17] BHAV 4121 'send person to work' instruction[9] T=10 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=26 sha256=3c32fb1171444b87a9fc28d2909286de94880ac4d5ea51ed0558ebc33df50821
+    instances=1
+      GameData/Objects/Objects.far!CarMJeep.iff
+[18] BHAV 4121 'send person to work' instruction[9] T=10 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=26 sha256=414e7fd87b6b5619b42f7b136c88ab387464d4a3c394f7545b559bf2da0f42fb
+    instances=1
+      GameData/Objects/Objects.far!CarBentley.iff
+[19] BHAV 4121 'send person to work' instruction[9] T=10 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=26 sha256=52fd1b10e9311833d46a70b8584667e18cab3fb36740014f17c0874f5a11d473
+    instances=1
+      GameData/Objects/Objects.far!CarSUV.iff
+[20] BHAV 4121 'send person to work' instruction[9] T=10 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=26 sha256=70fc0de3b0829b31d05ab438ce9d14b8a7fda8bcc14d0ca69a689a1f2bbac8a5
+    instances=1
+      GameData/Objects/Objects.far!CarJunk.iff
+[21] BHAV 4121 'send person to work' instruction[9] T=10 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=26 sha256=87ce5475d01e554db8e62ac34b445ad04b4ecfbd1a0410b0d808c8c144ab6570
+    instances=4
+      ExpansionPack2/ExpansionPack2.far!NPCCar.iff
+      ExpansionPack6/ExpansionPack6.far!NPC_Car_Presenter.iff
+      GameData/Objects/Objects.far!CarLimo.iff
+      GameData/Objects/Objects.far!CarTown.iff
+[22] BHAV 4121 'send person to work' instruction[9] T=10 F=253 operand=0c 00 00 00 00 00 00 00
+    routine instruction payload: instructions=26 sha256=bde0b0a7d39b667f1b143da035cd174333f1ee8be85fc747c818dbd1bba2d79b
+    instances=1
+      GameData/Objects/Objects.far!CarStaff.iff
+
+## container-family counts
+   1  ExpansionPack2/ExpansionPack2.far
+   3  ExpansionPack3/ExpansionPack3.far
+   6  ExpansionPack4/ExpansionPack4.far
+   6  ExpansionPack5/ExpansionPack5.FAR
+  16  ExpansionPack6/ExpansionPack6.far
+   2  ExpansionPack7/ExpansionPack7.far
+   3  ExpansionShared/ExpansionShared.far
+  10  GameData/Objects/Objects.far

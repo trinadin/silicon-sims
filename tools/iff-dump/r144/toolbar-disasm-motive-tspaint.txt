@@ -1,0 +1,392 @@
+0027ea50: dbe1fff8  stfd     f31, -8(r1)
+0027ea54: 7c0802a6  mflr     r0
+0027ea58: bec1ffc8  stmw     r22, -0x38(r1)
+0027ea5c: 7c7f1b78  mr       r31, r3
+0027ea60: 83428ca4  lwz      r26, -0x735c(r2)   ; TOC[-0x735c]->BSS off 0x9743c
+0027ea64: 7c992378  mr       r25, r4
+0027ea68: 8362afe4  lwz      r27, -0x501c(r2)   ; TOC[-0x501c]->BSS off 0x932c8
+0027ea6c: 83a2afe8  lwz      r29, -0x5018(r2)   ; TOC[-0x5018]->CODE file 0x5a44c0 firstword=1071644672(0x3fe00000)
+0027ea70: 83c2afec  lwz      r30, -0x5014(r2)   ; TOC[-0x5014]->CODE file 0x5a4478 firstword=1056964608(0x3f000000)
+0027ea74: 90010008  stw      r0, 8(r1)
+0027ea78: 9421fe40  stwu     r1, -0x1c0(r1)
+0027ea7c: 8063019c  lwz      r3, 0x19c(r3)
+0027ea80: 81830000  lwz      r12, 0(r3)
+0027ea84: 818c0060  lwz      r12, 0x60(r12)
+0027ea88: 48323f59  bl       0x5a29e0
+0027ea8c: 80410014  lwz      r2, 0x14(r1)
+0027ea90: 20a3000a  subfic   r5, r3, 0xa
+0027ea94: 80828870  lwz      r4, -0x7790(r2)   ; TOC[-0x7790]->BSS off 0x92660
+0027ea98: 54a00ffe  srwi     r0, r5, 0x1f
+0027ea9c: 80df001c  lwz      r6, 0x1c(r31)
+0027eaa0: 80640000  lwz      r3, 0(r4)
+0027eaa4: 7c002a14  add      r0, r0, r5
+0027eaa8: 80bf0024  lwz      r5, 0x24(r31)
+0027eaac: 7c1c0e70  srawi    r28, r0, 1
+0027eab0: 809f0020  lwz      r4, 0x20(r31)
+0027eab4: 801f0028  lwz      r0, 0x28(r31)
+0027eab8: 7ee62850  subf     r23, r6, r5
+0027eabc: 806300a4  lwz      r3, 0xa4(r3)
+0027eac0: 3ac00000  li       r22, 0
+0027eac4: 7f040050  subf     r24, r4, r0
+0027eac8: 4bf8dba9  bl       0x20c670   ; .IsDoubleByteUI__7CPStateFv
+0027eacc: 5460063f  clrlwi.  r0, r3, 0x18
+0027ead0: 41820054  beq      0x27eb24
+0027ead4: 7fe3fb78  mr       r3, r31
+0027ead8: 4bf9bad9  bl       0x21a5b0   ; .GetH__6cTSWinCFv
+0027eadc: 3b030000  addi     r24, r3, 0
+0027eae0: 387f0000  addi     r3, r31, 0
+0027eae4: 4bf9bb0d  bl       0x21a5f0   ; .GetW__6cTSWinCFv
+0027eae8: 80828874  lwz      r4, -0x778c(r2)   ; TOC[-0x778c]->BSS off 0x8510c
+0027eaec: 3ac00000  li       r22, 0
+0027eaf0: 3b18fffb  addi     r24, r24, -5
+0027eaf4: 3b960000  addi     r28, r22, 0
+0027eaf8: 80840000  lwz      r4, 0(r4)
+0027eafc: 3ae30000  addi     r23, r3, 0
+0027eb00: 88040064  lbz      r0, 0x64(r4)
+0027eb04: 7c000774  extsb    r0, r0
+0027eb08: 2c000014  cmpwi    r0, 0x14
+0027eb0c: 4082000c  bne      0x27eb18
+0027eb10: 3b800002  li       r28, 2
+0027eb14: 48000010  b        0x27eb24
+0027eb18: 2c00000f  cmpwi    r0, 0xf
+0027eb1c: 40820008  bne      0x27eb24
+0027eb20: 3b800003  li       r28, 3
+0027eb24: 38000001  li       r0, 1
+0027eb28: 2c000000  cmpwi    r0, 0
+0027eb2c: 901f0158  stw      r0, 0x158(r31)
+0027eb30: 41820018  beq      0x27eb48
+0027eb34: 92df0114  stw      r22, 0x114(r31)
+0027eb38: 939f0118  stw      r28, 0x118(r31)
+0027eb3c: 92ff011c  stw      r23, 0x11c(r31)
+0027eb40: 931f0120  stw      r24, 0x120(r31)
+0027eb44: 901f015c  stw      r0, 0x15c(r31)
+0027eb48: 387f0000  addi     r3, r31, 0
+0027eb4c: 38990000  addi     r4, r25, 0
+0027eb50: 4828e271  bl       0x50cdc0   ; .TSPaint__9cTSWinBtnFb
+0027eb54: 5460063f  clrlwi.  r0, r3, 0x18
+0027eb58: 4082000c  bne      0x27eb64
+0027eb5c: 38600000  li       r3, 0
+0027eb60: 4800081c  b        0x27f37c
+0027eb64: 807f018c  lwz      r3, 0x18c(r31)
+0027eb68: 3c004330  lis      r0, 0x4330
+0027eb6c: 90010120  stw      r0, 0x120(r1)
+0027eb70: 38030064  addi     r0, r3, 0x64
+0027eb74: c85d0008  lfd      f2, 8(r29)
+0027eb78: 6c008000  xoris    r0, r0, 0x8000
+0027eb7c: c07e003c  lfs      f3, 0x3c(r30)
+0027eb80: 90010124  stw      r0, 0x124(r1)
+0027eb84: c01e0040  lfs      f0, 0x40(r30)
+0027eb88: c8210120  lfd      f1, 0x120(r1)
+0027eb8c: c89d0000  lfd      f4, 0(r29)
+0027eb90: ec211028  fsubs    f1, f1, f2
+0027eb94: ec230072  fmuls    f1, f3, f1
+0027eb98: ec010024  fdivs    f0, f1, f0
+0027eb9c: fc04002a  fadd     f0, f4, f0
+0027eba0: fc00001e  fctiwz   f0, f0
+0027eba4: d8010128  stfd     f0, 0x128(r1)
+0027eba8: 80c1012c  lwz      r6, 0x12c(r1)
+0027ebac: 2c060000  cmpwi    r6, 0
+0027ebb0: 4080000c  bge      0x27ebbc
+0027ebb4: 38c00000  li       r6, 0
+0027ebb8: 48000010  b        0x27ebc8
+0027ebbc: 2c06003c  cmpwi    r6, 0x3c
+0027ebc0: 40810008  ble      0x27ebc8
+0027ebc4: 38c0003c  li       r6, 0x3c
+0027ebc8: 807b0004  lwz      r3, 4(r27)
+0027ebcc: 809b0000  lwz      r4, 0(r27)
+0027ebd0: 80bb0000  lwz      r5, 0(r27)
+0027ebd4: 38030005  addi     r0, r3, 5
+0027ebd8: 7c843214  add      r4, r4, r6
+0027ebdc: 9061007c  stw      r3, 0x7c(r1)
+0027ebe0: 90a10078  stw      r5, 0x78(r1)
+0027ebe4: 90810080  stw      r4, 0x80(r1)
+0027ebe8: 90010084  stw      r0, 0x84(r1)
+0027ebec: 80df0020  lwz      r6, 0x20(r31)
+0027ebf0: 80ff001c  lwz      r7, 0x1c(r31)
+0027ebf4: 7c633214  add      r3, r3, r6
+0027ebf8: 7c003214  add      r0, r0, r6
+0027ebfc: 7ca53a14  add      r5, r5, r7
+0027ec00: 7c843a14  add      r4, r4, r7
+0027ec04: 90a10078  stw      r5, 0x78(r1)
+0027ec08: 90810080  stw      r4, 0x80(r1)
+0027ec0c: 9061007c  stw      r3, 0x7c(r1)
+0027ec10: 90010084  stw      r0, 0x84(r1)
+0027ec14: 4bff5c6d  bl       0x274880   ; .Now__13TimeBase_SimsFv
+0027ec18: 38830000  addi     r4, r3, 0
+0027ec1c: 387f01dc  addi     r3, r31, 0x1dc
+0027ec20: 4becfd11  bl       0x14e930   ; .GetVal__13RampGeneratorFUl
+0027ec24: d0210040  stfs     f1, 0x40(r1)
+0027ec28: 386100b4  addi     r3, r1, 0xb4
+0027ec2c: 38810040  addi     r4, r1, 0x40
+0027ec30: 38bf01d0  addi     r5, r31, 0x1d0
+0027ec34: 4bff6e2d  bl       0x275a60
+0027ec38: 386100a8  addi     r3, r1, 0xa8
+0027ec3c: 389f01b8  addi     r4, r31, 0x1b8
+0027ec40: 38a100b4  addi     r5, r1, 0xb4
+0027ec44: 4bff6dbd  bl       0x275a00   ; .__pl__FRC4vec3RC4vec3
+0027ec48: 386100a8  addi     r3, r1, 0xa8
+0027ec4c: 38800001  li       r4, 1
+0027ec50: 4bff6d81  bl       0x2759d0   ; .__vc__4vec3Fi
+0027ec54: c0230000  lfs      f1, 0(r3)
+0027ec58: 386100a8  addi     r3, r1, 0xa8
+0027ec5c: c81d0000  lfd      f0, 0(r29)
+0027ec60: 38800000  li       r4, 0
+0027ec64: fc00082a  fadd     f0, f0, f1
+0027ec68: fc00001e  fctiwz   f0, f0
+0027ec6c: d8010128  stfd     f0, 0x128(r1)
+0027ec70: 8001012c  lwz      r0, 0x12c(r1)
+0027ec74: 5418402e  slwi     r24, r0, 8
+0027ec78: 4bff6d59  bl       0x2759d0   ; .__vc__4vec3Fi
+0027ec7c: c0230000  lfs      f1, 0(r3)
+0027ec80: 386100a8  addi     r3, r1, 0xa8
+0027ec84: c81d0000  lfd      f0, 0(r29)
+0027ec88: 38800002  li       r4, 2
+0027ec8c: fc00082a  fadd     f0, f0, f1
+0027ec90: fc00001e  fctiwz   f0, f0
+0027ec94: d8010120  stfd     f0, 0x120(r1)
+0027ec98: 80010124  lwz      r0, 0x124(r1)
+0027ec9c: 5400801e  slwi     r0, r0, 0x10
+0027eca0: 7c18c378  or       r24, r0, r24
+0027eca4: 4bff6d2d  bl       0x2759d0   ; .__vc__4vec3Fi
+0027eca8: c0230000  lfs      f1, 0(r3)
+0027ecac: c81d0000  lfd      f0, 0(r29)
+0027ecb0: 807a0000  lwz      r3, 0(r26)
+0027ecb4: fc00082a  fadd     f0, f0, f1
+0027ecb8: 81830000  lwz      r12, 0(r3)
+0027ecbc: fc00001e  fctiwz   f0, f0
+0027ecc0: 818c0024  lwz      r12, 0x24(r12)
+0027ecc4: d8010130  stfd     f0, 0x130(r1)
+0027ecc8: 80010134  lwz      r0, 0x134(r1)
+0027eccc: 7c16c378  or       r22, r0, r24
+0027ecd0: 48323d11  bl       0x5a29e0
+0027ecd4: 80410014  lwz      r2, 0x14(r1)
+0027ecd8: 81830000  lwz      r12, 0(r3)
+0027ecdc: 56c4863e  rlwinm   r4, r22, 0x10, 0x18, 0x1f
+0027ece0: 56c5c63e  rlwinm   r5, r22, 0x18, 0x18, 0x1f
+0027ece4: 818c0044  lwz      r12, 0x44(r12)
+0027ece8: 56c6063e  clrlwi   r6, r22, 0x18
+0027ecec: 48323cf5  bl       0x5a29e0
+0027ecf0: 80410014  lwz      r2, 0x14(r1)
+0027ecf4: 547c043e  clrlwi   r28, r3, 0x10
+0027ecf8: 4bff5b89  bl       0x274880   ; .Now__13TimeBase_SimsFv
+0027ecfc: 38830000  addi     r4, r3, 0
+0027ed00: 387f01dc  addi     r3, r31, 0x1dc
+0027ed04: 4bff6c7d  bl       0x275980   ; .IsDone__13RampGeneratorFUl
+0027ed08: 7c0300d0  neg      r0, r3
+0027ed0c: 7c001b78  or       r0, r0, r3
+0027ed10: 54000fff  rlwinm.  r0, r0, 1, 0x1f, 0x1f
+0027ed14: 41820220  beq      0x27ef34
+0027ed18: 3c16ff01  addis    r0, r22, -0xff
+0027ed1c: 28000000  cmplwi   r0, 0
+0027ed20: 40820214  bne      0x27ef34
+0027ed24: 7fe3fb78  mr       r3, r31
+0027ed28: 4bffefd9  bl       0x27dd00
+0027ed2c: c05e000c  lfs      f2, 0xc(r30)
+0027ed30: 3860005d  li       r3, 0x5d
+0027ed34: c01e0014  lfs      f0, 0x14(r30)
+0027ed38: 38800000  li       r4, 0
+0027ed3c: ec420828  fsubs    f2, f2, f1
+0027ed40: c03e0000  lfs      f1, 0(r30)
+0027ed44: ec0000b2  fmuls    f0, f0, f2
+0027ed48: efe1002a  fadds    f31, f1, f0
+0027ed4c: fc00f81e  fctiwz   f0, f31
+0027ed50: d8010130  stfd     f0, 0x130(r1)
+0027ed54: 80a10134  lwz      r5, 0x134(r1)
+0027ed58: 48000669  bl       0x27f3c0   ; .blend_sims__FUcUcUc
+0027ed5c: fc00f81e  fctiwz   f0, f31
+0027ed60: 5478442e  rlwinm   r24, r3, 8, 0x10, 0x17
+0027ed64: 38600040  li       r3, 0x40
+0027ed68: 388000d1  li       r4, 0xd1
+0027ed6c: d8010128  stfd     f0, 0x128(r1)
+0027ed70: 80a1012c  lwz      r5, 0x12c(r1)
+0027ed74: 4800064d  bl       0x27f3c0   ; .blend_sims__FUcUcUc
+0027ed78: fc00f81e  fctiwz   f0, f31
+0027ed7c: 5460821e  rlwinm   r0, r3, 0x10, 8, 0xf
+0027ed80: 7c18c378  or       r24, r0, r24
+0027ed84: 3860005f  li       r3, 0x5f
+0027ed88: d8010120  stfd     f0, 0x120(r1)
+0027ed8c: 38800000  li       r4, 0
+0027ed90: 80a10124  lwz      r5, 0x124(r1)
+0027ed94: 4800062d  bl       0x27f3c0   ; .blend_sims__FUcUcUc
+0027ed98: 5460063e  clrlwi   r0, r3, 0x18
+0027ed9c: 387f0000  addi     r3, r31, 0
+0027eda0: 7c19c378  or       r25, r0, r24
+0027eda4: 4bffef5d  bl       0x27dd00
+0027eda8: c05e000c  lfs      f2, 0xc(r30)
+0027edac: 3860005d  li       r3, 0x5d
+0027edb0: c01e0014  lfs      f0, 0x14(r30)
+0027edb4: 38800000  li       r4, 0
+0027edb8: ec420828  fsubs    f2, f2, f1
+0027edbc: c03e0000  lfs      f1, 0(r30)
+0027edc0: ec0000b2  fmuls    f0, f0, f2
+0027edc4: efe1002a  fadds    f31, f1, f0
+0027edc8: fc00f81e  fctiwz   f0, f31
+0027edcc: d8010138  stfd     f0, 0x138(r1)
+0027edd0: 80a1013c  lwz      r5, 0x13c(r1)
+0027edd4: 480005ed  bl       0x27f3c0   ; .blend_sims__FUcUcUc
+0027edd8: fc00f81e  fctiwz   f0, f31
+0027eddc: 5478442e  rlwinm   r24, r3, 8, 0x10, 0x17
+0027ede0: 38600040  li       r3, 0x40
+0027ede4: 388000d1  li       r4, 0xd1
+0027ede8: d8010140  stfd     f0, 0x140(r1)
+0027edec: 80a10144  lwz      r5, 0x144(r1)
+0027edf0: 480005d1  bl       0x27f3c0   ; .blend_sims__FUcUcUc
+0027edf4: fc00f81e  fctiwz   f0, f31
+0027edf8: 5460821e  rlwinm   r0, r3, 0x10, 8, 0xf
+0027edfc: 7c18c378  or       r24, r0, r24
+0027ee00: 3860005f  li       r3, 0x5f
+0027ee04: d8010148  stfd     f0, 0x148(r1)
+0027ee08: 38800000  li       r4, 0
+0027ee0c: 80a1014c  lwz      r5, 0x14c(r1)
+0027ee10: 480005b1  bl       0x27f3c0   ; .blend_sims__FUcUcUc
+0027ee14: 5460063e  clrlwi   r0, r3, 0x18
+0027ee18: c87d0010  lfd      f3, 0x10(r29)
+0027ee1c: 7c00c378  or       r0, r0, r24
+0027ee20: 386100c0  addi     r3, r1, 0xc0
+0027ee24: 3d004330  lis      r8, 0x4330
+0027ee28: 38810044  addi     r4, r1, 0x44
+0027ee2c: 5406063e  clrlwi   r6, r0, 0x18
+0027ee30: 91010150  stw      r8, 0x150(r1)
+0027ee34: 5407c63e  rlwinm   r7, r0, 0x18, 0x18, 0x1f
+0027ee38: 38a10048  addi     r5, r1, 0x48
+0027ee3c: 5400863e  rlwinm   r0, r0, 0x10, 0x18, 0x1f
+0027ee40: 90c10154  stw      r6, 0x154(r1)
+0027ee44: 38c1004c  addi     r6, r1, 0x4c
+0027ee48: c8010150  lfd      f0, 0x150(r1)
+0027ee4c: 90e1015c  stw      r7, 0x15c(r1)
+0027ee50: ec401828  fsubs    f2, f0, f3
+0027ee54: 91010158  stw      r8, 0x158(r1)
+0027ee58: c8010158  lfd      f0, 0x158(r1)
+0027ee5c: 90010164  stw      r0, 0x164(r1)
+0027ee60: ec201828  fsubs    f1, f0, f3
+0027ee64: 91010160  stw      r8, 0x160(r1)
+0027ee68: c8010160  lfd      f0, 0x160(r1)
+0027ee6c: d041004c  stfs     f2, 0x4c(r1)
+0027ee70: ec001828  fsubs    f0, f0, f3
+0027ee74: d0210048  stfs     f1, 0x48(r1)
+0027ee78: d0010044  stfs     f0, 0x44(r1)
+0027ee7c: 4bf254e5  bl       0x1a4360   ; .__ct__4vec3FRCfRCfRCf
+0027ee80: 38830000  addi     r4, r3, 0
+0027ee84: 387f01b8  addi     r3, r31, 0x1b8
+0027ee88: 4bff5a99  bl       0x274920   ; .__as__4vec3FRC4vec3
+0027ee8c: 3d004330  lis      r8, 0x4330
+0027ee90: c87d0010  lfd      f3, 0x10(r29)
+0027ee94: 5724063e  clrlwi   r4, r25, 0x18
+0027ee98: 91010168  stw      r8, 0x168(r1)
+0027ee9c: 5727c63e  rlwinm   r7, r25, 0x18, 0x18, 0x1f
+0027eea0: 386100cc  addi     r3, r1, 0xcc
+0027eea4: 5720863e  rlwinm   r0, r25, 0x10, 0x18, 0x1f
+0027eea8: 9081016c  stw      r4, 0x16c(r1)
+0027eeac: 38810050  addi     r4, r1, 0x50
+0027eeb0: 38a10054  addi     r5, r1, 0x54
+0027eeb4: c8010168  lfd      f0, 0x168(r1)
+0027eeb8: 38c10058  addi     r6, r1, 0x58
+0027eebc: 90e10174  stw      r7, 0x174(r1)
+0027eec0: ec401828  fsubs    f2, f0, f3
+0027eec4: 91010170  stw      r8, 0x170(r1)
+0027eec8: c8010170  lfd      f0, 0x170(r1)
+0027eecc: 9001017c  stw      r0, 0x17c(r1)
+0027eed0: ec201828  fsubs    f1, f0, f3
+0027eed4: 91010178  stw      r8, 0x178(r1)
+0027eed8: c8010178  lfd      f0, 0x178(r1)
+0027eedc: d0410058  stfs     f2, 0x58(r1)
+0027eee0: ec001828  fsubs    f0, f0, f3
+0027eee4: d0210054  stfs     f1, 0x54(r1)
+0027eee8: d0010050  stfs     f0, 0x50(r1)
+0027eeec: 4bf25475  bl       0x1a4360   ; .__ct__4vec3FRCfRCfRCf
+0027eef0: 38830000  addi     r4, r3, 0
+0027eef4: 387f01c4  addi     r3, r31, 0x1c4
+0027eef8: 4bff5a29  bl       0x274920   ; .__as__4vec3FRC4vec3
+0027eefc: 386100d8  addi     r3, r1, 0xd8
+0027ef00: 389f01c4  addi     r4, r31, 0x1c4
+0027ef04: 38bf01b8  addi     r5, r31, 0x1b8
+0027ef08: 4bff59b9  bl       0x2748c0   ; .__mi__FRC4vec3RC4vec3
+0027ef0c: 387f01d0  addi     r3, r31, 0x1d0
+0027ef10: 388100d8  addi     r4, r1, 0xd8
+0027ef14: 4bff5a0d  bl       0x274920   ; .__as__4vec3FRC4vec3
+0027ef18: 4bff5969  bl       0x274880   ; .Now__13TimeBase_SimsFv
+0027ef1c: c03e0004  lfs      f1, 4(r30)
+0027ef20: 38e30000  addi     r7, r3, 0
+0027ef24: c05e000c  lfs      f2, 0xc(r30)
+0027ef28: 387f01dc  addi     r3, r31, 0x1dc
+0027ef2c: 38c00000  li       r6, 0
+0027ef30: 4becf961  bl       0x14e890   ; .SetupConstantTimeRamp__13RampGeneratorFffUlUl
+0027ef34: 4bff594d  bl       0x274880   ; .Now__13TimeBase_SimsFv
+0027ef38: 38830000  addi     r4, r3, 0
+0027ef3c: 387f0210  addi     r3, r31, 0x210
+0027ef40: 4becf9f1  bl       0x14e930   ; .GetVal__13RampGeneratorFUl
+0027ef44: d021005c  stfs     f1, 0x5c(r1)
+0027ef48: 386100f0  addi     r3, r1, 0xf0
+0027ef4c: 3881005c  addi     r4, r1, 0x5c
+0027ef50: 38bf0204  addi     r5, r31, 0x204
+0027ef54: 4bff6b0d  bl       0x275a60
+0027ef58: 386100e4  addi     r3, r1, 0xe4
+0027ef5c: 389f01ec  addi     r4, r31, 0x1ec
+0027ef60: 38a100f0  addi     r5, r1, 0xf0
+0027ef64: 4bff6a9d  bl       0x275a00   ; .__pl__FRC4vec3RC4vec3
+0027ef68: 386100e4  addi     r3, r1, 0xe4
+0027ef6c: 38800001  li       r4, 1
+0027ef70: 4bff6a61  bl       0x2759d0   ; .__vc__4vec3Fi
+0027ef74: c0230000  lfs      f1, 0(r3)
+0027ef78: 386100e4  addi     r3, r1, 0xe4
+0027ef7c: c81d0000  lfd      f0, 0(r29)
+0027ef80: 38800000  li       r4, 0
+0027ef84: fc00082a  fadd     f0, f0, f1
+0027ef88: fc00001e  fctiwz   f0, f0
+0027ef8c: d8010178  stfd     f0, 0x178(r1)
+0027ef90: 8001017c  lwz      r0, 0x17c(r1)
+0027ef94: 5419402e  slwi     r25, r0, 8
+0027ef98: 4bff6a39  bl       0x2759d0   ; .__vc__4vec3Fi
+0027ef9c: c0230000  lfs      f1, 0(r3)
+0027efa0: 386100e4  addi     r3, r1, 0xe4
+0027efa4: c81d0000  lfd      f0, 0(r29)
+0027efa8: 38800002  li       r4, 2
+0027efac: fc00082a  fadd     f0, f0, f1
+0027efb0: fc00001e  fctiwz   f0, f0
+0027efb4: d8010170  stfd     f0, 0x170(r1)
+0027efb8: 80010174  lwz      r0, 0x174(r1)
+0027efbc: 5400801e  slwi     r0, r0, 0x10
+0027efc0: 7c19cb78  or       r25, r0, r25
+0027efc4: 4bff6a0d  bl       0x2759d0   ; .__vc__4vec3Fi
+0027efc8: c0230000  lfs      f1, 0(r3)
+0027efcc: c81d0000  lfd      f0, 0(r29)
+0027efd0: 807a0000  lwz      r3, 0(r26)
+0027efd4: fc00082a  fadd     f0, f0, f1
+0027efd8: 81830000  lwz      r12, 0(r3)
+0027efdc: fc00001e  fctiwz   f0, f0
+0027efe0: 818c0024  lwz      r12, 0x24(r12)
+0027efe4: d8010168  stfd     f0, 0x168(r1)
+0027efe8: 8001016c  lwz      r0, 0x16c(r1)
+0027efec: 7c16cb78  or       r22, r0, r25
+0027eff0: 483239f1  bl       0x5a29e0
+0027eff4: 80410014  lwz      r2, 0x14(r1)
+0027eff8: 81830000  lwz      r12, 0(r3)
+0027effc: 56c4863e  rlwinm   r4, r22, 0x10, 0x18, 0x1f
+0027f000: 56c5c63e  rlwinm   r5, r22, 0x18, 0x18, 0x1f
+0027f004: 818c0044  lwz      r12, 0x44(r12)
+0027f008: 56c6063e  clrlwi   r6, r22, 0x18
+0027f00c: 483239d5  bl       0x5a29e0
+0027f010: 80410014  lwz      r2, 0x14(r1)
+0027f014: 5479043e  clrlwi   r25, r3, 0x10
+0027f018: 4bff5869  bl       0x274880   ; .Now__13TimeBase_SimsFv
+0027f01c: 38830000  addi     r4, r3, 0
+0027f020: 387f0210  addi     r3, r31, 0x210
+0027f024: 4bff695d  bl       0x275980   ; .IsDone__13RampGeneratorFUl
+0027f028: 7c0300d0  neg      r0, r3
+0027f02c: 7c001b78  or       r0, r0, r3
+0027f030: 54000fff  rlwinm.  r0, r0, 1, 0x1f, 0x1f
+0027f034: 418201d4  beq      0x27f208
+0027f038: 2816ff00  cmplwi   r22, 0xff00
+0027f03c: 408201cc  bne      0x27f208
+0027f040: 807f018c  lwz      r3, 0x18c(r31)
+0027f044: 3c004330  lis      r0, 0x4330
+0027f048: 90010178  stw      r0, 0x178(r1)
+0027f04c: 38030032  addi     r0, r3, 0x32
+0027f050: c87d0008  lfd      f3, 8(r29)
+0027f054: 6c008000  xoris    r0, r0, 0x8000
+0027f058: c03e0008  lfs      f1, 8(r30)
+0027f05c: 9001017c  stw      r0, 0x17c(r1)
+0027f060: c01e0004  lfs      f0, 4(r30)
+0027f064: c8410178  lfd      f2, 0x178(r1)
+0027f068: ec421828  fsubs    f2, f2, f3
+0027f06c: ec220824  fdivs    f1, f2, f1

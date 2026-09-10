@@ -1,0 +1,39 @@
+                ; ==== .Tut_FlashRelButton__Fsb ====
+00156370: 93e1fffc  stw      r31, -4(r1)
+00156374: 7c0802a6  mflr     r0
+00156378: 80a28874  lwz      r5, -0x778c(r2)
+0015637c: 93c1fff8  stw      r30, -8(r1)
+00156380: 7c9e2378  mr       r30, r4
+00156384: 7c640734  extsh    r4, r3
+00156388: 90010008  stw      r0, 8(r1)
+0015638c: 9421ffb0  stwu     r1, -0x50(r1)
+00156390: 80a50000  lwz      r5, 0(r5)
+00156394: 80650024  lwz      r3, 0x24(r5)
+00156398: 4bf5ec59  bl       0xb4ff0   ; .FindNeighborByID__12NeighborhoodFi
+0015639c: 28030000  cmplwi   r3, 0
+001563a0: 41820050  beq      0x1563f0
+001563a4: 4bf4dcdd  bl       0xa4080   ; .GetGUID__8NeighborFv
+001563a8: 480edfb9  bl       0x244360   ; .GetHandle__12PersonFinderFl
+001563ac: 80828ca4  lwz      r4, -0x735c(r2)
+001563b0: 7c7f1b78  mr       r31, r3
+001563b4: 80640000  lwz      r3, 0(r4)
+001563b8: 81830000  lwz      r12, 0(r3)
+001563bc: 818c0020  lwz      r12, 0x20(r12)
+001563c0: 4844c621  bl       0x5a29e0
+001563c4: 80410014  lwz      r2, 0x14(r1)
+001563c8: 483c7839  bl       0x51dc00   ; .GetMainWindow__12cTSWinMgrW95Fv
+001563cc: 7fe4fb78  mr       r4, r31
+001563d0: 480006c1  bl       0x156a90   ; .FindRelButton__FP6cTSWini
+001563d4: 28030000  cmplwi   r3, 0
+001563d8: 41820018  beq      0x1563f0
+001563dc: 81830000  lwz      r12, 0(r3)
+001563e0: 7fc4f378  mr       r4, r30
+001563e4: 818c0168  lwz      r12, 0x168(r12)
+001563e8: 4844c5f9  bl       0x5a29e0
+001563ec: 80410014  lwz      r2, 0x14(r1)
+001563f0: 80010058  lwz      r0, 0x58(r1)
+001563f4: 38210050  addi     r1, r1, 0x50
+001563f8: 83e1fffc  lwz      r31, -4(r1)
+001563fc: 7c0803a6  mtlr     r0
+00156400: 83c1fff8  lwz      r30, -8(r1)
+00156404: 4e800020  blr      

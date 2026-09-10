@@ -1,0 +1,45 @@
+                ; ==== .TryElement__8cXPersonFP9StackElemP12BehaviorNode ====
+0010c3b0: 7c0802a6  mflr     r0
+0010c3b4: 38e50004  addi     r7, r5, 4
+0010c3b8: 90010008  stw      r0, 8(r1)
+0010c3bc: 9421ffc0  stwu     r1, -0x40(r1)
+0010c3c0: a8050000  lha      r0, 0(r5)
+0010c3c4: 5400045e  rlwinm   r0, r0, 0, 0x11, 0xf
+0010c3c8: 7c060734  extsh    r6, r0
+0010c3cc: 3806fffd  addi     r0, r6, -3
+0010c3d0: 2800002c  cmplwi   r0, 0x2c
+0010c3d4: 418100a4  bgt      0x10c478
+0010c3d8: 80c2a6fc  lwz      r6, -0x5904(r2)
+0010c3dc: 5400103a  slwi     r0, r0, 2
+0010c3e0: 7cc6002e  lwzx     r6, r6, r0
+0010c3e4: 7cc903a6  mtctr    r6
+0010c3e8: 4e800420  bctr     
+0010c3ec: 7ce53b78  mr       r5, r7
+0010c3f0: 480043e1  bl       0x1107d0
+0010c3f4: 48000088  b        0x10c47c
+0010c3f8: 7ce53b78  mr       r5, r7
+0010c3fc: 4bffe0d5  bl       0x10a4d0
+0010c400: 4800007c  b        0x10c47c
+0010c404: 480039bd  bl       0x10fdc0   ; .TryGosubFoundAction__8cXPersonFP9StackElem
+0010c408: 48000074  b        0x10c47c
+0010c40c: 7ce53b78  mr       r5, r7
+0010c410: 480035e1  bl       0x10f9f0   ; .TryLookTowards__8cXPersonFP9StackElemP10XPrimParam
+0010c414: 48000068  b        0x10c47c
+0010c418: 7ce53b78  mr       r5, r7
+0010c41c: 48003345  bl       0x10f760   ; .TryGotoRoutingSlot__8cXPersonFP9StackElemP10XPrimParam
+0010c420: 4800005c  b        0x10c47c
+0010c424: 7ce53b78  mr       r5, r7
+0010c428: 480000a9  bl       0x10c4d0   ; .TryReach__8cXPersonFP9StackElemP10XPrimParam
+0010c42c: 48000050  b        0x10c47c
+0010c430: 4bffd431  bl       0x109860   ; .TryFindBestAction__8cXPersonFP9StackElem
+0010c434: 48000048  b        0x10c47c
+0010c438: 7ce53b78  mr       r5, r7
+0010c43c: 4bffdc85  bl       0x10a0c0   ; .TryIdleForInput__8cXPersonFP9StackElemP10XPrimParam
+0010c440: 4800003c  b        0x10c47c
+0010c444: 80630a8c  lwz      r3, 0xa8c(r3)
+0010c448: 7ce53b78  mr       r5, r7
+0010c44c: 81830000  lwz      r12, 0(r3)
+0010c450: 818c0030  lwz      r12, 0x30(r12)
+0010c454: 4849658d  bl       0x5a29e0
+0010c458: 80410014  lwz      r2, 0x14(r1)
+0010c45c: 48000020  b        0x10c47c

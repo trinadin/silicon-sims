@@ -1,0 +1,52 @@
+### BHAV id=8193 label='person main' count=51
+  ins0  PRIM 280 opd=0100000000000000 t=30           f=other-path
+  ins1  MyMotives[Hunger] := Lit[75] t=45           f=other-path
+  ins2  StackObjID[0] := MyObject[11] t=25           f=other-path
+  ins3  MyPersonData[32] == Tuning[16896] t=5            f=8
+  ins4  CALL 8283 'person main loop' t=4            f=other-path
+  ins5  MyPersonData[28] := Tuning[8192] t=37           f=other-path
+  ins6  MyPersonData[28] := Tuning[8193] t=4            f=other-path
+  ins7  CALL 8286 'begin visiting'   t=6            f=6
+  ins8  MyPersonData[34] == Lit[0]   t=15           f=6
+  ins9  MyObject[8] HasFlag Lit[10]  t=10           f=11
+  ins10 CALL 8305 'burn to death'    t=11           f=other-path
+  ins11 MyPersonData[68] == Lit[1]   t=41           f=47
+  ins12 PRIM remove-object-instance opd=0000000000000000 t=13           f=13
+  ins13 PRIM 280 opd=0100000000000000 t=12           f=other-path
+  ins14 MyPersonData[34] := Lit[1]   t=46           f=other-path
+  ins15 MyPersonData[34] := Lit[-1]  t=7            f=other-path
+  ins16 CALL 8211 'init relationships' t=9            f=other-path
+  ins17 MyPersonData[29] := Lit[1]   t=42           f=other-path
+  ins18 CALL 8282 'check queue'      t=35           f=36
+  ins19 MyPersonData[74] HasFlag Lit[1] t=20           f=2
+  ins20 StackObjID[0] := Lit[0]      t=21           f=other-path
+  ins21 PRIM set-to-next opd=566a03f8840a0000 t=23           f=22
+  ins22 MyPersonData[74] ClearFlag Lit[1] t=2            f=other-path
+  ins23 PRIM relationship opd=0000010008000000 t=24           f=21
+  ins24 Temp[0] == Lit[1]            t=2            f=21
+  ins25 MyPersonData[27] := Lit[0]   t=31           f=other-path
+  ins26 Global[20] HasFlag Lit[1]    t=29           f=2
+  ins27 MyPersonData[32] := Tuning[16897] t=16           f=other-path
+  ins28 MyPersonData[34] := Lit[1]   t=27           f=other-path
+  ins29 PRIM 320 opd=ffffffffffffffff t=2            f=19
+  ins30 PRIM 320 opd=ffffffffffffffff t=27           f=16
+  ins31 PRIM 321 opd=ffffffffffffffff t=3            f=5
+  ins32 PRIM 320 opd=ffffffffffffffff t=34           f=4
+  ins33 MyPersonData[77] == Lit[0]   t=18           f=4
+  ins34 MyObject[11] != Global[3]    t=33           f=4
+  ins35 MyPersonData[27] == Lit[0]   t=36           f=4
+  ins36 CALL 8359 'try autonomy - no people' t=4            f=4
+  ins37 PRIM 469 opd=ffffffffffffffff t=34           f=32
+  ins38 CALL 8641 'Ghost - Main Loop' t=12           f=other-path
+  ins39 PRIM 287 opd=ffffffffffffffff t=38           f=40
+  ins40 StackObjID[0] := MyObject[11] t=38           f=other-path
+  ins41 Local[0] := MyAttr[1]        t=14           f=other-path
+  ins42 StackObjID[0] := Local[0]    t=39           f=other-path
+  ins43 MyMotives[Energy] := Lit[75] t=44           f=other-path
+  ins44 MyMotives[Comfort] := Lit[75] t=1            f=other-path
+  ins45 MyMotives[Hygiene] := Lit[75] t=17           f=other-path
+  ins46 MyMotives[Social] := Lit[75] t=43           f=other-path
+  ins47 MyPersonData[32] == Tuning[16903] t=50           f=26
+  ins48 PRIM remove-object-instance opd=0000000000000000 t=49           f=49
+  ins49 PRIM 280 opd=0100000000000000 t=48           f=other-path
+  ins50 CALL 8654 'Clone - Main Loop' t=48           f=other-path

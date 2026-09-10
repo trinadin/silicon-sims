@@ -1,0 +1,627 @@
+[
+ {
+  "opcode": 281,
+  "count": 782,
+  "name": "Wait For Notify"
+ },
+ {
+  "opcode": 280,
+  "count": 317,
+  "name": "idle"
+ },
+ {
+  "opcode": 321,
+  "count": 128,
+  "name": "Is lot a Residential Lot?"
+ },
+ {
+  "opcode": 365,
+  "count": 100,
+  "name": "Is either person a child?"
+ },
+ {
+  "opcode": 320,
+  "count": 81,
+  "name": "Is lot a Downtown Lot?"
+ },
+ {
+  "opcode": 357,
+  "count": 74,
+  "name": "get my relationship to temp 0"
+ },
+ {
+  "opcode": 363,
+  "count": 65,
+  "name": "Am I a Child?"
+ },
+ {
+  "opcode": 265,
+  "count": 48,
+  "name": "hide menu"
+ },
+ {
+  "opcode": 424,
+  "count": 42,
+  "name": "Is lot a Vacation Lot?"
+ },
+ {
+  "opcode": 379,
+  "count": 42,
+  "name": "enable debug balloons?"
+ },
+ {
+  "opcode": 290,
+  "count": 41,
+  "name": "old Wait for Notify"
+ },
+ {
+  "opcode": 355,
+  "count": 32,
+  "name": "verify person in stack obj"
+ },
+ {
+  "opcode": 446,
+  "count": 31,
+  "name": "Am I in Selected Sims Party? - 1.5"
+ },
+ {
+  "opcode": 309,
+  "count": 27,
+  "name": "help display - autosnapshot"
+ },
+ {
+  "opcode": 287,
+  "count": 25,
+  "name": "verify stack obj id"
+ },
+ {
+  "opcode": 306,
+  "count": 20,
+  "name": "Check Schedule"
+ },
+ {
+  "opcode": 469,
+  "count": 20,
+  "name": "Is Lot A Community Lot?"
+ },
+ {
+  "opcode": 393,
+  "count": 19,
+  "name": "kill person for good"
+ },
+ {
+  "opcode": 288,
+  "count": 18,
+  "name": "In Use?"
+ },
+ {
+  "opcode": 271,
+  "count": 15,
+  "name": "Init Object"
+ },
+ {
+  "opcode": 479,
+  "count": 15,
+  "name": "Is lot a Studio Lot?"
+ },
+ {
+  "opcode": 406,
+  "count": 15,
+  "name": "drop object from my slot to floor"
+ },
+ {
+  "opcode": 382,
+  "count": 14,
+  "name": "ensure Sim is standing"
+ },
+ {
+  "opcode": 388,
+  "count": 14,
+  "name": "fall on floor - end"
+ },
+ {
+  "opcode": 394,
+  "count": 13,
+  "name": "create flood under me"
+ },
+ {
+  "opcode": 273,
+  "count": 12,
+  "name": "Standard Exit"
+ },
+ {
+  "opcode": 307,
+  "count": 12,
+  "name": "Schedule"
+ },
+ {
+  "opcode": 261,
+  "count": 11,
+  "name": "SetComfort"
+ },
+ {
+  "opcode": 467,
+  "count": 9,
+  "name": "Am I a Dog?"
+ },
+ {
+  "opcode": 374,
+  "count": 9,
+  "name": "set to leave"
+ },
+ {
+  "opcode": 413,
+  "count": 9,
+  "name": "wake everyone in my room with balloon"
+ },
+ {
+  "opcode": 286,
+  "count": 9,
+  "name": "show skill progress"
+ },
+ {
+  "opcode": 282,
+  "count": 9,
+  "name": "divide tick counts"
+ },
+ {
+  "opcode": 260,
+  "count": 8,
+  "name": "set object graphic"
+ },
+ {
+  "opcode": 272,
+  "count": 8,
+  "name": "Standard entry"
+ },
+ {
+  "opcode": 492,
+  "count": 8,
+  "name": "Is lot a Magic Lot?"
+ },
+ {
+  "opcode": 387,
+  "count": 7,
+  "name": "fall on floor - begin"
+ },
+ {
+  "opcode": 428,
+  "count": 7,
+  "name": "Is lot a Vacation Snow Lot? - 1.5"
+ },
+ {
+  "opcode": 484,
+  "count": 7,
+  "name": "Adjust Stack Object's Fame 1.8"
+ },
+ {
+  "opcode": 275,
+  "count": 6,
+  "name": "set object lighting"
+ },
+ {
+  "opcode": 301,
+  "count": 6,
+  "name": "is object's room outside"
+ },
+ {
+  "opcode": 433,
+  "count": 6,
+  "name": "Is lot a Vacation Beach Lot? - 1.5"
+ },
+ {
+  "opcode": 468,
+  "count": 5,
+  "name": "Am I a Cat?"
+ },
+ {
+  "opcode": 295,
+  "count": 5,
+  "name": "flip Sim around"
+ },
+ {
+  "opcode": 425,
+  "count": 5,
+  "name": "animated idle for - 1.5"
+ },
+ {
+  "opcode": 472,
+  "count": 4,
+  "name": "Dream - Pet"
+ },
+ {
+  "opcode": 381,
+  "count": 4,
+  "name": "Schedule with Hour"
+ },
+ {
+  "opcode": 336,
+  "count": 4,
+  "name": "End Autofollow - Bad Behavior 1.4"
+ },
+ {
+  "opcode": 324,
+  "count": 4,
+  "name": "Get Stack Object's Autofollow Sim and Place In Temp 0"
+ },
+ {
+  "opcode": 397,
+  "count": 4,
+  "name": "enable social outcome choice?"
+ },
+ {
+  "opcode": 279,
+  "count": 4,
+  "name": "standard multi-tile exit"
+ },
+ {
+  "opcode": 449,
+  "count": 4,
+  "name": "Return in Temp 0 - Tile ID w/ Lowest Subindex - 1.5"
+ },
+ {
+  "opcode": 369,
+  "count": 3,
+  "name": "Schedule with param"
+ },
+ {
+  "opcode": 399,
+  "count": 3,
+  "name": "wake everyone up in stack objects room"
+ },
+ {
+  "opcode": 291,
+  "count": 3,
+  "name": "try fliiping object"
+ },
+ {
+  "opcode": 277,
+  "count": 3,
+  "name": "set multi-object graphic"
+ },
+ {
+  "opcode": 342,
+  "count": 3,
+  "name": "set object hidden"
+ },
+ {
+  "opcode": 332,
+  "count": 3,
+  "name": "Push Interaction on My Autofollow - 1.4"
+ },
+ {
+  "opcode": 333,
+  "count": 3,
+  "name": "Get My Autofollow Sim in Temp 0 - 1.4"
+ },
+ {
+  "opcode": 375,
+  "count": 3,
+  "name": "Is family full?"
+ },
+ {
+  "opcode": 373,
+  "count": 3,
+  "name": "find random portal"
+ },
+ {
+  "opcode": 403,
+  "count": 3,
+  "name": "group talk exit person"
+ },
+ {
+  "opcode": 316,
+  "count": 3,
+  "name": "do grim reaper"
+ },
+ {
+  "opcode": 488,
+  "count": 3,
+  "name": "Is Stack Object My Peer( Fame )?"
+ },
+ {
+  "opcode": 278,
+  "count": 3,
+  "name": "standard multi-tile entry"
+ },
+ {
+  "opcode": 312,
+  "count": 3,
+  "name": "privacy - should ignore person"
+ },
+ {
+  "opcode": 386,
+  "count": 3,
+  "name": "privacy - test alone"
+ },
+ {
+  "opcode": 483,
+  "count": 2,
+  "name": "Adjust my Fame 1.8"
+ },
+ {
+  "opcode": 364,
+  "count": 2,
+  "name": "Am I an Adult?"
+ },
+ {
+  "opcode": 395,
+  "count": 2,
+  "name": "create flood in front of me"
+ },
+ {
+  "opcode": 423,
+  "count": 2,
+  "name": "Allow on Vacation Only"
+ },
+ {
+  "opcode": 452,
+  "count": 2,
+  "name": "Allow in Locations only"
+ },
+ {
+  "opcode": 402,
+  "count": 2,
+  "name": "group talk add person"
+ },
+ {
+  "opcode": 401,
+  "count": 2,
+  "name": "group talk do"
+ },
+ {
+  "opcode": 400,
+  "count": 2,
+  "name": "group talk create"
+ },
+ {
+  "opcode": 419,
+  "count": 2,
+  "name": "Wander"
+ },
+ {
+  "opcode": 358,
+  "count": 2,
+  "name": "Do I Love temp 0?"
+ },
+ {
+  "opcode": 347,
+  "count": 2,
+  "name": "dirty inc"
+ },
+ {
+  "opcode": 313,
+  "count": 2,
+  "name": "do the drop"
+ },
+ {
+  "opcode": 380,
+  "count": 2,
+  "name": "push slap onto temp0 and temp1"
+ },
+ {
+  "opcode": 421,
+  "count": 2,
+  "name": "Return in Temp 0 & 1 - HIBYTE and LOBYTE - 1.5"
+ },
+ {
+  "opcode": 459,
+  "count": 2,
+  "name": "Vacation - Save Score"
+ },
+ {
+  "opcode": 311,
+  "count": 2,
+  "name": "help display - route failure"
+ },
+ {
+  "opcode": 384,
+  "count": 1,
+  "name": "Remove Stool"
+ },
+ {
+  "opcode": 383,
+  "count": 1,
+  "name": "Create Stool"
+ },
+ {
+  "opcode": 368,
+  "count": 1,
+  "name": "Leave"
+ },
+ {
+  "opcode": 325,
+  "count": 1,
+  "name": "Allow in Downtown Only"
+ },
+ {
+  "opcode": 338,
+  "count": 1,
+  "name": "Bored Social - 1.4"
+ },
+ {
+  "opcode": 371,
+  "count": 1,
+  "name": "Start Jealousy"
+ },
+ {
+  "opcode": 372,
+  "count": 1,
+  "name": "End Jealousy"
+ },
+ {
+  "opcode": 299,
+  "count": 1,
+  "name": "SetComfortFromMain"
+ },
+ {
+  "opcode": 370,
+  "count": 1,
+  "name": "animated idle for"
+ },
+ {
+  "opcode": 391,
+  "count": 1,
+  "name": "Exit Downtown Object?"
+ },
+ {
+  "opcode": 405,
+  "count": 1,
+  "name": "Exit fun object"
+ },
+ {
+  "opcode": 343,
+  "count": 1,
+  "name": "Create Trash Pile By Size"
+ },
+ {
+  "opcode": 345,
+  "count": 1,
+  "name": "wake everyone sleeping in lot"
+ },
+ {
+  "opcode": 359,
+  "count": 1,
+  "name": "am I friends with temp 0"
+ },
+ {
+  "opcode": 427,
+  "count": 1,
+  "name": "Get Available Family Adult in Temp 0"
+ },
+ {
+  "opcode": 489,
+  "count": 1,
+  "name": "Am I On a Quest?"
+ },
+ {
+  "opcode": 463,
+  "count": 1,
+  "name": "Charge for Away from Home 1.5 - 1.6"
+ },
+ {
+  "opcode": 285,
+  "count": 1,
+  "name": "Fun Object Test"
+ },
+ {
+  "opcode": 302,
+  "count": 1,
+  "name": "Clean"
+ },
+ {
+  "opcode": 259,
+  "count": 1,
+  "name": "old idle"
+ },
+ {
+  "opcode": 340,
+  "count": 1,
+  "name": "dress normal"
+ },
+ {
+  "opcode": 304,
+  "count": 1,
+  "name": "clean inc"
+ },
+ {
+  "opcode": 292,
+  "count": 1,
+  "name": "create multiple floods in front of object"
+ },
+ {
+  "opcode": 396,
+  "count": 1,
+  "name": "create flood in front of object"
+ },
+ {
+  "opcode": 296,
+  "count": 1,
+  "name": "schedule phone call with neighbor"
+ },
+ {
+  "opcode": 329,
+  "count": 1,
+  "name": "do I love anyone?"
+ },
+ {
+  "opcode": 330,
+  "count": 1,
+  "name": "does stack object love anyone?"
+ },
+ {
+  "opcode": 328,
+  "count": 1,
+  "name": "Allow Autonomous?"
+ },
+ {
+  "opcode": 442,
+  "count": 1,
+  "name": "Return in Temp 0 & 1 - Mutli-Tile Dimensions [base 0] - 1.5"
+ },
+ {
+  "opcode": 453,
+  "count": 1,
+  "name": "Find Nearest Rental Shack - 1.5"
+ },
+ {
+  "opcode": 455,
+  "count": 1,
+  "name": "Push Interaction by Number - 1.5"
+ },
+ {
+  "opcode": 456,
+  "count": 1,
+  "name": "Vacation - Add to Vacation Score 1.5"
+ },
+ {
+  "opcode": 473,
+  "count": 1,
+  "name": "Dream - Pet - About Other Sim"
+ },
+ {
+  "opcode": 474,
+  "count": 1,
+  "name": "Dream - Pet - About Object"
+ },
+ {
+  "opcode": 420,
+  "count": 1,
+  "name": "Autofollow my family member?"
+ },
+ {
+  "opcode": 339,
+  "count": 1,
+  "name": "dress naked"
+ },
+ {
+  "opcode": 485,
+  "count": 1,
+  "name": "Is Sim in Stack Object on Fame Track?"
+ },
+ {
+  "opcode": 318,
+  "count": 1,
+  "name": "Am I a clone?"
+ },
+ {
+  "opcode": 317,
+  "count": 1,
+  "name": "create reaper"
+ },
+ {
+  "opcode": 294,
+  "count": 1,
+  "name": "privacy - ask Sims to Shoo"
+ },
+ {
+  "opcode": 434,
+  "count": 1,
+  "name": "Is lot a Vacation Forest Lot? - 1.5"
+ },
+ {
+  "opcode": 501,
+  "count": 1,
+  "name": "Magic - Check For Abuse"
+ }
+]

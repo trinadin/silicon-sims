@@ -1,0 +1,256 @@
+0026a3e0: bf41ffe8  stmw     r26, -0x18(r1)
+0026a3e4: 7c0802a6  mflr     r0
+0026a3e8: 2c040013  cmpwi    r4, 0x13
+0026a3ec: 3bc30000  addi     r30, r3, 0
+0026a3f0: 3be50000  addi     r31, r5, 0
+0026a3f4: 90010008  stw      r0, 8(r1)
+0026a3f8: 9421ffa0  stwu     r1, -0x60(r1)
+0026a3fc: 41820370  beq      0x26a76c
+0026a400: 408003c8  bge      0x26a7c8
+0026a404: 2c040001  cmpwi    r4, 1
+0026a408: 41820008  beq      0x26a410
+0026a40c: 480003bc  b        0x26a7c8
+0026a410: 38000002  li       r0, 2
+0026a414: 7c0903a6  mtctr    r0
+0026a418: 38800000  li       r4, 0
+0026a41c: 60000000  nop      
+0026a420: 800300dc  lwz      r0, 0xdc(r3)
+0026a424: 7c1f0040  cmplw    r31, r0
+0026a428: 40820058  bne      0x26a480
+0026a42c: 2c040001  cmpwi    r4, 1
+0026a430: 41820030  beq      0x26a460
+0026a434: 40800044  bge      0x26a478
+0026a438: 2c040000  cmpwi    r4, 0
+0026a43c: 40800008  bge      0x26a444
+0026a440: 48000038  b        0x26a478
+0026a444: 807e00cc  lwz      r3, 0xcc(r30)
+0026a448: 4bfa31e9  bl       0x20d630   ; .ShopGetCatalogPage__7CPStateFv
+0026a44c: 7c641b78  mr       r4, r3
+0026a450: 807e00cc  lwz      r3, 0xcc(r30)
+0026a454: 3884ffff  addi     r4, r4, -1
+0026a458: 4bfa3079  bl       0x20d4d0   ; .ShopSetCatalogPage__7CPStateFi
+0026a45c: 4800001c  b        0x26a478
+0026a460: 807e00cc  lwz      r3, 0xcc(r30)
+0026a464: 4bfa31cd  bl       0x20d630   ; .ShopGetCatalogPage__7CPStateFv
+0026a468: 7c641b78  mr       r4, r3
+0026a46c: 807e00cc  lwz      r3, 0xcc(r30)
+0026a470: 38840001  addi     r4, r4, 1
+0026a474: 4bfa305d  bl       0x20d4d0   ; .ShopSetCatalogPage__7CPStateFi
+0026a478: 38600001  li       r3, 1
+0026a47c: 48000350  b        0x26a7cc
+0026a480: 38630004  addi     r3, r3, 4
+0026a484: 38840001  addi     r4, r4, 1
+0026a488: 4200ff98  bdnz     0x26a420
+0026a48c: 801e01c4  lwz      r0, 0x1c4(r30)
+0026a490: 7c1f0040  cmplw    r31, r0
+0026a494: 40820068  bne      0x26a4fc
+0026a498: 807e00cc  lwz      r3, 0xcc(r30)
+0026a49c: 80030094  lwz      r0, 0x94(r3)
+0026a4a0: 2c000001  cmpwi    r0, 1
+0026a4a4: 40820050  bne      0x26a4f4
+0026a4a8: 38800000  li       r4, 0
+0026a4ac: 4bfa4495  bl       0x20e940   ; .ShopSetSortState__7CPStateFQ27CPState20eWinCatalogSortState
+0026a4b0: 3ba00000  li       r29, 0
+0026a4b4: 3b9e0000  addi     r28, r30, 0
+0026a4b8: 60000000  nop      
+0026a4bc: 807c03f8  lwz      r3, 0x3f8(r28)
+0026a4c0: 38800000  li       r4, 0
+0026a4c4: 482a0e8d  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0026a4c8: 3bbd0001  addi     r29, r29, 1
+0026a4cc: 3b9c0004  addi     r28, r28, 4
+0026a4d0: 2c1d0008  cmpwi    r29, 8
+0026a4d4: 4180ffe8  blt      0x26a4bc
+0026a4d8: 807e00cc  lwz      r3, 0xcc(r30)
+0026a4dc: 80030094  lwz      r0, 0x94(r3)
+0026a4e0: 2c000001  cmpwi    r0, 1
+0026a4e4: 40820010  bne      0x26a4f4
+0026a4e8: 38600000  li       r3, 0
+0026a4ec: 38800001  li       r4, 1
+0026a4f0: 482a0e61  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0026a4f4: 38600001  li       r3, 1
+0026a4f8: 480002d4  b        0x26a7cc
+0026a4fc: 38000008  li       r0, 8
+0026a500: 7c0903a6  mtctr    r0
+0026a504: 387e0000  addi     r3, r30, 0
+0026a508: 3ba00000  li       r29, 0
+0026a50c: 800303f8  lwz      r0, 0x3f8(r3)
+0026a510: 7c1f0040  cmplw    r31, r0
+0026a514: 40820200  bne      0x26a714
+0026a518: 807e00cc  lwz      r3, 0xcc(r30)
+0026a51c: 80030094  lwz      r0, 0x94(r3)
+0026a520: 2c000001  cmpwi    r0, 1
+0026a524: 41820134  beq      0x26a658
+0026a528: 408001a0  bge      0x26a6c8
+0026a52c: 2c000000  cmpwi    r0, 0
+0026a530: 40800008  bge      0x26a538
+0026a534: 48000194  b        0x26a6c8
+0026a538: 38800001  li       r4, 1
+0026a53c: 4bfa4405  bl       0x20e940   ; .ShopSetSortState__7CPStateFQ27CPState20eWinCatalogSortState
+0026a540: 807e00cc  lwz      r3, 0xcc(r30)
+0026a544: 80030090  lwz      r0, 0x90(r3)
+0026a548: 28000006  cmplwi   r0, 6
+0026a54c: 418100bc  bgt      0x26a608
+0026a550: 8082af18  lwz      r4, -0x50e8(r2)
+0026a554: 5400103a  slwi     r0, r0, 2
+0026a558: 7c84002e  lwzx     r4, r4, r0
+0026a55c: 7c8903a6  mtctr    r4
+0026a560: 4e800420  bctr     
+0026a564: 7fa4eb78  mr       r4, r29
+0026a568: 4bfa4129  bl       0x20e690   ; .ShopSetRoomCatalog__7CPStateFQ27CPState15NewRoomCatalogs
+0026a56c: 807e00cc  lwz      r3, 0xcc(r30)
+0026a570: 38800000  li       r4, 0
+0026a574: 4bfa3fdd  bl       0x20e550   ; .ShopSetRoomSubCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a578: 48000090  b        0x26a608
+0026a57c: 7fa4eb78  mr       r4, r29
+0026a580: 4bfa3eb1  bl       0x20e430   ; .ShopSetFunctionCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a584: 807e00cc  lwz      r3, 0xcc(r30)
+0026a588: 38800000  li       r4, 0
+0026a58c: 4bfa3d65  bl       0x20e2f0   ; .ShopSetFunctionSubCatalog__7CPStateFQ27CPState20eFunctionSubCatalogs
+0026a590: 48000078  b        0x26a608
+0026a594: 7fa4eb78  mr       r4, r29
+0026a598: 4bfa3c39  bl       0x20e1d0   ; .ShopSetDowntownCatalog__7CPStateFQ27CPState19NewDowntownCatalogs
+0026a59c: 807e00cc  lwz      r3, 0xcc(r30)
+0026a5a0: 38800000  li       r4, 0
+0026a5a4: 4bfa363d  bl       0x20dbe0   ; .ShopSetDowntownSubCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a5a8: 48000060  b        0x26a608
+0026a5ac: 7fa4eb78  mr       r4, r29
+0026a5b0: 4bfa3b01  bl       0x20e0b0   ; .ShopSetVacationCatalog__7CPStateFQ27CPState19NewVacationCatalogs
+0026a5b4: 807e00cc  lwz      r3, 0xcc(r30)
+0026a5b8: 38800000  li       r4, 0
+0026a5bc: 4bfa34e5  bl       0x20daa0   ; .ShopSetVacationSubCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a5c0: 48000048  b        0x26a608
+0026a5c4: 7fa4eb78  mr       r4, r29
+0026a5c8: 4bfa39b9  bl       0x20df80   ; .ShopSetCommunityCatalog__7CPStateFQ27CPState20NewCommunityCatalogs
+0026a5cc: 807e00cc  lwz      r3, 0xcc(r30)
+0026a5d0: 38800000  li       r4, 0
+0026a5d4: 4bfa338d  bl       0x20d960   ; .ShopSetCommunitySubCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a5d8: 48000030  b        0x26a608
+0026a5dc: 7fa4eb78  mr       r4, r29
+0026a5e0: 4bfa3871  bl       0x20de50   ; .ShopSetStudiotownCatalog__7CPStateFQ27CPState21NewStudiotownCatalogs
+0026a5e4: 807e00cc  lwz      r3, 0xcc(r30)
+0026a5e8: 38800000  li       r4, 0
+0026a5ec: 4bfa3235  bl       0x20d820   ; .ShopSetStudiotownSubCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a5f0: 48000018  b        0x26a608
+0026a5f4: 7fa4eb78  mr       r4, r29
+0026a5f8: 4bfa3729  bl       0x20dd20   ; .ShopSetMagictownCatalog__7CPStateFQ27CPState20NewMagictownCatalogs
+0026a5fc: 807e00cc  lwz      r3, 0xcc(r30)
+0026a600: 38800000  li       r4, 0
+0026a604: 4bfa30dd  bl       0x20d6e0   ; .ShopSetMagictownSubCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a608: 83fe03f8  lwz      r31, 0x3f8(r30)
+0026a60c: 3b9e0000  addi     r28, r30, 0
+0026a610: 3ba00000  li       r29, 0
+0026a614: 60000000  nop      
+0026a618: 807c03f8  lwz      r3, 0x3f8(r28)
+0026a61c: 38800000  li       r4, 0
+0026a620: 482a0d31  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0026a624: 3bbd0001  addi     r29, r29, 1
+0026a628: 3b9c0004  addi     r28, r28, 4
+0026a62c: 2c1d0008  cmpwi    r29, 8
+0026a630: 4180ffe8  blt      0x26a618
+0026a634: 807e00cc  lwz      r3, 0xcc(r30)
+0026a638: 80030094  lwz      r0, 0x94(r3)
+0026a63c: 2c000001  cmpwi    r0, 1
+0026a640: 40820010  bne      0x26a650
+0026a644: 387f0000  addi     r3, r31, 0
+0026a648: 38800001  li       r4, 1
+0026a64c: 482a0d05  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0026a650: 38600001  li       r3, 1
+0026a654: 48000178  b        0x26a7cc
+0026a658: 80030090  lwz      r0, 0x90(r3)
+0026a65c: 28000006  cmplwi   r0, 6
+0026a660: 41810068  bgt      0x26a6c8
+0026a664: 8082af14  lwz      r4, -0x50ec(r2)
+0026a668: 5400103a  slwi     r0, r0, 2
+0026a66c: 7c84002e  lwzx     r4, r4, r0
+0026a670: 7c8903a6  mtctr    r4
+0026a674: 4e800420  bctr     
+0026a678: 7fa4eb78  mr       r4, r29
+0026a67c: 4bfa3ed5  bl       0x20e550   ; .ShopSetRoomSubCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a680: 48000048  b        0x26a6c8
+0026a684: 7fa4eb78  mr       r4, r29
+0026a688: 4bfa3c69  bl       0x20e2f0   ; .ShopSetFunctionSubCatalog__7CPStateFQ27CPState20eFunctionSubCatalogs
+0026a68c: 4800003c  b        0x26a6c8
+0026a690: 7fa4eb78  mr       r4, r29
+0026a694: 4bfa354d  bl       0x20dbe0   ; .ShopSetDowntownSubCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a698: 48000030  b        0x26a6c8
+0026a69c: 7fa4eb78  mr       r4, r29
+0026a6a0: 4bfa3401  bl       0x20daa0   ; .ShopSetVacationSubCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a6a4: 48000024  b        0x26a6c8
+0026a6a8: 7fa4eb78  mr       r4, r29
+0026a6ac: 4bfa32b5  bl       0x20d960   ; .ShopSetCommunitySubCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a6b0: 48000018  b        0x26a6c8
+0026a6b4: 7fa4eb78  mr       r4, r29
+0026a6b8: 4bfa3169  bl       0x20d820   ; .ShopSetStudiotownSubCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a6bc: 4800000c  b        0x26a6c8
+0026a6c0: 7fa4eb78  mr       r4, r29
+0026a6c4: 4bfa301d  bl       0x20d6e0   ; .ShopSetMagictownSubCatalog__7CPStateFQ27CPState19NewFunctionCatalogs
+0026a6c8: 3ba00000  li       r29, 0
+0026a6cc: 3b9e0000  addi     r28, r30, 0
+0026a6d0: 60000000  nop      
+0026a6d4: 807c03f8  lwz      r3, 0x3f8(r28)
+0026a6d8: 38800000  li       r4, 0
+0026a6dc: 482a0c75  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0026a6e0: 3bbd0001  addi     r29, r29, 1
+0026a6e4: 3b9c0004  addi     r28, r28, 4
+0026a6e8: 2c1d0008  cmpwi    r29, 8
+0026a6ec: 4180ffe8  blt      0x26a6d4
+0026a6f0: 807e00cc  lwz      r3, 0xcc(r30)
+0026a6f4: 80030094  lwz      r0, 0x94(r3)
+0026a6f8: 2c000001  cmpwi    r0, 1
+0026a6fc: 40820010  bne      0x26a70c
+0026a700: 387f0000  addi     r3, r31, 0
+0026a704: 38800001  li       r4, 1
+0026a708: 482a0c49  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0026a70c: 38600001  li       r3, 1
+0026a710: 480000bc  b        0x26a7cc
+0026a714: 38630004  addi     r3, r3, 4
+0026a718: 3bbd0001  addi     r29, r29, 1
+0026a71c: 4200fdf0  bdnz     0x26a50c
+0026a720: 3b800000  li       r28, 0
+0026a724: 835e041c  lwz      r26, 0x41c(r30)
+0026a728: 3bbc0000  addi     r29, r28, 0
+0026a72c: 3b600000  li       r27, 0
+0026a730: 48000024  b        0x26a754
+0026a734: 807e0420  lwz      r3, 0x420(r30)
+0026a738: 7f63e82e  lwzx     r27, r3, r29
+0026a73c: 7f63db78  mr       r3, r27
+0026a740: 4bf9f271  bl       0x2099b0   ; .GetButton__7ProductCFv
+0026a744: 7c1f1840  cmplw    r31, r3
+0026a748: 41820014  beq      0x26a75c
+0026a74c: 3b9c0001  addi     r28, r28, 1
+0026a750: 3bbd0004  addi     r29, r29, 4
+0026a754: 7c1cd000  cmpw     r28, r26
+0026a758: 4180ffdc  blt      0x26a734
+0026a75c: 387e0000  addi     r3, r30, 0
+0026a760: 389b0000  addi     r4, r27, 0
+0026a764: 4bfffacd  bl       0x26a230   ; .SetProduct__11cWinCatalogFP7Product
+0026a768: 48000060  b        0x26a7c8
+0026a76c: 801e0424  lwz      r0, 0x424(r30)
+0026a770: 28000000  cmplwi   r0, 0
+0026a774: 41820054  beq      0x26a7c8
+0026a778: 835e041c  lwz      r26, 0x41c(r30)
+0026a77c: 3b800000  li       r28, 0
+0026a780: 3ba00000  li       r29, 0
+0026a784: 4800003c  b        0x26a7c0
+0026a788: 807e0420  lwz      r3, 0x420(r30)
+0026a78c: 7f63e82e  lwzx     r27, r3, r29
+0026a790: 281b0000  cmplwi   r27, 0
+0026a794: 41820024  beq      0x26a7b8
+0026a798: 7f63db78  mr       r3, r27
+0026a79c: 4bf9f215  bl       0x2099b0   ; .GetButton__7ProductCFv
+0026a7a0: 7c1f1840  cmplw    r31, r3
+0026a7a4: 40820014  bne      0x26a7b8
+0026a7a8: 807e0424  lwz      r3, 0x424(r30)
+0026a7ac: 389b0000  addi     r4, r27, 0
+0026a7b0: 38be0000  addi     r5, r30, 0
+0026a7b4: 4800384d  bl       0x26e000   ; .EnablePopup__16cWinCatalogPopupFP7ProductP6cTSWin
+0026a7b8: 3b9c0001  addi     r28, r28, 1
+0026a7bc: 3bbd0004  addi     r29, r29, 4
+0026a7c0: 7c1cd000  cmpw     r28, r26
+0026a7c4: 4180ffc4  blt      0x26a788
+0026a7c8: 38600001  li       r3, 1
+0026a7cc: 80010068  lwz      r0, 0x68(r1)
+0026a7d0: 38210060  addi     r1, r1, 0x60
+0026a7d4: bb41ffe8  lmw      r26, -0x18(r1)
+0026a7d8: 7c0803a6  mtlr     r0
+0026a7dc: 4e800020  blr      

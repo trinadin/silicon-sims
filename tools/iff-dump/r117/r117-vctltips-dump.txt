@@ -1,0 +1,68 @@
+R117 canon dump — UIText.iff STR# chunks 138 / 240 / 241 / 145 / 150
+Source: game-data/The Sims/GameData/UIText.iff (2,300,704 bytes; full-file sha256
+b229da197eb9678370844c4da7c88640c3d1ce9a5e528654bfd71df6ef12a9ad)
+Parser: 60-byte Maxis header, first chunk @0x40, 76-byte chunk headers, BE sizes;
+STR# data LE, format -3 = language pairs {u8 lang, cstring value, cstring comment},
+lang 1 = English (first block, so game index == English index).
+
+=== chunk 138 'VCtlTips' (chunkSize 28762; 432 raw = 24 x languages; format -3) ===
+full-chunk sha256 d3dc987e72222692218cec96a497b53541581f7a2bf40cfbceca13fdbc95ee7a
+body-only  sha256 40a5193b28709c689ea8dded20ac00cec93da9291de284481d5644b6751937e2
+(trailer = 0xA3 x 432 — FreeSo TS1 STR writer quirk, STR.cs:355-358)
+
+English [0..23], verbatim:
+0  'First Story'
+1  'Second Story'
+2  'Roof'
+3  'Rotate Left'
+4  'Rotate Right'
+5  'Zoom In  +'          <- TWO spaces before '+'
+6  'Zoom Out  -'          <- TWO spaces before '-'
+7  'Walls Up'
+8  'Walls Cutaway'
+9  'Walls Down'
+10 'Live Mode - F1'
+11 'Buy Mode - F2'
+12 'Build Mode - F3'
+13 'Options Mode - F5'
+14 'Funds'
+15 'Pause - P'
+16 'Normal Speed - 1'
+17 'High Speed - 2'
+18 'Ultra Speed - 3'
+19 'Camera Mode - F4'
+20 'Family Friend Count'
+21 'AM'
+22 'PM'
+23 'Help'
+
+=== chunk 240 'Relationship Panel Sort Button Tooltip Text' (80 raw = 4 x 20; format -3) ===
+body-only sha256 75233e0997f4ded091dc933732a03ef369d16d08f7b291cff00b8816ae17c054
+English [0..3]: 'Family Only' | 'Friends Only' | 'Famous Only' | 'All'
+comments: 'UNLEASHED -- Translated', '...roll-over tool tip text for the relationship
+sort buttons', 'Superstar - TRANSLATED'. Mapped-UNUSED in the port: the relationship
+subpanel assigns NO tooltips (grep zero hits).
+
+=== chunk 241 'Inventory Panel Sort Button Tooltip Text' (60 raw = 3 x 20; format -3) ===
+body-only sha256 1415d809929905be5017987163b3b84c297ab00726230694480e9616f565c6c4
+English [0..2]: 'Other Items' | 'Magic Items' | 'Ingredients'
+Makin' Magic era ('###SPELLBOUND ... Needs Translation'). Mapped-UNUSED (same reason).
+
+=== chunk 145 'optionstrs' (1512 raw = 84 x 18; format -3) — R118 candidate ===
+body-only sha256 34b96437145cf11b4d771b591c975d348b944d22c46fc55af0d49beb66c502d2
+Key entries: [1] 'Neighborhood' [3] 'Save' [5] 'Quit' [7] 'Graphics Options'
+[9] 'Sound Options' [11] 'Play Options' [14] 'Anti-alias' [17] 'Shadows' [20] 'Lighting'
+[23] 'Interface Effects' [28] 'Terrain Detail' [31] 'Character Detail'
+[39] 'Low' [40] 'Med' [41] 'High' [44] 'F/X' [45] 'Sound Effects' [47]/[48] 'Music'
+[50]/[51] 'Vox' [56] 'Auto-Centering' [59] 'Free Will' [60] 'About Free Will'
+[62] 'Edge Scrolling' [65] 'Sim In Background' [69] 'Reset Tutorial' [72] 'Quick Tips'
+[75] 'Auto Snapshot' [78] 'Live PIP' [81] 'Export HTML' (+ per-item 'About' + popup
+description pairs). Port already reads [1]/[3]/[5] in UIMainPanel.cs:326-328.
+ON/OFF has NO original (zero hits — verified R115); 'Free Will' label = [59] exact.
+
+=== chunk 150 'BuyModeCatalogSortTips' (960 raw = 48 English x ...; format -3) ===
+English [0-7] rooms: 'Living Room','Dining Room','Bedroom','Study','Kitchen',
+'Bathroom','Outside','Miscellaneous'; [8-15] functions: 'Seating','Surfaces',
+'Decorative','Electronics','Appliances','Plumbing','Lighting','Miscellaneous';
+[16+] expansion sub-sorts (Downtown/Vacation/Unleashed/Studio Town). Future-round
+candidate for the buy-mode catalog sort UI.

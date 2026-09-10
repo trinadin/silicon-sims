@@ -1,0 +1,31 @@
+{
+ "round": "r249-freewill",
+ "sha256": "33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f",
+ "code_pins": 80,
+ "data_evidence": {
+  "constants": "0x48ea4=0.2 0x48ea8=0.05 0x48eac=0.1 0x48eb0=10",
+  "freewill_init": "data[0x45f1c]=1",
+  "comparator_tvector": "TOC-0x58f8->data 0xd9d0->{0x1011b0,0x8000}",
+  "constant_names": {
+   "402": "min autonomy score for family",
+   "432": "min autonomy score for visitors",
+   "596": "min autonomy score for sitting",
+   "627": "random selection count"
+  }
+ },
+ "fixtures": {
+  "comparator_ascending_eps0": "PASS",
+  "sort_order": "PASS",
+  "selection_pool_K": "PASS",
+  "uniform_draw": "PASS",
+  "int_to_double_idiom": "PASS",
+  "curve_interp": "PASS",
+  "score_mean": "PASS",
+  "attenuation_enum": "PASS",
+  "distance_attenuation": "PASS",
+  "winner_cutoff": "PASS",
+  "action_ring": "PASS",
+  "freewill_mirror": "PASS"
+ },
+ "pass": true
+}

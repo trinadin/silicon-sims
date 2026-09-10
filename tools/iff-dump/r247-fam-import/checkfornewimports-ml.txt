@@ -1,0 +1,90 @@
+                ; ==== .CheckForNewImports__13cWinMagiclandFv ====
+00581790: 93e1fffc  stw      r31, -4(r1)
+00581794: 7c0802a6  mflr     r0
+00581798: 83e2bdf4  lwz      r31, -0x420c(r2)
+0058179c: 93c1fff8  stw      r30, -8(r1)
+005817a0: 7c7e1b78  mr       r30, r3
+005817a4: 93a1fff4  stw      r29, -0xc(r1)
+005817a8: 83a28870  lwz      r29, -0x7790(r2)
+005817ac: 9381fff0  stw      r28, -0x10(r1)
+005817b0: 90010008  stw      r0, 8(r1)
+005817b4: 9421ffa0  stwu     r1, -0x60(r1)
+005817b8: 880301c0  lbz      r0, 0x1c0(r3)
+005817bc: 28000000  cmplwi   r0, 0
+005817c0: 40820114  bne      0x5818d4
+005817c4: 881e011a  lbz      r0, 0x11a(r30)
+005817c8: 28000000  cmplwi   r0, 0
+005817cc: 40820008  bne      0x5817d4
+005817d0: 48000104  b        0x5818d4
+005817d4: 38610040  addi     r3, r1, 0x40
+005817d8: 4bf73699  bl       0x4f4e70   ; .__ct__9cTSStringFv
+005817dc: 807d0000  lwz      r3, 0(r29)
+005817e0: 38810040  addi     r4, r1, 0x40
+005817e4: 4bcd627d  bl       0x257a60   ; .FindDataDirectory__8cSimsAppFR9cTSString
+005817e8: 38600058  li       r3, 0x58
+005817ec: 4bb06775  bl       0x87f60
+005817f0: 7c7c1b78  mr       r28, r3
+005817f4: 4801b53d  bl       0x59cd30
+005817f8: 38a30000  addi     r5, r3, 0
+005817fc: 38610040  addi     r3, r1, 0x40
+00581800: 389c0000  addi     r4, r28, 0
+00581804: 4bb02bad  bl       0x843b0
+00581808: 387f00b1  addi     r3, r31, 0xb1
+0058180c: 4801b525  bl       0x59cd30
+00581810: 38a30000  addi     r5, r3, 0
+00581814: 38610040  addi     r3, r1, 0x40
+00581818: 389f00b1  addi     r4, r31, 0xb1
+0058181c: 4bb02b95  bl       0x843b0
+00581820: 38610040  addi     r3, r1, 0x40
+00581824: 4bf287ed  bl       0x4aa010   ; .DoesAnyEntryExistThatMatchesPattern__12cTSDirectoryFRC9cTSString
+00581828: 5460063e  clrlwi   r0, r3, 0x18
+0058182c: 807d0000  lwz      r3, 0(r29)
+00581830: 60050000  ori      r5, r0, 0
+00581834: 38810040  addi     r4, r1, 0x40
+00581838: 7c0500d0  neg      r0, r5
+0058183c: 7c002b78  or       r0, r0, r5
+00581840: 541d0ffe  srwi     r29, r0, 0x1f
+00581844: 4bcd621d  bl       0x257a60   ; .FindDataDirectory__8cSimsAppFR9cTSString
+00581848: 38600058  li       r3, 0x58
+0058184c: 4bb06715  bl       0x87f60
+00581850: 7c7c1b78  mr       r28, r3
+00581854: 4801b4dd  bl       0x59cd30
+00581858: 38a30000  addi     r5, r3, 0
+0058185c: 38610040  addi     r3, r1, 0x40
+00581860: 389c0000  addi     r4, r28, 0
+00581864: 4bb02b4d  bl       0x843b0
+00581868: 387f00b7  addi     r3, r31, 0xb7
+0058186c: 4801b4c5  bl       0x59cd30
+00581870: 38a30000  addi     r5, r3, 0
+00581874: 38610040  addi     r3, r1, 0x40
+00581878: 389f00b7  addi     r4, r31, 0xb7
+0058187c: 4bb02b35  bl       0x843b0
+00581880: 38610040  addi     r3, r1, 0x40
+00581884: 4bf2878d  bl       0x4aa010   ; .DoesAnyEntryExistThatMatchesPattern__12cTSDirectoryFRC9cTSString
+00581888: 5460063e  clrlwi   r0, r3, 0x18
+0058188c: 807e016c  lwz      r3, 0x16c(r30)
+00581890: 7fa50378  or       r5, r29, r0
+00581894: 7c8500d0  neg      r4, r5
+00581898: 88030160  lbz      r0, 0x160(r3)
+0058189c: 7c842b78  or       r4, r4, r5
+005818a0: 54840ffe  srwi     r4, r4, 0x1f
+005818a4: 7c002040  cmplw    r0, r4
+005818a8: 41820018  beq      0x5818c0
+005818ac: 98830160  stb      r4, 0x160(r3)
+005818b0: 81830000  lwz      r12, 0(r3)
+005818b4: 818c0170  lwz      r12, 0x170(r12)
+005818b8: 48021129  bl       0x5a29e0
+005818bc: 80410014  lwz      r2, 0x14(r1)
+005818c0: 38000000  li       r0, 0
+005818c4: 38610040  addi     r3, r1, 0x40
+005818c8: 981e01c0  stb      r0, 0x1c0(r30)
+005818cc: 3880ffff  li       r4, -1
+005818d0: 4bf730b1  bl       0x4f4980   ; .__dt__9cTSStringFv
+005818d4: 80010068  lwz      r0, 0x68(r1)
+005818d8: 38210060  addi     r1, r1, 0x60
+005818dc: 83e1fffc  lwz      r31, -4(r1)
+005818e0: 83c1fff8  lwz      r30, -8(r1)
+005818e4: 7c0803a6  mtlr     r0
+005818e8: 83a1fff4  lwz      r29, -0xc(r1)
+005818ec: 8381fff0  lwz      r28, -0x10(r1)
+005818f0: 4e800020  blr      

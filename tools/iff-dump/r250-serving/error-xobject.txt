@@ -1,0 +1,49 @@
+                ; ==== .Error__8cXObjectFs ====
+000d2d60: 7c0802a6  mflr     r0
+000d2d64: 7c641b78  mr       r4, r3
+000d2d68: 90010008  stw      r0, 8(r1)
+000d2d6c: 38a00004  li       r5, 4
+000d2d70: 38c00001  li       r6, 1
+000d2d74: 9421ffc0  stwu     r1, -0x40(r1)
+000d2d78: 80030114  lwz      r0, 0x114(r3)
+000d2d7c: 5400062c  rlwinm   r0, r0, 0, 0x18, 0x16
+000d2d80: 60000100  ori      r0, r0, 0x100
+000d2d84: 90030114  stw      r0, 0x114(r3)
+000d2d88: 806300dc  lwz      r3, 0xdc(r3)
+000d2d8c: a88400f0  lha      r4, 0xf0(r4)
+000d2d90: 4800f121  bl       0xe1eb0
+000d2d94: 80010048  lwz      r0, 0x48(r1)
+000d2d98: 38210040  addi     r1, r1, 0x40
+000d2d9c: 7c0803a6  mtlr     r0
+000d2da0: 4e800020  blr      
+000d2da4: 00000000  .long    0x00000000
+000d2da8: 00092041  .long    0x00092041
+000d2dac: 80000000  lwz      r0, 0(0)
+000d2db0: 00000044  .long    0x00000044
+000d2db4: 00132e45  .long    0x00132e45
+000d2db8: 72726f72  andi.    r18, r19, 0x6f72
+000d2dbc: 5f5f3863  rlwnm.   r31, r26, r7, 1, 0x11
+000d2dc0: 584f626a  .long    0x584f626a
+000d2dc4: 65637446  oris     r3, r11, 0x7446
+000d2dc8: 73000000  andi.    r0, r24, 0
+000d2dcc: 00000000  .long    0x00000000
+000d2dd0: 80828858  lwz      r4, -0x77a8(r2)
+000d2dd4: 80628860  lwz      r3, -0x77a0(r2)
+000d2dd8: c8440000  lfd      f2, 0(r4)
+000d2ddc: c0a30000  lfs      f5, 0(r3)
+000d2de0: 80a28b04  lwz      r5, -0x74fc(r2)
+000d2de4: fc201050  fneg     f1, f2
+000d2de8: 8082885c  lwz      r4, -0x77a4(r2)
+000d2dec: fc802850  fneg     f4, f5
+000d2df0: 80628854  lwz      r3, -0x77ac(r2)
+000d2df4: 88050000  lbz      r0, 0(r5)
+000d2df8: c0640000  lfs      f3, 0(r4)
+000d2dfc: c8030000  lfd      f0, 0(r3)
+000d2e00: 7c000775  extsb.   r0, r0
+000d2e04: d082d02c  stfs     f4, -0x2fd4(r2)
+000d2e08: 80628afc  lwz      r3, -0x7504(r2)
+000d2e0c: d0a2d030  stfs     f5, -0x2fd0(r2)
+000d2e10: d062d034  stfs     f3, -0x2fcc(r2)
+000d2e14: d0a2d038  stfs     f5, -0x2fc8(r2)
+000d2e18: d822d040  stfd     f1, -0x2fc0(r2)
+000d2e1c: d842d048  stfd     f2, -0x2fb8(r2)

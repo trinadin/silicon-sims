@@ -1,0 +1,53 @@
+[
+  {
+    "run": "800x600",
+    "scale": 1,
+    "changed_bounds": [
+      618,
+      145,
+      718,
+      365
+    ],
+    "preview_with_one_pixel_sampling_border": [
+      617,
+      144,
+      719,
+      366
+    ],
+    "changed_outside_sampling_border": 0
+  },
+  {
+    "run": "1280x800",
+    "scale": 1,
+    "changed_bounds": [
+      618,
+      145,
+      718,
+      365
+    ],
+    "preview_with_one_pixel_sampling_border": [
+      617,
+      144,
+      719,
+      366
+    ],
+    "changed_outside_sampling_border": 0
+  },
+  {
+    "run": "800x600@2x",
+    "scale": 1.7033333,
+    "changed_bounds": [
+      1052,
+      246,
+      1224,
+      623
+    ],
+    "preview_with_one_pixel_sampling_border": [
+      1051,
+      245,
+      1224,
+      623
+    ],
+    "changed_outside_sampling_border": 0
+  }
+]

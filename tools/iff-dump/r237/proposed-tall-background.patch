@@ -1,0 +1,37 @@
+--- a/Client/Simitone/Simitone.Client/UI/Panels/UIMainPanel.cs
++++ b/Client/Simitone/Simitone.Client/UI/Panels/UIMainPanel.cs
+@@ -41,7 +41,14 @@
+         private Rectangle DivRect;
+         private UIDiagonalStripe Diag;
+         public UIImage OriginalPanelBack;
+-        public UIImage TallSubpanel;   // R193: kTallSubpanel 4918
++        public UIImage TallSubpanel;   // kTallSubpanel 4918; double-byte UI only.
++
++        // CPState::IsDoubleByteUI @0x20c670: language IDs 15,17,18,19,20.
++        // R193 inverted the caller's beq and mounted this over English LIVE.
++        public static bool UsesTallSubpanel(byte languageCode)
++        {
++            return languageCode == 15 || (languageCode >= 17 && languageCode <= 20);
++        }
+         // R144: kBackPatch bridge strip + the cWinPeople chrome (webcams/tabs)
+         public UIImage BackPatch;
+         public UIOriginalPeopleChrome PeopleChrome;
+@@ -281,14 +288,10 @@
+                 OriginalPanelBack = null;
+             }
+ 
+-            // R193: kTallSubpanel 4918 (cpanel\TallSubPanel.TGA 600x150) —
+-            // loaded by cWinCPanel::Init 0x270240 when the UI is NOT
+-            // double-byte. It is the tall backdrop of the 150-tall people
+-            // window (people-local (0,0) = MainPanel-local (0,-50)); the
+-            // 804x100 PanelBack paints over its lower band. The exact buffer
+-            // rect arithmetic (0x118/0x32 offsets) was not resolved — natural
+-            // size at the window origin, disclosed.
+-            if (Game.Desktop)
++            // Original cWinCPanel::Init @0x270238 skips this buffer when
++            // IsDoubleByteUI returns false. Keep the existing double-byte
++            // placement model pending its separate composition restoration.
++            if (Game.Desktop && UsesTallSubpanel((byte)FSO.Files.Formats.IFF.Chunks.STR.DefaultLangCode))
+             {
+                 try
+                 {

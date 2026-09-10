@@ -1,0 +1,55 @@
+{
+  "toc_slot": "-0x5790",
+  "unpacked_data_offset": "0x4ad40",
+  "rows": [
+    [
+      0,
+      1,
+      2,
+      3
+    ],
+    [
+      3,
+      0,
+      1,
+      2
+    ],
+    [
+      2,
+      3,
+      0,
+      1
+    ],
+    [
+      1,
+      2,
+      3,
+      0
+    ]
+  ],
+  "selected_byte1": [
+    1,
+    0,
+    3,
+    2
+  ],
+  "sample_offset_xy": [
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      1
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      0
+    ]
+  ],
+  "corner_evidence": "SetPackedAlt162038..16218c; byte0(x,y)=byte1(x,y+1), byte2(x,y)=byte1(x+1,y), byte3(x,y)=byte1(x+1,y+1)"
+}

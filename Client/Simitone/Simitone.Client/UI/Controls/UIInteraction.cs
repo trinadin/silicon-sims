@@ -30,6 +30,8 @@ namespace Simitone.Client.UI.Controls
     /// </summary>
     public class UIInteraction : UIContainer
     {
+        public const int OriginalIconSize = 45;
+
         public Texture2D Icon;
         private UITooltipHandler m_TooltipHandler;
         private Texture2D Background;
@@ -48,16 +50,45 @@ namespace Simitone.Client.UI.Controls
         public float OverlayScale;
         public float RimScale;
         public bool Dead;
+        internal Rectangle InteractionClickRegion => ClickHandler.Region;
+        internal Texture2D OriginalFrameTexture => Background;
+        internal Texture2D OriginalCancelTexture => Overlay;
 
         public void SetCancelled()
         {
-            OverlayScale = 2f;
-            Overlay = Content.Get().CustomUI.Get("int_cancel.png").Get(GameFacade.GraphicsDevice);
-            GameFacade.Screens.Tween.To(this, 0.5f, new Dictionary<string, float>() { { "OverlayScale", 1f }}, TweenQuad.EaseOut);
+            OverlayScale = OriginalStyle ? 1f : 2f;
+            // R142: the ORIGINAL cancel overlay — Res_Other id 9004
+            // Other/QueueCancel.bmp 45x45 (the red X over queued interactions);
+            // int_cancel.png was the Simitone-era X.
+            try
+            {
+                var qc = Simitone.Client.UI.Model.UIOriginal.EnsureResolved("other\\QueueCancel.bmp");
+                if (qc != null) Overlay = qc.Get(GameFacade.GraphicsDevice);
+            }
+            catch { }
+            if (Overlay == null) Overlay = Content.Get().CustomUI.Get("int_cancel.png").Get(GameFacade.GraphicsDevice);
+            if (!OriginalStyle)
+            {
+                GameFacade.Screens.Tween.To(this, 0.5f, new Dictionary<string, float>() { { "OverlayScale", 1f }}, TweenQuad.EaseOut);
+            }
         }
+
+        // Desktop uses the original 45x45 cActionIcon composition. The pill
+        // backgrounds, large active icon and rim remain the mobile skin.
+        public static readonly bool OriginalStyle = !FSO.Common.FSOEnvironment.SoftwareKeyboard;
 
         public void SetActive(bool active)
         {
+            if (OriginalStyle)
+            {
+                Active = active;
+                ClickHandler.Region = new Rectangle(0, 0, OriginalIconSize, OriginalIconSize);
+                ScaleX = ScaleY = 1f;
+                Rim = null;
+                ResolveOriginalFrame();
+                return;
+            }
+
             if (active)
             {
                 Rim = Content.Get().CustomUI.Get("int_big_sel.png").Get(GameFacade.GraphicsDevice);
@@ -122,8 +153,42 @@ namespace Simitone.Client.UI.Controls
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             base.Draw(batch);
-            DrawLocalTexture(batch, Background, null, new Vector2(-Background.Width, -Background.Height)/2, Vector2.One, new Color(104, 164, 184, 255));
+            if (OriginalStyle)
+            {
+                ResolveOriginalFrame();
+                if (Background != null)
+                {
+                    // MakeActionBitmap's flag selects the left/right 45px cell.
+                    // SetAction defaults that flag true; the active Sim derives it
+                    // from an original person field the port does not model. Do not
+                    // conflate it with queue position: use the proven default cell.
+                    var frame = new Rectangle(0, 0, OriginalIconSize, OriginalIconSize);
+                    if (frame.Right <= Background.Width && frame.Bottom <= Background.Height)
+                    {
+                        DrawLocalTexture(batch, Background, frame, Vector2.Zero, Vector2.One);
+                    }
+                    else
+                    {
+                        DrawLocalTexture(batch, Background, null, Vector2.Zero,
+                            new Vector2(OriginalIconSize / (float)Background.Width, OriginalIconSize / (float)Background.Height));
+                    }
+                }
+                // IconFrame.bmp is an OPAQUE blue button face, not a rim.
+                // cActionIcon paints it first and composites the action bitmap
+                // over it. Painting it after the icon hid every queue image and
+                // produced the solid-blue 45x45 placeholder seen in LIVE mode.
+                DrawOriginalIcon(batch);
+                if (Overlay != null)
+                {
+                    DrawLocalTexture(batch, Overlay, null, Vector2.Zero,
+                        new Vector2(OriginalIconSize / (float)Overlay.Width, OriginalIconSize / (float)Overlay.Height));
+                }
+                return;
+            }
+
+            if (Background != null) DrawLocalTexture(batch, Background, null, new Vector2(-Background.Width, -Background.Height)/2, Vector2.One, new Color(104, 164, 184, 255));
             var iconSize = (Active) ? 74f : 37f;
             if (Icon != null)
             {
@@ -134,7 +199,45 @@ namespace Simitone.Client.UI.Controls
                 else DrawLocalTexture(batch, Icon, new Rectangle(0, 0, Icon.Width / 2, Icon.Height), new Vector2(iconSize / -2, iconSize / -2), new Vector2(iconSize / Icon.Height, iconSize / Icon.Height));
             }
             if (Overlay != null) DrawLocalTexture(batch, Overlay, null, new Vector2(Overlay.Width, Overlay.Height) * (OverlayScale/-2), new Vector2(OverlayScale), Color.White * (2 - OverlayScale));
-            if (Rim != null) DrawLocalTexture(batch, Rim, null, new Vector2(Rim.Width, Rim.Height) * (RimScale / -2), new Vector2(RimScale), Color.Yellow * (2-RimScale));
+            if (Rim != null) DrawLocalTexture(batch, Rim, null, new Vector2(Rim.Width, Rim.Height) * (RimScale / -2), new Vector2(RimScale), Color.White * (2-RimScale));
+        }
+
+        private void DrawOriginalIcon(UISpriteBatch batch)
+        {
+            if (Icon == null) return;
+
+            var source = OriginalSourceRectangle(Icon.Width, Icon.Height);
+            DrawLocalTexture(batch, Icon, source, Vector2.Zero,
+                new Vector2(OriginalIconSize / (float)source.Width, OriginalIconSize / (float)source.Height));
+        }
+
+        /// <summary>
+        /// cActionIcon::SetIcon accepts canonical 45/180/270px-wide sheets and
+        /// 45/135px-high sheets. MakeActionBitmap selects column zero and the
+        /// middle row of a 135px-high sheet. The two-column branch preserves the
+        /// port's existing compatibility with its non-canonical wide thumbnails.
+        /// </summary>
+        public static Rectangle OriginalSourceRectangle(int width, int height)
+        {
+            width = Math.Max(1, width);
+            height = Math.Max(1, height);
+            var columns = (width == 270) ? 6 : (width == 180) ? 4 : 1;
+            if (columns == 1 && width > height * 1.1f) columns = 2;
+            var rows = (height == 135) ? 3 : 1;
+            var sourceWidth = Math.Max(1, width / columns);
+            var sourceHeight = Math.Max(1, height / rows);
+            return new Rectangle(0, (rows == 3) ? sourceHeight : 0,
+                sourceWidth, sourceHeight);
+        }
+
+        private void ResolveOriginalFrame()
+        {
+            if (Background != null) return;
+            try
+            {
+                Background = Simitone.Client.UI.Model.UIOriginal.EnsureResolved("cpanel\\Buttons\\IconFrame.bmp")?.Get(GameFacade.GraphicsDevice);
+            }
+            catch { }
         }
 
         public override Rectangle GetBounds()

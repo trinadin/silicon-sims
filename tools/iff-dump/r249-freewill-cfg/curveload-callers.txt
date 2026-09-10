@@ -1,0 +1,80 @@
+001114e0: 8065001c  lwz      r3, 0x1c(r5)
+001114e4: 38030001  addi     r0, r3, 1
+001114e8: 7c060040  cmplw    r6, r0
+001114ec: 40800014  bge      0x111500
+001114f0: 3806ffff  addi     r0, r6, -1
+001114f4: 80650020  lwz      r3, 0x20(r5)
+001114f8: 5400103a  slwi     r0, r0, 2
+001114fc: 7c83002e  lwzx     r4, r3, r0
+00111500: 28040000  cmplwi   r4, 0
+00111504: 41820034  beq      0x111538
+00111508: 80640118  lwz      r3, 0x118(r4)
+0011150c: a8030012  lha      r0, 0x12(r3)
+00111510: 2c000002  cmpwi    r0, 2
+00111514: 40820024  bne      0x111538
+00111518: 389d0000  addi     r4, r29, 0
+0011151c: 387f00e4  addi     r3, r31, 0xe4
+00111520: 4800e311  bl       0x11f830   ; .GetNthKey__9RelMatrixFi
+00111524: 38830000  addi     r4, r3, 0
+00111528: 387f00e4  addi     r3, r31, 0xe4
+0011152c: 4800f2c5  bl       0x1207f0   ; .RemoveArray__9RelMatrixFl
+00111530: 3ba0ffff  li       r29, -1
+00111534: 48000018  b        0x11154c
+00111538: 3bbd0001  addi     r29, r29, 1
+0011153c: 387f00e4  addi     r3, r31, 0xe4
+00111540: 4800e461  bl       0x11f9a0   ; .CountKeys__9RelMatrixFv
+00111544: 7c1d1800  cmpw     r29, r3
+00111548: 4180ff7c  blt      0x1114c4
+0011154c: 2c1dffff  cmpwi    r29, -1
+00111550: 4182ff68  beq      0x1114b8
+00111554: 807f0118  lwz      r3, 0x118(r31)
+00111558: aba30066  lha      r29, 0x66(r3)
+0011155c: 7fa00735  extsh.   r0, r29
+00111560: 41820024  beq      0x111584
+00111564: 807f011c  lwz      r3, 0x11c(r31)
+00111568: 8063000c  lwz      r3, 0xc(r3)
+0011156c: 4bf2f6c5  bl       0x40c30   ; .GetPrivFile__8BehaviorFv
+00111570: 7c641b78  mr       r4, r3
+00111574: 807f0a9c  lwz      r3, 0xa9c(r31)
+00111578: 7fa5eb78  mr       r5, r29
+0011157c: 4bf8df85  bl       0x9f500   ; .LoadFromFile__14MotiveCurveSetFP8iResFiles
+00111580: 48000064  b        0x1115e4
+00111584: a87f0600  lha      r3, 0x600(r31)
+00111588: 38800000  li       r4, 0
+0011158c: 7c600735  extsh.   r0, r3
+00111590: 41820010  beq      0x1115a0
+00111594: 2c030012  cmpwi    r3, 0x12
+00111598: 40800008  bge      0x1115a0
+0011159c: 38800001  li       r4, 1
+001115a0: 5480063f  clrlwi.  r0, r4, 0x18
+001115a4: 41820024  beq      0x1115c8
+001115a8: 807f011c  lwz      r3, 0x11c(r31)
+001115ac: 8063000c  lwz      r3, 0xc(r3)
+001115b0: 4bf2f641  bl       0x40bf0   ; .GetGlobFile__8BehaviorFv
+001115b4: 7c641b78  mr       r4, r3
+001115b8: 807f0a9c  lwz      r3, 0xa9c(r31)
+001115bc: 38a001f7  li       r5, 0x1f7
+001115c0: 4bf8df41  bl       0x9f500   ; .LoadFromFile__14MotiveCurveSetFP8iResFiles
+001115c4: 48000020  b        0x1115e4
+001115c8: 807f011c  lwz      r3, 0x11c(r31)
+001115cc: 8063000c  lwz      r3, 0xc(r3)
+001115d0: 4bf2f621  bl       0x40bf0   ; .GetGlobFile__8BehaviorFv
+001115d4: 7c641b78  mr       r4, r3
+001115d8: 807f0a9c  lwz      r3, 0xa9c(r31)
+001115dc: 38a001f5  li       r5, 0x1f5
+001115e0: 4bf8df21  bl       0x9f500   ; .LoadFromFile__14MotiveCurveSetFP8iResFiles
+001115e4: 807f0a8c  lwz      r3, 0xa8c(r31)
+001115e8: 28030000  cmplwi   r3, 0
+001115ec: 41820018  beq      0x111604
+001115f0: 81830000  lwz      r12, 0(r3)
+001115f4: 38800000  li       r4, 0
+001115f8: 818c005c  lwz      r12, 0x5c(r12)
+001115fc: 484913e5  bl       0x5a29e0
+00111600: 80410014  lwz      r2, 0x14(r1)
+00111604: 80010058  lwz      r0, 0x58(r1)
+00111608: 38210050  addi     r1, r1, 0x50
+0011160c: 83e1fffc  lwz      r31, -4(r1)
+00111610: 83c1fff8  lwz      r30, -8(r1)
+00111614: 7c0803a6  mtlr     r0
+00111618: 83a1fff4  lwz      r29, -0xc(r1)
+0011161c: 8381fff0  lwz      r28, -0x10(r1)

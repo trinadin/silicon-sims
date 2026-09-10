@@ -1,0 +1,96 @@
+== STR# 166 ('Help') entries=1598 chunkBytes=473342
+   sha256(chunk) = c30b13f66c04818f17f2f94219a646a3eeae5ac18c224f437be40155c5482f41
+   [ 0]T 'Auto-Snapshot'
+   [ 1]B "Significant moments in your Sims' lives are automatically photographed and put into their photo album. Click the Photo Album button in Camera Mode to view the pictures."
+   [ 2]T 'Bills'
+   [ 3]B "Don't forget to check the mailbox; bills come every three days. The more items you own, the more you owe. Pay your bills before they turn red or the repoman will pay you a visit. "
+   [ 4]T 'Bladder'
+   [ 5]B "When a Sim's gotta go, a Sim's gotta go. And there's really only one way to go--get them to a toilet with all due speed."
+   [ 6]T 'Build Mode - Delete'
+   [ 7]B "If it's too late for Undo, you can get money back for most architectural items by deleting or selling them. Things that can be picked up can be deleted using the hand tool. Other architectural tools have more specific instructions. Click the image of one of the selections under each tool to learn how to delete it."
+   [ 8]T 'Build Mode - Undo'
+   [ 9]B 'Click the Undo icon to reverse the last change you made--keep clicking it to undo previous changes. You will get money back for undone actions.  Once you leave Build Mode, your changes will become permanent. After that, you can delete them, but you will lose some money.'
+   [10]T 'Buy Mode - Rotate'
+   [11]B "To rotate an object, click it and while holding the mouse down drag it in the direction you'd like it to face. While holding the object with the Hand Tool you can use the < & > to rotate as well."
+   [12]T 'Buy Mode - Sell'
+   [13]B "To Delete an Object: Select it, release the mouse, and then either drag it back to the control panel or press delete. If no Sim time has passed, you'll get all your money back. Once you've had an object for a while, its value will go down. Certain objects may go up in value over time, but telling you which ones would be cheating, wouldn't it?"
+   [14]T 'Camera Mode'
+   [15]B "Use the camera to take your own photos. You can upload your family's story to the web. See the manual or www.thesims.com for more information."
+   [16]T 'Comfort'
+   [17]B "Sims need to be comfortable. If there isn't a comfy chair or couch to sit on or a nice hot bath to relax in this need can get mighty low."
+   [18]T 'Doors'
+   [19]B "In addition to allowing Sims to come and go, doors provide light. Along with the room's size, light is one of the best ways to improve a Sim's feeling about a room."
+   [20]T 'Doors - Delete'
+   [21]B "To delete doors, select the Door Tool and hold down the CTRL key. When the door you'd like to delete is highlighted, click to remove it.\r\n \r\nTIP: You can also remove doors by drawing a wall over them. "
+   [22]T 'Energy'
+   [23]B "There is nothing like a good night's sleep to restore a sagging energy bar. For a short-term fix, try a nap on the couch or a hot cup of coffee."
+   [24]T 'Floors'
+   [25]B 'Click to place single floor tiles, or click and drag to create a rectangle. Hold the Shift key down to cover the whole room at once. Click while holding the Shift key if you like it, or release the Shift key if you decide against it.'
+   [26]T 'Friends'
+   [27]B 'Never underestimate the power of friendship for moving forward in your career. You need to socialize to increase your friend count so it never hurts to take a day off and plan a big party.'
+   [28]T 'Friends - Count'
+   [29]B 'The Family Friend Count displays the total number of friends the family has as a whole.  Friends are only counted once even if more than one Sim considers them a friend.'
+   [30]T 'Fun'
+   [31]B 'Fun is different for everyone. Serious Sims may be more interested in reading a book, while playful Sims are more likely to enjoy some time at the pinball machine.'
+   [32]T 'Grades'
+   [33]B 'All young Sims need to study and work hard in school. To get good grades students must go to school in a good mood. Bookcases and computers both offer an excellent opportunity to study and further improve grades. If young Sims slack off instead, they may be banished to military school!'
+   [34]T 'Grass'
+   [35]B 'Grass will grow back by itself over time.'
+   [36]T 'Hills'
+   [37]B 'Hold down the CTRL key when raising terrain to make some nice curvy hills.'
+   [38]T 'Hunger'
+   [39]B "A refrigerator is the first stop for hungry Sims. The kitchen appliances you buy them affect the quality of the food they prepare. They can also call for pizza if they don't feel like cooking."
+   [40]T 'Hygiene'
+   [41]B 'A shower or bath is always good for a dirty Sim. Hand washing after messy activities also helps keep hygiene high.'
+   [42]T 'Interests'
+   [43]B 'Different Sims have different interests. Sims with similar interests are likely to have rewarding conversations.'
+   [44]T 'Job'
+   [45]B 'Unemployment - a desired state for some and a dreaded state for others. The newspaper or a computer can always be used to find a job.'
+   [46]T 'Job - Performance'
+   [47]B "The best way to improve job performance is to leave for work in a good mood. Do your best to fulfill all your Sims' needs before work."
+   [48]T 'Maintenance'
+   [49]B "Some household items need your care. A wilting violet or murky water in the fish tank are not uncommon. Don't forget to do routine maintenance."
+   [50]T 'Mood'
+   [51]B "Sims who are in a bad mood are likely to have negative social interactions. Also, they are likely to receive negative reactions if the Sims they're interacting with are in a bad mood."
+   [52]T 'Neighbors'
+   [53]B "Neighbors from the other houses in the neighborhood will drop by periodically. You can't control neighbors' actions directly but if your Sim is a good host they may become friends."
+   [54]T 'Performance'
+   [55]B 'The game may run faster on your machine if you turn off some of the options. Click the Options button and then the Graphics Options button to see your choices. Click on the icons to see the pop-ups that explain what each option is.'
+   [56]T 'Personality'
+   [57]B "Sims' personalities determine the kind of interactions they like to have. Consult the astrological signs for some clues about which Sims will get along and which will clash."
+   [58]T 'Phone'
+   [59]B "A phone allows Sims to call acquaintances and order services. They can only call people they've already met, so be sure to greet neighbors when they drop by."
+   [60]T 'Plants'
+   [61]B "Plants improve the room score. But if they're not cared for, they will die. If your Sims don't have time to care for the plants, be prepared to spend money on a gardener."
+   [62]T 'Plants - Move'
+   [63]B 'To move and delete plants, use the hand tool.'
+   [64]T 'Room Score'
+   [65]B 'Sims like big rooms with lots of light; windows help during the day and lamps are good at night. Decorations and landscaping bring this score up, but broken items, dirty dishes, or trash bring things down.'
+   [66]T 'Routing'
+   [67]B 'Sims let you know if something is preventing them from getting around. Usually when they stop an action and display an item in their thought bubble, it means that the item is in their way. Switch to Buy Mode and move things around to help them navigate better.'
+   [68]T 'Save'
+   [69]B "In The Sims, the houses are the saved games. Whenever you Quit or return to the Neighborhood screen the changes to the house and its inhabitants can be saved. If you decide you don't like the events that occurred while playing, choose not to save and reenter the house from the Neighborhood screen."
+   [70]T 'Skills'
+   [71]B 'A line under a skill denotes that you need to develop more of this skill before getting a promotion. If so, a line will indicate how many more skill points are needed. Click the skill name to find out how to improve it.'
+   [72]T 'Social'
+   [73]B 'Sims are social creatures, and they crave social interactions. They can fulfill their social need by interacting with family, friends, and neighbors. The phone is great for inviting people over.'
+   [74]T 'Space Bar'
+   [75]B "Change the active character by pressing the space bar to cycle through family members (even while a pie menu is up). Or just right-click on the character you'd like to select. Visitors cannot be selected."
+   [76]T 'Stairs'
+   [77]B 'Stairs connect the first story to the second. In order for them to be placed, there has to be open area on both floors. They can also be used outside to connect to balconies, just make sure they can connect to a floor tile on the second story.'
+   [78]T 'Trees - Shrubs'
+   [79]B "Trees and shrubs require no maintenance, so they're a good way to boost outside room score if you can afford the cost and the space."
+   [80]T 'Wallpaper'
+   [81]B 'You can paint or wallpaper a whole room by holding down the Shift key. Click while holding the Shift key if you like it, or release the Shift key if you decide against it.'
+   [82]T 'Wallpaper - Delete'
+   [83]B "To remove paint or wallpaper, hold down the CTRL key while using the Wallpaper Tool. To clear a whole room, hold down both the CTRL and Shift keys while clicking the mouse.\r\n\r\nTIP: Remove paint and wallpaper from a room before repainting it; that way, you'll get some of your original money back. "
+   [84]T 'Walls - Delete'
+   [85]B "Delete a wall by holding down the CTRL key. The wall cursor will change to a wrecking ball, and drawing over an existing wall will remove it. Keep the CTRL key down until you've released the mouse button."
+   [86]T 'Walls - Diagonal'
+   [87]B 'Diagonal walls can make the house look a little nicer, but you cannot place doors, windows, or objects on them.'
+   [88]T 'Walls - Room'
+   [89]B 'Build a complete room by holding the Shift key down while dragging out a wall. Keep the shift key pressed until you release the mouse button.'
+   [90]T 'Windows'
+   [91]B 'Sims like rooms with lots of light. The bigger the room, the more windows will be needed to brighten it during the day.'
+   [92]T 'Windows - Delete'
+   [93]B "To delete windows, select the Window Tool and hold down the CTRL key. When the window you'd like to delete is highlighted, click to remove it.\r\n \r\nTIP: You can also remove windows by drawing a wall over them."

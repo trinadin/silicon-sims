@@ -1,0 +1,84 @@
+R165 ORIGINAL SCHOOL-BUS CANON SCAN
+status: PASS
+scope: static metadata from locally staged, user-owned original-game inputs
+payload policy: no resource payloads emitted
+
+PINNED INPUTS
+  game-data/The Sims/UserData/Houses/House05.iff: bytes=383122 sha256=a6d18d81c5072c507b118b68598ee12ea57403634d6507c39b7a04ad4c6cdd99
+  game-data/The Sims/GameData/Objects/Objects.far: bytes=75494806 sha256=b029f449a91289b0a789810ff226da0e3a578b0931f1b5bcd104433e316efbf0
+  game-data/The Sims/GameData/Global/Global.far: bytes=2078993 sha256=c301952612dc2adfc4a94b9d9e6e78c3cef5635b989e1cb4342b29989d13b5fb
+
+PINNED FAR MEMBERS
+  CarPortal.iff: bytes=846157 sha256=267ffd7da0184bd14bde64e8005a287c1332fcae1f0df098fe14586e8aa81f6d
+  SchoolBus.iff: bytes=1313197 sha256=19863972fab858424a0c50f757e18a550206de2765ee0396e007d7a47a57f621
+  CarGlobals.iff: bytes=8240 sha256=a7f7fc870848885ae034d1f14084a506e5e8c37925e5264113f49827b193c917
+
+HOUSE05 CHILD FIXTURE (field-encoded ObjM)
+  object_id=16 objt_name='Cassandra' objt_type=Person objt_guid=0xc1207913
+  neighbor_id=PersonData[31]=32 person_type=PersonData[32]=0
+  age=PersonData[58]=9; original child predicate age < 18 => true
+  job_type=PersonData[56]=-1
+  grade_slot=PersonData[57]=4 (JobPromotionLevel / school grade)
+  performance=PersonData[63]=0
+  ObjM_version=62 PersonData_words=80
+
+CARPORTAL SCHOOL SCHEDULE
+  BCON 4097 'Tuning': flags=0x80 constants=[100, 5, 9, 15, 2, 40, 0, 12]
+  school_start: BCON[2] / Tuning[130] = 9; read at BHAV 4115:8
+  school_end:   BCON[3] / Tuning[131] = 15; read at BHAV 4116:5
+
+CARPORTAL RELEVANT BHAV METADATA
+  4100 'process': instructions=58
+  4115 'check for school bus schedule': instructions=22
+  4116 'At School': instructions=61
+  4117 'lower all kids grades': instructions=22
+  4119 'Create School Bus': instructions=10
+
+CARPORTAL CONTROL-FLOW LAW
+  BHAV 4100:28 -> 4115 (schedule check), true=5 false=253
+  BHAV 4115:10 -> 4119 (outbound create), true=11 false=11
+  BHAV 4116:27 -> 4119 (return create), true=41 false=6
+  BHAV 4119:3 set-to-next ObjectOfType GUID=0x50ac15bf; target=StackObjectID[0]; true=254 false=6; operand=bf15ac50840a0000
+  BHAV 4119:4 createObjectInstance GUID=0x50ac15bf; position=OutOfWorld; FaceStackObjDir=true; true=5 false=255; operand=bf15ac5006200000
+
+ATTENDANCE STATE LAW
+  SchoolBus 4121:5 goto private routing SLOT[4]; true=7 false=20
+  SchoolBus 4121:20 goto-relative fallback; true=7 false=23
+  SchoolBus 4121:6 MyObject.Hidden = 1 (successful boarding latch)
+  CarPortal 4116:31 tests MyObject.Hidden == 1 while the bus waits
+  CarPortal 4116:59 MyPersonData[87] = 1 (away at school)
+  CarPortal 4116:60 MyPersonData[87] = 0 (returned home)
+  CarPortal 4117:4 StackObjectPersonData[57] += 3 (missed-school penalty)
+
+SCHOOLBUS.IFF RESOURCE METADATA
+  master OBJD 16807 'Car - School Bus': version=138 object_type=4
+  master_id=2 sub_index=-1 stack_size=4 uses_function_table=1
+  main_id=4096 init_id=4101 load_id=4113
+  master GUID=0x50ac15bf; OBJD_count=31
+  GLOB='CarGlobals.iff'
+  private BHAV inventory:
+    4096 'main': instructions=22
+    4097 'notify car portal': instructions=3
+    4098 'Go to Work': instructions=10
+    4099 'Go to Work TEST': instructions=1
+    4100 'Is this bus for me?': instructions=2
+    4101 'init common': instructions=1
+    4102 'init route part': instructions=2
+    4103 'auto to school': instructions=7
+    4113 'load tree': instructions=2
+    4117 'init Main': instructions=2
+    4120 'Leave?': instructions=6
+    4121 'send person to work': instructions=26
+
+SCHOOLBUS -> CARGLOBALS SEMIGLOBAL RELATIONSHIP
+  SchoolBus 4096:15 -> CarGlobals 8200 'honk horn' (instructions=91); true=18 false=253
+  SchoolBus 4096:16 -> CarGlobals 8200 'honk horn' (instructions=91); true=9 false=253
+  SchoolBus 4096:19 -> CarGlobals 8205 'drive away' (instructions=29); true=21 false=253
+  SchoolBus 4098:7 -> CarGlobals 8208 'Find Clone' (instructions=8); true=8 false=5
+  SchoolBus 4101:0 -> CarGlobals 8198 'init' (instructions=9); true=254 false=253
+
+DISCLOSURE
+  Cassandra's fixture was decoded directly and is included; no requested fixture fact
+  was omitted. 'grade_slot' names the original PersonData[57] field used and mutated
+  by CarPortal BHAVs 4116/4117; no additional fixture semantics were guessed.
+  Every reported fact and every input/member hash is a hard drift assertion.

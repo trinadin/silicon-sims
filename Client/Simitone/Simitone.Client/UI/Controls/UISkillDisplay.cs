@@ -13,17 +13,27 @@ using FSO.Common.Rendering.Framework.Model;
 
 namespace Simitone.Client.UI.Controls
 {
+    /// <summary>
+    /// R159: skill pips on the ORIGINAL kSkillHilite art (CPanel/SkillsHilite.bmp
+    /// 4x11, res 4511 — the engine's own skill pip, replacing the mobile
+    /// skill.png + UIStyle tints). Filled pips draw the art; "needed" pips draw
+    /// it at half alpha; empty slots draw a dark pip silhouette. Alpha choice
+    /// for the needed tier is our disclosed reading (the engine tints via its
+    /// palette LUT; only the hilite bitmap ships).
+    /// </summary>
     public class UISkillDisplay : UIElement
     {
-        public Texture2D Skill;
+        public static Texture2D HiliteTexture;
 
         public UISkillDisplay() : base()
         {
-            Skill = Content.Get().CustomUI.Get("skill.png").Get(GameFacade.GraphicsDevice);
+            if (HiliteTexture == null)
+                HiliteTexture = UIOriginal.EnsureResolved("cpanel\\SkillsHilite.bmp")?.Get(GameFacade.GraphicsDevice);
         }
 
         private int _Value;
-        public int Value {
+        public int Value
+        {
             get
             {
                 return _Value;
@@ -50,12 +60,18 @@ namespace Simitone.Client.UI.Controls
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             for (int i = 0; i < 10; i++) {
                 Color color;
-                if (i < Value) color = UIStyle.Current.SkillActive;
-                else if (i < Needed) color = UIStyle.Current.SkillNeeded;
-                else color = UIStyle.Current.SkillInactive; 
-                DrawLocalTexture(batch, Skill, null, new Microsoft.Xna.Framework.Vector2(i * 8, 0), Vector2.One, color);
+                float alpha;
+                if (i < Value) { color = Color.White; alpha = 1f; }
+                else if (i < Needed) { color = Color.White; alpha = 0.45f; }
+                else { color = new Color(30, 34, 66); alpha = 1f; }
+                if (HiliteTexture != null)
+                    DrawLocalTexture(batch, HiliteTexture, null, new Microsoft.Xna.Framework.Vector2(i * 8, 0), Vector2.One, color * alpha);
+                else
+                    DrawLocalTexture(batch, FSO.Common.Utils.TextureGenerator.GetPxWhite(GameFacade.GraphicsDevice), null,
+                        new Microsoft.Xna.Framework.Vector2(i * 8, 0), new Vector2(4, 11), color);
             }
         }
     }

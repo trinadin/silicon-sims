@@ -1,0 +1,40 @@
+[ok] binary SHA256 pinned  33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f
+[ok] NBRS chunk @0xb8 data=6734 bytes
+[ok] NBRS chunk-data version 0x3e, magic b'SRBN', count=49, parse consumed exactly 6734/6734 bytes
+[ok] 33 of 49 records are Unknown1==1, ALL record Version == 0x4
+[ok] PersonMode == 5 on 31 records, 0 on 2; person data is 80 shorts (0xa0 bytes) on all
+[ok] 20 created records: NBRS Name == character-file stem (e.g. 'user00023' -> User00023.iff); NOT the literal 'iffname'
+[ok] FAMI @0x1b52 version 7, guidcount=4, guids=['0xe0536808', '0x43d37354', '0x979f36a7', '0xa4592e71'], data len 56 == 56 (no trailing frame)
+[ok] FAMI @0x1c32 version 7, guidcount=2, guids=['0x29753b90', '0x4cb50975'], data len 48 == 48 (no trailing frame)
+[ok] FAMI @0x1d09 version 7, guidcount=1, guids=['0x2f915d23'], data len 44 == 44 (no trailing frame)
+[ok] FAMI @0x1ddd version 7, guidcount=3, guids=['0xc07f6184', '0xc0c6298e', '0xc1207913'], data len 52 == 52 (no trailing frame)
+[ok] FAMI @0x1eb5 version 7, guidcount=2, guids=['0x32aa2056', '0x3251685c'], data len 48 == 48 (no trailing frame)
+[ok] FAMI @0x1f8b version 7, guidcount=0, guids=[], data len 40 == 40 (no trailing frame)
+[ok] all FAMI chunks Version 7 and byte-exact (no 16 trailing zeros)
+[ok] FAMI chunk id == in-game family id == NBRS pd[61] for all moved-in created sims
+
+-- original person-data field map (created records) --
+  pd[ 2] NicePersonality          {0: 5, 300: 1, 400: 5, 500: 2, 600: 4, 700: 3}
+  pd[ 3] ActivePersonality        {0: 3, 200: 1, 300: 1, 400: 4, 500: 3, 600: 3, 700: 1, 900: 3, 1000: 1}
+  pd[ 4] GenerousPersonality      {0: 20}
+  pd[ 5] PlayfulPersonality       {0: 3, 300: 3, 400: 1, 500: 2, 600: 3, 700: 5, 800: 1, 900: 2}
+  pd[ 6] OutgoingPersonality      {0: 3, 200: 1, 300: 5, 400: 1, 500: 2, 600: 4, 700: 2, 800: 2}
+  pd[ 7] NeatPersonality          {0: 5, 200: 5, 300: 1, 400: 3, 500: 2, 600: 2, 700: 2}
+  pd[46] Interest base [46..55]   {0: 3, 1: 3, 2: 3, 3: 2, 6: 2, 7: 2, 8: 2, 9: 2, 10: 1}
+  pd[56] JobType                  {-1: 3, 0: 15, 6: 1, 9: 1}
+  pd[57] JobPromotionLevel        {0: 14, 1: 1, 4: 5}
+  pd[58] PersonsAge               {9: 5, 27: 15}
+  pd[60] SkinColor                {1: 8, 2: 3, 3: 9}
+  pd[61] TS1FamilyNumber          {0: 8, 1: 2, 2: 1, 3: 2, 4: 4, 5: 3}
+  pd[63] JobPerformance           {0: 20}
+  pd[65] Gender                   {0: 10, 1: 10}
+  pd[70] TS1Zodiac                {0: 20}
+[ok] pd[4]=0 (Generous never persisted), pd[70]=0 (zodiac never persisted); skin={1,2,3}, age={9,27}, gender={0,1}
+[ok] skin encoding PROVEN: pd[60] 1->lgt(light) 2->drk(dark) 3->med(medium), age 9->child 27->adult, gender 1->female 0->male (checked 20 bodystring tables)
+
+-- port divergence summary (from the port source, not the original) --
+  port NBRS.Write: chunk-data version 0x49; record Version 0xA + Unknown3=9;
+  Neighbour.Save: PersonMode default, Name='iffname', skin 0/1/2 (AppearanceType 0/1/2).
+  port FAMI.Write: version 9 + 4 trailing int32 (16 zero bytes).
+
+ALL ASSERTIONS PASSED.

@@ -1,0 +1,8 @@
+{
+  "sha256": "33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f",
+  "code_pins": 64,
+  "data_pins": 45,
+  "fixtures": 49,
+  "failures": [],
+  "status": "PASS"
+}

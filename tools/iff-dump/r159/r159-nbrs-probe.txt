@@ -1,0 +1,58 @@
+NBRS header count=49 (leading zero dwords = empty entries the C# parser also chews)
+maid               nid= 11 w58(PersonsAge)=27 nrel=0
+officer            nid= 15 w58(PersonsAge)=27 nrel=0
+user00023          nid= 19 w58(PersonsAge)=9 nrel=1
+   rel -> 31: [0]
+user00022          nid= 20 w58(PersonsAge)=27 nrel=0
+thief              nid= 21 w58(PersonsAge)=27 nrel=0
+repairman          nid= 22 w58(PersonsAge)=27 nrel=0
+bones              nid= 23 w58(PersonsAge)=None nrel=0
+templateperson     nid= 24 w58(PersonsAge)=None nrel=0
+papercarrierf1     nid= 25 w58(PersonsAge)=10 nrel=0
+user00021          nid= 26 w58(PersonsAge)=27 nrel=0
+user00020          nid= 27 w58(PersonsAge)=27 nrel=0
+user00017          nid= 28 w58(PersonsAge)=27 nrel=0
+user00015          nid= 29 w58(PersonsAge)=9 nrel=0
+user00014          nid= 30 w58(PersonsAge)=27 nrel=0
+user00013          nid= 31 w58(PersonsAge)=27 nrel=1
+   rel -> 19: [0]
+user00011          nid= 32 w58(PersonsAge)=9 nrel=2
+   rel -> 34: [50]
+   rel -> 33: [50, 0]
+user00010          nid= 33 w58(PersonsAge)=27 nrel=2
+   rel -> 34: [100, 1]
+   rel -> 32: [85]
+user00009          nid= 34 w58(PersonsAge)=27 nrel=2
+   rel -> 33: [100, 1]
+   rel -> 32: [75]
+user00008          nid= 35 w58(PersonsAge)=9 nrel=3
+   rel -> 36: [20]
+   rel -> 37: [20]
+   rel -> 43: [20]
+user00007          nid= 36 w58(PersonsAge)=9 nrel=3
+   rel -> 35: [20]
+   rel -> 37: [20]
+   rel -> 43: [20]
+user00006          nid= 37 w58(PersonsAge)=27 nrel=3
+   rel -> 35: [20]
+   rel -> 36: [20]
+   rel -> 43: [55]
+repoman            nid= 38 w58(PersonsAge)=27 nrel=0
+mailcarrierf1      nid= 39 w58(PersonsAge)=27 nrel=0
+pizzadude          nid= 40 w58(PersonsAge)=27 nrel=0
+socialwkr          nid= 41 w58(PersonsAge)=27 nrel=0
+gardener           nid= 42 w58(PersonsAge)=27 nrel=0
+user00005          nid= 43 w58(PersonsAge)=27 nrel=3
+   rel -> 35: [20]
+   rel -> 36: [20]
+   rel -> 37: [55]
+user00004          nid= 44 w58(PersonsAge)=27 nrel=0
+user00003          nid= 45 w58(PersonsAge)=27 nrel=0
+user00002          nid= 46 w58(PersonsAge)=27 nrel=0
+user00001          nid= 47 w58(PersonsAge)=27 nrel=1
+   rel -> 48: [55, 0]
+user00000          nid= 48 w58(PersonsAge)=27 nrel=1
+   rel -> 47: [55, 0]
+firefighter        nid= 49 w58(PersonsAge)=27 nrel=0
+
+LAW: value lists are [score, flags] — married pair [100,1]; PersonsAge adults=27 children=9

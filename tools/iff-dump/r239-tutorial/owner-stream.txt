@@ -1,0 +1,30 @@
+000e7fcc: 8019000c  lwz      r0, 0xc(r25)
+000e7fd0: 2c000000  cmpwi    r0, 0
+000e7fd4: 41820020  beq      0xe7ff4
+000e7fd8: 807800ac  lwz      r3, 0xac(r24)
+000e7fdc: 28030000  cmplwi   r3, 0
+000e7fe0: 4182000c  beq      0xe7fec
+000e7fe4: a80300f0  lha      r0, 0xf0(r3)
+000e7fe8: 48000008  b        0xe7ff0
+000e7fec: 38000000  li       r0, 0
+000e7ff0: b0010046  sth      r0, 0x46(r1)
+000e7ff4: 38790000  addi     r3, r25, 0
+000e7ff8: 38810046  addi     r4, r1, 0x46
+000e7ffc: 38a00001  li       r5, 1
+000e8000: 480369c1  bl       0x11e9c0   ; .Recon16__11ReconBufferFPsi
+000e8004: 8019000c  lwz      r0, 0xc(r25)
+000e8008: 2c000000  cmpwi    r0, 0
+000e800c: 40820038  bne      0xe8044
+000e8010: a8a10046  lha      r5, 0x46(r1)
+000e8014: 38800000  li       r4, 0
+000e8018: 2c050000  cmpwi    r5, 0
+000e801c: 40810024  ble      0xe8040
+000e8020: 8078001c  lwz      r3, 0x1c(r24)
+000e8024: 38030001  addi     r0, r3, 1
+000e8028: 7c050040  cmplw    r5, r0
+000e802c: 40800014  bge      0xe8040
+000e8030: 3805ffff  addi     r0, r5, -1
+000e8034: 80780020  lwz      r3, 0x20(r24)
+000e8038: 5400103a  slwi     r0, r0, 2
+000e803c: 7c83002e  lwzx     r4, r3, r0
+000e8040: 909800ac  stw      r4, 0xac(r24)

@@ -1,0 +1,57 @@
+=== R147 FULL GATE (tools/run-autotest.sh, 2026-08-28 00:02) ===
+
+23:58:14.563 autotest: AUTOTEST START houses=[5] checks=[corpus,lot,motive,mood,load,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,career,freewill,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uicasorig] timeout=1800000ms
+00:02:16.242 autotest: AUTOTEST SUMMARY passed=88 failed=0 skipped=0
+00:02:16.242 autotest: AUTOTEST RESULT PASS
+AUTOTEST RESULT PASS passed=88 failed=0
+
+=== uizoomcage (NEW — camera cage law) ===
+23:58:14.563 autotest: AUTOTEST START houses=[5] checks=[corpus,lot,motive,mood,load,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,career,freewill,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uicasorig] timeout=1800000ms
+23:58:22.729 autotest: AUTOTEST uizoomcage Far tileHalf=16/8 cage |u|<=20 |v|<=4 lot=52
+23:58:22.746 autotest: AUTOTEST uizoomcage Medium tileHalf=32/16 cage |u|<=36 |v|<=28 lot=52
+23:58:22.758 autotest: AUTOTEST uizoomcage Near tileHalf=64/32 cage |u|<=44 |v|<=40 lot=52
+23:58:22.765 autotest: AUTOTEST uizoomcage: PASS
+
+=== zoomlive probe (post-cage, full-gate run) ===
+23:58:22.578 AUTOTEST zoomlive ARM (baseline 30 frames, then far, then medium, then scroll)
+23:58:27.804 AUTOTEST zoomlive f=10 phase=1 zoom=Near pz=1 target=1 bbs=1 immediate=False ssDirty=False dark=97/14839 green=12/14839
+23:58:27.806 AUTOTEST zoomlive f=20 phase=1 zoom=Near pz=1 target=1 bbs=1 immediate=False ssDirty=False dark=97/14839 green=12/14839
+23:58:27.813 AUTOTEST zoomlive f=30 phase=1 zoom=Near pz=1 target=1 bbs=1 immediate=False ssDirty=False dark=33/14839 green=6/14839
+23:58:27.813 AUTOTEST zoomlive >>> target far (TargetZoom=0.25)
+23:58:27.814 AUTOTEST zoomlive f=40 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=33/14839 green=6/14839
+23:58:27.814 AUTOTEST zoomlive f=50 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=33/14839 green=6/14839
+23:58:27.896 AUTOTEST zoomlive f=60 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4710/14839 green=83/14839
+23:58:28.148 AUTOTEST zoomlive f=70 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4710/14839 green=83/14839
+23:58:28.229 AUTOTEST zoomlive f=80 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4710/14839 green=83/14839
+23:58:28.407 AUTOTEST zoomlive f=90 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4710/14839 green=83/14839
+23:58:28.571 AUTOTEST zoomlive f=100 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4710/14839 green=83/14839
+23:58:28.771 AUTOTEST zoomlive f=110 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4710/14839 green=83/14839
+23:58:28.986 AUTOTEST zoomlive f=120 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4710/14839 green=83/14839
+23:58:29.151 AUTOTEST zoomlive f=130 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4710/14839 green=83/14839
+23:58:29.152 AUTOTEST zoomlive >>> target medium (TargetZoom=0.5)
+23:58:29.229 AUTOTEST zoomlive f=140 phase=3 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=276/14839 green=247/14839
+23:58:29.406 AUTOTEST zoomlive f=150 phase=3 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=276/14839 green=247/14839
+23:58:29.572 AUTOTEST zoomlive f=160 phase=3 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=276/14839 green=247/14839
+23:58:29.758 AUTOTEST zoomlive f=170 phase=3 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=276/14839 green=247/14839
+23:58:29.933 AUTOTEST zoomlive f=180 phase=3 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=276/14839 green=247/14839
+23:58:30.200 AUTOTEST zoomlive f=190 phase=3 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=276/14839 green=247/14839
+23:58:30.200 AUTOTEST zoomlive >>> scroll phase (front-left corner, 0.4 tiles/frame)
+23:58:30.229 AUTOTEST zoomlive f=200 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=238/14839 green=184/14839
+23:58:30.406 AUTOTEST zoomlive f=210 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=351/14839 green=92/14839
+23:58:30.573 AUTOTEST zoomlive f=220 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=1121/14839 green=17/14839
+23:58:30.785 AUTOTEST zoomlive f=230 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=3276/14839 green=19/14839
+23:58:30.895 AUTOTEST zoomlive f=240 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6145/14839 green=8/14839
+23:58:31.164 AUTOTEST zoomlive f=250 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6145/14839 green=8/14839
+23:58:31.355 AUTOTEST zoomlive f=260 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6145/14839 green=8/14839
+23:58:31.357 AUTOTEST zoomlive >>> scroll stop (does the wedge heal = 'pops back in'?)
+23:58:31.395 AUTOTEST zoomlive f=270 phase=5 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6145/14839 green=8/14839
+23:58:31.600 AUTOTEST zoomlive f=280 phase=5 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6145/14839 green=8/14839
+23:58:31.817 AUTOTEST zoomlive f=290 phase=5 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6145/14839 green=8/14839
+23:58:31.896 AUTOTEST zoomlive f=300 phase=5 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6145/14839 green=8/14839
+23:58:32.062 AUTOTEST zoomlive f=310 phase=5 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6145/14839 green=8/14839
+23:58:32.320 AUTOTEST zoomlive f=320 phase=5 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6145/14839 green=8/14839
+23:58:32.320 AUTOTEST zoomlive END
+
+=== terrain-extent (camera at load) ===
+23:56:23.843 AUTOTEST uisurvey terrain-extent meshTiles=-1 lot=52x52 center=0,0
+23:58:22.538 AUTOTEST uisurvey terrain-extent meshTiles=2704 lot=52x52 center=0,0

@@ -1,0 +1,170 @@
+                ; ==== .DefaultLabel__13cTSWinCtrlMgrFUlRC9cTSString ====
+0050fa30: 93e1fffc  stw      r31, -4(r1)
+0050fa34: 7c0802a6  mflr     r0
+0050fa38: 3be50000  addi     r31, r5, 0
+0050fa3c: 93c1fff8  stw      r30, -8(r1)
+0050fa40: 3bc40000  addi     r30, r4, 0
+0050fa44: 93a1fff4  stw      r29, -0xc(r1)
+0050fa48: 3ba30000  addi     r29, r3, 0
+0050fa4c: 38600108  li       r3, 0x108
+0050fa50: 9381fff0  stw      r28, -0x10(r1)
+0050fa54: 90010008  stw      r0, 8(r1)
+0050fa58: 9421ffb0  stwu     r1, -0x50(r1)
+0050fa5c: 480819e5  bl       0x591440
+0050fa60: 7c7c1b79  or.      r28, r3, r3
+0050fa64: 41820008  beq      0x50fa6c
+0050fa68: 48028fe9  bl       0x538a50   ; .__ct__10cTSWinTextFv
+0050fa6c: 93dc0008  stw      r30, 8(r28)
+0050fa70: 387c0000  addi     r3, r28, 0
+0050fa74: 389f0000  addi     r4, r31, 0
+0050fa78: 819c0000  lwz      r12, 0(r28)
+0050fa7c: 818c00a4  lwz      r12, 0xa4(r12)
+0050fa80: 48092f61  bl       0x5a29e0
+0050fa84: 80410014  lwz      r2, 0x14(r1)
+0050fa88: 7fa3eb78  mr       r3, r29
+0050fa8c: 819d0000  lwz      r12, 0(r29)
+0050fa90: 38800000  li       r4, 0
+0050fa94: 818c0010  lwz      r12, 0x10(r12)
+0050fa98: 48092f49  bl       0x5a29e0
+0050fa9c: 80410014  lwz      r2, 0x14(r1)
+0050faa0: 819c0000  lwz      r12, 0(r28)
+0050faa4: 38830000  addi     r4, r3, 0
+0050faa8: 387c0000  addi     r3, r28, 0
+0050faac: 818c01f0  lwz      r12, 0x1f0(r12)
+0050fab0: 48092f31  bl       0x5a29e0
+0050fab4: 80410014  lwz      r2, 0x14(r1)
+0050fab8: 7f83e378  mr       r3, r28
+0050fabc: 819c0000  lwz      r12, 0(r28)
+0050fac0: 38800001  li       r4, 1
+0050fac4: 818c01f4  lwz      r12, 0x1f4(r12)
+0050fac8: 48092f19  bl       0x5a29e0
+0050facc: 80410014  lwz      r2, 0x14(r1)
+0050fad0: 7f83e378  mr       r3, r28
+0050fad4: 819c0000  lwz      r12, 0(r28)
+0050fad8: 38800000  li       r4, 0
+0050fadc: 818c01ec  lwz      r12, 0x1ec(r12)
+0050fae0: 48092f01  bl       0x5a29e0
+0050fae4: 80410014  lwz      r2, 0x14(r1)
+0050fae8: 7f83e378  mr       r3, r28
+0050faec: 819c0000  lwz      r12, 0(r28)
+0050faf0: 38800002  li       r4, 2
+0050faf4: 38a00000  li       r5, 0
+0050faf8: 818c01e4  lwz      r12, 0x1e4(r12)
+0050fafc: 48092ee5  bl       0x5a29e0
+0050fb00: 80410014  lwz      r2, 0x14(r1)
+0050fb04: 7f83e378  mr       r3, r28
+0050fb08: 819c0000  lwz      r12, 0(r28)
+0050fb0c: 818c01d8  lwz      r12, 0x1d8(r12)
+0050fb10: 48092ed1  bl       0x5a29e0
+0050fb14: 80410014  lwz      r2, 0x14(r1)
+0050fb18: 7f83e378  mr       r3, r28
+0050fb1c: 80010058  lwz      r0, 0x58(r1)
+0050fb20: 38210050  addi     r1, r1, 0x50
+0050fb24: 7c0803a6  mtlr     r0
+0050fb28: 83e1fffc  lwz      r31, -4(r1)
+0050fb2c: 83c1fff8  lwz      r30, -8(r1)
+0050fb30: 83a1fff4  lwz      r29, -0xc(r1)
+0050fb34: 8381fff0  lwz      r28, -0x10(r1)
+0050fb38: 4e800020  blr
+0050fb3c: 00000000  .long    0x00000000
+0050fb40: 00092041  .long    0x00092041
+0050fb44: 80040000  lwz      r0, 0(r4)
+0050fb48: 0000010c  .long    0x0000010c
+0050fb4c: 002d2e44  .long    0x002d2e44
+0050fb50: 65666175  oris     r6, r11, 0x6175
+0050fb54: 6c744c61  xoris    r20, r3, 0x4c61
+0050fb58: 62656c5f  ori      r5, r19, 0x6c5f
+0050fb5c: 5f313363  rlwnm.   r17, r25, r6, 0xd, 0x11
+0050fb60: 54535769  rlwinm.  r19, r2, 0xa, 0x1d, 0x14
+0050fb64: 6e437472  xoris    r3, r18, 0x7472
+0050fb68: 6c4d6772  xoris    r13, r2, 0x6772
+0050fb6c: 46556c52  sc       0x62
+0050fb70: 43396354  bdnz+    0x515ec4
+0050fb74: 53537472  rlwimi   r19, r26, 0xe, 0x11, 0x19
+0050fb78: 696e6700  xori     r14, r11, 0x6700
+0050fb7c: 00000000  .long    0x00000000
+                ; ==== .DefaultPushBtn__13cTSWinCtrlMgrFUlRC9cTSString ====
+0050fb80: 93e1fffc  stw      r31, -4(r1)
+0050fb84: 7c0802a6  mflr     r0
+0050fb88: 93c1fff8  stw      r30, -8(r1)
+0050fb8c: 3bc50000  addi     r30, r5, 0
+0050fb90: 93a1fff4  stw      r29, -0xc(r1)
+0050fb94: 3ba40000  addi     r29, r4, 0
+0050fb98: 38800000  li       r4, 0
+0050fb9c: 9381fff0  stw      r28, -0x10(r1)
+0050fba0: 90010008  stw      r0, 8(r1)
+0050fba4: 9421ffb0  stwu     r1, -0x50(r1)
+0050fba8: 81830000  lwz      r12, 0(r3)
+0050fbac: 818c0018  lwz      r12, 0x18(r12)
+0050fbb0: 48092e31  bl       0x5a29e0
+0050fbb4: 80410014  lwz      r2, 0x14(r1)
+0050fbb8: 3be30000  addi     r31, r3, 0
+0050fbbc: 388000ff  li       r4, 0xff
+0050fbc0: 38a00000  li       r5, 0
+0050fbc4: 38c000ff  li       r6, 0xff
+0050fbc8: 4bf7e7b9  bl       0x48e380   ; .ConvertRGBValueToNative16Bit__9cTSBufferFUcUcUc
+0050fbcc: 819f0000  lwz      r12, 0(r31)
+0050fbd0: 5464043e  clrlwi   r4, r3, 0x10
+0050fbd4: 387f0000  addi     r3, r31, 0
+0050fbd8: 818c0070  lwz      r12, 0x70(r12)
+0050fbdc: 48092e05  bl       0x5a29e0
+0050fbe0: 80410014  lwz      r2, 0x14(r1)
+0050fbe4: 386001a4  li       r3, 0x1a4
+0050fbe8: 48081859  bl       0x591440
+0050fbec: 7c7c1b79  or.      r28, r3, r3
+0050fbf0: 4182000c  beq      0x50fbfc
+0050fbf4: 7fe4fb78  mr       r4, r31
+0050fbf8: 4bff0c89  bl       0x500880   ; .__ct__15cTSSystemButtonFP9cTSBuffer
+0050fbfc: 281c0000  cmplwi   r28, 0
+0050fc00: 3bfc0000  addi     r31, r28, 0
+0050fc04: 4182005c  beq      0x50fc60
+0050fc08: 93bc0008  stw      r29, 8(r28)
+0050fc0c: 387c0000  addi     r3, r28, 0
+0050fc10: 389e0000  addi     r4, r30, 0
+0050fc14: 819c0000  lwz      r12, 0(r28)
+0050fc18: 818c00a4  lwz      r12, 0xa4(r12)
+0050fc1c: 48092dc5  bl       0x5a29e0
+0050fc20: 80410014  lwz      r2, 0x14(r1)
+0050fc24: 38000000  li       r0, 0
+0050fc28: 901c00ec  stw      r0, 0xec(r28)
+0050fc2c: 809c0074  lwz      r4, 0x74(r28)
+0050fc30: 801c007c  lwz      r0, 0x7c(r28)
+0050fc34: 7c040050  subf     r0, r4, r0
+0050fc38: 2c000064  cmpwi    r0, 0x64
+0050fc3c: 40800024  bge      0x50fc60
+0050fc40: 819c0000  lwz      r12, 0(r28)
+0050fc44: 7f83e378  mr       r3, r28
+0050fc48: 80bc0078  lwz      r5, 0x78(r28)
+0050fc4c: 38c40064  addi     r6, r4, 0x64
+0050fc50: 80fc0080  lwz      r7, 0x80(r28)
+0050fc54: 818c0068  lwz      r12, 0x68(r12)
+0050fc58: 48092d89  bl       0x5a29e0
+0050fc5c: 80410014  lwz      r2, 0x14(r1)
+0050fc60: 7fe3fb78  mr       r3, r31
+0050fc64: 80010058  lwz      r0, 0x58(r1)
+0050fc68: 38210050  addi     r1, r1, 0x50
+0050fc6c: 7c0803a6  mtlr     r0
+0050fc70: 83e1fffc  lwz      r31, -4(r1)
+0050fc74: 83c1fff8  lwz      r30, -8(r1)
+0050fc78: 83a1fff4  lwz      r29, -0xc(r1)
+0050fc7c: 8381fff0  lwz      r28, -0x10(r1)
+0050fc80: 4e800020  blr
+0050fc84: 00000000  .long    0x00000000
+0050fc88: 00092041  .long    0x00092041
+0050fc8c: 80040000  lwz      r0, 0(r4)
+0050fc90: 00000104  .long    0x00000104
+0050fc94: 002f2e44  .long    0x002f2e44
+0050fc98: 65666175  oris     r6, r11, 0x6175
+0050fc9c: 6c745075  xoris    r20, r3, 0x5075
+0050fca0: 73684274  andi.    r8, r27, 0x4274
+0050fca4: 6e5f5f31  xoris    r31, r18, 0x5f31
+0050fca8: 33635453  addic    r27, r3, 0x5453
+0050fcac: 57696e43  rlwinm.  r9, r27, 0xd, 0x19, 1
+0050fcb0: 74726c4d  andis.   r18, r3, 0x6c4d
+0050fcb4: 67724655  oris     r18, r27, 0x4655
+0050fcb8: 6c524339  xoris    r18, r2, 0x4339
+0050fcbc: 63545353  ori      r20, r26, 0x5353
+0050fcc0: 7472696e  andis.   r18, r3, 0x696e
+0050fcc4: 67000000  oris     r0, r24, 0
+0050fcc8: 00000000  .long    0x00000000
+0050fccc: 00000000  .long    0x00000000

@@ -1,0 +1,62 @@
+000cc4a0: 93e1fffc  stw      r31, -4(r1)
+000cc4a4: 7c0802a6  mflr     r0
+000cc4a8: 80828ca4  lwz      r4, -0x735c(r2)
+000cc4ac: 93c1fff8  stw      r30, -8(r1)
+000cc4b0: 83e28e08  lwz      r31, -0x71f8(r2)
+000cc4b4: 93a1fff4  stw      r29, -0xc(r1)
+000cc4b8: 7c7d1b78  mr       r29, r3
+000cc4bc: 9381fff0  stw      r28, -0x10(r1)
+000cc4c0: 90010008  stw      r0, 8(r1)
+000cc4c4: 9421ffb0  stwu     r1, -0x50(r1)
+000cc4c8: 80640000  lwz      r3, 0(r4)
+000cc4cc: 81830000  lwz      r12, 0(r3)
+000cc4d0: 818c0020  lwz      r12, 0x20(r12)
+000cc4d4: 484d650d  bl       0x5a29e0
+000cc4d8: 80410014  lwz      r2, 0x14(r1)
+000cc4dc: 3bc30000  addi     r30, r3, 0
+000cc4e0: 38600144  li       r3, 0x144
+000cc4e4: 484c4f5d  bl       0x591440
+000cc4e8: 7c7c1b79  or.      r28, r3, r3
+000cc4ec: 41820018  beq      0xcc504
+000cc4f0: 481cb531  bl       0x297a20   ; .__ct__17cWinPictureDialogFv
+000cc4f4: 93fc0000  stw      r31, 0(r28)
+000cc4f8: 381f01a4  addi     r0, r31, 0x1a4
+000cc4fc: 901c00cc  stw      r0, 0xcc(r28)
+000cc500: 93bc0140  stw      r29, 0x140(r28)
+000cc504: 281c0000  cmplwi   r28, 0
+000cc508: 939d0040  stw      r28, 0x40(r29)
+000cc50c: 41820014  beq      0xcc520
+000cc510: 881d0039  lbz      r0, 0x39(r29)
+000cc514: 7c000034  cntlzw   r0, r0
+000cc518: 5400d97e  srwi     r0, r0, 5
+000cc51c: 981c0121  stb      r0, 0x121(r28)
+000cc520: 801d0040  lwz      r0, 0x40(r29)
+000cc524: 28000000  cmplwi   r0, 0
+000cc528: 4182004c  beq      0xcc574
+000cc52c: 7fa3eb78  mr       r3, r29
+000cc530: 480000a1  bl       0xcc5d0   ; .SetupDialog__12ObjectDialogFv
+000cc534: 38000001  li       r0, 1
+000cc538: 80628870  lwz      r3, -0x7790(r2)
+000cc53c: 901d0044  stw      r0, 0x44(r29)
+000cc540: 38c00002  li       r6, 2
+000cc544: 80630000  lwz      r3, 0(r3)
+000cc548: 809d0040  lwz      r4, 0x40(r29)
+000cc54c: 88bd0039  lbz      r5, 0x39(r29)
+000cc550: 481873c1  bl       0x253910   ; .DoSimsModalDialog__8cSimsAppFP6cTSWinbi
+000cc554: 881d0039  lbz      r0, 0x39(r29)
+000cc558: 28000000  cmplwi   r0, 0
+000cc55c: 41820018  beq      0xcc574
+000cc560: 809d0040  lwz      r4, 0x40(r29)
+000cc564: 7fc3f378  mr       r3, r30
+000cc568: 48451a39  bl       0x51dfa0   ; .DestroyWindow__12cTSWinMgrW95FP6cTSWin
+000cc56c: 38000000  li       r0, 0
+000cc570: 901d0040  stw      r0, 0x40(r29)
+000cc574: 887d0039  lbz      r3, 0x39(r29)
+000cc578: 80010058  lwz      r0, 0x58(r1)
+000cc57c: 38210050  addi     r1, r1, 0x50
+000cc580: 7c0803a6  mtlr     r0
+000cc584: 83e1fffc  lwz      r31, -4(r1)
+000cc588: 83c1fff8  lwz      r30, -8(r1)
+000cc58c: 83a1fff4  lwz      r29, -0xc(r1)
+000cc590: 8381fff0  lwz      r28, -0x10(r1)
+000cc594: 4e800020  blr

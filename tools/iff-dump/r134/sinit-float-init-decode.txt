@@ -1,0 +1,21 @@
+# float-init stub: .__sinit_:GUIDTranslation_cpp, entry 0x8bb10, body 0x8bb10-0x8bb5c
+# record 0x8bb6c (len 29); trailer size 0x4c. Verdict: LITERALS (see sinit-float-init-resolution.txt)
+0x0008bb10: 80828858  lwz r4, -30632(r2)                               |...X|   ; lwz r4, -30632(r2)      ; r4 = TOC entry -> sec1+0x7b358 (DBL_MAX const)
+0x0008bb14: 80628860  lwz r3, -30624(r2)                               |.b.`|   ; lwz r3, -30624(r2)      ; r3 = TOC entry -> sec1+0x7b37c (FLT_MAX const)
+0x0008bb18: c8440000  lfd f2, 0(r4)                                    |.D..|   ; lfd f2, 0(r4)           ; f2 = DBL_MAX = 1.7976931348623157e+308
+0x0008bb1c: c0a30000  lfs f5, 0(r3)                                    |....|   ; lfs f5, 0(r3)           ; f5 = FLT_MAX = 3.4028234663852886e+38
+0x0008bb20: 8082885c  lwz r4, -30628(r2)                               |...\|   ; lwz r4, -30628(r2)      ; r4 -> sec1+0x7b378 (FLT_MIN const)
+0x0008bb24: fc201050  fneg f1, f2                                      |. .P|   ; fneg f1, f2             ; f1 = -DBL_MAX
+0x0008bb28: 80628854  lwz r3, -30636(r2)                               |.b.T|   ; lwz r3, -30636(r2)      ; r3 -> sec1+0x7b350 (DBL_MIN const)
+0x0008bb2c: fc802850  fneg f4, f5                                      |..(P|   ; fneg f4, f5             ; f4 = -FLT_MAX
+0x0008bb30: c0640000  lfs f3, 0(r4)                                    |.d..|   ; lfs f3, 0(r4)           ; f3 = FLT_MIN = 1.1754943508222875e-38
+0x0008bb34: c8030000  lfd f0, 0(r3)                                    |....|   ; lfd f0, 0(r3)           ; f0 = DBL_MIN = 2.2250738585072014e-308
+0x0008bb38: d082cc28  stfs f4, -13272(r2)                              |...(|   ; stfs f4, -13272(r2)     ; global#1 (float) = -FLT_MAX
+0x0008bb3c: d0a2cc2c  stfs f5, -13268(r2)                              |...,|   ; stfs f5, -13268(r2)     ; global#2 (float) = FLT_MAX
+0x0008bb40: d062cc30  stfs f3, -13264(r2)                              |.b.0|   ; stfs f3, -13264(r2)     ; global#3 (float) = FLT_MIN
+0x0008bb44: d0a2cc34  stfs f5, -13260(r2)                              |...4|   ; stfs f5, -13260(r2)     ; global#4 (float) = FLT_MAX
+0x0008bb48: d822cc38  stfd f1, -13256(r2)                              |.".8|   ; stfd f1, -13256(r2)     ; global#5 (double) = -DBL_MAX
+0x0008bb4c: d842cc40  stfd f2, -13248(r2)                              |.B.@|   ; stfd f2, -13248(r2)     ; global#6 (double) = DBL_MAX
+0x0008bb50: d802cc48  stfd f0, -13240(r2)                              |...H|   ; stfd f0, -13240(r2)     ; global#7 (double) = DBL_MIN
+0x0008bb54: d842cc50  stfd f2, -13232(r2)                              |.B.P|   ; stfd f2, -13232(r2)     ; global#8 (double) = DBL_MAX
+0x0008bb58: 4e800020  bclr                                             |N.. |   ; bclr                    ; return

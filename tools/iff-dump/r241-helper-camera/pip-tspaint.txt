@@ -1,0 +1,32 @@
+0x29a070: 93e1fffc  stw r31, -4(r1)                            |....|
+0x29a074: 7c0802a6  mfxer r0                                   ||...|
+0x29a078: 7c7f1b78  or r3, r31, r3                             ||..x|
+0x29a07c: 90010008  stw r0, 8(r1)                              |....|
+0x29a080: 9421ffb0  stwu r1, -80(r1)                           |.!..|
+0x29a084: 880300de  lbz r0, 222(r3)                            |....|
+0x29a088: 28000000  cmplwi r0, r0, 0                           |(...|
+0x29a08c: 4182001c  bne(2) 0x29a0a8                            |A...|
+0x29a090: 4bfa0ad1  bl 0x23ab60                                 ; .GetOptionsMgr__11cOptionsMgrFv |K...|
+0x29a094: 4bf9fb8d  bl 0x239c20                                 ; .GetLivePIP__11cOptionsMgrFv |K...|
+0x29a098: 5460063f  rlwinm r0, r3, 0, 24, 31                   |T`.?|
+0x29a09c: 4182000c  bne(2) 0x29a0a8                            |A...|
+0x29a0a0: 7fe3fb78  or r31, r3, r31                            |...x|
+0x29a0a4: 4bfff01d  bl 0x2990c0                                 ; .BuildImage__20cWinPictureInPictureFv |K...|
+0x29a0a8: 807f00e4  lwz r3, 228(r31)                           |....|
+0x29a0ac: 28030000  cmplwi r0, r3, 0                           |(...|
+0x29a0b0: 41820014  bne(2) 0x29a0c4                            |A...|
+0x29a0b4: 81830000  lwz r12, 0(r3)                             |....|
+0x29a0b8: 818c0170  lwz r12, 368(r12)                          |...p|
+0x29a0bc: 48308925  bl 0x5a29e0                                 ; .sub_5a29e0 |H0.%|
+0x29a0c0: 80410014  lwz r2, 20(r1)                             |.A..|
+0x29a0c4: 7fe3fb78  or r31, r3, r31                            |...x|
+0x29a0c8: 819f0000  lwz r12, 0(r31)                            |....|
+0x29a0cc: 818c0170  lwz r12, 368(r12)                          |...p|
+0x29a0d0: 48308911  bl 0x5a29e0                                 ; .sub_5a29e0 |H0..|
+0x29a0d4: 80410014  lwz r2, 20(r1)                             |.A..|
+0x29a0d8: 38600000  addi r3, r0, 0                             |8`..|
+0x29a0dc: 80010058  lwz r0, 88(r1)                             |...X|
+0x29a0e0: 38210050  addi r1, r1, 80                            |8!.P|
+0x29a0e4: 7c0803a6  mtxer r0                                   ||...|
+0x29a0e8: 83e1fffc  lwz r31, -4(r1)                            |....|
+0x29a0ec: 4e800020  bclr                                       |N.. |

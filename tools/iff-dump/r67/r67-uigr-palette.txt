@@ -1,0 +1,9 @@
+IFF-grounded ORIGINAL UI palette anchors (tools/bmp_palette.py / bmp_cols24.py):
+  PanelBack.bmp(804x100): #000029 #000052 #00004A #080852 steel #73739C #636394 #5A5A8C #42427B #313173
+  CreateACharBack.BMP(800x600 CAS): #00186B #00106B #000029 #001063 #00085A #000863 #000039
+  PersBkg.bmp: #3C3C7A #0E0E5B #000051
+  Mood.bmp(128x39): #212166 #1E1E64 cyan #00FFFF sky #CCD3D8
+  Greenbars.BMP(27x25): greens #00660A #00A61E #00E631 on steel #72729E
+  Redbars.bmp(27x25): reds #540303 #850202 #B50101 #C90101 #E60000 on steel #72729E
+  JobFriendSmiley.bmp: cyan #00FFFF / #00DFE3
+=> ORIGINAL look: dark navy panels + steel-blue highlights + CYAN accent. NOT black/green.

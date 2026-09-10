@@ -1,0 +1,145 @@
+                ; ==== .GetCenterOnPt__20cWinPictureInPictureFv ====
+00298e50: 80a28cac  lwz      r5, -0x7354(r2)
+00298e54: 38c00000  li       r6, 0
+00298e58: 810400d0  lwz      r8, 0xd0(r4)
+00298e5c: 54c0073e  clrlwi   r0, r6, 0x1c
+00298e60: 80850000  lwz      r4, 0(r5)
+00298e64: 28080000  cmplwi   r8, 0
+00298e68: 80e40010  lwz      r7, 0x10(r4)
+00298e6c: 8082b0a8  lwz      r4, -0x4f58(r2)
+00298e70: 54e50ffe  srwi     r5, r7, 0x1f
+00298e74: 7ca53a14  add      r5, r5, r7
+00298e78: 7ca70e70  srawi    r7, r5, 1
+00298e7c: 54e52036  slwi     r5, r7, 4
+00298e80: 7ca00378  or       r0, r5, r0
+00298e84: 54050036  rlwinm   r5, r0, 0, 0, 0x1b
+00298e88: 50e62036  rlwimi   r6, r7, 4, 0, 0x1b
+00298e8c: 90a1ffe4  stw      r5, -0x1c(r1)
+00298e90: 54c00036  rlwinm   r0, r6, 0, 0, 0x1b
+00298e94: 9001ffe0  stw      r0, -0x20(r1)
+00298e98: 418201cc  beq      0x299064
+00298e9c: 80a80118  lwz      r5, 0x118(r8)
+00298ea0: a8050014  lha      r0, 0x14(r5)
+00298ea4: 2c000000  cmpwi    r0, 0
+00298ea8: 418201ac  beq      0x299054
+00298eac: c0840004  lfs      f4, 4(r4)
+00298eb0: 39400000  li       r10, 0
+00298eb4: 80080190  lwz      r0, 0x190(r8)
+00298eb8: fca02090  fmr      f5, f4
+00298ebc: 28000000  cmplwi   r0, 0
+00298ec0: 4182000c  beq      0x298ecc
+00298ec4: 7c090378  mr       r9, r0
+00298ec8: 48000008  b        0x298ed0
+00298ecc: 7d094378  mr       r9, r8
+00298ed0: 3ca04330  lis      r5, 0x4330
+00298ed4: 48000058  b        0x298f2c
+00298ed8: 80c900f8  lwz      r6, 0xf8(r9)
+00298edc: 394a0001  addi     r10, r10, 1
+00298ee0: 800900f4  lwz      r0, 0xf4(r9)
+00298ee4: 6cc68000  xoris    r6, r6, 0x8000
+00298ee8: 80e2b0a4  lwz      r7, -0x4f5c(r2)
+00298eec: 90c1ffec  stw      r6, -0x14(r1)
+00298ef0: 6c008000  xoris    r0, r0, 0x8000
+00298ef4: c8670010  lfd      f3, 0x10(r7)
+00298ef8: 90a1ffe8  stw      r5, -0x18(r1)
+00298efc: c0440008  lfs      f2, 8(r4)
+00298f00: c801ffe8  lfd      f0, -0x18(r1)
+00298f04: 9001fff4  stw      r0, -0xc(r1)
+00298f08: ec201828  fsubs    f1, f0, f3
+00298f0c: 8129018c  lwz      r9, 0x18c(r9)
+00298f10: 90a1fff0  stw      r5, -0x10(r1)
+00298f14: c801fff0  lfd      f0, -0x10(r1)
+00298f18: ec2100b2  fmuls    f1, f1, f2
+00298f1c: ec001828  fsubs    f0, f0, f3
+00298f20: ec84082a  fadds    f4, f4, f1
+00298f24: ec0000b2  fmuls    f0, f0, f2
+00298f28: eca5002a  fadds    f5, f5, f0
+00298f2c: 28090000  cmplwi   r9, 0
+00298f30: 4082ffa8  bne      0x298ed8
+00298f34: 2c0a0000  cmpwi    r10, 0
+00298f38: 40820050  bne      0x298f88
+00298f3c: 80c800f8  lwz      r6, 0xf8(r8)
+00298f40: 3ca04330  lis      r5, 0x4330
+00298f44: 800800f4  lwz      r0, 0xf4(r8)
+00298f48: 39400001  li       r10, 1
+00298f4c: 6cc68000  xoris    r6, r6, 0x8000
+00298f50: 6c008000  xoris    r0, r0, 0x8000
+00298f54: 80e2b0a4  lwz      r7, -0x4f5c(r2)
+00298f58: 90c1fff4  stw      r6, -0xc(r1)
+00298f5c: c8670010  lfd      f3, 0x10(r7)
+00298f60: 90a1fff0  stw      r5, -0x10(r1)
+00298f64: c0240008  lfs      f1, 8(r4)
+00298f68: c801fff0  lfd      f0, -0x10(r1)
+00298f6c: 9001ffec  stw      r0, -0x14(r1)
+00298f70: ec401828  fsubs    f2, f0, f3
+00298f74: 90a1ffe8  stw      r5, -0x18(r1)
+00298f78: c801ffe8  lfd      f0, -0x18(r1)
+00298f7c: ec820072  fmuls    f4, f2, f1
+00298f80: ec001828  fsubs    f0, f0, f3
+00298f84: eca00072  fmuls    f5, f0, f1
+00298f88: 6d458000  xoris    r5, r10, 0x8000
+00298f8c: 80c2b0a4  lwz      r6, -0x4f5c(r2)
+00298f90: 3c004330  lis      r0, 0x4330
+00298f94: 90a1fff4  stw      r5, -0xc(r1)
+00298f98: c8460010  lfd      f2, 0x10(r6)
+00298f9c: 9001fff0  stw      r0, -0x10(r1)
+00298fa0: c064000c  lfs      f3, 0xc(r4)
+00298fa4: c821fff0  lfd      f1, -0x10(r1)
+00298fa8: c0040004  lfs      f0, 4(r4)
+00298fac: ec211028  fsubs    f1, f1, f2
+00298fb0: ec240824  fdivs    f1, f4, f1
+00298fb4: ec230072  fmuls    f1, f3, f1
+00298fb8: fc010040  .long    0xfc010040
+00298fbc: 4080001c  bge      0x298fd8
+00298fc0: c0840010  lfs      f4, 0x10(r4)
+00298fc4: ec012028  fsubs    f0, f1, f4
+00298fc8: fc00001e  fctiwz   f0, f0
+00298fcc: d801fff0  stfd     f0, -0x10(r1)
+00298fd0: 80e1fff4  lwz      r7, -0xc(r1)
+00298fd4: 48000018  b        0x298fec
+00298fd8: c0840010  lfs      f4, 0x10(r4)
+00298fdc: ec04082a  fadds    f0, f4, f1
+00298fe0: fc00001e  fctiwz   f0, f0
+00298fe4: d801fff0  stfd     f0, -0x10(r1)
+00298fe8: 80e1fff4  lwz      r7, -0xc(r1)
+00298fec: 6d458000  xoris    r5, r10, 0x8000
+00298ff0: 80c2b0a4  lwz      r6, -0x4f5c(r2)
+00298ff4: 3c004330  lis      r0, 0x4330
+00298ff8: 90a1fff4  stw      r5, -0xc(r1)
+00298ffc: c8460010  lfd      f2, 0x10(r6)
+00299000: 9001fff0  stw      r0, -0x10(r1)
+00299004: c064000c  lfs      f3, 0xc(r4)
+00299008: c821fff0  lfd      f1, -0x10(r1)
+0029900c: c0040004  lfs      f0, 4(r4)
+00299010: ec211028  fsubs    f1, f1, f2
+00299014: 90e1ffe4  stw      r7, -0x1c(r1)
+00299018: ec250824  fdivs    f1, f5, f1
+0029901c: ec230072  fmuls    f1, f3, f1
+00299020: fc010040  .long    0xfc010040
+00299024: 40800018  bge      0x29903c
+00299028: ec012028  fsubs    f0, f1, f4
+0029902c: fc00001e  fctiwz   f0, f0
+00299030: d801ffe8  stfd     f0, -0x18(r1)
+00299034: 8001ffec  lwz      r0, -0x14(r1)
+00299038: 48000014  b        0x29904c
+0029903c: ec04082a  fadds    f0, f4, f1
+00299040: fc00001e  fctiwz   f0, f0
+00299044: d801fff8  stfd     f0, -8(r1)
+00299048: 8001fffc  lwz      r0, -4(r1)
+0029904c: 9001ffe0  stw      r0, -0x20(r1)
+00299050: 48000014  b        0x299064
+00299054: 808800f4  lwz      r4, 0xf4(r8)
+00299058: 800800f8  lwz      r0, 0xf8(r8)
+0029905c: 9081ffe0  stw      r4, -0x20(r1)
+00299060: 9001ffe4  stw      r0, -0x1c(r1)
+00299064: 8081ffe0  lwz      r4, -0x20(r1)
+00299068: 8001ffe4  lwz      r0, -0x1c(r1)
+0029906c: 90830000  stw      r4, 0(r3)
+00299070: 90030004  stw      r0, 4(r3)
+00299074: 4e800020  blr
+00299078: 00000000  .long    0x00000000
+0029907c: 00092040  .long    0x00092040
+00299080: 00000000  .long    0x00000000
+00299084: 00000228  .long    0x00000228
+00299088: 00282e47  .long    0x00282e47
+0029908c: 65744365  oris     r20, r11, 0x4365

@@ -1,0 +1,21 @@
+00251d1c: 48000b25  bl       0x252840   ; .__ct__12SimsAppCheatFiQ212SimsAppCheat4TypePCcPCcPCc
+00251d20: 387d0000  addi     r3, r29, 0
+00251d24: 388103c8  addi     r4, r1, 0x3c8
+00251d28: 48000a69  bl       0x252790
+00251d2c: 38fe0155  addi     r7, r30, 0x155
+00251d30: 386103dc  addi     r3, r1, 0x3dc
+00251d34: 39070000  addi     r8, r7, 0
+00251d38: 38de0d47  addi     r6, r30, 0xd47
+00251d3c: 3880002d  li       r4, 0x2d
+00251d40: 38a00000  li       r5, 0
+00251d44: 48000afd  bl       0x252840   ; .__ct__12SimsAppCheatFiQ212SimsAppCheat4TypePCcPCcPCc
+00251d48: 387d0000  addi     r3, r29, 0
+00251d4c: 388103dc  addi     r4, r1, 0x3dc
+00251d50: 48000a41  bl       0x252790
+00251d54: 38fe0155  addi     r7, r30, 0x155
+00251d58: 386103f0  addi     r3, r1, 0x3f0
+00251d5c: 39070000  addi     r8, r7, 0
+00251d60: 38de0d53  addi     r6, r30, 0xd53
+00251d64: 3880002e  li       r4, 0x2e
+00251d68: 38a00000  li       r5, 0
+00251d6c: 48000ad5  bl       0x252840   ; .__ct__12SimsAppCheatFiQ212SimsAppCheat4TypePCcPCcPCc

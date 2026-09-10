@@ -1,0 +1,185 @@
+
+SetArea text rectangle
+005330e0: mr       r3, r31
+005330e4: bl       0x21a5b0
+005330e8: addi     r30, r3, 0
+005330ec: addi     r3, r31, 0
+005330f0: bl       0x21a5f0
+005330f4: li       r0, 5
+005330f8: stw      r0, 0x108(r31)
+005330fc: li       r0, 0
+00533100: stw      r0, 0x10c(r31)
+00533104: stw      r3, 0x110(r31)
+00533108: stw      r30, 0x114(r31)
+0053310c: lwz      r0, 0x68(r1)
+00533110: addi     r1, r1, 0x60
+
+Init rectangle, visible rows, wrap width and y centering
+00534f48: bne      0x534f54
+00534f4c: li       r3, 0
+00534f50: b        0x5350b4
+00534f54: lwz      r3, 0x108(r31)
+00534f58: lwz      r0, 0x110(r31)
+00534f5c: subf.    r0, r3, r0
+00534f60: bne      0x534f90
+00534f64: mr       r3, r31
+00534f68: bl       0x21a5b0
+00534f6c: addi     r30, r3, 0
+00534f70: addi     r3, r31, 0
+00534f74: bl       0x21a5f0
+00534f78: li       r0, 5
+00534f7c: stw      r0, 0x108(r31)
+00534f80: li       r0, 0
+00534f84: stw      r0, 0x10c(r31)
+00534f88: stw      r3, 0x110(r31)
+00534f8c: stw      r30, 0x114(r31)
+00534f90: li       r0, 0
+00534f94: stw      r0, 0x118(r31)
+00534f98: stw      r0, 0x11c(r31)
+00534f9c: lwz      r3, 0x104(r31)
+00534fa0: lwz      r12, 0(r3)
+00534fa4: lwz      r12, 0x60(r12)
+00534fa8: bl       0x5a29e0
+00534fac: lwz      r2, 0x14(r1)
+00534fb0: lwz      r4, 0x10c(r31)
+00534fb4: lwz      r0, 0x114(r31)
+00534fb8: subf     r0, r4, r0
+00534fbc: divw.    r0, r0, r3
+00534fc0: stw      r0, 0x120(r31)
+00534fc4: bne      0x534fd0
+00534fc8: li       r0, 1
+00534fcc: stw      r0, 0x120(r31)
+00534fd0: lwz      r0, 0x124(r31)
+00534fd4: cmpwi    r0, 1
+00534fd8: bne      0x534ff4
+00534fdc: mr       r3, r31
+00534fe0: bl       0x535100
+00534fe4: li       r0, 0x7fff
+00534fe8: stw      r0, 0xf8(r31)
+00534fec: stw      r3, 0xfc(r31)
+00534ff0: b        0x53500c
+00534ff4: addi     r3, r31, 0x108
+00534ff8: bl       0x261c80
+00534ffc: addi     r0, r3, -5
+00535000: stw      r0, 0xf8(r31)
+00535004: li       r0, 0x7fff
+00535008: stw      r0, 0xfc(r31)
+0053500c: li       r0, 0
+00535010: stw      r0, 0x130(r31)
+00535014: addi     r3, r31, 0
+00535018: li       r4, 0
+0053501c: stw      r0, 0x134(r31)
+00535020: bl       0x5306b0
+00535024: lwz      r3, -0x71fc(r2)
+00535028: li       r4, 2
+0053502c: lwz      r3, 0(r3)
+00535030: lwz      r3, 0x190(r3)
+00535034: bl       0x4972d0
+00535038: addi     r4, r3, 0
+0053503c: addi     r3, r31, 0
+00535040: bl       0x503f00
+00535044: lwz      r3, 0x78(r31)
+00535048: lwz      r0, 0x80(r31)
+0053504c: subf.    r30, r3, r0
+00535050: beq      0x53509c
+00535054: lwz      r0, 0x120(r31)
+00535058: cmpwi    r0, 0
+0053505c: ble      0x53509c
+00535060: lwz      r3, 0x104(r31)
+00535064: cmplwi   r3, 0
+00535068: beq      0x53509c
+0053506c: lwz      r12, 0(r3)
+00535070: lwz      r12, 0x60(r12)
+00535074: bl       0x5a29e0
+00535078: lwz      r2, 0x14(r1)
+0053507c: lwz      r0, 0x120(r31)
+00535080: mullw    r0, r0, r3
+00535084: subf     r3, r0, r30
+00535088: srwi     r0, r3, 0x1f
+0053508c: add      r0, r0, r3
+00535090: srawi    r0, r0, 1
+00535094: stw      r0, 0xf4(r31)
+
+Rebuild empty-row origin
+00530774: bl       0x5316e0
+00530778: lwz      r19, 0(r3)
+0053077c: addi     r3, r1, 0x78
+00530780: li       r4, 5
+00530784: stw      r22, 0(r19)
+00530788: li       r5, 0
+0053078c: stw      r20, 8(r19)
+00530790: bl       0x260b60
+00530794: addi     r4, r3, 0
+00530798: addi     r3, r19, 0xc
+0053079c: bl       0x260ab0
+
+Rebuild row origin
+00530a60: mr       r29, r3
+00530a64: lwz      r26, 0xf8(r31)
+00530a68: mullw    r5, r23, r20
+00530a6c: lwz      r25, 0(r25)
+00530a70: addi     r3, r1, 0x90
+00530a74: stw      r22, 0(r25)
+00530a78: stw      r20, 8(r25)
+00530a7c: li       r4, 5
+00530a80: bl       0x260b60
+00530a84: addi     r4, r3, 0
+00530a88: addi     r3, r25, 0xc
+00530a8c: bl       0x260ab0
+
+Scroll row offset
+005317b8: lwz      r12, 0x60(r12)
+005317bc: bl       0x5a29e0
+005317c0: lwz      r2, 0x14(r1)
+005317c4: mullw    r3, r31, r3
+005317c8: lwz      r0, 0xf4(r30)
+005317cc: subf     r0, r3, r0
+005317d0: stw      r0, 0xf0(r30)
+
+Paint row placement
+005346f8: lwz      r26, 0x5c(r31)
+005346fc: addi     r30, r3, 0
+00534700: addi     r3, r31, 0x1c
+00534704: bl       0x26df10
+00534708: addi     r20, r3, 0
+0053470c: addi     r3, r1, 0x70
+00534710: addi     r4, r31, 0xec
+00534714: addi     r5, r25, 0xc
+00534718: bl       0x295470
+0053471c: addi     r5, r20, 0
+00534720: addi     r3, r1, 0x60
+00534724: addi     r4, r1, 0x70
+00534728: bl       0x295470
+
+Typed Return and control-character rules
+005336e8: stb      r0, 0x184(r30)
+005336ec: li       r3, 1
+005336f0: b        0x533980
+005336f4: extsb    r0, r28
+005336f8: cmpwi    r0, 0xd
+005336fc: bne      0x533704
+00533700: li       r28, 0xa
+00533704: extsb    r0, r28
+00533708: cmpwi    r0, 0xa
+0053370c: bne      0x533748
+00533710: lwz      r0, 0x124(r30)
+00533714: cmpwi    r0, 1
+00533718: bne      0x533748
+0053371c: lwz      r4, 0x50(r30)
+00533720: cmplwi   r4, 0
+00533724: beq      0x53397c
+00533728: lwz      r3, -0x71fc(r2)
+0053372c: mr       r7, r30
+00533730: li       r5, 3
+00533734: lwz      r3, 0(r3)
+00533738: li       r6, 0x17
+0053373c: li       r8, 0
+00533740: bl       0x51d930
+00533744: b        0x53397c
+00533748: clrlwi   r0, r28, 0x18
+0053374c: cmplwi   r0, 0x20
+00533750: bge      0x533760
+00533754: extsb    r0, r28
+00533758: cmpwi    r0, 0xa
+0053375c: bne      0x53397c
+00533760: lwz      r3, 0x180(r30)

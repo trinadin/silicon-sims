@@ -1,0 +1,78 @@
+00281c38: 38a50004  addi     r5, r5, 4
+00281c3c: 7c051840  cmplw    r5, r3
+00281c40: 41820010  beq      0x281c50
+00281c44: 80050000  lwz      r0, 0(r5)
+00281c48: 7c00c040  cmplw    r0, r24
+00281c4c: 4082ffec  bne      0x281c38
+00281c50: 381e0180  addi     r0, r30, 0x180
+00281c54: 7c050040  cmplw    r5, r0
+00281c58: 41820f34  beq      0x282b8c
+00281c5c: 381e00d8  addi     r0, r30, 0xd8
+00281c60: 7c002850  subf     r0, r0, r5
+00281c64: 7c001670  srawi    r0, r0, 2
+00281c68: 7f200195  addze.   r25, r0
+00281c6c: 418000b4  blt      0x281d20
+00281c70: 2c19002a  cmpwi    r25, 0x2a
+00281c74: 408000ac  bge      0x281d20
+00281c78: 5720103a  slwi     r0, r25, 2
+00281c7c: 7c7e0214  add      r3, r30, r0
+00281c80: 806300d8  lwz      r3, 0xd8(r3)
+00281c84: 28030000  cmplwi   r3, 0
+00281c88: 41820098  beq      0x281d20
+00281c8c: 800300a4  lwz      r0, 0xa4(r3)
+00281c90: 28000000  cmplwi   r0, 0
+00281c94: 4182008c  beq      0x281d20
+00281c98: 807e018c  lwz      r3, 0x18c(r30)
+00281c9c: 880300d8  lbz      r0, 0xd8(r3)
+00281ca0: 28000000  cmplwi   r0, 0
+00281ca4: 41820020  beq      0x281cc4
+00281ca8: 809e0190  lwz      r4, 0x190(r30)
+00281cac: 80040014  lwz      r0, 0x14(r4)
+00281cb0: 7c180040  cmplw    r24, r0
+00281cb4: 40820010  bne      0x281cc4
+00281cb8: 38800001  li       r4, 1
+00281cbc: 4bff7155  bl       0x278e10   ; .DisablePopup__13cWinLivePopupFb
+00281cc0: 48000060  b        0x281d20
+00281cc4: 807e0190  lwz      r3, 0x190(r30)
+00281cc8: 80630014  lwz      r3, 0x14(r3)
+00281ccc: 28030000  cmplwi   r3, 0
+00281cd0: 4182000c  beq      0x281cdc
+00281cd4: 38800000  li       r4, 0
+00281cd8: 48289679  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+00281cdc: 82f800a4  lwz      r23, 0xa4(r24)
+00281ce0: 807e0190  lwz      r3, 0x190(r30)
+00281ce4: 80970000  lwz      r4, 0(r23)
+00281ce8: 4bff7d79  bl       0x279a60   ; .SetName__19cWinLivePopupClientFPCc
+00281cec: 807e0190  lwz      r3, 0x190(r30)
+00281cf0: 80970004  lwz      r4, 4(r23)
+00281cf4: 4bff7ccd  bl       0x2799c0   ; .SetDesc__19cWinLivePopupClientFPCc
+00281cf8: 807e0190  lwz      r3, 0x190(r30)
+00281cfc: 38800000  li       r4, 0
+00281d00: 80b70008  lwz      r5, 8(r23)
+00281d04: 4bff84cd  bl       0x27a1d0   ; .SetBitmap__19cWinLivePopupClientFiP9cTSBuffer
+00281d08: 807e0190  lwz      r3, 0x190(r30)
+00281d0c: 7fc5f378  mr       r5, r30
+00281d10: 93030014  stw      r24, 0x14(r3)
+00281d14: 807e018c  lwz      r3, 0x18c(r30)
+00281d18: 809e0190  lwz      r4, 0x190(r30)
+00281d1c: 4bff71c5  bl       0x278ee0   ; .EnablePopup__13cWinLivePopupFP19cWinLivePopupClientP6cTSWin
+00281d20: 2c190004  cmpwi    r25, 4
+00281d24: 41820cf0  beq      0x282a14
+00281d28: 40800028  bge      0x281d50
+00281d2c: 2c190001  cmpwi    r25, 1
+00281d30: 41820bf0  beq      0x282920
+00281d34: 40800010  bge      0x281d44
+00281d38: 2c190000  cmpwi    r25, 0
+00281d3c: 4080002c  bge      0x281d68
+00281d40: 48000e4c  b        0x282b8c
+00281d44: 2c190003  cmpwi    r25, 3
+00281d48: 40800ca0  bge      0x2829e8
+00281d4c: 48000bec  b        0x282938
+00281d50: 2c190021  cmpwi    r25, 0x21
+00281d54: 41820d18  beq      0x282a6c
+00281d58: 40800e34  bge      0x282b8c
+00281d5c: 2c190006  cmpwi    r25, 6
+00281d60: 40800e2c  bge      0x282b8c
+00281d64: 48000cdc  b        0x282a40
+00281d68: 807c0000  lwz      r3, 0(r28)
+00281d6c: 8323001c  lwz      r25, 0x1c(r3)

@@ -1,4 +1,4 @@
-﻿using FSO.Client;
+using FSO.Client;
 using FSO.LotView;
 using FSO.UI;
 using Simitone.Client;
@@ -19,8 +19,11 @@ namespace Simitone.Windows
             World.DirectX = useDX;
             SimitoneGame game = new SimitoneGame();
 
+            Simitone.Client.GameLog.Write("exit-probe: before Run");
             game.Run();
+            Simitone.Client.GameLog.Write("exit-probe: after Run");
             game.Dispose();
+            Simitone.Client.GameLog.Write("exit-probe: after Dispose");
         }
     }
 }

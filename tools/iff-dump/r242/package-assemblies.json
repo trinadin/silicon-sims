@@ -1,0 +1,47 @@
+[
+  {
+    "assembly": "TheSims.dll",
+    "publish": "12b022456227ee561e05fab9bd30a45b01454d2834e0cec283e23ca8a99b99b5",
+    "package": "12b022456227ee561e05fab9bd30a45b01454d2834e0cec283e23ca8a99b99b5"
+  },
+  {
+    "assembly": "Simitone.Client.dll",
+    "publish": "435ad4b7418b37b2ffbef6b6fd387cb911a62630bb8386acccbd80fda70fdb92",
+    "package": "435ad4b7418b37b2ffbef6b6fd387cb911a62630bb8386acccbd80fda70fdb92"
+  },
+  {
+    "assembly": "FSO.SimAntics.dll",
+    "publish": "36b7f4313f6889f2f93959ce4aa2826c56ff514529eace70bf2023718243bcb9",
+    "package": "36b7f4313f6889f2f93959ce4aa2826c56ff514529eace70bf2023718243bcb9"
+  },
+  {
+    "assembly": "FSO.Content.dll",
+    "publish": "b206b8dc19e8be2a2908a35be0e1fe844eab3aaab0994590139b3e1ccb3dbcd0",
+    "package": "b206b8dc19e8be2a2908a35be0e1fe844eab3aaab0994590139b3e1ccb3dbcd0"
+  },
+  {
+    "assembly": "FSO.Files.dll",
+    "publish": "4d13b3be9ff831fe1ec48d9e5372e6ab528a824e754e72c3609ab5966c7f908c",
+    "package": "4d13b3be9ff831fe1ec48d9e5372e6ab528a824e754e72c3609ab5966c7f908c"
+  },
+  {
+    "assembly": "FSO.SimAntics.JIT.dll",
+    "publish": "349759eef3097111eb61a1383f0fb66973ee4f7b30bf7fe89a0b2d346a1bc12c",
+    "package": "349759eef3097111eb61a1383f0fb66973ee4f7b30bf7fe89a0b2d346a1bc12c"
+  },
+  {
+    "assembly": "FSO.LotView.dll",
+    "publish": "9a2801400790272fe060aabf02bcc3f6e7e73c4d8617df369443198f4cb0bf52",
+    "package": "9a2801400790272fe060aabf02bcc3f6e7e73c4d8617df369443198f4cb0bf52"
+  },
+  {
+    "assembly": "FSO.Common.dll",
+    "publish": "c395d8c0a64913d9d9729f804d2e82c9db983abf88093a2c64ee4a41613e8022",
+    "package": "c395d8c0a64913d9d9729f804d2e82c9db983abf88093a2c64ee4a41613e8022"
+  },
+  {
+    "assembly": "FSO.UI.dll",
+    "publish": "87969bc907b3b19b0135545e385faa490768b32c5bb2b497aa510b5b4738ab61",
+    "package": "87969bc907b3b19b0135545e385faa490768b32c5bb2b497aa510b5b4738ab61"
+  }
+]

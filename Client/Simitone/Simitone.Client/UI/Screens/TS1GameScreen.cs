@@ -30,7 +30,6 @@ using Simitone.Client.UI.Controls;
 using Simitone.Client.UI.Panels;
 using Simitone.Client.UI.Panels.WorldUI;
 using Simitone.Client.Utils;
-using Simitone.Client.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -47,6 +46,12 @@ namespace Simitone.Client.UI.Screens
         public bool Desktop = !FSOEnvironment.SoftwareKeyboard;
 
         public UILotControl LotControl { get; set; }
+        public UIOriginalCameraOverlay CameraOverlay { get; set; }
+        // R204: the STR# 148 'Paused' blink label (engine DrawPause law) —
+        // mounts above the frontend at the default window position (0,0).
+        public Simitone.Client.UI.Controls.UIOriginalPauseLabel PauseLabel { get; set; }
+        private OriginalSnapshotCaptureScene SnapshotScene;
+        public UIOriginalPictureInPicture PictureInPicture { get; private set; }
         public UISimitoneFrontend Frontend { get; set; }
         private FSO.LotView.World World;
         public FSO.SimAntics.VM vm { get; set; }
@@ -56,6 +61,7 @@ namespace Simitone.Client.UI.Screens
 
         //for TS1 hybrid mode
         public UINeighborhoodSelectionPanel TS1NeighPanel;
+        public UIElement TS1NeighSwitcher;   // R141: tracked so null-switcher entry paths tear it down too
         public FAMI ActiveFamily;
         private ushort CurrentNeighborhoodMode = 4; // default to Normal/Old Town
 
@@ -64,6 +70,7 @@ namespace Simitone.Client.UI.Screens
         private WeatherType LastWeatherType = WeatherType.Rain;
         private bool LastThunder = false;
         private bool TerrainSnowApplied = false;
+        private int ArchValueFrame;
         private float ThunderTimer = 0f;
         private Random ThunderRandom = new Random();
         private short? PendingWeatherData = null;
@@ -183,19 +190,24 @@ namespace Simitone.Client.UI.Screens
             }
         }
 
-        private ushort GetNeighborhoodModeFromHouse(short house)
+        internal static ushort GetNeighborhoodModeFromHouse(short house)
         {
             // House number ranges match the lot types
             if (house >= 21 && house <= 31) return 2;  // Downtown
             else if (house >= 40 && house <= 49) return 3;  // Vacation
-            else if (house >= 81 && house <= 90) return 5;  // Studiotown
+            else if (house >= 81 && house <= 89) return 5;  // Studiotown
             else if (house >= 90 && house <= 99) return 7;  // Magictown
             else return 4;  // Normal/Old Town (default)
         }
 
         public TS1GameScreen(NeighSelectionMode mode) : base()
         {
-            Bg = new UISimitoneBg();
+            // R160: the Simitone gradient is RETIRED behind the neighborhood — the
+            // engine surround is the kLargeMask law (r143 §1: windows wider than the
+            // 800x600 artboard load kLargeMask 5001 = Downtown/LargeBack.bmp 1024x768
+            // as surround). loadModernFallback=false + ResolveNeighborhoodSurround.
+            Bg = new UISimitoneBg(loadModernFallback: false);
+            Bg.ResolveNeighborhoodSurround();
             Bg.Position = (new Vector2(ScreenWidth, ScreenHeight)) / 2;
             Add(Bg);
 
@@ -206,8 +218,10 @@ namespace Simitone.Client.UI.Screens
             {
                 NeighSelection(mode);
 
-                // Check for updates from GitHub releases
-                UpdateChecker.CheckForUpdatesAsync();
+                // R118: the Simitone GitHub update-check dialog is REMOVED - it popped an
+                // "A new version of Simitone is available!" alert (MSDF-rendered) over the
+                // game; the original game has no update plumbing. Services/UpdateChecker.cs
+                // is deleted with it.
             }
         }
         public int? MoveInFamily;
@@ -216,6 +230,59 @@ namespace Simitone.Client.UI.Screens
         {
             MoveInFamily = familyID;
         }
+
+        // ROUND-197: cWinNeighborhoodVC::MoveInModeLotHandler @0x471d82, decoded
+        // (r197/r197-lot-movein-law.md). The engine guard ORDER on a move-in lot
+        // click: tutorial flag (HouseInfo+0x14) → invalid family → precomputed
+        // can-afford (+0x10) → occupied (+0x24 != -1) → the +0x18 house-built
+        // split between the two YesNo confirms. Every string pair is STR# 132
+        // 'MoveInModeStrs'; the AskDialog style-2 (YesNo) YES button returns 4
+        // and only then does the engine call LoadGame(lot, family).
+        public enum NativeMoveInOutcome
+        {
+            TouchFallback,       // not the desktop path — keep the Simitone card
+            ExitMoveInMode,      // family query failed: SetMode(0), silent return
+            RefuseTutorial,      // 132[16]/[17]
+            RefuseCommunity,     // 132[12]/[13] (the UL community guard)
+            RefuseUnaffordable,  // 132[2]/[3]
+            RefuseOccupied,      // 132[14]/[15]
+            ConfirmPurchaseHouse,// 132[0]/[1] YesNo
+            ConfirmPurchaseLot   // 132[6]/[7] YesNo
+        }
+
+        public static int NativeMoveInTitleIndex(NativeMoveInOutcome o)
+        {
+            switch (o)
+            {
+                case NativeMoveInOutcome.RefuseTutorial: return 16;
+                case NativeMoveInOutcome.RefuseCommunity: return 12;
+                case NativeMoveInOutcome.RefuseUnaffordable: return 2;
+                case NativeMoveInOutcome.RefuseOccupied: return 14;
+                case NativeMoveInOutcome.ConfirmPurchaseHouse: return 0;
+                case NativeMoveInOutcome.ConfirmPurchaseLot: return 6;
+                default: return -1;
+            }
+        }
+
+        public static bool NativeMoveInIsConfirm(NativeMoveInOutcome o)
+        {
+            return o == NativeMoveInOutcome.ConfirmPurchaseHouse
+                || o == NativeMoveInOutcome.ConfirmPurchaseLot;
+        }
+
+        public static NativeMoveInOutcome NativeMoveInDecision(bool desktop, bool familyValid,
+            bool tutorial, bool community, bool canAfford, bool occupied, bool houseBuilt)
+        {
+            if (!desktop) return NativeMoveInOutcome.TouchFallback;
+            if (tutorial) return NativeMoveInOutcome.RefuseTutorial;
+            if (!familyValid) return NativeMoveInOutcome.ExitMoveInMode;
+            if (community) return NativeMoveInOutcome.RefuseCommunity;
+            if (!canAfford) return NativeMoveInOutcome.RefuseUnaffordable;
+            if (occupied) return NativeMoveInOutcome.RefuseOccupied;
+            return houseBuilt ? NativeMoveInOutcome.ConfirmPurchaseHouse
+                              : NativeMoveInOutcome.ConfirmPurchaseLot;
+        }
+
 
         public void NeighSelection(NeighSelectionMode mode)
         {
@@ -235,27 +302,113 @@ namespace Simitone.Client.UI.Screens
                 {
                     //move them in first
                     //confirm it
-                    UIMobileAlert confirmDialog = null;
-                    confirmDialog = new UIMobileAlert(new UIAlertOptions()
+                    // R197: the native MoveInModeLotHandler guard chain decides the
+                    // dialog (tutorial/community/afford/occupied/house-vs-lot). The
+                    // old unconditional "Purchase House?" confirm was the Simitone
+                    // surface; desktop now follows the engine law, touch keeps it.
+                    var neigh = Content.Get().Neighborhood;
+                    var moveIn = neigh.GetFamily((ushort)MoveInFamily.Value);
+                    var houseIff = neigh.GetHouse(house);
+                    var simi = houseIff?.Get<FSO.Files.Formats.IFF.Chunks.SIMI>(1);
+                    var price = simi?.PurchaseValue ?? 0;
+                    // HouseInfo+0x18 proxy: an empty lot carries land value only; a
+                    // built house adds objects/architecture to the SIMI record.
+                    bool houseBuilt = simi != null && (simi.ObjectsValue > 0 || simi.ArchitectureValue > 0);
+                    bool occupied = neigh.GetFamilyForHouse((short)house) != null;
+                    short zoning;
+                    if (!neigh.ZoningDictionary.TryGetValue((short)house, out zoning)) zoning = 0;
+                    var outcome = NativeMoveInDecision(Desktop,
+                        moveIn != null && moveIn.FamilyGUIDs.Length > 0,
+                        // R247 (r247-tut-lifecycle §G): HouseInfo+0x14 — the
+                        // FIRST guard — is the house file's SIMI global 58.
+                        // The literal false kept the R197 refusal permanently
+                        // inert; the engine's IsTutorialHouse reads the same
+                        // source. API missing → false (the legacy contract).
+                        Simitone.Client.Utils.TutorialEngine247.IsTutorialHouse((short)house),
+                        zoning > 0,
+                        moveIn != null && moveIn.Budget >= price,
+                        occupied, houseBuilt);
+                    if (outcome == NativeMoveInOutcome.ExitMoveInMode)
                     {
-                        Title = GameFacade.Strings.GetString("132", "0"),
-                        Message = GameFacade.Strings.GetString("132", "1"),
-                        Buttons = UIAlertButton.YesNo((b) =>
+                        MoveInFamily = null;
+                        return;
+                    }
+                    if (outcome == NativeMoveInOutcome.TouchFallback)
+                    {
+                        UIMobileAlert confirmDialog = null;
+                        confirmDialog = new UIMobileAlert(new UIAlertOptions()
                         {
-                            confirmDialog.Close();
+                            Title = GameFacade.Strings.GetString("132", "0"),
+                            Message = GameFacade.Strings.GetString("132", "1"),
+                            Buttons = UIAlertButton.YesNo((b) =>
+                            {
+                                confirmDialog.Close();
+                                MoveInAndPlay((short)house, MoveInFamily.Value, switcher);
+                            },
+                            (b) => confirmDialog.Close())
+                        });
+                        UIScreen.GlobalShowDialog(confirmDialog, true);
+                        return;
+                    }
+                    UIMobileAlert nativeDialog = null;
+                    var titleIdx = NativeMoveInTitleIndex(outcome);
+                    var isConfirm = NativeMoveInIsConfirm(outcome);
+                    FSO.Client.UI.Controls.UIAlertButton[] buttons;
+                    if (isConfirm)
+                    {
+                        buttons = UIAlertButton.YesNo((b) =>
+                        {
+                            nativeDialog.Close();
                             MoveInAndPlay((short)house, MoveInFamily.Value, switcher);
                         },
-                        (b) => confirmDialog.Close())
+                        (b) => nativeDialog.Close());
+                    }
+                    else
+                    {
+                        buttons = UIAlertButton.Ok((b) => nativeDialog.Close());
+                    }
+                    nativeDialog = new UIMobileAlert(new UIAlertOptions()
+                    {
+                        Title = GameFacade.Strings.GetString("132", titleIdx.ToString()),
+                        Message = GameFacade.Strings.GetString("132", (titleIdx + 1).ToString()),
+                        Buttons = buttons
                     });
-                    UIScreen.GlobalShowDialog(confirmDialog, true);
+                    UIScreen.GlobalShowDialog(nativeDialog, true);
                 }
                 else
                 {
+                    var occupied = Content.Get().Neighborhood.GetFamilyForHouse((short)house) != null;
+                    if (NativeDesktopEmptyLotRequiresDialog(Desktop, neighborhoodMode,
+                        MoveInFamily != null, house, occupied))
+                    {
+                        // cWinNeighborhoodVC and the private Creepy Hollow lots
+                        // refuse an empty regular-mode lot with STR#133 and one
+                        // OK button. Old Town and all public destination lots
+                        // dispatch directly, even when no family owns the lot.
+                        UIMobileAlert emptyDialog = null;
+                        emptyDialog = new UIMobileAlert(new UIAlertOptions()
+                        {
+                            Title = GameFacade.Strings.GetString("133", "0"),
+                            Message = GameFacade.Strings.GetString("133", "1"),
+                            Buttons = UIAlertButton.Ok((b) => emptyDialog.Close())
+                        });
+                        UIScreen.GlobalShowDialog(emptyDialog, true);
+                        return;
+                    }
                     PlayHouse((short)house, switcher);
                 }
             };
             Add(TS1NeighPanel);
             Add(switcher);
+            TS1NeighSwitcher = switcher;
+        }
+
+        public static bool NativeDesktopEmptyLotRequiresDialog(bool desktop,
+            ushort neighborhoodMode, bool movingFamily, int house, bool occupied)
+        {
+            if (!desktop || movingFamily || occupied) return false;
+            return neighborhoodMode == 1
+                || (neighborhoodMode == 7 && house >= 90 && house <= 92);
         }
 
         public void PlayHouse(short house, UIElement switcher)
@@ -265,6 +418,13 @@ namespace Simitone.Client.UI.Screens
             InitializeLot(Content.Get().Neighborhood.GetHousePath(house), false);// "UserData/Houses/House21.iff"
             Remove(TS1NeighPanel);
             if (switcher != null) Remove(switcher);
+            // R141: entry paths that hand us a null switcher (the autotest harness)
+            // used to leave the neighborhood switcher mounted in-lot — five 96x96
+            // edge buttons bleeding over the lot view (survey uisurvey-ucp evidence).
+            if (TS1NeighSwitcher != null) { Remove(TS1NeighSwitcher); TS1NeighSwitcher = null; }
+            var kids = GetChildren();
+            if (kids != null)
+                foreach (var child in kids.Where(c => c is UINeighbourhoodSwitcher).ToList()) Remove(child);
         }
 
         public void MoveInAndPlay(short house, int family, UIElement switcher)
@@ -370,6 +530,9 @@ namespace Simitone.Client.UI.Screens
 
         public override void Update(FSO.Common.Rendering.Framework.Model.UpdateState state)
         {
+            // Tutorial dialog keys precede world hotkeys (Space selects a Sim
+            // in the frontend). Only the topmost visible dialog can consume.
+            GetChildren().OfType<UIMobileAlert>().LastOrDefault(x => x.Visible)?.HandleTutorialKeys(state);
             GameFacade.Game.IsFixedTimeStep = (vm == null || vm.Ready);
             
             Visible = World?.Visible != false && World?.State.Cameras.HideUI != true;
@@ -387,6 +550,13 @@ namespace Simitone.Client.UI.Screens
                 GameThread.NextUpdate((FSO.Common.Rendering.Framework.Model.UpdateState ustate) => ChangeSpeedTo(0));
             }
             base.Update(state);
+
+            // R137: periodic live arch-value refresh (objects change value
+            // without touching walls; wall changes fire WallsChanged)
+            if ((ArchValueFrame++ % 600) == 0) RefreshArchValue();
+
+            // R247: the neighborhood-screen import poll (1 s cadence, frontmost only)
+            TickTutorialImportPoll();
 
             // Update weather effects (sounds and terrain)
             UpdateWeatherEffects();
@@ -555,6 +725,9 @@ namespace Simitone.Client.UI.Screens
             }
             vm.CloseNet(VMCloseNetReason.LeaveLot);
             GameFacade.Scenes.Remove(World);
+            if (SnapshotScene != null) { GameFacade.Scenes.Remove(SnapshotScene); SnapshotScene.Dispose(); SnapshotScene = null; }
+            if (CameraOverlay != null) { this.Remove(CameraOverlay); CameraOverlay = null; }
+            if (PictureInPicture != null) { Remove(PictureInPicture); PictureInPicture.Dispose(); PictureInPicture = null; }
             World.Dispose();
             //LotControl.Dispose();
             this.Remove(LotControl);
@@ -593,6 +766,16 @@ namespace Simitone.Client.UI.Screens
             LotControl = new UILotControl(vm, World);
             this.AddAt(0, LotControl);
 
+            // R190: the camera-mode world surface sits directly above the lot
+            // control (and below the frontend) so it consumes world clicks in
+            // camera mode only; the snapshot readback hook draws right after
+            // the world scene. The family album resets per lot load.
+            CameraOverlay = new UIOriginalCameraOverlay(this);
+            this.AddAt(1, CameraOverlay);
+            SnapshotScene = new OriginalSnapshotCaptureScene(GameFacade.GraphicsDevice);
+            GameFacade.Scenes.Add(SnapshotScene);
+            Simitone.Client.UI.Model.OriginalSnapshotAlbum.ResetForLot(ActiveFamily);
+
             if (m_ZoomLevel > 3)
             {
                 World.Visible = false;
@@ -603,10 +786,56 @@ namespace Simitone.Client.UI.Screens
 
             if (IDEHook.IDE != null) IDEHook.IDE.StartIDE(vm);
 
+            PictureInPicture = new UIOriginalPictureInPicture(this, World);
+            Add(PictureInPicture);
+
             vm.OnFullRefresh += VMRefreshed;
             //vm.OnEODMessage += LotControl.EODs.OnEODMessage;
             vm.OnRequestLotSwitch += VMLotSwitch;
             vm.OnGenericVMEvent += Vm_OnGenericVMEvent;
+
+            // R137: the ORIGINAL recomputes the architecture value whenever
+            // the house changes (cFixedWorld::ComputeArchValue 0x15ea70,
+            // decoded r137); the port's FAMI.ValueInArch was file-read only.
+            // (WallsChanged is wired lazily in RefreshArchValue — the
+            // architecture is not attached yet at InitializeLot time.)
+            RefreshArchValue();
+        }
+
+        private void OnArchWallsChanged(FSO.SimAntics.VMArchitecture caller)
+        {
+            RefreshArchValue();
+        }
+
+        /// <summary>
+        /// R137: recompute the family's architecture value live — the same
+        /// formula the save path's UpdateSIMI snapshots into SIMI
+        /// (GetArchValue on the decoded engine law + build-mode objects),
+        /// mirrored into FAMI.ValueInArch so the neighborhood net-worth
+        /// surfaces and the evict payout read a current number.
+        /// </summary>
+        private bool ArchWired;
+
+        public void RefreshArchValue()
+        {
+            try
+            {
+                if (vm == null || vm.Context == null || vm.Context.Architecture == null) return;
+                if (!ArchWired)
+                {
+                    ArchWired = true;
+                    vm.Context.Architecture.WallsChanged += OnArchWallsChanged;
+                }
+                var family = ActiveFamily;
+                if (family == null) return;
+                var objValue = FSO.SimAntics.Utils.VMArchitectureStats.GetObjectValue(vm);
+                int arch = FSO.SimAntics.Utils.VMArchitectureStats.GetArchValue(vm.Context.Architecture)
+                    + objValue.Item2;
+                family.ValueInArch = arch;
+                if (vm.TS1State != null && vm.TS1State.SimulationInfo != null)
+                    vm.TS1State.SimulationInfo.ArchitectureValue = arch;
+            }
+            catch { }
         }
 
         public void InitializeLot(VMMarshal marshal)
@@ -645,6 +874,42 @@ namespace Simitone.Client.UI.Screens
 
             Frontend = new UISimitoneFrontend(this);
             this.Add(Frontend);
+            MountPauseLabel();
+            WireCameraOverlayMode();
+        }
+
+        private bool CameraModeWired;
+
+        // R204: engine cDDDSimsView::Init creates the pause label once per
+        // frontend mount; R214: the label follows the decoded DrawPause law —
+        // a steady indicator whose only hide-timer is the one-shot 3000ms
+        // TSOnTimerMsg fire on clock-stopping mode entries (see
+        // UIOriginalPauseLabel).
+        private void MountPauseLabel()
+        {
+            if (PauseLabel == null)
+            {
+                try
+                {
+                    PauseLabel = new Simitone.Client.UI.Controls.UIOriginalPauseLabel(GameFacade.GraphicsDevice);
+                    this.Add(PauseLabel);
+                }
+                catch { /* headless/probe contexts without a device keep the engine surface off, disclosed */ }
+            }
+            // CPState::SetMode's DrawPause arms ride the mode event; each
+            // frontend remount builds a fresh MainPanel, so rewire per mount.
+            if (PauseLabel != null && Frontend != null && Frontend.MainPanel != null)
+                Frontend.MainPanel.ModeChanged += PauseLabel.OnModeChanged;
+        }
+
+        private void WireCameraOverlayMode()
+        {
+            if (CameraModeWired || Frontend == null || Frontend.MainPanel == null || CameraOverlay == null) return;
+            CameraModeWired = true;
+            Frontend.MainPanel.ModeChanged += (mode) =>
+            {
+                CameraOverlay?.SetCameraActive(mode == UI.Panels.UIMainPanelMode.CAMERA);
+            };
         }
 
         public void ShowLoadErrors(List<VMLoadError> errors, bool verbose)
@@ -761,7 +1026,10 @@ namespace Simitone.Client.UI.Screens
 
             Frontend = new UISimitoneFrontend(this);
             this.Add(Frontend);
+            MountPauseLabel();
+            WireCameraOverlayMode();
         }
+
 
         public void LoadSurrounding(short houseID)
         {
@@ -863,6 +1131,9 @@ namespace Simitone.Client.UI.Screens
         {
             switch (type)
             {
+                case VMEventType.TS1PictureInPicture:
+                    PictureInPicture?.Handle((VMTS1PIPEvent)data);
+                    break;
                 case VMEventType.TS1BuildBuyChange:
                     Frontend?.ModeSwitcher?.UpdateBuildBuy();
                     Frontend?.DesktopUCP?.UpdateBuildBuy();
@@ -883,6 +1154,7 @@ namespace Simitone.Client.UI.Screens
         private void VMRefreshed()
         {
             if (vm == null) return;
+            PictureInPicture?.Close();
             LotControl.ActiveEntity = null;
             LotControl.RefreshCut();
         }
@@ -960,6 +1232,7 @@ namespace Simitone.Client.UI.Screens
         {
             //save the house first
             var iff = new IffFile();
+            RefreshArchValue(); // R137: ValueInArch mirrors the SIMI snapshot
             vm.TS1State.UpdateSIMI(vm);
             var marshal = vm.Save();
             var fsov = new FSOV();
@@ -1026,6 +1299,98 @@ namespace Simitone.Client.UI.Screens
             NeighSelection(CurrentNeighborhoodMode);
             Downtown = false;
             SavedLot = null;
+        }
+
+        // ---- R247: the neighborhood-screen import poll -----------------------
+        // r247-fam-import decode §1.1: cWinNeighborhoodVC runs CheckForNewImports
+        // once per second (Init + TSOnTimerMsg's 1000 ms re-arm) while the
+        // neighborhood screen is open. The port binds the same cadence in its
+        // Update tick, ONLY while the neighborhood screen is frontmost (never
+        // in a lot; CAS is a separate screen so its Update never runs here).
+        //
+        // Return contract (coordinated with the engine): imported → the client
+        // rebuilds the neighborhood screen WHEN the import carried a house
+        // (native DoNbhdScreen(true) of the auto-import law, gated on the
+        // provider's LastImportHouse — decode §1.2 reloadScreen); nothing or
+        // error keeps the screen as-is. The native "Couldn't import the
+        // family"/"Error" literals are surfaced only through the tri-state
+        // (TutorialEngine247 maps 0/1/2). Missing engine API → wired but inert
+        // (the cadence calls a no-op, disclosed by TutorialEngine247).
+        internal bool TutorialImportPollSuppressed; // R247 battery seam: the battery drives PollNeighborhoodImports() directly
+        internal int TutorialImportPollAutoCount; // battery evidence: how many cadence polls actually fired
+        private DateTime _lastTutorialImportPoll = DateTime.MinValue;
+        // R247 repair F6: the 1 s cadence replays a persistent engine failure
+        // every poll, and this dialog would stack a new modal each time (the
+        // native MessageDialog had a 1 s timer too, but the port must not
+        // stack). Choice: the error dialog shows only on an ok→error
+        // TRANSITION and at most once per session — a persistent failure never
+        // re-alerts; a recovery followed by a NEW failure episode re-arms it.
+        private bool _lastImportPollError;
+        private bool _importErrorDialogShown;
+
+        private void TickTutorialImportPoll()
+        {
+            if (InLot || TS1NeighPanel == null || TutorialImportPollSuppressed) return;
+            var now = DateTime.UtcNow;
+            if ((now - _lastTutorialImportPoll).TotalMilliseconds < 1000) return;
+            _lastTutorialImportPoll = now;
+            TutorialImportPollAutoCount++;
+            PollNeighborhoodImports();
+        }
+
+        /// <summary>One poll step; internal so the battery can drive the native
+        /// cadence deterministically. Returns the bridge's result.</summary>
+        internal Simitone.Client.Utils.TutorialEngine247.ImportPollResult PollNeighborhoodImports()
+        {
+            var result = Simitone.Client.Utils.TutorialEngine247.PollImports();
+            switch (result)
+            {
+                case Simitone.Client.Utils.TutorialEngine247.ImportPollResult.Imported:
+                    // R248 P2-9 (native §1.2 reloadScreen law): only an import that
+                    // carried a HOUSE rebuilds the neighborhood screen (ii.+0x110
+                    // != 0 && ii.+0x150 != 0); a family-only import leaves it alone.
+                    if (Simitone.Client.Utils.TutorialEngine247.GetLastImportHouse() != 0)
+                    {
+                        RefreshNeighborhoodScreen(); // native DoNbhdScreen(true)
+                    }
+                    break;
+                case Simitone.Client.Utils.TutorialEngine247.ImportPollResult.Error:
+                    {
+                        // r247-fam-import §2.3: any import failure shows
+                        // MessageDialog("Couldn't import the family", "Error",
+                        // style 0). Both literals are static strings in the
+                        // original binary (blob 0x6d1c0), safe to pin here.
+                        // Debounced (F6): only the ok→error transition of an
+                        // episode, and only the first one this session.
+                        if (_lastImportPollError || _importErrorDialogShown) break;
+                        _importErrorDialogShown = true;
+                        UIMobileAlert fail = null;
+                        fail = new UIMobileAlert(new FSO.Client.UI.Controls.UIAlertOptions
+                        {
+                            Title = "Error",
+                            Message = "Couldn't import the family",
+                            Buttons = FSO.Client.UI.Controls.UIAlertButton.Ok((b) => fail.Close())
+                        });
+                        GlobalShowDialog(fail, true);
+                    }
+                    break;
+            }
+            _lastImportPollError = result == Simitone.Client.Utils.TutorialEngine247.ImportPollResult.Error;
+            return result;
+        }
+
+        /// <summary>The native DoNbhdScreen(true) equivalence: a full rebuild
+        /// of the neighborhood screen on the current mode (in-lot this is the
+        /// ExitLot production teardown).</summary>
+        public void RefreshNeighborhoodScreen()
+        {
+            if (InLot) { ExitLot(); return; }
+            var mode = CurrentNeighborhoodMode;
+            if (TS1NeighPanel != null) Remove(TS1NeighPanel);
+            if (TS1NeighSwitcher != null) Remove(TS1NeighSwitcher);
+            TS1NeighPanel = null;
+            TS1NeighSwitcher = null;
+            NeighSelection(mode);
         }
     }
 

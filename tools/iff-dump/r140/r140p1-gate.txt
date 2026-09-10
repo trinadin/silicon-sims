@@ -1,0 +1,1205 @@
+AUTOTEST enabled houses=5 checks=(default)
+09:30:12.334 autotest: AUTOTEST START houses=[5] checks=[corpus,lot,motive,mood,load,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,career,freewill,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uidesc,uitt,uibuild,uibldt,uiroof,uigauge,uirate,uihouse,uivalue,uitext] timeout=1800000ms
+09:30:12.492 autotest: AUTOTEST hook-registered
+09:30:13.316 exit-probe: before Run
+09:30:13.326 exit-probe: Game.Run(Sync) enter
+09:30:13.695 exit-probe: Initialize enter
+Warning: Failed to set window icon: Unable to load shared library 'libSDL2.dylib' or one of its dependencies. In order to help diagnose loading problems, consider setting the DYLD_PRINT_LIBRARIES environment variable: 
+dlopen(/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib, 0x0001): tried: '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib' (no such file), '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib' (no such file)
+dlopen(libSDL2.dylib, 0x0001): tried: 'libSDL2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibSDL2.dylib' (no such file), '/usr/lib/libSDL2.dylib' (no such file, not in dyld cache), 'libSDL2.dylib' (no such file)
+dlopen(/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib, 0x0001): tried: '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib' (no such file), '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib' (no such file)
+dlopen(liblibSDL2.dylib, 0x0001): tried: 'liblibSDL2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OSliblibSDL2.dylib' (no such file), '/usr/lib/liblibSDL2.dylib' (no such file, not in dyld cache), 'liblibSDL2.dylib' (no such file)
+dlopen(/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib.dylib, 0x0001): tried: '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib.dylib' (no such file), '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib.dylib' (no such file)
+dlopen(libSDL2.dylib.dylib, 0x0001): tried: 'libSDL2.dylib.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibSDL2.dylib.dylib' (no such file), '/usr/lib/libSDL2.dylib.dylib' (no such file, not in dyld cache), 'libSDL2.dylib.dylib' (no such file)
+dlopen(/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib.dylib, 0x0001): tried: '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib.dylib' (no such file), '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib.dylib' (no such file)
+dlopen(liblibSDL2.dylib.dylib, 0x0001): tried: 'liblibSDL2.dylib.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OSliblibSDL2.dylib.dylib' (no such file), '/usr/lib/liblibSDL2.dylib.dylib' (no such file, not in dyld cache), 'liblibSDL2.dylib.dylib' (no such file)
+
+09:30:13.946 exit-probe: Initialize exit
+09:30:13.952 screen: EnterLoading
+09:30:14.034 loadscreen: DIRECT FAR mount original kSimsLogo boot screen 800x600 len=1440056 sha=8ecf9500 (from frame one; Simitone loader chrome deleted R118)
+09:30:14.042 content-init: begin
+09:30:14.054 loadscreen: splashprogress mount EXC (logs once) NullReferenceException Object reference not set to an instance of an object.
+09:30:14.215 loadscreen: IFF-mount original splashprogress strings (17) in variablesans_10 over the boot screen
+09:30:15.934 loading-screen: update frame=120 complete=False progress=InitObjects
+Unexpected TrailingZero: 617176985
+Unexpected TrailingZero: -666831736
+Unexpected TrailingZero: 1995593413
+09:30:16.992 content-init: done
+09:30:17.026 cursor-init: IFF resolve liveperson.cur -> Shared\cursors\LivePerson.cur 326 bytes
+09:30:17.027 cursor-init: IFF-first original cursors mounted livePersonLen=326
+09:30:17.035 loadscreen: IFF-mount original Community\Bus_loadscreen_1024x768.bmp
+09:30:17.044 loadscreen: IFF-mount texture 1024x768
+09:30:17.044 EnterGameMode lot= external=False
+09:30:17.656 global-context: global.iff BHAVs=251
+09:30:17.666 module: PersonGlobals BHAVs=473
+09:30:17.666 module: SocialGlobals BHAVs=101
+09:30:17.667 module: CatGlobals BHAVs=179
+09:30:17.667 module: DogGlobals BHAVs=177
+09:30:17.667 module: PetSitGlobals BHAVs=22
+09:30:17.668 module: PhoneGlobals BHAVs=149
+09:30:17.668 module: VacationDirectorGlobals BHAVs=85
+09:30:17.672 autotest: AUTOTEST neighborhood-screen ready; attempting houses
+09:30:17.682 autotest: AUTOTEST LOT-TRY house=5 path='/Users/nathannoom/Documents/Simitone/UserData/Houses/House05.iff'
+09:30:17.870 uioriginal: IFF-mount original cpanel\Buttons\House.bmp
+09:30:17.884 uioriginal: IFF-mount original cpanel\Buttons\options.bmp
+09:30:17.891 panel-ctor: original toolbar backdrop mounted 804x100
+09:30:17.891 panel-ctor: original speed strip mounted 334x40
+09:30:17.893 uioriginal: IFF-mount original cpanel\Buttons\Mood.bmp
+09:30:17.893 uioriginal: IFF-mount original cpanel\Buttons\Job.bmp
+09:30:17.894 uioriginal: IFF-mount original cpanel\Buttons\Personality.bmp
+09:30:17.894 uioriginal: IFF-mount original cpanel\Buttons\Relationship.BMP
+09:30:17.894 uioriginal: IFF-mount original cpanel\Buttons\people.bmp
+09:30:17.894 uioriginal: IFF-mount original cpanel\Buttons\ScrollLeft.BMP
+09:30:17.894 uioriginal: IFF-mount original cpanel\Buttons\ScrollRight.BMP
+09:30:17.895 autotest: AUTOTEST LOT-ACTION house=5 inlot=True vm=True
+09:30:17.896 autotest: AUTOTEST LOT-READY house=5 entities=303 avatars=3 loadErrors=0 speed=1 minute=30
+09:30:17.897 autotest: AUTOTEST load: PASS
+09:30:17.897 autotest: AUTOTEST lot: PASS
+09:30:17.898 autotest: AUTOTEST corpus global expected=251 actual=251
+09:30:17.899 autotest: AUTOTEST corpus PersonGlobals expected=473 actual=473
+09:30:17.899 autotest: AUTOTEST corpus SocialGlobals expected=101 actual=101
+09:30:17.899 autotest: AUTOTEST corpus CatGlobals expected=179 actual=179
+09:30:17.899 autotest: AUTOTEST corpus DogGlobals expected=177 actual=177
+09:30:17.899 autotest: AUTOTEST corpus PetSitGlobals expected=22 actual=22
+09:30:17.899 autotest: AUTOTEST corpus PhoneGlobals expected=149 actual=149
+09:30:17.899 autotest: AUTOTEST corpus VacationDirectorGlobals expected=85 actual=85
+09:30:17.899 autotest: AUTOTEST corpus: PASS
+09:30:17.908 autotest: AUTOTEST glob-fix probes=2 named=2 vdg=2
+09:30:17.908 autotest: AUTOTEST glob-fix: PASS
+09:30:17.908 autotest: AUTOTEST famnames id=1 length=1 s0=Newbie
+09:30:17.908 autotest: AUTOTEST famnames id=2 length=1 s0=Bachelor
+09:30:17.908 autotest: AUTOTEST famnames id=3 length=1 s0=Roomies
+09:30:17.908 autotest: AUTOTEST famnames id=4 length=1 s0=Pleasant
+09:30:17.909 autotest: AUTOTEST famnames id=5 length=1 s0=Goth
+09:30:17.909 autotest: AUTOTEST famnames id=6 NULL
+09:30:17.909 autotest: AUTOTEST famnames id=7 NULL
+09:30:17.909 autotest: AUTOTEST famnames: PASS
+09:30:17.920 autotest: AUTOTEST callgraph ops=92124 global+private-unresolved=0 semi-global-opcodes=134 semi-unknown-module=48 samples=CCPhonePlugin.iff op=65535 | CCPhonePlugin.iff op=65535 | CCPhonePlugin.iff op=32767 | CCPhonePlugin.iff op=65535
+09:30:17.921 autotest: AUTOTEST callgraph-notes: 48 semi-global ops have no resolvable module (e.g. NPCCatererPP with no GLOB) — verified 86/134
+09:30:17.921 autotest: AUTOTEST callgraph: PASS
+09:30:17.924 autotest: AUTOTEST chunk-reg posi=2 xxxx=0 nonEmpty=3
+09:30:17.924 autotest: AUTOTEST chunk-reg: PASS
+09:30:17.927 autotest: AUTOTEST relation pairs=22 vars=27 out-of-bounds=0 sample=19->31=0 | 31->19=0 | 32->34=50 | 32->33=50,0 | 33->34=100,1 | 33->32=85 | 34->33=100,1 | 34->32=75 | 35->36=20 | 35->37=20 | 35->43=20 | 36->35=20 | 36->37=20 | 36->43=20 | 37->35=20 | 37->36=20 | 37->43=55 | 
+09:30:17.928 autotest: AUTOTEST relation: PASS
+09:30:17.928 autotest: AUTOTEST relation-write roundtrip=True clamp+=True clamp-=True record=19->31
+09:30:17.928 autotest: AUTOTEST rel-key storedPairs=6 foundByObjectID=0 missByObjectID=6 foundByResolvedNID=6 samples=32->33 stored=[50,0] objKey=18 (objectID!=33) | 32->34 stored=[50] objKey=21 (objectID!=34) | 33->32 stored=[85] objKey=16 (objectID!=32) | 33->34 stored=[100,1] objKey=21 (objectID!=34) | 34->32 stored=[75] objKey=16 (objectID!=32) | 34->33 stored=[100,1] objKey=18 (objectID!=33)
+09:30:17.929 autotest: AUTOTEST rel-key: PASS
+09:30:17.929 autotest: AUTOTEST rel-mode stored=6 mode1Found=6 mode2Found=6 mode3Found=6 rawObjectIDMiss=6 samples=
+09:30:17.929 autotest: AUTOTEST rel-mode: PASS
+09:30:17.930 autotest: AUTOTEST jobs NumJobs=20 resolved=1 unresolved=0 lines=obj=16 nid=32 jtype=-1 jlevel=4 jperf=0 track=(none/>0?) | obj=18 nid=33 jtype=0 jlevel=0 jperf=0 track=(none/>0?) | obj=21 nid=34 jtype=9 jlevel=0 jperf=0 track=Test Subject
+09:30:17.930 autotest: AUTOTEST jobs: PASS
+09:30:17.934 autotest: AUTOTEST career IFF-literal data path: matched=20 bad=0 incoherent=0 NumJobs=20 (all 20 tracks level-0 salary/hours/car/req[0..6] == raw IFF canon); IFF progression BHAVs live in CarPortal.iff At-Work/Get-paid/At-School/test-promotion/Chance-Cards
+09:30:17.935 autotest: AUTOTEST career-iff control-flow closure: 41 private call targets all resolve inside engine-mounted CarPortal.iff (IFF-literal self-contained loop)
+09:30:17.936 autotest: AUTOTEST career-iff work-censorship triggers IFF-literal: 'At Work' ins19/ins23 + 'At School' ins10/ins14 write MyPersonData[30] (original work-clothes censorship sites)
+09:30:17.936 autotest: AUTOTEST career-iff 'test promotion' live-exec: avatar jobType=9 level=0 served levels=10 salary=155 gate-temp0-after=9 (ORIGINAL promotion gate ran on avatar thread)
+09:30:17.943 autotest: AUTOTEST career-iff live-exec step=start motives delta completed 0ms served salary=155 (ORIGINAL career-loop step ran on avatar thread)
+09:30:17.943 autotest: AUTOTEST career-iff live-exec step=get paid completed 0ms served salary=155 (ORIGINAL career-loop step ran on avatar thread)
+09:30:17.944 autotest: AUTOTEST career-iff IFF-mount loop=[set car type,test promotion,start motives delta,Chance Cards 3,Chance Cards,process,Chance Cards 2,get paid,send to work,At Work,At School] jobdata-indices=[0,1,2,3,4,5,6,7,8,12,13,14,15,16,17,18,19,20,21] reach(loop code mounted + IFF-literal served)=3 reachBad=0
+09:30:17.944 autotest: AUTOTEST career: PASS
+09:30:17.945 autotest: AUTOTEST freewill 'process mood' live-exec: completed (ORIGINAL periodic personality/motive brain ran on avatar thread; engine served every scope it reads)
+09:30:17.945 autotest: AUTOTEST freewill IFF-mount chain=[do idle and mood->do idle core ; do idle->do idle core ; brain process mood check hunger ; ids=8303,8301,8229,8275,8219] reach(original brain mounted + IFF-literal entry chain)=1 reachBad=0
+09:30:17.945 autotest: AUTOTEST freewill: PASS
+09:30:17.948 autotest: AUTOTEST deathchain 'check motive failure'(8299) live-exec serve-proof: completed (ORIGINAL failure-decision chain ran on avatar thread at low motives)
+09:30:17.948 autotest: AUTOTEST deathchain 'PC - Check Motive Failures'(8340) live-exec serve-proof: completed (ORIGINAL death-decision chain ran on avatar thread; engine served every scope it reads)
+09:30:17.949 autotest: AUTOTEST deathchain ghost serve-proof 8305: completed (ORIGINAL ghost code ran on avatar thread)
+09:30:17.951 autotest: AUTOTEST deathchain ghost serve-proof 8306: completed (ORIGINAL ghost code ran on avatar thread)
+09:30:17.952 autotest: AUTOTEST deathchain ghost serve-proof 8641: completed (ORIGINAL ghost code ran on avatar thread)
+09:30:17.954 autotest: AUTOTEST deathchain IFF-literal=20/20 drift=0 bad= live-reach(soak)= natural-death-reach(soak+collapse)= (Personglobals death-chain ids seen in live frames); closure: targets=47 unresolved= wiring=[8283.ins4=8327 ins5=8299 ok; 8327.ins1=8305 ok; 8342.ins9=8340 ok] entry=[8342-IFF-callers=0 8340-IFF-callers=1 8342.ins9->8340 ok] dispatch=[8193(person main) ins4=8283 ins10=8305 ins38=8641 ok; IFF-callers 8193=0 8641=1 ok] person-type=[8305.ins21 PersonType-write ok] shipped-save-death=[total-IsGhost=10 shipped-8-present=8 ids:9genie2 19user00023 20user00022 26user00021 27user00020 28user00017 29user00015 30user00014 31user00013 268campfireghost] serve-proof(8340)=completed on avatar obj=16 serve-proof(8299)=completed on avatar obj=16 ghost(8306/8641)=n/a 8305=completed(obj=16) 8306=completed(obj=16) 8641=completed(obj=16)
+09:30:17.954 autotest: AUTOTEST deathchain: PASS
+09:30:17.955 autotest: AUTOTEST savesim shipped-save career(JobLvl>0)=7/7 ids:19user00023 25papercarrierf1 29user00015 32user00011 35user00008 36user00007 43user00005 | user00000 cooking=300 mech=200 ok | rel=dirRows=22 ok (IFF-factual NBRS.cs mount; motives runtime-only)
+09:30:17.955 autotest: AUTOTEST savesim: PASS
+09:30:17.956 autotest: AUTOTEST personality iff-gates=1 desc= 2vs600@t20
+09:30:17.957 autotest: AUTOTEST personality playable pd2..7 = 400,500,0,700,200,700 | 700,500,0,300,300,700 | 400,400,0,700,600,400
+09:30:17.957 autotest: AUTOTEST personality IFF-literal index map + engine personality->decay coupling + IFF-reach pd2-vs-600 node: verified=4/4 notes=
+09:30:17.957 autotest: AUTOTEST personality: PASS
+09:30:17.959 autotest: AUTOTEST motiveinit IFF-literal 'init motives'(8325) motive-set=5,6,7,8,9,14,15 bcon8195=50,1,1,1,50,1,15,20,99,99,99,99,50,99,20 verified=2/2 notes=
+09:30:17.959 autotest: AUTOTEST motiveinit: PASS
+09:30:17.960 autotest: AUTOTEST skills IFF-literal skill-gain sites: verified=4/4 notes=
+09:30:17.960 autotest: AUTOTEST skills: PASS
+09:30:17.961 autotest: AUTOTEST motiveact IFF-literal activity->need sites: verified=4/4 notes=
+09:30:17.961 autotest: AUTOTEST motiveact: PASS
+09:30:17.962 autotest: AUTOTEST relact IFF-literal relationship-write sites: verified=3/3 notes=
+09:30:17.963 autotest: AUTOTEST relact: PASS
+09:30:17.963 autotest: AUTOTEST money IFF-literal money/fame write sites: verified=4/4 notes=
+09:30:17.963 autotest: AUTOTEST money: PASS
+09:30:17.964 autotest: AUTOTEST ttab IFF-literal pie-dispatch sites: verified=3/3 notes=
+09:30:17.964 autotest: AUTOTEST ttab: PASS
+09:30:17.967 autotest: AUTOTEST ttas IFF-literal pie-label sites: verified=3/3 notes=
+09:30:17.967 autotest: AUTOTEST ttas: PASS
+09:30:17.969 autotest: AUTOTEST opcodes whole-brain fingerprint: total=6124 op2=3562 op8=73 op3=3 op13=304 op44=375 op42=159 op28=176 op26=80 op31=73 op41=63 ok=True
+09:30:17.969 autotest: AUTOTEST opcodes: PASS
+09:30:17.971 autotest: AUTOTEST callgraph object-surface histogram: mounted=20/20 total=7767 op2=4035 op44=475 op23=433 op32=157 op31=152 op8=88 op48=81 op29=77 op13=21 ok=True
+09:30:17.972 autotest: AUTOTEST callgraph: PASS
+09:30:17.975 autotest: AUTOTEST globalcalls global-dispatch surface: mounted=20/20 total=1053 distinct=98 resolved=98 named=98 unresolved=0 checksum=338605 top=[Wait For Notify(281)x149,idle(280)x75,Is either person a child?(365)x73] ok=True
+09:30:17.975 autotest: AUTOTEST globalcalls: PASS
+09:30:18.033 autotest: AUTOTEST catalog IFF-literal: fixture-verified=20/20 notes= served=1114 eligible=1114 served-match=1114 served-missing=0 partB=True sort-match=1114 sort-missing=0 partC=True sortNotes= name-match=1114 name-missing=0 partD=True nameNotes= bhav-match=1114 partE=True bhavNotes= def-count=1114 partG=True defNotes= order-match=1114 partH=True orderNotes= srvNotes=
+09:30:18.033 autotest: AUTOTEST catalog: PASS
+09:30:18.034 autotest: AUTOTEST censor live-flags nonzero=0/3
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 0 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+09:30:18.321 autotest: AUTOTEST censor RENDER pair saved: off=/Users/nathannoom/Documents/Simitone/r36-censor-off.png on=/Users/nathannoom/Documents/Simitone/r36-censor-on.png (pixel diff = censored-mosaic pixels)
+09:30:18.321 autotest: AUTOTEST censor force-set roundtrip=True renderer=CensorshipFlags=0 render-pair=on+off
+09:30:18.321 autotest: AUTOTEST censor: PASS
+09:30:18.322 autotest: AUTOTEST censor-iff censor writes-var30=
+09:30:18.323 autotest: AUTOTEST censor-iff dress naked writes-var30=128,0,3,1
+09:30:18.323 autotest: AUTOTEST censor-iff dress normal writes-var30=128,0,0
+09:30:18.323 autotest: AUTOTEST censor-iff dress for bed writes-var30=128,3,3,0
+09:30:18.323 autotest: AUTOTEST censor-iff dress swimsuit writes-var30=128,3,3,0
+09:30:18.324 autotest: AUTOTEST censor-iff trigger-values=0,1,3,128 bhavs=censor,dress for bed,dress naked,dress normal,dress swimsuit ok=True
+09:30:18.326 autotest: AUTOTEST censor-live-exec dress naked=0->3 dress normal=3->0 RendererFlags=0 (ORIGINAL Global.iff dressing BHAVs executed through live avatar thread)
+09:30:18.327 autotest: AUTOTEST orig-bhavs avatar-resource=User00011.iff
+09:30:18.332 autotest: AUTOTEST orig-bhavs init-motives needs-before=0,0,0,0,0,0,0 after=99,99,99,86,100,27,99 (ORIGINAL IFF spawn-init BHAV ran, tuning+random boost in-process)
+09:30:18.332 autotest: AUTOTEST orig-bhavs init-NPC canon needs[h,c,hg,b,e,f,s]=0,0,0,0,0,0,0 -> 99,99,99,56,100,24,99 (ORIGINAL full new-sim init chain live-exec; IFF BCON 8195 canon; engine starts at 100)
+09:30:18.332 autotest: AUTOTEST orig-bhavs init-NPC canon pd[2,3,4,5,6,7,9,10,11,12,15,17,18,29,32,33,36,56,57,63] before=400,500,0,700,200,700,0,0,0,0,0,0,0,0,0,0,50,-1,4,0 -> after=1000,1000,1000,1000,1000,1000,0,0,0,0,0,0,0,1,2,25,50,-1,4,0 (IFF 8298/8192 write-set; engine MakePersonData=500/no-job/no-autonomy)
+09:30:18.333 autotest: AUTOTEST orig-bhavs do-idle-and-mood present (cid=8303, semi=True, scheduler-oriented, not sync-drivable)
+09:30:18.334 autotest: AUTOTEST npcinfo pd[2..7]=0,0,0,0,0,0 pd[33](Priority)=25 pd[36](Autonomy)=50 pd[56](JobType)=-1 pd[57](JobLevel)=4 pd[63](JobPerf)=0 pd[29](Cheats)=1 pd[32](PersonType)=2 skills[9..12,15,17,18]={28,64,529,80,163,379,897} (IFF 8298/8192 canon 25/50/-1,4,0 + 1,2 + skills [0,1000); InheritNeighbor ships record PersonData to runtime avatar)
+09:30:18.334 autotest: AUTOTEST npcinfo: PASS
+09:30:18.334 autotest: AUTOTEST names obj=16 nid=32 gender=1 name=Cassandra multiname=Cassandra tostring=Cassandra pet=False
+09:30:18.335 autotest: AUTOTEST names obj=18 nid=33 gender=1 name=Bella multiname=Bella tostring=Bella pet=False
+09:30:18.335 autotest: AUTOTEST names obj=21 nid=34 gender=0 name=Mortimer multiname=Mortimer tostring=Mortimer pet=False
+09:30:18.335 autotest: AUTOTEST names: PASS
+09:30:18.335 autotest: AUTOTEST chunks IFF-literal inventory types=28/28 eng=BCON=3663,BHAV=27852,BMP_=6174,CARR=21,CATS=1,CTSS=1895,DGRP=20522,FCNS=6,FWAV=15921,glob=2,GLOB=476,OBJD=5120,OBJf=3906,PALT=5238,pers=2,POSI=41,rsmp=1200,SLOT=1472,SPR#=758,SPR2=17140,STR#=5430,TMPL=4,TPRP=206,TRCN=9,TREE=213,TTAB=1804,TTAs=1568,XXXX=135 canon=BCON=3663,BHAV=27852,BMP_=6174,CARR=21,CATS=1,CTSS=1895,DGRP=20522,FCNS=6,FWAV=15921,GLOB=476,OBJD=5120,OBJf=3906,PALT=5238,POSI=41,SLOT=1472,SPR#=758,SPR2=17140,STR#=5430,TMPL=4,TPRP=206,TRCN=9,TREE=213,TTAB=1804,TTAs=1568,XXXX=135,glob=2,pers=2,rsmp=1200
+09:30:18.336 autotest: chunks FAILEDCOUNT 0
+09:30:18.336 autotest: AUTOTEST chunks: PASS
+09:30:18.336 autotest: AUTOTEST operand IFF-literal bytes=3108024 (256-bucket)
+09:30:18.336 autotest: AUTOTEST operand: PASS
+09:30:18.338 autotest: AUTOTEST opmx IFF-literal opcodes=713 pairs=4571 bytes=3108024
+09:30:18.338 autotest: AUTOTEST opmx: PASS
+09:30:18.339 autotest: AUTOTEST slot IFF-literal SLOT=1472/1472 entries=6969/6969 SPR#=758/758 frames=3120/3120 SPR2=17140/17140 frames=138948/138948
+09:30:18.339 autotest: AUTOTEST slot: PASS
+09:30:18.339 autotest: AUTOTEST dgrp IFF-literal DGRP refs=514716/514716 chunks=20522/20522 PALT entries=1340928/1340928 chunks=5238/5238
+09:30:18.339 autotest: AUTOTEST dgrp: PASS
+09:30:18.340 autotest: AUTOTEST bhop IFF-literal opcodes: distinct=713/713
+09:30:18.340 autotest: AUTOTEST bhop: PASS
+09:30:18.340 autotest: AUTOTEST bhvi IFF-literal BHAV instructions: 388503/388503
+09:30:18.340 autotest: AUTOTEST bhvi: PASS
+09:30:18.344 autotest: AUTOTEST consts IFF-literal constants: BCON=3663/3663 29952/29952 TPRP=206/206 434/434 GLOB=478/478
+09:30:18.344 autotest: AUTOTEST consts: PASS
+09:30:18.345 autotest: AUTOTEST strs IFF-literal STR-family: STR#=5430/5430 155482/155482 TTAs=1568/1568 11286/11286
+09:30:18.345 autotest: AUTOTEST strs: PASS
+09:30:18.346 autotest: AUTOTEST ctss IFF-literal STR corpus: blocks=3769/3769 chunks=1895/1895
+09:30:18.346 autotest: AUTOTEST ctss: PASS
+09:30:18.346 autotest: AUTOTEST objd IFF-literal OBJD corpus: mounted=5120 canon=5120
+09:30:18.346 autotest: AUTOTEST objd: PASS
+09:30:18.346 autotest: AUTOTEST iff IFF-literal resource census: ok=True 
+09:30:18.347 autotest: AUTOTEST iff: PASS
+09:30:18.356 autotest: AUTOTEST snd xa-mounted=17438 first=Beach\gulls1.XA
+09:30:18.356 autotest: AUTOTEST snd IFF-literal corpus: ok=True 
+09:30:18.356 autotest: AUTOTEST snd: PASS
+09:30:18.357 autotest: AUTOTEST audio hitvm=ok disableSound=False events=4479 lot_enter=False soundEntities=3 sample=[3,acta_fight_confa,acta_fight_confb,acta_fight_confc,acta_fight_furya,acta_fight_furyb,acta_fight_furyc,acta_fight_pasa,acta_fight_pasb,acta_fight_pasc]
+09:30:18.357 autotest: AUTOTEST audio PlaySoundEvent(stereo_zydeco)=HITTVOn: dead=False
+09:30:18.357 autotest: AUTOTEST audio: PASS
+09:30:18.363 autotest: AUTOTEST uichrome IFF-literal live-toolbar chrome mount: ok=True 
+09:30:18.363 autotest: AUTOTEST uichrome: PASS
+09:30:18.368 autotest: AUTOTEST uitoolbar IFF-literal live-toolbar chrome mount: ok=True 
+09:30:18.368 autotest: AUTOTEST uitoolbar: PASS
+09:30:18.369 autotest: AUTOTEST uicur IFF-literal cursor mount: ok=True livePersonMounted=True mountedLen=326 
+09:30:18.369 autotest: AUTOTEST uicur: PASS
+09:30:18.396 autotest: AUTOTEST uiglyph IFF-literal glyph-table mount + ORIGINAL TEXT RENDER (title + caption + bold money + small toolbar + dialog tables): ok=True render=True fontsParsed=11 textsMounted=6 hoverCaptions=0 moneyUpdates=1 toolbarReadouts=0 cheatMessages=0 dialogTitles=0  
+09:30:18.396 autotest: AUTOTEST uiglyph: PASS
+09:30:18.433 autotest: AUTOTEST uiboot IFF-literal kSimsLogo boot screen: ok=True mounted=True dims=800x600 simitoneChromeHidden=True engineBar=True barFill=1 directFrameOne=True (len=1440056 sha=8ecf950019fb86bed4be7d02e1e72ff2217e8ea1d5b44da6c6a0deec2d934ae6) 
+09:30:18.433 autotest: AUTOTEST uiboot: PASS
+09:30:18.435 autotest: AUTOTEST uisplash IFF-literal splashprogress corpus + ORIGINAL text mount: canon=True found=True chunkID=155 entries=340 english=17 chunkSha=39fdf8af203d mounted=True liveEqualsDisk=True font=True
+09:30:18.435 autotest: AUTOTEST uisplash: PASS
+09:30:18.448 autotest: AUTOTEST uidialog IFF-literal ObjDialogs + dialog twins: canon=True label=ObjDialogs entries=90 chunkSha=fa35753e3a5a titleTwinned=True bodyTwinned=True bodyLines=3 captions=OK/Cancel captionsCanon=True glyphPathArmed=True
+09:30:18.449 autotest: AUTOTEST uidialog: PASS
+09:30:18.453 autotest: AUTOTEST uilotq IFF-literal NghRollover+MoveInModeStrs + lot-query twins: canon=True m132=MoveInModeStrs/480 r134=NghRollover/780 mounted=True synced=True wrapped=True street=1 Sim Lane
+09:30:18.453 autotest: AUTOTEST uilotq: PASS
+09:30:18.461 autotest: AUTOTEST uilogo IFF-literal logo-stamp mount: ok=True 
+09:30:18.461 autotest: AUTOTEST uilogo: PASS
+09:30:18.498 autotest: AUTOTEST uianim IFF-literal animation-frame mount: ok=True bmpRows=4911 tgaRows=16 
+09:30:18.498 autotest: AUTOTEST uianim: PASS
+09:30:18.555 autotest: AUTOTEST uinbhd IFF-literal neighborhood screens + LIVE cycling + ENGINE-derived positions + ENGINE car lanes + ENGINE clouds/balloon + ENGINE nessie cheat: pinned=True families=8/8 cyc=True lanes=True cars=54/54 clouds=True wrapped=21/21 balloon=True nessie=True fsWater=True  flowLanes=6 flowClouds=1 flowBalloons=1 flowNessie=2 flowLayers=11 flowAdvances=8      
+09:30:18.555 autotest: AUTOTEST uinbhd: PASS
+09:30:18.558 uioriginal: IFF-mount original cpanel\Backgrounds\LiveGadget.bmp
+09:30:18.558 uioriginal: IFF-mount original cpanel\Greenbars.BMP
+09:30:18.558 uioriginal: IFF-mount original cpanel\Redbars.bmp
+09:30:18.559 uioriginal: IFF-mount original cpanel\People\TrackingTarget.bmp
+09:30:18.799 autotest: AUTOTEST uidump screen=TS1GameScreen size=1024x768 nonBg=786345 bbox=0,0..1023,767 top=#1050B0,#1070D0,#101050,#1070B0 -> /Users/nathannoom/Documents/Simitone/uidump-lot.png
+09:30:18.799 autotest: AUTOTEST uiback panel=True backdrop=True size=1024x128 vis=True strip=True band=321,625..583,681 steelIFF=172 navyteal=0 pin=PASS
+09:30:18.800 autotest: AUTOTEST uidump-tree TS1GameScreen pos=0,0 size=0x0 vis=True
+09:30:18.800 autotest: AUTOTEST uidump-tree   UILotControl pos=0,0 size=0x0 vis=True
+09:30:18.800 autotest: AUTOTEST uidump-tree     UIInteractionQueue pos=0,0 size=0x0 vis=True
+09:30:18.800 autotest: AUTOTEST uidump-tree     UILotControlTouchHelper pos=0,0 size=0x0 vis=True
+09:30:18.800 autotest: AUTOTEST uidump-tree     UIArchTouchHelper pos=0,0 size=0x0 vis=True
+09:30:18.800 autotest: AUTOTEST uidump-tree       UITwoStateButton pos=25,25 size=75x75 vis=True
+09:30:18.800 autotest: AUTOTEST uidump-tree       UITwoStateButton pos=25,513 size=75x75 vis=True
+09:30:18.800 autotest: AUTOTEST uidump-tree       UITwoStateButton pos=924,513 size=75x75 vis=True
+09:30:18.801 autotest: AUTOTEST uidump-tree       UITwoStateButton pos=25,513 size=75x75 vis=True
+09:30:18.801 autotest: AUTOTEST uidump-tree       UITwoStateButton pos=924,513 size=75x75 vis=True
+09:30:18.801 autotest: AUTOTEST uidump-tree   UISimitoneBg pos=512,384 size=0x0 vis=False
+09:30:18.801 autotest: AUTOTEST uidump-tree   UIContainer pos=0,0 size=0x0 vis=True
+09:30:18.801 autotest: AUTOTEST uidump-tree   UINeighbourhoodSwitcher pos=0,0 size=0x0 vis=True
+09:30:18.801 autotest: AUTOTEST uidump-tree     UIElasticButton pos=65,62 size=96x96 vis=True
+09:30:18.801 autotest: AUTOTEST uidump-tree     UIElasticButton pos=959,62 size=96x96 vis=True
+09:30:18.801 autotest: AUTOTEST uidump-tree     UIElasticButton pos=959,172 size=96x96 vis=True
+09:30:18.802 autotest: AUTOTEST uidump-tree     UIElasticButton pos=959,282 size=96x96 vis=True
+09:30:18.802 autotest: AUTOTEST uidump-tree     UIElasticButton pos=959,392 size=96x96 vis=True
+09:30:18.802 autotest: AUTOTEST uidump-tree   UISimitoneBg pos=512,384 size=0x0 vis=True
+09:30:18.802 autotest: AUTOTEST uidump-tree   UIOriginalLoadBar pos=195,708 size=0x0 vis=True
+09:30:18.802 autotest: AUTOTEST uidump-tree   UIOriginalText pos=399,672 size=0x0 vis=True
+09:30:18.802 autotest: AUTOTEST uidump-tree   UISimitoneFrontend pos=0,0 size=0x0 vis=True
+09:30:18.802 autotest: AUTOTEST uidump-tree     UICheatTextbox pos=10,10 size=0x0 vis=False
+09:30:18.802 autotest: AUTOTEST uidump-tree       UITextBox pos=0,0 size=200x23 vis=True
+09:30:18.802 autotest: AUTOTEST uidump-tree     UIDesktopUCP pos=15,475 size=292x281 vis=True
+09:30:18.803 autotest: AUTOTEST uidump-tree       UIContainer pos=0,0 size=0x0 vis=True
+09:30:18.803 autotest: AUTOTEST uidump-tree       UIImage pos=0,0 size=292x281 vis=True
+09:30:18.803 autotest: AUTOTEST uidump-tree       UIImage pos=156,186 size=16x18 vis=True
+09:30:18.803 autotest: AUTOTEST uidump-tree       UIStencilButton pos=155,164 size=18x18 vis=False
+09:30:18.803 autotest: AUTOTEST uidump-tree       UIButton pos=15,2 size=27x30 vis=True
+09:30:18.803 autotest: AUTOTEST uidump-tree       UIButton pos=107,27 size=74x74 vis=True
+09:30:18.803 autotest: AUTOTEST uidump-tree       UIButton pos=179,80 size=62x62 vis=True
+09:30:18.803 autotest: AUTOTEST uidump-tree       UIButton pos=242,165 size=23x23 vis=True
+09:30:18.803 autotest: AUTOTEST uidump-tree       UIStencilButton pos=16,150 size=34x34 vis=True
+09:30:18.803 autotest: AUTOTEST uidump-tree       UIStencilButton pos=16,192 size=34x34 vis=True
+09:30:18.804 autotest: AUTOTEST uidump-tree       UIStencilButton pos=15,111 size=26x24 vis=True
+09:30:18.804 autotest: AUTOTEST uidump-tree       UIStencilButton pos=50,107 size=26x24 vis=True
+09:30:18.804 autotest: AUTOTEST uidump-tree       UIStencilButton pos=86,112 size=26x24 vis=True
+09:30:18.804 autotest: AUTOTEST uidump-tree       UIStencilButton pos=117,122 size=26x24 vis=True
+09:30:18.804 autotest: AUTOTEST uidump-tree       UIStencilButton pos=87,154 size=25x25 vis=True
+09:30:18.804 autotest: AUTOTEST uidump-tree       UIStencilButton pos=87,196 size=25x25 vis=True
+09:30:18.804 autotest: AUTOTEST uidump-tree       UIStencilButton pos=62,175 size=25x25 vis=True
+09:30:18.804 autotest: AUTOTEST uidump-tree       UIStencilButton pos=114,175 size=25x25 vis=True
+09:30:18.804 autotest: AUTOTEST uidump-tree       UIStencilButton pos=158,246 size=22x14 vis=True
+09:30:18.804 autotest: AUTOTEST uidump-tree       UIStencilButton pos=188,246 size=22x14 vis=True
+09:30:18.804 autotest: AUTOTEST uidump-tree       UIStencilButton pos=218,246 size=22x14 vis=True
+09:30:18.805 autotest: AUTOTEST uidump-tree       UIStencilButton pos=248,246 size=22x14 vis=True
+09:30:18.805 autotest: AUTOTEST uidump-tree       UILabel pos=7,241 size=138x30 vis=False
+09:30:18.805 autotest: AUTOTEST uidump-tree       UIOriginalText pos=65,249 size=0x0 vis=True
+09:30:18.805 autotest: AUTOTEST uidump-tree       UILabel pos=157,223 size=114x16 vis=False
+09:30:18.805 autotest: AUTOTEST uidump-tree       UILabel pos=157,221 size=114x16 vis=False
+09:30:18.805 autotest: AUTOTEST uidump-tree       UILabel pos=176,186 size=0x0 vis=False
+09:30:18.805 autotest: AUTOTEST uidump-tree       UILabel pos=176,184 size=0x0 vis=False
+09:30:18.805 autotest: AUTOTEST uidump-tree       UILabel pos=22,186 size=24x15 vis=False
+09:30:18.805 autotest: AUTOTEST uidump-tree       UILabel pos=22,184 size=24x15 vis=False
+09:30:18.805 autotest: AUTOTEST uidump-tree       UIOriginalText pos=179,223 size=0x0 vis=True
+09:30:18.805 autotest: AUTOTEST uidump-tree       UIOriginalText pos=176,184 size=0x0 vis=True
+09:30:18.806 autotest: AUTOTEST uidump-tree       UIOriginalText pos=22,187 size=0x0 vis=True
+09:30:18.806 autotest: AUTOTEST uidump-tree     UIMainPanel pos=315,625 size=0x0 vis=True
+09:30:18.806 autotest: AUTOTEST uidump-tree       UIDiagonalStripe pos=263,0 size=0x0 vis=True
+09:30:18.806 autotest: AUTOTEST uichrome tree: btn=True (128x39) bar=True (27x25)
+09:30:18.806 autotest: AUTOTEST uidump: PASS
+09:30:18.806 autotest: AUTOTEST uitoolbar tree: live=True (108x30) gauge=True (108x100)
+09:30:18.807 autotest: AUTOTEST uimpanel desktop bottom-bar composition: ok=True ucp=15,475 292x281 panel=315,625 ucpRight=307 screen=1024x768 viewport=1024x768 dpi=1
+09:30:18.807 autotest: AUTOTEST uimpanel: PASS
+09:30:18.813 autotest: AUTOTEST uilive IFF-literal Live.iff Motives+Personality + subpanel twins: motiveCanon=True (Motives/289) traitCanon=True (Personality/714) motiveTwinned=True motiveTextCanon=True traitTwinned=True traitTextCanon=True
+09:30:18.813 autotest: AUTOTEST uilive: PASS
+09:30:18.816 uioriginal: IFF-mount original cpanel\Backgrounds\JobSubBarsOff.bmp
+09:30:18.816 uioriginal: IFF-mount original cpanel\JobSubBars.bmp
+09:30:18.817 autotest: AUTOTEST uijob IFF-literal JobSubpanelLabels+PopupText + twins: labelCanon=True (JobSubpanelLabels/187) popupCanon=True (JobSubpanelPopupText/544) twinned=True textCanon=True valuesWired=True floaterTwinned=True
+09:30:18.817 autotest: AUTOTEST uijob: PASS
+09:30:18.828 autotest: AUTOTEST uicas IFF-literal PickFamily+DesignFamily+DesignChar + CAS twins: c128=True c129=True c130=True simTwinned=True simText=True famsTwinned=True famTwinned=True dialogWired=True
+09:30:18.829 autotest: AUTOTEST uicas: PASS
+09:30:18.830 autotest: AUTOTEST uidtips IFF-literal VCtlTips + UCP tooltips: canon=True (VCtlTips/432) wired=True eyedropperPortAuthored=True live='Live Mode - F1' zoomIn='Zoom In  +'
+09:30:18.830 autotest: AUTOTEST uidtips: PASS
+09:30:18.832 autotest: AUTOTEST uivfont original .ffn default renderer: ok=True tablesMounted=19/10 draws=12 glyphs=42 lastTable=10@1
+09:30:18.832 autotest: AUTOTEST uivfont: PASS
+09:30:18.846 uioriginal: IFF-mount original cpanel\Buttons\OptSave.BMP
+09:30:18.846 uioriginal: IFF-mount original cpanel\Buttons\OptNbhd.bmp
+09:30:18.846 uioriginal: IFF-mount original cpanel\Buttons\OptExit.bmp
+09:30:18.847 uioriginal: IFF-mount original cpanel\Buttons\optgraphics.bmp
+09:30:18.847 uioriginal: IFF-mount original cpanel\Buttons\optsound.bmp
+09:30:18.847 uioriginal: IFF-mount original cpanel\Buttons\optplay.bmp
+09:30:18.847 uioriginal: IFF-mount original cpanel\Buttons\optcheckbox.bmp
+09:30:18.847 uioriginal: IFF-mount original cpanel\Buttons\optradio.bmp
+09:30:18.847 uioriginal: IFF-mount original cpanel\Buttons\optslideron.bmp
+09:30:18.847 uioriginal: IFF-mount original cpanel\Buttons\optslideroff.bmp
+09:30:18.847 uioriginal: IFF-mount original cpanel\Buttons\opttutreset.BMP
+09:30:18.853 uioriginal: IFF-mount original cpanel\PopupOptFreeWill.bmp
+09:30:18.853 autotest: AUTOTEST uiopts original options screen: canon=True (optionstrs/84 sha=b4f0ecd7) art=True live=True directivesParsed=7
+09:30:18.854 autotest: AUTOTEST uiopts: PASS
+09:30:18.862 uioriginal: IFF-mount original cpanel\Catalog\BuyFSeating.BMP
+09:30:18.862 uioriginal: IFF-mount original cpanel\Catalog\BuyFSurfaces.bmp
+09:30:18.862 uioriginal: IFF-mount original cpanel\Catalog\BuyFDecorative.bmp
+09:30:18.862 uioriginal: IFF-mount original cpanel\Catalog\BuyFElectronics.bmp
+09:30:18.862 uioriginal: IFF-mount original cpanel\Catalog\BuyFAppliances.bmp
+09:30:18.862 uioriginal: IFF-mount original cpanel\Catalog\BuyFPlumbing.bmp
+09:30:18.862 uioriginal: IFF-mount original cpanel\Catalog\BuyFLighting.bmp
+09:30:18.862 uioriginal: IFF-mount original cpanel\Catalog\BuyFMisc.bmp
+09:30:18.890 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\Seating\BuySubSortOne.BMP
+09:30:18.890 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\Seating\BuySubSortTwo.bmp
+09:30:18.890 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\Seating\BuySubSortThree.BMP
+09:30:18.890 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\Seating\BuySubSortFour.BMP
+09:30:18.891 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\BuySubSortOther.bmp
+09:30:18.891 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\BuySubSortAll.bmp
+09:30:18.891 uioriginal: IFF-mount original cpanel\Catalog\BuyRLiving.BMP
+09:30:18.891 uioriginal: IFF-mount original cpanel\Catalog\BuyRDining.bmp
+09:30:18.891 uioriginal: IFF-mount original cpanel\Catalog\BuyRBedroom.bmp
+09:30:18.892 uioriginal: IFF-mount original cpanel\Catalog\BuyRStudy.bmp
+09:30:18.892 uioriginal: IFF-mount original cpanel\Catalog\BuyRKitchen.bmp
+09:30:18.892 uioriginal: IFF-mount original cpanel\Catalog\BuyRBathroom.bmp
+09:30:18.892 uioriginal: IFF-mount original cpanel\Catalog\BuyROutside.bmp
+09:30:18.892 uioriginal: IFF-mount original cpanel\Catalog\BuyRMisc.bmp
+09:30:18.916 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomSeating.BMP
+09:30:18.916 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomSurfaces.BMP
+09:30:18.917 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomDecorative.BMP
+09:30:18.917 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomElectronics.bmp
+09:30:18.917 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomAppliances.BMP
+09:30:18.917 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomPlumbing.BMP
+09:30:18.917 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomLighting.BMP
+09:30:18.917 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomMisc.bmp
+09:30:18.955 uioriginal: IFF-mount original cpanel\Catalog\BuyDDining.BMP
+09:30:18.955 uioriginal: IFF-mount original cpanel\Catalog\BuyDShops.bmp
+09:30:18.955 uioriginal: IFF-mount original cpanel\Catalog\BuyDOutdoor.bmp
+09:30:18.956 uioriginal: IFF-mount original cpanel\Catalog\BuyDStreet.bmp
+09:30:18.956 uioriginal: IFF-mount original cpanel\Catalog\ThumbTemplate1Frame.BMP
+09:30:18.956 uioriginal: IFF-mount original cpanel\Catalog\ThumbTemplate.BMP
+09:30:18.956 autotest: AUTOTEST uibuy original buy catalog: canon=True (BuyModeCatalogSortTips/48+) art=True (80 pins) live=True
+09:30:18.956 autotest: AUTOTEST uibuy: PASS
+09:30:18.960 uioriginal: IFF-mount original cpanel\Backgrounds\PopupInfo.BMP
+09:30:18.960 uioriginal: IFF-mount original cpanel\Backgrounds\PopupInfoTiles.bmp
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=33,nid=0,avatar=False] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=34,nid=0,avatar=False] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=1 stack[obj=1,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=2 stack[obj=2,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=3 stack[obj=3,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=4 stack[obj=4,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=5 stack[obj=5,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=6 stack[obj=6,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=7 stack[obj=7,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=8 stack[obj=8,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=9 stack[obj=9,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=10 stack[obj=10,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=11 stack[obj=11,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=12 stack[obj=12,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=13 stack[obj=13,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=14 stack[obj=14,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=15 stack[obj=15,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=32 stack[obj=16,nid=32,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=17 stack[obj=17,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=1 myNID=33 caller[obj=16,nid=32] targNID=32 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=1 myNID=33 caller[obj=16,nid=32] targNID=32 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=1 myNID=34 caller[obj=16,nid=32] targNID=32 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=1 myNID=34 caller[obj=16,nid=32] targNID=32 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=1 myNID=34 caller[obj=18,nid=33] targNID=33 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=1 myNID=34 caller[obj=18,nid=33] targNID=33 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=34 stack[obj=21,nid=34,avatar=True] exists=False bucketMismatch=False
+09:30:19.016 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\Electronics\BuySubSortOne.BMP
+09:30:19.016 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\Electronics\BuySubSortTwo.bmp
+09:30:19.016 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\Electronics\BuySubSortThree.BMP
+09:30:19.017 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\Electronics\BuySubSortFour.BMP
+09:30:19.027 autotest: AUTOTEST uidesc original description panel: canon=True (160/20) art=True (2 pins) live=True mounts=0 strLoads=2
+09:30:19.027 autotest: AUTOTEST uidesc: PASS
+09:30:19.175 autotest: AUTOTEST uitt original object hover tooltips: canon=True (159/9) live=True strLoads=6
+09:30:19.175 autotest: AUTOTEST uitt: PASS
+09:30:19.177 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWall.bmp
+09:30:19.178 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWallpaper.bmp
+09:30:19.178 uioriginal: IFF-mount original cpanel\Buttons\toolBtnFloor.bmp
+09:30:19.178 uioriginal: IFF-mount original cpanel\Buttons\toolBtnRoof.bmp
+09:30:19.178 uioriginal: IFF-mount original cpanel\Buttons\toolBtnTree.bmp
+09:30:19.178 uioriginal: IFF-mount original cpanel\Buttons\toolBtnTerrain.bmp
+09:30:19.178 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWater.bmp
+09:30:19.179 uioriginal: IFF-mount original cpanel\Buttons\toolBtnDoor.bmp
+09:30:19.179 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWindow.bmp
+09:30:19.179 uioriginal: IFF-mount original cpanel\Buttons\toolBtnStairs.bmp
+09:30:19.179 uioriginal: IFF-mount original cpanel\Buttons\toolBtnFireplace.bmp
+09:30:19.179 autotest: AUTOTEST uibuild original build catalog: canon=True (BldTips/16 ) art=True (11 pins) live=True
+09:30:19.179 autotest: AUTOTEST uibuild: PASS
+09:30:19.182 uioriginal: IFF-mount original cpanel\Build\TerrainUpIcon.BMP
+09:30:19.182 uioriginal: IFF-mount original cpanel\Build\PopupTerrainUp.bmp
+09:30:19.182 uioriginal: IFF-mount original cpanel\Build\TerrainDownIcon.BMP
+09:30:19.182 uioriginal: IFF-mount original cpanel\Build\PopupTerrainDown.bmp
+09:30:19.182 uioriginal: IFF-mount original cpanel\Build\TerrainLevelIcon.BMP
+09:30:19.182 uioriginal: IFF-mount original cpanel\Build\PopupTerrainLevel.bmp
+09:30:19.183 uioriginal: IFF-mount original cpanel\HDBuild\TerrainGrassIcon.BMP
+09:30:19.183 uioriginal: IFF-mount original cpanel\HDBuild\popupGrass.bmp
+09:30:19.183 autotest: AUTOTEST uibldt original terrain tools: art=True (8 pins) live=True
+09:30:19.183 autotest: AUTOTEST uibldt: PASS
+09:30:19.186 uioriginal: IFF-mount original cpanel\Buttons\ScrollLeft.bmp
+09:30:19.187 uioriginal: IFF-mount original cpanel\Buttons\ScrollRight.bmp
+09:30:19.188 uioriginal: IFF-mount original cpanel\Build\RoofSteep.bmp
+09:30:19.188 uioriginal: IFF-mount original cpanel\Build\popuproofpitch.bmp
+09:30:19.188 uioriginal: IFF-mount original cpanel\Build\RoofMedium.bmp
+09:30:19.188 uioriginal: IFF-mount original cpanel\Build\RoofShallow.bmp
+09:30:19.188 uioriginal: IFF-mount original cpanel\Build\RoofFlat.bmp
+09:30:19.189 uioriginal: IFF-mount original cpanel\Build\popuproofpattern.bmp
+09:30:19.194 uioriginal: IFF-mount original cpanel\Build\RoofPatternTemplate.bmp
+09:30:19.194 autotest: AUTOTEST uiroof original roof panel: str=True art=True (7 pins) live=True
+09:30:19.194 autotest: AUTOTEST uiroof: PASS
+09:30:19.197 autotest: AUTOTEST uigauge original live mood gauge: str=True art=True (9 pins) live=True
+09:30:19.197 autotest: AUTOTEST uigauge: PASS
+09:30:19.198 autotest: AUTOTEST uirate ratings family: art=True (9 pins) math=True live=True
+09:30:19.199 autotest: AUTOTEST uirate: PASS
+09:30:19.201 uioriginal: IFF-mount original cpanel\Backgrounds\HouseSubBarsOff.BMP
+09:30:19.201 uioriginal: IFF-mount original cpanel\HouseSubBars.bmp
+09:30:19.202 autotest: AUTOTEST uihouse original house tab: str=True math=True live=True
+09:30:19.202 autotest: AUTOTEST uihouse: PASS
+09:30:19.206 autotest: AUTOTEST uivalue live house value: str=True live=True
+09:30:19.207 autotest: AUTOTEST uivalue: PASS
+09:30:19.210 autotest: AUTOTEST uitext direct: ink=1008 solid=304 mid=704 saturated=304 eq=15360 bbox=157x21
+09:30:19.211 autotest: AUTOTEST uitext uilabel: ink=1052 solid=266 mid=786 saturated=266 eq=15360 bbox=202x18
+09:30:19.211 autotest: AUTOTEST uitext bg-composite: between=411 saturated=214 solid=15360
+09:30:19.212 autotest: AUTOTEST uitext bold-ceiling: maxAlpha=221 (13*17=221, nibble-as-is law)
+09:30:19.214 autotest: AUTOTEST uitext cp1252: unicode-ink=378 bytes-ink=378 bbox 62/62
+09:30:19.214 autotest: AUTOTEST uitext probe7: ink=231 bboxW=60 measure=61
+09:30:19.215 autotest: AUTOTEST uitext probe8: ink=296 bboxW=62 measure=62
+09:30:19.215 autotest: AUTOTEST uitext probe9: ink=331 bboxW=69 measure=69
+09:30:19.216 autotest: AUTOTEST uitext probe10: ink=382 bboxW=72 measure=72
+09:30:19.216 autotest: AUTOTEST uitext probe11: ink=457 bboxW=83 measure=83
+09:30:19.217 autotest: AUTOTEST uitext probe12: ink=534 bboxW=88 measure=89
+09:30:19.217 autotest: AUTOTEST uitext probe14: ink=702 bboxW=108 measure=109
+09:30:19.218 autotest: AUTOTEST uitext probe16: ink=822 bboxW=109 measure=110
+09:30:19.218 autotest: AUTOTEST uitext probe18: ink=1031 bboxW=126 measure=127
+09:30:19.219 autotest: AUTOTEST uitext probe20: ink=1272 bboxW=139 measure=140
+09:30:19.219 autotest: AUTOTEST uitext rendered-pixel law: OK
+09:30:19.219 autotest: AUTOTEST uitext: PASS
+09:30:19.219 autotest: AUTOTEST uitext nbr house=1 name=
+09:30:19.220 autotest: AUTOTEST uitext nbr house=2 name=
+09:30:19.220 autotest: AUTOTEST uitext nbr house=3 name=
+09:30:19.220 autotest: AUTOTEST uitext nbr house=4 name=
+09:30:19.220 autotest: AUTOTEST uitext nbr house=5 name=
+09:30:19.220 autotest: AUTOTEST uitext nbr house=6 name=
+09:30:19.220 autotest: AUTOTEST uitext nbr house=7 name=
+09:30:19.220 autotest: AUTOTEST uitext nbr house=8 name=
+09:30:19.221 autotest: AUTOTEST uipal canon=13 hex=000029,000052,00004A UIStyle bg=0,0,30 title=0,0,20 accent=0,255,255 navyBg=True navyTitle=True cyanAccent=True
+09:30:19.221 autotest: AUTOTEST uipal: PASS
+09:30:19.232 autotest: AUTOTEST loadscreen IFF-literal start/loading mount: ok=True 
+09:30:19.232 autotest: AUTOTEST loadscreen: PASS
+09:30:19.258 autotest: AUTOTEST forced speed 1 (was 1)
+09:30:19.258 autotest: AUTOTEST mood load-phase av0 storedMood=73 needs=99,98,99,75,100,29,99 roomScore=-9 rowRoom=-9 s7=599 hypNoRoom=85 hypEngine=73 (original-save values; engine recomputes after first decay tick)
+09:30:19.258 autotest: AUTOTEST mood load-phase av1 storedMood=72 needs=99,98,99,71,100,22,99 roomScore=-9 rowRoom=-9 s7=588 hypNoRoom=84 hypEngine=72 (original-save values; engine recomputes after first decay tick)
+09:30:19.258 autotest: AUTOTEST mood load-phase av2 storedMood=73 needs=99,98,99,71,100,33,99 roomScore=-9 rowRoom=-9 s7=599 hypNoRoom=85 hypEngine=73 (original-save values; engine recomputes after first decay tick)
+09:30:19.259 autotest: AUTOTEST brainlive diag av0 threads=7
+09:30:19.259 autotest: AUTOTEST brainlive diag   frame0 routineID=4096 label=Main rti=Main semiGlobal=personglobals.iff
+09:30:19.259 autotest: AUTOTEST brainlive diag   frame1 routineID=8193 label=person main rti=person main semiGlobal=personglobals.iff
+09:30:19.259 autotest: AUTOTEST brainlive diag   frame2 routineID=8283 label=person main loop rti=person main loop semiGlobal=personglobals.iff
+09:30:19.259 autotest: AUTOTEST brainlive diag   frame3 routineID=8303 label=do idle and mood rti=do idle and mood semiGlobal=personglobals.iff
+09:30:19.259 autotest: AUTOTEST brainlive diag   frame4 routineID=8229 label=do idle core rti=do idle core semiGlobal=personglobals.iff
+09:30:19.259 autotest: AUTOTEST brainlive diag   frame5 routineID=8534 label=do shy child rti=do shy child semiGlobal=personglobals.iff
+09:30:19.260 autotest: AUTOTEST brainlive diag   frame6 routineID=8534 label=do shy child rti=do shy child semiGlobal=personglobals.iff
+09:30:19.260 autotest: AUTOTEST brainlive diag av1 threads=5
+09:30:19.260 autotest: AUTOTEST brainlive diag   frame0 routineID=4096 label=Main rti=Main semiGlobal=personglobals.iff
+09:30:19.260 autotest: AUTOTEST brainlive diag   frame1 routineID=8193 label=person main rti=person main semiGlobal=personglobals.iff
+09:30:19.260 autotest: AUTOTEST brainlive diag   frame2 routineID=8283 label=person main loop rti=person main loop semiGlobal=personglobals.iff
+09:30:19.260 autotest: AUTOTEST brainlive diag   frame3 routineID=8330 label=do new adult idle rti=do new adult idle semiGlobal=personglobals.iff
+09:30:19.260 autotest: AUTOTEST brainlive diag   frame4 routineID=280 label=idle rti=idle semiGlobal=personglobals.iff
+09:30:19.260 autotest: AUTOTEST brainlive diag av2 threads=5
+09:30:19.260 autotest: AUTOTEST brainlive diag   frame0 routineID=4096 label=Main rti=Main semiGlobal=personglobals.iff
+09:30:19.260 autotest: AUTOTEST brainlive diag   frame1 routineID=8193 label=person main rti=person main semiGlobal=personglobals.iff
+09:30:19.261 autotest: AUTOTEST brainlive diag   frame2 routineID=8283 label=person main loop rti=person main loop semiGlobal=personglobals.iff
+09:30:19.261 autotest: AUTOTEST brainlive diag   frame3 routineID=8330 label=do new adult idle rti=do new adult idle semiGlobal=personglobals.iff
+09:30:19.261 autotest: AUTOTEST brainlive diag   frame4 routineID=280 label=idle rti=idle semiGlobal=personglobals.iff
+[SimAnticsExc] Object reference not set to an instance of an object.VMStackFrame.cs:line 131
+[SimAnticsExc] Object reference not set to an instance of an object.VMStackFrame.cs:line 131
+09:30:19.541 autotest: AUTOTEST mood load-phase av0 storedMood=73 needs=99,97,99,75,100,29,99 roomScore=-9 rowRoom=-9 s7=598 hypNoRoom=85 hypEngine=73 (original-save values; engine recomputes after first decay tick)
+09:30:19.541 autotest: AUTOTEST mood load-phase av1 storedMood=72 needs=99,97,99,71,100,22,99 roomScore=-9 rowRoom=-9 s7=587 hypNoRoom=83 hypEngine=72 (original-save values; engine recomputes after first decay tick)
+09:30:19.541 autotest: AUTOTEST mood load-phase av2 storedMood=73 needs=99,97,99,71,100,33,99 roomScore=-9 rowRoom=-9 s7=598 hypNoRoom=85 hypEngine=73 (original-save values; engine recomputes after first decay tick)
+09:30:20.541 autotest: AUTOTEST motive sample minute=33 avatars=3 moodAllOk=True elapsed=2 speed=1 (33:6 h)
+09:30:21.541 autotest: AUTOTEST motive sample minute=34 avatars=3 moodAllOk=True elapsed=3 speed=1 (34:6 h)
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+09:30:22.541 autotest: AUTOTEST motive sample minute=35 avatars=3 moodAllOk=True elapsed=4 speed=1 (35:6 h)
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+09:30:23.541 autotest: AUTOTEST motive sample minute=36 avatars=3 moodAllOk=True elapsed=5 speed=1 (36:6 h)
+09:30:24.541 autotest: AUTOTEST motive sample minute=37 avatars=3 moodAllOk=True elapsed=6 speed=1 (37:6 h)
+09:30:24.558 autotest: AUTOTEST death-reach: motives collapsed to 3 on av0 obj=16 at minute=37 (natural death-decision reach probe)
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:30:25.541 autotest: AUTOTEST motive sample minute=38 avatars=3 moodAllOk=True elapsed=7 speed=1 (38:6 h)
+09:30:26.541 autotest: AUTOTEST motive sample minute=39 avatars=3 moodAllOk=True elapsed=8 speed=1 (39:6 h)
+09:30:27.541 autotest: AUTOTEST motive sample minute=40 avatars=3 moodAllOk=True elapsed=9 speed=1 (40:6 h)
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+09:30:28.541 autotest: AUTOTEST motive sample minute=41 avatars=3 moodAllOk=True elapsed=10 speed=1 (41:6 h)
+09:30:28.558 autotest: AUTOTEST mood: PASS
+09:30:28.559 autotest: AUTOTEST MOTIVE av0 deltas=[-97,-95,-97,-73,-98,-26,-96] over 10 sim-min
+09:30:28.559 autotest: AUTOTEST MOTIVE av1 deltas=[-2,-2,-1,-2,-2,-1,0] over 10 sim-min
+09:30:28.559 autotest: AUTOTEST MOTIVE av2 deltas=[-2,-2,-1,-2,-2,-1,0] over 10 sim-min
+09:30:28.559 autotest: AUTOTEST motive: PASS
+09:30:28.561 autotest: AUTOTEST brainlive pg-seen=True routine-count=9677 distinct=15 ids=280,4096,8193,8216,8219,8227,8229,8233,8283,8292,8303,8330,8331,8333,8534
+09:30:28.561 autotest: AUTOTEST brainlive brain-id-hit=True (8303/8301/8229/8275/8219 = IFF-verified canonical idle/personality brain BHAVs)
+09:30:28.562 autotest: AUTOTEST brainlive: PASS
+09:30:28.562 autotest: AUTOTEST carseek: entering commute soak after pins minute=6:41 (no clock jump; natural ~1 sim-min/sec wait)
+09:30:28.564 autotest: AUTOTEST carseek discovery avatars=3 plan=[obj=16 jtype=-1 jlevel=4 jperf=0 start=- track= | obj=18 jtype=0 jlevel=0 jperf=0 start=- track= | obj=21 jtype=9 jlevel=0 jperf=0 start=9 track=Test Subject]
+09:30:28.565 autotest: AUTOTEST carseek discovery distinct-mounted-IFFs=89 car-ifffs=[CarPortal.iffx1]
+09:30:28.566 autotest: AUTOTEST carseek discovery iff=Windows.iff entities=50
+09:30:28.566 autotest: AUTOTEST carseek discovery iff=Trees.iff entities=40
+09:30:28.566 autotest: AUTOTEST carseek discovery iff=Shrubs.iff entities=25
+09:30:28.566 autotest: AUTOTEST carseek discovery iff=Destination.iff entities=14
+09:30:28.566 autotest: AUTOTEST carseek discovery iff=Doors.iff entities=12
+09:30:28.566 autotest: AUTOTEST carseek discovery iff=stair.iff entities=9
+09:30:28.566 autotest: AUTOTEST carseek discovery iff=Beds.iff entities=9
+09:30:28.566 autotest: AUTOTEST carseek discovery iff=UrnStone.iff entities=8
+09:30:28.566 autotest: AUTOTEST carseek discovery iff=FlowersOutdoor.iff entities=7
+09:30:28.567 autotest: AUTOTEST carseek discovery iff=SocialInteractions.iff entities=7
+09:30:28.567 autotest: AUTOTEST carseek discovery iff=DiningTables.iff entities=6
+09:30:28.567 autotest: AUTOTEST carseek discovery iff=piano.iff entities=4
+09:30:28.567 autotest: AUTOTEST carseek discovery iff=Counters.iff entities=4
+09:30:28.567 autotest: AUTOTEST carseek discovery iff=Plants.iff entities=4
+09:30:28.567 autotest: AUTOTEST carseek discovery iff=Sofas.iff entities=4
+09:30:28.567 autotest: AUTOTEST carseek discovery iff=DiningChairs.iff entities=4
+09:30:28.567 autotest: AUTOTEST carseek discovery iff=Lamps.iff entities=3
+09:30:28.568 autotest: AUTOTEST carseek discovery iff=Paintings.iff entities=3
+09:30:28.568 autotest: AUTOTEST carseek discovery iff=PedPortal.iff entities=2
+09:30:28.568 autotest: AUTOTEST carseek discovery iff=phones.iff entities=2
+09:30:28.568 autotest: AUTOTEST carseek discovery iff=MailBox.iff entities=2
+09:30:28.568 autotest: AUTOTEST carseek discovery iff=Sinks.iff entities=2
+09:30:28.568 autotest: AUTOTEST carseek discovery iff=TubM.iff entities=2
+09:30:28.568 autotest: AUTOTEST carseek discovery iff=TablesEnd.iff entities=2
+09:30:28.568 autotest: AUTOTEST carseek discovery iff=ToyBox.iff entities=2
+09:30:28.568 autotest: AUTOTEST carseek discovery iff=unleashedcontroller.iff entities=2
+09:30:28.569 autotest: AUTOTEST carseek discovery iff=ControllerStudioLot.iff entities=2
+09:30:28.569 autotest: AUTOTEST carseek discovery iff=AnimTester.iff entities=1
+09:30:28.569 autotest: AUTOTEST carseek discovery iff=JobFinder.iff entities=1
+09:30:28.569 autotest: AUTOTEST carseek discovery iff=NPCController.iff entities=1
+09:30:28.569 autotest: AUTOTEST carseek IFF-label-map CarPortal.iff bhavs=[4099:Clean,4108:dress for work,4118:Random A++ Bonus,4107:set car type,4111:send out of world,4109:hide the menu,4128:display bad mood help,4104:test promotion,4122:start motive deltas for school,4115:check for school bus schedule,4098:msg:show special,4130:display no study for school,4117:lower all kids grades,4127:was stack object due at work?,4132:verify stack object,4112:start motives delta,4114:CT - reset,4120:set car type from work,4121:create car from work,4135:push pet,4136:look for pets,4137:Interaction - Run to car,4119:Create School Bus,4138:call pets,4134:Chance Cards 3,4133:Chance Cards,4110:ensure stand,4106:Create Car,4141:Clone - Warning,4125:process warnings car pools,4100:process,4124:Chance Cards 2,4103:get paid,4096:main,4123:bring all children home,4129:display bad mood school,4113:return to world,4126:warn/fire people who miss work,4139:Clone - Find My Clone?,4140:Clone - Find My Owner?,4105:send to work,4142:Clone - Am I a Clone?,4131:set icon,4102:At Work,4116:At School,4097:load tree,4101:init common]
+09:30:28.569 autotest: AUTOTEST carseek: earliest CARR StartTime=540 target=615 (wait 214 sim-min ~ 3.6 real min)
+09:30:28.576 autotest: AUTOTEST carseek car-entity-change carEnt=1 present=[CarPortal.iff#id8]
+09:30:28.577 autotest: AUTOTEST carseek first-seen id=4096 label=main owner=CarPortal.iff sg=
+09:30:28.577 autotest: AUTOTEST carseek first-seen id=280 label=idle owner=CarPortal.iff sg=
+09:30:28.577 autotest: AUTOTEST carseek minute=6:41 carEnt=1 maxCarEnt=1 careerFrames=2 distinct=2 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:30:29.541 autotest: AUTOTEST carseek minute=6:42 carEnt=1 maxCarEnt=1 careerFrames=120 distinct=2 jobPerfLvlChanged=False
+09:30:30.541 autotest: AUTOTEST carseek minute=6:43 carEnt=1 maxCarEnt=1 careerFrames=240 distinct=2 jobPerfLvlChanged=False
+09:30:31.541 autotest: AUTOTEST carseek minute=6:44 carEnt=1 maxCarEnt=1 careerFrames=360 distinct=2 jobPerfLvlChanged=False
+09:30:32.541 autotest: AUTOTEST carseek minute=6:45 carEnt=1 maxCarEnt=1 careerFrames=480 distinct=2 jobPerfLvlChanged=False
+09:30:33.541 autotest: AUTOTEST carseek minute=6:46 carEnt=1 maxCarEnt=1 careerFrames=600 distinct=2 jobPerfLvlChanged=False
+09:30:34.541 autotest: AUTOTEST carseek minute=6:47 carEnt=1 maxCarEnt=1 careerFrames=720 distinct=2 jobPerfLvlChanged=False
+09:30:35.541 autotest: AUTOTEST carseek minute=6:48 carEnt=1 maxCarEnt=1 careerFrames=840 distinct=2 jobPerfLvlChanged=False
+09:30:36.541 autotest: AUTOTEST carseek minute=6:49 carEnt=1 maxCarEnt=1 careerFrames=960 distinct=2 jobPerfLvlChanged=False
+09:30:37.541 autotest: AUTOTEST carseek minute=6:50 carEnt=1 maxCarEnt=1 careerFrames=1080 distinct=2 jobPerfLvlChanged=False
+09:30:38.541 autotest: AUTOTEST carseek minute=6:51 carEnt=1 maxCarEnt=1 careerFrames=1200 distinct=2 jobPerfLvlChanged=False
+09:30:39.541 autotest: AUTOTEST carseek minute=6:52 carEnt=1 maxCarEnt=1 careerFrames=1320 distinct=2 jobPerfLvlChanged=False
+09:30:40.713 autotest: AUTOTEST carseek minute=6:53 carEnt=1 maxCarEnt=1 careerFrames=1440 distinct=2 jobPerfLvlChanged=False
+09:30:41.540 autotest: AUTOTEST carseek minute=6:54 carEnt=1 maxCarEnt=1 careerFrames=1560 distinct=2 jobPerfLvlChanged=False
+09:30:42.553 autotest: AUTOTEST carseek minute=6:55 carEnt=1 maxCarEnt=1 careerFrames=1680 distinct=2 jobPerfLvlChanged=False
+09:30:43.540 autotest: AUTOTEST carseek minute=6:56 carEnt=1 maxCarEnt=1 careerFrames=1800 distinct=2 jobPerfLvlChanged=False
+09:30:44.540 autotest: AUTOTEST carseek minute=6:57 carEnt=1 maxCarEnt=1 careerFrames=1920 distinct=2 jobPerfLvlChanged=False
+09:30:45.546 autotest: AUTOTEST carseek minute=6:58 carEnt=1 maxCarEnt=1 careerFrames=2040 distinct=2 jobPerfLvlChanged=False
+09:30:46.540 autotest: AUTOTEST carseek minute=6:59 carEnt=1 maxCarEnt=1 careerFrames=2160 distinct=2 jobPerfLvlChanged=False
+09:30:47.540 autotest: AUTOTEST carseek first-seen id=4100 label=process owner=CarPortal.iff sg=
+09:30:47.558 autotest: AUTOTEST carseek first-seen id=4125 label=process warnings car pools owner=CarPortal.iff sg=
+09:30:47.558 autotest: AUTOTEST carseek minute=7:00 carEnt=1 maxCarEnt=1 careerFrames=2281 distinct=4 jobPerfLvlChanged=False
+09:30:48.540 autotest: AUTOTEST carseek minute=7:01 carEnt=1 maxCarEnt=1 careerFrames=2461 distinct=4 jobPerfLvlChanged=False
+09:30:49.540 autotest: AUTOTEST carseek minute=7:02 carEnt=1 maxCarEnt=1 careerFrames=2641 distinct=4 jobPerfLvlChanged=False
+09:30:50.540 autotest: AUTOTEST carseek minute=7:03 carEnt=1 maxCarEnt=1 careerFrames=2821 distinct=4 jobPerfLvlChanged=False
+09:30:51.540 autotest: AUTOTEST carseek minute=7:04 carEnt=1 maxCarEnt=1 careerFrames=3001 distinct=4 jobPerfLvlChanged=False
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+09:30:52.540 autotest: AUTOTEST carseek minute=7:05 carEnt=1 maxCarEnt=1 careerFrames=3181 distinct=4 jobPerfLvlChanged=False
+09:30:53.540 autotest: AUTOTEST carseek minute=7:06 carEnt=1 maxCarEnt=1 careerFrames=3361 distinct=4 jobPerfLvlChanged=False
+09:30:54.540 autotest: AUTOTEST carseek minute=7:07 carEnt=1 maxCarEnt=1 careerFrames=3541 distinct=4 jobPerfLvlChanged=False
+09:30:55.540 autotest: AUTOTEST carseek minute=7:08 carEnt=1 maxCarEnt=1 careerFrames=3721 distinct=4 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:30:56.540 autotest: AUTOTEST carseek minute=7:09 carEnt=1 maxCarEnt=1 careerFrames=3901 distinct=4 jobPerfLvlChanged=False
+09:30:57.540 autotest: AUTOTEST carseek minute=7:10 carEnt=1 maxCarEnt=1 careerFrames=4081 distinct=4 jobPerfLvlChanged=False
+09:30:58.540 autotest: AUTOTEST carseek minute=7:11 carEnt=1 maxCarEnt=1 careerFrames=4261 distinct=4 jobPerfLvlChanged=False
+09:30:59.540 autotest: AUTOTEST carseek minute=7:12 carEnt=1 maxCarEnt=1 careerFrames=4441 distinct=4 jobPerfLvlChanged=False
+09:31:00.541 autotest: AUTOTEST carseek minute=7:13 carEnt=1 maxCarEnt=1 careerFrames=4621 distinct=4 jobPerfLvlChanged=False
+09:31:01.540 autotest: AUTOTEST carseek minute=7:14 carEnt=1 maxCarEnt=1 careerFrames=4801 distinct=4 jobPerfLvlChanged=False
+09:31:02.540 autotest: AUTOTEST carseek minute=7:15 carEnt=1 maxCarEnt=1 careerFrames=4981 distinct=4 jobPerfLvlChanged=False
+09:31:03.540 autotest: AUTOTEST carseek minute=7:16 carEnt=1 maxCarEnt=1 careerFrames=5161 distinct=4 jobPerfLvlChanged=False
+09:31:04.540 autotest: AUTOTEST carseek minute=7:17 carEnt=1 maxCarEnt=1 careerFrames=5341 distinct=4 jobPerfLvlChanged=False
+09:31:05.540 autotest: AUTOTEST carseek minute=7:18 carEnt=1 maxCarEnt=1 careerFrames=5521 distinct=4 jobPerfLvlChanged=False
+09:31:06.540 autotest: AUTOTEST carseek minute=7:19 carEnt=1 maxCarEnt=1 careerFrames=5701 distinct=4 jobPerfLvlChanged=False
+09:31:07.540 autotest: AUTOTEST carseek minute=7:20 carEnt=1 maxCarEnt=1 careerFrames=5881 distinct=4 jobPerfLvlChanged=False
+09:31:08.540 autotest: AUTOTEST carseek minute=7:21 carEnt=1 maxCarEnt=1 careerFrames=6061 distinct=4 jobPerfLvlChanged=False
+09:31:23.740 autotest: AUTOTEST carseek minute=7:22 carEnt=1 maxCarEnt=1 careerFrames=8222 distinct=4 jobPerfLvlChanged=False
+09:31:28.507 autotest: AUTOTEST carseek minute=7:23 carEnt=1 maxCarEnt=1 careerFrames=8794 distinct=4 jobPerfLvlChanged=False
+09:31:29.507 autotest: AUTOTEST carseek minute=7:24 carEnt=1 maxCarEnt=1 careerFrames=8914 distinct=4 jobPerfLvlChanged=False
+09:31:32.173 autotest: AUTOTEST carseek minute=7:25 carEnt=1 maxCarEnt=1 careerFrames=9234 distinct=4 jobPerfLvlChanged=False
+09:31:33.173 autotest: AUTOTEST carseek minute=7:26 carEnt=1 maxCarEnt=1 careerFrames=9354 distinct=4 jobPerfLvlChanged=False
+09:31:34.173 autotest: AUTOTEST carseek minute=7:27 carEnt=1 maxCarEnt=1 careerFrames=9474 distinct=4 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:31:35.173 autotest: AUTOTEST carseek minute=7:28 carEnt=1 maxCarEnt=1 careerFrames=9594 distinct=4 jobPerfLvlChanged=False
+09:31:36.173 autotest: AUTOTEST carseek minute=7:29 carEnt=1 maxCarEnt=1 careerFrames=9714 distinct=4 jobPerfLvlChanged=False
+09:31:37.173 autotest: AUTOTEST carseek minute=7:30 carEnt=1 maxCarEnt=1 careerFrames=9834 distinct=4 jobPerfLvlChanged=False
+09:31:38.173 autotest: AUTOTEST carseek minute=7:31 carEnt=1 maxCarEnt=1 careerFrames=9954 distinct=4 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMThread.cs:line 709
+[SimAnticsExc] Index was outside the bounds of the array.VMThread.cs:line 709
+09:31:39.173 autotest: AUTOTEST carseek minute=7:32 carEnt=1 maxCarEnt=1 careerFrames=10074 distinct=4 jobPerfLvlChanged=False
+09:31:40.173 autotest: AUTOTEST carseek minute=7:33 carEnt=1 maxCarEnt=1 careerFrames=10194 distinct=4 jobPerfLvlChanged=False
+09:31:41.173 autotest: AUTOTEST carseek minute=7:34 carEnt=1 maxCarEnt=1 careerFrames=10314 distinct=4 jobPerfLvlChanged=False
+09:31:42.173 autotest: AUTOTEST carseek minute=7:35 carEnt=1 maxCarEnt=1 careerFrames=10434 distinct=4 jobPerfLvlChanged=False
+09:31:43.186 autotest: AUTOTEST carseek minute=7:36 carEnt=1 maxCarEnt=1 careerFrames=10554 distinct=4 jobPerfLvlChanged=False
+09:31:44.186 autotest: AUTOTEST carseek minute=7:37 carEnt=1 maxCarEnt=1 careerFrames=10674 distinct=4 jobPerfLvlChanged=False
+09:31:45.188 autotest: AUTOTEST carseek minute=7:38 carEnt=1 maxCarEnt=1 careerFrames=10794 distinct=4 jobPerfLvlChanged=False
+09:31:46.178 autotest: AUTOTEST carseek minute=7:39 carEnt=1 maxCarEnt=1 careerFrames=10914 distinct=4 jobPerfLvlChanged=False
+09:31:47.179 autotest: AUTOTEST carseek minute=7:40 carEnt=1 maxCarEnt=1 careerFrames=11034 distinct=4 jobPerfLvlChanged=False
+09:31:48.181 autotest: AUTOTEST carseek minute=7:41 carEnt=1 maxCarEnt=1 careerFrames=11154 distinct=4 jobPerfLvlChanged=False
+09:31:49.182 autotest: AUTOTEST carseek minute=7:42 carEnt=1 maxCarEnt=1 careerFrames=11274 distinct=4 jobPerfLvlChanged=False
+09:31:50.188 autotest: AUTOTEST carseek minute=7:43 carEnt=1 maxCarEnt=1 careerFrames=11394 distinct=4 jobPerfLvlChanged=False
+09:31:51.197 autotest: AUTOTEST carseek minute=7:44 carEnt=1 maxCarEnt=1 careerFrames=11514 distinct=4 jobPerfLvlChanged=False
+09:31:52.190 autotest: AUTOTEST carseek minute=7:45 carEnt=1 maxCarEnt=1 careerFrames=11634 distinct=4 jobPerfLvlChanged=False
+09:31:53.180 autotest: AUTOTEST carseek minute=7:46 carEnt=1 maxCarEnt=1 careerFrames=11754 distinct=4 jobPerfLvlChanged=False
+09:31:54.200 autotest: AUTOTEST carseek minute=7:47 carEnt=1 maxCarEnt=1 careerFrames=11874 distinct=4 jobPerfLvlChanged=False
+09:31:55.205 autotest: AUTOTEST carseek minute=7:48 carEnt=1 maxCarEnt=1 careerFrames=11994 distinct=4 jobPerfLvlChanged=False
+09:31:56.197 autotest: AUTOTEST carseek minute=7:49 carEnt=1 maxCarEnt=1 careerFrames=12114 distinct=4 jobPerfLvlChanged=False
+09:31:57.189 autotest: AUTOTEST carseek minute=7:50 carEnt=1 maxCarEnt=1 careerFrames=12234 distinct=4 jobPerfLvlChanged=False
+09:31:58.177 autotest: AUTOTEST carseek minute=7:51 carEnt=1 maxCarEnt=1 careerFrames=12354 distinct=4 jobPerfLvlChanged=False
+09:31:59.190 autotest: AUTOTEST carseek minute=7:52 carEnt=1 maxCarEnt=1 careerFrames=12474 distinct=4 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:32:00.242 autotest: AUTOTEST carseek minute=7:53 carEnt=1 maxCarEnt=1 careerFrames=12594 distinct=4 jobPerfLvlChanged=False
+09:32:01.173 autotest: AUTOTEST carseek minute=7:54 carEnt=1 maxCarEnt=1 careerFrames=12714 distinct=4 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:32:02.173 autotest: AUTOTEST carseek minute=7:55 carEnt=1 maxCarEnt=1 careerFrames=12834 distinct=4 jobPerfLvlChanged=False
+09:32:03.173 autotest: AUTOTEST carseek minute=7:56 carEnt=1 maxCarEnt=1 careerFrames=12954 distinct=4 jobPerfLvlChanged=False
+09:32:04.173 autotest: AUTOTEST carseek minute=7:57 carEnt=1 maxCarEnt=1 careerFrames=13074 distinct=4 jobPerfLvlChanged=False
+09:32:05.173 autotest: AUTOTEST carseek minute=7:58 carEnt=1 maxCarEnt=1 careerFrames=13194 distinct=4 jobPerfLvlChanged=False
+09:32:06.173 autotest: AUTOTEST carseek minute=7:59 carEnt=1 maxCarEnt=1 careerFrames=13314 distinct=4 jobPerfLvlChanged=False
+09:32:07.196 autotest: AUTOTEST carseek car-entity-change carEnt=19 present=[CarPortal.iff#id8,CarJunk.iff#id310#guid1265757402,CarJunk.iff#id311#guid1265757402,CarJunk.iff#id312#guid1265757402,CarJunk.iff#id313#guid1265757402,CarJunk.iff#id314#guid1265757402,CarJunk.iff#id315#guid1265757402,CarJunk.iff#id316#guid1265757402,CarJunk.iff#id317#guid1265757402,CarJunk.iff#id318#guid1265757402,CarJunk.iff#id319#guid1265757402,CarJunk.iff#id320#guid1265757402,CarJunk.iff#id321#guid1265757402,CarJunk.iff#id322#guid1265757402,CarJunk.iff#id323#guid1265757402,CarJunk.iff#id324#guid1265757402,CarJunk.iff#id325#guid1265757402,CarJunk.iff#id326#guid1265757402,CarJunk.iff#id327#guid1265757402]
+09:32:07.214 autotest: AUTOTEST carseek minute=8:00 carEnt=19 maxCarEnt=19 careerFrames=13452 distinct=4 jobPerfLvlChanged=False
+09:32:07.229 autotest: AUTOTEST carseek first-seen id=8192 label=shared main owner=CarJunk.iff sg=carglobals.iff
+09:32:08.173 autotest: AUTOTEST carseek minute=8:01 carEnt=19 maxCarEnt=19 careerFrames=16776 distinct=5 jobPerfLvlChanged=False
+09:32:08.806 autotest: AUTOTEST carseek first-seen id=4102 label=At Work owner=CarPortal.iff sg=
+09:32:08.822 autotest: AUTOTEST carseek first-seen id=4105 label=send to work owner=CarPortal.iff sg=
+09:32:08.822 autotest: AUTOTEST carseek first-seen id=4121 label=send person to work owner=CarJunk.iff sg=carglobals.iff
+09:32:09.173 autotest: AUTOTEST carseek minute=8:02 carEnt=19 maxCarEnt=19 careerFrames=20228 distinct=8 jobPerfLvlChanged=False
+09:32:10.173 autotest: AUTOTEST carseek minute=8:03 carEnt=19 maxCarEnt=19 careerFrames=23828 distinct=8 jobPerfLvlChanged=False
+09:32:11.175 autotest: AUTOTEST carseek minute=8:04 carEnt=19 maxCarEnt=19 careerFrames=27428 distinct=8 jobPerfLvlChanged=False
+09:32:12.173 autotest: AUTOTEST carseek minute=8:05 carEnt=19 maxCarEnt=19 careerFrames=31028 distinct=8 jobPerfLvlChanged=False
+09:32:13.173 autotest: AUTOTEST carseek minute=8:06 carEnt=19 maxCarEnt=19 careerFrames=34628 distinct=8 jobPerfLvlChanged=False
+09:32:14.173 autotest: AUTOTEST carseek minute=8:07 carEnt=19 maxCarEnt=19 careerFrames=38228 distinct=8 jobPerfLvlChanged=False
+09:32:15.173 autotest: AUTOTEST carseek minute=8:08 carEnt=19 maxCarEnt=19 careerFrames=41828 distinct=8 jobPerfLvlChanged=False
+09:32:16.173 autotest: AUTOTEST carseek minute=8:09 carEnt=19 maxCarEnt=19 careerFrames=45428 distinct=8 jobPerfLvlChanged=False
+09:32:17.173 autotest: AUTOTEST carseek minute=8:10 carEnt=19 maxCarEnt=19 careerFrames=49028 distinct=8 jobPerfLvlChanged=False
+09:32:18.173 autotest: AUTOTEST carseek minute=8:11 carEnt=19 maxCarEnt=19 careerFrames=52628 distinct=8 jobPerfLvlChanged=False
+09:32:19.173 autotest: AUTOTEST carseek minute=8:12 carEnt=19 maxCarEnt=19 careerFrames=56228 distinct=8 jobPerfLvlChanged=False
+09:32:20.173 autotest: AUTOTEST carseek minute=8:13 carEnt=19 maxCarEnt=19 careerFrames=59828 distinct=8 jobPerfLvlChanged=False
+09:32:21.173 autotest: AUTOTEST carseek minute=8:14 carEnt=19 maxCarEnt=19 careerFrames=63428 distinct=8 jobPerfLvlChanged=False
+09:32:22.174 autotest: AUTOTEST carseek minute=8:15 carEnt=19 maxCarEnt=19 careerFrames=67028 distinct=8 jobPerfLvlChanged=False
+09:32:23.174 autotest: AUTOTEST carseek minute=8:16 carEnt=19 maxCarEnt=19 careerFrames=70628 distinct=8 jobPerfLvlChanged=False
+09:32:23.674 autotest: AUTOTEST carseek first-seen id=4116 label=At School owner=CarPortal.iff sg=
+09:32:24.175 autotest: AUTOTEST carseek minute=8:17 carEnt=19 maxCarEnt=19 careerFrames=74290 distinct=9 jobPerfLvlChanged=False
+09:32:25.176 autotest: AUTOTEST carseek minute=8:18 carEnt=19 maxCarEnt=19 careerFrames=78010 distinct=9 jobPerfLvlChanged=False
+09:32:26.177 autotest: AUTOTEST carseek minute=8:19 carEnt=19 maxCarEnt=19 careerFrames=81730 distinct=9 jobPerfLvlChanged=False
+09:32:27.177 autotest: AUTOTEST carseek minute=8:20 carEnt=19 maxCarEnt=19 careerFrames=85450 distinct=9 jobPerfLvlChanged=False
+09:32:28.178 autotest: AUTOTEST carseek minute=8:21 carEnt=19 maxCarEnt=19 careerFrames=89170 distinct=9 jobPerfLvlChanged=False
+09:32:29.179 autotest: AUTOTEST carseek minute=8:22 carEnt=19 maxCarEnt=19 careerFrames=92890 distinct=9 jobPerfLvlChanged=False
+09:32:30.180 autotest: AUTOTEST carseek minute=8:23 carEnt=19 maxCarEnt=19 careerFrames=96610 distinct=9 jobPerfLvlChanged=False
+09:32:31.180 autotest: AUTOTEST carseek minute=8:24 carEnt=19 maxCarEnt=19 careerFrames=100330 distinct=9 jobPerfLvlChanged=False
+09:32:32.186 autotest: AUTOTEST carseek minute=8:25 carEnt=19 maxCarEnt=19 careerFrames=104050 distinct=9 jobPerfLvlChanged=False
+09:32:33.185 autotest: AUTOTEST carseek minute=8:26 carEnt=19 maxCarEnt=19 careerFrames=107770 distinct=9 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 876
+09:32:34.182 autotest: AUTOTEST carseek minute=8:27 carEnt=19 maxCarEnt=19 careerFrames=111260 distinct=9 jobPerfLvlChanged=False
+09:32:34.386 autotest: AUTOTEST carseek first-seen id=8205 label=drive away owner=CarJunk.iff sg=carglobals.iff
+09:32:35.183 autotest: AUTOTEST carseek minute=8:28 carEnt=19 maxCarEnt=19 careerFrames=114789 distinct=10 jobPerfLvlChanged=False
+09:32:36.183 autotest: AUTOTEST carseek minute=8:29 carEnt=19 maxCarEnt=19 careerFrames=118329 distinct=10 jobPerfLvlChanged=False
+09:32:37.183 autotest: AUTOTEST carseek minute=8:30 carEnt=19 maxCarEnt=19 careerFrames=121869 distinct=10 jobPerfLvlChanged=False
+09:32:38.184 autotest: AUTOTEST carseek minute=8:31 carEnt=19 maxCarEnt=19 careerFrames=125409 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMThread.cs:line 709
+[SimAnticsExc] Index was outside the bounds of the array.VMThread.cs:line 709
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:32:39.184 autotest: AUTOTEST carseek minute=8:32 carEnt=19 maxCarEnt=19 careerFrames=128949 distinct=10 jobPerfLvlChanged=False
+09:32:40.185 autotest: AUTOTEST carseek minute=8:33 carEnt=19 maxCarEnt=19 careerFrames=132489 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:32:41.185 autotest: AUTOTEST carseek minute=8:34 carEnt=19 maxCarEnt=19 careerFrames=136029 distinct=10 jobPerfLvlChanged=False
+09:32:42.185 autotest: AUTOTEST carseek minute=8:35 carEnt=19 maxCarEnt=19 careerFrames=139569 distinct=10 jobPerfLvlChanged=False
+09:32:43.186 autotest: AUTOTEST carseek minute=8:36 carEnt=19 maxCarEnt=19 careerFrames=143109 distinct=10 jobPerfLvlChanged=False
+09:32:44.186 autotest: AUTOTEST carseek minute=8:37 carEnt=19 maxCarEnt=19 careerFrames=146649 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:32:45.189 autotest: AUTOTEST carseek minute=8:38 carEnt=19 maxCarEnt=19 careerFrames=150189 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 876
+09:32:46.206 autotest: AUTOTEST carseek minute=8:39 carEnt=19 maxCarEnt=19 careerFrames=153709 distinct=10 jobPerfLvlChanged=False
+09:32:47.191 autotest: AUTOTEST carseek minute=8:40 carEnt=19 maxCarEnt=19 careerFrames=157129 distinct=10 jobPerfLvlChanged=False
+09:32:48.199 autotest: AUTOTEST carseek minute=8:41 carEnt=19 maxCarEnt=19 careerFrames=160549 distinct=10 jobPerfLvlChanged=False
+09:32:49.208 autotest: AUTOTEST carseek minute=8:42 carEnt=19 maxCarEnt=19 careerFrames=163969 distinct=10 jobPerfLvlChanged=False
+09:32:50.191 autotest: AUTOTEST carseek minute=8:43 carEnt=19 maxCarEnt=19 careerFrames=167389 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:32:51.192 autotest: AUTOTEST carseek minute=8:44 carEnt=19 maxCarEnt=19 careerFrames=170809 distinct=10 jobPerfLvlChanged=False
+09:32:52.190 autotest: AUTOTEST carseek minute=8:45 carEnt=19 maxCarEnt=19 careerFrames=174229 distinct=10 jobPerfLvlChanged=False
+09:32:53.195 autotest: AUTOTEST carseek minute=8:46 carEnt=19 maxCarEnt=19 careerFrames=177649 distinct=10 jobPerfLvlChanged=False
+09:32:54.193 autotest: AUTOTEST carseek minute=8:47 carEnt=19 maxCarEnt=19 careerFrames=181069 distinct=10 jobPerfLvlChanged=False
+09:32:55.204 autotest: AUTOTEST carseek minute=8:48 carEnt=19 maxCarEnt=19 careerFrames=184489 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:32:56.204 autotest: AUTOTEST carseek minute=8:49 carEnt=19 maxCarEnt=19 careerFrames=187909 distinct=10 jobPerfLvlChanged=False
+09:32:57.197 autotest: AUTOTEST carseek minute=8:50 carEnt=19 maxCarEnt=19 careerFrames=191329 distinct=10 jobPerfLvlChanged=False
+09:32:58.211 autotest: AUTOTEST carseek minute=8:51 carEnt=19 maxCarEnt=19 careerFrames=194749 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:32:59.208 autotest: AUTOTEST carseek minute=8:52 carEnt=19 maxCarEnt=19 careerFrames=198169 distinct=10 jobPerfLvlChanged=False
+09:33:00.195 autotest: AUTOTEST carseek minute=8:53 carEnt=19 maxCarEnt=19 careerFrames=201589 distinct=10 jobPerfLvlChanged=False
+09:33:01.221 autotest: AUTOTEST carseek minute=8:54 carEnt=19 maxCarEnt=19 careerFrames=205009 distinct=10 jobPerfLvlChanged=False
+09:33:02.220 autotest: AUTOTEST carseek minute=8:55 carEnt=19 maxCarEnt=19 careerFrames=208429 distinct=10 jobPerfLvlChanged=False
+09:33:03.211 autotest: AUTOTEST carseek minute=8:56 carEnt=19 maxCarEnt=19 careerFrames=211849 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:04.228 autotest: AUTOTEST carseek minute=8:57 carEnt=19 maxCarEnt=19 careerFrames=215269 distinct=10 jobPerfLvlChanged=False
+09:33:05.196 autotest: AUTOTEST carseek minute=8:58 carEnt=19 maxCarEnt=19 careerFrames=218689 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:06.204 autotest: AUTOTEST carseek minute=8:59 carEnt=19 maxCarEnt=19 careerFrames=222109 distinct=10 jobPerfLvlChanged=False
+09:33:07.198 autotest: AUTOTEST carseek minute=9:00 carEnt=19 maxCarEnt=19 careerFrames=225529 distinct=10 jobPerfLvlChanged=False
+09:33:08.212 autotest: AUTOTEST carseek minute=9:01 carEnt=19 maxCarEnt=19 careerFrames=228949 distinct=10 jobPerfLvlChanged=False
+09:33:09.189 autotest: AUTOTEST carseek minute=9:02 carEnt=19 maxCarEnt=19 careerFrames=232369 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:10.189 autotest: AUTOTEST carseek minute=9:03 carEnt=19 maxCarEnt=19 careerFrames=235789 distinct=10 jobPerfLvlChanged=False
+09:33:11.206 autotest: AUTOTEST carseek minute=9:04 carEnt=19 maxCarEnt=19 careerFrames=239209 distinct=10 jobPerfLvlChanged=False
+09:33:12.206 autotest: AUTOTEST carseek minute=9:05 carEnt=19 maxCarEnt=19 careerFrames=242629 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:13.224 autotest: AUTOTEST carseek minute=9:06 carEnt=19 maxCarEnt=19 careerFrames=246049 distinct=10 jobPerfLvlChanged=False
+09:33:13.524 autotest: AUTOTEST carseek car-entity-change carEnt=20 present=[CarPortal.iff#id8,People\PaperCarrierF1.iff#id218,CarJunk.iff#id310#guid1265757402,CarJunk.iff#id311#guid1265757402,CarJunk.iff#id312#guid1265757402,CarJunk.iff#id313#guid1265757402,CarJunk.iff#id314#guid1265757402,CarJunk.iff#id315#guid1265757402,CarJunk.iff#id316#guid1265757402,CarJunk.iff#id317#guid1265757402,CarJunk.iff#id318#guid1265757402,CarJunk.iff#id319#guid1265757402,CarJunk.iff#id320#guid1265757402,CarJunk.iff#id321#guid1265757402,CarJunk.iff#id322#guid1265757402,CarJunk.iff#id323#guid1265757402,CarJunk.iff#id324#guid1265757402,CarJunk.iff#id325#guid1265757402,CarJunk.iff#id326#guid1265757402,CarJunk.iff#id327#guid1265757402]
+09:33:14.192 autotest: AUTOTEST carseek minute=9:07 carEnt=20 maxCarEnt=20 careerFrames=249553 distinct=10 jobPerfLvlChanged=False
+09:33:15.215 autotest: AUTOTEST carseek minute=9:08 carEnt=20 maxCarEnt=20 careerFrames=253093 distinct=10 jobPerfLvlChanged=False
+09:33:16.223 autotest: AUTOTEST carseek minute=9:09 carEnt=20 maxCarEnt=20 careerFrames=256633 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:17.198 autotest: AUTOTEST carseek minute=9:10 carEnt=20 maxCarEnt=20 careerFrames=260173 distinct=10 jobPerfLvlChanged=False
+09:33:18.200 autotest: AUTOTEST carseek minute=9:11 carEnt=20 maxCarEnt=20 careerFrames=263713 distinct=10 jobPerfLvlChanged=False
+09:33:19.201 autotest: AUTOTEST carseek minute=9:12 carEnt=20 maxCarEnt=20 careerFrames=267253 distinct=10 jobPerfLvlChanged=False
+09:33:20.216 autotest: AUTOTEST carseek minute=9:13 carEnt=20 maxCarEnt=20 careerFrames=270793 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:21.218 autotest: AUTOTEST carseek minute=9:14 carEnt=20 maxCarEnt=20 careerFrames=274333 distinct=10 jobPerfLvlChanged=False
+09:33:22.192 autotest: AUTOTEST carseek minute=9:15 carEnt=20 maxCarEnt=20 careerFrames=277873 distinct=10 jobPerfLvlChanged=False
+09:33:23.233 autotest: AUTOTEST carseek minute=9:16 carEnt=20 maxCarEnt=20 careerFrames=281413 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:24.208 autotest: AUTOTEST carseek minute=9:17 carEnt=20 maxCarEnt=20 careerFrames=284953 distinct=10 jobPerfLvlChanged=False
+09:33:25.225 autotest: AUTOTEST carseek minute=9:18 carEnt=20 maxCarEnt=20 careerFrames=288493 distinct=10 jobPerfLvlChanged=False
+09:33:26.225 autotest: AUTOTEST carseek minute=9:19 carEnt=20 maxCarEnt=20 careerFrames=292033 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:27.192 autotest: AUTOTEST carseek minute=9:20 carEnt=20 maxCarEnt=20 careerFrames=295573 distinct=10 jobPerfLvlChanged=False
+09:33:28.201 autotest: AUTOTEST carseek minute=9:21 carEnt=20 maxCarEnt=20 careerFrames=299113 distinct=10 jobPerfLvlChanged=False
+09:33:29.226 autotest: AUTOTEST carseek minute=9:22 carEnt=20 maxCarEnt=20 careerFrames=302653 distinct=10 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:30.195 autotest: AUTOTEST carseek minute=9:23 carEnt=20 maxCarEnt=20 careerFrames=306193 distinct=10 jobPerfLvlChanged=False
+09:33:31.202 autotest: AUTOTEST carseek first-seen id=4099 label=drop paper owner=People\PaperCarrierF1.iff sg=personglobals.iff
+09:33:31.220 autotest: AUTOTEST carseek minute=9:24 carEnt=20 maxCarEnt=20 careerFrames=309735 distinct=11 jobPerfLvlChanged=False
+09:33:32.243 autotest: AUTOTEST carseek minute=9:25 carEnt=20 maxCarEnt=20 careerFrames=313395 distinct=11 jobPerfLvlChanged=False
+09:33:33.211 autotest: AUTOTEST carseek minute=9:26 carEnt=20 maxCarEnt=20 careerFrames=317055 distinct=11 jobPerfLvlChanged=False
+09:33:34.228 autotest: AUTOTEST carseek minute=9:27 carEnt=20 maxCarEnt=20 careerFrames=320670 distinct=11 jobPerfLvlChanged=False
+09:33:34.339 autotest: AUTOTEST carseek first-seen id=4106 label=special drop tabloid function owner=People\PaperCarrierF1.iff sg=personglobals.iff
+09:33:35.212 autotest: AUTOTEST carseek minute=9:28 carEnt=20 maxCarEnt=20 careerFrames=324323 distinct=12 jobPerfLvlChanged=False
+09:33:36.221 autotest: AUTOTEST carseek minute=9:29 carEnt=20 maxCarEnt=20 careerFrames=327983 distinct=12 jobPerfLvlChanged=False
+09:33:37.221 autotest: AUTOTEST carseek minute=9:30 carEnt=20 maxCarEnt=20 careerFrames=331606 distinct=12 jobPerfLvlChanged=False
+09:33:37.521 autotest: AUTOTEST carseek first-seen id=368 label=Leave owner=People\PaperCarrierF1.iff sg=personglobals.iff
+09:33:37.554 autotest: AUTOTEST carseek first-seen id=281 label=Wait For Notify owner=People\PaperCarrierF1.iff sg=personglobals.iff
+09:33:38.228 autotest: AUTOTEST carseek minute=9:31 carEnt=20 maxCarEnt=20 careerFrames=335206 distinct=14 jobPerfLvlChanged=False
+09:33:39.203 autotest: AUTOTEST carseek minute=9:32 carEnt=20 maxCarEnt=20 careerFrames=338806 distinct=14 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:40.213 autotest: AUTOTEST carseek minute=9:33 carEnt=20 maxCarEnt=20 careerFrames=342406 distinct=14 jobPerfLvlChanged=False
+09:33:41.204 autotest: AUTOTEST carseek minute=9:34 carEnt=20 maxCarEnt=20 careerFrames=346006 distinct=14 jobPerfLvlChanged=False
+09:33:42.204 autotest: AUTOTEST carseek minute=9:35 carEnt=20 maxCarEnt=20 careerFrames=349606 distinct=14 jobPerfLvlChanged=False
+09:33:43.213 autotest: AUTOTEST carseek minute=9:36 carEnt=20 maxCarEnt=20 careerFrames=353206 distinct=14 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:44.196 autotest: AUTOTEST carseek minute=9:37 carEnt=20 maxCarEnt=20 careerFrames=356806 distinct=14 jobPerfLvlChanged=False
+09:33:45.196 autotest: AUTOTEST carseek minute=9:38 carEnt=20 maxCarEnt=20 careerFrames=360406 distinct=14 jobPerfLvlChanged=False
+09:33:46.222 autotest: AUTOTEST carseek minute=9:39 carEnt=20 maxCarEnt=20 careerFrames=364006 distinct=14 jobPerfLvlChanged=False
+09:33:47.222 autotest: AUTOTEST carseek minute=9:40 carEnt=20 maxCarEnt=20 careerFrames=367606 distinct=14 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:48.239 autotest: AUTOTEST carseek minute=9:41 carEnt=20 maxCarEnt=20 careerFrames=371206 distinct=14 jobPerfLvlChanged=False
+09:33:49.234 autotest: AUTOTEST carseek minute=9:42 carEnt=20 maxCarEnt=20 careerFrames=374806 distinct=14 jobPerfLvlChanged=False
+09:33:50.222 autotest: AUTOTEST carseek minute=9:43 carEnt=20 maxCarEnt=20 careerFrames=378406 distinct=14 jobPerfLvlChanged=False
+09:33:51.214 autotest: AUTOTEST carseek minute=9:44 carEnt=20 maxCarEnt=20 careerFrames=382006 distinct=14 jobPerfLvlChanged=False
+09:33:52.222 autotest: AUTOTEST carseek minute=9:45 carEnt=20 maxCarEnt=20 careerFrames=385606 distinct=14 jobPerfLvlChanged=False
+09:33:53.223 autotest: AUTOTEST carseek minute=9:46 carEnt=20 maxCarEnt=20 careerFrames=389206 distinct=14 jobPerfLvlChanged=False
+09:33:54.057 autotest: AUTOTEST carseek car-entity-change carEnt=19 present=[CarPortal.iff#id8,CarJunk.iff#id310#guid1265757402,CarJunk.iff#id311#guid1265757402,CarJunk.iff#id312#guid1265757402,CarJunk.iff#id313#guid1265757402,CarJunk.iff#id314#guid1265757402,CarJunk.iff#id315#guid1265757402,CarJunk.iff#id316#guid1265757402,CarJunk.iff#id317#guid1265757402,CarJunk.iff#id318#guid1265757402,CarJunk.iff#id319#guid1265757402,CarJunk.iff#id320#guid1265757402,CarJunk.iff#id321#guid1265757402,CarJunk.iff#id322#guid1265757402,CarJunk.iff#id323#guid1265757402,CarJunk.iff#id324#guid1265757402,CarJunk.iff#id325#guid1265757402,CarJunk.iff#id326#guid1265757402,CarJunk.iff#id327#guid1265757402]
+09:33:54.199 autotest: AUTOTEST carseek minute=9:47 carEnt=19 maxCarEnt=20 careerFrames=392767 distinct=14 jobPerfLvlChanged=False
+09:33:55.233 autotest: AUTOTEST carseek minute=9:48 carEnt=19 maxCarEnt=20 careerFrames=396187 distinct=14 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:33:56.240 autotest: AUTOTEST carseek minute=9:49 carEnt=19 maxCarEnt=20 careerFrames=399607 distinct=14 jobPerfLvlChanged=False
+09:33:57.199 autotest: AUTOTEST carseek minute=9:50 carEnt=19 maxCarEnt=20 careerFrames=403027 distinct=14 jobPerfLvlChanged=False
+09:33:58.199 autotest: AUTOTEST carseek minute=9:51 carEnt=19 maxCarEnt=20 careerFrames=406447 distinct=14 jobPerfLvlChanged=False
+09:33:59.216 autotest: AUTOTEST carseek minute=9:52 carEnt=19 maxCarEnt=20 careerFrames=409867 distinct=14 jobPerfLvlChanged=False
+09:34:00.241 autotest: AUTOTEST carseek minute=9:53 carEnt=19 maxCarEnt=20 careerFrames=413287 distinct=14 jobPerfLvlChanged=False
+09:34:01.225 autotest: AUTOTEST carseek minute=9:54 carEnt=19 maxCarEnt=20 careerFrames=416707 distinct=14 jobPerfLvlChanged=False
+09:34:02.199 autotest: AUTOTEST carseek minute=9:55 carEnt=19 maxCarEnt=20 careerFrames=420127 distinct=14 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:34:03.200 autotest: AUTOTEST carseek minute=9:56 carEnt=19 maxCarEnt=20 careerFrames=423547 distinct=14 jobPerfLvlChanged=False
+09:34:04.243 autotest: AUTOTEST carseek minute=9:57 carEnt=19 maxCarEnt=20 careerFrames=426967 distinct=14 jobPerfLvlChanged=False
+09:34:05.234 autotest: AUTOTEST carseek minute=9:58 carEnt=19 maxCarEnt=20 careerFrames=430387 distinct=14 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:34:06.251 autotest: AUTOTEST carseek minute=9:59 carEnt=19 maxCarEnt=20 careerFrames=433807 distinct=14 jobPerfLvlChanged=False
+09:34:07.234 autotest: AUTOTEST carseek minute=10:00 carEnt=19 maxCarEnt=20 careerFrames=437227 distinct=14 jobPerfLvlChanged=False
+09:34:07.419 autotest: AUTOTEST carseek car-entity-change carEnt=1 present=[CarPortal.iff#id8]
+09:34:08.202 autotest: AUTOTEST carseek minute=10:01 carEnt=1 maxCarEnt=20 careerFrames=437842 distinct=14 jobPerfLvlChanged=False
+09:34:09.194 autotest: AUTOTEST carseek minute=10:02 carEnt=1 maxCarEnt=20 careerFrames=437962 distinct=14 jobPerfLvlChanged=False
+09:34:10.236 autotest: AUTOTEST carseek minute=10:03 carEnt=1 maxCarEnt=20 careerFrames=438082 distinct=14 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:34:11.243 autotest: AUTOTEST carseek minute=10:04 carEnt=1 maxCarEnt=20 careerFrames=438202 distinct=14 jobPerfLvlChanged=False
+09:34:12.194 autotest: AUTOTEST carseek minute=10:05 carEnt=1 maxCarEnt=20 careerFrames=438322 distinct=14 jobPerfLvlChanged=False
+09:34:13.211 autotest: AUTOTEST carseek minute=10:06 carEnt=1 maxCarEnt=20 careerFrames=438442 distinct=14 jobPerfLvlChanged=False
+09:34:14.219 autotest: AUTOTEST carseek minute=10:07 carEnt=1 maxCarEnt=20 careerFrames=438562 distinct=14 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:34:15.253 autotest: AUTOTEST carseek minute=10:08 carEnt=1 maxCarEnt=20 careerFrames=438682 distinct=14 jobPerfLvlChanged=False
+09:34:16.211 autotest: AUTOTEST carseek minute=10:09 carEnt=1 maxCarEnt=20 careerFrames=438802 distinct=14 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+09:34:17.203 autotest: AUTOTEST carseek minute=10:10 carEnt=1 maxCarEnt=20 careerFrames=438922 distinct=14 jobPerfLvlChanged=False
+09:34:18.205 autotest: AUTOTEST carseek minute=10:11 carEnt=1 maxCarEnt=20 careerFrames=439042 distinct=14 jobPerfLvlChanged=False
+09:34:19.212 autotest: AUTOTEST carseek minute=10:12 carEnt=1 maxCarEnt=20 careerFrames=439162 distinct=14 jobPerfLvlChanged=False
+09:34:20.197 autotest: AUTOTEST carseek minute=10:13 carEnt=1 maxCarEnt=20 careerFrames=439282 distinct=14 jobPerfLvlChanged=False
+09:42:49.125 autotest: AUTOTEST carseek minute=10:14 carEnt=1 maxCarEnt=20 careerFrames=500350 distinct=14 jobPerfLvlChanged=False
+09:42:50.108 autotest: AUTOTEST carseek minute=10:15 carEnt=1 maxCarEnt=20 careerFrames=500470 distinct=14 jobPerfLvlChanged=False
+09:42:50.127 autotest: AUTOTEST carseek RESULT minute=615 car-entity-max=20 career-frames=500470 ids=[280,281,368,4096,4099,4100,4102,4105,4106,4116,4121,4125,8192,8205] jobPerfLvlChanged=False iff4100process=True
+09:42:50.127 autotest: AUTOTEST carseek: PASS
+RELPROBE SUMMARY calls=2753 misses=1443 objectbucket=6 avatarStack=1922
+09:42:50.133 autotest: AUTOTEST audio end thread=HITTVOn: dead=False
+09:42:50.133 autotest: AUTOTEST SUMMARY passed=80 failed=0 skipped=0
+09:42:50.133 autotest: AUTOTEST RESULT PASS
+AUTOTEST RESULT PASS passed=80 failed=0
+09:42:50.141 exit-probe: OnExiting cancel=True screen=TS1GameScreen
+09:42:50.142 exit-probe: OnExiting cancel=False screen=TS1GameScreen
+09:42:50.143 exit-probe: after Run
+09:42:50.237 exit-probe: after Dispose
+AUTOTEST_WRAPPER_EXIT=0

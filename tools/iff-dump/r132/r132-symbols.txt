@@ -1,0 +1,36 @@
+== ALL end-of-function symbols 0x288000-0x292500 ==
+0x2881d8  .SetQuickTips__10cWinPeopleFb
+0x2885fc  .UpdateAtWorkStatus__10cWinPeopleFv
+0x2887ac  .StopTracking__10cWinPeopleFv
+0x289190  .BuildGifts__10cWinPeopleFv
+0x2891e0  .cWinGift_LessThan__FPC8cWinGiftPC8cWinGift
+0x289584  .BuildInterests__10cWinPeopleFv
+0x28982c  .BuildPersonalityButtons__10cWinPeopleFPP15cWinPersonalityiP7cTSRect
+0x28a4e0  .BuildRelationships__10cWinPeopleFv
+0x28aac8  .SetPanel__10cWinPeopleFQ210cWinPeople5Panel
+0x28ab14  .DeletingPerson__10cWinPeopleFP8cXPerson
+0x28abe0  .TSOnMouseExitChild__10cWinPeopleFllP6cTSWinP6cTSWin
+0x28acc8  .TSOnMouseExit__10cWinPeopleFllP6cTSWin
+0x28b2dc  .UpdateViewFromCPState__10cWinPeopleFP7CPState
+0x28b340  .GetPieBackBuffer__10cWinPeopleFv
+0x28b3a0  .GetPeopleSubPie__10cWinPeopleFv
+0x28b400  .GetPeoplePie__10cWinPeopleFv
+0x28bee4  .SetPerson__10cWinPeopleFi
+0x28c068  .TrackPerson__10cWinPeopleFP8cXPerson
+0x28d234  .TSOnCommand__10cWinPeopleFUlUl
+0x28d3c8  .IsPointInWindowWindowCoordinates__10cWinPeopleFll
+0x28d4d0  .InvalidateAgainstDDD__10cWinPeopleFRC7cTSRectb
+0x28daac  .TSPaint__10cWinPeopleFb
+0x28dc74  .PaintRect__10cWinPeopleFRC7cTSRect
+0x28de44  .Plot__10cWinPeopleFb
+0x28e290  .Shutdown__10cWinPeopleFv
+0x28e8dc  .InitInventorySorts__10cWinPeopleFv
+0x28ee14  .InitRelationshipSorts__10cWinPeopleFv
+0x291828  .Init__10cWinPeopleFv
+0x291afc  .__pl__8cTSPointCFRC7cTSRect
+0x292200  .__dt__10cWinPeopleFv
+0x292454  .__ct__10cWinPeopleFP7CPStateP9cTSBuffer
+total 31
+
+== addi-form id immediates 0x286000-0x292500 (any register) ==
+0x291138: 386011f9  addi r3,r0,4601 (kTrackingTarget)

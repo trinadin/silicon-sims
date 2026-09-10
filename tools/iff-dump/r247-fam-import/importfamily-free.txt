@@ -1,0 +1,105 @@
+                ; ==== .ImportFamily__FP10ImportInfoPi ====
+00231df0: bf41ffe8  stmw     r26, -0x18(r1)
+00231df4: 7c0802a6  mflr     r0
+00231df8: 7c9a2378  mr       r26, r4
+00231dfc: 83e28874  lwz      r31, -0x778c(r2)
+00231e00: 83c28bb4  lwz      r30, -0x744c(r2)
+00231e04: 38830000  addi     r4, r3, 0
+00231e08: 90010008  stw      r0, 8(r1)
+00231e0c: 9421fd70  stwu     r1, -0x290(r1)
+00231e10: 80df0000  lwz      r6, 0(r31)
+00231e14: 38a10040  addi     r5, r1, 0x40
+00231e18: 80660024  lwz      r3, 0x24(r6)
+00231e1c: 38c10044  addi     r6, r1, 0x44
+00231e20: 4be7be31  bl       0xadc50
+00231e24: 7c600735  extsh.   r0, r3
+00231e28: 40820150  bne      0x231f78
+00231e2c: 80610044  lwz      r3, 0x44(r1)
+00231e30: 3b60ffff  li       r27, -1
+00231e34: 28030000  cmplwi   r3, 0
+00231e38: 41820008  beq      0x231e40
+00231e3c: 8363010c  lwz      r27, 0x10c(r3)
+00231e40: 3b800000  li       r28, 0
+00231e44: 48000030  b        0x231e74
+00231e48: 60000000  nop      
+00231e4c: 80610040  lwz      r3, 0x40(r1)
+00231e50: 7f84e378  mr       r4, r28
+00231e54: 4be44e5d  bl       0x76cb0   ; .GetIndexedMember__6FamilyFi
+00231e58: 80630000  lwz      r3, 0(r3)
+00231e5c: 48012505  bl       0x244360   ; .GetHandle__12PersonFinderFl
+00231e60: 3880001f  li       r4, 0x1f
+00231e64: 38a00001  li       r5, 1
+00231e68: 48013689  bl       0x2454f0   ; .GenerateBitmaps__12PersonFinderFiQ212PersonFinder12eBitmapTypesQ212PersonFinder15eGenerationType
+00231e6c: 4bde0515  bl       0x12380   ; .UpdateAll__16CQuickTimePlayerFv
+00231e70: 3b9c0001  addi     r28, r28, 1
+00231e74: 80610040  lwz      r3, 0x40(r1)
+00231e78: 4be44d99  bl       0x76c10   ; .CountMembers__6FamilyFv
+00231e7c: 7c1c1800  cmpw     r28, r3
+00231e80: 4180ffcc  blt      0x231e4c
+00231e84: 80610040  lwz      r3, 0x40(r1)
+00231e88: 83a3010c  lwz      r29, 0x10c(r3)
+00231e8c: 2c1d0fa0  cmpwi    r29, 0xfa0
+00231e90: 41820064  beq      0x231ef4
+00231e94: 80bf0000  lwz      r5, 0(r31)
+00231e98: 38610048  addi     r3, r1, 0x48
+00231e9c: 38810054  addi     r4, r1, 0x54
+00231ea0: 83850024  lwz      r28, 0x24(r5)
+00231ea4: 38a00000  li       r5, 0
+00231ea8: 38c00104  li       r6, 0x104
+00231eac: 4bf104b5  bl       0x142360   ; .__ct__12StringBufferFPcUiUi
+00231eb0: 93c10050  stw      r30, 0x50(r1)
+00231eb4: 38600057  li       r3, 0x57
+00231eb8: 4be560a9  bl       0x87f60
+00231ebc: 38a10048  addi     r5, r1, 0x48
+00231ec0: 38800000  li       r4, 0
+00231ec4: 4802a14d  bl       0x25c010
+00231ec8: 387c0000  addi     r3, r28, 0
+00231ecc: 389d0000  addi     r4, r29, 0
+00231ed0: 4be822e1  bl       0xb41b0   ; .GetFamily__12NeighborhoodFi
+00231ed4: 7c651b79  or.      r5, r3, r3
+00231ed8: 41820010  beq      0x231ee8
+00231edc: 387c0000  addi     r3, r28, 0
+00231ee0: 38810048  addi     r4, r1, 0x48
+00231ee4: 4be7d2bd  bl       0xaf1a0
+00231ee8: 80610040  lwz      r3, 0x40(r1)
+00231eec: 8003010c  lwz      r0, 0x10c(r3)
+00231ef0: 901a0000  stw      r0, 0(r26)
+00231ef4: 807f0000  lwz      r3, 0(r31)
+00231ef8: 7f64db78  mr       r4, r27
+00231efc: 80630024  lwz      r3, 0x24(r3)
+00231f00: 4be822b1  bl       0xb41b0   ; .GetFamily__12NeighborhoodFi
+00231f04: 28030000  cmplwi   r3, 0
+00231f08: 90610044  stw      r3, 0x44(r1)
+00231f0c: 41820064  beq      0x231f70
+00231f10: 83a3010c  lwz      r29, 0x10c(r3)
+00231f14: 2c1d0000  cmpwi    r29, 0
+00231f18: 41820058  beq      0x231f70
+00231f1c: 80bf0000  lwz      r5, 0(r31)
+00231f20: 38610158  addi     r3, r1, 0x158
+00231f24: 38810164  addi     r4, r1, 0x164
+00231f28: 83e50024  lwz      r31, 0x24(r5)
+00231f2c: 38a00000  li       r5, 0
+00231f30: 38c00104  li       r6, 0x104
+00231f34: 4bf1042d  bl       0x142360   ; .__ct__12StringBufferFPcUiUi
+00231f38: 93c10160  stw      r30, 0x160(r1)
+00231f3c: 38600057  li       r3, 0x57
+00231f40: 4be56021  bl       0x87f60
+00231f44: 38a10158  addi     r5, r1, 0x158
+00231f48: 38800000  li       r4, 0
+00231f4c: 4802a0c5  bl       0x25c010
+00231f50: 387f0000  addi     r3, r31, 0
+00231f54: 389d0000  addi     r4, r29, 0
+00231f58: 4be82259  bl       0xb41b0   ; .GetFamily__12NeighborhoodFi
+00231f5c: 7c651b79  or.      r5, r3, r3
+00231f60: 41820010  beq      0x231f70
+00231f64: 387f0000  addi     r3, r31, 0
+00231f68: 38810158  addi     r4, r1, 0x158
+00231f6c: 4be7d235  bl       0xaf1a0
+00231f70: 38600001  li       r3, 1
+00231f74: 48000008  b        0x231f7c
+00231f78: 38600000  li       r3, 0
+00231f7c: 80010298  lwz      r0, 0x298(r1)
+00231f80: 38210290  addi     r1, r1, 0x290
+00231f84: bb41ffe8  lmw      r26, -0x18(r1)
+00231f88: 7c0803a6  mtlr     r0
+00231f8c: 4e800020  blr      

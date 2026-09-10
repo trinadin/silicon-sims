@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +16,14 @@ namespace Simitone.Client.UI.Model
 
         //class definition
 
-        public Color Bg = Color.Black * 0.75f;
-        public Color TitleBg = Color.Black * 0.85f;
+        // UI-parity (Round 67): palette aligned to the ORIGINAL game's UI sprites (extracted
+        // byte-faithfully from UIGraphics.far, tools/iff-dump/uigr-orig/ - PARITY 'uipal').
+        // PanelBack.bmp / CreateACharBack.bmp / PersBkg.bmp are all dark NAVY (#000029..#00106B,
+        // anchors #000029 #000052 #00004A #080852 with steel-blue #73739C highlights); the original
+        // accent color is CYAN #00FFFF (Mood.bmp / JobFriendSmiley.bmp). Not pure black, not green.
+        public Color Bg = new Color(0, 0, 41) * 0.75f;          // #000029 (original panel navy)
+        public Color TitleBg = new Color(0, 0, 24) * 0.85f;     // darker navy for title bars
+        public Color SecondaryText = new Color(0, 255, 255);    // original cyan accent #00FFFF
 
         public Color BtnNormal = Color.White;
         public Color BtnActive = new Color(0, 255, 128, 255);
@@ -26,7 +32,6 @@ namespace Simitone.Client.UI.Model
         public Color ActiveSelection = Color.Yellow;
 
         public Color Text = Color.White;
-        public Color SecondaryText = new Color(0, 255, 128, 255);
 
         public Color DialogBg = Color.Black * 0.8f;
         public Color DialogText = Color.White;

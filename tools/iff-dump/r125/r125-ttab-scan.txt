@@ -1,0 +1,69 @@
+R125 TTAB classification scan — every catalog master, all FARs (case-insensitive)
+Parser: TTAB.cs mirror (v8 plain LE / v9 bit-packed IffFieldEncode mirror).
+Classes as the port classifies (ObjectTooltipReason): pets/dogs/cats-only,
+kids-only (all TS1NoAdult 0x40), adults-only (all TS1NoChild 0x10), mixed, none.
+
+masters scanned: 1571
+
+==== pets-only: 12 masters ====
+  "Stray-Away" Pet Prevention System NoPetSign.far!NoPetSign.iff    flags=['0x671']
+  Persian Plush Pet Bed              ExpansionPack5.FAR!petbed.iff  flags=['0x770', '0x671']
+  Dura-Bean Pet Bed                  ExpansionPack5.FAR!petbed.iff  flags=['0x770', '0x671']
+  Happy Paws Cuddle Sack             ExpansionPack5.FAR!petbed.iff  flags=['0x770', '0x671']
+  Squeaky Tara Pet Toy               ExpansionPack5.FAR!petchewtoy. flags=['0x671']
+  Template Object - Basic            ExpansionPack5.FAR!villagecont flags=['0x650', '0x621']
+  Template Object - Basic            ExpansionPack5.FAR!villagecont flags=['0x650', '0x621']
+  Template Object - Basic            ExpansionPack5.FAR!villagecont flags=['0x650', '0x621']
+  Dragon Strength Chew Toy           ExpansionPack7.far!DragonChewT flags=['0x671']
+  Flies                              ExpansionShared.far!Flies.iff  flags=['0x671']
+  Flies                              ExpansionShared.far!Flies.iff  flags=['0x671']
+  Destination                        Objects.far!Destination.iff    flags=['0x621', '0x421', '0x600', '0x601', '0x601', '0x621']
+
+==== dogs-only: 7 masters ====
+  Critter Condo                      ExpansionPack5.FAR!doghouse.if flags=['0x570', '0x450', '0x470']
+  Pad Prolifique                     ExpansionPack5.FAR!doghouse.if flags=['0x570', '0x450', '0x470']
+  Purinal Fire Plug                  ExpansionPack5.FAR!hydrantunle flags=['0x431']
+  Gnawhide Pet Toy                   ExpansionPack5.FAR!petchewtoy. flags=['0x471']
+  comeandsee.iff                     Objects.far!comeandsee.iff     flags=['0x400']
+  Nancy the Paper Girl               Objects.far!People\PaperCarrie flags=['0x458']
+  Some Sneaky Sim                    Objects.far!People\thief.iff   flags=['0x458']
+
+==== cats-only: 5 masters ====
+  Bunny Rabbit                       ExpansionPack5.FAR!bunnyrabbit flags=['0x250']
+  Gopher                             ExpansionPack5.FAR!gardenpest. flags=['0x270']
+  Marty McMousenip                   ExpansionPack5.FAR!petchewtoy. flags=['0x271']
+  Praise 'em High Pet Treats!        ExpansionPack5.FAR!petchewtoy. flags=['0x271']
+  Scratcheriffic Scratching Post     ExpansionPack5.FAR!petpost.iff flags=['0x271']
+
+==== kids-only: 0 masters ====
+
+==== adults-only: 128 masters ====
+  Clown Catchers Plugin              CCPlugin.far!CCPhonePlugin.iff flags=['0x11']
+  Mistletoe Ceiling Ornament         Christmas2001.far!Christmas200 flags=['0x10', '0x11']
+  Viva PGT Home Casino               SlotMach.far!slotmachine.iff   flags=['0x30', '0x30']
+  Baroque Optilopticon               ExpansionPack.far!mirrors2.iff flags=['0x10']
+  Madame Blahbatfry Crystal Ball     ExpansionPack.far!CrystalBall. flags=['0x10', '0x90', '0x90', '0x90', '0x90', '0x90']
+  Little Voodoo Dolly                ExpansionPack.far!VooDooDoll.i flags=['0x10', '0x11', '0x11', '0x11']
+  The Grim Reaper                    ExpansionPack.far!GrimReaper.i flags=['0x14']
+  Candy Caddy Candy Rack             ExpansionPack3.far!CounterDisp flags=['0x39', '0x39']
+  "Toy With Me" Toy Display          ExpansionPack3.far!CounterDisp flags=['0x39', '0x39']
+  Bijou Cosmorama                    ExpansionPack3.far!CounterDisp flags=['0x31', '0x39']
+  Floral Concepts Flower Display     ExpansionPack3.far!CounterDisp flags=['0x39', '0x39']
+  MAXSIMUM                           ExpansionPack3.far!MagazineSta flags=['0x10', '0x10', '0x10', '0x10']
+  Victors' Digest                    ExpansionPack3.far!MagazineSta flags=['0x10', '0x10', '0x10', '0x10']
+  The Avarix                         ExpansionPack3.far!MagazineSta flags=['0x10', '0x10', '0x10', '0x10']
+  Livin' Large                       ExpansionPack3.far!MagazineSta flags=['0x10', '0x10', '0x10', '0x10']
+  WhooNoo!!!                         ExpansionPack3.far!MagazineSta flags=['0x10', '0x10', '0x10', '0x10']
+  Barmaid Renee                      ExpansionPack3.far!NPC_Barmaid flags=['0x3d', '0x3d', '0x3d']
+  Barmaid Rosie                      ExpansionPack3.far!NPC_Barmaid flags=['0x3d', '0x3d', '0x3d']
+  Barmaid Sandy                      ExpansionPack3.far!NPC_Barmaid flags=['0x3d', '0x3d', '0x3d']
+  Barmaid Renee                      ExpansionPack3.far!NPC_Barmaid flags=['0x3d', '0x3d', '0x3d']
+  Barmaid Rosie                      ExpansionPack3.far!NPC_Barmaid flags=['0x3d', '0x3d', '0x3d']
+  Barmaid Sandy                      ExpansionPack3.far!NPC_Barmaid flags=['0x3d', '0x3d', '0x3d']
+  Bartender Brendan                  ExpansionPack3.far!NPC_Bartend flags=['0x3d', '0x3d', '0x3d']
+  Bartender Monte                    ExpansionPack3.far!NPC_Bartend flags=['0x3d', '0x3d', '0x3d']
+  Bartender Leonardo                 ExpansionPack3.far!NPC_Bartend flags=['0x3d', '0x3d', '0x3d']
+  "Light My Fire" BBQ                ExpansionPack3.far!parkgrill.i flags=['0x30', '0x10']
+  ... and 102 more
+
+none(no TTAB): 668   mixed/everything-else: 751

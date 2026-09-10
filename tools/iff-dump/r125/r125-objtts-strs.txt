@@ -1,0 +1,23 @@
+R125 STR# 159 'ObjectTTs' — the original live-mode object hover reasons
+Source: /Users/nathannoom/Developer/Games/The Sims/simitone-fork/game-data/The Sims/GameData/UIText.iff
+
+=== STR# 159 'ObjectTTs' (chunkSize 19263; 180 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x11039f..0x114ede  flags=0x0010
+full-chunk sha256 4c02d15de5163e7ca8a92bc6dbf8fca8a1dee8acfdd83f39971d5535227aa10c   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 196ea717b3485f6e28f41ddbd7e1ebfcbe8e6e45c2c046f75e867a2e753da7fc
+raw declared count: 180   English (lang-1) count: 9
+languages present: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 180 = 9 English x 20 languages
+trailer: 180 bytes, UNEXPECTED non-0xA3 bytes: b'\x00\xa3\x00\x00\x00\xa3\x00\x00\x00\xa3\x00\x00\x00\xa3\x00\x00\x00\xa3\x00\x00\x00\xa3\x00\x00\x00\xa3\x00\x00\x00\xa3\x00\x00'
+entries containing an '(x;y)' layout directive: 0 of 9 English
+
+English entries [0..8], verbatim (mac_roman), as idx<TAB>text:
+0	There are no actions available
+1	This can only be used by adults
+2	This can only be used by kids
+3	This is the active character
+4	This can only be used by dogs
+5	This can only be used by cats
+6	This can only be used by pets
+7	This can only be used by people
+8	There are no user-directed actions available

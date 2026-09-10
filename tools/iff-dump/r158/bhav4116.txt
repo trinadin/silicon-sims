@@ -1,0 +1,62 @@
+### BHAV 4116 'At School' (61 instructions)
+ins0  T255/F1  CALL 4139 (own-iff) opd=ffffffffffffffff
+ins1  T2/F253  PRIM changeActionString (50) opd=2e01000001000000
+ins2  T37/F255 CALL 4110 (own-iff) opd=ffffffffffffffff
+ins3  T36/F8   CALL 4105 (own-iff) opd=ffffffffffffffff
+ins4  T29/F253 Local[0] = MyMotives[3]
+ins5  T15/F6   Tuning[131] == Global[0]
+ins6  T31/F253 CALL 280 (global.iff) opd=3c00000000000000
+ins7  T20/F253 MyObj[34] = Lit[0]
+ins8  T9/F253  MyObj[34] = Lit[0]
+ins9  T255/F253 CALL 280 (global.iff) opd=1e00000000000000
+ins10 T12/F253 MyPD[30] = Lit[128]
+ins11 T13/F253 PRIM changeSuit (6) opd=0001000000000000
+ins12 T11/F253 CALL 280 (global.iff) opd=0a00000000000000
+ins13 T14/F253 CALL 280 (global.iff) opd=0a00000000000000
+ins14 T254/F253 MyPD[30] = Lit[0]
+ins15 T27/F253 Local[2] = StkObjID[0]
+ins16 T59/F8   CALL 4111 (own-iff) opd=ffffffffffffffff
+ins17 T18/F253 PRIM setMotiveChange (29) opd=0707050114006400
+ins18 T33/F6   CALL 4113 (own-iff) opd=ffffffffffffffff
+ins19 T30/F253 StkObjID[0] = MyObj[11]
+ins20 T21/F34  Local[0] <= Tuning[134]
+ins21 T19/F253 MyPD[57] += Lit[1]
+ins22 T23/F253 MyPD[57] -= Lit[1]
+ins23 T24/F19  MyPD[57] < Lit[0]
+ins24 T19/F253 MyPD[57] = Lit[0]
+ins25 T26/F28  MyPD[57] == Lit[0]
+ins26 T28/F253 CALL 4118 (own-iff) opd=ffffffffffffffff
+ins27 T41/F6   CALL 4119 (own-iff) opd=ffffffffffffffff
+ins28 T40/F253 StkObjID[0] = Local[2]
+ins29 T46/F253 CALL 4122 (own-iff) opd=ffffffffffffffff
+ins30 T25/F253 PRIM setMotiveChange (29) opd=0707050114006400
+ins31 T5/F32   MyObj[34] == Lit[1]
+ins32 T17/F253 Local[2] = StkObjID[0]
+ins33 T60/F253 CALL 4123 (own-iff) opd=ffffffffffffffff
+ins34 T22/F19  Local[0] >= Tuning[133]
+ins35 T16/F253 CALL 4131 (own-iff) opd=ffffffffffffffff
+ins36 T35/F253 PRIM changeActionString (50) opd=2e01000004000000
+ins37 T39/F253 CALL 340 (global.iff) opd=0000000000000000
+ins38 T3/F253  CALL 4129 (own-iff) opd=ffffffffffffffff
+ins39 T38/F3   MyMotives[3] < Lit[0]
+ins40 T42/F253 CALL 4136 (own-iff) opd=ffffffffffffffff
+ins41 T17/F253 CALL 4138 (own-iff) opd=ffffffffffffffff
+ins42 T43/F253 Local[3] = Lit[10]
+ins43 T58/F253 CALL 280 (global.iff) opd=1e00000000000000
+ins44 T254/F45 CALL 281 (global.iff) opd=0000000000000000
+ins45 T43/F254 Local[3] --&> Lit[0]
+ins46 T31/F31  CALL 4140 (own-iff) opd=ffffffffffffffff
+ins47 T48/F253 CALL 280 (global.iff) opd=3200000000000000
+ins48 T47/F47  PRIM removeObjectInstance (18) opd=0000030000000000
+ins49 T50/F253 StkObjID[0] = Lit[0]
+ins50 T52/F47  setToNext Person guid=0x00000000 -> StkObjID[0] (flags=0x81)
+ins51 T54/F50  StkObjPD[31] == MyPD[31]
+ins52 T50/F53  StkObj[11] == MyObj[11]
+ins53 T50/F51  StkObjPD[32] == Tuning[16903]
+ins54 T55/F253 StkObjPD[56] = MyPD[56]
+ins55 T56/F253 StkObjPD[57] = MyPD[57]
+ins56 T57/F253 StkObjPD[24] = MyPD[24]
+ins57 T47/F253 StkObjPD[63] = MyPD[63]
+ins58 T49/F44  CALL 4142 (own-iff) opd=ffffffffffffffff
+ins59 T4/F253  MyPD[87] = Lit[1]
+ins60 T7/F253  MyPD[87] = Lit[0]

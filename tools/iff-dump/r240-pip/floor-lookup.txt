@@ -1,0 +1,141 @@
+                ; ==== .GenerateFloorLookup__13ZBufferLookupFP14cAnimDeviceSubi ====
+00202e10: dbe1fff8  stfd     f31, -8(r1)
+00202e14: 7c0802a6  mflr     r0
+00202e18: dbc1fff0  stfd     f30, -0x10(r1)
+00202e1c: dba1ffe8  stfd     f29, -0x18(r1)
+00202e20: bee1ffbc  stmw     r23, -0x44(r1)
+00202e24: 7cba2b78  mr       r26, r5
+00202e28: 237a0003  subfic   r27, r26, 3
+00202e2c: 3b030000  addi     r24, r3, 0
+00202e30: 5777103a  slwi     r23, r27, 2
+00202e34: 7f98ba14  add      r28, r24, r23
+00202e38: 83c2ac00  lwz      r30, -0x5400(r2)
+00202e3c: 83e2ac04  lwz      r31, -0x53fc(r2)
+00202e40: 3b240000  addi     r25, r4, 0
+00202e44: 90010008  stw      r0, 8(r1)
+00202e48: 9421ff50  stwu     r1, -0xb0(r1)
+00202e4c: 801c0010  lwz      r0, 0x10(r28)
+00202e50: 28000000  cmplwi   r0, 0
+00202e54: 40820178  bne      0x202fcc
+00202e58: 80990000  lwz      r4, 0(r25)
+00202e5c: 38610040  addi     r3, r1, 0x40
+00202e60: c8240070  lfd      f1, 0x70(r4)
+00202e64: c8040078  lfd      f0, 0x78(r4)
+00202e68: d8210040  stfd     f1, 0x40(r1)
+00202e6c: 80810040  lwz      r4, 0x40(r1)
+00202e70: 80010044  lwz      r0, 0x44(r1)
+00202e74: d8010048  stfd     f0, 0x48(r1)
+00202e78: 7c8400d0  neg      r4, r4
+00202e7c: 7ca000d0  neg      r5, r0
+00202e80: 4be34df1  bl       0x37c70
+00202e84: 80a10044  lwz      r5, 0x44(r1)
+00202e88: 38000008  li       r0, 8
+00202e8c: 8081004c  lwz      r4, 0x4c(r1)
+00202e90: 7c1dd030  slw      r29, r0, r26
+00202e94: 57a3402e  slwi     r3, r29, 8
+00202e98: 7c052050  subf     r0, r5, r4
+00202e9c: 389c0000  addi     r4, r28, 0
+00202ea0: 1c00000c  mulli    r0, r0, 0xc
+00202ea4: 38630001  addi     r3, r3, 1
+00202ea8: 3ae40010  addi     r23, r4, 0x10
+00202eac: 90180028  stw      r0, 0x28(r24)
+00202eb0: 907c001c  stw      r3, 0x1c(r28)
+00202eb4: 80180028  lwz      r0, 0x28(r24)
+00202eb8: 7c001a14  add      r0, r0, r3
+00202ebc: 5403103a  slwi     r3, r0, 2
+00202ec0: 4838e6b1  bl       0x591570
+00202ec4: 28030000  cmplwi   r3, 0
+00202ec8: 90770000  stw      r3, 0(r23)
+00202ecc: 40820010  bne      0x202edc
+00202ed0: 3c609b0b  lis      r3, -0x64f5
+00202ed4: 38630001  addi     r3, r3, 1
+00202ed8: 480000f8  b        0x202fd0
+00202edc: 577b103a  slwi     r27, r27, 2
+00202ee0: 809c0010  lwz      r4, 0x10(r28)
+00202ee4: 7ef8da14  add      r23, r24, r27
+00202ee8: c83e0008  lfd      f1, 8(r30)
+00202eec: 8077001c  lwz      r3, 0x1c(r23)
+00202ef0: 201a0003  subfic   r0, r26, 3
+00202ef4: 5400103a  slwi     r0, r0, 2
+00202ef8: 5463103a  slwi     r3, r3, 2
+00202efc: 7cb90214  add      r5, r25, r0
+00202f00: 7c041a14  add      r0, r4, r3
+00202f04: 901c0010  stw      r0, 0x10(r28)
+00202f08: c3e50010  lfs      f31, 0x10(r5)
+00202f0c: c0050174  lfs      f0, 0x174(r5)
+00202f10: efbf0028  fsubs    f29, f31, f0
+00202f14: 4839ec65  bl       0x5a1b78
+00202f18: 80410014  lwz      r2, 0x14(r1)
+00202f1c: ffc00818  frsp     f30, f1
+00202f20: c83e0020  lfd      f1, 0x20(r30)
+00202f24: 4839ec55  bl       0x5a1b78
+00202f28: 80410014  lwz      r2, 0x14(r1)
+00202f2c: 6fa08000  xoris    r0, r29, 0x8000
+00202f30: c01f0000  lfs      f0, 0(r31)
+00202f34: 3c804330  lis      r4, 0x4330
+00202f38: 90010054  stw      r0, 0x54(r1)
+00202f3c: 8017001c  lwz      r0, 0x1c(r23)
+00202f40: ec6007b2  fmuls    f3, f0, f30
+00202f44: 90810050  stw      r4, 0x50(r1)
+00202f48: fc800818  frsp     f4, f1
+00202f4c: c85e0018  lfd      f2, 0x18(r30)
+00202f50: c8210050  lfd      f1, 0x50(r1)
+00202f54: c01f0004  lfs      f0, 4(r31)
+00202f58: 7ce000d0  neg      r7, r0
+00202f5c: ec211028  fsubs    f1, f1, f2
+00202f60: 54e6103a  slwi     r6, r7, 2
+00202f64: ec000132  fmuls    f0, f0, f4
+00202f68: ec9fe828  fsubs    f4, f31, f29
+00202f6c: 38bb0010  addi     r5, r27, 0x10
+00202f70: ec230824  fdivs    f1, f3, f1
+00202f74: ec610032  fmuls    f3, f1, f0
+00202f78: 48000048  b        0x202fc0
+00202f7c: 6ce08000  xoris    r0, r7, 0x8000
+00202f80: 90810050  stw      r4, 0x50(r1)
+00202f84: c83e0018  lfd      f1, 0x18(r30)
+00202f88: 38e70001  addi     r7, r7, 1
+00202f8c: 90010054  stw      r0, 0x54(r1)
+00202f90: c05f0008  lfs      f2, 8(r31)
+00202f94: c8010050  lfd      f0, 0x50(r1)
+00202f98: 7c78282e  lwzx     r3, r24, r5
+00202f9c: ec000828  fsubs    f0, f0, f1
+00202fa0: ec0020fc  fnmsubs  f0, f0, f3, f4
+00202fa4: ec020032  fmuls    f0, f2, f0
+00202fa8: ec00f824  fdivs    f0, f0, f31
+00202fac: fc00001e  fctiwz   f0, f0
+00202fb0: d8010058  stfd     f0, 0x58(r1)
+00202fb4: 8001005c  lwz      r0, 0x5c(r1)
+00202fb8: 7c03312e  stwx     r0, r3, r6
+00202fbc: 38c60004  addi     r6, r6, 4
+00202fc0: 80180028  lwz      r0, 0x28(r24)
+00202fc4: 7c070000  cmpw     r7, r0
+00202fc8: 4180ffb4  blt      0x202f7c
+00202fcc: 38600000  li       r3, 0
+00202fd0: 800100b8  lwz      r0, 0xb8(r1)
+00202fd4: 382100b0  addi     r1, r1, 0xb0
+00202fd8: cbe1fff8  lfd      f31, -8(r1)
+00202fdc: cbc1fff0  lfd      f30, -0x10(r1)
+00202fe0: 7c0803a6  mtlr     r0
+00202fe4: cba1ffe8  lfd      f29, -0x18(r1)
+00202fe8: bae1ffbc  lmw      r23, -0x44(r1)
+00202fec: 4e800020  blr
+00202ff0: 00000000  .long    0x00000000
+00202ff4: 00092041  .long    0x00092041
+00202ff8: 83090000  lwz      r24, 0(r9)
+00202ffc: 000001e0  .long    0x000001e0
+00203000: 00382e47  .long    0x00382e47
+00203004: 656e6572  oris     r14, r11, 0x6572
+00203008: 61746546  ori      r20, r11, 0x6546
+0020300c: 6c6f6f72  xoris    r15, r3, 0x6f72
+00203010: 4c6f6f6b  .long    0x4c6f6f6b
+00203014: 75705f5f  andis.   r16, r11, 0x5f5f
+00203018: 31335a42  addic    r9, r19, 0x5a42
+0020301c: 75666665  andis.   r6, r11, 0x6665
+00203020: 724c6f6f  andi.    r12, r18, 0x6f6f
+00203024: 6b757046  xori     r21, r27, 0x7046
+00203028: 50313463  rlwimi.  r17, r1, 6, 0x11, 0x11
+0020302c: 416e696d  bdztl    4*cr3+eq, 0x209998
+00203030: 44657669  .long    0x44657669
+00203034: 63655375  ori      r5, r27, 0x5375
+00203038: 62690000  ori      r9, r19, 0
+0020303c: 00000000  .long    0x00000000

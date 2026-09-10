@@ -1,0 +1,197 @@
+                ; ==== .UpdateViewFromCPState__13cWinRoofPanelFP7CPState ====
+0029c420: dbe1fff8  stfd     f31, -8(r1)
+0029c424: 7c0802a6  mflr     r0
+0029c428: 93e1ffec  stw      r31, -0x14(r1)
+0029c42c: 83e291e8  lwz      r31, -0x6e18(r2)
+0029c430: 93c1ffe8  stw      r30, -0x18(r1)
+0029c434: 93a1ffe4  stw      r29, -0x1c(r1)
+0029c438: 7c7d1b78  mr       r29, r3
+0029c43c: 90010008  stw      r0, 8(r1)
+0029c440: 9421ffa0  stwu     r1, -0x60(r1)
+0029c444: 4804067d  bl       0x2dcac0   ; .GetPitch__10cRoofLayerFv
+0029c448: ffe00890  fmr      f31, f1
+0029c44c: c002f974  lfs      f0, -0x68c(r2)
+0029c450: ec3f0028  fsubs    f1, f31, f0
+0029c454: 4beae77d  bl       0x14abd0   ; .fabs__3stdFf
+0029c458: c01f0000  lfs      f0, 0(r31)
+0029c45c: fc010040  .long    0xfc010040
+0029c460: 4c401382  cror     cr0eq, cr0lt, cr0eq
+0029c464: 40820038  bne      0x29c49c
+0029c468: 807d00cc  lwz      r3, 0xcc(r29)
+0029c46c: 38800001  li       r4, 1
+0029c470: 4826eee1  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c474: 807d00d0  lwz      r3, 0xd0(r29)
+0029c478: 38800000  li       r4, 0
+0029c47c: 4826eed5  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c480: 807d00d4  lwz      r3, 0xd4(r29)
+0029c484: 38800000  li       r4, 0
+0029c488: 4826eec9  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c48c: 807d00e0  lwz      r3, 0xe0(r29)
+0029c490: 38800000  li       r4, 0
+0029c494: 4826eebd  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c498: 480000c8  b        0x29c560
+0029c49c: c002f978  lfs      f0, -0x688(r2)
+0029c4a0: ec3f0028  fsubs    f1, f31, f0
+0029c4a4: 4beae72d  bl       0x14abd0   ; .fabs__3stdFf
+0029c4a8: c01f0000  lfs      f0, 0(r31)
+0029c4ac: fc010040  .long    0xfc010040
+0029c4b0: 4c401382  cror     cr0eq, cr0lt, cr0eq
+0029c4b4: 40820038  bne      0x29c4ec
+0029c4b8: 807d00cc  lwz      r3, 0xcc(r29)
+0029c4bc: 38800000  li       r4, 0
+0029c4c0: 4826ee91  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c4c4: 807d00d0  lwz      r3, 0xd0(r29)
+0029c4c8: 38800001  li       r4, 1
+0029c4cc: 4826ee85  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c4d0: 807d00d4  lwz      r3, 0xd4(r29)
+0029c4d4: 38800000  li       r4, 0
+0029c4d8: 4826ee79  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c4dc: 807d00e0  lwz      r3, 0xe0(r29)
+0029c4e0: 38800000  li       r4, 0
+0029c4e4: 4826ee6d  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c4e8: 48000078  b        0x29c560
+0029c4ec: 8062b0dc  lwz      r3, -0x4f24(r2)
+0029c4f0: c0030000  lfs      f0, 0(r3)
+0029c4f4: fc1f0040  .long    0xfc1f0040
+0029c4f8: 40800038  bge      0x29c530
+0029c4fc: 807d00cc  lwz      r3, 0xcc(r29)
+0029c500: 38800000  li       r4, 0
+0029c504: 4826ee4d  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c508: 807d00d0  lwz      r3, 0xd0(r29)
+0029c50c: 38800000  li       r4, 0
+0029c510: 4826ee41  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c514: 807d00d4  lwz      r3, 0xd4(r29)
+0029c518: 38800000  li       r4, 0
+0029c51c: 4826ee35  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c520: 807d00e0  lwz      r3, 0xe0(r29)
+0029c524: 38800001  li       r4, 1
+0029c528: 4826ee29  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c52c: 48000034  b        0x29c560
+0029c530: 807d00cc  lwz      r3, 0xcc(r29)
+0029c534: 38800000  li       r4, 0
+0029c538: 4826ee19  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c53c: 807d00d0  lwz      r3, 0xd0(r29)
+0029c540: 38800000  li       r4, 0
+0029c544: 4826ee0d  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c548: 807d00d4  lwz      r3, 0xd4(r29)
+0029c54c: 38800001  li       r4, 1
+0029c550: 4826ee01  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c554: 807d00e0  lwz      r3, 0xe0(r29)
+0029c558: 38800000  li       r4, 0
+0029c55c: 4826edf5  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c560: 480403f1  bl       0x2dc950   ; .GetRoofPattern__10cRoofLayerFv
+0029c564: 3bc30000  addi     r30, r3, 0
+0029c568: 3be00000  li       r31, 0
+0029c56c: 48000060  b        0x29c5cc
+0029c570: 389f0000  addi     r4, r31, 0
+0029c574: 387d00f0  addi     r3, r29, 0xf0
+0029c578: 48000149  bl       0x29c6c0
+0029c57c: 4bd98b05  bl       0x35080
+0029c580: 38830000  addi     r4, r3, 0
+0029c584: 387e0000  addi     r3, r30, 0
+0029c588: 483008b9  bl       0x59ce40
+0029c58c: 2c030000  cmpwi    r3, 0
+0029c590: 40820020  bne      0x29c5b0
+0029c594: 389f0000  addi     r4, r31, 0
+0029c598: 387d00e4  addi     r3, r29, 0xe4
+0029c59c: 4bff8725  bl       0x294cc0
+0029c5a0: 80630000  lwz      r3, 0(r3)
+0029c5a4: 38800001  li       r4, 1
+0029c5a8: 4826eda9  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c5ac: 4800001c  b        0x29c5c8
+0029c5b0: 389f0000  addi     r4, r31, 0
+0029c5b4: 387d00e4  addi     r3, r29, 0xe4
+0029c5b8: 4bff8709  bl       0x294cc0
+0029c5bc: 80630000  lwz      r3, 0(r3)
+0029c5c0: 38800000  li       r4, 0
+0029c5c4: 4826ed8d  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+0029c5c8: 3bff0001  addi     r31, r31, 1
+0029c5cc: 801d00f4  lwz      r0, 0xf4(r29)
+0029c5d0: 7c1f0040  cmplw    r31, r0
+0029c5d4: 4180ff9c  blt      0x29c570
+0029c5d8: 801d0108  lwz      r0, 0x108(r29)
+0029c5dc: 2c000000  cmpwi    r0, 0
+0029c5e0: 4082001c  bne      0x29c5fc
+0029c5e4: 807d00d8  lwz      r3, 0xd8(r29)
+0029c5e8: 81830000  lwz      r12, 0(r3)
+0029c5ec: 818c00a0  lwz      r12, 0xa0(r12)
+0029c5f0: 483063f1  bl       0x5a29e0
+0029c5f4: 80410014  lwz      r2, 0x14(r1)
+0029c5f8: 48000018  b        0x29c610
+0029c5fc: 807d00d8  lwz      r3, 0xd8(r29)
+0029c600: 81830000  lwz      r12, 0(r3)
+0029c604: 818c009c  lwz      r12, 0x9c(r12)
+0029c608: 483063d9  bl       0x5a29e0
+0029c60c: 80410014  lwz      r2, 0x14(r1)
+0029c610: 387d00e4  addi     r3, r29, 0xe4
+0029c614: 4bff871d  bl       0x294d30
+0029c618: 809d0108  lwz      r4, 0x108(r29)
+0029c61c: 801d010c  lwz      r0, 0x10c(r29)
+0029c620: 38840001  addi     r4, r4, 1
+0029c624: 7c0401d6  mullw    r0, r4, r0
+0029c628: 7c001840  cmplw    r0, r3
+0029c62c: 4080001c  bge      0x29c648
+0029c630: 807d00dc  lwz      r3, 0xdc(r29)
+0029c634: 81830000  lwz      r12, 0(r3)
+0029c638: 818c009c  lwz      r12, 0x9c(r12)
+0029c63c: 483063a5  bl       0x5a29e0
+0029c640: 80410014  lwz      r2, 0x14(r1)
+0029c644: 48000018  b        0x29c65c
+0029c648: 807d00dc  lwz      r3, 0xdc(r29)
+0029c64c: 81830000  lwz      r12, 0(r3)
+0029c650: 818c00a0  lwz      r12, 0xa0(r12)
+0029c654: 4830638d  bl       0x5a29e0
+0029c658: 80410014  lwz      r2, 0x14(r1)
+0029c65c: 80010068  lwz      r0, 0x68(r1)
+0029c660: 38210060  addi     r1, r1, 0x60
+0029c664: cbe1fff8  lfd      f31, -8(r1)
+0029c668: 83e1ffec  lwz      r31, -0x14(r1)
+0029c66c: 7c0803a6  mtlr     r0
+0029c670: 83c1ffe8  lwz      r30, -0x18(r1)
+0029c674: 83a1ffe4  lwz      r29, -0x1c(r1)
+0029c678: 4e800020  blr      
+0029c67c: 00000000  .long    0x00000000
+0029c680: 00092041  .long    0x00092041
+0029c684: 81030000  lwz      r8, 0(r3)
+0029c688: 0000025c  .long    0x0000025c
+0029c68c: 00312e55  .long    0x00312e55
+0029c690: 70646174  andi.    r4, r3, 0x6174
+0029c694: 65566965  oris     r22, r10, 0x6965
+0029c698: 7746726f  andis.   r6, r26, 0x726f
+0029c69c: 6d435053  xoris    r3, r10, 0x5053
+0029c6a0: 74617465  andis.   r1, r3, 0x7465
+0029c6a4: 5f5f3133  rlwnm.   r31, r26, r6, 4, 0x19
+0029c6a8: 6357696e  ori      r23, r26, 0x696e
+0029c6ac: 526f6f66  rlwimi   r15, r19, 0xd, 0x1d, 0x13
+0029c6b0: 50616e65  rlwimi.  r1, r3, 0xd, 0x19, 0x12
+0029c6b4: 6c465037  xoris    r6, r2, 0x5037
+0029c6b8: 43505374  bdz-     0x2a1a2c
+0029c6bc: 61746500  ori      r20, r11, 0x6500
+0029c6c0: 80630008  lwz      r3, 8(r3)
+0029c6c4: 5480103a  slwi     r0, r4, 2
+0029c6c8: 7c630214  add      r3, r3, r0
+0029c6cc: 4e800020  blr      
+0029c6d0: 00000000  .long    0x00000000
+0029c6d4: 00092040  .long    0x00092040
+0029c6d8: 00000000  .long    0x00000000
+0029c6dc: 00000010  .long    0x00000010
+0029c6e0: 004a2e5f  .long    0x004a2e5f
+0029c6e4: 5f76635f  rlwnm.   r22, r27, r12, 0xd, 0xf
+0029c6e8: 5f513233  rlwnm.   r17, r26, r6, 8, 0x19
+0029c6ec: 73746435  andi.    r20, r27, 0x6435
+0029c6f0: 365f5f76  addic.   r18, r31, 0x5f76
+0029c6f4: 6563746f  oris     r3, r11, 0x746f
+0029c6f8: 725f696d  andi.    r31, r18, 0x696d
+0029c6fc: 703c3963  andi.    r28, r1, 0x3963
+0029c700: 54535374  rlwinm   r19, r2, 0xa, 0xd, 0x1a
+0029c704: 72696e67  andi.    r9, r19, 0x6e67
+0029c708: 2c513233  .long    0x2c513233
+0029c70c: 73746432  andi.    r20, r27, 0x6432
+0029c710: 31616c6c  addic    r11, r1, 0x6c6c
+0029c714: 6f636174  xoris    r3, r27, 0x6174
+0029c718: 6f723c39  xoris    r18, r27, 0x3c39
+0029c71c: 63545353  ori      r20, r26, 0x5353
+0029c720: 7472696e  andis.   r18, r3, 0x696e
+0029c724: 673e2c30  oris     r30, r25, 0x2c30
+0029c728: 3e46556c  addis    r18, r6, 0x556c
+0029c72c: 00000000  .long    0x00000000

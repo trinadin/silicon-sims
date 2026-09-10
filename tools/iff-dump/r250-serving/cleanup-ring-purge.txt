@@ -1,0 +1,37 @@
+00108d00: 38030001  addi     r0, r3, 1
+00108d04: 901e0a00  stw      r0, 0xa00(r30)
+00108d08: 83410208  lwz      r26, 0x208(r1)
+00108d0c: 281a0000  cmplwi   r26, 0
+00108d10: 4182003c  beq      0x108d4c
+00108d14: ab3e00f0  lha      r25, 0xf0(r30)
+00108d18: 807a011c  lwz      r3, 0x11c(r26)
+00108d1c: 4bffa405  bl       0x103120   ; .GetFnTable__11ObjSelectorFv
+00108d20: 38800004  li       r4, 4
+00108d24: 4bff3f7d  bl       0xfcca0   ; .GetTreeID__10ObjFnTableF13ObjEntryPoint
+00108d28: 38c30000  addi     r6, r3, 0
+00108d2c: 7cc00735  extsh.   r0, r6
+00108d30: 4182001c  beq      0x108d4c
+00108d34: 809a011c  lwz      r4, 0x11c(r26)
+00108d38: 387a0000  addi     r3, r26, 0
+00108d3c: 38b90000  addi     r5, r25, 0
+00108d40: 8084000c  lwz      r4, 0xc(r4)
+00108d44: 38e00000  li       r7, 0
+00108d48: 4804b179  bl       0x153ec0
+00108d4c: 387b0000  addi     r3, r27, 0
+00108d50: 3880ffff  li       r4, -1
+00108d54: 4846884d  bl       0x5715a0   ; .__dt__9CTGStringFv
+00108d58: 807e0a00  lwz      r3, 0xa00(r30)
+00108d5c: 801e0a04  lwz      r0, 0xa04(r30)
+00108d60: 7c030051  subf.    r0, r3, r0
+00108d64: 4082fef8  bne      0x108c5c
+00108d68: 801e0114  lwz      r0, 0x114(r30)
+00108d6c: 54000566  rlwinm   r0, r0, 0, 0x15, 0x13
+00108d70: 901e0114  stw      r0, 0x114(r30)
+00108d74: 4800000c  b        0x108d80
+00108d78: 3b610228  addi     r27, r1, 0x228
+00108d7c: 4bffffdc  b        0x108d58
+00108d80: 80010458  lwz      r0, 0x458(r1)
+00108d84: 38210450  addi     r1, r1, 0x450
+00108d88: bb21ffe4  lmw      r25, -0x1c(r1)
+00108d8c: 7c0803a6  mtlr     r0
+00108d90: 4e800020  blr      

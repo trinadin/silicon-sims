@@ -1,0 +1,197 @@
+                ; ==== .Simulate__12cDDDSimsViewFv ====
+00216e90: bec1ffd8  stmw     r22, -0x28(r1)
+00216e94: 7c0802a6  mflr     r0
+00216e98: 83c2ac84  lwz      r30, -0x537c(r2)
+00216e9c: 7c7d1b78  mr       r29, r3
+00216ea0: 8342ac70  lwz      r26, -0x5390(r2)
+00216ea4: 82e290c0  lwz      r23, -0x6f40(r2)
+00216ea8: 389e00a1  addi     r4, r30, 0xa1
+00216eac: 83e29234  lwz      r31, -0x6dcc(r2)
+00216eb0: 38a00000  li       r5, 0
+00216eb4: 83628e04  lwz      r27, -0x71fc(r2)
+00216eb8: 83828874  lwz      r28, -0x778c(r2)
+00216ebc: 90010008  stw      r0, 8(r1)
+00216ec0: 9421fe40  stwu     r1, -0x1c0(r1)
+00216ec4: 38610070  addi     r3, r1, 0x70
+00216ec8: 481a3c29  bl       0x3baaf0   ; .__ct__Q214cTimePartition6SampleFPCcUl
+00216ecc: 801f0004  lwz      r0, 4(r31)
+00216ed0: 7fe3fb78  mr       r3, r31
+00216ed4: 809f0008  lwz      r4, 8(r31)
+00216ed8: 38c10070  addi     r6, r1, 0x70
+00216edc: 54002036  slwi     r0, r0, 4
+00216ee0: 7c840214  add      r4, r4, r0
+00216ee4: 38a00001  li       r5, 1
+00216ee8: 4bfc3ae9  bl       0x1da9d0
+00216eec: 807b0000  lwz      r3, 0(r27)
+00216ef0: 38810054  addi     r4, r1, 0x54
+00216ef4: 38a10058  addi     r5, r1, 0x58
+00216ef8: 48308779  bl       0x51f670   ; .GetCursorScreenPosition__12cTSWinMgrW95FRlRl
+00216efc: 807b0000  lwz      r3, 0(r27)
+00216f00: 80810054  lwz      r4, 0x54(r1)
+00216f04: 80a10058  lwz      r5, 0x58(r1)
+00216f08: 48307579  bl       0x51e480   ; .GetWindowFromPoint__12cTSWinMgrW95Fll
+00216f0c: 7c1d1840  cmplw    r29, r3
+00216f10: 4082024c  bne      0x21715c
+00216f14: 480004bd  bl       0x2173d0   ; .GetTool__7XViewerFv
+00216f18: 7c781b79  or.      r24, r3, r3
+00216f1c: 41820240  beq      0x21715c
+00216f20: 81830028  lwz      r12, 0x28(r3)
+00216f24: 818c0070  lwz      r12, 0x70(r12)
+00216f28: 4838bab9  bl       0x5a29e0
+00216f2c: 80410014  lwz      r2, 0x14(r1)
+00216f30: 5460063f  clrlwi.  r0, r3, 0x18
+00216f34: 40820228  bne      0x21715c
+00216f38: 7f03c378  mr       r3, r24
+00216f3c: 4bf7ae75  bl       0x191db0   ; .GetRunningTotal__5cToolFv
+00216f40: 809c0000  lwz      r4, 0(r28)
+00216f44: 7c791b78  mr       r25, r3
+00216f48: 82d70000  lwz      r22, 0(r23)
+00216f4c: 80640004  lwz      r3, 4(r4)
+00216f50: 82f70004  lwz      r23, 4(r23)
+00216f54: 81830004  lwz      r12, 4(r3)
+00216f58: 818c0040  lwz      r12, 0x40(r12)
+00216f5c: 4838ba85  bl       0x5a29e0
+00216f60: 80410014  lwz      r2, 0x14(r1)
+00216f64: 809c0000  lwz      r4, 0(r28)
+00216f68: 7ee52670  srawi    r5, r23, 4
+00216f6c: 9861004e  stb      r3, 0x4e(r1)
+00216f70: 7ec02670  srawi    r0, r22, 4
+00216f74: 80640004  lwz      r3, 4(r4)
+00216f78: 98a1004c  stb      r5, 0x4c(r1)
+00216f7c: 81830004  lwz      r12, 4(r3)
+00216f80: 9801004d  stb      r0, 0x4d(r1)
+00216f84: 818c0040  lwz      r12, 0x40(r12)
+00216f88: 4838ba59  bl       0x5a29e0
+00216f8c: 80410014  lwz      r2, 0x14(r1)
+00216f90: 8881004c  lbz      r4, 0x4c(r1)
+00216f94: 7c671b78  mr       r7, r3
+00216f98: 8801004d  lbz      r0, 0x4d(r1)
+00216f9c: 38610048  addi     r3, r1, 0x48
+00216fa0: 7c850774  extsb    r5, r4
+00216fa4: 809c0000  lwz      r4, 0(r28)
+00216fa8: 7c060774  extsb    r6, r0
+00216fac: 81028fb8  lwz      r8, -0x7048(r2)
+00216fb0: 39200000  li       r9, 0
+00216fb4: 90a10068  stw      r5, 0x68(r1)
+00216fb8: 80840004  lwz      r4, 4(r4)
+00216fbc: 90c1006c  stw      r6, 0x6c(r1)
+00216fc0: 81080008  lwz      r8, 8(r8)
+00216fc4: 4bfbc88d  bl       0x1d3850   ; .TileToPoint__11HouseViewerF6TilePtiiPUc
+00216fc8: 7f03c378  mr       r3, r24
+00216fcc: 80010048  lwz      r0, 0x48(r1)
+00216fd0: 81980028  lwz      r12, 0x28(r24)
+00216fd4: 90010040  stw      r0, 0x40(r1)
+00216fd8: 818c006c  lwz      r12, 0x6c(r12)
+00216fdc: 4838ba05  bl       0x5a29e0
+00216fe0: 80410014  lwz      r2, 0x14(r1)
+00216fe4: 5460063f  clrlwi.  r0, r3, 0x18
+00216fe8: 4182007c  beq      0x217064
+00216fec: 809d11b4  lwz      r4, 0x11b4(r29)
+00216ff0: 38610090  addi     r3, r1, 0x90
+00216ff4: 8084000c  lwz      r4, 0xc(r4)
+00216ff8: 4be20009  bl       0x37000
+00216ffc: 38610050  addi     r3, r1, 0x50
+00217000: 38810090  addi     r4, r1, 0x90
+00217004: 482ddc8d  bl       0x4f4c90   ; .__ct__9cTSStringFPCc
+00217008: 7fa3eb78  mr       r3, r29
+0021700c: 819d0000  lwz      r12, 0(r29)
+00217010: 38800400  li       r4, 0x400
+00217014: 38a00001  li       r5, 1
+00217018: 818c0098  lwz      r12, 0x98(r12)
+0021701c: 4838b9c5  bl       0x5a29e0
+00217020: 80410014  lwz      r2, 0x14(r1)
+00217024: a8a10042  lha      r5, 0x42(r1)
+00217028: 7fa3eb78  mr       r3, r29
+0021702c: a8010040  lha      r0, 0x40(r1)
+00217030: 38810050  addi     r4, r1, 0x50
+00217034: 90bd0170  stw      r5, 0x170(r29)
+00217038: 901d0174  stw      r0, 0x174(r29)
+0021703c: 482eda95  bl       0x504ad0
+00217040: 38000000  li       r0, 0
+00217044: 901d00a0  stw      r0, 0xa0(r29)
+00217048: 901d009c  stw      r0, 0x9c(r29)
+0021704c: 807b0000  lwz      r3, 0(r27)
+00217050: 48307d31  bl       0x51ed80   ; .TriggerToolTips__12cTSWinMgrW95Fv
+00217054: 38610050  addi     r3, r1, 0x50
+00217058: 3880ffff  li       r4, -1
+0021705c: 482dd925  bl       0x4f4980   ; .__dt__9cTSStringFv
+00217060: 480000fc  b        0x21715c
+00217064: 2c190000  cmpwi    r25, 0
+00217068: 4182009c  beq      0x217104
+0021706c: 38610044  addi     r3, r1, 0x44
+00217070: 482dde01  bl       0x4f4e70   ; .__ct__9cTSStringFv
+00217074: 80628ca4  lwz      r3, -0x735c(r2)
+00217078: 80630000  lwz      r3, 0(r3)
+0021707c: 81830000  lwz      r12, 0(r3)
+00217080: 818c000c  lwz      r12, 0xc(r12)
+00217084: 4838b95d  bl       0x5a29e0
+00217088: 80410014  lwz      r2, 0x14(r1)
+0021708c: 81830000  lwz      r12, 0(r3)
+00217090: 7f24fe70  srawi    r4, r25, 0x1f
+00217094: 38b90000  addi     r5, r25, 0
+00217098: 38c10044  addi     r6, r1, 0x44
+0021709c: 818c0084  lwz      r12, 0x84(r12)
+002170a0: 4838b941  bl       0x5a29e0
+002170a4: 80410014  lwz      r2, 0x14(r1)
+002170a8: 7fa3eb78  mr       r3, r29
+002170ac: 819d0000  lwz      r12, 0(r29)
+002170b0: 38800400  li       r4, 0x400
+002170b4: 38a00001  li       r5, 1
+002170b8: 818c0098  lwz      r12, 0x98(r12)
+002170bc: 4838b925  bl       0x5a29e0
+002170c0: 80410014  lwz      r2, 0x14(r1)
+002170c4: a8a10042  lha      r5, 0x42(r1)
+002170c8: 7fa3eb78  mr       r3, r29
+002170cc: a8010040  lha      r0, 0x40(r1)
+002170d0: 38810044  addi     r4, r1, 0x44
+002170d4: 90bd0170  stw      r5, 0x170(r29)
+002170d8: 901d0174  stw      r0, 0x174(r29)
+002170dc: 482ed9f5  bl       0x504ad0
+002170e0: 38000000  li       r0, 0
+002170e4: 901d00a0  stw      r0, 0xa0(r29)
+002170e8: 901d009c  stw      r0, 0x9c(r29)
+002170ec: 807b0000  lwz      r3, 0(r27)
+002170f0: 48307c91  bl       0x51ed80   ; .TriggerToolTips__12cTSWinMgrW95Fv
+002170f4: 38610044  addi     r3, r1, 0x44
+002170f8: 3880ffff  li       r4, -1
+002170fc: 482dd885  bl       0x4f4980   ; .__dt__9cTSStringFv
+00217100: 4800005c  b        0x21715c
+00217104: 807b0000  lwz      r3, 0(r27)
+00217108: 3881005c  addi     r4, r1, 0x5c
+0021710c: 38a10060  addi     r5, r1, 0x60
+00217110: 48308561  bl       0x51f670   ; .GetCursorScreenPosition__12cTSWinMgrW95FRlRl
+00217114: 807b0000  lwz      r3, 0(r27)
+00217118: 8081005c  lwz      r4, 0x5c(r1)
+0021711c: 80a10060  lwz      r5, 0x60(r1)
+00217120: 48307361  bl       0x51e480   ; .GetWindowFromPoint__12cTSWinMgrW95Fll
+00217124: 7c1d1840  cmplw    r29, r3
+00217128: 40820034  bne      0x21715c
+0021712c: 7fa3eb78  mr       r3, r29
+00217130: 819d0000  lwz      r12, 0(r29)
+00217134: 38800400  li       r4, 0x400
+00217138: 38a00000  li       r5, 0
+0021713c: 818c0098  lwz      r12, 0x98(r12)
+00217140: 4838b8a1  bl       0x5a29e0
+00217144: 80410014  lwz      r2, 0x14(r1)
+00217148: 807b0000  lwz      r3, 0(r27)
+0021714c: 48307c35  bl       0x51ed80   ; .TriggerToolTips__12cTSWinMgrW95Fv
+00217150: 3800d8f0  li       r0, -0x2710
+00217154: 901d0170  stw      r0, 0x170(r29)
+00217158: 901d0174  stw      r0, 0x174(r29)
+0021715c: 4bf3f3f5  bl       0x156550   ; .Tut_CheckForEvents__Fv
+00217160: 881d0110  lbz      r0, 0x110(r29)
+00217164: 28000000  cmplwi   r0, 0
+00217168: 4082002c  bne      0x217194
+0021716c: 881d0111  lbz      r0, 0x111(r29)
+00217170: 28000000  cmplwi   r0, 0
+00217174: 40820020  bne      0x217194
+00217178: 38000001  li       r0, 1
+0021717c: 981d0110  stb      r0, 0x110(r29)
+00217180: 807c0000  lwz      r3, 0(r28)
+00217184: 8063001c  lwz      r3, 0x1c(r3)
+00217188: 4bf21889  bl       0x138a10   ; .Simulate__10cSimulatorFv
+0021718c: 38000000  li       r0, 0
+00217190: 981d0110  stb      r0, 0x110(r29)
+00217194: 7fa3eb78  mr       r3, r29
+00217198: 819d0000  lwz      r12, 0(r29)
+0021719c: 818c0170  lwz      r12, 0x170(r12)

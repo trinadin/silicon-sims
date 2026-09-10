@@ -1,0 +1,3 @@
+46c6021c091151a22c14f84cd72e36080f315354a3fb3c465b043715930ad7fb  dist/The Sims-arm64.app/Contents/MacOS/Simitone.Client.dll
+65bd17cc107a17a6f1b8d26750d5fe95a463fd8bc235be197077923b7389530a  dist/The Sims-arm64.app/Contents/MacOS/FSO.SimAntics.dll
+5b68002de6bad89760ebcd6e14218a8905c05a6cabf67dc6de370bc9c21c431d  dist/The Sims-arm64.app/Contents/MacOS/FSO.Files.dll

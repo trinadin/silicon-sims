@@ -1,0 +1,48 @@
+000b85c0: 93e1fffc  stw      r31, -4(r1)
+000b85c4: 7c0802a6  mflr     r0
+000b85c8: 83e28d60  lwz      r31, -0x72a0(r2)
+000b85cc: 90010008  stw      r0, 8(r1)
+000b85d0: 7cc03378  mr       r0, r6
+000b85d4: 38c40000  addi     r6, r4, 0
+000b85d8: 9421ffa0  stwu     r1, -0x60(r1)
+000b85dc: 90610048  stw      r3, 0x48(r1)
+000b85e0: 38610040  addi     r3, r1, 0x40
+000b85e4: 38810044  addi     r4, r1, 0x44
+000b85e8: 90a1004c  stw      r5, 0x4c(r1)
+000b85ec: 38a70000  addi     r5, r7, 0
+000b85f0: 7c070378  mr       r7, r0
+000b85f4: 93e10044  stw      r31, 0x44(r1)
+000b85f8: 48065889  bl       0x11de80   ; .Compact__12ReconBuilderFP11ReconObjectlP8iResFiles
+000b85fc: 93e10044  stw      r31, 0x44(r1)
+000b8600: 3be30000  addi     r31, r3, 0
+000b8604: 38610044  addi     r3, r1, 0x44
+000b8608: 38800000  li       r4, 0
+000b860c: 48065515  bl       0x11db20   ; .__dt__11ReconObjectFv
+000b8610: 7fe3fb78  mr       r3, r31
+000b8614: 80010068  lwz      r0, 0x68(r1)
+000b8618: 38210060  addi     r1, r1, 0x60
+000b861c: 7c0803a6  mtlr     r0
+000b8620: 83e1fffc  lwz      r31, -4(r1)
+000b8624: 4e800020  blr      
+000b8628: 00000000  .long    0x00000000
+000b862c: 00092041  .long    0x00092041
+000b8630: 80010000  lwz      r0, 0(r1)
+000b8634: 00000068  .long    0x00000068
+000b8638: 00412e52  .long    0x00412e52
+000b863c: 65636f6e  oris     r3, r11, 0x6f6e
+000b8640: 53617665  rlwimi.  r1, r27, 0xe, 0x19, 0x12
+000b8644: 4f626a65  .long    0x4f626a65
+000b8648: 63743c31  ori      r20, r27, 0x3c31
+000b864c: 324e6569  addic    r18, r14, 0x6569
+000b8650: 6768626f  oris     r8, r27, 0x626f
+000b8654: 72686f6f  andi.    r8, r19, 0x6f6f
+000b8658: 643e5f5f  oris     r30, r1, 0x5f5f
+000b865c: 46503132  sc       9
+000b8660: 4e656967  .long    0x4e656967
+000b8664: 68626f72  xori     r2, r3, 0x6f72
+000b8668: 686f6f64  xori     r15, r3, 0x6f64
+000b866c: 50386952  rlwimi   r24, r1, 0xd, 5, 9
+000b8670: 65734669  oris     r19, r11, 0x4669
+000b8674: 6c656c73  xoris    r5, r3, 0x6c73
+000b8678: 6c5f7300  xoris    r31, r2, 0x7300
+000b867c: 00000000  .long    0x00000000

@@ -1,0 +1,36 @@
+R121 original options art canon - byte-verbatim members of UIGraphics.far
+source: game-data/The Sims/UIGraphics/UIGraphics.far (sha b229da197eb9678370844c4da7c88640c3d1ce9a5e528654bfd71df6ef12a9ad - r117 pin)
+
+popupoptantialias.bmp      len=4726    BMP=133x103   sha256=5f348b3cf1caf2381cc81ef2285f657c1f85ec6367e85052e5b0ec007a7c553a
+popupoptautocenter.bmp     len=7786    BMP=133x103   sha256=433a3ec8936b198e9a23c8ac5f5aee284fb6201744aa4da80e03e13ef299195f
+popupoptautosnap.bmp       len=6498    BMP=133x103   sha256=12f96f9febadc9734245c6b1750d786e2fcd4752536645f9cede943ad6d19a19
+popupoptchardetail.bmp     len=6724    BMP=133x103   sha256=5c8a1993edf964a77be5310cbf96150d232fa554639af1f2cfafd26485222eb9
+popupoptedgescroll.bmp     len=9724    BMP=131x102   sha256=3f1e2b9d7d73509009482de538c89f977d74cf5af3ac7b7b65b10260011170b1
+popupoptfreewill.bmp       len=6254    BMP=133x103   sha256=32012c88abc3832fcc231714a320fbca943d1e659d12244c86601a12409754d0
+popupoptlighting.bmp       len=6720    BMP=133x103   sha256=0ae774f792dfc38a3bfea48e8f1e5696ebc7daa0324f03b84c75587782a5a118
+popupoptlivepip.bmp        len=6780    BMP=133x103   sha256=ee2c12b10b73ed8b54896fead3cb1a00bd3d5a413ed9b4f2cd7dde921ff574eb
+popupoptmusic.bmp          len=6500    BMP=133x103   sha256=3c67160002f64a02679d2b2114e96cb486e1584b35e9fc63fbcd495044f44c1b
+popupoptquicktips.bmp      len=5926    BMP=133x103   sha256=bea95e44af4d4832af7d0f8c38d4ba88eee23b63a9b9f3d3124b6ce3d9c8f697
+popupoptsfx.bmp            len=6910    BMP=133x103   sha256=6cb52c1e72838cdbcc99806790e5117e8be1f0c2f1ef36ed1154d3a7217fd41e
+popupoptshadows.bmp        len=5430    BMP=133x103   sha256=cc2e00d6fc9b16386da9575cd83f2882c9e23d805d6ebb95da67a445440a5520
+popupoptsiminback.bmp      len=6118    BMP=133x103   sha256=ffc3b8a8c01f7bac1c61d59d6d368a856aadb9c104e4c45811006776d22f7352
+popupoptterraindetail.bmp  len=8216    BMP=133x103   sha256=2a9e43f3ac5e40b8cf802c1e67cc429d2dd41098e49d369208bd253a326810c5
+popupopttransui.bmp        len=4876    BMP=133x103   sha256=de46eb677ed4a3903db4d3b21e9c2c7745dd25a9028a65af8cc18797499b0182
+popupoptvox.bmp            len=6288    BMP=133x103   sha256=c3b5c0a5254388dbb65eb22aba8b140d481ad6ad2aeb39506afe7500933eccec
+optionspatch.bmp           len=2328    BMP=37x100   sha256=84caef9fd6fef0601b9fb818dd5fbca64d885a791244b08c2f91ec188abb90f9
+optionstoothpkhoriz.bmp    len=1486    BMP=201x2     sha256=7248e0407549f0be65d066b988a2602a83a931ad1f5683cfc3cf91160d17f24a
+optionstoothpkvert.bmp     len=1434    BMP=2x89    sha256=d225aa4024484beb4e336a07e645a5990fe8a48030e89f641a92058ace2c0097
+optcheckbox.bmp            len=2720    BMP=120x21    sha256=75c2a96a04cc2c148c21a3afff0e215c85ff77f86b13936a3f07978db48a511b
+optexit.bmp                len=3162    BMP=200x40    sha256=28938dc05c8c83232e74a3c9d2e6299cab6087a6356e393dd0155cc15890ee47
+optgraphics.bmp            len=3760    BMP=152x40    sha256=ba017c9abe35db4c4da4b40fc113fdfe7b440648fa21af48c7dccce7d72d6055
+optnbhd.bmp                len=5650    BMP=196x37    sha256=3b1a95c8d818d5f72cead336c3ac470586431fcc1aecb4f3c9272d238b3614e5
+optplay.bmp                len=5606    BMP=220x40    sha256=9a2dd1401974adc67f516c8bb720ae6798b1f996284c4424e553cef51b55af25
+optradio.bmp               len=2752    BMP=120x20    sha256=f2a57a687da6cd4b0e02d9cec15111353e117cdb9a0daa7a466fe2b74684df8d
+optsave.bmp                len=4810    BMP=156x39    sha256=5b1d4b1b9993d5ace23759fd9efc6fe56c75fc758e8316f2f01ae158a1376296
+optslideroff.bmp           len=1382    BMP=44x14    sha256=9d4cd5cacec0653388d11d17d71ad595c055da6083848f751d37d855a2bf398d
+optslideron.bmp            len=1382    BMP=44x14    sha256=11bcbfc1754d06d2da9d6810f86c87af3cd1ca76860c0561a2bf9a8d2d39ed1d
+optsound.bmp               len=6182    BMP=188x40    sha256=bfcdf901d1371c919fbc9a6b3e470ad9d90638ebbe3d8b5c244836b7eb15e49e
+opttutreset.bmp            len=3156    BMP=88x30    sha256=e36529152baa3a1504994b74dd2bb8f742426dd86f701ae1eca204137b44da69
+cpanel\Buttons\options.bmp      len=2632   BMP=92x23    sha256=5ed64448e505e71d5f6a703c300d07cd30d1df09ffb37103a97faaeeea19a600
+cpanel\PopupResetTutorial.bmp    len=5100  BMP=133x103   sha256=c5b8d770408dac85e96aee65f65d37057dcf1609d7cf8ce2bf3f00d56ec28a6b
+cpanel\PopupExportHTML.bmp       len=5232  BMP=133x103   sha256=3c9ee095afe56e4f3cedeea97367d9322fae5403c55f386709954aa85c2e006b

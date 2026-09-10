@@ -1,0 +1,13 @@
+00251f9c: 480008a5  bl       0x252840   ; .__ct__12SimsAppCheatFiQ212SimsAppCheat4TypePCcPCcPCc
+00251fa0: 387d0000  addi     r3, r29, 0
+00251fa4: 38810508  addi     r4, r1, 0x508
+00251fa8: 480007e9  bl       0x252790
+00251fac: 38fe0155  addi     r7, r30, 0x155
+00251fb0: 3861051c  addi     r3, r1, 0x51c
+00251fb4: 39070000  addi     r8, r7, 0
+00251fb8: 38de0dea  addi     r6, r30, 0xdea
+00251fbc: 3880003d  li       r4, 0x3d
+00251fc0: 38a00002  li       r5, 2
+00251fc4: 4800087d  bl       0x252840   ; .__ct__12SimsAppCheatFiQ212SimsAppCheat4TypePCcPCcPCc
+00251fc8: 387d0000  addi     r3, r29, 0
+00251fcc: 3881051c  addi     r4, r1, 0x51c

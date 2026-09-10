@@ -1,0 +1,261 @@
+AUTOTEST enabled houses=5 checks=recordfmt
+08:34:56.804 autotest: AUTOTEST START houses=[5] checks=[recordfmt] timeout=1800000ms
+08:34:56.805 autotest: AUTOTEST hook-registered
+2026-09-08 08:34:57.120 TheSims[73536:41864402] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/com.thesims.macos.savedState
+08:34:57.194 exit-probe: before Run
+08:34:57.194 exit-probe: Game.Run(Sync) enter
+08:34:57.514 exit-probe: Initialize enter
+08:34:59.636 exit-probe: Initialize exit
+08:34:59.637 screen: EnterLoading
+08:34:59.679 loadscreen: DIRECT FAR mount original kSimsLogo boot screen 800x600 len=1440056 sha=8ecf9500 (from frame one; Simitone loader chrome deleted R118)
+08:34:59.680 content-init: begin
+08:34:59.834 loadscreen: IFF-mount original splashprogress strings (17) in variablesans_10 over the boot screen
+08:35:01.620 loading-screen: update frame=120 complete=False progress=InitObjects
+Unexpected TrailingZero: 617176985
+Unexpected TrailingZero: -666831736
+Unexpected TrailingZero: 1995593413
+08:35:03.096 content-init: done
+08:35:03.110 cursor-init: IFF resolve liveperson.cur -> Shared\cursors\LivePerson.cur 326 bytes
+08:35:03.112 cursor-init: IFF-first original cursors mounted livePersonLen=326
+08:35:03.121 loadscreen: IFF-mount original Community\Bus_loadscreen_1024x768.bmp
+08:35:03.125 loadscreen: IFF-mount texture 1024x768
+08:35:03.125 EnterGameMode lot= external=False
+08:35:03.141 uioriginal: IFF-mount original Downtown\LargeBack.bmp
+08:35:03.143 uinav: IFF-mount neighborhood surround 1024x768
+08:35:03.614 uioriginal: IFF-mount original Nbhd\HotspotPopupTiler.TGA
+08:35:03.622 uioriginal: IFF-mount original NghUI\banner_neighborhood.bmp
+08:35:03.623 uioriginal: IFF-mount original NghUI\Current.bmp
+08:35:03.626 uioriginal: IFF-mount original NghUI\MoveIn.bmp
+08:35:03.627 uioriginal: IFF-mount original NghUI\Bulldoze.bmp
+08:35:03.627 uioriginal: IFF-mount original NghUI\Exit.bmp
+08:35:03.627 uioriginal: IFF-mount original NghUI\InetBtn.bmp
+08:35:03.627 uioriginal: IFF-mount original Nbhd\CreditBtnEn.bmp
+08:35:03.628 uioriginal: IFF-mount original NghUI\Previous.bmp
+08:35:03.628 uioriginal: IFF-mount original NghUI\Next.bmp
+08:35:03.628 uioriginal: IFF-mount original NghUI\Import.bmp
+08:35:03.630 uioriginal: IFF-mount original NghUI\Downtown.bmp
+08:35:03.630 uioriginal: IFF-mount original NghUI\TheSimsLogo.bmp
+08:35:03.630 uioriginal: IFF-mount original NghUI\Vacation.bmp
+08:35:03.630 uioriginal: IFF-mount original NghUI\Rezone.bmp
+08:35:03.630 uioriginal: IFF-mount original NghUI\Studiotown.bmp
+08:35:03.630 uioriginal: IFF-mount original NghUI\MagicLand.bmp
+08:35:03.632 global-context: global.iff BHAVs=251
+08:35:03.632 module: PersonGlobals BHAVs=473
+08:35:03.633 module: SocialGlobals BHAVs=101
+08:35:03.633 module: CatGlobals BHAVs=179
+08:35:03.633 module: DogGlobals BHAVs=177
+08:35:03.633 module: PetSitGlobals BHAVs=22
+08:35:03.634 module: PhoneGlobals BHAVs=149
+08:35:03.634 module: VacationDirectorGlobals BHAVs=85
+08:35:04.123 autotest: AUTOTEST uicasflow neighborhood-screen ready; entering CAS flow
+08:35:04.139 autotest: AUTOTEST uicasflow neigh-switcher-mount: PASS
+08:35:04.142 uioriginal: IFF-mount original nbhd\CreateACharBack.BMP
+08:35:04.147 uioriginal: IFF-mount original nbhd\DesignCharAdultBtn.bmp
+08:35:04.148 uioriginal: IFF-mount original nbhd\DesignCharChildBtn.bmp
+08:35:04.148 uioriginal: IFF-mount original nbhd\DesignCharFemaleBtn.bmp
+08:35:04.148 uioriginal: IFF-mount original nbhd\DesignCharMaleBtn.bmp
+08:35:04.149 uioriginal: IFF-mount original nbhd\DesignCharDarkBtn.bmp
+08:35:04.149 uioriginal: IFF-mount original nbhd\DesignCharMediumBtn.bmp
+08:35:04.149 uioriginal: IFF-mount original nbhd\DesignCharLightBtn.bmp
+08:35:04.149 uioriginal: IFF-mount original nbhd\DesignCharSkinsLeftBtn.bmp
+08:35:04.149 uioriginal: IFF-mount original nbhd\DesignCharSkinsRightBtn.bmp
+08:35:04.150 uioriginal: IFF-mount original nbhd\NbhdTileBtn.BMP
+08:35:04.151 uioriginal: IFF-mount original nbhd\DesignCharPersLED.bmp
+08:35:04.152 uioriginal: IFF-mount original nbhd\CACPointRemainingBars.bmp
+08:35:04.152 uioriginal: IFF-mount original nbhd\DsgnFamBkg.bmp
+08:35:04.154 uioriginal: IFF-mount original nbhd\AddPersonBtn.bmp
+08:35:04.154 uioriginal: IFF-mount original nbhd\DeletePersonBtn.bmp
+08:35:04.155 uioriginal: IFF-mount original nbhd\EditPersonBtn.bmp
+08:35:04.156 uioriginal: IFF-mount original nbhd\PickBkg.bmp
+08:35:04.157 uioriginal: IFF-mount original nbhd\PAFAddFamily.bmp
+08:35:04.157 uioriginal: IFF-mount original nbhd\PAFDeleteFamily.bmp
+08:35:04.158 uioriginal: IFF-mount original nbhd\PAFMoveIn.bmp
+08:35:04.159 autotest: AUTOTEST uicasflow production MoveIn pressed (GameController.EnterCAS)
+08:35:04.344 uioriginal: IFF-mount original nbhd\FamilyPickItemBkg.bmp
+08:35:04.377 uioriginal: IFF-mount original nbhd\Smiley.bmp
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 0 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+08:35:05.420 autotest: AUTOTEST uicasflow cas-desktop-original: PASS
+08:35:05.420 autotest: AUTOTEST uicasflow cas-real-vm: PASS
+08:35:05.424 autotest: AUTOTEST uicasflow nbrs-writer-residual: Entries=284 NeighbourByID=268 (the delta is malformed pristine-file decodes the existing NBRS writer drops)
+08:35:05.425 autotest: AUTOTEST uicasflow baseline: famiIds=[0,1,2,3,4,5] maxFamilyNumber=9 census=3 nbEntries=268 chunks=23 charFiles=20 templateStrSlots=27 userdir=/var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/simitone-r246-88c2475121cc4d2786c047b165eab833
+08:35:05.586 autotest: AUTOTEST uicasflow capture 01-pickafamily-initial 1024x768 -> /var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/simitone-r246-88c2475121cc4d2786c047b165eab833/ui-audit/r246/casflow-01-pickafamily-initial.png
+08:35:05.953 autotest: AUTOTEST uicasflow family-name-real-field: PASS
+08:35:05.955 autotest: AUTOTEST uicasflow family-name-forbidden-dropped: PASS
+08:35:05.955 autotest: AUTOTEST uicasflow family-name-cap24 (len=24): PASS
+08:35:05.955 autotest: AUTOTEST uicasflow family-name-exact: PASS
+08:35:05.955 autotest: AUTOTEST uicasflow family-name=AuditFam0123456789012345
+08:35:06.119 autotest: AUTOTEST uicasflow capture 02-familyedit-typed 1024x768 -> /var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/simitone-r246-88c2475121cc4d2786c047b165eab833/ui-audit/r246/casflow-02-familyedit-typed.png
+08:35:06.165 autotest: AUTOTEST uicasflow post-addbtn mode=SimEdit casVisible=False famVisible=True interp=-0.34722573
+08:35:06.620 autotest: AUTOTEST uicasflow person-name-cap25 (len=25): PASS
+08:35:06.623 autotest: AUTOTEST uicasflow bio-typed: PASS
+08:35:06.720 autotest: AUTOTEST uicasflow desktop-preview-position-survives-update: PASS
+08:35:06.720 autotest: AUTOTEST uicasflow desktop-mobile-carousel-stays-hidden: PASS
+08:35:06.913 autotest: AUTOTEST uicasflow capture 03-characteredit-preview 1024x768 -> /var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/simitone-r246-88c2475121cc4d2786c047b165eab833/ui-audit/r246/casflow-03-characteredit-preview.png
+08:35:07.115 autotest: AUTOTEST uicasflow type-skin-restored: PASS
+08:35:07.116 autotest: AUTOTEST uicasflow screen-code-skin-restored: PASS
+08:35:07.308 autotest: AUTOTEST uicasflow capture 04-preview-suitmemory 1024x768 -> /var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/simitone-r246-88c2475121cc4d2786c047b165eab833/ui-audit/r246/casflow-04-preview-suitmemory.png
+08:35:07.310 autotest: AUTOTEST uicasflow vector-sum-24: PASS
+08:35:07.310 autotest: AUTOTEST uicasflow pool-one-left (pool=1): PASS
+08:35:07.310 autotest: AUTOTEST uicasflow zodiac-nearest-archetype (1 vs 1): PASS
+08:35:07.311 autotest: AUTOTEST uicasflow zodiac=Taurus vector=[Neat=8,Outgoing=2,Active=3,Playful=5,Nice=6]
+08:35:07.312 uioriginal: IFF-mount original shared\dlg\GenDlg.bmp
+08:35:07.312 uioriginal: IFF-mount original shared\sys\WinBtn.bmp
+08:35:07.317 autotest: AUTOTEST uicasflow unspent-real-alert-mounts: PASS
+08:35:07.317 autotest: AUTOTEST uicasflow unspent-real-alert-title: PASS
+08:35:07.447 autotest: AUTOTEST uicasflow capture 05-unspent-alert 1024x768 -> /var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/simitone-r246-88c2475121cc4d2786c047b165eab833/ui-audit/r246/casflow-05-unspent-alert.png
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=1 stack[obj=1,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=1 stack[obj=1,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=2 stack[obj=2,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=2 stack[obj=2,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=3 stack[obj=3,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=3 stack[obj=3,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=4 stack[obj=4,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=4 stack[obj=4,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=5 stack[obj=5,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=5 stack[obj=5,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=6 stack[obj=6,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=6 stack[obj=6,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=7 stack[obj=7,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=7 stack[obj=7,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=8 stack[obj=8,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=8 stack[obj=8,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=9 stack[obj=9,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=9 stack[obj=9,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=10 stack[obj=10,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=10 stack[obj=10,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=11 stack[obj=11,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=11 stack[obj=11,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=12 stack[obj=12,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=24 caller[obj=274,nid=24] targNID=12 stack[obj=12,nid=0,avatar=False] exists=False bucketMismatch=False
+08:35:08.137 autotest: AUTOTEST uicasflow wip-one-member-after-accept: PASS
+08:35:08.670 autotest: AUTOTEST uicasflow unspent-seam-pending: PASS
+08:35:08.670 autotest: AUTOTEST uicasflow unspent-seam-title: PASS
+08:35:08.670 autotest: AUTOTEST uicasflow unspent-seam-message: PASS
+08:35:09.837 autotest: AUTOTEST uicasflow wip-member-present: PASS
+08:35:09.837 autotest: AUTOTEST uicasflow wip-name (len=25): PASS
+08:35:09.837 autotest: AUTOTEST uicasflow wip-bio: PASS
+08:35:09.837 autotest: AUTOTEST uicasflow wip-gender-adult-male: PASS
+08:35:09.837 autotest: AUTOTEST uicasflow wip-skin: PASS
+08:35:09.837 autotest: AUTOTEST uicasflow wip-head-body-in-collections: PASS
+08:35:09.837 autotest: AUTOTEST uicasflow wip-textures: PASS
+08:35:09.838 autotest: AUTOTEST uicasflow wip-personality-ui-order: PASS
+08:35:09.838 autotest: AUTOTEST uicasflow buildmember-matches-wip: PASS
+08:35:09.853 autotest: AUTOTEST uicasflow save-confirm-title: PASS
+08:35:09.854 autotest: AUTOTEST uicasflow save-confirm-message: PASS
+08:35:09.854 autotest: AUTOTEST uicasflow invoking real SaveFamily (SimitoneNeighbourGenerator.CreateFamily)
+08:35:11.020 autotest: AUTOTEST uicasflow census-plus-one (4 vs 3): PASS
+08:35:11.021 autotest: AUTOTEST uicasflow new-family-card-in-census: PASS
+08:35:11.022 autotest: AUTOTEST uicasflow new-card-fams-name (AuditFam0123456789012345): PASS
+08:35:11.110 autotest: AUTOTEST uicasflow capture 06-pickafamily-newcard 1024x768 -> /var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/simitone-r246-88c2475121cc4d2786c047b165eab833/ui-audit/r246/casflow-06-pickafamily-newcard.png
+08:35:11.125 autotest: AUTOTEST uicasflow new-card-selected: PASS
+08:35:11.125 autotest: AUTOTEST uicasflow movein-seam-chunkid (6): PASS
+08:35:11.125 autotest: AUTOTEST uicasflow movein-boundary-no-lot-load: PASS
+08:35:11.127 autotest: AUTOTEST uicasflow neighborhood-written: PASS
+08:35:11.127 autotest: AUTOTEST uicasflow preexisting-chunks-survive: PASS
+08:35:11.127 autotest: AUTOTEST uicasflow rsmp-dropped-by-writer=[rsmp:0] (derived resource map; documented residual, not fixed this round)
+08:35:11.128 autotest: AUTOTEST uicasflow ngbh-parses: PASS
+08:35:11.128 autotest: AUTOTEST uicasflow tatt-parses: PASS
+08:35:11.128 autotest: AUTOTEST uicasflow default-family-survives: PASS
+08:35:11.128 autotest: AUTOTEST uicasflow new-chunks=[FAMI:6,FAMs:6] (expect the new FAMI/FAMs pair only)
+08:35:11.128 autotest: AUTOTEST uicasflow exactly-one-new-fami: PASS
+08:35:11.128 autotest: AUTOTEST uicasflow fami-id-matches-census: PASS
+08:35:11.128 autotest: AUTOTEST uicasflow fami-house-zero: PASS
+08:35:11.128 autotest: AUTOTEST uicasflow fami-number-max-plus-one (10 vs 9): PASS
+08:35:11.128 autotest: AUTOTEST uicasflow fami-budget-20000: PASS
+08:35:11.129 autotest: AUTOTEST uicasflow fami-unknown-24 (port-chosen constant, documented): PASS
+08:35:11.129 autotest: AUTOTEST uicasflow fami-guid-count-1: PASS
+08:35:11.129 autotest: AUTOTEST uicasflow fami-guid-unique: PASS
+08:35:11.129 autotest: AUTOTEST uicasflow fams-lang1-name: PASS
+08:35:11.129 autotest: AUTOTEST uicasflow nbrs-parses: PASS
+08:35:11.130 autotest: AUTOTEST uicasflow nbrs-preexisting-preserved: PASS
+08:35:11.130 autotest: AUTOTEST uicasflow nbrs-member-present: PASS
+08:35:11.131 autotest: AUTOTEST uicasflow nbrs-lowest-free-id (269): PASS
+08:35:11.131 autotest: AUTOTEST uicasflow nbrs-record-version-4 (4): PASS
+08:35:11.132 autotest: AUTOTEST uicasflow personmode-5-original (5): PASS
+08:35:11.132 autotest: AUTOTEST uicasflow nbrs-name-stem (user00024 vs user00024): PASS
+08:35:11.132 autotest: AUTOTEST uicasflow persondata-88 (len=88): PASS
+08:35:11.132 autotest: AUTOTEST uicasflow pd2-nice-x100 (600): PASS
+08:35:11.132 autotest: AUTOTEST uicasflow pd3-active-x100 (300): PASS
+08:35:11.132 autotest: AUTOTEST uicasflow pd4-generous-zero (0): PASS
+08:35:11.132 autotest: AUTOTEST uicasflow pd5-playful-x100 (500): PASS
+08:35:11.132 autotest: AUTOTEST uicasflow pd6-outgoing-x100 (200): PASS
+08:35:11.132 autotest: AUTOTEST uicasflow pd7-neat-x100 (800): PASS
+08:35:11.132 autotest: AUTOTEST uicasflow pd58-age-27-adult (27): PASS
+08:35:11.132 autotest: AUTOTEST uicasflow pd60-skin-original-encoding (lgt=1; 1): PASS
+08:35:11.132 autotest: AUTOTEST uicasflow pd61-family-chunkid (6): PASS
+08:35:11.133 autotest: AUTOTEST uicasflow pd65-gender-male (0): PASS
+08:35:11.133 autotest: AUTOTEST uicasflow pd56-job-type-minus1: PASS
+08:35:11.133 autotest: AUTOTEST uicasflow pd57-job-level-4: PASS
+08:35:11.133 autotest: AUTOTEST uicasflow pd36-autonomy-50: PASS
+08:35:11.133 autotest: AUTOTEST uicasflow pd33-priority-25: PASS
+08:35:11.133 autotest: AUTOTEST uicasflow pd29-cheats-1: PASS
+08:35:11.133 autotest: AUTOTEST uicasflow pd32-person-type-2: PASS
+08:35:11.133 autotest: AUTOTEST uicasflow pd70-zodiac-absent (canon: never persisted): PASS
+08:35:11.133 autotest: AUTOTEST uicasflow skills-random-in-range: PASS
+08:35:11.134 autotest: AUTOTEST uicasflow random-presence skills=[845,714,421,792,80,564,813] interests pd13=800 pd14=700 pd16=300 pd20=400 pd26=500 pd46=900 (random by design — presence/range only)
+08:35:11.134 autotest: AUTOTEST uicasflow one-new-character-file (1): PASS
+08:35:11.134 autotest: AUTOTEST uicasflow char-objd-128: PASS
+08:35:11.134 autotest: AUTOTEST uicasflow char-objd-guid-in-family: PASS
+08:35:11.135 autotest: AUTOTEST uicasflow char-objd-label (user00024 - AuditSimABCDEFGHIJKLMNOPQ): PASS
+08:35:11.135 autotest: AUTOTEST uicasflow char-ctss-name-bio: PASS
+08:35:11.135 autotest: AUTOTEST uicasflow char-str200-present: PASS
+08:35:11.135 autotest: AUTOTEST uicasflow str0-adult (adult): PASS
+08:35:11.135 autotest: AUTOTEST uicasflow str12-male (male): PASS
+08:35:11.135 autotest: AUTOTEST uicasflow str13-27 (27): PASS
+08:35:11.135 autotest: AUTOTEST uicasflow str14-skin (lgt): PASS
+08:35:11.135 autotest: AUTOTEST uicasflow str1-body-pair: PASS
+08:35:11.135 autotest: AUTOTEST uicasflow str2-head-pair: PASS
+08:35:11.136 autotest: AUTOTEST uicasflow str-diff-body-head-changed: PASS
+08:35:11.136 autotest: AUTOTEST uicasflow str200-changed-slots=[1,2,15,16,17,18,19,20,21,22] baselineSlots=27 writtenSlots=27
+08:35:11.136 autotest: AUTOTEST uicasflow str-divergent-slot-27 written='<absent>' template='<absent>' (prefix divergence — residual, documented)
+08:35:11.136 autotest: AUTOTEST uicasflow str-divergent-slot-28 written='<absent>' template='<absent>' (prefix divergence — residual, documented)
+08:35:11.136 autotest: AUTOTEST uicasflow str-divergent-slot-29 written='<absent>' template='<absent>' (prefix divergence — residual, documented)
+08:35:11.136 autotest: AUTOTEST uicasflow str-extra-slot-30='<absent>' (generator extra; original base-game TemplatePerson never carries it — residual, documented)
+08:35:11.136 autotest: AUTOTEST uicasflow str-extra-slot-31='<absent>' (generator extra; original base-game TemplatePerson never carries it — residual, documented)
+08:35:11.136 autotest: AUTOTEST uicasflow str-extra-slot-32='<absent>' (generator extra; original base-game TemplatePerson never carries it — residual, documented)
+08:35:11.136 autotest: AUTOTEST uicasflow str-extra-slot-33='<absent>' (generator extra; original base-game TemplatePerson never carries it — residual, documented)
+08:35:11.136 autotest: AUTOTEST uicasflow str-extra-slot-34='<absent>' (generator extra; original base-game TemplatePerson never carries it — residual, documented)
+08:35:11.137 autotest: AUTOTEST recordfmt nbrs-chunkver-3e (62): PASS
+08:35:11.138 autotest: AUTOTEST recordfmt nbrs-raw-member-found: PASS
+08:35:11.138 autotest: AUTOTEST recordfmt nbrs-raw-rec-version-4 (4): PASS
+08:35:11.138 autotest: AUTOTEST recordfmt nbrs-raw-pm-5 (5): PASS
+08:35:11.138 autotest: AUTOTEST recordfmt nbrs-raw-name-stem (user00024 vs user00024): PASS
+08:35:11.138 autotest: AUTOTEST recordfmt nbrs-raw-pd-bytes-a0 (160): PASS
+08:35:11.138 autotest: AUTOTEST recordfmt member-version-4: PASS
+08:35:11.138 autotest: AUTOTEST recordfmt member-pm-5: PASS
+08:35:11.138 autotest: AUTOTEST recordfmt member-name-stem: PASS
+08:35:11.138 autotest: AUTOTEST recordfmt pd2-7-personality (generous=0): PASS
+08:35:11.138 autotest: AUTOTEST recordfmt pd58-adult-27 (27): PASS
+08:35:11.139 autotest: AUTOTEST recordfmt pd65-male-0 (0): PASS
+08:35:11.139 autotest: AUTOTEST recordfmt pd60-skin-light-1 (1): PASS
+08:35:11.139 autotest: AUTOTEST recordfmt pd61-family-chunkid (6): PASS
+08:35:11.139 autotest: AUTOTEST recordfmt pd70-zodiac-0 (0): PASS
+08:35:11.139 autotest: AUTOTEST recordfmt skinmap-original-1-light: PASS
+08:35:11.139 autotest: AUTOTEST recordfmt skinmap-original-3-medium: PASS
+08:35:11.139 autotest: AUTOTEST recordfmt skinmap-original-2-dark: PASS
+08:35:11.139 autotest: AUTOTEST recordfmt skinmap-legacy-0-light: PASS
+08:35:11.139 autotest: AUTOTEST recordfmt skinmap-legacy-1-medium: PASS
+08:35:11.139 autotest: AUTOTEST recordfmt skinmap-legacy-2-dark: PASS
+08:35:11.139 autotest: AUTOTEST recordfmt fami-version-7 (7): PASS
+08:35:11.140 autotest: AUTOTEST recordfmt fami-no-trailing (len=44 expect 44): PASS
+08:35:11.141 autotest: AUTOTEST recordfmt roundtrip-member: PASS
+08:35:11.141 autotest: AUTOTEST recordfmt roundtrip-ver-pm-name: PASS
+08:35:11.141 autotest: AUTOTEST recordfmt roundtrip-pd-present: PASS
+08:35:11.141 autotest: AUTOTEST recordfmt roundtrip-fields-preserved: PASS
+08:35:11.141 autotest: AUTOTEST recordfmt roundtrip-pd60-still-disk-1 (1): PASS
+08:35:11.141 autotest: AUTOTEST uicasflow isolation userdir=/var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/simitone-r246-88c2475121cc4d2786c047b165eab833 (redirect from /Users/nathannoom/Documents/Simitone/)
+08:35:11.142 autotest: AUTOTEST uicasflow note: autotest.log writes to <UserDir>/autotest.log (temp redirect) + /tmp/autotest.log; simitone_debug.log writes to the process CWD (bundle; TS1CASScreen.SetFamilies production leftover) — both outside the redirect by design
+08:35:11.142 autotest: AUTOTEST uicasflow gamedata-neighborhood-byte-identical: PASS
+08:35:11.142 autotest: AUTOTEST uicasflow gamedata-neighborhood-mtime-untouched: PASS
+08:35:11.143 autotest: AUTOTEST uicasflow evidence Neighborhood.iff sha256=7021fc9f18fc368f9d36ba4c6ee5ec95aafed555dd77c002323cb7be5ad29f07
+08:35:11.144 autotest: AUTOTEST uicasflow evidence User00024.iff sha256=03e8eb81efc60dff815017fedc4c2f9f529164207c882f1b93189f45310522ea
+08:35:11.144 autotest: AUTOTEST uicasflow evidence copied to /var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/simitone-r246-88c2475121cc4d2786c047b165eab833/ui-audit/r246
+08:35:11.144 autotest: AUTOTEST recordfmt: PASS
+08:35:11.144 autotest: AUTOTEST recordfmt passed=28 failed=0
+RELPROBE SUMMARY calls=510 misses=510 objectbucket=0 avatarStack=0
+08:35:11.145 autotest: AUTOTEST SUMMARY passed=1 failed=0 skipped=0
+08:35:11.145 autotest: AUTOTEST RESULT PASS
+AUTOTEST RESULT PASS passed=1 failed=0
+08:35:11.145 exit-probe: OnExiting cancel=False screen=TS1CASScreen
+08:35:11.145 exit-probe: after Run
+08:35:11.205 exit-probe: after Dispose

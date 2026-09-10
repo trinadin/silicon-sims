@@ -1,0 +1,138 @@
+                ; ==== .SetStackVars__11InteractionFPs ====
+0009ca30: a8040000  lha      r0, 0(r4)
+0009ca34: b0030014  sth      r0, 0x14(r3)
+0009ca38: a8040002  lha      r0, 2(r4)
+0009ca3c: b0030016  sth      r0, 0x16(r3)
+0009ca40: a8040004  lha      r0, 4(r4)
+0009ca44: b0030018  sth      r0, 0x18(r3)
+0009ca48: a8040006  lha      r0, 6(r4)
+0009ca4c: b003001a  sth      r0, 0x1a(r3)
+0009ca50: 4e800020  blr      
+0009ca54: 00000000  .long    0x00000000
+0009ca58: 00092040  .long    0x00092040
+0009ca5c: 00000000  .long    0x00000000
+0009ca60: 00000024  .long    0x00000024
+0009ca64: 001f2e53  .long    0x001f2e53
+0009ca68: 65745374  oris     r20, r11, 0x5374
+0009ca6c: 61636b56  ori      r3, r11, 0x6b56
+0009ca70: 6172735f  ori      r18, r11, 0x735f
+0009ca74: 5f313149  rlwnm.   r17, r25, r6, 5, 4
+0009ca78: 6e746572  xoris    r20, r19, 0x6572
+0009ca7c: 61637469  ori      r3, r11, 0x7469
+0009ca80: 6f6e4650  xoris    r14, r27, 0x4650
+0009ca84: 73000000  andi.    r0, r24, 0
+0009ca88: 00000000  .long    0x00000000
+0009ca8c: 00000000  .long    0x00000000
+                ; ==== .__ct__11InteractionFP8cXPersonP8cXObjectii ====
+0009ca90: bf61ffec  stmw     r27, -0x14(r1)
+0009ca94: 7c0802a6  mflr     r0
+0009ca98: 3be30000  addi     r31, r3, 0
+0009ca9c: 3b640000  addi     r27, r4, 0
+0009caa0: 387f0028  addi     r3, r31, 0x28
+0009caa4: 3b850000  addi     r28, r5, 0
+0009caa8: 3ba60000  addi     r29, r6, 0
+0009caac: 3bc70000  addi     r30, r7, 0
+0009cab0: 90010008  stw      r0, 8(r1)
+0009cab4: 9421ffa0  stwu     r1, -0x60(r1)
+0009cab8: 484d4dd9  bl       0x571890   ; .__ct__9CTGStringFv
+0009cabc: 38600000  li       r3, 0
+0009cac0: 281c0000  cmplwi   r28, 0
+0009cac4: 907f0000  stw      r3, 0(r31)
+0009cac8: 546007f8  rlwinm   r0, r3, 0, 0x1f, 0x1c
+0009cacc: 93df001c  stw      r30, 0x1c(r31)
+0009cad0: 901f0038  stw      r0, 0x38(r31)
+0009cad4: 937f0004  stw      r27, 4(r31)
+0009cad8: 40820018  bne      0x9caf0
+0009cadc: 907f0008  stw      r3, 8(r31)
+0009cae0: 3800ffff  li       r0, -1
+0009cae4: 907f000c  stw      r3, 0xc(r31)
+0009cae8: 901f0010  stw      r0, 0x10(r31)
+0009caec: 48000010  b        0x9cafc
+0009caf0: 939f0008  stw      r28, 8(r31)
+0009caf4: 939f000c  stw      r28, 0xc(r31)
+0009caf8: 93bf0010  stw      r29, 0x10(r31)
+0009cafc: 3bc00000  li       r30, 0
+0009cb00: b3df0014  sth      r30, 0x14(r31)
+0009cb04: b3df0016  sth      r30, 0x16(r31)
+0009cb08: b3df0018  sth      r30, 0x18(r31)
+0009cb0c: b3df001a  sth      r30, 0x1a(r31)
+0009cb10: 93df0034  stw      r30, 0x34(r31)
+0009cb14: 807f0008  lwz      r3, 8(r31)
+0009cb18: 28030000  cmplwi   r3, 0
+0009cb1c: 41820060  beq      0x9cb7c
+0009cb20: 8063011c  lwz      r3, 0x11c(r3)
+0009cb24: 480664bd  bl       0x102fe0   ; .GetTreeTable__11ObjSelectorFv
+0009cb28: 28030000  cmplwi   r3, 0
+0009cb2c: 41820050  beq      0x9cb7c
+0009cb30: 8003000c  lwz      r0, 0xc(r3)
+0009cb34: 80df0010  lwz      r6, 0x10(r31)
+0009cb38: 28000000  cmplwi   r0, 0
+0009cb3c: 4182003c  beq      0x9cb78
+0009cb40: 80030000  lwz      r0, 0(r3)
+0009cb44: 38a00000  li       r5, 0
+0009cb48: 2c000000  cmpwi    r0, 0
+0009cb4c: 7c0903a6  mtctr    r0
+0009cb50: 40810028  ble      0x9cb78
+0009cb54: 60000000  nop      
+0009cb58: 8083000c  lwz      r4, 0xc(r3)
+0009cb5c: 7fc4282e  lwzx     r30, r4, r5
+0009cb60: 801e0018  lwz      r0, 0x18(r30)
+0009cb64: 7c060000  cmpw     r6, r0
+0009cb68: 40820008  bne      0x9cb70
+0009cb6c: 48000010  b        0x9cb7c
+0009cb70: 38a50004  addi     r5, r5, 4
+0009cb74: 4200ffe4  bdnz     0x9cb58
+0009cb78: 3bc00000  li       r30, 0
+0009cb7c: 281e0000  cmplwi   r30, 0
+0009cb80: 41820054  beq      0x9cbd4
+0009cb84: a81e0002  lha      r0, 2(r30)
+0009cb88: 7fc3f378  mr       r3, r30
+0009cb8c: b01f0020  sth      r0, 0x20(r31)
+0009cb90: 809f0004  lwz      r4, 4(r31)
+0009cb94: a88405cc  lha      r4, 0x5cc(r4)
+0009cb98: 7c0400d0  neg      r0, r4
+0009cb9c: 7c002378  or       r0, r0, r4
+0009cba0: 54040ffe  srwi     r4, r0, 0x1f
+0009cba4: 480b879d  bl       0x155340   ; .GetAttenuationValue__14TreeTableEntryFb
+0009cba8: d03f0024  stfs     f1, 0x24(r31)
+0009cbac: 807e0014  lwz      r3, 0x14(r30)
+0009cbb0: 801f0038  lwz      r0, 0x38(r31)
+0009cbb4: 5463c7ff  rlwinm.  r3, r3, 0x18, 0x1f, 0x1f
+0009cbb8: 5400003c  rlwinm   r0, r0, 0, 0, 0x1e
+0009cbbc: 901f0038  stw      r0, 0x38(r31)
+0009cbc0: 41820034  beq      0x9cbf4
+0009cbc4: 801f0038  lwz      r0, 0x38(r31)
+0009cbc8: 60000001  ori      r0, r0, 1
+0009cbcc: 901f0038  stw      r0, 0x38(r31)
+0009cbd0: 48000024  b        0x9cbf4
+0009cbd4: 8062a448  lwz      r3, -0x5bb8(r2)
+0009cbd8: 38000000  li       r0, 0
+0009cbdc: b01f0020  sth      r0, 0x20(r31)
+0009cbe0: c0030000  lfs      f0, 0(r3)
+0009cbe4: d01f0024  stfs     f0, 0x24(r31)
+0009cbe8: 801f0038  lwz      r0, 0x38(r31)
+0009cbec: 5400003c  rlwinm   r0, r0, 0, 0, 0x1e
+0009cbf0: 901f0038  stw      r0, 0x38(r31)
+0009cbf4: 7fe3fb78  mr       r3, r31
+0009cbf8: 80010068  lwz      r0, 0x68(r1)
+0009cbfc: 38210060  addi     r1, r1, 0x60
+0009cc00: 7c0803a6  mtlr     r0
+0009cc04: bb61ffec  lmw      r27, -0x14(r1)
+0009cc08: 4e800020  blr      
+0009cc0c: 00000000  .long    0x00000000
+0009cc10: 00092041  .long    0x00092041
+0009cc14: 80050000  lwz      r0, 0(r5)
+0009cc18: 0000017c  .long    0x0000017c
+0009cc1c: 002b2e5f  .long    0x002b2e5f
+0009cc20: 5f63745f  rlwnm.   r3, r27, r14, 0x11, 0xf
+0009cc24: 5f313149  rlwnm.   r17, r25, r6, 5, 4
+0009cc28: 6e746572  xoris    r20, r19, 0x6572
+0009cc2c: 61637469  ori      r3, r11, 0x7469
+0009cc30: 6f6e4650  xoris    r14, r27, 0x4650
+0009cc34: 38635850  addi     r3, r3, 0x5850
+0009cc38: 6572736f  oris     r18, r11, 0x736f
+0009cc3c: 6e503863  xoris    r16, r18, 0x3863
+0009cc40: 584f626a  .long    0x584f626a
+0009cc44: 65637469  oris     r3, r11, 0x7469
+0009cc48: 69000000  xori     r0, r8, 0
+0009cc4c: 00000000  .long    0x00000000

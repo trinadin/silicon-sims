@@ -36,8 +36,11 @@ namespace Simitone.Client.UI.Controls
             {
                 var scrHeight = GameFacade.Screens.CurrentUIScreen.ScreenHeight;
                 var size = (scrHeight - (128 + 15));
-                Stripe.Y = (-value) * size;
-                Stripe.BodySize = new Point(85, (int)(value*size));
+                if (Stripe != null)
+                {
+                    Stripe.Y = (-value) * size;
+                    Stripe.BodySize = new Point(85, (int)(value*size));
+                }
 
                 var i = 0;
                 foreach (var btn in CatSwitchButtons)
@@ -47,30 +50,58 @@ namespace Simitone.Client.UI.Controls
                     btn.Visible = value > 0;
                 }
 
-                Grad.Visible = value > 0;
-                Grad.GSize = new Vector2(size, 75*value);
-                Stripe.Visible = value > 0;
+                if (Grad != null)
+                {
+                    Grad.Visible = value > 0;
+                    Grad.GSize = new Vector2(size, 75*value);
+                }
+                if (Stripe != null) Stripe.Visible = value > 0;
                 _ce = value;
             }
         }
 
+        // R142: desktop runs the original category plaques bare — the diagonal
+        // stripe and the rotated title gradient are the mobile column's chrome and
+        // have no original counterpart (the engine's category column is plain
+        // plaques floating over the game view).
+        public readonly bool OriginalChrome = !FSO.Common.FSOEnvironment.SoftwareKeyboard;
+
         public UICategorySwitcher()
         {
-            Stripe = new UIDiagonalStripe(new Point(), UIDiagonalStripeSide.UP, UIStyle.Current.Bg);
-            Add(Stripe);
+            if (!OriginalChrome)
+            {
+                Stripe = new UIDiagonalStripe(new Point(), UIDiagonalStripeSide.UP, UIStyle.Current.Bg);
+                Add(Stripe);
 
-            Grad = new UIVertGrad();
-            Grad.Position = new Vector2(43, 0);
-            Grad.Visible = false;
-            Add(Grad);
+                Grad = new UIVertGrad();
+                Grad.Position = new Vector2(43, 0);
+                Grad.Visible = false;
+                Add(Grad);
+            }
 
             MainButton = new UICatButton(TextureGenerator.GetPxWhite(GameFacade.GraphicsDevice));
             MainButton.Position = new Microsoft.Xna.Framework.Vector2(10, 31);
             MainButton.OnButtonClick += (b) => { Open(); };
             MainButton.Selected = true;
+            // R142: desktop never draws the modern round plaque behind original art.
+            MainButton.OriginalStyle = OriginalChrome;
             Add(MainButton);
 
             CategoryExpand = CategoryExpand;
+        }
+
+        private Texture2D CategoryTexture(UICategory catG)
+        {
+            if (catG.OriginalName != null)
+            {
+                var iffTx = Simitone.Client.UI.Model.UIOriginal.EnsureResolved(catG.OriginalName);
+                if (iffTx != null)
+                {
+                    try { return iffTx.Get(GameFacade.GraphicsDevice); }
+                    catch { }
+                }
+            }
+            return Content.Get().CustomUI.Get(catG.IconName).Get(GameFacade.GraphicsDevice);
         }
 
         public void Select(int cat)
@@ -85,14 +116,19 @@ namespace Simitone.Client.UI.Controls
                 var id = catG.ID;
                 if (catG.ID == cat)
                 {
-                    MainButton.Texture = Content.Get().CustomUI.Get(catG.IconName).Get(GameFacade.GraphicsDevice);
+                    MainButton.Texture = CategoryTexture(catG);
+                    MainButton.Tooltip = catG.Caption;
                 }
-                if (catG.ID != cat || UIScreen.Current.ScreenHeight >= 720)
+                // R141: the ACTIVE category must NOT get a stencil button in the
+                // expanding column — the >=720 clause double-rendered it stacked
+                // directly over the main plaque on every desktop screen.
+                if (catG.ID != cat)
                 {
-                    var btn = new UIStencilButton(Content.Get().CustomUI.Get(catG.IconName).Get(GameFacade.GraphicsDevice));
+                    var btn = new UIStencilButton(CategoryTexture(catG));
                     btn.Shadow = true;
                     btn.X = 10;
                     btn.Visible = false;
+                    btn.Tooltip = catG.Caption;
                     btn.OnButtonClick += (b) => { Select(id); };
                     Add(btn);
                     CatSwitchButtons.Add(btn);
@@ -138,6 +174,11 @@ namespace Simitone.Client.UI.Controls
     {
         public int ID;
         public string IconName;
+        public string OriginalName;
+        // R122: the original sort-button tooltip (STR# 150's own label calls these
+        // strings sort TIPS — they are the button captions the original showed on
+        // hover, not on-screen labels; the plaque art carries the visible text).
+        public string Caption;
     }
 
     public class UIVertGrad : UIElement
@@ -152,6 +193,7 @@ namespace Simitone.Client.UI.Controls
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             DrawLocalTexture(batch, Grad, null, new Vector2(0, 0), new Vector2(GSize.X / Grad.Width, GSize.Y), Color.White, (float)Math.PI / -2, new Vector2(0, 0.5f));
         }
     }

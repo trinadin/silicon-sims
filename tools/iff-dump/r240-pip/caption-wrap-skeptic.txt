@@ -1,0 +1,157 @@
+                ; ==== .CalculateWordsToFitInWidth__7cTSFontFPCcll ====
+004ad3b0: bec1ffd8  stmw     r22, -0x28(r1)
+004ad3b4: 7c0802a6  mflr     r0
+004ad3b8: 3b040000  addi     r24, r4, 0
+004ad3bc: 3ae30000  addi     r23, r3, 0
+004ad3c0: 7cb92b79  or.      r25, r5, r5
+004ad3c4: 3b460000  addi     r26, r6, 0
+004ad3c8: 3bb80000  addi     r29, r24, 0
+004ad3cc: 3b600000  li       r27, 0
+004ad3d0: 7fd8ca14  add      r30, r24, r25
+004ad3d4: 3b800000  li       r28, 0
+004ad3d8: 3be00000  li       r31, 0
+004ad3dc: 90010008  stw      r0, 8(r1)
+004ad3e0: 9421ff90  stwu     r1, -0x70(r1)
+004ad3e4: 4181000c  bgt      0x4ad3f0
+004ad3e8: 38600000  li       r3, 0
+004ad3ec: 480001e0  b        0x4ad5cc
+004ad3f0: 88180000  lbz      r0, 0(r24)
+004ad3f4: 80770010  lwz      r3, 0x10(r23)
+004ad3f8: 1c00001c  mulli    r0, r0, 0x1c
+004ad3fc: 7c630214  add      r3, r3, r0
+004ad400: 48000221  bl       0x4ad620   ; .Width__8FontRectCFv
+004ad404: 7c761b78  mr       r22, r3
+004ad408: 480000dc  b        0x4ad4e4
+004ad40c: 60000000  nop
+004ad410: 3b9c0001  addi     r28, r28, 1
+004ad414: 7c1cc800  cmpw     r28, r25
+004ad418: 41800010  blt      0x4ad428
+004ad41c: 7f83e378  mr       r3, r28
+004ad420: 480001ac  b        0x4ad5cc
+004ad424: 60000000  nop
+004ad428: 7ee3bb78  mr       r3, r23
+004ad42c: 889d0000  lbz      r4, 0(r29)
+004ad430: 81970000  lwz      r12, 0(r23)
+004ad434: 7c840774  extsb    r4, r4
+004ad438: 818c003c  lwz      r12, 0x3c(r12)
+004ad43c: 480f55a5  bl       0x5a29e0
+004ad440: 80410014  lwz      r2, 0x14(r1)
+004ad444: 5460063f  clrlwi.  r0, r3, 0x18
+004ad448: 41820010  beq      0x4ad458
+004ad44c: 3b7c0000  addi     r27, r28, 0
+004ad450: 3be00001  li       r31, 1
+004ad454: 48000098  b        0x4ad4ec
+004ad458: 7ee3bb78  mr       r3, r23
+004ad45c: 889d0000  lbz      r4, 0(r29)
+004ad460: 81970000  lwz      r12, 0(r23)
+004ad464: 7c840774  extsb    r4, r4
+004ad468: 818c0038  lwz      r12, 0x38(r12)
+004ad46c: 480f5575  bl       0x5a29e0
+004ad470: 80410014  lwz      r2, 0x14(r1)
+004ad474: 5460063f  clrlwi.  r0, r3, 0x18
+004ad478: 41820010  beq      0x4ad488
+004ad47c: 7c16d000  cmpw     r22, r26
+004ad480: 41810008  bgt      0x4ad488
+004ad484: 7f9be378  mr       r27, r28
+004ad488: 881d0000  lbz      r0, 0(r29)
+004ad48c: 80770010  lwz      r3, 0x10(r23)
+004ad490: 1c00001c  mulli    r0, r0, 0x1c
+004ad494: 7c630214  add      r3, r3, r0
+004ad498: 48000189  bl       0x4ad620   ; .Width__8FontRectCFv
+004ad49c: 7ec3b050  subf     r22, r3, r22
+004ad4a0: 889d0000  lbz      r4, 0(r29)
+004ad4a4: 7ee3bb78  mr       r3, r23
+004ad4a8: 81970000  lwz      r12, 0(r23)
+004ad4ac: 7c840774  extsb    r4, r4
+004ad4b0: 818c0064  lwz      r12, 0x64(r12)
+004ad4b4: 480f552d  bl       0x5a29e0
+004ad4b8: 80410014  lwz      r2, 0x14(r1)
+004ad4bc: 7c1df040  cmplw    r29, r30
+004ad4c0: 7ed61a14  add      r22, r22, r3
+004ad4c4: 40800020  bge      0x4ad4e4
+004ad4c8: 881d0001  lbz      r0, 1(r29)
+004ad4cc: 80770010  lwz      r3, 0x10(r23)
+004ad4d0: 1c00001c  mulli    r0, r0, 0x1c
+004ad4d4: 7c630214  add      r3, r3, r0
+004ad4d8: 48000149  bl       0x4ad620   ; .Width__8FontRectCFv
+004ad4dc: 7ed61a14  add      r22, r22, r3
+004ad4e0: 3bbd0001  addi     r29, r29, 1
+004ad4e4: 7c16d000  cmpw     r22, r26
+004ad4e8: 4081ff28  ble      0x4ad410
+004ad4ec: 2c1b0000  cmpwi    r27, 0
+004ad4f0: 40820080  bne      0x4ad570
+004ad4f4: 2c1c0001  cmpwi    r28, 1
+004ad4f8: 4081000c  ble      0x4ad504
+004ad4fc: 3b7cffff  addi     r27, r28, -1
+004ad500: 48000070  b        0x4ad570
+004ad504: 7f58da14  add      r26, r24, r27
+004ad508: 48000010  b        0x4ad518
+004ad50c: 60000000  nop
+004ad510: 3b7b0001  addi     r27, r27, 1
+004ad514: 3b5a0001  addi     r26, r26, 1
+004ad518: 7c1bc800  cmpw     r27, r25
+004ad51c: 40800054  bge      0x4ad570
+004ad520: 889a0000  lbz      r4, 0(r26)
+004ad524: 7c800775  extsb.   r0, r4
+004ad528: 41820048  beq      0x4ad570
+004ad52c: 7ee3bb78  mr       r3, r23
+004ad530: 81970000  lwz      r12, 0(r23)
+004ad534: 7c840774  extsb    r4, r4
+004ad538: 818c003c  lwz      r12, 0x3c(r12)
+004ad53c: 480f54a5  bl       0x5a29e0
+004ad540: 80410014  lwz      r2, 0x14(r1)
+004ad544: 5460063f  clrlwi.  r0, r3, 0x18
+004ad548: 40820028  bne      0x4ad570
+004ad54c: 7ee3bb78  mr       r3, r23
+004ad550: 889a0000  lbz      r4, 0(r26)
+004ad554: 81970000  lwz      r12, 0(r23)
+004ad558: 7c840774  extsb    r4, r4
+004ad55c: 818c0040  lwz      r12, 0x40(r12)
+004ad560: 480f5481  bl       0x5a29e0
+004ad564: 80410014  lwz      r2, 0x14(r1)
+004ad568: 5460063f  clrlwi.  r0, r3, 0x18
+004ad56c: 4182ffa4  beq      0x4ad510
+004ad570: 57e0063f  clrlwi.  r0, r31, 0x18
+004ad574: 40820040  bne      0x4ad5b4
+004ad578: 7f18da14  add      r24, r24, r27
+004ad57c: 4800000c  b        0x4ad588
+004ad580: 3b7b0001  addi     r27, r27, 1
+004ad584: 3b180001  addi     r24, r24, 1
+004ad588: 7c1bc800  cmpw     r27, r25
+004ad58c: 40800028  bge      0x4ad5b4
+004ad590: 7ee3bb78  mr       r3, r23
+004ad594: 88980000  lbz      r4, 0(r24)
+004ad598: 81970000  lwz      r12, 0(r23)
+004ad59c: 7c840774  extsb    r4, r4
+004ad5a0: 818c0040  lwz      r12, 0x40(r12)
+004ad5a4: 480f543d  bl       0x5a29e0
+004ad5a8: 80410014  lwz      r2, 0x14(r1)
+004ad5ac: 5460063f  clrlwi.  r0, r3, 0x18
+004ad5b0: 4082ffd0  bne      0x4ad580
+004ad5b4: 2c1b0000  cmpwi    r27, 0
+004ad5b8: 40820010  bne      0x4ad5c8
+004ad5bc: 2c190000  cmpwi    r25, 0
+004ad5c0: 40810008  ble      0x4ad5c8
+004ad5c4: 3b7b0001  addi     r27, r27, 1
+004ad5c8: 7f63db78  mr       r3, r27
+004ad5cc: 80010078  lwz      r0, 0x78(r1)
+004ad5d0: 38210070  addi     r1, r1, 0x70
+004ad5d4: bac1ffd8  lmw      r22, -0x28(r1)
+004ad5d8: 7c0803a6  mtlr     r0
+004ad5dc: 4e800020  blr
+004ad5e0: 00000000  .long    0x00000000
+004ad5e4: 00092041  .long    0x00092041
+004ad5e8: 800a0000  lwz      r0, 0(r10)
+004ad5ec: 00000230  .long    0x00000230
+004ad5f0: 002b2e43  .long    0x002b2e43
+004ad5f4: 616c6375  ori      r12, r11, 0x6375
+004ad5f8: 6c617465  xoris    r1, r3, 0x7465
+004ad5fc: 576f7264  rlwinm   r15, r27, 0xe, 9, 0x12
+004ad600: 73546f46  andi.    r20, r26, 0x6f46
+004ad604: 6974496e  xori     r20, r11, 0x496e
+004ad608: 57696474  rlwinm   r9, r27, 0xc, 0x11, 0x1a
+004ad60c: 685f5f37  xori     r31, r2, 0x5f37
+004ad610: 63545346  ori      r20, r26, 0x5346
+004ad614: 6f6e7446  xoris    r14, r27, 0x7446
+004ad618: 5043636c  rlwimi   r3, r2, 0xc, 0xd, 0x16
+004ad61c: 6c000000  xoris    r0, r0, 0

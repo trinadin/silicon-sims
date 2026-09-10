@@ -1,0 +1,221 @@
+== R200 evidence: cWinPeople TrackPerson/StopTracking + the follow-sim surfaces ==
+
+== cWinPeople::TrackPerson(cXPerson*) @0x28bf02 (aligned 0x28bf00, 344B) ==
+== law: pre-clear gadget this+0x244; person==globalTracked(TOC-0x70b8) -> 0x47cb10(0) untrack; ==
+== else webcam-array this+0xf0[index this+0xec bound] -> this->0x244, reparent into this+0x240 at {0,0}; 0x47cb10(person) ==
+0028bf00: 93e1fffc  stw      r31, -4(r1)
+0028bf04: 7c0802a6  mflr     r0
+0028bf08: 93c1fff8  stw      r30, -8(r1)
+0028bf0c: 3bc40000  addi     r30, r4, 0
+0028bf10: 93a1fff4  stw      r29, -0xc(r1)
+0028bf14: 7c7d1b78  mr       r29, r3
+0028bf18: 90010008  stw      r0, 8(r1)
+0028bf1c: 9421ffa0  stwu     r1, -0x60(r1)
+0028bf20: 80630244  lwz      r3, 0x244(r3)
+0028bf24: 28030000  cmplwi   r3, 0
+0028bf28: 41820024  beq      0x28bf4c
+0028bf2c: 38000000  li       r0, 0
+0028bf30: 38a10040  addi     r5, r1, 0x40
+0028bf34: 90010040  stw      r0, 0x40(r1)
+0028bf38: 38800000  li       r4, 0
+0028bf3c: 90010044  stw      r0, 0x44(r1)
+0028bf40: 4827de11  bl       0x509d50
+0028bf44: 38000000  li       r0, 0
+0028bf48: 901d0244  stw      r0, 0x244(r29)
+0028bf4c: 80628f48  lwz      r3, -0x70b8(r2)
+0028bf50: 80030000  lwz      r0, 0(r3)
+0028bf54: 7c1e0040  cmplw    r30, r0
+0028bf58: 40820010  bne      0x28bf68
+0028bf5c: 38600000  li       r3, 0
+0028bf60: 481f0bb1  bl       0x47cb10
+0028bf64: 480000d8  b        0x28c03c
+0028bf68: 281e0000  cmplwi   r30, 0
+0028bf6c: 418200d0  beq      0x28c03c
+0028bf70: 7fc3f378  mr       r3, r30
+0028bf74: 4bfb831d  bl       0x244290
+0028bf78: 3be30000  addi     r31, r3, 0
+0028bf7c: 2c1fffff  cmpwi    r31, -1
+0028bf80: 418200bc  beq      0x28c03c
+0028bf84: 4bfb46bd  bl       0x240640
+0028bf88: 5460063f  clrlwi.  r0, r3, 0x18
+0028bf8c: 41820058  beq      0x28bfe4
+0028bf90: 80828874  lwz      r4, -0x778c(r2)
+0028bf94: 38600000  li       r3, 0
+0028bf98: a8be0638  lha      r5, 0x638(r30)
+0028bf9c: 80840000  lwz      r4, 0(r4)
+0028bfa0: 7ca00735  extsh.   r0, r5
+0028bfa4: 80840000  lwz      r4, 0(r4)
+0028bfa8: 80c40014  lwz      r6, 0x14(r4)
+0028bfac: 40810024  ble      0x28bfd0
+0028bfb0: 8086001c  lwz      r4, 0x1c(r6)
+0028bfb4: 38040001  addi     r0, r4, 1
+0028bfb8: 7c050040  cmplw    r5, r0
+0028bfbc: 40800014  bge      0x28bfd0
+0028bfc0: 3805ffff  addi     r0, r5, -1
+0028bfc4: 80660020  lwz      r3, 0x20(r6)
+0028bfc8: 5400103a  slwi     r0, r0, 2
+0028bfcc: 7c63002e  lwzx     r3, r3, r0
+0028bfd0: 28030000  cmplwi   r3, 0
+0028bfd4: 41820068  beq      0x28c03c
+0028bfd8: 38800001  li       r4, 1
+0028bfdc: 4be38995  bl       0xc4970
+0028bfe0: 4800005c  b        0x28c03c
+0028bfe4: 7fe3fb78  mr       r3, r31
+0028bfe8: 4bfb7fa9  bl       0x243f90
+0028bfec: 2c030000  cmpwi    r3, 0
+0028bff0: 4180004c  blt      0x28c03c
+0028bff4: 801d00ec  lwz      r0, 0xec(r29)
+0028bff8: 7c030040  cmplw    r3, r0
+0028bffc: 40800040  bge      0x28c03c
+0028c000: 809d00f0  lwz      r4, 0xf0(r29)
+0028c004: 5460103a  slwi     r0, r3, 2
+0028c008: 7c04002e  lwzx     r0, r4, r0
+0028c00c: 28000000  cmplwi   r0, 0
+0028c010: 901d0244  stw      r0, 0x244(r29)
+0028c014: 41820020  beq      0x28c034
+0028c018: 38000000  li       r0, 0
+0028c01c: 38a10048  addi     r5, r1, 0x48
+0028c020: 90010048  stw      r0, 0x48(r1)
+0028c024: 9001004c  stw      r0, 0x4c(r1)
+0028c028: 807d0244  lwz      r3, 0x244(r29)
+0028c02c: 809d0240  lwz      r4, 0x240(r29)
+0028c030: 4827dd21  bl       0x509d50
+0028c034: 7fc3f378  mr       r3, r30
+0028c038: 481f0ad9  bl       0x47cb10
+0028c03c: 80010068  lwz      r0, 0x68(r1)
+0028c040: 38210060  addi     r1, r1, 0x60
+0028c044: 83e1fffc  lwz      r31, -4(r1)
+0028c048: 83c1fff8  lwz      r30, -8(r1)
+0028c04c: 7c0803a6  mtlr     r0
+0028c050: 83a1fff4  lwz      r29, -0xc(r1)
+0028c054: 4e800020  blr      
+
+== cWinPeople::StopTracking() @0x288742 (aligned 0x288740, 92B) ==
+00288740: 93e1fffc  stw      r31, -4(r1)
+00288744: 7c0802a6  mflr     r0
+00288748: 7c7f1b78  mr       r31, r3
+0028874c: 90010008  stw      r0, 8(r1)
+00288750: 9421ffa0  stwu     r1, -0x60(r1)
+00288754: 80630244  lwz      r3, 0x244(r3)
+00288758: 28030000  cmplwi   r3, 0
+0028875c: 41820024  beq      0x288780
+00288760: 38000000  li       r0, 0
+00288764: 38a10040  addi     r5, r1, 0x40
+00288768: 90010040  stw      r0, 0x40(r1)
+0028876c: 38800000  li       r4, 0
+00288770: 90010044  stw      r0, 0x44(r1)
+00288774: 482815dd  bl       0x509d50
+00288778: 38000000  li       r0, 0
+0028877c: 901f0244  stw      r0, 0x244(r31)
+00288780: 38600000  li       r3, 0
+00288784: 481f438d  bl       0x47cb10
+00288788: 80010068  lwz      r0, 0x68(r1)
+0028878c: 38210060  addi     r1, r1, 0x60
+00288790: 83e1fffc  lwz      r31, -4(r1)
+00288794: 7c0803a6  mtlr     r0
+00288798: 4e800020  blr      
+
+== the webcam click law: cWinPeople::TSOnCommand +0x224 select-when-different (0x28c298-0x28c2cc) ==
+0028c268: 807f00dc  lwz      r3, 0xdc(r31)
+0028c26c: 4bf80ff5  bl       0x20d260
+0028c270: 3b230000  addi     r25, r3, 0
+0028c274: 38780000  addi     r3, r24, 0
+0028c278: 4bfb7e79  bl       0x2440f0
+0028c27c: 7c03c800  cmpw     r3, r25
+0028c280: 41820050  beq      0x28c2d0
+0028c284: 807f00f0  lwz      r3, 0xf0(r31)
+0028c288: 38800000  li       r4, 0
+0028c28c: 7c63b82e  lwzx     r3, r3, r23
+0028c290: 4827f0c1  bl       0x50b350
+0028c294: 4800003c  b        0x28c2d0
+0028c298: 931f00e0  stw      r24, 0xe0(r31)
+0028c29c: 7f03c378  mr       r3, r24
+0028c2a0: 4bfb7e51  bl       0x2440f0
+0028c2a4: 7c601b78  mr       r0, r3
+0028c2a8: 807f00dc  lwz      r3, 0xdc(r31)
+0028c2ac: 7c170378  mr       r23, r0
+0028c2b0: 38970000  addi     r4, r23, 0
+0028c2b4: 4bf80dfd  bl       0x20d0b0
+0028c2b8: 807f00dc  lwz      r3, 0xdc(r31)
+0028c2bc: 38800008  li       r4, 8
+0028c2c0: 4bf84481  bl       0x210740
+0028c2c4: 387f0000  addi     r3, r31, 0
+0028c2c8: 38970000  addi     r4, r23, 0
+0028c2cc: 4bfff155  bl       0x28b420
+
+== the webcam click law: TSOnCommand +0xfcc sender loop -> TrackPerson (0x28d02c-0x28d074) ==
+0028d02c: 3ae00000  li       r23, 0
+0028d030: 3b000000  li       r24, 0
+0028d034: 48000034  b        0x28d068
+0028d038: 807f00f0  lwz      r3, 0xf0(r31)
+0028d03c: 7c03c02e  lwzx     r0, r3, r24
+0028d040: 7c1e0040  cmplw    r30, r0
+0028d044: 4082001c  bne      0x28d060
+0028d048: 7ee3bb78  mr       r3, r23
+0028d04c: 4bfb70a5  bl       0x2440f0
+0028d050: 4bfb7641  bl       0x244690
+0028d054: 38830000  addi     r4, r3, 0
+0028d058: 387f0000  addi     r3, r31, 0
+0028d05c: 4bffeea5  bl       0x28bf00
+0028d060: 3af70001  addi     r23, r23, 1
+0028d064: 3b180004  addi     r24, r24, 4
+0028d068: 801f00ec  lwz      r0, 0xec(r31)
+0028d06c: 7c170040  cmplw    r23, r0
+0028d070: 4180ffc8  blt      0x28d038
+0028d074: 48000198  b        0x28d20c
+
+== the RETURN hotkey: local cDDDSimsView dispatcher, VK 0x0D -> 0x217a3c (gate GetMode()==2 BUILD) ==
+00217608: 2c1e0029  cmpwi    r30, 0x29
+0021760c: 40800050  bge      0x21765c
+00217610: 2c1e001b  cmpwi    r30, 0x1b
+00217614: 418204b4  beq      0x217ac8
+00217618: 4080001c  bge      0x217634
+0021761c: 2c1e000d  cmpwi    r30, 0xd
+00217620: 4182041c  beq      0x217a3c
+00217a3c: 807d0114  lwz      r3, 0x114(r29)
+00217a40: 4bff9711  bl       0x211150
+00217a44: 2c030002  cmpwi    r3, 2
+00217a48: 40820364  bne      0x217dac
+00217a4c: 4802c455  bl       0x243ea0
+00217a50: 2c03ffff  cmpwi    r3, -1
+00217a54: 41820358  beq      0x217dac
+00217a58: 4802cc39  bl       0x244690
+00217a5c: 80a28df4  lwz      r5, -0x720c(r2)
+00217a60: 7c641b78  mr       r4, r3
+00217a64: 80650000  lwz      r3, 0(r5)
+00217a68: 48074499  bl       0x28bf00
+00217a6c: 48000340  b        0x217dac
+
+== the level buttons stop tracking (cWinViewControl::TSOnCommand, skipped when level unchanged) ==
+002b4904: 801f0104  lwz      r0, 0x104(r31)
+002b4908: 7c180040  cmplw    r24, r0
+002b490c: 40820030  bne      0x2b493c
+002b4910: 807f00cc  lwz      r3, 0xcc(r31)
+002b4914: 4bf5c6cd  bl       0x210fe0
+002b4918: 2c030001  cmpwi    r3, 1
+002b491c: 4182000c  beq      0x2b4928
+002b4920: 80770000  lwz      r3, 0(r23)
+002b4924: 4bfd3e1d  bl       0x288740
+002b4928: 807f00cc  lwz      r3, 0xcc(r31)
+002b492c: 38800001  li       r4, 1
+002b4930: 38a00000  li       r5, 0
+002b4934: 4bf5b83d  bl       0x210170
+002b4938: 48000ac8  b        0x2b5400
+002b493c: 801f0108  lwz      r0, 0x108(r31)
+002b4940: 7c180040  cmplw    r24, r0
+002b4944: 40820030  bne      0x2b4974
+002b4948: 807f00cc  lwz      r3, 0xcc(r31)
+002b494c: 4bf5c695  bl       0x210fe0
+002b4950: 2c030002  cmpwi    r3, 2
+002b4954: 4182000c  beq      0x2b4960
+002b4958: 80770000  lwz      r3, 0(r23)
+002b495c: 4bfd3de5  bl       0x288740
+002b4960: 807f00cc  lwz      r3, 0xcc(r31)
+002b4964: 38800002  li       r4, 2
+002b4968: 38a00000  li       r5, 0
+002b496c: 4bf5b805  bl       0x210170
+002b4970: 48000a90  b        0x2b5400
+
+== callers (r195/callers.py): TrackPerson x2 (TSOnCommand+0xfcc, dispatcher 0x217a68); ==
+== StopTracking: cObjPickerTool::OnChar, CPState::SetSelectedPerson+0xac, EdgeDetectScroller ==
+== OnKeyDown/OnMouseUpR/OnMouseMove, cWinViewControl x2 (levels), cWinPictureInPicture, SAnimator dtor ==

@@ -155,6 +155,7 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             DrawLocalTexture(batch, ItemBg, null, new Vector2(20, 40), Vector2.One, new Color(104, 164, 184, 255));
 
             if (Item != null)

@@ -1,4 +1,4 @@
-﻿using FSO.Client;
+using FSO.Client;
 using FSO.Client.UI.Framework;
 using FSO.Client.UI.Controls;
 using FSO.Common.Utils;
@@ -17,6 +17,7 @@ namespace Simitone.Client
     {
         public static void EnterLoading()
         {
+            GameLog.Write("screen: EnterLoading");
             var screen = new LoadingScreen();
             GameFacade.Screens.RemoveCurrent();
             GameFacade.Screens.AddScreen(screen);
@@ -24,6 +25,7 @@ namespace Simitone.Client
 
         public static void EnterGameMode(string lotName, bool external)
         {
+            GameLog.Write("EnterGameMode lot=" + lotName + " external=" + external);
             GameThread.NextUpdate((x) =>
             {
                 var mode = NeighSelectionMode.Normal;
@@ -54,12 +56,67 @@ namespace Simitone.Client
                     var children = new List<UIElement>(last.GetChildren());
                     for (int i = 0; i < children.Count; i++)
                     {
+                        // R141: the loading screen's PROGRESS BAR and SPLASH TIP are
+                        // load-time chrome only — transferring them into the game screen
+                        // left them drawn over the lot view forever (survey evidence:
+                        // UIOriginalLoadBar at (195,708) + 'Reticulating...' text as
+                        // permanent game-screen children). Only the backdrop carries over.
+                        if (children[i] is Simitone.Client.UI.Screens.UIOriginalLoadBar) continue;
+                        if (children[i] is Simitone.Client.UI.Controls.UIOriginalText) continue;
                         last.Remove(children[i]);
                         screen.Add(children[i]);
                     }
                 }
                 screen.Initialize(lotName, external);
-                
+
+                // Runtime cross-check of the reverse-engineered corpus: report how many BHAV
+                // function chunks the engine actually loaded into the global context, plus the
+                // IFF that supplied them (see tools/ and PARITY.md).
+                try {
+                    var wog = FSO.Content.Content.Get().WorldObjectGlobals;
+                    var giff = wog.Get("global")?.Resource?.MainIff;
+                    if (giff != null)
+                    {
+                        var bhavs = giff.List<FSO.Files.Formats.IFF.Chunks.BHAV>();
+                        GameLog.Write("global-context: " + giff.Filename + " BHAVs=" + (bhavs?.Count ?? -1));
+                    }
+                    else
+                    {
+                        GameLog.Write("global-context: null");
+                    }
+
+                    // Per-species / per-role behavior modules the engine resolves lazily as
+                    // semi-globals (VMEntity: GLOB chunk name -> WorldObjectGlobals.Get(name)).
+                    // Report which ones actually load from the original data at run time, with the
+                    // BHAV function count each provides.
+                    string[] modules = { "PersonGlobals", "SocialGlobals", "CatGlobals", "DogGlobals",
+                                         "PetSitGlobals", "PhoneGlobals", "VacationDirectorGlobals" };
+                    for (int i = 0; i < modules.Length; i++)
+                    {
+                        try
+                        {
+                            var mi = wog.Get(modules[i])?.Resource?.MainIff;
+                            if (mi != null)
+                            {
+                                var mb = mi.List<FSO.Files.Formats.IFF.Chunks.BHAV>();
+                                GameLog.Write("module: " + modules[i] + " BHAVs=" + (mb?.Count ?? -1));
+                            }
+                            else
+                            {
+                                GameLog.Write("module: " + modules[i] + " null");
+                            }
+                        }
+                        catch (Exception me)
+                        {
+                            GameLog.Write("module: " + modules[i] + " " + me.GetType().Name);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    GameLog.Write("global-context: " + e.GetType().Name + " " + e.Message);
+                }
+
                 // Show notification about any failed content files
                 ShowFailedContentNotification();
             });
@@ -75,6 +132,7 @@ namespace Simitone.Client
             var failedFiles = Content.FailedContentFiles;
             if (failedFiles == null || failedFiles.Count == 0)
                 return;
+            GameLog.Write("content-failures: " + failedFiles.Count);
             
             var realFailures = failedFiles
                 .Where(f => f.ErrorType != "DebugInfo")

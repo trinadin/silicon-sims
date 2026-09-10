@@ -1,0 +1,48 @@
+000e5f40: 4bffffc8  b        0xe5f08
+000e5f44: 2c000005  cmpwi    r0, 5
+000e5f48: 4082001c  bne      0xe5f64
+000e5f4c: 38800001  li       r4, 1
+000e5f50: 4bfe7d11  bl       0xcdc60   ; .__dt__12ObjectDialogFv
+000e5f54: 38950000  addi     r4, r21, 0
+000e5f58: 387e0064  addi     r3, r30, 0x64
+000e5f5c: 4bf50285  bl       0x361e0
+000e5f60: 4bffffa8  b        0xe5f08
+000e5f64: 3ab50004  addi     r21, r21, 4
+000e5f68: 7c152040  cmplw    r21, r4
+000e5f6c: 4082ffb4  bne      0xe5f20
+000e5f70: a87e00ec  lha      r3, 0xec(r30)
+000e5f74: 7c600735  extsh.   r0, r3
+000e5f78: 40800080  bge      0xe5ff8
+000e5f7c: 7c600734  extsh    r0, r3
+000e5f80: 2c00d8f1  cmpwi    r0, -0x270f
+000e5f84: 41820074  beq      0xe5ff8
+000e5f88: 386001a8  li       r3, 0x1a8
+000e5f8c: 484ab4b5  bl       0x591440
+000e5f90: 7c751b79  or.      r21, r3, r3
+000e5f94: 41820018  beq      0xe5fac
+000e5f98: 80828e88  lwz      r4, -0x7178(r2)
+000e5f9c: a81e00ec  lha      r0, 0xec(r30)
+000e5fa0: 80840030  lwz      r4, 0x30(r4)
+000e5fa4: 7ca000d0  neg      r5, r0
+000e5fa8: 48373bb9  bl       0x459b60   ; .__ct__13CWinPhoneBookFP8cITSFonti
+000e5fac: 807c0000  lwz      r3, 0(r28)
+000e5fb0: 38950000  addi     r4, r21, 0
+000e5fb4: 38a00001  li       r5, 1
+000e5fb8: 38c00000  li       r6, 0
+000e5fbc: 4816d955  bl       0x253910   ; .DoSimsModalDialog__8cSimsAppFP6cTSWinbi
+000e5fc0: 7ea3ab78  mr       r3, r21
+000e5fc4: 4837299d  bl       0x458960   ; .GetSelected__13CWinPhoneBookFv
+000e5fc8: 2c030000  cmpwi    r3, 0
+000e5fcc: 40810014  ble      0xe5fe0
+000e5fd0: 7ea3ab78  mr       r3, r21
+000e5fd4: 4837298d  bl       0x458960   ; .GetSelected__13CWinPhoneBookFv
+000e5fd8: b07e00ec  sth      r3, 0xec(r30)
+000e5fdc: 4800000c  b        0xe5fe8
+000e5fe0: 3800d8f1  li       r0, -0x270f
+000e5fe4: b01e00ec  sth      r0, 0xec(r30)
+000e5fe8: 807d0000  lwz      r3, 0(r29)
+000e5fec: 7ea4ab78  mr       r4, r21
+000e5ff0: 80630050  lwz      r3, 0x50(r3)
+000e5ff4: 48437fad  bl       0x51dfa0   ; .DestroyWindow__12cTSWinMgrW95FP6cTSWin
+000e5ff8: a81e00ee  lha      r0, 0xee(r30)
+000e5ffc: 2c000000  cmpwi    r0, 0

@@ -5,6 +5,7 @@ using FSO.Common.Utils;
 using FSO.Content;
 using FSO.Files.Formats.IFF.Chunks;
 using FSO.LotView.Model;
+using FSO.Common.Rendering.Framework.Model;
 using FSO.SimAntics;
 using FSO.SimAntics.Engine.TSOTransaction;
 using FSO.SimAntics.Model;
@@ -39,6 +40,18 @@ namespace Simitone.Client.UI.Panels
         public int HouseID;
 
         public List<UIBigButton> OptionButtons = new List<UIBigButton>();
+
+        // ROUND-113: original-glyph twins for the lot-query labels (the strings were always
+        // original — street names from the neighborhood STR tables, body/secondary from
+        // UIText.iff 'NghRollover' (134) / 'MoveInModeStrs' (132); this round makes the
+        // GLYPHS original: street + lot titles as UIOriginalText, description + secondary
+        // as wrapping UIOriginalParagraphs). Captions mutate after ctor (family/community/
+        // price branches), so twins sync every Update and mirror the MoreTween visibility.
+        public UIOriginalText StreetTwin;
+        public UIOriginalText LotTwin;
+        public UIOriginalParagraph DescTwin;
+        public UIOriginalParagraph SecondaryTwin;
+        public static int LotQueryTwinsMounted = 0;
 
         private float _MoreTween;
         public float MoreTween
@@ -346,6 +359,54 @@ namespace Simitone.Client.UI.Panels
             X = screen.ScreenWidth / -2;
             GameFacade.Screens.Tween.To(this, 0.5f, new Dictionary<string, float>() { { "X", 0f } }, TweenQuad.EaseOut);
             MoreTween = MoreTween;
+        }
+
+        public override void Update(UpdateState state)
+        {
+            base.Update(state);
+            SyncOriginalTwins();
+        }
+
+        /// <summary>
+        /// ROUND-113: mounts the original-glyph twins for the four lot-query labels and
+        /// keeps them synced — the ctor's family/community/price branches mutate the modern
+        /// labels' captions AFTER construction, so the twins re-read them each Update and
+        /// mirror the MoreTween visibility (which toggles the modern labels' Visible).
+        /// Font roles (disclosed): street/lot-body/secondary in the caption table (_10),
+        /// the lot NAME in the title table (_14, matching the neighborhood title role);
+        /// line height 13px for _10. Modern labels remain as the pre-IFF-mount fallback.
+        /// </summary>
+        private void SyncOriginalTwins()
+        {
+            if (StreetTwin == null)
+            {
+                var cap = Simitone.Client.UI.Controls.OriginalGlyphFont.LoadCaption(FSO.Client.GameFacade.GraphicsDevice);
+                var def = Simitone.Client.UI.Controls.OriginalGlyphFont.LoadDefault(FSO.Client.GameFacade.GraphicsDevice);
+                if (cap == null || def == null || cap.Atlas == null || def.Atlas == null) return;
+                StreetTwin = new UIOriginalText(StreetTitle.Caption, cap) { Color = UIStyle.Current.BtnActive };
+                StreetTwin.Position = StreetTitle.Position;
+                LotTwin = new UIOriginalText(LotTitle.Caption, def) { Color = Color.White };
+                LotTwin.Position = LotTitle.Position;
+                DescTwin = new UIOriginalParagraph(cap) { MaxWidth = LotDescription.Size.X, LineHeight = 13f, TextColor = UIStyle.Current.SecondaryText };
+                DescTwin.Position = LotDescription.Position;
+                SecondaryTwin = new UIOriginalParagraph(cap) { MaxWidth = SecondaryText.Size.X, LineHeight = 13f, RightAlign = true, BottomAnchor = true, TextColor = UIStyle.Current.SecondaryText };
+                SecondaryTwin.Position = new Vector2(SecondaryText.Position.X, SecondaryText.Position.Y + SecondaryText.Size.Y);
+                Add(StreetTwin);
+                Add(LotTwin);
+                Add(DescTwin);
+                Add(SecondaryTwin);
+                StreetTitle.Visible = false;
+                LotTitle.Visible = false;
+                LotDescription.Visible = false;
+                SecondaryText.Visible = false;
+                LotQueryTwinsMounted++;
+            }
+            StreetTwin.Text = StreetTitle.Caption;
+            LotTwin.Text = LotTitle.Caption;
+            DescTwin.Text = LotDescription.Caption;
+            SecondaryTwin.Text = SecondaryText.Caption;
+            DescTwin.Visible = LotDescription.Visible;
+            SecondaryTwin.Visible = SecondaryText.Visible;
         }
 
         public void Evict(FAMI family)

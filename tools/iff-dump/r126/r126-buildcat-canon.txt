@@ -1,0 +1,89 @@
+R126 canon dump — BUILD-mode catalog subcategory surfaces: STR# 139 'BldTips' + cpanel\Buttons\toolBtn* plaques (kToolBtn 64..77)
+Sources: /Users/nathannoom/Developer/Games/The Sims/simitone-fork/game-data/The Sims/GameData/UIText.iff
+        /Users/nathannoom/Developer/Games/The Sims/simitone-fork/game-data/The Sims/UIGraphics/UIGraphics.far
+        /Users/nathannoom/Developer/Games/The Sims/simitone-fork/game-data/The Sims/UIGraphics/Res_CPanel.RT
+
+=== STR# 139 'BldTips' (chunkSize 20064; 288 raw = 16 English x 18 langs; format -3) ===
+full-chunk sha256 367ee0e830ba1c87dfa7eda09875518f8035e33f25b9ce392d309d7c69cc8769   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 3b7f2faf20e6b766d60eb2ffc9d3ff15272f87bc6736fc90610e4c5dbeda7843
+trailer: 288 bytes, all 0xA3 padding
+
+English entries [0..15], verbatim (mac_roman), as idx<TAB>text:
+0	Terrain Tool
+1	Water Tool
+2	Wall & Fence Tool
+3	Wallpaper Tool
+4	Stair Tool
+5	Fireplace Tool
+6	Plant Tool
+7	Floor Tool
+8	Door Tool
+9	Window Tool
+10	Roof Tool
+11	Hand Tool
+12	Undo Last
+13	Redo Last
+14	Previous Page
+15	Next Page
+
+port mapping check: all 11 mounted indices [0..10] end in 'Tool' — OK
+
+=== MOUNTED plaques (11): {idx, manifest-exact name, len, WxH, sha256, sheet-hazard} ===
+139/0  cpanel\Buttons\toolBtnTerrain.bmp      len=3734  156x39  034dbd2ce9be35c6901331053ee5953e0b4532356115dd7db6d6e25a2540fc21  <-- SHEET HAZARD: w=4*h -> UIOriginal.Frame would crop to 39x39; load FULL image
+139/1  cpanel\Buttons\toolBtnWater.bmp        len=2824  100x38  3632e824982d88a7283c21e0361ec72e8269e3cd51bed1c1d935505d23d8cd29
+139/2  cpanel\Buttons\toolBtnWall.bmp         len=4480  124x40  de2f95ec8f24e7e6a015a8012e6e1c3844cba1f5592b0fd1393a7650dcf8a90f
+139/3  cpanel\Buttons\toolBtnWallpaper.bmp    len=3606  128x40  011d4a376747e717e8293b83f0c6e174bfc104575130396e26ed6de2635aef55
+139/4  cpanel\Buttons\toolBtnStairs.bmp       len=3932  128x38  d3f6035a71e951e9db00531dfbc092ab0e75c7555ac64ad8ccc6fef6857fbcde
+139/5  cpanel\Buttons\toolBtnFireplace.bmp    len=3476  116x35  d765cd828e0e0e578091da9e2467840444b4bbb6969c6ccb4ba6bde35bd8a714
+139/6  cpanel\Buttons\toolBtnTree.bmp         len=3846  140x39  379adea5c3504877bf0d5535334348e3a0ef618d8b1685eee22860352cb3796a
+139/7  cpanel\Buttons\toolBtnFloor.bmp        len=3230  172x28  923308614501e14c230839bc80487e0317f402e8df8def4b68315678ea7e8ff2
+139/8  cpanel\Buttons\toolBtnDoor.bmp         len=4242  108x41  f4bb79c8b9b522a2d9e3b8ab19fbc5001ede8fdb0bf075cdb5b88375c2628673
+139/9  cpanel\Buttons\toolBtnWindow.bmp       len=4560  116x39  800a110f83a26b58dbd200197bdd2fa4a39e5e6ffabe945875555abbe7fdc58e
+139/10 cpanel\Buttons\toolBtnRoof.bmp         len=3686  156x33  18031baaf470ee811398c578c3d8f1383c748cd9e28131c890fcba1f1bfa865b
+
+first plaque header facts: bpp=8 comp=1 (BI_RLE8) hdr=40 dataoff=1078
+
+=== canon-but-UNMOUNTED tools (no port surface; still pinned as corpus) ===
+139/11 cpanel\Buttons\toolBtnHand.bmp         len=3186  120x35  473e7fc23b281cf86268bd23283176b2122b1e80913be62bd68400e419b22057  (Hand Tool; port surface: none)
+139/12 cpanel\Buttons\Undo.BMP                len=2570  120x24  7b3eb66d6032dbec4a18388cc61f07c13c2732a55907564493dbbf5ab1fd0976  (Undo Last; port surface: none)
+139/13 cpanel\Buttons\Redo.bmp                len=2596  120x24  9528d89212f69afdb8d602807a81bb257172d08bfb5d2faed2419b5ab4e222d4  (Redo Last; port surface: none)
+
+=== Res_CPanel.RT symbol lines verbatim (kToolBtn*/kBuildBack/kBldSbTl*/kBuildModePatch) ===
+{RLEBMP,kToolBtnUndo,"CPanel/Buttons/Undo.bmp"}
+{RLEBMP,kToolBtnRedo,"CPanel/Buttons/Redo.bmp"}
+{RLEBMP,kToolBtnTerrain,"CPanel/Buttons/ToolBtnTerrain.bmp"}
+{RLEBMP,kToolBtnTree,"CPanel/Buttons/ToolBtnTree.bmp"}
+{RLEBMP,kToolBtnPool,"CPanel/Buttons/ToolBtnWater.bmp"}
+{RLEBMP,kToolBtnFloor,"CPanel/Buttons/ToolBtnFloor.bmp"}
+{RLEBMP,kToolBtnWall,"CPanel/Buttons/ToolBtnWall.bmp"}
+{RLEBMP,kToolBtnDoor,"CPanel/Buttons/ToolBtnDoor.bmp"}
+{RLEBMP,kToolBtnWindow,"CPanel/Buttons/ToolBtnWindow.bmp"}
+{RLEBMP,kToolBtnWallpaper,"CPanel/Buttons/ToolBtnWallpaper.bmp"}
+{RLEBMP,kToolBtnStairs,"CPanel/Buttons/ToolBtnStairs.bmp"}
+{RLEBMP,kToolBtnFireplace,"CPanel/Buttons/ToolBtnFireplace.bmp"}
+{RLEBMP,kToolBtnRoof,"CPanel/Buttons/ToolBtnRoof.bmp"}
+{RLEBMP,kToolBtnHand,"CPanel/Buttons/ToolBtnHand.bmp"}
+{RLEBMP,kBuildBack,"CPanel/Backgrounds/BuildBack.bmp"}
+{RLEBMP,kBldSbTlPool,"CPanel/Build/PoolToolIcon.BMP"}
+{RLEBMP,kBldSbTlTerrainDown,"CPanel/Build/TerrainDownIcon.BMP"}
+{RLEBMP,kBldSbTlTerrainLevel,"CPanel/Build/TerrainLevelIcon.BMP"}
+{RLEBMP,kBldSbTlTerrainUp,"CPanel/Build/TerrainUpIcon.BMP"}
+{RLEBMP,kBldSbTlRoofShallow,"CPanel/Build/RoofShallow.bmp"}
+{RLEBMP,kBldSbTlRoofMedium,"CPanel/Build/RoofMedium.bmp"}
+{RLEBMP,kBldSbTlRoofSteep,"CPanel/Build/RoofSteep.bmp"}
+{RLEBMP,kBldSbTlRoofFlat,"CPanel/Build/RoofFlat.bmp"}
+{BITMAP,kBuildModePatch,"CPanel/Backgrounds/BuildPatch.bmp"}
+{RLEBMP,kBldSbTlGrass,"CPanel/HDBuild/TerrainGrassIcon.BMP"}
+{RLEBMP,kBldSbTlWater,"CPanel/HDBuild/WaterToolIcon.bmp"}
+
+=== NEGATIVE SPACE / disclosed residuals ===
+cpanel\backgrounds\buildback.bmp (kBuildBack): NOT on this disk (missing like BuyBack.bmp)
+cpanel\backgrounds\buyback.bmp (kCatalogBck): NOT on this disk (missing like BuyBack.bmp)
+all FAR members containing 'build' (case-insensitive): cpanel\Backgrounds\BuildPatch.bmp, cpanel\Backgrounds\BuildToothpkLeft.bmp, cpanel\Backgrounds\BuildToothpkRight.bmp, cpanel\Build\HandIcon.bmp, cpanel\Build\PoolToolIcon.bmp, cpanel\Build\PopupHand.bmp, cpanel\Build\PopupPool.BMP, cpanel\Build\PopupTerrainDown.bmp, cpanel\Build\PopupTerrainLevel.bmp, cpanel\Build\PopupTerrainUp.BMP, cpanel\Build\TerrainDownIcon.BMP, cpanel\Build\TerrainLevelIcon.BMP, cpanel\Build\TerrainUpIcon.BMP, cpanel\Build\popuproofpattern.bmp, cpanel\Build\popuproofpitch.bmp, cpanel\Build\roofflat.bmp, cpanel\Build\roofmedium.bmp, cpanel\Build\roofpatterntemplate.bmp, cpanel\Build\roofshallow.bmp, cpanel\Build\roofsteep.bmp, cpanel\HDBuild\PopupWaterTool.bmp, cpanel\HDBuild\TerrainGrassIcon.BMP, cpanel\HDBuild\WaterToolIcon.bmp, cpanel\HDBuild\popupGrass.bmp
+NO canon plaque exists for the port's 3 main build tabs (architecture/
+outdoors/objects) — no BuildF*/BuildR*-shaped member; the main switcher
+stays port art (disclosed). STR# 139 [14]/[15] 'Previous/Next Page' pair
+with kCatalogPrevPage/NextPage = ScrollLeft/Right (mounted by R122).
+The original build UI's own structure evidence: 14 kToolBtn symbols + the
+paging strings suggest a flat paged tool list, NOT the port's 3-category
+hierarchy — the hierarchy is a port structure kept this round (disclosed).

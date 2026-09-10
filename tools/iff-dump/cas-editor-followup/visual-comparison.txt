@@ -1,0 +1,1 @@
+Prior R246 versus final CAS capture: 0 changed pixels in 384944 pixels of the 800x600 UI outside the biography and animated preview rectangles.

@@ -1,0 +1,41 @@
+UIText STR# tables: 74; port reads 36
+
+== UNREAD tables (id / label / english entries) ==
+   135  'Ranger'                                             raw=   1 eng=1
+   141  'scrapbookstrs'                                      raw=  17 eng=17
+   143  'ImportStrs'                                         raw= 162 eng=9
+   145  'optionstrs'                                         raw=1512 eng=84
+   156  'PIPStrings'                                         raw=  17 eng=1
+   157  'ConfigStrings'                                      raw= 252 eng=14
+   158  'WebPageStrings'                                     raw= 260 eng=13
+   161  'LocalKeys'                                          raw= 558 eng=31
+   163  'credits'                                            raw=  65 eng=65
+   167  'HTMLUpdate'                                         raw=  51 eng=3
+   168  'TranslateImport'                                    raw= 119 eng=7
+   170  'Vacation Island Screen Tooltips'                    raw= 100 eng=5
+   171  'Filter Bar'                                         raw= 260 eng=13
+   172  'Unleashed Import Strings'                           raw=  40 eng=2
+   173  'Studio Town Screen Tooltips'                        raw= 100 eng=5
+   174  'Magic land Screen Tooltips'                         raw= 120 eng=6
+   200  'Seating Function Sub Sorts'                         raw= 102 eng=6
+   201  'Surfaces Function Sub Sorts'                        raw= 102 eng=6
+   202  'Decorative Function Sub Sorts'                      raw= 102 eng=6
+   203  'Electronics Function Sub Sorts'                     raw= 102 eng=6
+   204  'Appliances Function Sub Sorts'                      raw= 102 eng=6
+   205  'Plumbing Function Sub Sorts'                        raw= 102 eng=6
+   206  'Lighting Function Sub Sorts'                        raw= 102 eng=6
+   207  'Miscellaneous Function Sub Sorts'                   raw= 102 eng=6
+   210  'Function Sub Sort Extra Strings'                    raw= 100 eng=5
+   211  'Townies'                                            raw=  90 eng=5
+   212  'Go Downtown Dialog Strings'                         raw=  60 eng=3
+   213  'Vacation Dialog Strings'                            raw=  60 eng=3
+   225  'Neighborhood Screen change button failure tooltips' raw= 100 eng=5
+   230  'Tourists Strings'                                   raw= 120 eng=6
+   250  'Rezone Mode strings'                                raw=  40 eng=2
+   251  'Zoning Types'                                       raw=  40 eng=2
+   260  'Visit Mode Neighborhood Strings'                    raw=  40 eng=2
+   261  'Visit Mode Magictown Strings'                       raw=  40 eng=2
+   270  'Unleashed Welcome Dialog'                           raw=  40 eng=2
+   271  'Celebrity Strings for Loading Dialog'               raw= 200 eng=10
+   272  'Magic town Strings for Pool Dialog'                 raw= 200 eng=10
+   273  'Transform Me Dialog'                                raw= 160 eng=8

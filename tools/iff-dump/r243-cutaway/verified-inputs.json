@@ -1,0 +1,66 @@
+{
+  "executable_sha256": "33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f",
+  "pins": {
+    "0x128b0c": "0x80030034",
+    "0x128b18": "0x2c1e0000",
+    "0x128b24": "0x5404b7be",
+    "0x128b28": "0x38040001",
+    "0x128b34": "0x4bffc5fd",
+    "0x125148": "0x387d007c",
+    "0x125164": "0x38a00200",
+    "0x125180": "0x4bfffe61",
+    "0x125248": "0x48000799",
+    "0x125318": "0x48003049",
+    "0x125598": "0x480a9999",
+    "0x1cf344": "0x387b0204",
+    "0x1cf34c": "0x38a00200",
+    "0x1cf358": "0x981b01f8",
+    "0x1cf3e4": "0x88030049",
+    "0x1cf400": "0x20030002",
+    "0x1cf5c8": "0x80628f48",
+    "0x1cf5e0": "0x4bf12a81",
+    "0x1cf60c": "0x807e0018",
+    "0x1cf610": "0x80140110",
+    "0x1cf61c": "0xa0940aac",
+    "0x1c0e78": "0x38600000",
+    "0x1c0ed4": "0x482bbc3d",
+    "0x47cb14": "0x80828f48",
+    "0x47cb24": "0x90640000",
+    "0x1c1088": "0x92900018",
+    "0x1c108c": "0x7e84a378",
+    "0x1c10a0": "0x4bf67a41",
+    "0x1d9640": "0x38800003"
+  },
+  "floor_fixtures": [
+    {
+      "room_id": "0x1",
+      "floor": 1,
+      "all_floor_argument": 0
+    },
+    {
+      "room_id": "0x3ff",
+      "floor": 1,
+      "all_floor_argument": 0
+    },
+    {
+      "room_id": "0x400",
+      "floor": 2,
+      "all_floor_argument": 0
+    },
+    {
+      "room_id": "0x7ff",
+      "floor": 2,
+      "all_floor_argument": 0
+    },
+    {
+      "room_id": "0x800",
+      "floor": 3,
+      "all_floor_argument": 0
+    },
+    {
+      "room_id": "0xc00",
+      "floor": 4,
+      "all_floor_argument": 0
+    }
+  ]
+}

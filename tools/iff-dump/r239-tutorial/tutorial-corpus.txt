@@ -1,0 +1,542 @@
+BHAV 4099 (show situation info) [0] opcode=0002 T=2 F=253 operand=0100010000050007
+BHAV 4099 (show situation info) [1] opcode=0031 T=254 F=253 operand=0000000000000000
+BHAV 4099 (show situation info) [2] opcode=0002 T=1 F=253 operand=00000b0000050a03
+BHAV 4107 (find Bob) [0] opcode=0002 T=1 F=4 operand=0900000000100607
+BHAV 4107 (find Bob) [1] opcode=0002 T=2 F=253 operand=0000000000050a07
+BHAV 4107 (find Bob) [2] opcode=001f T=3 F=4 operand=00000000850a0000
+BHAV 4107 (find Bob) [3] opcode=0002 T=6 F=2 operand=3d00090000022006
+BHAV 4107 (find Bob) [4] opcode=000f T=5 F=253 operand=0100070000000000
+BHAV 4107 (find Bob) [5] opcode=0012 T=254 F=254 operand=0000000000000000
+BHAV 4107 (find Bob) [6] opcode=0002 T=7 F=2 operand=4100000000022007
+BHAV 4107 (find Bob) [7] opcode=0002 T=254 F=253 operand=000000000005080a
+BHAV 4115 (detect routed to shower) [0] opcode=0002 T=1 F=253 operand=0000000000050a07
+BHAV 4115 (detect routed to shower) [1] opcode=001f T=2 F=8 operand=402ae085840a0000
+BHAV 4115 (detect routed to shower) [2] opcode=0002 T=9 F=1 operand=3e00000000000407
+BHAV 4115 (detect routed to shower) [3] opcode=0002 T=5 F=253 operand=0000060000050a00
+BHAV 4115 (detect routed to shower) [4] opcode=0002 T=9 F=254 operand=2700000000021307
+BHAV 4115 (detect routed to shower) [5] opcode=0002 T=6 F=253 operand=0000000000050a18
+BHAV 4115 (detect routed to shower) [6] opcode=0002 T=7 F=4 operand=0000000000020a07
+BHAV 4115 (detect routed to shower) [7] opcode=000f T=253 F=253 operand=0100070000000000
+BHAV 4115 (detect routed to shower) [8] opcode=102a T=0 F=255 operand=ffffffffffffffff
+BHAV 4115 (detect routed to shower) [9] opcode=102a T=3 F=255 operand=ffffffffffffffff
+BHAV 4114 (detect showered) [0] opcode=0002 T=1 F=253 operand=0000000000050a07
+BHAV 4114 (detect showered) [1] opcode=001f T=2 F=254 operand=402ae085840a0000
+BHAV 4114 (detect showered) [2] opcode=0002 T=3 F=1 operand=3e00000000000407
+BHAV 4114 (detect showered) [3] opcode=102a T=0 F=255 operand=ffffffffffffffff
+BHAV 4112 (count objects in use) [0] opcode=0002 T=1 F=253 operand=0000000000050807
+BHAV 4112 (count objects in use) [1] opcode=0002 T=2 F=253 operand=0000000000050a07
+BHAV 4112 (count objects in use) [2] opcode=001f T=3 F=254 operand=00000000800a0000
+BHAV 4112 (count objects in use) [3] opcode=0002 T=4 F=2 operand=3e00000000000407
+BHAV 4112 (count objects in use) [4] opcode=0002 T=2 F=253 operand=0000010000030807
+BHAV 4134 (Family tutorial) [0] opcode=0002 T=1 F=253 operand=000082000005081a
+BHAV 4134 (Family tutorial) [1] opcode=0002 T=2 F=253 operand=0100501400050807
+BHAV 4134 (Family tutorial) [2] opcode=1023 T=254 F=254 operand=ffffffffffffffff
+BHAV 4100 (detect zoom) [0] opcode=0002 T=1 F=2 operand=0000020000020906
+BHAV 4100 (detect zoom) [1] opcode=1006 T=254 F=255 operand=0100000000000000
+BHAV 4100 (detect zoom) [2] opcode=102a T=0 F=255 operand=ffffffffffffffff
+BHAV 4108 (detect person selection) [0] opcode=0002 T=1 F=253 operand=0000000000050a18
+BHAV 4108 (detect person selection) [1] opcode=0002 T=254 F=2 operand=0000030000020a06
+BHAV 4108 (detect person selection) [2] opcode=102a T=1 F=255 operand=ffffffffffffffff
+BHAV 4131 (detect ui event w/ data) [0] opcode=101c T=1 F=253 operand=ffffffffffffffff
+BHAV 4131 (detect ui event w/ data) [1] opcode=0002 T=3 F=253 operand=0200000000050009
+BHAV 4131 (detect ui event w/ data) [2] opcode=0002 T=254 F=4 operand=0200000000020007
+BHAV 4131 (detect ui event w/ data) [3] opcode=0002 T=4 F=253 operand=0300010000050009
+BHAV 4131 (detect ui event w/ data) [4] opcode=102a T=2 F=255 operand=ffffffffffffffff
+BHAV 4120 (detect button press) [0] opcode=101c T=1 F=253 operand=ffffffffffffffff
+BHAV 4120 (detect button press) [1] opcode=0002 T=3 F=253 operand=020082000005001a
+BHAV 4120 (detect button press) [2] opcode=0002 T=254 F=4 operand=0200000000020007
+BHAV 4120 (detect button press) [3] opcode=0002 T=4 F=253 operand=0300000000050009
+BHAV 4120 (detect button press) [4] opcode=102a T=2 F=255 operand=ffffffffffffffff
+BHAV 4128 (find Betty) [0] opcode=0002 T=1 F=7 operand=0900000000100607
+BHAV 4128 (find Betty) [1] opcode=0002 T=2 F=253 operand=0000000000050a07
+BHAV 4128 (find Betty) [2] opcode=001f T=3 F=7 operand=00000000850a0000
+BHAV 4128 (find Betty) [3] opcode=0002 T=4 F=2 operand=3d00090000022006
+BHAV 4128 (find Betty) [4] opcode=0002 T=5 F=2 operand=4100010000022007
+BHAV 4128 (find Betty) [5] opcode=0002 T=254 F=253 operand=000000000005080a
+BHAV 4128 (find Betty) [6] opcode=0012 T=254 F=254 operand=0000000000000000
+BHAV 4128 (find Betty) [7] opcode=0024 T=6 F=253 operand=0002230000000009
+BHAV 4098 (setup) [0] opcode=0002 T=1 F=1 operand=0100000000022207
+BHAV 4098 (setup) [1] opcode=0002 T=2 F=4 operand=1a00010000020607
+BHAV 4098 (setup) [2] opcode=1020 T=6 F=253 operand=ffffffffffffffff
+BHAV 4098 (setup) [3] opcode=0001 T=21 F=5 operand=0600000000000000
+BHAV 4098 (setup) [4] opcode=0012 T=254 F=254 operand=0000000000000000
+BHAV 4098 (setup) [5] opcode=0024 T=10 F=253 operand=0002220000000009
+BHAV 4098 (setup) [6] opcode=0002 T=8 F=253 operand=0000000000050a08
+BHAV 4098 (setup) [7] opcode=0002 T=3 F=253 operand=040000000005000a
+BHAV 4098 (setup) [8] opcode=0002 T=5 F=7 operand=0000000000020a07
+BHAV 4098 (setup) [9] opcode=0002 T=254 F=253 operand=0500010000050007
+BHAV 4098 (setup) [10] opcode=0012 T=254 F=254 operand=0000000000000000
+BHAV 4098 (setup) [11] opcode=100b T=12 F=253 operand=ffffffffffffffff
+BHAV 4098 (setup) [12] opcode=0002 T=13 F=253 operand=0000000000050a08
+BHAV 4098 (setup) [13] opcode=0002 T=5 F=14 operand=0000000000020a07
+BHAV 4098 (setup) [14] opcode=0002 T=9 F=253 operand=060000000005000a
+BHAV 4098 (setup) [15] opcode=0002 T=16 F=4 operand=0a00000000020607
+BHAV 4098 (setup) [16] opcode=0002 T=254 F=253 operand=0500020000050007
+BHAV 4098 (setup) [17] opcode=0002 T=15 F=18 operand=0100010000022207
+BHAV 4098 (setup) [18] opcode=0002 T=19 F=4 operand=0100020000022207
+BHAV 4098 (setup) [19] opcode=0002 T=254 F=253 operand=0500030000050007
+BHAV 4098 (setup) [20] opcode=0002 T=23 F=253 operand=43000a0000051306
+BHAV 4098 (setup) [21] opcode=0002 T=22 F=253 operand=0000000000050a18
+BHAV 4098 (setup) [22] opcode=0002 T=5 F=24 operand=0000000000020a07
+BHAV 4098 (setup) [23] opcode=0012 T=11 F=11 operand=0100010000000000
+BHAV 4098 (setup) [24] opcode=0002 T=20 F=253 operand=2200010000050407
+BHAV 4111 (detect interaction) [0] opcode=0002 T=2 F=253 operand=020000000005190a
+BHAV 4111 (detect interaction) [1] opcode=0002 T=6 F=9 operand=0600010000020107
+BHAV 4111 (detect interaction) [2] opcode=0002 T=3 F=253 operand=0300000000051918
+BHAV 4111 (detect interaction) [3] opcode=0002 T=4 F=5 operand=0300000000021907
+BHAV 4111 (detect interaction) [4] opcode=1022 T=254 F=253 operand=ffffffffffffffff
+BHAV 4111 (detect interaction) [5] opcode=0002 T=1 F=253 operand=0000030000050a19
+BHAV 4111 (detect interaction) [6] opcode=0002 T=12 F=9 operand=21003200000e1307
+BHAV 4111 (detect interaction) [7] opcode=0002 T=8 F=11 operand=0600000000020107
+BHAV 4111 (detect interaction) [8] opcode=1006 T=254 F=254 operand=0500000000000000
+BHAV 4111 (detect interaction) [9] opcode=102a T=5 F=255 operand=ffffffffffffffff
+BHAV 4111 (detect interaction) [10] opcode=102a T=7 F=255 operand=ffffffffffffffff
+BHAV 4111 (detect interaction) [11] opcode=0002 T=8 F=13 operand=2100320000011307
+BHAV 4111 (detect interaction) [12] opcode=0002 T=7 F=253 operand=00000a0000051907
+BHAV 4111 (detect interaction) [13] opcode=0002 T=10 F=254 operand=0000000000111907
+BHAV 4129 (decrease Bob's hygiene) [0] opcode=0002 T=1 F=253 operand=0000060000050a00
+BHAV 4129 (decrease Bob's hygiene) [1] opcode=0002 T=2 F=253 operand=0000000000050a18
+BHAV 4129 (decrease Bob's hygiene) [2] opcode=0002 T=254 F=3 operand=0000000000020a07
+BHAV 4129 (decrease Bob's hygiene) [3] opcode=0002 T=254 F=253 operand=08001e0000050f07
+BHAV 4117 (pump up motives) [0] opcode=0002 T=1 F=253 operand=0000000000051907
+BHAV 4117 (pump up motives) [1] opcode=0002 T=2 F=253 operand=0000040000050a00
+BHAV 4117 (pump up motives) [2] opcode=0002 T=3 F=253 operand=0000000000050a18
+BHAV 4117 (pump up motives) [3] opcode=0002 T=10 F=4 operand=0000000000020a07
+BHAV 4117 (pump up motives) [4] opcode=0002 T=5 F=253 operand=05005a0000050f07
+BHAV 4117 (pump up motives) [5] opcode=0002 T=6 F=253 operand=06005a0000050f07
+BHAV 4117 (pump up motives) [6] opcode=0002 T=7 F=253 operand=07005a0000050f07
+BHAV 4117 (pump up motives) [7] opcode=0002 T=8 F=253 operand=08005a0000050f07
+BHAV 4117 (pump up motives) [8] opcode=0002 T=9 F=253 operand=09005a0000050f07
+BHAV 4117 (pump up motives) [9] opcode=0002 T=14 F=253 operand=0e005a0000050f07
+BHAV 4117 (pump up motives) [10] opcode=0002 T=11 F=253 operand=0000010000031907
+BHAV 4117 (pump up motives) [11] opcode=0002 T=12 F=253 operand=0000060000050a00
+BHAV 4117 (pump up motives) [12] opcode=0002 T=13 F=253 operand=0000000000050a18
+BHAV 4117 (pump up motives) [13] opcode=0002 T=254 F=4 operand=0000000000020a07
+BHAV 4117 (pump up motives) [14] opcode=0002 T=16 F=253 operand=0f005a0000050f07
+BHAV 4117 (pump up motives) [15] opcode=0002 T=10 F=254 operand=0000000000021907
+BHAV 4117 (pump up motives) [16] opcode=0002 T=15 F=253 operand=0300320000050f07
+BHAV 4102 (pause) [0] opcode=0002 T=1 F=253 operand=0000140000060907
+BHAV 4102 (pause) [1] opcode=0002 T=2 F=253 operand=0000000000050809
+BHAV 4102 (pause) [2] opcode=1032 T=254 F=255 operand=ffffffffffffffff
+BHAV 4101 (detect object cursor) [0] opcode=0002 T=1 F=253 operand=0000000000050a07
+BHAV 4101 (detect object cursor) [1] opcode=001f T=254 F=2 operand=37040000840a0000
+BHAV 4101 (detect object cursor) [2] opcode=102a T=1 F=255 operand=ffffffffffffffff
+BHAV 4136 (tutorial - job) [0] opcode=0002 T=2 F=253 operand=0000000000050a07
+BHAV 4136 (tutorial - job) [1] opcode=0024 T=4 F=253 operand=002f300000040081
+BHAV 4136 (tutorial - job) [2] opcode=001f T=1 F=3 operand=0168b2e6840a0000
+BHAV 4136 (tutorial - job) [3] opcode=1022 T=254 F=253 operand=ffffffffffffffff
+BHAV 4136 (tutorial - job) [4] opcode=1025 T=18 F=1 operand=ffffffffffffffff
+BHAV 4136 (tutorial - job) [5] opcode=0024 T=9 F=253 operand=0005320000040089
+BHAV 4136 (tutorial - job) [6] opcode=0002 T=7 F=253 operand=0000971100051907
+BHAV 4136 (tutorial - job) [7] opcode=0022 T=5 F=253 operand=0019000001000000
+BHAV 4136 (tutorial - job) [8] opcode=0022 T=17 F=253 operand=0019000000000000
+BHAV 4136 (tutorial - job) [9] opcode=0002 T=10 F=253 operand=0000000000050819
+BHAV 4136 (tutorial - job) [10] opcode=1018 T=8 F=5 operand=ffffffffffffffff
+BHAV 4136 (tutorial - job) [11] opcode=0024 T=12 F=253 operand=003a330000040089
+BHAV 4136 (tutorial - job) [12] opcode=0002 T=15 F=253 operand=00008a000005081a
+BHAV 4136 (tutorial - job) [13] opcode=0024 T=14 F=253 operand=0011340000040087
+BHAV 4136 (tutorial - job) [14] opcode=0002 T=16 F=253 operand=00008c000005081a
+BHAV 4136 (tutorial - job) [15] opcode=102f T=13 F=11 operand=ffffffffffffffff
+BHAV 4136 (tutorial - job) [16] opcode=102f T=254 F=13 operand=ffffffffffffffff
+BHAV 4136 (tutorial - job) [17] opcode=1006 T=11 F=11 operand=0300000000000000
+BHAV 4136 (tutorial - job) [18] opcode=0002 T=6 F=253 operand=0200000000051908
+BHAV 4137 (tutorial - options) [0] opcode=0002 T=2 F=253 operand=0000d90700051907
+BHAV 4137 (tutorial - options) [1] opcode=0024 T=4 F=253 operand=000a350000040087
+BHAV 4137 (tutorial - options) [2] opcode=0022 T=1 F=253 operand=0019000001000000
+BHAV 4137 (tutorial - options) [3] opcode=0022 T=5 F=253 operand=0019000000000000
+BHAV 4137 (tutorial - options) [4] opcode=0002 T=3 F=7 operand=1300030000020607
+BHAV 4137 (tutorial - options) [5] opcode=0024 T=6 F=253 operand=000a360000040006
+BHAV 4137 (tutorial - options) [6] opcode=0001 T=254 F=253 operand=0000000000000000
+BHAV 4137 (tutorial - options) [7] opcode=102a T=4 F=1 operand=ffffffffffffffff
+BHAV 4149 (find the object) [0] opcode=0002 T=1 F=253 operand=0000000000050a07
+BHAV 4149 (find the object) [1] opcode=001f T=2 F=255 operand=00000000800a0000
+BHAV 4149 (find the object) [2] opcode=001a T=3 F=1 operand=0001010008000000
+BHAV 4149 (find the object) [3] opcode=0002 T=4 F=1 operand=0000010000020807
+BHAV 4149 (find the object) [4] opcode=0002 T=254 F=253 operand=000000000005080a
+BHAV 4130 (fatal error) [0] opcode=1034 T=1 F=253 operand=ffffffffffffffff
+BHAV 4130 (fatal error) [1] opcode=0024 T=2 F=253 operand=0002230000000008
+BHAV 4130 (fatal error) [2] opcode=0012 T=254 F=254 operand=0000000000000000
+BHAV 4148 (cancel tutorial) [0] opcode=0002 T=8 F=253 operand=0000040000050a00
+BHAV 4148 (cancel tutorial) [1] opcode=0001 T=2 F=9 operand=0400000000000000
+BHAV 4148 (cancel tutorial) [2] opcode=002a T=3 F=9 operand=0000000006040000
+BHAV 4148 (cancel tutorial) [3] opcode=0002 T=5 F=253 operand=000000000005190a
+BHAV 4148 (cancel tutorial) [4] opcode=0010 T=9 F=9 operand=0003010000000000
+BHAV 4148 (cancel tutorial) [5] opcode=0002 T=6 F=253 operand=0000060000050a00
+BHAV 4148 (cancel tutorial) [6] opcode=0002 T=7 F=253 operand=0300000000051918
+BHAV 4148 (cancel tutorial) [7] opcode=0002 T=4 F=253 operand=0000000000050a19
+BHAV 4148 (cancel tutorial) [8] opcode=0002 T=1 F=9 operand=0000000000021807
+BHAV 4148 (cancel tutorial) [9] opcode=102b T=10 F=253 operand=0100000000000000
+BHAV 4148 (cancel tutorial) [10] opcode=1030 T=13 F=253 operand=0000000000000000
+BHAV 4148 (cancel tutorial) [11] opcode=0001 T=254 F=253 operand=0000000000000000
+BHAV 4148 (cancel tutorial) [12] opcode=0002 T=11 F=253 operand=2b00040000090407
+BHAV 4148 (cancel tutorial) [13] opcode=1035 T=14 F=11 operand=ffffffffffffffff
+BHAV 4148 (cancel tutorial) [14] opcode=0002 T=12 F=253 operand=0000000000050a08
+BHAV 4106 (init) [0] opcode=010f T=2 F=253 operand=ffffffffffffffff
+BHAV 4106 (init) [1] opcode=0002 T=5 F=253 operand=1b00fa0000050307
+BHAV 4106 (init) [2] opcode=0002 T=3 F=253 operand=08000200ff090307
+BHAV 4106 (init) [3] opcode=0002 T=4 F=253 operand=21003200ff050307
+BHAV 4106 (init) [4] opcode=0002 T=1 F=253 operand=1c003200ff050307
+BHAV 4106 (init) [5] opcode=0002 T=6 F=253 operand=3c00010000050307
+BHAV 4106 (init) [6] opcode=0002 T=7 F=253 operand=2b000400000a0307
+BHAV 4106 (init) [7] opcode=0002 T=8 F=253 operand=28000800ff090307
+BHAV 4106 (init) [8] opcode=0002 T=254 F=253 operand=28000e0000090307
+BHAV 4104 (instruct live) [0] opcode=0002 T=5 F=2 operand=1300000000020607
+BHAV 4104 (instruct live) [1] opcode=0024 T=12 F=253 operand=0005090000000089
+BHAV 4104 (instruct live) [2] opcode=0002 T=3 F=253 operand=0000ee0700051907
+BHAV 4104 (instruct live) [3] opcode=0022 T=1 F=253 operand=0019000001000000
+BHAV 4104 (instruct live) [4] opcode=0022 T=5 F=253 operand=0019000000000000
+BHAV 4104 (instruct live) [5] opcode=0002 T=254 F=7 operand=0200030000020607
+BHAV 4104 (instruct live) [6] opcode=0024 T=13 F=253 operand=00130a0000000087
+BHAV 4104 (instruct live) [7] opcode=0002 T=8 F=253 operand=0000dd0700051907
+BHAV 4104 (instruct live) [8] opcode=0022 T=6 F=253 operand=0019000001000000
+BHAV 4104 (instruct live) [9] opcode=0022 T=254 F=253 operand=0019000000000000
+BHAV 4104 (instruct live) [10] opcode=0002 T=4 F=12 operand=1300000000020607
+BHAV 4104 (instruct live) [11] opcode=0002 T=9 F=13 operand=0200030000020607
+BHAV 4104 (instruct live) [12] opcode=102a T=10 F=2 operand=ffffffffffffffff
+BHAV 4104 (instruct live) [13] opcode=102a T=11 F=7 operand=ffffffffffffffff
+BHAV 4119 (detect object rotation) [0] opcode=1035 T=3 F=9 operand=ffffffffffffffff
+BHAV 4119 (detect object rotation) [1] opcode=1006 T=254 F=254 operand=0300000000000000
+BHAV 4119 (detect object rotation) [2] opcode=0002 T=254 F=253 operand=2b00040000090407
+BHAV 4119 (detect object rotation) [3] opcode=0002 T=4 F=253 operand=0000000000050a08
+BHAV 4119 (detect object rotation) [4] opcode=0002 T=5 F=253 operand=0000010000051904
+BHAV 4119 (detect object rotation) [5] opcode=102a T=7 F=255 operand=ffffffffffffffff
+BHAV 4119 (detect object rotation) [6] opcode=0002 T=5 F=2 operand=0000010000021904
+BHAV 4119 (detect object rotation) [7] opcode=1035 T=8 F=10 operand=ffffffffffffffff
+BHAV 4119 (detect object rotation) [8] opcode=0002 T=6 F=253 operand=0000000000050a08
+BHAV 4119 (detect object rotation) [9] opcode=1022 T=254 F=253 operand=ffffffffffffffff
+BHAV 4119 (detect object rotation) [10] opcode=1022 T=254 F=253 operand=ffffffffffffffff
+BHAV 4143 (detect popup) [0] opcode=0002 T=2 F=253 operand=0000000000050809
+BHAV 4143 (detect popup) [1] opcode=0002 T=4 F=253 operand=0200000000050009
+BHAV 4143 (detect popup) [2] opcode=1009 T=1 F=255 operand=ffffffffffffffff
+BHAV 4143 (detect popup) [3] opcode=0002 T=1 F=8 operand=0200000000020007
+BHAV 4143 (detect popup) [4] opcode=0002 T=11 F=253 operand=0000010000051907
+BHAV 4143 (detect popup) [5] opcode=0002 T=6 F=7 operand=0000000000111907
+BHAV 4143 (detect popup) [6] opcode=0118 T=3 F=253 operand=0100000000000000
+BHAV 4143 (detect popup) [7] opcode=0002 T=254 F=253 operand=0200000000050007
+BHAV 4143 (detect popup) [8] opcode=0002 T=5 F=10 operand=0100000000020007
+BHAV 4143 (detect popup) [9] opcode=0002 T=255 F=253 operand=0200000000050007
+BHAV 4143 (detect popup) [10] opcode=0002 T=9 F=253 operand=0100000000050007
+BHAV 4143 (detect popup) [11] opcode=0002 T=6 F=253 operand=0000140000061907
+BHAV 4109 (detect go here) [0] opcode=0002 T=1 F=253 operand=0000000000051907
+BHAV 4109 (detect go here) [1] opcode=0002 T=2 F=253 operand=0000000000050a07
+BHAV 4109 (detect go here) [2] opcode=001f T=3 F=6 operand=c4070000840a0000
+BHAV 4109 (detect go here) [3] opcode=0002 T=254 F=2 operand=3e00000000000407
+BHAV 4109 (detect go here) [4] opcode=0002 T=7 F=253 operand=0000010000031907
+BHAV 4109 (detect go here) [5] opcode=0024 T=1 F=253 operand=00000f0000040083
+BHAV 4109 (detect go here) [6] opcode=102a T=4 F=255 operand=ffffffffffffffff
+BHAV 4109 (detect go here) [7] opcode=0002 T=5 F=1 operand=00001a0000021907
+BHAV 4146 (pause ticks) [0] opcode=0000 T=1 F=253 operand=0000000000000000
+BHAV 4146 (pause ticks) [1] opcode=0002 T=2 F=3 operand=0100010000020007
+BHAV 4146 (pause ticks) [2] opcode=0002 T=255 F=253 operand=0100000000050007
+BHAV 4146 (pause ticks) [3] opcode=0002 T=254 F=0 operand=0000000000020907
+BHAV 4139 (poke autonomy) [0] opcode=0002 T=1 F=253 operand=0000000000050a07
+BHAV 4139 (poke autonomy) [1] opcode=001f T=2 F=254 operand=00000000810a0000
+BHAV 4139 (poke autonomy) [2] opcode=0002 T=3 F=4 operand=0000000000100907
+BHAV 4139 (poke autonomy) [3] opcode=0002 T=1 F=253 operand=2400320000051307
+BHAV 4139 (poke autonomy) [4] opcode=0002 T=1 F=253 operand=2400000000051307
+BHAV 4144 (set motives static) [0] opcode=0002 T=1 F=253 operand=0000000000050a07
+BHAV 4144 (set motives static) [1] opcode=001f T=2 F=254 operand=00000000810a0000
+BHAV 4144 (set motives static) [2] opcode=0002 T=1 F=253 operand=1d00000000051309
+BHAV 4110 (detect routing complete) [0] opcode=0002 T=1 F=253 operand=0000000000050a07
+BHAV 4110 (detect routing complete) [1] opcode=001f T=2 F=254 operand=c4070000840a0000
+BHAV 4110 (detect routing complete) [2] opcode=0002 T=3 F=253 operand=0000000000050a07
+BHAV 4110 (detect routing complete) [3] opcode=001f T=6 F=7 operand=c4070000810a0000
+BHAV 4110 (detect routing complete) [4] opcode=0002 T=5 F=254 operand=2700000000021307
+BHAV 4110 (detect routing complete) [5] opcode=102a T=0 F=255 operand=ffffffffffffffff
+BHAV 4110 (detect routing complete) [6] opcode=0002 T=4 F=3 operand=1f00060000021300
+BHAV 4110 (detect routing complete) [7] opcode=1022 T=254 F=253 operand=ffffffffffffffff
+BHAV 4113 (instruct needs panel) [0] opcode=1008 T=11 F=253 operand=ffffffffffffffff
+BHAV 4113 (instruct needs panel) [1] opcode=0002 T=5 F=253 operand=0000941100051907
+BHAV 4113 (instruct needs panel) [2] opcode=0024 T=3 F=253 operand=0016130000000087
+BHAV 4113 (instruct needs panel) [3] opcode=0002 T=8 F=253 operand=000082000005081a
+BHAV 4113 (instruct needs panel) [4] opcode=1006 T=254 F=254 operand=0100000000000000
+BHAV 4113 (instruct needs panel) [5] opcode=0002 T=6 F=253 operand=020087000005001a
+BHAV 4113 (instruct needs panel) [6] opcode=0002 T=10 F=253 operand=0300000000050019
+BHAV 4113 (instruct needs panel) [7] opcode=0002 T=254 F=2 operand=0200000000020007
+BHAV 4113 (instruct needs panel) [8] opcode=0002 T=9 F=253 operand=0100000000050819
+BHAV 4113 (instruct needs panel) [9] opcode=1023 T=4 F=2 operand=ffffffffffffffff
+BHAV 4113 (instruct needs panel) [10] opcode=102a T=7 F=7 operand=ffffffffffffffff
+BHAV 4113 (instruct needs panel) [11] opcode=101c T=1 F=253 operand=ffffffffffffffff
+BHAV 4142 (detect ui event w/ delay) [0] opcode=0002 T=2 F=253 operand=0000000000050809
+BHAV 4142 (detect ui event w/ delay) [1] opcode=0002 T=4 F=253 operand=0200000000050009
+BHAV 4142 (detect ui event w/ delay) [2] opcode=1009 T=1 F=255 operand=ffffffffffffffff
+BHAV 4142 (detect ui event w/ delay) [3] opcode=0002 T=1 F=8 operand=0200000000020007
+BHAV 4142 (detect ui event w/ delay) [4] opcode=0002 T=11 F=253 operand=0000010000051909
+BHAV 4142 (detect ui event w/ delay) [5] opcode=0002 T=6 F=7 operand=0000000000111907
+BHAV 4142 (detect ui event w/ delay) [6] opcode=0118 T=3 F=253 operand=0100000000000000
+BHAV 4142 (detect ui event w/ delay) [7] opcode=0002 T=254 F=253 operand=0200000000050007
+BHAV 4142 (detect ui event w/ delay) [8] opcode=0002 T=5 F=10 operand=0100000000020007
+BHAV 4142 (detect ui event w/ delay) [9] opcode=0002 T=255 F=253 operand=0200000000050007
+BHAV 4142 (detect ui event w/ delay) [10] opcode=0002 T=9 F=253 operand=0100000000050007
+BHAV 4142 (detect ui event w/ delay) [11] opcode=0002 T=6 F=253 operand=0000140000061907
+BHAV 4096 (main) [0] opcode=0118 T=8 F=253 operand=0100000000000000
+BHAV 4096 (main) [1] opcode=1001 T=4 F=253 operand=ffffffffffffffff
+BHAV 4096 (main) [2] opcode=000a T=6 F=3 operand=0000000000000000
+BHAV 4096 (main) [3] opcode=0118 T=2 F=253 operand=9001000000000000
+BHAV 4096 (main) [4] opcode=000a T=5 F=5 operand=0100000000000000
+BHAV 4096 (main) [5] opcode=0012 T=254 F=254 operand=0000000000000000
+BHAV 4096 (main) [6] opcode=0002 T=1 F=10 operand=0500010000020007
+BHAV 4096 (main) [7] opcode=1026 T=4 F=253 operand=ffffffffffffffff
+BHAV 4096 (main) [8] opcode=1002 T=2 F=253 operand=ffffffffffffffff
+BHAV 4096 (main) [9] opcode=1007 T=4 F=253 operand=ffffffffffffffff
+BHAV 4096 (main) [10] opcode=0002 T=7 F=9 operand=0500020000020007
+BHAV 4141 (detect rotation) [0] opcode=0002 T=4 F=253 operand=000085000005081a
+BHAV 4141 (detect rotation) [1] opcode=0002 T=2 F=253 operand=0300000000050007
+BHAV 4141 (detect rotation) [2] opcode=102a T=253 F=255 operand=ffffffffffffffff
+BHAV 4141 (detect rotation) [3] opcode=0002 T=253 F=253 operand=0300000000050007
+BHAV 4141 (detect rotation) [4] opcode=0002 T=5 F=253 operand=0100010000050807
+BHAV 4141 (detect rotation) [5] opcode=102e T=254 F=255 operand=ffffffffffffffff
+BHAV 4122 (got wait event) [0] opcode=0002 T=2 F=253 operand=0200000000050007
+BHAV 4122 (got wait event) [1] opcode=0031 T=254 F=253 operand=0000000000000000
+BHAV 4122 (got wait event) [2] opcode=0002 T=1 F=253 operand=00000b0000050a03
+BHAV 4124 (flush events) [0] opcode=0002 T=2 F=253 operand=0200000000050007
+BHAV 4124 (flush events) [1] opcode=0118 T=3 F=253 operand=0100000000000000
+BHAV 4124 (flush events) [2] opcode=0002 T=1 F=253 operand=0700000000050007
+BHAV 4124 (flush events) [3] opcode=0002 T=1 F=254 operand=0700000000020007
+BHAV 4121 (query wait event) [0] opcode=0002 T=1 F=253 operand=0700010000030007
+BHAV 4121 (query wait event) [1] opcode=0002 T=255 F=2 operand=0200000000020007
+BHAV 4121 (query wait event) [2] opcode=0002 T=3 F=253 operand=0000020000050800
+BHAV 4121 (query wait event) [3] opcode=0002 T=254 F=253 operand=0100030000050800
+BHAV 4140 (detect scroll) [0] opcode=0002 T=1 F=253 operand=000086000005081a
+BHAV 4140 (detect scroll) [1] opcode=0002 T=2 F=253 operand=0100000000050809
+BHAV 4140 (detect scroll) [2] opcode=102e T=254 F=255 operand=ffffffffffffffff
+BHAV 4133 (detect job) [0] opcode=0002 T=1 F=253 operand=0000000000051907
+BHAV 4133 (detect job) [1] opcode=0002 T=2 F=253 operand=0000000000050a07
+BHAV 4133 (detect job) [2] opcode=001f T=3 F=9 operand=00000000810a0000
+BHAV 4133 (detect job) [3] opcode=0002 T=16 F=2 operand=3800000000101307
+BHAV 4133 (detect job) [4] opcode=0002 T=8 F=253 operand=0000010000031907
+BHAV 4133 (detect job) [5] opcode=0024 T=1 F=253 operand=0000310000000000
+BHAV 4133 (detect job) [6] opcode=0002 T=7 F=253 operand=0000000000050a07
+BHAV 4133 (detect job) [7] opcode=001f T=14 F=5 operand=0168b2e6840a0000
+BHAV 4133 (detect job) [8] opcode=0002 T=6 F=1 operand=0000b40000021907
+BHAV 4133 (detect job) [9] opcode=102a T=4 F=255 operand=ffffffffffffffff
+BHAV 4133 (detect job) [10] opcode=0002 T=11 F=253 operand=0200380000051913
+BHAV 4133 (detect job) [11] opcode=1006 T=12 F=255 operand=0300000000000000
+BHAV 4133 (detect job) [12] opcode=0002 T=13 F=9 operand=0200380000021913
+BHAV 4133 (detect job) [13] opcode=0002 T=254 F=253 operand=0000020000050819
+BHAV 4133 (detect job) [14] opcode=0002 T=7 F=15 operand=3e00000000020407
+BHAV 4133 (detect job) [15] opcode=0002 T=1 F=253 operand=0000000000051907
+BHAV 4133 (detect job) [16] opcode=0002 T=2 F=10 operand=3d00000000021307
+BHAV 4123 (detect person button) [0] opcode=101c T=1 F=253 operand=ffffffffffffffff
+BHAV 4123 (detect person button) [1] opcode=0002 T=3 F=253 operand=020083000005001a
+BHAV 4123 (detect person button) [2] opcode=0002 T=254 F=4 operand=0200000000020007
+BHAV 4123 (detect person button) [3] opcode=0002 T=4 F=253 operand=030000000005000a
+BHAV 4123 (detect person button) [4] opcode=102a T=2 F=255 operand=ffffffffffffffff
+BHAV 4127 (add Betty) [0] opcode=0002 T=1 F=253 operand=0000040000050a00
+BHAV 4127 (add Betty) [1] opcode=0001 T=3 F=2 operand=0400000000000000
+BHAV 4127 (add Betty) [2] opcode=1022 T=254 F=253 operand=ffffffffffffffff
+BHAV 4127 (add Betty) [3] opcode=002a T=26 F=2 operand=0000000006040000
+BHAV 4127 (add Betty) [4] opcode=0010 T=10 F=2 operand=0001010000000000
+BHAV 4127 (add Betty) [5] opcode=0002 T=6 F=253 operand=0000000000050a07
+BHAV 4127 (add Betty) [6] opcode=001f T=7 F=2 operand=f9bee681840a0000
+BHAV 4127 (add Betty) [7] opcode=0002 T=8 F=253 operand=010000000005190a
+BHAV 4127 (add Betty) [8] opcode=0002 T=4 F=253 operand=0000000000050a19
+BHAV 4127 (add Betty) [9] opcode=1006 T=22 F=11 operand=0500000000000000
+BHAV 4127 (add Betty) [10] opcode=0002 T=12 F=253 operand=0000000000050a19
+BHAV 4127 (add Betty) [11] opcode=1015 T=254 F=253 operand=ffffffffffffffff
+BHAV 4127 (add Betty) [12] opcode=002a T=14 F=9 operand=c407000006000000
+BHAV 4127 (add Betty) [13] opcode=000d T=9 F=21 operand=0202030200000000
+BHAV 4127 (add Betty) [14] opcode=0002 T=17 F=253 operand=020000000005190a
+BHAV 4127 (add Betty) [15] opcode=0002 T=13 F=253 operand=0000000000050a19
+BHAV 4127 (add Betty) [16] opcode=0010 T=15 F=21 operand=0003010000000000
+BHAV 4127 (add Betty) [17] opcode=0002 T=18 F=253 operand=0000060000050a00
+BHAV 4127 (add Betty) [18] opcode=0002 T=19 F=253 operand=0300000000051918
+BHAV 4127 (add Betty) [19] opcode=0002 T=16 F=253 operand=0000020000050a19
+BHAV 4127 (add Betty) [20] opcode=0012 T=9 F=9 operand=0100000000000000
+BHAV 4127 (add Betty) [21] opcode=0002 T=20 F=253 operand=0000020000050a19
+BHAV 4127 (add Betty) [22] opcode=0002 T=23 F=253 operand=0000000000050a19
+BHAV 4127 (add Betty) [23] opcode=0002 T=24 F=11 operand=2100050000001307
+BHAV 4127 (add Betty) [24] opcode=102a T=23 F=11 operand=ffffffffffffffff
+BHAV 4127 (add Betty) [25] opcode=0010 T=27 F=2 operand=0003010000000000
+BHAV 4127 (add Betty) [26] opcode=0002 T=31 F=253 operand=0300000000051907
+BHAV 4127 (add Betty) [27] opcode=1015 T=28 F=253 operand=ffffffffffffffff
+BHAV 4127 (add Betty) [28] opcode=102b T=29 F=253 operand=0000000000000000
+BHAV 4127 (add Betty) [29] opcode=1030 T=30 F=253 operand=0100000000000000
+BHAV 4127 (add Betty) [30] opcode=1006 T=254 F=254 operand=0100000000000000
+BHAV 4127 (add Betty) [31] opcode=001f T=25 F=2 operand=741912ef84190003
+BHAV 4127 (add Betty) [32] opcode=0023 T=11 F=253 operand=0a00010249000000
+BHAV 4135 (tutorial - live mode) [0] opcode=0002 T=46 F=253 operand=0000da0700051907
+BHAV 4135 (tutorial - live mode) [1] opcode=0024 T=2 F=253 operand=00071f0000040087
+BHAV 4135 (tutorial - live mode) [2] opcode=0002 T=47 F=35 operand=1300000000020607
+BHAV 4135 (tutorial - live mode) [3] opcode=0024 T=8 F=253 operand=0015210000040087
+BHAV 4135 (tutorial - live mode) [4] opcode=0002 T=5 F=253 operand=0000951100051907
+BHAV 4135 (tutorial - live mode) [5] opcode=0022 T=3 F=253 operand=0019000001000000
+BHAV 4135 (tutorial - live mode) [6] opcode=0022 T=43 F=253 operand=0019000000000000
+BHAV 4135 (tutorial - live mode) [7] opcode=1018 T=6 F=3 operand=ffffffffffffffff
+BHAV 4135 (tutorial - live mode) [8] opcode=0002 T=7 F=253 operand=0000000000050819
+BHAV 4135 (tutorial - live mode) [9] opcode=0024 T=12 F=253 operand=0005240000040085
+BHAV 4135 (tutorial - live mode) [10] opcode=0022 T=9 F=253 operand=010a000001000000
+BHAV 4135 (tutorial - live mode) [11] opcode=0022 T=13 F=253 operand=010a000000000000
+BHAV 4135 (tutorial - live mode) [12] opcode=101b T=50 F=9 operand=ffffffffffffffff
+BHAV 4135 (tutorial - live mode) [13] opcode=0024 T=34 F=253 operand=000c250000040006
+BHAV 4135 (tutorial - live mode) [14] opcode=0024 T=15 F=253 operand=0005260000040085
+BHAV 4135 (tutorial - live mode) [15] opcode=0002 T=16 F=253 operand=0000040000050a00
+BHAV 4135 (tutorial - live mode) [16] opcode=100f T=19 F=34 operand=ffffffffffffffff
+BHAV 4135 (tutorial - live mode) [17] opcode=101f T=18 F=253 operand=ffffffffffffffff
+BHAV 4135 (tutorial - live mode) [18] opcode=0002 T=10 F=253 operand=0000040000050a00
+BHAV 4135 (tutorial - live mode) [19] opcode=0024 T=21 F=253 operand=000b280000040087
+BHAV 4135 (tutorial - live mode) [20] opcode=100c T=37 F=19 operand=ffffffffffffffff
+BHAV 4135 (tutorial - live mode) [21] opcode=0002 T=20 F=253 operand=0000060000050a00
+BHAV 4135 (tutorial - live mode) [22] opcode=0024 T=23 F=253 operand=000c290000040087
+BHAV 4135 (tutorial - live mode) [23] opcode=0002 T=24 F=253 operand=0000040000050a00
+BHAV 4135 (tutorial - live mode) [24] opcode=100c T=38 F=22 operand=ffffffffffffffff
+BHAV 4135 (tutorial - live mode) [25] opcode=0024 T=26 F=253 operand=000d2a0000040087
+BHAV 4135 (tutorial - live mode) [26] opcode=1024 T=27 F=25 operand=ffffffffffffffff
+BHAV 4135 (tutorial - live mode) [27] opcode=0024 T=28 F=253 operand=000e2b0000040087
+BHAV 4135 (tutorial - live mode) [28] opcode=1024 T=31 F=27 operand=ffffffffffffffff
+BHAV 4135 (tutorial - live mode) [29] opcode=0024 T=36 F=253 operand=00172c0000040087
+BHAV 4135 (tutorial - live mode) [30] opcode=0024 T=254 F=253 operand=002f2e0000040008
+BHAV 4135 (tutorial - live mode) [31] opcode=0002 T=32 F=253 operand=0000981100051907
+BHAV 4135 (tutorial - live mode) [32] opcode=0022 T=29 F=253 operand=0019000001000000
+BHAV 4135 (tutorial - live mode) [33] opcode=0022 T=48 F=253 operand=0019000000000000
+BHAV 4135 (tutorial - live mode) [34] opcode=0002 T=14 F=253 operand=0000040000050a00
+BHAV 4135 (tutorial - live mode) [35] opcode=102a T=2 F=1 operand=ffffffffffffffff
+BHAV 4135 (tutorial - live mode) [36] opcode=0002 T=42 F=253 operand=0000000000050819
+BHAV 4135 (tutorial - live mode) [37] opcode=1006 T=22 F=22 operand=0100000000000000
+BHAV 4135 (tutorial - live mode) [38] opcode=1006 T=25 F=25 operand=0100000000000000
+BHAV 4135 (tutorial - live mode) [39] opcode=0024 T=41 F=253 operand=002d380000040089
+BHAV 4135 (tutorial - live mode) [40] opcode=102f T=49 F=39 operand=ffffffffffffffff
+BHAV 4135 (tutorial - live mode) [41] opcode=0002 T=40 F=253 operand=000088000005081a
+BHAV 4135 (tutorial - live mode) [42] opcode=1018 T=33 F=29 operand=ffffffffffffffff
+BHAV 4135 (tutorial - live mode) [43] opcode=0024 T=44 F=253 operand=0015390000040087
+BHAV 4135 (tutorial - live mode) [44] opcode=0002 T=45 F=253 operand=000081000005081a
+BHAV 4135 (tutorial - live mode) [45] opcode=102f T=17 F=43 operand=ffffffffffffffff
+BHAV 4135 (tutorial - live mode) [46] opcode=0022 T=1 F=253 operand=0019000001000000
+BHAV 4135 (tutorial - live mode) [47] opcode=0022 T=4 F=253 operand=0019000000000000
+BHAV 4135 (tutorial - live mode) [48] opcode=0022 T=39 F=253 operand=0200060001000000
+BHAV 4135 (tutorial - live mode) [49] opcode=0022 T=30 F=253 operand=0200060000000000
+BHAV 4135 (tutorial - live mode) [50] opcode=102c T=11 F=11 operand=0100000000000000
+BHAV 4125 (tutorial - person control) [0] opcode=0002 T=2 F=253 operand=0000060000050a00
+BHAV 4125 (tutorial - person control) [1] opcode=0024 T=21 F=253 operand=00050d0000040085
+BHAV 4125 (tutorial - person control) [2] opcode=0022 T=1 F=253 operand=010a000001000000
+BHAV 4125 (tutorial - person control) [3] opcode=0024 T=4 F=253 operand=00010e0000040087
+BHAV 4125 (tutorial - person control) [4] opcode=100d T=5 F=3 operand=ffffffffffffffff
+BHAV 4125 (tutorial - person control) [5] opcode=0024 T=6 F=253 operand=0001100000040006
+BHAV 4125 (tutorial - person control) [6] opcode=100e T=7 F=5 operand=ffffffffffffffff
+BHAV 4125 (tutorial - person control) [7] opcode=0024 T=22 F=253 operand=0002110000040087
+BHAV 4125 (tutorial - person control) [8] opcode=100f T=9 F=7 operand=ffffffffffffffff
+BHAV 4125 (tutorial - person control) [9] opcode=1011 T=11 F=253 operand=ffffffffffffffff
+BHAV 4125 (tutorial - person control) [10] opcode=0024 T=24 F=253 operand=0005140000040008
+BHAV 4125 (tutorial - person control) [11] opcode=0002 T=10 F=253 operand=0000941100051907
+BHAV 4125 (tutorial - person control) [12] opcode=0024 T=16 F=253 operand=0016150000040081
+BHAV 4125 (tutorial - person control) [13] opcode=0002 T=14 F=253 operand=0000000000050a07
+BHAV 4125 (tutorial - person control) [14] opcode=001f T=12 F=12 operand=402ae085840a0000
+BHAV 4125 (tutorial - person control) [15] opcode=1012 T=18 F=17 operand=ffffffffffffffff
+BHAV 4125 (tutorial - person control) [16] opcode=1013 T=17 F=13 operand=ffffffffffffffff
+BHAV 4125 (tutorial - person control) [17] opcode=0024 T=15 F=253 operand=0003170000040087
+BHAV 4125 (tutorial - person control) [18] opcode=0024 T=19 F=253 operand=0018180000040087
+BHAV 4125 (tutorial - person control) [19] opcode=0002 T=25 F=253 operand=000084000005081a
+BHAV 4125 (tutorial - person control) [20] opcode=0022 T=23 F=253 operand=010a000000000000
+BHAV 4125 (tutorial - person control) [21] opcode=101b T=20 F=1 operand=ffffffffffffffff
+BHAV 4125 (tutorial - person control) [22] opcode=0002 T=8 F=253 operand=0000060000050a00
+BHAV 4125 (tutorial - person control) [23] opcode=1006 T=3 F=3 operand=0100000000000000
+BHAV 4125 (tutorial - person control) [24] opcode=1021 T=13 F=253 operand=ffffffffffffffff
+BHAV 4125 (tutorial - person control) [25] opcode=102f T=254 F=18 operand=ffffffffffffffff
+BHAV 4147 (test expanded cp) [0] opcode=101c T=1 F=253 operand=ffffffffffffffff
+BHAV 4147 (test expanded cp) [1] opcode=0002 T=3 F=253 operand=020080000005001a
+BHAV 4147 (test expanded cp) [2] opcode=0002 T=254 F=5 operand=0200000000020007
+BHAV 4147 (test expanded cp) [3] opcode=0002 T=4 F=253 operand=0300000000050007
+BHAV 4147 (test expanded cp) [4] opcode=102a T=2 F=255 operand=ffffffffffffffff
+BHAV 4147 (test expanded cp) [5] opcode=101c T=255 F=253 operand=ffffffffffffffff
+BHAV 4138 (pause for detect) [0] opcode=1032 T=254 F=255 operand=0500000000000000
+BHAV 4105 (detect ui event) [0] opcode=101c T=1 F=253 operand=ffffffffffffffff
+BHAV 4105 (detect ui event) [1] opcode=0002 T=3 F=253 operand=0200000000050009
+BHAV 4105 (detect ui event) [2] opcode=0002 T=254 F=4 operand=0200000000020007
+BHAV 4105 (detect ui event) [3] opcode=0002 T=4 F=253 operand=0300000000050007
+BHAV 4105 (detect ui event) [4] opcode=102a T=2 F=255 operand=ffffffffffffffff
+BHAV 4116 (tutorial - navigation) [0] opcode=0002 T=2 F=253 operand=0000dd0700051907
+BHAV 4116 (tutorial - navigation) [1] opcode=0024 T=3 F=253 operand=0013270000040087
+BHAV 4116 (tutorial - navigation) [2] opcode=0022 T=1 F=253 operand=0019000001000000
+BHAV 4116 (tutorial - navigation) [3] opcode=1004 T=6 F=1 operand=0200000000000000
+BHAV 4116 (tutorial - navigation) [4] opcode=0024 T=8 F=253 operand=0013040000040087
+BHAV 4116 (tutorial - navigation) [5] opcode=0022 T=4 F=253 operand=0019000001000000
+BHAV 4116 (tutorial - navigation) [6] opcode=0022 T=25 F=253 operand=0019000000000000
+BHAV 4116 (tutorial - navigation) [7] opcode=0022 T=9 F=253 operand=0019000000000000
+BHAV 4116 (tutorial - navigation) [8] opcode=1004 T=7 F=4 operand=0300000000000000
+BHAV 4116 (tutorial - navigation) [9] opcode=0024 T=27 F=253 operand=0014060000040087
+BHAV 4116 (tutorial - navigation) [10] opcode=0024 T=28 F=253 operand=0014070000040087
+BHAV 4116 (tutorial - navigation) [11] opcode=0024 T=29 F=253 operand=000f080000040087
+BHAV 4116 (tutorial - navigation) [12] opcode=0022 T=16 F=253 operand=0019000001000000
+BHAV 4116 (tutorial - navigation) [13] opcode=0002 T=15 F=253 operand=0000dc0700051907
+BHAV 4116 (tutorial - navigation) [14] opcode=0022 T=17 F=253 operand=0019000000000000
+BHAV 4116 (tutorial - navigation) [15] opcode=0002 T=12 F=253 operand=0100db0700051907
+BHAV 4116 (tutorial - navigation) [16] opcode=0022 T=11 F=253 operand=0019010001000000
+BHAV 4116 (tutorial - navigation) [17] opcode=0022 T=18 F=253 operand=0019010000000000
+BHAV 4116 (tutorial - navigation) [18] opcode=1008 T=30 F=253 operand=ffffffffffffffff
+BHAV 4116 (tutorial - navigation) [19] opcode=0002 T=21 F=253 operand=0000da0700051907
+BHAV 4116 (tutorial - navigation) [20] opcode=0024 T=24 F=253 operand=00070b0000040087
+BHAV 4116 (tutorial - navigation) [21] opcode=0022 T=20 F=253 operand=0019000001000000
+BHAV 4116 (tutorial - navigation) [22] opcode=0022 T=26 F=253 operand=0019000000000000
+BHAV 4116 (tutorial - navigation) [23] opcode=1009 T=22 F=19 operand=ffffffffffffffff
+BHAV 4116 (tutorial - navigation) [24] opcode=0002 T=23 F=253 operand=000080000005081a
+BHAV 4116 (tutorial - navigation) [25] opcode=0002 T=5 F=253 operand=0000dd0700051907
+BHAV 4116 (tutorial - navigation) [26] opcode=1006 T=31 F=30 operand=0100000000000000
+BHAV 4116 (tutorial - navigation) [27] opcode=102c T=10 F=9 operand=0200000000000000
+BHAV 4116 (tutorial - navigation) [28] opcode=102c T=13 F=10 operand=0200000000000000
+BHAV 4116 (tutorial - navigation) [29] opcode=102d T=14 F=11 operand=ffffffffffffffff
+BHAV 4116 (tutorial - navigation) [30] opcode=1033 T=254 F=19 operand=ffffffffffffffff
+BHAV 4116 (tutorial - navigation) [31] opcode=1033 T=254 F=26 operand=ffffffffffffffff
+BHAV 4097 (General tutorial) [0] opcode=102b T=1 F=253 operand=0000000000000000
+BHAV 4097 (General tutorial) [1] opcode=1015 T=12 F=253 operand=ffffffffffffffff
+BHAV 4097 (General tutorial) [2] opcode=0024 T=10 F=253 operand=0012030000040006
+BHAV 4097 (General tutorial) [3] opcode=0024 T=5 F=253 operand=00070c0000040006
+BHAV 4097 (General tutorial) [4] opcode=0002 T=253 F=253 operand=ffffffffffffffff
+BHAV 4097 (General tutorial) [5] opcode=101d T=6 F=253 operand=ffffffffffffffff
+BHAV 4097 (General tutorial) [6] opcode=101e T=7 F=253 operand=ffffffffffffffff
+BHAV 4097 (General tutorial) [7] opcode=1027 T=8 F=253 operand=ffffffffffffffff
+BHAV 4097 (General tutorial) [8] opcode=1028 T=9 F=253 operand=ffffffffffffffff
+BHAV 4097 (General tutorial) [9] opcode=1029 T=11 F=253 operand=ffffffffffffffff
+BHAV 4097 (General tutorial) [10] opcode=1014 T=3 F=253 operand=ffffffffffffffff
+BHAV 4097 (General tutorial) [11] opcode=102b T=13 F=253 operand=0100000000000000
+BHAV 4097 (General tutorial) [12] opcode=1030 T=2 F=253 operand=0100000000000000
+BHAV 4097 (General tutorial) [13] opcode=1030 T=254 F=253 operand=0000000000000000
+BHAV 4132 (detect social) [0] opcode=0002 T=1 F=253 operand=0200000000051907
+BHAV 4132 (detect social) [1] opcode=0002 T=2 F=253 operand=0000060000050a00
+BHAV 4132 (detect social) [2] opcode=0002 T=3 F=253 operand=0000000000050a18
+BHAV 4132 (detect social) [3] opcode=0002 T=4 F=5 operand=0000000000020a07
+BHAV 4132 (detect social) [4] opcode=1022 T=254 F=253 operand=ffffffffffffffff
+BHAV 4132 (detect social) [5] opcode=0002 T=14 F=253 operand=0000210000051913
+BHAV 4132 (detect social) [6] opcode=0002 T=7 F=253 operand=0000000000050a18
+BHAV 4132 (detect social) [7] opcode=0002 T=4 F=8 operand=0000000000020a07
+BHAV 4132 (detect social) [8] opcode=0002 T=20 F=253 operand=0100210000051913
+BHAV 4132 (detect social) [9] opcode=0002 T=10 F=19 operand=00003200000e1907
+BHAV 4132 (detect social) [10] opcode=0002 T=11 F=19 operand=01003200000e1907
+BHAV 4132 (detect social) [11] opcode=0002 T=12 F=253 operand=0000000000050a07
+BHAV 4132 (detect social) [12] opcode=001f T=13 F=19 operand=cfa91733860a0000
+BHAV 4132 (detect social) [13] opcode=0002 T=16 F=12 operand=3e000200000e0407
+BHAV 4132 (detect social) [14] opcode=0002 T=6 F=253 operand=0000040000050a00
+BHAV 4132 (detect social) [15] opcode=0002 T=9 F=17 operand=0200000000021907
+BHAV 4132 (detect social) [16] opcode=0002 T=1 F=253 operand=0200010000051907
+BHAV 4132 (detect social) [17] opcode=0002 T=18 F=19 operand=0000320000011907
+BHAV 4132 (detect social) [18] opcode=0002 T=254 F=19 operand=0100320000011907
+BHAV 4132 (detect social) [19] opcode=102a T=1 F=255 operand=ffffffffffffffff
+BHAV 4132 (detect social) [20] opcode=0002 T=15 F=253 operand=00001d430005091a
+BHAV 4126 (tutorial - place objects) [0] opcode=0002 T=2 F=253 operand=0000d80700051907
+BHAV 4126 (tutorial - place objects) [1] opcode=0024 T=13 F=253 operand=0008190000040087
+BHAV 4126 (tutorial - place objects) [2] opcode=0022 T=1 F=253 operand=0019000001000000
+BHAV 4126 (tutorial - place objects) [3] opcode=0022 T=4 F=253 operand=0019000000000000
+BHAV 4126 (tutorial - place objects) [4] opcode=0024 T=5 F=253 operand=00041a0000040006
+BHAV 4126 (tutorial - place objects) [5] opcode=0024 T=11 F=253 operand=00001b0000040083
+BHAV 4126 (tutorial - place objects) [6] opcode=0024 T=7 F=253 operand=00001c0000040083
+BHAV 4126 (tutorial - place objects) [7] opcode=1016 T=8 F=5 operand=ffffffffffffffff
+BHAV 4126 (tutorial - place objects) [8] opcode=0024 T=9 F=253 operand=00051d0000040087
+BHAV 4126 (tutorial - place objects) [9] opcode=1017 T=254 F=8 operand=ffffffffffffffff
+BHAV 4126 (tutorial - place objects) [10] opcode=0024 T=12 F=253 operand=00061e0000040087
+BHAV 4126 (tutorial - place objects) [11] opcode=1005 T=6 F=5 operand=ffffffffffffffff
+BHAV 4126 (tutorial - place objects) [12] opcode=1005 T=254 F=10 operand=ffffffffffffffff
+BHAV 4126 (tutorial - place objects) [13] opcode=0002 T=14 F=3 operand=1300020000100607
+BHAV 4126 (tutorial - place objects) [14] opcode=102a T=13 F=1 operand=ffffffffffffffff
+BHAV 4126 (tutorial - place objects) [15] opcode=1006 T=8 F=8 operand=0200000000000000
+BHAV 4118 (detect object purchase) [0] opcode=0002 T=2 F=253 operand=00000d0000051906
+BHAV 4118 (detect object purchase) [1] opcode=0002 T=3 F=2 operand=00000d0000101906
+BHAV 4118 (detect object purchase) [2] opcode=102a T=1 F=255 operand=ffffffffffffffff
+BHAV 4118 (detect object purchase) [3] opcode=0002 T=4 F=253 operand=0000000000050a07
+BHAV 4118 (detect object purchase) [4] opcode=001f T=5 F=255 operand=00000000800a0000
+BHAV 4118 (detect object purchase) [5] opcode=0002 T=7 F=4 operand=2d00080000020406
+BHAV 4118 (detect object purchase) [6] opcode=000f T=254 F=253 operand=0100070000000000
+BHAV 4118 (detect object purchase) [7] opcode=0002 T=8 F=4 operand=2e00070000020406
+BHAV 4118 (detect object purchase) [8] opcode=0002 T=9 F=4 operand=2f00010000020406
+BHAV 4118 (detect object purchase) [9] opcode=0002 T=10 F=4 operand=1800000000020406
+BHAV 4118 (detect object purchase) [10] opcode=0002 T=11 F=4 operand=1500050000020406
+BHAV 4118 (detect object purchase) [11] opcode=001a T=12 F=253 operand=0001040007000100
+BHAV 4118 (detect object purchase) [12] opcode=0002 T=254 F=253 operand=2b000400000a0407

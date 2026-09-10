@@ -1,0 +1,26 @@
+R83 loadscreen canon — engine-independent raw IFF scan (game-data/The Sims/UIGraphics/UIGraphics.far)
+
+Member name + stored byte length + BMP header dims (offset 18/22 little-endian), parsed directly from
+the FAR1 manifest payloads with python struct (no engine code involved). Matches AutotestCatalogCanon.GoScreens 19/19.
+
+Computed 800x600   456692 'Community\Bus_loadscreen_800x600.bmp'
+Computed 1024x768  748936 'Community\Bus_loadscreen_1024x768.bmp'
+Computed 1024x768  748936 'Nbhd\Bus_loadscreen_1024x768.bmp'
+Computed 800x600   456692 'Nbhd\Bus_loadscreen_800x600.bmp'
+Computed 800x600   476066 'Nbhd\NScreen.BMP'
+Computed 800x600   466556 'Downtown\Taxi_loadscreen_800x600.bmp'
+Computed 1024x768  768874 'Downtown\Taxi_loadscreen_1024x768.bmp'
+Computed 800x600   469320 'Magicland\magicland_loadscreen_800x600.bmp'
+Computed 1024x768  776562 'Magicland\magicland_loadscreen_1024x768.bmp'
+Computed 800x600   474900 'Magicland\magicland_loadscreen_hole_800x600.bmp'
+Computed 1024x768  782552 'Magicland\magicland_loadscreen_hole_1024x768.bmp'
+Computed 800x600   465134 'Studiotown\Studiotown_loadscreen_800x600.bmp'
+Computed 1024x768  773708 'Studiotown\Studiotown_loadscreen_1024x768.bmp'
+Computed 800x600   452974 'Studiotown\Studiotown_loadscreen_fan_800x600.bmp'
+Computed 1024x768  762376 'Studiotown\Studiotown_loadscreen_fan_1024x768.bmp'
+Computed 800x600   456118 'VIsland\vacation_loadscreen_800x600.bmp'
+Computed 1024x768  770696 'VIsland\vacation_loadscreen_1024x768.bmp'
+Computed 800x600   444084 'VIsland\vacation_loadscreen2_800x600.bmp'
+Computed 1024x768  736600 'VIsland\vacation_loadscreen2_1024x768.bmp'
+
+19/19 members present in manifest with IFF-literal stored length == payload length and matching BMP dims.

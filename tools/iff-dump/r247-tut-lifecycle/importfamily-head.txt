@@ -1,0 +1,32 @@
+000adc50: bda1ffb4  stmw     r13, -0x4c(r1)
+000adc54: 7c0802a6  mflr     r0
+000adc58: 83c28bac  lwz      r30, -0x7454(r2)
+000adc5c: 7cb02b78  mr       r16, r5
+000adc60: 82428af8  lwz      r18, -0x7508(r2)
+000adc64: 81c2a530  lwz      r14, -0x5ad0(r2)
+000adc68: 7cd13378  mr       r17, r6
+000adc6c: 81a28874  lwz      r13, -0x778c(r2)
+000adc70: 7c6f1b78  mr       r15, r3
+000adc74: 90010008  stw      r0, 8(r1)
+000adc78: 38000000  li       r0, 0
+000adc7c: 9421f450  stwu     r1, -0xbb0(r1)
+000adc80: 90050000  stw      r0, 0(r5)
+000adc84: 386100b8  addi     r3, r1, 0xb8
+000adc88: 90060000  stw      r0, 0(r6)
+000adc8c: 90810bcc  stw      r4, 0xbcc(r1)
+000adc90: 4bfe9c41  bl       0x978d0   ; .__ct__11IFFResFile2Fv
+000adc94: 80810bcc  lwz      r4, 0xbcc(r1)
+000adc98: 386100b8  addi     r3, r1, 0xb8
+000adc9c: 38a00001  li       r5, 1
+000adca0: 4bfe94d1  bl       0x97170
+000adca4: 3a630000  addi     r19, r3, 0
+000adca8: 7e600735  extsh.   r0, r19
+000adcac: 41820018  beq      0xadcc4
+000adcb0: 386100b8  addi     r3, r1, 0xb8
+000adcb4: 3880ffff  li       r4, -1
+000adcb8: 4bfe9b49  bl       0x97800   ; .__dt__11IFFResFile2Fv
+000adcbc: 7e639b78  mr       r3, r19
+000adcc0: 48001158  b        0xaee18
+000adcc4: 808d0000  lwz      r4, 0(r13)
+000adcc8: 3ca04558  lis      r5, 0x4558
+000adccc: 38000000  li       r0, 0

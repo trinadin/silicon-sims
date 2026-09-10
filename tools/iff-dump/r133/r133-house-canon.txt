@@ -1,0 +1,37 @@
+== STR# 135 'HouseSubpanelPopupText' size=68923 sha256=58edc85abd48705b218e1dddc805d1842f183dad4cfcb45ac5859851e9071593 English=18 ==
+  [ 0] 'House Size'
+  [ 1] 'Sims need their space. This bar tells you how happy the Sims are with the size of their house. This rating is not just based on the size of the house, but also the number of Sims living in it.'
+  [ 2] 'Furnishings'
+  [ 3] 'This bar shows how much the Sims like the items you have purchased to furnish their home. They are consumers at heart, and like any discriminating buyer, they prefer quality over quantity.'
+  [ 4] 'Yard'
+  [ 5] 'This bar tells you how happy the Sims are with their landscaping. They like to spend time in the great outdoors with lots of flowers and trees, and of course, a nice big swimming pool.'
+  [ 6] 'Upkeep'
+  [ 7] "Sims hate when things aren't working right! This bar is full as long as everything is in working order. When something is broken they can try to fix it, or they can always call a repairman. "
+  [ 8] 'Layout'
+  [ 9] 'The goal of any architectural design is to create a layout that allows for smooth movement throughout the home--Sims hold this same ideal. The less time and effort it takes them to move from one activity to the next, the higher this bar will be.'
+  [10] 'Square Feet'
+  [11] "This is the area inside the house--the area enclosed by walls. Sims like lots of room, the more the better, and they really won't be happy if space is limited."
+  [12] 'Bedrooms'
+  [13] "A bedroom is any room that has a bed.  As long you provide your Sims with comfy beds, they'll sleep well and wake re-energized."
+  [14] 'Bathrooms'
+  [15] 'Any room that contains a toilet, tub, or shower is considered a bathroom. Sims definitely need at least one bathroom to relieve their bladder and hygiene needs.'
+  [16] 'Lot Size'
+  [17] 'A lot can happen on a lot. They come in various sizes and cost accordingly.'
+
+== STR# 133 'HouseSubpanelLabels' size=15891 sha256=0e80bb305fc4ee32fd4005753c531ee61ab3b2e99b8ab229df7a8087969c4297 English=10 ==
+  [ 0] 'House'
+  [ 1] 'Size'
+  [ 2] 'Furnishings'
+  [ 3] 'Yard'
+  [ 4] 'Upkeep'
+  [ 5] 'Layout'
+  [ 6] 'Sq. Ft.: %d'
+  [ 7] 'Bedrooms: %d'
+  [ 8] 'Bathrooms: %d'
+  [ 9] 'Lot: %s'
+
+== STR# 138 'HouseSubpanelSize' size=4016 sha256=c643273986d4ccd324484405836b59c8d75ba79cd4b485418cfb44bb19c3d781 English=3 ==
+  [ 0] 'Small'
+  [ 1] 'Medium'
+  [ 2] 'Large'
+

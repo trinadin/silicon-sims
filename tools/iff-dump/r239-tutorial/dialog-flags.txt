@@ -1,0 +1,55 @@
+000cca50: bea1ffd4  stmw     r21, -0x2c(r1)
+000cca54: 7c0802a6  mflr     r0
+000cca58: 7c7f1b78  mr       r31, r3
+000cca5c: 83628c5c  lwz      r27, -0x73a4(r2)
+000cca60: 82e28c70  lwz      r23, -0x7390(r2)
+000cca64: 83028bdc  lwz      r24, -0x7424(r2)
+000cca68: 7c9d2378  mr       r29, r4
+000cca6c: 83228bb4  lwz      r25, -0x744c(r2)
+000cca70: 3bc50000  addi     r30, r5, 0
+000cca74: 83428e00  lwz      r26, -0x7200(r2)
+000cca78: 82c28af8  lwz      r22, -0x7508(r2)
+000cca7c: 3aa00000  li       r21, 0
+000cca80: 8382a558  lwz      r28, -0x5aa8(r2)
+000cca84: 90010008  stw      r0, 8(r1)
+000cca88: 9421ea00  stwu     r1, -0x1600(r1)
+000cca8c: 80630000  lwz      r3, 0(r3)
+000cca90: 28030000  cmplwi   r3, 0
+000cca94: 4182001c  beq      0xccab0
+000cca98: 806300dc  lwz      r3, 0xdc(r3)
+000cca9c: 480162e5  bl       0xe2d80   ; .GetTutorialObject__12ObjectModuleFv
+000ccaa0: 801f0000  lwz      r0, 0(r31)
+000ccaa4: 7c001840  cmplw    r0, r3
+000ccaa8: 40820008  bne      0xccab0
+000ccaac: 3aa00001  li       r21, 1
+000ccab0: 9abf003c  stb      r21, 0x3c(r31)
+000ccab4: 3aa00000  li       r21, 0
+000ccab8: 807f0000  lwz      r3, 0(r31)
+000ccabc: 28030000  cmplwi   r3, 0
+000ccac0: 4182001c  beq      0xccadc
+000ccac4: 8063011c  lwz      r3, 0x11c(r3)
+000ccac8: 48038849  bl       0x105310   ; .GetGUID__11ObjSelectorFv
+000ccacc: 3c033cdc  addis    r0, r3, 0x3cdc
+000ccad0: 28009a1d  cmplwi   r0, 0x9a1d
+000ccad4: 40820008  bne      0xccadc
+000ccad8: 3aa00001  li       r21, 1
+000ccadc: 9abf003d  stb      r21, 0x3d(r31)
+000ccae0: 807f0004  lwz      r3, 4(r31)
+000ccae4: 480384ad  bl       0x104f90   ; .GetCatalogName__11ObjSelectorFv
+000ccae8: 38830000  addi     r4, r3, 0
+000ccaec: 387f0008  addi     r3, r31, 8
+000ccaf0: 484a49e1  bl       0x5714d0
+000ccaf4: 881e0005  lbz      r0, 5(r30)
+000ccaf8: 281d0000  cmplwi   r29, 0
+000ccafc: 5400067e  clrlwi   r0, r0, 0x19
+000ccb00: 901f0020  stw      r0, 0x20(r31)
+000ccb04: 881e0005  lbz      r0, 5(r30)
+000ccb08: 5400cffe  rlwinm   r0, r0, 0x19, 0x1f, 0x1f
+000ccb0c: 981f003e  stb      r0, 0x3e(r31)
+000ccb10: 881e0007  lbz      r0, 7(r30)
+000ccb14: 540007fe  clrlwi   r0, r0, 0x1f
+000ccb18: 981f0038  stb      r0, 0x38(r31)
+000ccb1c: 881e0007  lbz      r0, 7(r30)
+000ccb20: 5400cffe  rlwinm   r0, r0, 0x19, 0x1f, 0x1f
+000ccb24: 68000001  xori     r0, r0, 1
+000ccb28: 981f0039  stb      r0, 0x39(r31)

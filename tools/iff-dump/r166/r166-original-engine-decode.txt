@@ -1,0 +1,54 @@
+# R166 original-engine decode: Generic Sims Call mode 12
+engine sha256: 33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f
+PEF packed data: file+0x5c22f0 length 0x6d834 -> 0x7bf80
+PEF unpacked data sha256: f740c1dfa1dea8187b12ebf222ca1a39223365d26ad5d2f2e353d5efba247be3
+dispatch: TOC[-0x59a0] -> data+0x485a8; entry[12] -> code-virtual 0xe9778 -> file 0xf2608
+rotation lookup: TOC[-0x73e4] -> BSS+0x7f0b8; world root: TOC[-0x7350] -> BSS+0x85c48
+code sha256: BuildRotationLookup[0x60f20,0x61070)=c25d81d41eb662c33ce65865de4c03573015e25fb53c4e61c46b032e1b76af80
+code sha256: mode12[0xf2608,0xf26d8)=acc62561f9a0c5c63afc2a26b53a6066dfa16b5f56180c71335c2647d60ef228
+
+law recovered from BuildRotationLookup (x,y are byte-valued object tile coordinates loaded with lbz and sign-extended; validated domain 0..63):
+  r0 = (x, y)
+  r1 = (63-y, x)
+  r2 = (63-x, 63-y)
+  r3 = (y, 63-x)
+  Temp0 = -(rotated_x + rotated_y); level byte is copied but unused
+  return value remains true
+
+sample vectors:
+  (11,23) -> r0=-34, r1=-51, r2=-92, r3=-75
+  (0,0) -> r0=0, r1=-63, r2=-126, r3=-63
+  (63,63) -> r0=-126, r1=-63, r2=0, r3=-63
+  (0,63) -> r0=-63, r1=0, r2=-63, r3=-126
+  (63,0) -> r0=-63, r1=-126, r2=-63, r3=0
+
+decisive BuildRotationLookup words:
+  0x060f20 39600000
+  0x060f24 80c28c1c
+  0x060f3c 206a003f
+  0x060f88 38ea0000
+  0x060f8c 2109003f
+  0x060f94 39030000
+  0x060f98 20e9003f
+  0x060fa0 38e30000
+  0x060fa4 39090000
+  0x060fa8 99040000
+  0x060fac 98e40001
+  0x061060 38c62000
+  0x061064 2c0b0003
+
+decisive TryGenericSimCall mode-12 words:
+  0x0f2608 a8180004
+  0x0f2660 88f300fc
+  0x0f2668 88b300fd
+  0x0f266c 7ce60774
+  0x0f2670 80630084
+  0x0f2678 7ca40774
+  0x0f2690 54606824
+  0x0f26a8 8864e000
+  0x0f26ac 8804e001
+  0x0f26c0 7c630774
+  0x0f26c4 7c000774
+  0x0f26c8 7c030214
+  0x0f26cc 7c0000d0
+  0x0f26d0 b01f003a

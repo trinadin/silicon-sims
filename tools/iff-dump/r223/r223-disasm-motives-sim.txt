@@ -1,0 +1,207 @@
+0x09eab4: 8082a4bc  lwz r4, -23364(r2)                         |....|
+0x09eab8: 90010008  stw r0, 8(r1)                              |....|
+0x09eabc: 38c00000  addi r6, r0, 0                             |8...|
+0x09eac0: 9421ffb0  stwu r1, -80(r1)                           |.!..|
+0x09eac4: 80a30080  lwz r5, 128(r3)                            |....|
+0x09eac8: a8a5060e  lha r5, 1550(r5)                           |....|
+0x09eacc: 54a007bd  rlwinm r0, r5, 0, 30, 30                   |T...|
+0x09ead0: 4182000c  bne(2) 0x9eadc                             |A...|
+0x09ead4: 38c00001  addi r6, r0, 1                             |8...|
+0x09ead8: 48000010  b 0x9eae8                                  |H...|
+0x09eadc: 54a0077b  rlwinm r0, r5, 0, 29, 29                   |T..{|
+0x09eae0: 41820008  bne(2) 0x9eae8                             |A...|
+0x09eae4: 38c00002  addi r6, r0, 2                             |8...|
+0x09eae8: c023002c  lfs f1, 44(3)                              |.#.,|
+0x09eaec: c0040000  lfs f0, 0(4)                               |....|
+0x09eaf0: fc010040  fcmpu cr0, f1, f1                          |...@|
+0x09eaf4: 4c411382  cror 2, 1, 2                               |LA..|
+0x09eaf8: 40820020  beq(2) 0x9eb18                             |@.. |
+0x09eafc: 80a2a4b8  lwz r5, -23368(r2)                         |....|
+0x09eb00: 54c0103a  rlwinm r0, r6 <<2                          |T..:|
+0x09eb04: c0230014  lfs f1, 20(3)                              |.#..|
+0x09eb08: 7c05042e  lfsx f0, r5, r0                            ||...|
+0x09eb0c: ec01002a  fadds f0, f1, f0                           |...*|
+0x09eb10: d0030014  stfs f0, 20(3)                             |....|
+0x09eb14: 48000060  b 0x9eb74                                  |H..`|
+0x09eb18: 80a2a4b4  lwz r5, -23372(r2)                         |....|
+0x09eb1c: 54c0103a  rlwinm r0, r6 <<2                          |T..:|
+0x09eb20: c0230014  lfs f1, 20(3)                              |.#..|
+0x09eb24: 7c05042e  lfsx f0, r5, r0                            ||...|
+0x09eb28: 80c28874  lwz r6, -30604(r2)                         |...t|
+0x09eb2c: ec01002a  fadds f0, f1, f0                           |...*|
+0x09eb30: 80a2a4b0  lwz r5, -23376(r2)                         |....|
+0x09eb34: d0030014  stfs f0, 20(3)                             |....|
+0x09eb38: 80c60000  lwz r6, 0(r6)                              |....|
+0x09eb3c: 7ca5002e  lwzx r5, r0, r5                            ||...|
+0x09eb40: 80c6001c  lwz r6, 28(r6)                             |....|
+0x09eb44: a8c60010  lha r6, 16(r6)                             |....|
+0x09eb48: 7c062800  cmp cr0, r6, r5                            ||.(.|
+0x09eb4c: 40810028  beq(1) 0x9eb74                             |@..(|
+0x09eb50: 80a2a4ac  lwz r5, -23380(r2)                         |....|
+0x09eb54: 7ca5002e  lwzx r5, r0, r5                            ||...|
+0x09eb58: 7c062800  cmp cr0, r6, r5                            ||.(.|
+0x09eb5c: 40800018  beq(0) 0x9eb74                             |@...|
+0x09eb60: 80a2a4a8  lwz r5, -23384(r2)                         |....|
+0x09eb64: c0230014  lfs f1, 20(3)                              |.#..|
+0x09eb68: 7c05042e  lfsx f0, r5, r0                            ||...|
+0x09eb6c: ec010028  fsubs f0, f1, f0                           |...(|
+0x09eb70: d0030014  stfs f0, 20(3)                             |....|
+0x09eb74: c043001c  lfs f2, 28(3)                              |.C..|
+0x09eb78: c023005c  lfs f1, 92(3)                              |.#.\|
+0x09eb7c: c0040000  lfs f0, 0(4)                               |....|
+0x09eb80: ec420828  fsubs f2, f2, f0                           |.B.(|
+0x09eb84: fc020040  fcmpu cr0, f2, f1                          |...@|
+0x09eb88: 40810018  beq(1) 0x9eba0                             |@...|
+0x09eb8c: 80a2a4a4  lwz r5, -23388(r2)                         |....|
+0x09eb90: c0030024  lfs f0, 36(3)                              |...$|
+0x09eb94: 7c25042e  lfsx f1, r5, r0                            ||%..|
+0x09eb98: ec02007c  fnmsubs f0, f2, f0, f1                     |...||
+0x09eb9c: d0030024  stfs f0, 36(3)                             |...$|
+0x09eba0: 80a30080  lwz r5, 128(r3)                            |....|
+0x09eba4: 3ce04330  addis r7, r0, 17200                        |<.C0|
+0x09eba8: 8102a474  lwz r8, -23436(r2)                         |...t|
+0x09ebac: a8a50592  lha r5, 1426(r5)                           |....|
+0x09ebb0: 8122a49c  lwz r9, -23396(r2)                         |."..|
+0x09ebb4: 6ca68000  xoris r5, r6, 32768                        |l...|
+0x09ebb8: 80a2a4a0  lwz r5, -23392(r2)                         |....|
+0x09ebbc: 90c10044  stw r6, 68(r1)                             |...D|
+0x09ebc0: c8880000  lfd f4, 0(8)                               |....|
+0x09ebc4: 90e10040  stw r7, 64(r1)                             |...@|
+0x09ebc8: 7c69042e  lfsx f3, r9, r0                            ||i..|
+0x09ebcc: c8210040  lfd f1, 64(1)                              |.!.@|
+0x09ebd0: 7c05042e  lfsx f0, r5, r0                            ||...|
+0x09ebd4: ec212028  fsubs f1, f1, f0                           |.! (|
+0x09ebd8: c0a30018  lfs f5, 24(3)                              |....|
+0x09ebdc: c0440004  lfs f2, 4(4)                               |.D..|
+0x09ebe0: 80c2a498  lwz r6, -23400(r2)                         |....|
+0x09ebe4: ec23007a  fmadds f1, f3, f0, f1                      |.#.z|
+0x09ebe8: 90e10048  stw r7, 72(r1)                             |...H|
+0x09ebec: c0040000  lfs f0, 0(4)                               |....|
+0x09ebf0: ec250828  fsubs f1, f5, f0                           |.%.(|
+0x09ebf4: 80e2a490  lwz r7, -23408(r2)                         |....|
+0x09ebf8: 80a2a494  lwz r5, -23404(r2)                         |....|
+0x09ebfc: d0230018  stfs f1, 24(3)                             |.#..|
+0x09ec00: c063001c  lfs f3, 28(3)                              |.c..|
+0x09ec04: 7c26042e  lfsx f1, r6, r0                            ||&..|
+0x09ec08: ec42182a  fadds f2, f2, f0                           |.B.*|
+0x09ec0c: ec220072  fmuls f1, f2, f0                           |.".r|
+0x09ec10: ec230828  fsubs f1, f3, f0                           |.#.(|
+0x09ec14: d023001c  stfs f1, 28(3)                             |.#..|
+0x09ec18: 80c30080  lwz r6, 128(r3)                            |....|
+0x09ec1c: c023002c  lfs f1, 44(3)                              |.#.,|
+0x09ec20: a8c60598  lha r6, 1432(r6)                           |....|
+0x09ec24: fc010040  fcmpu cr0, f1, f1                          |...@|
+0x09ec28: 7c47042e  lfsx f2, r7, r0                            ||G..|
+0x09ec2c: 6cc68000  xoris r6, r6, 32768                        |l...|
+0x09ec30: 7c05042e  lfsx f0, r5, r0                            ||...|
+0x09ec34: 90c1004c  stw r6, 76(r1)                             |...L|
+0x09ec38: c8210048  lfd f1, 72(1)                              |.!.H|
+0x09ec3c: 4c411382  cror 2, 1, 2                               |LA..|
+0x09ec40: ec212028  fsubs f1, f1, f0                           |.! (|
+0x09ec44: ec22007a  fmadds f1, f2, f0, f1                      |.".z|
+0x09ec48: 40820010  beq(2) 0x9ec58                             |@...|
+0x09ec4c: c0030038  lfs f0, 56(3)                              |...8|
+0x09ec50: ec000828  fsubs f0, f0, f0                           |...(|
+0x09ec54: d0030038  stfs f0, 56(3)                             |...8|
+0x09ec58: c023002c  lfs f1, 44(3)                              |.#.,|
+0x09ec5c: c0040000  lfs f0, 0(4)                               |....|
+0x09ec60: fc010040  fcmpu cr0, f1, f1                          |...@|
+0x09ec64: 4c411382  cror 2, 1, 2                               |LA..|
+0x09ec68: 40820044  beq(2) 0x9ecac                             |@..D|
+0x09ec6c: 80a2a48c  lwz r5, -23412(r2)                         |....|
+0x09ec70: c023003c  lfs f1, 60(3)                              |.#.<|
+0x09ec74: 7c05042e  lfsx f0, r5, r0                            ||...|
+0x09ec78: 80c2a488  lwz r6, -23416(r2)                         |....|
+0x09ec7c: ec010028  fsubs f0, f1, f0                           |...(|
+0x09ec80: 80a2a484  lwz r5, -23420(r2)                         |....|
+0x09ec84: d003003c  stfs f0, 60(3)                             |...<|
+0x09ec88: c0230020  lfs f1, 32(3)                              |.#. |
+0x09ec8c: 7c06042e  lfsx f0, r6, r0                            ||...|
+0x09ec90: ec010028  fsubs f0, f1, f0                           |...(|
+0x09ec94: d0030020  stfs f0, 32(3)                             |... |
+0x09ec98: c0230024  lfs f1, 36(3)                              |.#.$|
+0x09ec9c: 7c05042e  lfsx f0, r5, r0                            ||...|
+0x09eca0: ec010028  fsubs f0, f1, f0                           |...(|
+0x09eca4: d0030024  stfs f0, 36(3)                             |...$|
+0x09eca8: 48000040  b 0x9ece8                                  |H..@|
+0x09ecac: 80a2a480  lwz r5, -23424(r2)                         |....|
+0x09ecb0: c023003c  lfs f1, 60(3)                              |.#.<|
+0x09ecb4: 7c05042e  lfsx f0, r5, r0                            ||...|
+0x09ecb8: 80c2a47c  lwz r6, -23428(r2)                         |...||
+0x09ecbc: ec010032  fmuls f0, f1, f0                           |...2|
+0x09ecc0: 80a2a478  lwz r5, -23432(r2)                         |...x|
+0x09ecc4: d003003c  stfs f0, 60(3)                             |...<|
+0x09ecc8: c0230020  lfs f1, 32(3)                              |.#. |
+0x09eccc: 7c06042e  lfsx f0, r6, r0                            ||...|
+0x09ecd0: ec010028  fsubs f0, f1, f0                           |...(|
+0x09ecd4: d0030020  stfs f0, 32(3)                             |... |
+0x09ecd8: c0230024  lfs f1, 36(3)                              |.#.$|
+0x09ecdc: 7c05042e  lfsx f0, r5, r0                            ||...|
+0x09ece0: ec010028  fsubs f0, f1, f0                           |...(|
+0x09ece4: d0030024  stfs f0, 36(3)                             |...$|
+0x09ece8: 38000004  addi r0, r0, 4                             |8...|
+0x09ecec: 7c0903a6  mtctr r0                                   ||...|
+0x09ecf0: 38a30000  addi r5, r3, 0                             |8...|
+0x09ecf4: 38c00000  addi r6, r0, 0                             |8...|
+0x09ecf8: c0050000  lfs f0, 0(5)                               |....|
+0x09ecfc: c0240004  lfs f1, 4(4)                               |.$..|
+0x09ed00: fc000840  fcmpu cr0, f0, f1                          |...@|
+0x09ed04: 40810008  beq(1) 0x9ed0c                             |@...|
+0x09ed08: d0250000  stfs f1, 0(5)                              |.%..|
+0x09ed0c: c0250000  lfs f1, 0(5)                               |.%..|
+0x09ed10: c0040008  lfs f0, 8(4)                               |....|
+0x09ed14: fc010040  fcmpu cr0, f1, f1                          |...@|
+0x09ed18: 40800008  beq(0) 0x9ed20                             |@...|
+0x09ed1c: d0050000  stfs f0, 0(5)                              |....|
+0x09ed20: c0050000  lfs f0, 0(5)                               |....|
+0x09ed24: c0240004  lfs f1, 4(4)                               |.$..|
+0x09ed28: d0050040  stfs f0, 64(5)                             |...@|
+0x09ed2c: c0050004  lfs f0, 4(5)                               |....|
+0x09ed30: fc000840  fcmpu cr0, f0, f1                          |...@|
+0x09ed34: 40810008  beq(1) 0x9ed3c                             |@...|
+0x09ed38: d0250004  stfs f1, 4(5)                              |.%..|
+0x09ed3c: c0250004  lfs f1, 4(5)                               |.%..|
+0x09ed40: c0040008  lfs f0, 8(4)                               |....|
+0x09ed44: fc010040  fcmpu cr0, f1, f1                          |...@|
+0x09ed48: 40800008  beq(0) 0x9ed50                             |@...|
+0x09ed4c: d0050004  stfs f0, 4(5)                              |....|
+0x09ed50: c0050004  lfs f0, 4(5)                               |....|
+0x09ed54: c0240004  lfs f1, 4(4)                               |.$..|
+0x09ed58: d0050044  stfs f0, 68(5)                             |...D|
+0x09ed5c: c0050008  lfs f0, 8(5)                               |....|
+0x09ed60: fc000840  fcmpu cr0, f0, f1                          |...@|
+0x09ed64: 40810008  beq(1) 0x9ed6c                             |@...|
+0x09ed68: d0250008  stfs f1, 8(5)                              |.%..|
+0x09ed6c: c0250008  lfs f1, 8(5)                               |.%..|
+0x09ed70: c0040008  lfs f0, 8(4)                               |....|
+0x09ed74: fc010040  fcmpu cr0, f1, f1                          |...@|
+0x09ed78: 40800008  beq(0) 0x9ed80                             |@...|
+0x09ed7c: d0050008  stfs f0, 8(5)                              |....|
+0x09ed80: c0050008  lfs f0, 8(5)                               |....|
+0x09ed84: c0240004  lfs f1, 4(4)                               |.$..|
+0x09ed88: d0050048  stfs f0, 72(5)                             |...H|
+0x09ed8c: c005000c  lfs f0, 12(5)                              |....|
+0x09ed90: fc000840  fcmpu cr0, f0, f1                          |...@|
+0x09ed94: 40810008  beq(1) 0x9ed9c                             |@...|
+0x09ed98: d025000c  stfs f1, 12(5)                             |.%..|
+0x09ed9c: c025000c  lfs f1, 12(5)                              |.%..|
+0x09eda0: c0040008  lfs f0, 8(4)                               |....|
+0x09eda4: fc010040  fcmpu cr0, f1, f1                          |...@|
+0x09eda8: 40800008  beq(0) 0x9edb0                             |@...|
+0x09edac: d005000c  stfs f0, 12(5)                             |....|
+0x09edb0: c005000c  lfs f0, 12(5)                              |....|
+0x09edb4: 38c60003  addi r6, r6, 3                             |8...|
+0x09edb8: d005004c  stfs f0, 76(5)                             |...L|
+0x09edbc: 38a50010  addi r5, r5, 16                            |8...|
+0x09edc0: 4200ff38  bBO16/0 0x9ecf8                            |B..8|
+0x09edc4: 80630080  lwz r3, 128(r3)                            |.c..|
+0x09edc8: 4806cbf9  bl 0x10b9c0                                |H...|
+0x09edcc: 80010058  lwz r0, 88(r1)                             |...X|
+0x09edd0: 38210050  addi r1, r1, 80                            |8!.P|
+0x09edd4: 7c0803a6  mtxer r0                                   ||...|
+0x09edd8: 4e800020  bclr                                       |N.. |
+0x09eddc: 00000000  .long                                      |....|
+0x09ede0: 00092041  .long                                      |.. A|
+0x09ede4: 80000000  lwz r0, 0(r0)                              |....|
+0x09ede8: 0000032c  .long                                      |...,|
+0x09edec: 00102e53  .long                                      |...S|

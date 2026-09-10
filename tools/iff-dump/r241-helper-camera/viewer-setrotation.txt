@@ -1,0 +1,326 @@
+0x1d7230: be81ffd0  stmw r20, -48(r1)                          |....|
+0x1d7234: 7c0802a6  mfxer r0                                   ||...|
+0x1d7238: 83028cb0  lwz r24, -29520(r2)                        |....|
+0x1d723c: 7c7d1b78  or r3, r29, r3                             ||}.x|
+0x1d7240: 7c942378  or r4, r20, r4                             ||.#x|
+0x1d7244: 82e28cac  lwz r23, -29524(r2)                        |....|
+0x1d7248: 7cbe2b78  or r5, r30, r5                             ||.+x|
+0x1d724c: 83228ca4  lwz r25, -29532(r2)                        |."..|
+0x1d7250: 7cdf3378  or r6, r31, r6                             ||.3x|
+0x1d7254: 83428874  lwz r26, -30604(r2)                        |.B.t|
+0x1d7258: 83628fb8  lwz r27, -28744(r2)                        |.b..|
+0x1d725c: 83828dc0  lwz r28, -29248(r2)                        |....|
+0x1d7260: 90010008  stw r0, 8(r1)                              |....|
+0x1d7264: 9421ff70  stwu r1, -144(r1)                          |.!.p|
+0x1d7268: 80780000  lwz r3, 0(r24)                             |.x..|
+0x1d726c: 80030084  lwz r0, 132(r3)                            |....|
+0x1d7270: 7c140000  cmp cr0, r20, r0                           ||...|
+0x1d7274: 4082000c  beq(2) 0x1d7280                            |@...|
+0x1d7278: 57c0063f  rlwinm r0, r30, 0, 24, 31                  |W..?|
+0x1d727c: 418204b8  bne(2) 0x1d7734                            |A...|
+0x1d7280: 881c0000  lbz r0, 0(r28)                             |....|
+0x1d7284: 28000000  cmplwi r0, r0, 0                           |(...|
+0x1d7288: 418200d0  bne(2) 0x1d7358                            |A...|
+0x1d728c: 881d017a  lbz r0, 378(r29)                           |...z|
+0x1d7290: 28000000  cmplwi r0, r0, 0                           |(...|
+0x1d7294: 41820024  bne(2) 0x1d72b8                            |A..$|
+0x1d7298: 387d0184  addi r3, r29, 388                          |8}..|
+0x1d729c: 4802b1c5  bl 0x202460                                 ; .GetEndX__15XSmoothScrollerFv |H...|
+0x1d72a0: 38030000  addi r0, r3, 0                             |8...|
+0x1d72a4: 387d0184  addi r3, r29, 388                          |8}..|
+0x1d72a8: 7c150378  or r0, r21, r0                             ||..x|
+0x1d72ac: 4802b135  bl 0x2023e0                                 ; .GetEndY__15XSmoothScrollerFv |H..5|
+0x1d72b0: 7c761b78  or r3, r22, r3                             ||v.x|
+0x1d72b4: 4800001c  b 0x1d72d0                                  ; -> 1d72d0 |H...|
+0x1d72b8: 80bb0000  lwz r5, 0(r27)                             |....|
+0x1d72bc: 809d0170  lwz r4, 368(r29)                           |...p|
+0x1d72c0: 807b0004  lwz r3, 4(r27)                             |.{..|
+0x1d72c4: 801d0174  lwz r0, 372(r29)                           |...t|
+0x1d72c8: 7ea52214  add r21, r5, r4                            |~.".|
+0x1d72cc: 7ec30214  add r22, r3, r0                            |~...|
+0x1d72d0: 881d0179  lbz r0, 377(r29)                           |...y|
+0x1d72d4: 28000000  cmplwi r0, r0, 0                           |(...|
+0x1d72d8: 40820060  beq(2) 0x1d7338                            |@..`|
+0x1d72dc: 881c0000  lbz r0, 0(r28)                             |....|
+0x1d72e0: 28000001  cmplwi r0, r0, 1                           |(...|
+0x1d72e4: 40820054  beq(2) 0x1d7338                            |@..T|
+0x1d72e8: 38000000  addi r0, r0, 0                             |8...|
+0x1d72ec: 387d0184  addi r3, r29, 388                          |8}..|
+0x1d72f0: 981c0000  stb r0, 0(r28)                             |....|
+0x1d72f4: 4802b3ed  bl 0x2026e0                                 ; .StopScrolling__15XSmoothScrollerFv |H...|
+0x1d72f8: 38000000  addi r0, r0, 0                             |8...|
+0x1d72fc: 80829244  lwz r4, -28092(r2)                         |...D|
+0x1d7300: 981d017a  stb r0, 378(r29)                           |...z|
+0x1d7304: 7fa3eb78  or r29, r3, r29                            |...x|
+0x1d7308: c01d01b8  lfs f0, 440(29)                            |....|
+0x1d730c: d0040000  stfs f0, 0(4)                              |....|
+0x1d7310: 819d0004  lwz r12, 4(r29)                            |....|
+0x1d7314: 818c0050  lwz r12, 80(r12)                           |...P|
+0x1d7318: 483cb6c9  bl 0x5a29e0                                 ; .sub_5a29e0 |H<..|
+0x1d731c: 80410014  lwz r2, 20(r1)                             |.A..|
+0x1d7320: 80790000  lwz r3, 0(r25)                             |.y..|
+0x1d7324: 81830000  lwz r12, 0(r3)                             |....|
+0x1d7328: 818c0020  lwz r12, 32(r12)                           |... |
+0x1d732c: 483cb6b5  bl 0x5a29e0                                 ; .sub_5a29e0 |H<..|
+0x1d7330: 80410014  lwz r2, 20(r1)                             |.A..|
+0x1d7334: 48344bdd  bl 0x51bf10                                 ; .PumpMouseMoveMsg__12cTSWinMgrW95Fv |H4K.|
+0x1d7338: 38000000  addi r0, r0, 0                             |8...|
+0x1d733c: 901d0170  stw r0, 368(r29)                           |...p|
+0x1d7340: 387d0000  addi r3, r29, 0                            |8}..|
+0x1d7344: 38950000  addi r4, r21, 0                            |8...|
+0x1d7348: 901d0174  stw r0, 372(r29)                           |...t|
+0x1d734c: 38b60000  addi r5, r22, 0                            |8...|
+0x1d7350: 38c00001  addi r6, r0, 1                             |8...|
+0x1d7354: 4bfff9bd  bl 0x1d6d10                                 ; .sub_1d6d10 |K...|
+0x1d7358: 80dd0028  lwz r6, 40(r29)                            |...(|
+0x1d735c: 7fa4eb78  or r29, r4, r29                            |...x|
+0x1d7360: 80bd0030  lwz r5, 48(r29)                            |...0|
+0x1d7364: 807d002c  lwz r3, 44(r29)                            |.}.,|
+0x1d7368: 7ce62850  subf r7, r6, r5                            ||.(P|
+0x1d736c: 801d0034  lwz r0, 52(r29)                            |...4|
+0x1d7370: 54e60ffe  rlwinm r6, r7 bit31(rS)                    |T...|
+0x1d7374: 819d0004  lwz r12, 4(r29)                            |....|
+0x1d7378: 7ca30050  subf r5, r3, r0                            ||..P|
+0x1d737c: 7c063a14  add r0, r6, r7                             ||.:.|
+0x1d7380: 7c060e70  srawi r6, r0, 1                            ||..p|
+0x1d7384: 818c000c  lwz r12, 12(r12)                           |....|
+0x1d7388: 54a00ffe  rlwinm r0, r5 bit31(rS)                    |T...|
+0x1d738c: b0c1004a  sth r6, 74(r1)                             |...J|
+0x1d7390: 7c002a14  add r0, r0, r5                             ||.*.|
+0x1d7394: 38610050  addi r3, r1, 80                            |8a.P|
+0x1d7398: 7c000e70  srawi r0, r0, 1                            ||..p|
+0x1d739c: b0010048  sth r0, 72(r1)                             |...H|
+0x1d73a0: 38c00001  addi r6, r0, 1                             |8...|
+0x1d73a4: 80a10048  lwz r5, 72(r1)                             |...H|
+0x1d73a8: 483cb639  bl 0x5a29e0                                 ; .sub_5a29e0 |H<.9|
+0x1d73ac: 80410014  lwz r2, 20(r1)                             |.A..|
+0x1d73b0: 81180000  lwz r8, 0(r24)                             |....|
+0x1d73b4: 38a00001  addi r5, r0, 1                             |8...|
+0x1d73b8: 80010054  lwz r0, 84(r1)                             |...T|
+0x1d73bc: 80680070  lwz r3, 112(r8)                            |.h.p|
+0x1d73c0: 7c072670  srawi r7, r0, 4                            ||.&p|
+0x1d73c4: 80c10050  lwz r6, 80(r1)                             |...P|
+0x1d73c8: 54e4063e  rlwinm r4, r7, 0, 24, 31                   |T..>|
+0x1d73cc: 38030001  addi r0, r3, 1                             |8...|
+0x1d73d0: 7c840774  extsb r4, r4, r0                           ||..t|
+0x1d73d4: 98e1004c  stb r7, 76(r1)                             |...L|
+0x1d73d8: 7cc62670  srawi r6, r6, 4                            ||.&p|
+0x1d73dc: 7c040000  cmp cr0, r4, r0                            ||...|
+0x1d73e0: 98c1004d  stb r6, 77(r1)                             |...M|
+0x1d73e4: 98a1004e  stb r5, 78(r1)                             |...N|
+0x1d73e8: 4180003c  bne(0) 0x1d7424                            |A..<|
+0x1d73ec: 80680074  lwz r3, 116(r8)                            |.h.t|
+0x1d73f0: 3803ffff  addi r0, r3, -1                            |8...|
+0x1d73f4: 7c040000  cmp cr0, r4, r0                            ||...|
+0x1d73f8: 4181002c  bne(1) 0x1d7424                            |A..,|
+0x1d73fc: 80680078  lwz r3, 120(r8)                            |.h.x|
+0x1d7400: 54c0063e  rlwinm r0, r6, 0, 24, 31                   |T..>|
+0x1d7404: 7c040774  extsb r0, r4, r0                           ||..t|
+0x1d7408: 38030001  addi r0, r3, 1                             |8...|
+0x1d740c: 7c040000  cmp cr0, r4, r0                            ||...|
+0x1d7410: 41800014  bne(0) 0x1d7424                            |A...|
+0x1d7414: 8068007c  lwz r3, 124(r8)                            |.h.||
+0x1d7418: 3803ffff  addi r0, r3, -1                            |8...|
+0x1d741c: 7c040000  cmp cr0, r4, r0                            ||...|
+0x1d7420: 4081000c  beq(1) 0x1d742c                            |@...|
+0x1d7424: 38000001  addi r0, r0, 1                             |8...|
+0x1d7428: 48000008  b 0x1d7430                                  ; -> 1d7430 |H...|
+0x1d742c: 38000000  addi r0, r0, 0                             |8...|
+0x1d7430: 5400063f  rlwinm r0, r0, 0, 24, 31                   |T..?|
+0x1d7434: 41820080  bne(2) 0x1d74b4                            |A...|
+0x1d7438: 80880010  lwz r4, 16(r8)                             |....|
+0x1d743c: 38000000  addi r0, r0, 0                             |8...|
+0x1d7440: 98010042  stb r0, 66(r1)                             |...B|
+0x1d7444: 54830ffe  rlwinm r3, r4 bit31(rS)                    |T...|
+0x1d7448: 80d80000  lwz r6, 0(r24)                             |....|
+0x1d744c: 7c032214  add r0, r3, r4                             ||.".|
+0x1d7450: 7c050e70  srawi r5, r0, 1                            ||..p|
+0x1d7454: 80060070  lwz r0, 112(r6)                            |...p|
+0x1d7458: 54a40ffe  rlwinm r4, r5 bit31(rS)                    |T...|
+0x1d745c: 80660078  lwz r3, 120(r6)                            |.f.x|
+0x1d7460: 7c842a14  add r4, r4, r5                             ||.*.|
+0x1d7464: 7c850e70  srawi r5, r4, 1                            ||..p|
+0x1d7468: 7c640774  extsb r3, r4, r0                           ||d.t|
+0x1d746c: 54a3063e  rlwinm r3, r5, 0, 24, 31                   |T..>|
+0x1d7470: 7c000774  extsb r0, r0, r0                           ||..t|
+0x1d7474: 7c832214  add r4, r3, r4                             ||.".|
+0x1d7478: 7ca30214  add r5, r3, r0                             ||...|
+0x1d747c: 98810041  stb r4, 65(r1)                             |...A|
+0x1d7480: 5483063e  rlwinm r3, r4, 0, 24, 31                   |T..>|
+0x1d7484: 54a0063e  rlwinm r0, r5, 0, 24, 31                   |T..>|
+0x1d7488: 98a10040  stb r5, 64(r1)                             |...@|
+0x1d748c: 7c630774  extsb r3, r3, r0                           ||c.t|
+0x1d7490: 7c000774  extsb r0, r0, r0                           ||..t|
+0x1d7494: 54632036  rlwinm r3, r3 <<4                          |Tc 6|
+0x1d7498: 60630008  ori r3, r3, 8                              |`c..|
+0x1d749c: 54002036  rlwinm r0, r0 <<4                          |T. 6|
+0x1d74a0: 90610058  stw r3, 88(r1)                             |.a.X|
+0x1d74a4: 60000008  ori r0, r0, 8                              |`...|
+0x1d74a8: 9001005c  stw r0, 92(r1)                             |...\|
+0x1d74ac: 90610050  stw r3, 80(r1)                             |.a.P|
+0x1d74b0: 90010054  stw r0, 84(r1)                             |...T|
+0x1d74b4: 80780000  lwz r3, 0(r24)                             |.x..|
+0x1d74b8: 3aa10054  addi r21, r1, 84                           |:..T|
+0x1d74bc: 38950000  addi r4, r21, 0                            |8...|
+0x1d74c0: 38a10050  addi r5, r1, 80                            |8..P|
+0x1d74c4: 80030084  lwz r0, 132(r3)                            |....|
+0x1d74c8: 38e00400  addi r7, r0, 1024                          |8...|
+0x1d74cc: 20000004  .long                                      | ...|
+0x1d74d0: 540607be  rlwinm r6, r0, 0, 30, 31                   |T...|
+0x1d74d4: 4bf862dd  bl 0x15d7b0                                 ; .RotateCoords__15cRotatableWorldCFPiPiii |K.b.|
+0x1d74d8: 839b000c  lwz r28, 12(r27)                           |....|
+0x1d74dc: 7e84a378  or r20, r4, r20                            |~..x|
+0x1d74e0: 80780000  lwz r3, 0(r24)                             |.x..|
+0x1d74e4: 38a00000  addi r5, r0, 0                             |8...|
+0x1d74e8: 929b000c  stw r20, 12(r27)                           |....|
+0x1d74ec: 4bf8ae25  bl 0x162310                                 ; .sub_162310 |K..%|
+0x1d74f0: 7fa3eb78  or r29, r3, r29                            |...x|
+0x1d74f4: 4bfef67d  bl 0x1c6b70                                 ; .BuildMaxAltsTable__11HouseViewerFv |K..}|
+0x1d74f8: 80780000  lwz r3, 0(r24)                             |.x..|
+0x1d74fc: 38950000  addi r4, r21, 0                            |8...|
+0x1d7500: 38a10050  addi r5, r1, 80                            |8..P|
+0x1d7504: 80c30084  lwz r6, 132(r3)                            |....|
+0x1d7508: 38e00400  addi r7, r0, 1024                          |8...|
+0x1d750c: 4bf862a5  bl 0x15d7b0                                 ; .RotateCoords__15cRotatableWorldCFPiPiii |K.b.|
+0x1d7510: 80810050  lwz r4, 80(r1)                             |...P|
+0x1d7514: 7fa3eb78  or r29, r3, r29                            |...x|
+0x1d7518: 80a10054  lwz r5, 84(r1)                             |...T|
+0x1d751c: 38e00000  addi r7, r0, 0                             |8...|
+0x1d7520: 80dd0018  lwz r6, 24(r29)                            |....|
+0x1d7524: 39000001  addi r8, r0, 1                             |9...|
+0x1d7528: 48000769  bl 0x1d7c90                                 ; .ScrollToTile__11HouseViewerF7FTilePtibb |H..i|
+0x1d752c: 80fb0000  lwz r7, 0(r27)                             |....|
+0x1d7530: 38000000  addi r0, r0, 0                             |8...|
+0x1d7534: 809d0170  lwz r4, 368(r29)                           |...p|
+0x1d7538: 7fa3eb78  or r29, r3, r29                            |...x|
+0x1d753c: 80db0004  lwz r6, 4(r27)                             |....|
+0x1d7540: 80bd0174  lwz r5, 372(r29)                           |...t|
+0x1d7544: 7c872214  add r4, r7, r4                             ||.".|
+0x1d7548: 901d0170  stw r0, 368(r29)                           |...p|
+0x1d754c: 7ca62a14  add r5, r6, r5                             ||.*.|
+0x1d7550: 38c00001  addi r6, r0, 1                             |8...|
+0x1d7554: 901d0174  stw r0, 372(r29)                           |...t|
+0x1d7558: 4bfff7b9  bl 0x1d6d10                                 ; .sub_1d6d10 |K...|
+0x1d755c: 7fa3eb78  or r29, r3, r29                            |...x|
+0x1d7560: 4bfecee1  bl 0x1c4440                                 ; .UpdateSimsPose__11HouseViewerFv |K...|
+0x1d7564: 80628f48  lwz r3, -28856(r2)                         |.b.H|
+0x1d7568: 80630000  lwz r3, 0(r3)                              |.c..|
+0x1d756c: 28030000  cmplwi r0, r3, 0                           |(...|
+0x1d7570: 41820030  bne(2) 0x1d75a0                            |A..0|
+0x1d7574: 81830028  lwz r12, 40(r3)                            |...(|
+0x1d7578: 818c0034  lwz r12, 52(r12)                           |...4|
+0x1d757c: 483cb465  bl 0x5a29e0                                 ; .sub_5a29e0 |H<.e|
+0x1d7580: 80410014  lwz r2, 20(r1)                             |.A..|
+0x1d7584: 28030000  cmplwi r0, r3, 0                           |(...|
+0x1d7588: 41820018  bne(2) 0x1d75a0                            |A...|
+0x1d758c: 81830000  lwz r12, 0(r3)                             |....|
+0x1d7590: 38800000  addi r4, r0, 0                             |8...|
+0x1d7594: 818c00ac  lwz r12, 172(r12)                          |....|
+0x1d7598: 483cb449  bl 0x5a29e0                                 ; .sub_5a29e0 |H<.I|
+0x1d759c: 80410014  lwz r2, 20(r1)                             |.A..|
+0x1d75a0: 7fa3eb78  or r29, r3, r29                            |...x|
+0x1d75a4: 819d0004  lwz r12, 4(r29)                            |....|
+0x1d75a8: 818c0050  lwz r12, 80(r12)                           |...P|
+0x1d75ac: 483cb435  bl 0x5a29e0                                 ; .sub_5a29e0 |H<.5|
+0x1d75b0: 80410014  lwz r2, 20(r1)                             |.A..|
+0x1d75b4: 38600084  addi r3, r0, 132                           |8`..|
+0x1d75b8: 38800000  addi r4, r0, 0                             |8...|
+0x1d75bc: 4be896e5  bl 0x60ca0                                  ; .GlobalDispatch__Fsl |K...|
+0x1d75c0: 807d0054  lwz r3, 84(r29)                            |.}.T|
+0x1d75c4: 4bfcbc5d  bl 0x1a3220                                 ; .Exists__14cAnimDeviceSubFv |K..]|
+0x1d75c8: 5460063f  rlwinm r0, r3, 0, 24, 31                   |T`.?|
+0x1d75cc: 41820020  bne(2) 0x1d75ec                            |A.. |
+0x1d75d0: 80f80000  lwz r7, 0(r24)                             |....|
+0x1d75d4: 807d0054  lwz r3, 84(r29)                            |.}.T|
+0x1d75d8: 809b0008  lwz r4, 8(r27)                             |....|
+0x1d75dc: 80bb0000  lwz r5, 0(r27)                             |....|
+0x1d75e0: 80db0004  lwz r6, 4(r27)                             |....|
+0x1d75e4: 80e70084  lwz r7, 132(r7)                            |....|
+0x1d75e8: 4bfc9dc9  bl 0x1a13b0                                 ; .SetCameraPosition__14cAnimDeviceSubFiiii |K...|
+0x1d75ec: 7fa3eb78  or r29, r3, r29                            |...x|
+0x1d75f0: 4bfecfe1  bl 0x1c45d0                                 ; .BuildStaticClearRegion__11HouseViewerFv |K...|
+0x1d75f4: 801d001c  lwz r0, 28(r29)                            |....|
+0x1d75f8: 28000000  cmplwi r0, r0, 0                           |(...|
+0x1d75fc: 41820014  bne(2) 0x1d7610                            |A...|
+0x1d7600: 809d0054  lwz r4, 84(r29)                            |...T|
+0x1d7604: 387d00b8  addi r3, r29, 184                          |8}..|
+0x1d7608: 80bb0008  lwz r5, 8(r27)                             |....|
+0x1d760c: 4802c495  bl 0x203aa0                                 ; .GenerateLookupTables__13ZBufferLookupFP14cAnimDeviceSubi |H...|
+0x1d7610: 807a0000  lwz r3, 0(r26)                             |.z..|
+0x1d7614: 809d0018  lwz r4, 24(r29)                            |....|
+0x1d7618: 80630000  lwz r3, 0(r3)                              |.c..|
+0x1d761c: 80630024  lwz r3, 36(r3)                             |.c.$|
+0x1d7620: 4bf514c1  bl 0x128ae0                                 ; .ComputeCutaway__11RoomManagerFi |K...|
+0x1d7624: 881d0049  lbz r0, 73(r29)                            |...I|
+0x1d7628: 28000000  cmplwi r0, r0, 0                           |(...|
+0x1d762c: 41820010  bne(2) 0x1d763c                            |A...|
+0x1d7630: 889d01f8  lbz r4, 504(r29)                           |....|
+0x1d7634: 7fa3eb78  or r29, r3, r29                            |...x|
+0x1d7638: 4bff7d79  bl 0x1cf3b0                                 ; .DoDynamicCutaway__11HouseViewerFb |K.}y|
+0x1d763c: 57e0063f  rlwinm r0, r31, 0, 24, 31                  |W..?|
+0x1d7640: 41820010  bne(2) 0x1d7650                            |A...|
+0x1d7644: 807a0000  lwz r3, 0(r26)                             |.z..|
+0x1d7648: 80630028  lwz r3, 40(r3)                             |.c.(|
+0x1d764c: 4befbe35  bl 0xd3480                                  ; .FreeUnusedData__12ObjectFolderFv |K..5|
+0x1d7650: 80790000  lwz r3, 0(r25)                             |.y..|
+0x1d7654: 81830000  lwz r12, 0(r3)                             |....|
+0x1d7658: 818c0020  lwz r12, 32(r12)                           |... |
+0x1d765c: 483cb385  bl 0x5a29e0                                 ; .sub_5a29e0 |H<..|
+0x1d7660: 80410014  lwz r2, 20(r1)                             |.A..|
+0x1d7664: 483448ad  bl 0x51bf10                                 ; .PumpMouseMoveMsg__12cTSWinMgrW95Fv |H4H.|
+0x1d7668: 57c0063f  rlwinm r0, r30, 0, 24, 31                  |W..?|
+0x1d766c: 408200bc  beq(2) 0x1d7728                            |@...|
+0x1d7670: 801b000c  lwz r0, 12(r27)                            |....|
+0x1d7674: 7c60e050  subf r3, r0, r28                           ||`.P|
+0x1d7678: 483bbae9  bl 0x593160                                 ; .sub_593160 |H;..|
+0x1d767c: 546007ff  rlwinm r0, r3 &1                           |T`..|
+0x1d7680: 418200a8  bne(2) 0x1d7728                            |A...|
+0x1d7684: 80770000  lwz r3, 0(r23)                             |.w..|
+0x1d7688: 39400000  addi r10, r0, 0                            |9@..|
+0x1d768c: 81230010  lwz r9, 16(r3)                             |.#..|
+0x1d7690: 48000090  b 0x1d7720                                  ; -> 1d7720 |H...|
+0x1d7694: 5540063e  rlwinm r0, r10, 0, 24, 31                  |U@.>|
+0x1d7698: 2c090000  cmpwi r0, r9, 0                            |,...|
+0x1d769c: 7c000774  extsb r0, r0, r0                           ||..t|
+0x1d76a0: 7d2903a6  mtctr r9                                   |})..|
+0x1d76a4: 5408083c  rlwinm r8, r0 <<1                          |T..<|
+0x1d76a8: 39600000  addi r11, r0, 0                            |9`..|
+0x1d76ac: 40810070  beq(1) 0x1d771c                            |@..p|
+0x1d76b0: 38800001  addi r4, r0, 1                             |8...|
+0x1d76b4: 80d70000  lwz r6, 0(r23)                             |....|
+0x1d76b8: 5485103a  rlwinm r5, r4 <<2                          |T..:|
+0x1d76bc: 98810046  stb r4, 70(r1)                             |...F|
+0x1d76c0: 38050020  addi r0, r5, 32                            |8.. |
+0x1d76c4: 7c66002e  lwzx r3, r0, r6                            ||f..|
+0x1d76c8: 5560063e  rlwinm r0, r11, 0, 24, 31                  |U`.>|
+0x1d76cc: 7c000774  extsb r0, r0, r0                           ||..t|
+0x1d76d0: 99610044  stb r11, 68(r1)                            |.a.D|
+0x1d76d4: 8063000c  lwz r3, 12(r3)                             |.c..|
+0x1d76d8: 5407103a  rlwinm r7, r0 <<2                          |T..:|
+0x1d76dc: 99410045  stb r10, 69(r1)                            |.A.E|
+0x1d76e0: 7c63382e  lwzx r3, r7, r3                            ||c8.|
+0x1d76e4: 7c83422e  lhzx r4, r8, r3                            ||.B.|
+0x1d76e8: 2804000a  cmplwi r0, r4, 10                          |(...|
+0x1d76ec: 41820010  bne(2) 0x1d76fc                            |A...|
+0x1d76f0: 5480043e  rlwinm r0, r4, 0, 16, 31                   |T..>|
+0x1d76f4: 2800000b  cmplwi r0, r0, 11                          |(...|
+0x1d76f8: 4082001c  beq(2) 0x1d7714                            |@...|
+0x1d76fc: 38050020  addi r0, r5, 32                            |8.. |
+0x1d7700: 7c66002e  lwzx r3, r0, r6                            ||f..|
+0x1d7704: 68800001  xori r4, r0, 1                             |h...|
+0x1d7708: 8063000c  lwz r3, 12(r3)                             |.c..|
+0x1d770c: 7c63382e  lwzx r3, r7, r3                            ||c8.|
+0x1d7710: 7c03432e  sthx r0, r8, r3                            ||.C.|
+0x1d7714: 396b0001  addi r11, r11, 1                           |9k..|
+0x1d7718: 4200ff98  bBO16/0 0x1d76b0                           |B...|
+0x1d771c: 394a0001  addi r10, r10, 1                           |9J..|
+0x1d7720: 7c0a4800  cmp cr0, r10, r9                           ||.H.|
+0x1d7724: 4180ff70  bne(0) 0x1d7694                            |A..p|
+0x1d7728: 807a0000  lwz r3, 0(r26)                             |.z..|
+0x1d772c: 80630010  lwz r3, 16(r3)                             |.c..|
+0x1d7730: 481315c1  bl 0x308cf0                                 ; .sub_308cf0 |H...|
+0x1d7734: 80010098  lwz r0, 152(r1)                            |....|
+0x1d7738: 38210090  addi r1, r1, 144                           |8!..|
+0x1d773c: ba81ffd0  lmw r20, -48(r1)                           |....|
+0x1d7740: 7c0803a6  mtxer r0                                   ||...|
+0x1d7744: 4e800020  bclr                                       |N.. |

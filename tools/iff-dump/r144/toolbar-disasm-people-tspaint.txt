@@ -1,0 +1,115 @@
+0028d510: bec1ffd8  stmw     r22, -0x28(r1)
+0028d514: 7c0802a6  mflr     r0
+0028d518: 8382b04c  lwz      r28, -0x4fb4(r2)   ; TOC[-0x4fb4]->BSS off 0x93498
+0028d51c: 7c7a1b78  mr       r26, r3
+0028d520: 83a2b050  lwz      r29, -0x4fb0(r2)   ; TOC[-0x4fb0]->BSS off 0x934a0
+0028d524: 83c2b054  lwz      r30, -0x4fac(r2)   ; TOC[-0x4fac]->BSS off 0x93480
+0028d528: 83e2b068  lwz      r31, -0x4f98(r2)   ; TOC[-0x4f98]->CODE file 0x5a45ec firstword=1061158912(0x3f400000)
+0028d52c: 90010008  stw      r0, 8(r1)
+0028d530: 9421fed0  stwu     r1, -0x130(r1)
+0028d534: 88030061  lbz      r0, 0x61(r3)
+0028d538: 28000000  cmplwi   r0, 0
+0028d53c: 40820018  bne      0x28d554
+0028d540: 801a00ac  lwz      r0, 0xac(r26)
+0028d544: 2c000000  cmpwi    r0, 0
+0028d548: 4082000c  bne      0x28d554
+0028d54c: 38600001  li       r3, 1
+0028d550: 48000538  b        0x28da88
+0028d554: 7f43d378  mr       r3, r26
+0028d558: 4bffaca9  bl       0x288200   ; .UpdateAtWorkStatus__10cWinPeopleFv
+0028d55c: 4bfb6945  bl       0x243ea0   ; .GetSelected__12PersonFinderFv
+0028d560: 7c601b78  mr       r0, r3
+0028d564: 807a005c  lwz      r3, 0x5c(r26)
+0028d568: 7c1b0378  mr       r27, r0
+0028d56c: 81830000  lwz      r12, 0(r3)
+0028d570: 38800010  li       r4, 0x10
+0028d574: 818c0028  lwz      r12, 0x28(r12)
+0028d578: 48315469  bl       0x5a29e0
+0028d57c: 80410014  lwz      r2, 0x14(r1)
+0028d580: 5460063f  clrlwi.  r0, r3, 0x18
+0028d584: 41820500  beq      0x28da84
+0028d588: 815a001c  lwz      r10, 0x1c(r26)
+0028d58c: 38a10040  addi     r5, r1, 0x40
+0028d590: 38c10050  addi     r6, r1, 0x50
+0028d594: 91410040  stw      r10, 0x40(r1)
+0028d598: 38e00000  li       r7, 0
+0028d59c: 811a0020  lwz      r8, 0x20(r26)
+0028d5a0: 91010044  stw      r8, 0x44(r1)
+0028d5a4: 38080032  addi     r0, r8, 0x32
+0028d5a8: 809a0024  lwz      r4, 0x24(r26)
+0028d5ac: 90810048  stw      r4, 0x48(r1)
+0028d5b0: 807a0028  lwz      r3, 0x28(r26)
+0028d5b4: 3923ffce  addi     r9, r3, -0x32
+0028d5b8: 91410050  stw      r10, 0x50(r1)
+0028d5bc: 90810058  stw      r4, 0x58(r1)
+0028d5c0: 9061005c  stw      r3, 0x5c(r1)
+0028d5c4: 9121004c  stw      r9, 0x4c(r1)
+0028d5c8: 90010054  stw      r0, 0x54(r1)
+0028d5cc: 807a0020  lwz      r3, 0x20(r26)
+0028d5d0: 801a001c  lwz      r0, 0x1c(r26)
+0028d5d4: 7d6300d0  neg      r11, r3
+0028d5d8: 7c0000d0  neg      r0, r0
+0028d5dc: 7c685a14  add      r3, r8, r11
+0028d5e0: 7d0a0214  add      r8, r10, r0
+0028d5e4: 7c840214  add      r4, r4, r0
+0028d5e8: 7c095a14  add      r0, r9, r11
+0028d5ec: 91010040  stw      r8, 0x40(r1)
+0028d5f0: 90810048  stw      r4, 0x48(r1)
+0028d5f4: 90610044  stw      r3, 0x44(r1)
+0028d5f8: 9001004c  stw      r0, 0x4c(r1)
+0028d5fc: 807a005c  lwz      r3, 0x5c(r26)
+0028d600: 809a00cc  lwz      r4, 0xcc(r26)
+0028d604: 81830000  lwz      r12, 0(r3)
+0028d608: 818c00a0  lwz      r12, 0xa0(r12)
+0028d60c: 483153d5  bl       0x5a29e0
+0028d610: 80410014  lwz      r2, 0x14(r1)
+0028d614: 809a0224  lwz      r4, 0x224(r26)
+0028d618: 38c100c0  addi     r6, r1, 0xc0
+0028d61c: 811a0020  lwz      r8, 0x20(r26)
+0028d620: 38e00000  li       r7, 0
+0028d624: 80040020  lwz      r0, 0x20(r4)
+0028d628: 83040018  lwz      r24, 0x18(r4)
+0028d62c: 38a40014  addi     r5, r4, 0x14
+0028d630: 7d604214  add      r11, r0, r8
+0028d634: 82e40014  lwz      r23, 0x14(r4)
+0028d638: 813a001c  lwz      r9, 0x1c(r26)
+0028d63c: 8064001c  lwz      r3, 0x1c(r4)
+0028d640: 7f384214  add      r25, r24, r8
+0028d644: 82de0004  lwz      r22, 4(r30)
+0028d648: 7d974a14  add      r12, r23, r9
+0028d64c: 801e0000  lwz      r0, 0(r30)
+0028d650: 7fc34a14  add      r30, r3, r9
+0028d654: 7d19b214  add      r8, r25, r22
+0028d658: 7d4c0214  add      r10, r12, r0
+0028d65c: 7d3e0214  add      r9, r30, r0
+0028d660: 7c0bb214  add      r0, r11, r22
+0028d664: 92e100d0  stw      r23, 0xd0(r1)
+0028d668: 906100d8  stw      r3, 0xd8(r1)
+0028d66c: 930100d4  stw      r24, 0xd4(r1)
+0028d670: 918100e0  stw      r12, 0xe0(r1)
+0028d674: 932100e4  stw      r25, 0xe4(r1)
+0028d678: 93c100e8  stw      r30, 0xe8(r1)
+0028d67c: 916100ec  stw      r11, 0xec(r1)
+0028d680: 914100c0  stw      r10, 0xc0(r1)
+0028d684: 910100c4  stw      r8, 0xc4(r1)
+0028d688: 912100c8  stw      r9, 0xc8(r1)
+0028d68c: 900100cc  stw      r0, 0xcc(r1)
+0028d690: 807a005c  lwz      r3, 0x5c(r26)
+0028d694: 918100d0  stw      r12, 0xd0(r1)
+0028d698: 81830000  lwz      r12, 0(r3)
+0028d69c: 93c100d8  stw      r30, 0xd8(r1)
+0028d6a0: 818c00a0  lwz      r12, 0xa0(r12)
+0028d6a4: 932100d4  stw      r25, 0xd4(r1)
+0028d6a8: 916100dc  stw      r11, 0xdc(r1)
+0028d6ac: 914100e0  stw      r10, 0xe0(r1)
+0028d6b0: 912100e8  stw      r9, 0xe8(r1)
+0028d6b4: 910100e4  stw      r8, 0xe4(r1)
+0028d6b8: 900100ec  stw      r0, 0xec(r1)
+0028d6bc: 48315325  bl       0x5a29e0
+0028d6c0: 80410014  lwz      r2, 0x14(r1)
+0028d6c4: 2c1bffff  cmpwi    r27, -1
+0028d6c8: 4182004c  beq      0x28d714
+0028d6cc: 7f63db78  mr       r3, r27
+0028d6d0: 4bfb3821  bl       0x240ef0   ; .GetMotives__12PersonFinderFi
+0028d6d4: c023000c  lfs      f1, 0xc(r3)
+0028d6d8: c01f0014  lfs      f0, 0x14(r31)

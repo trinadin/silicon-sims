@@ -1,0 +1,60 @@
+0x0ee4c0: 80760118  lwz r3, 280(r22)                           |.v..|
+0x0ee4c4: a8030012  lha r0, 18(r3)                             |....|
+0x0ee4c8: 2c000002  cmpwi r0, r0, 2                            |,...|
+0x0ee4cc: 4182001c  bne(2) 0xee4e8                             |A...|
+0x0ee4d0: 3800001c  addi r0, r0, 28                            |8...|
+0x0ee4d4: 38810086  addi r4, r1, 134                           |8...|
+0x0ee4d8: b0010086  sth r0, 134(r1)                            |....|
+0x0ee4dc: 387a0000  addi r3, r26, 0                            |8z..|
+0x0ee4e0: 38a00000  addi r5, r0, 0                             |8...|
+0x0ee4e4: 484a223d  bl 0x590720                                |HJ"=|
+0x0ee4e8: 38760000  addi r3, r22, 0                            |8v..|
+0x0ee4ec: 38bc0000  addi r5, r28, 0                            |8...|
+0x0ee4f0: 38db0000  addi r6, r27, 0                            |8...|
+0x0ee4f4: 38800028  addi r4, r0, 40                            |8..(|
+0x0ee4f8: 38e00000  addi r7, r0, 0                             |8...|
+0x0ee4fc: 484a2d35  bl 0x591230                                |HJ-5|
+0x0ee500: 7fc60734  extsh r30, r6, r0                          |...4|
+0x0ee504: 38830000  addi r4, r3, 0                             |8...|
+0x0ee508: 54c5083c  rlwinm r5, r6 <<1                          |T..<|
+0x0ee50c: 7c642a14  add r3, r4, r5                             ||d*.|
+0x0ee510: a863058c  lha r3, 1420(r3)                           |.c..|
+0x0ee514: 57e0063f  rlwinm r0, r31, 0, 24, 31                  |W..?|
+0x0ee518: b0610040  sth r3, 64(r1)                             |.a.@|
+0x0ee51c: 41820edc  bne(2) 0xef3f8                             |A...|
+0x0ee520: 38a5058c  addi r5, r5, 1420                          |8...|
+0x0ee524: 3806ffbc  addi r0, r6, -68                           |8...|
+0x0ee528: 807d0128  lwz r3, 296(r29)                           |.}.(|
+0x0ee52c: 7ca42a14  add r5, r4, r5                             ||.*.|
+0x0ee530: 28000010  cmplwi r0, r0, 16                          |(...|
+0x0ee534: 90a30000  stw r5, 0(r3)                              |....|
+0x0ee538: 41810050  bne(1) 0xee588                             |A..P|
+0x0ee53c: 8062a674  lwz r3, -22924(r2)                         |.b.t|
+0x0ee540: 5400103a  rlwinm r0, r0 <<2                          |T..:|
+0x0ee544: 7c63002e  lwzx r3, r0, r3                            ||c..|
+0x0ee548: 7c6903a6  mtctr r3                                   ||i..|
+0x0ee54c: 4e800420  bcctr                                      |N.. |
+0x0ee550: 807d00dc  lwz r3, 220(r29)                           |.}..|
+0x0ee554: 4bff4cfd  bl 0xe3250                                 |K.L.|
+0x0ee558: 48000ea0  b 0xef3f8                                  |H...|
+0x0ee55c: 807d00dc  lwz r3, 220(r29)                           |.}..|
+0x0ee560: 4bff4c51  bl 0xe31b0                                 |K.LQ|
+0x0ee564: 48000e94  b 0xef3f8                                  |H...|
+0x0ee568: 807d011c  lwz r3, 284(r29)                           |.}..|
+0x0ee56c: 38800001  addi r4, r0, 1                             |8...|
+0x0ee570: 480143f1  bl 0x102960                                |H.C.|
+0x0ee574: 80780000  lwz r3, 0(r24)                             |.x..|
+0x0ee578: 3c802000  addis r4, r0, 8192                         |<. .|
+0x0ee57c: 806300a4  lwz r3, 164(r3)                            |.c..|
+0x0ee580: 481221c1  bl 0x210740                                |H.!.|
+0x0ee584: 48000e74  b 0xef3f8                                  |H..t|
+0x0ee588: 7fc00734  extsh r30, r0, r0                          |...4|
+0x0ee58c: 2c000002  cmpwi r0, r0, 2                            |,...|
+0x0ee590: 38600000  addi r3, r0, 0                             |8`..|
+0x0ee594: 41800010  bne(0) 0xee5a4                             |A...|
+0x0ee598: 2c000007  cmpwi r0, r0, 7                            |,...|
+0x0ee59c: 41810008  bne(1) 0xee5a4                             |A...|
+0x0ee5a0: 38600001  addi r3, r0, 1                             |8`..|
+0x0ee5a4: 5460063f  rlwinm r0, r3, 0, 24, 31                   |T`.?|
+0x0ee5a8: 41820014  bne(2) 0xee5bc                             |A...|
+0x0ee5ac: 807d00dc  lwz r3, 220(r29)                           |.}..|

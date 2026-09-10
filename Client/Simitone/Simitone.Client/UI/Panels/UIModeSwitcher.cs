@@ -49,7 +49,7 @@ namespace Simitone.Client.UI.Panels
             BuyButton.Opacity = 0;
             Add(BuyButton);
 
-            OptionButton = new UIElasticButton(ui.Get("mode_options.png").Get(GameFacade.GraphicsDevice));
+            OptionButton = new UIElasticButton(Simitone.Client.UI.Model.UIOriginal.ResolveOrPng("cpanel\\Buttons\\options.bmp", "btn_options.png", ui.Get("mode_options.png").Get(GameFacade.GraphicsDevice)));
             OptionButton.Position = btn.Position;
             OptionButton.OnButtonClick += (b) => { SwitchMode(UIMainPanelMode.OPTIONS); };
             OptionButton.Opacity = 0;

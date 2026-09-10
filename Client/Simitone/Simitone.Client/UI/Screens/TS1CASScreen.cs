@@ -1,6 +1,7 @@
 using FSO.Client;
 using FSO.Client.UI.Framework;
 using FSO.Common;
+using FSO.Common.Rendering.Framework.IO;
 using FSO.Common.Utils;
 using FSO.SimAntics;
 using FSO.SimAntics.Engine.TSOTransaction;
@@ -60,6 +61,17 @@ namespace Simitone.Client.UI.Screens
             set
             {
                 CameraInterp(value);
+                if (Original)
+                {
+                    // engine law: each original screen is an opaque 800x600
+                    // replacement of the previous, not a layered slide.
+                    DesktopCAS.Visible = value > 0.5f;
+                    if (!DesktopCAS.Visible) DesktopCAS.BioEdit.Blur();
+                    DesktopFamily.Visible = value <= 0.5f && value > -0.5f;
+                    DesktopFamilies.Visible = value <= -0.5f;
+                    _FamilySimInterp = value;
+                    return;
+                }
                 CASPanel.Position = new Vector2((Cam == null)?10:((ScreenWidth - 500) / 2), 10 - (282 * (1-value)));
                 FamilyPanel.ShowI = 1-Math.Abs(value);
                 FamiliesPanel.TitleI = 1 - Math.Abs(value+1);
@@ -86,9 +98,41 @@ namespace Simitone.Client.UI.Screens
         public string CurrentSkin = "lgt";
         private bool CurrentChild;
 
+        // Native cWinDesignCharacter owns four zero-initialized {body,head}
+        // rows. They survive type/skin changes only within one editing session.
+        private readonly int[,] DesktopSuitMemory = new int[4, 2];
+        internal Action<string> DesktopTypeLoaderForTest;
+
+        private static int DesktopTypeIndex(string type) => (type[0] == 'f' ? 2 : 0) + (type[1] == 'c' ? 1 : 0);
+        internal static int SanifyDesktopSuit(int index, int count) => count == 0 ? -1 : Math.Max(0, Math.Min(count - 1, index));
+        private static int CarouselIndex(float position, int count) => count == 0 ? -1
+            : (int)DirectionUtils.PosMod(Math.Round(position + 8), count);
+
+        private void LoadDesktopType(string type)
+        {
+            if (DesktopTypeLoaderForTest == null) PopulateSimType(type);
+            else { CurrentCode = type; DesktopTypeLoaderForTest(type); }
+        }
+
+        private void ChangeDesktopCollection(string type, string skin)
+        {
+            if (vm == null && DesktopTypeLoaderForTest == null) return;
+            if (CurrentSkin == skin && CurrentCode == type) return;
+            int previous = DesktopTypeIndex(CurrentCode);
+            DesktopSuitMemory[previous, 0] = CarouselIndex(BodyPosition, ActiveBodies.Count);
+            DesktopSuitMemory[previous, 1] = CarouselIndex(HeadPosition, ActiveHeads.Count);
+            CurrentSkin = skin;
+            LoadDesktopType(type);
+            int next = DesktopTypeIndex(type);
+            BodyPosition = SanifyDesktopSuit(DesktopSuitMemory[next, 0], ActiveBodies.Count) - 8;
+            HeadPosition = SanifyDesktopSuit(DesktopSuitMemory[next, 1], ActiveHeads.Count) - 8;
+        }
+
         private int? MoveInFamily;
 
         private UICASMode Mode = UICASMode.FamilyEdit;
+        internal UICASMode CurrentMode => Mode;
+        internal Action<int?> NeighborhoodTransition;
 
         public List<CASFamilyMember> WIPFamily = new List<CASFamilyMember>();
         public List<VMAvatar> RepresentFamily = new List<VMAvatar>();
@@ -98,6 +142,28 @@ namespace Simitone.Client.UI.Screens
         public UIFamiliesCASPanel FamiliesPanel;
         public UITwoStateButton BackButton;
         public UITwoStateButton AcceptButton;
+
+        // R143: desktop runs the ORIGINAL 800x600 screens on the decoded
+        // engine law (r143/cas-layout-law.md + nbhd-layout-law.md); the FreeSO
+        // mobile panels below are the !Original path, unchanged.
+        public readonly bool Original = !FSOEnvironment.SoftwareKeyboard;
+        public Simitone.Client.UI.Panels.CAS.UIOriginalDesignChar DesktopCAS;
+        public Simitone.Client.UI.Panels.CAS.UIOriginalDesignFamily DesktopFamily;
+        public Simitone.Client.UI.Panels.CAS.UIOriginalPickFamily DesktopFamilies;
+        public VMAvatar VitaPreview;
+
+        // R212: the engine vita window plays its idle cycle per paint
+        // (cWinVitaBtnSolo::AnimatePet law) — the preview's idle driver.
+        public Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer VitaIdle;
+
+        // R143 Vita window calibration: the engine viewport rect is canon
+        // ((618,145) 100x220); these camera constants are tuned ONCE against
+        // the uisurvey dump so the preview sim lands in the hole (the engine's
+        // own camera keyframes are a decoding residual).
+        public Vector2 VitaCenterTile = new Vector2(31.1f, 23.6f);
+        public float VitaZoom = 1.5f;
+        public Vector3 VitaWorldPos = new Vector3(90f, 0, 58f);
+        public float VitaFacing = MathHelper.PiOver2;
 
         public Vector3[] ModePositions = new Vector3[]
         {
@@ -181,9 +247,11 @@ namespace Simitone.Client.UI.Screens
         private void PopulateSimType(string simtype)
         {
             CurrentCode = simtype;
-            var heads = Content.Get().BCFGlobal.CollectionsByName["c"].ClothesByAvatarType[simtype];
+            // Filtering one skin must not remove entries from the shared
+            // content collection and permanently hide them for other skins.
+            var heads = Content.Get().BCFGlobal.CollectionsByName["c"].ClothesByAvatarType[simtype].ToList();
             if (simtype[1] == 'c') simtype += "chd";
-            var bodies = Content.Get().BCFGlobal.CollectionsByName["b"].GeneralAvatarType(simtype);
+            var bodies = Content.Get().BCFGlobal.CollectionsByName["b"].GeneralAvatarType(simtype).ToList();
 
             var tex = (TS1AvatarTextureProvider)Content.Get().AvatarTextures;
             var texnames = tex.GetAllNames();
@@ -437,6 +505,35 @@ namespace Simitone.Client.UI.Screens
             var ui = Content.Get().CustomUI;
             var gd = GameFacade.GraphicsDevice;
 
+            if (Original)
+            {
+                DesktopCAS = new Simitone.Client.UI.Panels.CAS.UIOriginalDesignChar();
+                DesktopFamily = new Simitone.Client.UI.Panels.CAS.UIOriginalDesignFamily();
+                DesktopFamilies = new Simitone.Client.UI.Panels.CAS.UIOriginalPickFamily();
+
+                DesktopCAS.OnCollectionChange += ChangeDesktopCollection;
+                DesktopCAS.OnCycleHead += (dir) => { HeadPosition += dir; };
+                DesktopCAS.OnCycleBody += (dir) => { BodyPosition += dir; };
+                DesktopCAS.OnDone += () => Accept(null);
+                DesktopCAS.OnCancel += () => GoBack(null);
+
+                DesktopFamily.ModifySim = RequestModifySim;
+                DesktopFamily.OnFamilyDone += () => Accept(null);
+                DesktopFamily.OnFamilyCancel += () => GoBack(null);
+
+                DesktopFamilies.OnNewFamily += () => { SetMode(UICASMode.FamilyEdit); };
+                DesktopFamilies.OnDeleteFamily += DeleteFamily;
+                DesktopFamilies.OnCancel += () => GoBack(null);
+                DesktopFamilies.MoveInButton.OnButtonClick += (b) => { if (!DesktopFamilies.MoveInButton.Disabled) Accept(null); };
+
+                DesktopCAS.Visible = false;
+                DesktopFamily.Visible = false;
+                Add(DesktopFamilies);
+                Add(DesktopFamily);
+                Add(DesktopCAS);
+                return;
+            }
+
             CASPanel = new UISimCASPanel();
             CASPanel.OnCollectionChange += CASPanel_OnCollectionChange;
             CASPanel.Position = new Vector2(0, -400);
@@ -464,10 +561,53 @@ namespace Simitone.Client.UI.Screens
             AcceptButton.OnButtonClick += Accept;
         }
 
+        private FSO.Client.UI.Controls.UITextBox PendingDesktopNameFocus;
+        private InputManager DesktopInput;
+
+        private void ClearDesktopNameFocus()
+        {
+            PendingDesktopNameFocus = null;
+            var focus = DesktopInput?.GetFocus();
+            if (focus != null && (focus == DesktopCAS?.NameBox || focus == DesktopFamily?.FamilyNameBox))
+                DesktopInput.SetFocus(null);
+        }
+
+        internal void UpdateDesktopNameFocus(UpdateState state)
+        {
+            if (!Original || state.InputManager == null) return;
+            DesktopInput = state.InputManager;
+            var focus = DesktopInput.GetFocus();
+            if ((focus == DesktopCAS.NameBox && (!DesktopCAS.Visible || Mode != UICASMode.SimEdit || ConfirmationPending))
+                || (focus == DesktopFamily.FamilyNameBox && (!DesktopFamily.Visible || Mode != UICASMode.FamilyEdit || ConfirmationPending)))
+                DesktopInput.SetFocus(null);
+            var target = PendingDesktopNameFocus;
+            if (target == null || ConfirmationPending || !state.WindowFocused) return;
+            if (target == DesktopCAS.NameBox ? !DesktopCAS.Visible : !DesktopFamily.Visible) return;
+            // R143 TSSetFocus at 0x2cf53c / 0x2d1f24: once on dialog entry,
+            // after the incoming panel becomes visible, before child input.
+            PendingDesktopNameFocus = null;
+            if (DesktopInput.GetFocus() == null || DesktopInput.GetFocus() == target)
+                DesktopInput.SetFocus(target);
+        }
+
         private int EditIndex = -1;
+
+        internal void RequestModifySim(bool delete, int index)
+        {
+            if (!delete) { ModifySim(false, index); return; }
+            if (index < 0 || index >= WIPFamily.Count) return;
+            // Native family TSOnCommand @0x2d07dc..0x2d0810 confirms
+            // deleting a selected person before mutating the draft.
+            ShowConfirmation(GameFacade.Strings.GetString("129", "5"),
+                GameFacade.Strings.GetString("129", "6"), () => ModifySim(true, index));
+        }
 
         public void ModifySim(bool delete, int index)
         {
+            if (delete && (index < 0 || index >= WIPFamily.Count)) return;
+            if (!delete && (index < -1 || index >= WIPFamily.Count)) return;
+            if (!delete && index == -1 && Original
+                && (WIPFamily.Count >= 8 || DesktopFamily.FamilyNameBox.CurrentText.Length == 0)) return;
             if (index == -1)
             {
                 PrepareEdit(index);
@@ -480,6 +620,8 @@ namespace Simitone.Client.UI.Screens
                     fam.Delete(true, vm.Context);
                     RepresentFamily.RemoveAt(index);
                     WIPFamily.RemoveAt(index);
+                    // Native deletion clears selected index @0x2d0860..64.
+                    if (Original) DesktopFamily.SelectedMember = -1;
 
                     foreach (var fam2 in RepresentFamily)
                     {
@@ -489,7 +631,8 @@ namespace Simitone.Client.UI.Screens
                     {
                         SetFamilyMember(i);
                     }
-                    FamilyPanel.Reset();
+                    FamilyPanel?.Reset();
+                    UpdateFamilySlots();
                 } else
                 {
                     //prepare sim edit mode with old sim's parameters
@@ -502,6 +645,35 @@ namespace Simitone.Client.UI.Screens
         private void PrepareEdit(int i)
         {
             EditIndex = i;
+            if (Original)
+            {
+                // R143: the original screen's fields are the state holders on
+                // desktop (engine capacities: name 25, bio 2048, pool 25).
+                var sim = (i > -1) ? WIPFamily[i] : null;
+                DesktopCAS.NameBox.CurrentText = sim?.Name ?? "";
+                DesktopCAS.BioEdit.Text = sim?.Bio ?? "";
+                CurrentCode = sim == null ? "ma"
+                    : (sim.Gender == 0) ? "ma" : (sim.Gender == 1) ? "fa"
+                    : (sim.Gender == 2) ? "mc" : "fc";
+                CurrentSkin = sim?.SkinColor ?? "lgt";
+                for (int j = 0; j < 5; j++) DesktopCAS.Values[j] = (sim != null) ? sim.Personality[j] / 100 : 0;
+                int spent = 0;
+                for (int j = 0; j < 5; j++) spent += DesktopCAS.Values[j];
+                DesktopCAS.Pool = 25 - spent;
+
+                // Each native character dialog starts with a fresh four-type
+                // memory table, even when editing a previously saved draft Sim.
+                Array.Clear(DesktopSuitMemory, 0, DesktopSuitMemory.Length);
+                LoadDesktopType(CurrentCode);
+
+                BodyPosition = SanifyDesktopSuit(sim != null ? ActiveBodies.IndexOf(sim.Body) : 0, ActiveBodies.Count) - 8;
+                HeadPosition = SanifyDesktopSuit(sim != null ? ActiveHeads.IndexOf(sim.Head) : 0, ActiveHeads.Count) - 8;
+                DesktopCAS.AType = CurrentCode;
+                DesktopCAS.SkinType = CurrentSkin;
+                DesktopCAS.UpdateType();
+                DesktopCAS.UpdateLeds();
+                return;
+            }
             if (i > -1)
             {
                 var sim = WIPFamily[i];
@@ -549,96 +721,137 @@ namespace Simitone.Client.UI.Screens
         }
 
         public UIMobileAlert ConfirmDialog;
+        internal bool ConfirmationPending; // internal: ucasflow gate reads the seam/dialog latch state
+        internal Action<string, string, Action, Action> ConfirmationPresenter;
+        internal Action<FAMI> FamilyDeleteWriter;
+        internal Action<string, CASFamilyMember[]> FamilySaveWriter;
+        internal Func<List<FAMI>> FamilyCensus;
 
-        private void Accept(UIElement button)
+        private void ShowConfirmation(string title, string message, Action accepted)
         {
+            if (ConfirmationPending) return;
+            ClearDesktopNameFocus();
+            DesktopCAS?.BioEdit.Blur();
+            ConfirmationPending = true;
+            bool answered = false;
+            Action<bool> answer = yes =>
+            {
+                if (answered) return;
+                answered = true;
+                ConfirmDialog?.Close();
+                ConfirmDialog = null;
+                ConfirmationPending = false;
+                if (yes) accepted();
+            };
+            if (ConfirmationPresenter != null)
+            {
+                ConfirmationPresenter(title, message, () => answer(true), () => answer(false));
+                return;
+            }
+            ConfirmDialog = new UIMobileAlert(new UIAlertOptions
+            {
+                Title = title,
+                Message = message,
+                Buttons = UIAlertButton.YesNo(b => answer(true), b => answer(false))
+            });
+            UIScreen.GlobalShowDialog(ConfirmDialog, true);
+        }
+
+        internal void Accept(UIElement button)
+        {
+            if (ConfirmationPending) return;
             switch (Mode)
             {
                 case UICASMode.SimEdit:
-                    //add or replace the sim in the family
+                    if ((Original ? DesktopCAS.NameBox.CurrentText : CASPanel.FirstNameTextBox.CurrentText).Length == 0) return;
+                    if (Original && DesktopCAS.Pool > 0)
+                    {
+                        // Native TSOnCommand @0x2cd414..0x2cd464 asks before
+                        // keeping a Sim with unspent personality points.
+                        ShowConfirmation(GameFacade.Strings.GetString("130", "13"),
+                            GameFacade.Strings.GetString("130", "14", new[] { DesktopCAS.NameBox.CurrentText }),
+                            () => { AcceptMember(); SetMode(UICASMode.FamilyEdit); });
+                        return;
+                    }
                     AcceptMember();
                     break;
                 case UICASMode.FamilyEdit:
-                    //add or replace the family in the neighbourhood
-                    //need to generate an actual FAMI and save it for this
-                    if (ConfirmDialog == null)
-                    {
-                        ConfirmDialog = new UIMobileAlert(new UIAlertOptions()
-                        {
-                            Title = GameFacade.Strings.GetString("129", "13"),
-                            Message = GameFacade.Strings.GetString("129", "14"),
-                            Buttons = UIAlertButton.YesNo(
-                                (ybtn) => { ConfirmDialog.Close(); Accept(ybtn); ConfirmDialog = null; },
-                                (nbtn) => { ConfirmDialog.Close(); ConfirmDialog = null; }
-                            )
-                        });
-                        UIScreen.GlobalShowDialog(ConfirmDialog, true);
-                        return;
-                    } else
-                    {
-                        SaveFamily();
-                    }
-                    break;
+                    if (WIPFamily.Count == 0) return;
+                    ShowConfirmation(GameFacade.Strings.GetString("129", "13"),
+                        GameFacade.Strings.GetString("129", "14"),
+                        () => { SaveFamily(); SetMode(UICASMode.FamilySelect); });
+                    return;
                 case UICASMode.FamilySelect:
                     //accept button here is move in. notify the neighbourhood screen that we're moving in now.
-                    MoveInFamily = FamiliesPanel.Families[FamiliesPanel.Selection].ChunkID;
+                    var selected = SelectedFamily();
+                    if (selected == null) return;
+                    MoveInFamily = selected.ChunkID;
                     break;
             }
             SetMode((UICASMode)(((int)Mode) - 1));
         }
 
-        private void GoBack(UIElement button)
+        internal void GoBack(UIElement button)
         {
+            if (ConfirmationPending) return;
             if (Mode == UICASMode.FamilyEdit)
             {
-                if (ConfirmDialog == null)
+                // Native @0x2d0b48..0x2d0b8c bypasses the warning for an
+                // empty draft, but asks before discarding any members.
+                if (!Original || WIPFamily.Count > 0)
                 {
-                    ConfirmDialog = new UIMobileAlert(new UIAlertOptions()
-                    {
-                        Title = GameFacade.Strings.GetString("129", "7"),
-                        Message = GameFacade.Strings.GetString("129", "8"),
-                        Buttons = UIAlertButton.YesNo(
-                            (ybtn) => { ConfirmDialog.Close(); GoBack(ybtn); ConfirmDialog = null; },
-                            (nbtn) => { ConfirmDialog.Close(); ConfirmDialog = null; }
-                        )
-                    });
-                    UIScreen.GlobalShowDialog(ConfirmDialog, true);
+                    ShowConfirmation(GameFacade.Strings.GetString("129", "7"),
+                        GameFacade.Strings.GetString("129", "8"),
+                        () => { ClearFamily(); SetMode(UICASMode.FamilySelect); });
                     return;
                 }
-                else
-                {
-                    ClearFamily();
-                }
+                ClearFamily();
             }
             SetMode((UICASMode)(((int)Mode) - 1));
         }
 
         public void SetMode(UICASMode mode)
         {
+            bool newFamily = Mode == UICASMode.FamilySelect && mode == UICASMode.FamilyEdit;
+            ClearDesktopNameFocus();
+            DesktopCAS?.BioEdit.Blur();
             if (mode == UICASMode.ToNeighborhood)
             {
-                //todo: animate into this
-                
+                if (NeighborhoodTransition != null)
+                {
+                    NeighborhoodTransition(MoveInFamily);
+                    return;
+                }
+                // R208: the engine's done-path runs LoadGame DIRECTLY —
+                // cWinDesignFamily::TSOnCommand constructs/loads the next
+                // screen with no wipe; the lot load itself shows the canon
+                // loading splash (uisplash). The trans_normal stripe wipe was
+                // a Simitone invention and is retired.
                 Dead = true;
-                var dialog = new UITransDialog("normal", () => {
-                    CleanupLastWorld();
-                    if (MoveInFamily == null)
-                        GameController.EnterGameMode("", false);
-                    else
-                        GameController.EnterGameMode("!"+((NeighTypeFrom == 7)?'m':'n')+MoveInFamily.Value.ToString(), false);
-                });
+                CleanupLastWorld();
+                if (MoveInFamily == null)
+                    GameController.EnterGameMode("", false);
+                else
+                    GameController.EnterGameMode("!"+((NeighTypeFrom == 7)?'m':'n')+MoveInFamily.Value.ToString(), false);
                 return;
             } else if (mode == UICASMode.FamilyEdit)
             {
-                FamilyPanel.Reset();
+                FamilyPanel?.Reset();
+                if (Original) UpdateFamilySlots();
             }
 
-            FamiliesPanel.SetSelection(-1);
-            if (mode == UICASMode.FamilySelect) AcceptButton.Texture = Content.Get().CustomUI.Get("btn_movein.png").Get(GameFacade.GraphicsDevice);
-            else AcceptButton.Texture = Content.Get().CustomUI.Get("btn_accept.png").Get(GameFacade.GraphicsDevice);
+            if (!Original)
+            {
+                FamiliesPanel.SetSelection(-1);
+                if (mode == UICASMode.FamilySelect) AcceptButton.Texture = Content.Get().CustomUI.Get("btn_movein.png").Get(GameFacade.GraphicsDevice);
+                else AcceptButton.Texture = Content.Get().CustomUI.Get("btn_accept.png").Get(GameFacade.GraphicsDevice);
+            }
 
             GameFacade.Screens.Tween.To(this, 1f, new Dictionary<string, float> { { "FamilySimInterp", (int)mode-1 } }, TweenQuad.EaseInOut);
             Mode = mode;
+            if (Original)
+                PendingDesktopNameFocus = mode == UICASMode.SimEdit ? DesktopCAS.NameBox
+                    : newFamily ? DesktopFamily.FamilyNameBox : null;
         }
 
         private void CASPanel_OnRandom()
@@ -661,6 +874,7 @@ namespace Simitone.Client.UI.Screens
 
         public override void Update(UpdateState state)
         {
+            UpdateDesktopNameFocus(state);
             base.Update(state);
             ModePositions[3].Y = 11;
             ModeTargets[3].Y = 7.896059f;
@@ -714,23 +928,74 @@ namespace Simitone.Client.UI.Screens
             switch (Mode)
             {
                 case UICASMode.SimEdit:
-                    if (CASPanel.FirstNameTextBox.CurrentText.Length == 0) disableAccept = true;
+                    if ((Original ? DesktopCAS.NameBox.CurrentText : CASPanel.FirstNameTextBox.CurrentText).Length == 0) disableAccept = true;
                     break;
                 case UICASMode.FamilySelect:
-                    if (FamiliesPanel.Selection == -1) disableAccept = true;
+                    if ((Original ? DesktopFamilies.GetSelection() : FamiliesPanel.Selection) == -1) disableAccept = true;
                     break;
                 case UICASMode.FamilyEdit:
                     if (WIPFamily.Count == 0) disableAccept = true;
                     break;
             }
 
-            AcceptButton.Disabled = disableAccept;
+            if (Original)
+            {
+                DesktopCAS.DoneBtn.Disabled = disableAccept;
+                DesktopFamily.DoneBtn.Disabled = disableAccept;
+                DesktopFamily.AddBtn.Disabled = WIPFamily.Count >= 8 || DesktopFamily.FamilyNameBox.CurrentText.Length == 0;
+            }
+            else AcceptButton.Disabled = disableAccept;
             //AcceptButton.ForceState = disableAccept ? 0 : -1;
             //AcceptButton.Opacity = disableAccept ? 0.5f : 1;
 
-            if (Mode == UICASMode.SimEdit)
+            if (Mode == UICASMode.SimEdit && !Original)
                 UpdateCarousel(state);
 
+            if (Original && Mode == UICASMode.SimEdit)
+            {
+                // R143 Vita window: ONE full sim (chosen head + chosen body on a
+                // single avatar) stands in the engine's (618,145) 100x220 view
+                // rect; the ring carousel is the mobile look and stays hidden.
+                if (VitaPreview == null)
+                {
+                    VitaPreview = BodyAvatars[0];
+                    foreach (var body in BodyAvatars) body.VisualPosition = new Vector3(9999, 0, 9999);
+                    foreach (var head in HeadAvatars) head.VisualPosition = new Vector3(9999, 0, 9999);
+                }
+                var chosenBody = (int)DirectionUtils.PosMod(Math.Round(BodyPosition + 8), ActiveBodies.Count);
+                var chosenHead = (int)DirectionUtils.PosMod(Math.Round(HeadPosition + 8), ActiveHeads.Count);
+                SetBody(VitaPreview, chosenBody);
+                SetHead(VitaPreview, chosenHead);
+                // VisualPosition is tile XY/height Z; VitaWorldPos is renderer
+                // world XYZ. Invert WorldSpace.GetWorldFromTile's axis/scale map.
+                VitaPreview.VisualPosition = new Vector3(VitaWorldPos.X, VitaWorldPos.Z, VitaWorldPos.Y)
+                    / WorldSpace.WorldUnitsPerTile;
+                VitaPreview.RadianDirection = VitaFacing;
+                // The dedicated view renders the same posed avatar, independent
+                // of the lot camera and the window's dimensions.
+                if (DesktopCAS.VitaSurface != null)
+                {
+                    // This staging avatar belongs only to the Vita surface;
+                    // larger windows must not reveal a second Sim in the lot.
+                    VitaPreview.WorldUI.Visible = false;
+                    DesktopCAS.VitaSurface.Person = VitaPreview;
+                    DesktopCAS.VitaSurface.Visible = true;
+                }
+
+                // R212 AnimatePet law: only a person change re-arms the idle
+                // cycle (SetPerson semantics); spinner changes are SetOutfit
+                // 0x2daf32 and must not restart it.
+                var vitaChild = CurrentCode[1] == 'c';
+                var vitaMale = CurrentCode[0] == 'm';
+                if (VitaIdle == null)
+                    VitaIdle = new Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer(VitaPreview, vitaChild, vitaMale);
+                else if (VitaIdle.Avatar != VitaPreview || VitaIdle.Child != vitaChild || VitaIdle.Male != vitaMale)
+                    VitaIdle.SetPerson(VitaPreview, vitaChild, vitaMale);
+                try { VitaIdle.Update(state, VitaFacing); }
+                catch (Exception ve) { Simitone.Client.GameLog.Write("cas-vita-idle EXC " + ve.GetType().Name + " " + ve.Message); VitaIdle = null; }
+            }
+
+            if (!Original)
             for (int i=0; i<18; i++)
             {
                 var relPos = HeadPosition + i - 9;
@@ -742,6 +1007,9 @@ namespace Simitone.Client.UI.Screens
                 HeadAvatars[i].VisualPosition = pos;
             }
 
+            // The desktop preview already positioned BodyAvatars[0] above.
+            // Only the mobile screen owns the ring carousel.
+            if (!Original)
             for (int i = 0; i < 18; i++)
             {
                 var relPos = BodyPosition + i - 9;
@@ -765,62 +1033,92 @@ namespace Simitone.Client.UI.Screens
             }
         }
 
+        internal FAMI SelectedFamily()
+        {
+            var families = Original ? DesktopFamilies.Families : FamiliesPanel.Families;
+            var index = Original ? DesktopFamilies.GetSelection() : FamiliesPanel.Selection;
+            return index >= 0 && index < families.Count ? families[index] : null;
+        }
+
         public void DeleteFamily()
         {
-            if (FamiliesPanel.Selection == -1) return;
-            
-            var selectedFamily = FamiliesPanel.Families[FamiliesPanel.Selection];
-            var familyName = Content.Get().Neighborhood.MainResource.Get<FAMs>(selectedFamily.ChunkID)?.GetString(0) ?? "this family";
-            
-            if (ConfirmDialog == null)
-            {
-                ConfirmDialog = new UIMobileAlert(new UIAlertOptions()
+            var selectedFamily = SelectedFamily();
+            if (selectedFamily == null) return;
+            var familyName = selectedFamily.ChunkParent?.Get<FAMs>(selectedFamily.ChunkID)?.GetString(0) ?? "";
+            ShowConfirmation(GameFacade.Strings.GetString("128", "6"),
+                GameFacade.Strings.GetString("128", "7", new[] { familyName }), () =>
                 {
-                    Title = "Delete Family",
-                    Message = $"Are you sure you want to delete the {familyName} family? This cannot be undone.",
-                    Buttons = UIAlertButton.YesNo(
-                        (ybtn) => { 
-                            ConfirmDialog.Close(); 
-                            ConfirmDialog = null;
-                            var neigh = Content.Get().Neighborhood;
-                            var fami = selectedFamily;
-                            var fams = neigh.MainResource.Get<FAMs>(fami.ChunkID);
-                            
-                            fami.ChunkParent.FullRemoveChunk(fami);
-                            if (fams != null) fams.ChunkParent.FullRemoveChunk(fams);
-                            
-                            neigh.SaveNeighbourhood(true);
-                            
-                            FamiliesPanel.SetSelection(-1);
-                            SetFamilies();
-                        },
-                        (nbtn) => { ConfirmDialog.Close(); ConfirmDialog = null; }
-                    )
+                    if (FamilyDeleteWriter != null) FamilyDeleteWriter(selectedFamily);
+                    else
+                    {
+                        var neigh = Content.Get().Neighborhood;
+                        var fams = neigh.MainResource.Get<FAMs>(selectedFamily.ChunkID);
+                        selectedFamily.ChunkParent.FullRemoveChunk(selectedFamily);
+                        if (fams != null) fams.ChunkParent.FullRemoveChunk(fams);
+                        neigh.SaveNeighbourhood(true);
+                    }
+                    if (Original) DesktopFamilies.SetSelection(-1);
+                    else FamiliesPanel.SetSelection(-1);
+                    SetFamilies();
                 });
-                UIScreen.GlobalShowDialog(ConfirmDialog, true);
-            }
         }
 
         public void SetFamilies()
         {
+            if (FamilyCensus != null)
+            {
+                var isolated = FamilyCensus();
+                if (Original) DesktopFamilies.UpdateFamilies(isolated, vm);
+                else FamiliesPanel.UpdateFamilies(isolated, vm);
+                return;
+            }
             //get all families that don't have a house from neighbourhood, and populate the list
             //i think house number -1 is townies, so only select 0
             var all = Content.Get().Neighborhood.MainResource.List<FAMI>();
-            
+
             // Filter: HouseNumber == 0 (not moved into a house)
             // AND ChunkID < 1000 (exclude NPCs/townies which have IDs like 2000, 3000+, 4000, 5000, 6000)
             // AND ChunkID > 0 (exclude "Default Family" which is ChunkID=0 with 0 members)
             // AND FamilyGUIDs.Length > 0 (must have at least one member)
             var families = all.Where(x => x.HouseNumber == 0 && x.ChunkID > 0 && x.ChunkID < 1000 && x.FamilyGUIDs.Length > 0).ToList();
-            
-            File.AppendAllText("simitone_debug.log", $"[SetFamilies] Families being added to CAS panel ({families.Count} total):\n");
+
+            // Keep diagnostics outside the signed application bundle.
+            Console.WriteLine($"[SetFamilies] Families being added to CAS panel ({families.Count} total):");
             foreach (var fam in families)
             {
-                File.AppendAllText("simitone_debug.log", 
-                    $"  - ChunkID={fam.ChunkID}, HouseNumber={fam.HouseNumber}, Unknown={fam.Unknown}, Members={fam.FamilyGUIDs.Length}\n");
+                Console.WriteLine(
+                    $"  - ChunkID={fam.ChunkID}, HouseNumber={fam.HouseNumber}, Unknown={fam.Unknown}, Members={fam.FamilyGUIDs.Length}");
             }
-            
-            FamiliesPanel.UpdateFamilies(families, vm);
+
+            if (Original) DesktopFamilies.UpdateFamilies(families, vm);
+            else FamiliesPanel.UpdateFamilies(families, vm);
+        }
+
+        /// <summary>
+        /// R143: the original Create-A-Family member slots - 85x105 cells,
+        /// portrait at (15,10), name at the slot bottom (engine law §4.3).
+        /// </summary>
+        public void UpdateFamilySlots()
+        {
+            if (!Original) return;
+            DesktopFamily.MemberCount = WIPFamily.Count;
+            var font = Simitone.Client.UI.Controls.OriginalGlyphFont.LoadCaption(GameFacade.GraphicsDevice);
+            for (int i = 0; i < 8; i++)
+            {
+                var slot = DesktopFamily.Slots[i];
+                foreach (var child in slot.GetChildren().ToList()) slot.Remove(child);
+                slot.Visible = i < WIPFamily.Count;
+                if (i >= WIPFamily.Count) continue;
+                var data = WIPFamily[i];
+                // WIP representatives use a generic object resource: its saved BMP
+                // belongs to the template Sim, so render the edited head instead.
+                var portrait = UIOriginalPersonPortrait.Create(RepresentFamily[i], false);
+                portrait.Position = new Vector2(15, 10);
+                slot.Add(portrait);
+                if (font != null)
+                    slot.Add(new UIOriginalFamilyCaption(data.Name, font));
+            }
+            DesktopFamily.RefreshSelection();
         }
 
         public void SetFamilyMember(int index)
@@ -886,7 +1184,25 @@ namespace Simitone.Client.UI.Screens
             var info = new SimTemplateCreateInfo(code, x.SkinColor);
             info.Name = x.Name;
             info.Bio = x.Bio;
-            info.PersonalityPoints = x.Personality;
+            // R246 bug fix: SimTemplateCreateInfo.PersonalityPoints is short[6] in the
+            // generator's IFF person-data order [Nice, Active, Generous, Playful,
+            // Outgoing, Neat] (MakePersonData writes them to pd[2..7], 0..1000 scale).
+            // CASFamilyMember.Personality stays short[5] holding the CAS UI values in
+            // DesktopCAS display order [Neat, Outgoing, Active, Playful, Nice]
+            // (UIOriginalDesignChar.Values; the original CAS UI has only 5 sliders and
+            // Generous/pd[4] was 0 in every original created record). The pre-fix
+            // straight copy assigned the 5-slot array to the 6-slot field, so
+            // MakePersonData's PersonalityPoints[5] read threw IndexOutOfRangeException
+            // on the FIRST real family save. Remap at this generator boundary;
+            // PrepareEdit still round-trips the 5-slot UI vector untouched.
+            var points = new short[6];
+            points[0] = x.Personality[4]; // Nice
+            points[1] = x.Personality[2]; // Active
+            points[2] = 0;                // Generous: no CAS slider in the original UI
+            points[3] = x.Personality[3]; // Playful
+            points[4] = x.Personality[1]; // Outgoing
+            points[5] = x.Personality[0]; // Neat
+            info.PersonalityPoints = points;
 
             info.BodyStringReplace[1] = x.Body + ",BODY=" + x.BodyTex;
             info.BodyStringReplace[2] = x.Head + ",HEAD-HEAD=" + x.HeadTex;
@@ -904,14 +1220,17 @@ namespace Simitone.Client.UI.Screens
         public void ClearFamily()
         {
             var count = WIPFamily.Count;
-            FamilyPanel.SecondName.CurrentText = "";
+            if (FamilyPanel != null) FamilyPanel.SecondName.CurrentText = "";
+            if (DesktopFamily != null) DesktopFamily.FamilyNameBox.CurrentText = "";
             for (int i = count-1; i >= 0; i--)
                 ModifySim(true, i);
         }
 
         public void SaveFamily()
         {
-            SimitoneNeighbourGenerator.CreateFamily(FamilyPanel.SecondName.CurrentText, WIPFamily.Count, WIPFamily.Select(CASToNeighGen).ToArray());
+            var lastName = Original ? DesktopFamily.FamilyNameBox.CurrentText : FamilyPanel.SecondName.CurrentText;
+            if (FamilySaveWriter != null) FamilySaveWriter(lastName, WIPFamily.ToArray());
+            else SimitoneNeighbourGenerator.CreateFamily(lastName, WIPFamily.Count, WIPFamily.Select(CASToNeighGen).ToArray());
             SetFamilies();
             ClearFamily();
         }
@@ -935,17 +1254,31 @@ namespace Simitone.Client.UI.Screens
             //build the object out of the contents of various menus
             var i = (int)DirectionUtils.PosMod(Math.Round(BodyPosition+8), ActiveBodies.Count);
             var j = (int)DirectionUtils.PosMod(Math.Round(HeadPosition+8), ActiveHeads.Count);
+            string name, bio;
+            short[] personality;
+            if (Original)
+            {
+                name = DesktopCAS.NameBox.CurrentText;
+                bio = DesktopCAS.BioEdit.Text;
+                personality = DesktopCAS.Values.Select(x => (short)(x * 100)).ToArray();
+            }
+            else
+            {
+                name = CASPanel.FirstNameTextBox.CurrentText;
+                bio = CASPanel.BioEdit.CurrentText;
+                personality = CASPanel.Personalities.Select(x => (short)(x.Points * 100)).ToArray();
+            }
             var sim = new CASFamilyMember()
             {
-                Name = CASPanel.FirstNameTextBox.CurrentText,
-                Bio = CASPanel.BioEdit.CurrentText,
+                Name = name,
+                Bio = bio,
                 Body = ActiveBodies[i],
                 BodyTex = ActiveBodyTex[i],
                 HandgroupTex = ActiveHandgroupTex[i],
                 Head = ActiveHeads[j],
                 HeadTex = ActiveHeadTex[j],
                 Gender = (short)(((CurrentCode[0] == 'm') ? 0 : 1) | ((CurrentCode[1] == 'c') ? 2 : 0)),
-                Personality = CASPanel.Personalities.Select(x => (short)(x.Points * 100)).ToArray(),
+                Personality = personality,
                 SkinColor = CurrentSkin
             };
             return sim;
@@ -955,8 +1288,11 @@ namespace Simitone.Client.UI.Screens
         {
             base.GameResized();
             World?.GameResized();
-            BackButton.Position = new Vector2(25, ScreenHeight - 140);
-            AcceptButton.Position = new Vector2(ScreenWidth - 140, ScreenHeight - 140);
+            if (!Original)
+            {
+                BackButton.Position = new Vector2(25, ScreenHeight - 140);
+                AcceptButton.Position = new Vector2(ScreenWidth - 140, ScreenHeight - 140);
+            }
             FamilySimInterp = FamilySimInterp;
         }
 
@@ -968,11 +1304,14 @@ namespace Simitone.Client.UI.Screens
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             base.Draw(batch);
         }
 
         public void CleanupLastWorld()
         {
+            ClearDesktopNameFocus();
+            DesktopCAS?.VitaSurface?.Release();
             if (vm == null) return;
 
             //clear our cache too, if the setting lets us do that

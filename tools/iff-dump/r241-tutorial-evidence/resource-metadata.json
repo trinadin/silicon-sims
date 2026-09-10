@@ -1,0 +1,18 @@
+[
+  {
+    "tag": "BHAV",
+    "id": 4099,
+    "label": "show situation info"
+  },
+  {
+    "file": "GameData/Objects/Objects.far!Tutorial.iff",
+    "tag": "BMP_",
+    "id": 300,
+    "label": "TutorialIcon.bmp",
+    "length": 2548,
+    "signature": "424d",
+    "width": 45,
+    "height": 45,
+    "bpp": 8
+  }
+]

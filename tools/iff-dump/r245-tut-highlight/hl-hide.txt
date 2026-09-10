@@ -1,0 +1,29 @@
+                ; ==== .HideWindow__23cTSWinTutorialHighlightFv ====
+00538b90: 93e1fffc  stw      r31, -4(r1)
+00538b94: 7c0802a6  mflr     r0
+00538b98: 3be30000  addi     r31, r3, 0
+00538b9c: 90010008  stw      r0, 8(r1)
+00538ba0: 38800001  li       r4, 1
+00538ba4: 9421ffb0  stwu     r1, -0x50(r1)
+00538ba8: 81830000  lwz      r12, 0(r3)
+00538bac: 818c0094  lwz      r12, 0x94(r12)
+00538bb0: 48069e31  bl       0x5a29e0
+00538bb4: 80410014  lwz      r2, 0x14(r1)
+00538bb8: 5460063f  clrlwi.  r0, r3, 0x18
+00538bbc: 41820028  beq      0x538be4
+00538bc0: 881f00e0  lbz      r0, 0xe0(r31)
+00538bc4: 28000000  cmplwi   r0, 0
+00538bc8: 4182001c  beq      0x538be4
+00538bcc: 80628e04  lwz      r3, -0x71fc(r2)
+00538bd0: 7fe4fb78  mr       r4, r31
+00538bd4: 80630000  lwz      r3, 0(r3)
+00538bd8: 4bfe3589  bl       0x51c160   ; .UnsubscribeTimerMsg__12cTSWinMgrW95FP6cTSWin
+00538bdc: 38000000  li       r0, 0
+00538be0: 981f00e0  stb      r0, 0xe0(r31)
+00538be4: 7fe3fb78  mr       r3, r31
+00538be8: 4bfc9cb9  bl       0x5028a0
+00538bec: 80010058  lwz      r0, 0x58(r1)
+00538bf0: 38210050  addi     r1, r1, 0x50
+00538bf4: 83e1fffc  lwz      r31, -4(r1)
+00538bf8: 7c0803a6  mtlr     r0
+00538bfc: 4e800020  blr      

@@ -1,0 +1,307 @@
+
+{INCLUDE,Res_Nbhd.h}
+{INCLUDE,Res_Languages.h}
+
+//Unleashed Neighborhood screens
+// us screen
+{RLEBMP,kNbhdBck_UL,"Community/NScreen_unleashed.bmp"}
+// used in Asia & Europe
+{RLEBMP,kNbhdBckNonUS_UL, "Community/NScreen_unleashed_nonus.bmp"}
+// used in US
+{RLEBMP,kNghFrameDelta1_UL,"Community/NScreen_unleashed_waves001.bmp"}
+{RLEBMP,kNghFrameDelta2_UL,"Community/NScreen_unleashed_waves002.bmp"}
+{RLEBMP,kNghFrameDelta3_UL,"Community/NScreen_unleashed_waves003.bmp"}
+{RLEBMP,kNghFrameDelta4_UL,"Community/NScreen_unleashed_waves004.bmp"}
+{RLEBMP,kNghFrameDelta5_UL,"Community/NScreen_unleashed_waves005.bmp"}
+{RLEBMP,kNghFrameDelta6_UL,"Community/NScreen_unleashed_waves006.bmp"}
+// used in Asia & Europe
+{RLEBMP,kNghFrameDelta1NonUS_UL,"Community/NScreen_unleashed_waves001_nonus.bmp"}
+{RLEBMP,kNghFrameDelta2NonUS_UL,"Community/NScreen_unleashed_waves002_nonus.bmp"}
+{RLEBMP,kNghFrameDelta3NonUS_UL,"Community/NScreen_unleashed_waves003_nonus.bmp"}
+{RLEBMP,kNghFrameDelta4NonUS_UL,"Community/NScreen_unleashed_waves004_nonus.bmp"}
+{RLEBMP,kNghFrameDelta5NonUS_UL,"Community/NScreen_unleashed_waves005_nonus.bmp"}
+{RLEBMP,kNghFrameDelta6NonUS_UL,"Community/NScreen_unleashed_waves006_nonus.bmp"}
+//end Unleashed Neighborhood screens
+
+
+
+//Original 1.0 Neighborhood screens
+// used in US
+{RLEBMP,kNbhdBck,"Nbhd/NScreen.BMP"}
+// used in Asia & Europe
+{RLEBMP,kNbhdBckNonUS, "Nbhd/NScreen_Loc.bmp"}
+// used in US
+{RLEBMP,kNghFrameDelta1,"Nbhd/DiffN1-N2_8.bmp"}
+{RLEBMP,kNghFrameDelta2,"Nbhd/DiffN1-N3_8.bmp"}
+{RLEBMP,kNghFrameDelta3,"Nbhd/DiffN1-N4_8.bmp"}
+// used in Asia & Europe
+{RLEBMP,kNghFrameDelta1NonUS,"Nbhd/DiffN1-N2_Loc_8.bmp"}
+{RLEBMP,kNghFrameDelta2NonUS,"Nbhd/DiffN1-N3_Loc_8.bmp"}
+{RLEBMP,kNghFrameDelta3NonUS,"Nbhd/DiffN1-N4_Loc_8.bmp"}
+//end Original 1.0 Neighborhood screens
+
+
+
+
+
+
+// Main Panel Background
+
+
+// Downtown US
+{RLEBMP,kDowntownBackground,"Downtown/DScreen.bmp"}
+
+// Studiotown US
+{RLEBMP,kStudiotownBackground,"Studiotown/DScreen.bmp"}
+
+{RLEBMP,kMagiclandBackground,"Magicland/DScreen.bmp"}
+
+// Downtown Water
+{RLEBMP,kDowntownWater0,"Downtown/dscreen00.bmp"}
+{RLEBMP,kDowntownWater1,"Downtown/dscreen01.bmp"}
+{RLEBMP,kDowntownWater2,"Downtown/dscreen02.bmp"}
+{RLEBMP,kDowntownWater3,"Downtown/dscreen03.bmp"}
+{RLEBMP,kDowntownWater4,"Downtown/dscreen04.bmp"}
+{RLEBMP,kDowntownWater5,"Downtown/dscreen05.bmp"}
+
+// Magictown Water
+{RLEBMP,kMagictownWater0,"Magicland/dscreen_waves1.bmp"}
+{RLEBMP,kMagictownWater1,"Magicland/dscreen_waves2.bmp"}
+{RLEBMP,kMagictownWater2,"Magicland/dscreen_waves3.bmp"}
+{RLEBMP,kMagictownWater3,"Magicland/dscreen_waves4.bmp"}
+{RLEBMP,kMagictownWater4,"Magicland/dscreen_waves5.bmp"}
+{RLEBMP,kMagictownWater5,"Magicland/dscreen_waves6.bmp"}
+
+// 10 odd is one direction, even the other.
+{RLEBMP,kStudiotownCar0,"Studiotown/Nhood_superstar_car0.bmp"}
+{RLEBMP,kStudiotownCar1,"Studiotown/Nhood_superstar_car1.bmp"}
+{RLEBMP,kStudiotownCar2,"Studiotown/Nhood_superstar_car2.bmp"}
+{RLEBMP,kStudiotownCar3,"Studiotown/Nhood_superstar_car3.bmp"}
+{RLEBMP,kStudiotownCar4,"Studiotown/Nhood_superstar_car4.bmp"}
+{RLEBMP,kStudiotownCar5,"Studiotown/Nhood_superstar_car5.bmp"}
+{RLEBMP,kStudiotownCar6,"Studiotown/Nhood_superstar_car6.bmp"}
+{RLEBMP,kStudiotownCar7,"Studiotown/Nhood_superstar_car7.bmp"}
+{RLEBMP,kStudiotownCar8,"Studiotown/Nhood_superstar_car8.bmp"}
+{RLEBMP,kStudiotownCar9,"Studiotown/Nhood_superstar_car9.bmp"}
+{RLEBMP,kStudiotownCar10,"Studiotown/Nhood_superstar_car10.bmp"}
+{RLEBMP,kStudiotownCar11,"Studiotown/Nhood_superstar_car11.bmp"}
+{RLEBMP,kStudiotownCar12,"Studiotown/Nhood_superstar_car12.bmp"}
+{RLEBMP,kStudiotownCar13,"Studiotown/Nhood_superstar_car13.bmp"}
+{RLEBMP,kStudiotownCar14,"Studiotown/Nhood_superstar_car14.bmp"}
+{RLEBMP,kStudiotownCar15,"Studiotown/Nhood_superstar_car15.bmp"}
+{RLEBMP,kStudiotownCar16,"Studiotown/Nhood_superstar_car16.bmp"}
+{RLEBMP,kStudiotownCar17,"Studiotown/Nhood_superstar_car17.bmp"}
+{RLEBMP,kStudiotownCar18,"Studiotown/Nhood_superstar_car18.bmp"}
+{RLEBMP,kStudiotownCar19,"Studiotown/Nhood_superstar_car19.bmp"}
+
+{RLEBMP,kMagictownBalloon1,"Magicland/Nhood_balloon1.bmp"}
+{RLEBMP,kMagictownBalloon2,"Magicland/Nhood_balloon2.bmp"}
+{RLEBMP,kMagictownBalloon3,"Magicland/Nhood_balloon3.bmp"}
+{RLEBMP,kMagictownBalloon4,"Magicland/Nhood_balloon4.bmp"}
+{RLEBMP,kMagictownBalloon5,"Magicland/Nhood_balloon5.bmp"}
+{RLEBMP,kMagictownBalloon6,"Magicland/Nhood_balloon6.bmp"}
+{RLEBMP,kMagictownBalloon7,"Magicland/Nhood_balloon7.bmp"}
+{RLEBMP,kMagictownBalloon8,"Magicland/Nhood_balloon8.bmp"}
+{RLEBMP,kMagictownBalloon9,"Magicland/Nhood_balloon9.bmp"}
+{RLEBMP,kMagictownBalloon10,"Magicland/Nhood_balloon10.bmp"}
+{RLEBMP,kMagictownBalloon11,"Magicland/Nhood_balloon11.bmp"}
+{RLEBMP,kMagictownBalloon12,"Magicland/Nhood_balloon12.bmp"}
+{RLEBMP,kMagictownBalloon13,"Magicland/Nhood_balloon13.bmp"}
+{RLEBMP,kMagictownBalloon14,"Magicland/Nhood_balloon14.bmp"}
+{RLEBMP,kMagictownBalloon15,"Magicland/Nhood_balloon15.bmp"}
+{RLEBMP,kMagictownBalloon16,"Magicland/Nhood_balloon16.bmp"}
+
+{RLEBMP,kMagictownFogA,"Magicland/DScreen_mistA.tga"}
+{RLEBMP,kMagictownFogB,"Magicland/DScreen_mistB.tga"}
+{RLEBMP,kMagictownFogC,"Magicland/DScreen_mistC.tga"}
+
+// Vacation Water
+{RLEBMP,kVIWater0,"VIsland/visland_waves001.bmp"}
+{RLEBMP,kVIWater1,"VIsland/visland_waves002.bmp"}
+{RLEBMP,kVIWater2,"VIsland/visland_waves003.bmp"}
+{RLEBMP,kVIWater3,"VIsland/visland_waves004.bmp"}
+{RLEBMP,kVIWater4,"VIsland/visland_waves005.bmp"}
+
+// Go Downtown Button
+{RLEBMP,kNghExitToDowntown,"NghUI/Downtown.bmp"}
+// Go Studiotown Button
+{RLEBMP,kNghExitToStudiotown,"NghUI/Studiotown.bmp"}
+// Go Studiotown Button
+{RLEBMP,kNghExitToMagicland,"NghUI/Magicland.bmp"}
+// Go Magictown Button
+{RLEBMP,kMagictownImport,"Magicland/Import.bmp"}
+
+
+// Go Vacation Button
+{RLEBMP,kNghExitToVacation,"NghUI/Vacation.bmp"}
+
+// Go Back from Downtown Button
+{RLEBMP,kDowntownExitToNgh,"Downtown/Return.bmp"}
+
+// Go Back from Studiotown Button
+{RLEBMP,kStudiotownExitToNgh,"Studiotown/Return.bmp"}
+
+
+// More Downtown
+{RLEBMP,kDowntownImport,"Downtown/Import.bmp"}
+{RLEBMP,kDowntownBulldoze,"Downtown/Bulldoze.bmp"}
+
+{RLEBMP,kStudiotownImport,"Studiotown/Import.bmp"}
+{RLEBMP,kStudiownBulldoze,"Studiotown/Bulldoze.bmp"}
+
+
+{RLEBMP,kVacationImport,"VIsland/Import.bmp"}
+
+// Mask for 1024x768
+{RLEBMP,kLargeMask,"Downtown/LargeBack.bmp"}
+{RLEBMP,kLargeMaskSS,"Studiotown/dlgframe_1024x768.bmp"}
+
+
+// Credits button
+{RLEBMP,kNghCredits,"Nbhd/CreditBtn.BMP"}
+{RLEBMP,kNghCreditsFr,"Nbhd/CreditBtnFr.BMP"}
+{RLEBMP,kNghCreditsDe,"Nbhd/CreditBtnDe.BMP"}
+{RLEBMP,kNghCreditsSp,"Nbhd/CreditBtnSp.BMP"}
+{RLEBMP,kNghCreditsEn,"Nbhd/CreditBtnEn.BMP"}
+{RLEBMP,kNghCreditsJp,"Nbhd/CreditBtnJp.BMP"}
+
+// Downtown Credits button
+{RLEBMP,kDowntownCredits,"Downtown/TheSimsLogo.bmp"}
+{RLEBMP,kStudiotownCredits,"Studiotown/TheSimsLogo.bmp"}
+
+
+// Lot popups
+{RLEBMP,kPickAFamily,"Nbhd/SimEstates.bmp"}
+{RLEBMP,kMarquee,"Nbhd/Marquee.bmp"}
+{RLEBMP,kPickScrollbar,"Nbhd/ScrollBar.bmp"}
+{RLEBMP,kPickFamilyItemBkg,"Nbhd/FamilyPickItemBkg.bmp"}
+{RLEBMP,kPickSpellItemBkg,"Nbhd/SpellPickItemBkg.bmp"}
+{RLEBMP,kPickFamilyPersonInfoBkg,"Nbhd/PersonInfoBkg.bmp"}
+{RLEBMP,kPickFamilySmiley,"Nbhd/Smiley.bmp"}
+
+{RLEBMP,kDesignFamilyAdd,"Nbhd/AddPersonBtn.bmp"}
+{RLEBMP,kDesignFamilyDelete,"Nbhd/DeletePersonBtn.bmp"}
+{RLEBMP,kDesignFamilyEdit,"Nbhd/EditPersonBtn.bmp"}
+{RLEBMP,kDesignFamilyDone,"Nbhd/DesignFamDone.bmp"}
+{RLEBMP,kDesignFamilyCancel,"Nbhd/DesignFamCancel.bmp"}
+
+{RLEBMP,kDesignCharAdultBtn,"Nbhd/DesignCharAdultBtn.bmp"}
+{RLEBMP,kDesignCharChildBtn,"Nbhd/DesignCharChildBtn.bmp"}
+{RLEBMP,kDesignCharSkinsLeftBtn,"Nbhd/DesignCharSkinsLeftBtn.bmp"}
+{RLEBMP,kDesignCharSkinsRightBtn,"Nbhd/DesignCharSkinsRightBtn.bmp"}
+{RLEBMP,kDesignCharDoneBtn,"Nbhd/DesignCharDoneBtn.bmp"}
+{RLEBMP,kDesignCharCancelBtn,"Nbhd/DesignCharCancelBtn.bmp"}
+
+{RLEBMP,kDesignCharFemaleBtn,"Nbhd/DesignCharFemaleBtn.bmp"}
+{RLEBMP,kDesignCharMaleBtn,"Nbhd/DesignCharMaleBtn.bmp"}
+{RLEBMP,kDesignCharDarkBtn,"Nbhd/DesignCharDarkBtn.bmp"}
+{RLEBMP,kDesignCharMediumBtn,"Nbhd/DesignCharMediumBtn.bmp"}
+{RLEBMP,kDesignCharLightBtn,"Nbhd/DesignCharLightBtn.bmp"}
+{RLEBMP,kDesignCharPersLED,"Nbhd/DesignCharPersLED.bmp"}
+
+{BITMAP,kHotspotPopupBkg,"Nbhd/HotSpotPopupBkg.bmp"}
+{BITMAP,kHotspotPopupAlphaBkg,"Nbhd/HotSpotPopupBkgAlpha.bmp"}
+{BITMAP,kHotspotPopupTiler,"Nbhd/HotSpotPopupTiler.tga"}
+
+{RLEBMP,kPickFamilyBkg,"Nbhd/PickBkg.bmp"}
+{RLEBMP,kPickFamilyBkgMagic,"Nbhd/PickBkgMagic.bmp"}
+{RLEBMP,kDesignCharBkg,"Nbhd/CreateACharBack.bmp"}
+{RLEBMP,kDesignFamilyBkg,"Nbhd/DsgnFamBkg.bmp"}
+
+{RLEBMP,kPickFamilyAdd,"Nbhd/PAFAddFamily.bmp"}
+{RLEBMP,kPickFamilyCancel,"Nbhd/PAFCancel.bmp"}
+{RLEBMP,kPickFamilyDelete,"Nbhd/PAFDeleteFamily.bmp"}
+{RLEBMP,kPickFamilyMoveIn,"Nbhd/PAFMoveIn.bmp"}
+
+{RLEBMP,kNghMoveIn,"NghUI/MoveIn.bmp"}
+{RLEBMP,kNghBulldoze,"NghUI/Bulldoze.bmp"}
+{RLEBMP,kNghExit,"NghUI/Exit.bmp"}
+{RLEBMP,kNghInet,"NghUI/InetBtn.bmp"}
+{RLEBMP,kNghPrevious,"NghUI/Previous.bmp"}
+{RLEBMP,kNghNext,"NghUI/Next.bmp"}
+{RLEBMP,kNghCurrent,"NghUI/Current.bmp"}
+{RLEBMP,kNghImport, "NghUI/Import.bmp"}
+{RLEBMP,kNghRezone, "NghUI/Rezone.bmp"}
+
+{RLEBMP,kPeoplePtsBuffer,"Nbhd/CACPointRemainingBars.bmp"}
+
+{RLEBMP,kNghDefaultBtn,"Nbhd/NbhdTileBtn.bmp"}
+
+{RLEBMP,kNghNoOneLivesHereIcon,"Nbhd/MustPickFam.BMP"}
+
+{RLEBMP,kNghInetUpdateIcon,"Nbhd/INetDialogIcon.BMP"}
+
+{RLEBMP,kNghBarBkg,"NghUI/banner_neighborhood.bmp"}
+{RLEBMP,kNghSimsLogoEn,"NghUI/TheSimsLogo.bmp"}
+{RLEBMP,kNghSimsLogo_SP,"NghUI/TheSimsLogo_sp.bmp"}
+{RLEBMP,kNghSimsLogo_FR,"NghUI/TheSimsLogo_fr.bmp"}
+{RLEBMP,kNghSimsLogo_GR,"NghUI/TheSimsLogo_gr.bmp"}
+{RLEBMP,kNghSimsLogo_JP,"NghUI/TheSimsLogo_jp.bmp"}
+{RLEBMP,kDTBarBkg,"NghUI/banner_downtown.bmp"}
+{RLEBMP,kDTDlgBkg,"Downtown/dlgframe.bmp"}
+{RLEBMP,kDTDlgBkg2,"Downtown/dlgframe2.bmp"}
+
+{RLEBMP,kDTGo,"Downtown/Taxi_loadscreen_800x600.bmp"}
+{RLEBMP,kDTGoBig,"Downtown/Taxi_loadscreen_1024x768.bmp"}
+{RLEBMP,kDTPhone,"Downtown/dtphone.bmp"}
+{RLEBMP,kVIPhone,"VIsland/viphone.bmp"}
+{RLEBMP,kNGBHPhone,"nbhd/NeighborhoodPhone.bmp"}
+{RLEBMP,kStudiotownPhone,"Studiotown/stphone.bmp"}
+{RLEBMP,kMagictownPhone,"Magicland/mtphone.bmp"}
+{RLEBMP,kMagictownHole,"Magicland/mtclownhole.bmp"}
+
+
+
+{RLEBMP,kVacationIsland,"VIsland/VIsland.bmp"}
+{RLEBMP,kNghVacationLogo,"VIsland/vacationlogosmall.bmp"}
+{RLEBMP,kNghVacationPort,"VIsland/VIsland_port.bmp"}
+{RLEBMP,kNghVacationTrees,"VIsland/VIsland_trees.bmp"}
+
+{RLEBMP,kVacationGo,"VIsland/vacation_loadscreen_800x600.bmp"}
+{RLEBMP,kVacationGoBig,"VIsland/vacation_loadscreen_1024x768.bmp"}
+
+{RLEBMP,kVacationGo2,"VIsland/vacation_loadscreen2_800x600.bmp"}
+{RLEBMP,kVacationGo2Big,"VIsland/vacation_loadscreen2_1024x768.bmp"}
+
+{RLEBMP,kVacationNoVacancy,"VIsland/no_vacancy.bmp"}
+
+{RLEBMP,kNeighborhoodGo,"Community/Bus_loadscreen_800x600.bmp"}
+{RLEBMP,kNeighborhoodGoBig,"Community/Bus_loadscreen_1024x768.bmp"}
+
+{RLEBMP,kStudiotownGo,"Studiotown/Studiotown_loadscreen_800x600.bmp"}
+{RLEBMP,kStudiotownGoBig,"Studiotown/Studiotown_loadscreen_1024x768.bmp"}
+
+{RLEBMP,kStudiotownFanGo,"Studiotown/Studiotown_loadscreen_fan_800x600.bmp"}
+{RLEBMP,kStudiotownFanGoBig,"Studiotown/Studiotown_loadscreen_fan_1024x768.bmp"}
+
+{RLEBMP,kMagicLandGo,"Magicland/magicland_loadscreen_800x600.bmp"}
+{RLEBMP,kMagicLandGoBig,"Magicland/magicland_loadscreen_1024x768.bmp"}
+
+{RLEBMP,kMagicLandHoleGo,"Magicland/magicland_loadscreen_hole_800x600.bmp"}
+{RLEBMP,kMagicLandHoleGoBig,"Magicland/magicland_loadscreen_hole_1024x768.bmp"}
+
+									
+{RLEBMP,kNess1,"Community/ness01.bmp"}
+{RLEBMP,kNess2,"Community/ness02.bmp"}
+{RLEBMP,kNess3,"Community/ness03.bmp"}
+
+{RLEBMP,kNghPic,"Community/ngh.bmp"}
+{RLEBMP,kCelebPoolPic,"nbhd/CelebPool.bmp"}
+{RLEBMP,kFanPoolPic,"nbhd/FanPool.bmp"}
+{RLEBMP,kMagicPoolPic,"nbhd/MagicPool.bmp"}
+
+{RLEBMP,kFilterLodgingButton,"NghUI/FilterLodgingBtn.bmp"}
+{RLEBMP,kFilterFoodButton,"NghUI/FilterFoodBtn.bmp"}
+{RLEBMP,kFilterGardeningButton,"NghUI/FilterGardeningBtn.bmp"}
+{RLEBMP,kFilterShoppingButton,"NghUI/FilterShoppingBtn.bmp"}
+{RLEBMP,kFilterDogCatButton,"NghUI/FilterDogCatBtn.bmp"}
+{RLEBMP,kFilterSmallAnimalButton,"NghUI/FilterSmallAnimalBtn.bmp"}
+{RLEBMP,kFilterRecreationButton,"NghUI/FilterRecreationBtn.bmp"}
+{RLEBMP,kFilterSpaButton,"NghUI/FilterSpaBtn.bmp"}
+{RLEBMP,kFilterMusicButton,"NghUI/FilterMusicBtn.bmp"}
+{RLEBMP,kFilterMagicButton,"NghUI/FilterMagicBtn.bmp"}
+{RLEBMP,kFilterRidesButton,"NghUI/FilterRidesBtn.bmp"}
+{RLEBMP,kFilterMovieButton,"NghUI/FilterMovieBtn.bmp"}
+{RLEBMP,kFilterModelButton,"NghUI/FilterModelBtn.bmp"}
+{RLEBMP,kFilterToolbar,"NghUI/Filter_Toolbar_Unleashed.bmp"}
+{RLEBMP,kFilterToolbarST,"NghUI/Filter_Toolbar_Studiotown.bmp"}

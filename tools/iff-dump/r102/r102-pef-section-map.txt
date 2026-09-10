@@ -1,0 +1,29 @@
+# R102 — PEF container map + the InitClouds table investigation (trace, not run)
+
+The executable is a real PEF ("Joy!peff" / "pwpc", 3 sections):
+  sec0 CODE   unpacked 0x5b9458 @ file 0x8e90 (kind 0)
+  sec1 DATA   unpacked 0x989a4, PACKED 0x7bf80 @ file 0x5c22f0 (compressed!)
+  sec2 (loader/debug-ish) small
+
+Consequences:
+- All code addresses used since R90 are SECTION-RELATIVE (file = addr +
+  0x8e90); the scanner's working assumption is confirmed and now explicit.
+- The InitClouds table loads (`lwz r0, 342/462(r26)`, `lwz r0, 282/462(r31)`
+  with bases architecturally 0 — `addi rD, r0, 0` IS li 0 in PPC D-form
+  arithmetic, re-confirming the R92 loop semantics) point at section-rel
+  282..686, which is the CODE SECTION HEAD: an import-stub branch table
+  (48xxxxxx words). Static bytes there are NOT the coordinate tables.
+- Therefore those lwz DISPLACEMENTS are patched by the PEF relocator at
+  load time (CFM relocates section-relative data references against the
+  actual section load addresses). Resolving them statically requires
+  implementing the PEF relocation stream against the PACKED data section
+  (sec1 is compressed with the PEF packer) — a full loader, out of scope
+  for this round. The R92 DISCLOSED MODEL (142/262 column family) stays,
+  now with the mechanism identified: the tables exist but their bytes ride
+  behind loader relocation + section compression.
+
+Honest state: the loop-2/3 x/wrapX/drift table BYTES are not recoverable
+without a PEF loader; the model in UINeighborhoodCloudLayer remains the
+disclosed substitute. Next agent: implement PEF unpack (sec1 packer) +
+relocation application, then re-read section-rel 282..686 in the unpacked
+image.

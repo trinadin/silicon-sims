@@ -1,0 +1,57 @@
+# R168 original-engine decode: Generic Sims Call mode 14
+engine sha256: 33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f
+PEF packed data: file+0x5c22f0 length 0x6d834 -> 0x7bf80
+PEF unpacked data sha256: f740c1dfa1dea8187b12ebf222ca1a39223365d26ad5d2f2e353d5efba247be3
+dispatch: TOC[-0x59a0] -> data+0x485a8; entry[14] -> code-virtual 0xe98ac -> file 0xf273c; entry[15] -> file 0xf2754
+code sha256: mode14[0xf273c,0xf2754)=c6a1b6222721ef0a9f8d090fb71c5e4ae24471f6214d3804d35b320577424a44
+code sha256: cSimulator::SetGlobal[0x138c20,0x138c34)=0f5525dcf5c237f281b90a7cb88ea76e1e468711f4b0c8159ea501a30faf6e6e
+
+recovered law:
+  r31 = the cXObject receiver; the StackElem argument is not used
+  ObjectModule = *(cXObject + 0xdc)
+  cSimulator = *(ObjectModule + 0x80)
+  signed Temp0 = *(int16_t *)(cXObject + 0x3a)
+  cSimulator::SetGlobal(index=31, value=Temp0)
+  SetGlobal stores the 16-bit value at cSimulator + 0x10 + 2*index
+  therefore global[31] (cSimulator + 0x4e) is overwritten by Temp0
+  the case performs no comparison and does not inspect Stack Object
+  TryGenericSimCall takes its common true return
+
+decisive TryGenericSimCall dispatch words:
+  0x0f1f68 a8050000
+  0x0f1f6c 2800002b
+  0x0f1f70 41812194
+  0x0f1f74 8082a660
+  0x0f1f78 5400103a
+  0x0f1f7c 7c84002e
+  0x0f1f80 7c8903a6
+  0x0f1f84 4e800420
+
+decisive TryGenericSimCall mode-14 words:
+  0x0f273c 807f00dc
+  0x0f2740 3880001f
+  0x0f2744 a8bf003a
+  0x0f2748 80630080
+  0x0f274c 480464d5
+  0x0f2750 480019cc
+
+decisive cSimulator::SetGlobal words:
+  0x138c20 7c800734
+  0x138c24 5400083c
+  0x138c28 7c630214
+  0x138c2c b0a30010
+  0x138c30 4e800020
+
+constructor argument/store words proving the pointer chain:
+  0x0cab58 3be30000
+  0x0cab60 3bc50000
+  0x0cabec 93df00dc
+  0x0e8b18 3be40000
+  0x0e8b20 3bc30000
+  0x0e8c34 93fe0080
+
+common-true-return words:
+  0x0f1f30 7c7f1b78
+  0x0f1f44 3b800001
+  0x0f411c 7f83e378
+  0x0f4138 4e800020

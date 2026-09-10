@@ -1,0 +1,44 @@
+000cc3c0: 93e1fffc  stw      r31, -4(r1)
+000cc3c4: 7c0802a6  mflr     r0
+000cc3c8: 3be30000  addi     r31, r3, 0
+000cc3cc: 90010008  stw      r0, 8(r1)
+000cc3d0: 38000005  li       r0, 5
+000cc3d4: 9421ffb0  stwu     r1, -0x50(r1)
+000cc3d8: 90030044  stw      r0, 0x44(r3)
+000cc3dc: 80830040  lwz      r4, 0x40(r3)
+000cc3e0: 28040000  cmplwi   r4, 0
+000cc3e4: 41820078  beq      0xcc45c
+000cc3e8: 881f0039  lbz      r0, 0x39(r31)
+000cc3ec: 28000000  cmplwi   r0, 0
+000cc3f0: 4082006c  bne      0xcc45c
+000cc3f4: 38000000  li       r0, 0
+000cc3f8: 80628870  lwz      r3, -0x7790(r2)
+000cc3fc: 90040140  stw      r0, 0x140(r4)
+000cc400: 80630000  lwz      r3, 0(r3)
+000cc404: 80630080  lwz      r3, 0x80(r3)
+000cc408: 28030000  cmplwi   r3, 0
+000cc40c: 41820028  beq      0xcc434
+000cc410: 8063119c  lwz      r3, 0x119c(r3)
+000cc414: 28030000  cmplwi   r3, 0
+000cc418: 4182001c  beq      0xcc434
+000cc41c: 881f003c  lbz      r0, 0x3c(r31)
+000cc420: 28000000  cmplwi   r0, 0
+000cc424: 41820010  beq      0xcc434
+000cc428: 809f0040  lwz      r4, 0x40(r31)
+000cc42c: 38840074  addi     r4, r4, 0x74
+000cc430: 48192a01  bl       0x25ee30   ; .SetLastTargetArea__13cTutorialIconFRC7cTSRect
+000cc434: 80628ca4  lwz      r3, -0x735c(r2)
+000cc438: 80630000  lwz      r3, 0(r3)
+000cc43c: 81830000  lwz      r12, 0(r3)
+000cc440: 818c0020  lwz      r12, 0x20(r12)
+000cc444: 484d659d  bl       0x5a29e0
+000cc448: 80410014  lwz      r2, 0x14(r1)
+000cc44c: 809f0040  lwz      r4, 0x40(r31)
+000cc450: 48451b51  bl       0x51dfa0   ; .DestroyWindow__12cTSWinMgrW95FP6cTSWin
+000cc454: 38000000  li       r0, 0
+000cc458: 901f0040  stw      r0, 0x40(r31)
+000cc45c: 80010058  lwz      r0, 0x58(r1)
+000cc460: 38210050  addi     r1, r1, 0x50
+000cc464: 83e1fffc  lwz      r31, -4(r1)
+000cc468: 7c0803a6  mtlr     r0
+000cc46c: 4e800020  blr

@@ -1,0 +1,200 @@
+0x1d7c90: bec1ffd8  stmw r22, -40(r1)                          |....|
+0x1d7c94: 7c0802a6  mfxer r0                                   ||...|
+0x1d7c98: 7cd83378  or r6, r24, r6                             ||.3x|
+0x1d7c9c: 83629220  lwz r27, -28128(r2)                        |.b. |
+0x1d7ca0: 83829244  lwz r28, -28092(r2)                        |...D|
+0x1d7ca4: 83a28cb0  lwz r29, -29520(r2)                        |....|
+0x1d7ca8: 7c771b78  or r3, r23, r3                             ||w.x|
+0x1d7cac: 83c28fb8  lwz r30, -28744(r2)                        |....|
+0x1d7cb0: 3b270000  addi r25, r7, 0                            |;'..|
+0x1d7cb4: 83e28dc0  lwz r31, -29248(r2)                        |....|
+0x1d7cb8: 7d1a4378  or r8, r26, r8                             |}.Cx|
+0x1d7cbc: 90010008  stw r0, 8(r1)                              |....|
+0x1d7cc0: 9421ff80  stwu r1, -128(r1)                          |.!..|
+0x1d7cc4: 82c30018  lwz r22, 24(r3)                            |....|
+0x1d7cc8: 9081009c  stw r4, 156(r1)                            |....|
+0x1d7ccc: 7c16c000  cmp cr0, r22, r24                          ||...|
+0x1d7cd0: 90a100a0  stw r5, 160(r1)                            |....|
+0x1d7cd4: 418200b8  bne(2) 0x1d7d8c                            |A...|
+0x1d7cd8: 4182009c  bne(2) 0x1d7d74                            |A...|
+0x1d7cdc: 480ead15  bl 0x2c29f0                                 ; .GetWallManager__11WallManagerFv |H...|
+0x1d7ce0: 38b60000  addi r5, r22, 0                            |8...|
+0x1d7ce4: 38800000  addi r4, r0, 0                             |8...|
+0x1d7ce8: 480eb2a9  bl 0x2c2f90                                 ; .SetCutaway__11WallManagerFbi |H...|
+0x1d7cec: 807701fc  lwz r3, 508(r23)                           |.w..|
+0x1d7cf0: 4bfd2171  bl 0x1a9e60                                 ; .clear__11cCutawaySetFv |K.!q|
+0x1d7cf4: 38000001  addi r0, r0, 1                             |8...|
+0x1d7cf8: 9817004e  stb r0, 78(r23)                            |...N|
+0x1d7cfc: 88170049  lbz r0, 73(r23)                            |...I|
+0x1d7d00: 28000000  cmplwi r0, r0, 0                           |(...|
+0x1d7d04: 4182000c  bne(2) 0x1d7d10                            |A...|
+0x1d7d08: 7ee3bb78  or r23, r3, r23                            |~..x|
+0x1d7d0c: 4bff7535  bl 0x1cf240                                 ; .ResetDynamicCutaway__11HouseViewerFv |K.u5|
+0x1d7d10: 93170018  stw r24, 24(r23)                           |....|
+0x1d7d14: 7f04c378  or r24, r4, r24                            |...x|
+0x1d7d18: 80628874  lwz r3, -30604(r2)                         |.b.t|
+0x1d7d1c: 80630000  lwz r3, 0(r3)                              |.c..|
+0x1d7d20: 80630000  lwz r3, 0(r3)                              |.c..|
+0x1d7d24: 80630024  lwz r3, 36(r3)                             |.c.$|
+0x1d7d28: 4bf50db9  bl 0x128ae0                                 ; .ComputeCutaway__11RoomManagerFi |K...|
+0x1d7d2c: 88170049  lbz r0, 73(r23)                            |...I|
+0x1d7d30: 28000000  cmplwi r0, r0, 0                           |(...|
+0x1d7d34: 41820010  bne(2) 0x1d7d44                            |A...|
+0x1d7d38: 889701f8  lbz r4, 504(r23)                           |....|
+0x1d7d3c: 7ee3bb78  or r23, r3, r23                            |~..x|
+0x1d7d40: 4bff7671  bl 0x1cf3b0                                 ; .DoDynamicCutaway__11HouseViewerFb |K.vq|
+0x1d7d44: 7ee3bb78  or r23, r3, r23                            |~..x|
+0x1d7d48: 81970004  lwz r12, 4(r23)                            |....|
+0x1d7d4c: 818c0050  lwz r12, 80(r12)                           |...P|
+0x1d7d50: 483cac91  bl 0x5a29e0                                 ; .sub_5a29e0 |H<..|
+0x1d7d54: 80410014  lwz r2, 20(r1)                             |.A..|
+0x1d7d58: 80628ca4  lwz r3, -29532(r2)                         |.b..|
+0x1d7d5c: 80630000  lwz r3, 0(r3)                              |.c..|
+0x1d7d60: 81830000  lwz r12, 0(r3)                             |....|
+0x1d7d64: 818c0020  lwz r12, 32(r12)                           |... |
+0x1d7d68: 483cac79  bl 0x5a29e0                                 ; .sub_5a29e0 |H<.y|
+0x1d7d6c: 80410014  lwz r2, 20(r1)                             |.A..|
+0x1d7d70: 483441a1  bl 0x51bf10                                 ; .PumpMouseMoveMsg__12cTSWinMgrW95Fv |H4A.|
+0x1d7d74: 80628870  lwz r3, -30608(r2)                         |.b.p|
+0x1d7d78: 38980000  addi r4, r24, 0                            |8...|
+0x1d7d7c: 38a00001  addi r5, r0, 1                             |8...|
+0x1d7d80: 80630000  lwz r3, 0(r3)                              |.c..|
+0x1d7d84: 806300a4  lwz r3, 164(r3)                            |.c..|
+0x1d7d88: 480383e9  bl 0x210170                                 ; .SetLevel__7CPStateFiQ27CPState8Synchron |H...|
+0x1d7d8c: 800100a0  lwz r0, 160(r1)                            |....|
+0x1d7d90: 38800001  addi r4, r0, 1                             |8...|
+0x1d7d94: 80fd0000  lwz r7, 0(r29)                             |....|
+0x1d7d98: 7c062670  srawi r6, r0, 4                            ||.&p|
+0x1d7d9c: 80a1009c  lwz r5, 156(r1)                            |....|
+0x1d7da0: 54c3063e  rlwinm r3, r6, 0, 24, 31                   |T..>|
+0x1d7da4: 80070070  lwz r0, 112(r7)                            |...p|
+0x1d7da8: 7c630774  extsb r3, r3, r0                           ||c.t|
+0x1d7dac: 98c10048  stb r6, 72(r1)                             |...H|
+0x1d7db0: 7ca52670  srawi r5, r5, 4                            ||.&p|
+0x1d7db4: 7c030000  cmp cr0, r3, r0                            ||...|
+0x1d7db8: 98a10049  stb r5, 73(r1)                             |...I|
+0x1d7dbc: 9881004a  stb r4, 74(r1)                             |...J|
+0x1d7dc0: 41800030  bne(0) 0x1d7df0                            |A..0|
+0x1d7dc4: 80070074  lwz r0, 116(r7)                            |...t|
+0x1d7dc8: 7c030000  cmp cr0, r3, r0                            ||...|
+0x1d7dcc: 41810024  bne(1) 0x1d7df0                            |A..$|
+0x1d7dd0: 54a3063e  rlwinm r3, r5, 0, 24, 31                   |T..>|
+0x1d7dd4: 80070078  lwz r0, 120(r7)                            |...x|
+0x1d7dd8: 7c630774  extsb r3, r3, r0                           ||c.t|
+0x1d7ddc: 7c030000  cmp cr0, r3, r0                            ||...|
+0x1d7de0: 41800010  bne(0) 0x1d7df0                            |A...|
+0x1d7de4: 8007007c  lwz r0, 124(r7)                            |...||
+0x1d7de8: 7c030000  cmp cr0, r3, r0                            ||...|
+0x1d7dec: 4081000c  beq(1) 0x1d7df8                            |@...|
+0x1d7df0: 38000001  addi r0, r0, 1                             |8...|
+0x1d7df4: 48000008  b 0x1d7dfc                                  ; -> 1d7dfc |H...|
+0x1d7df8: 38000000  addi r0, r0, 0                             |8...|
+0x1d7dfc: 5400063f  rlwinm r0, r0, 0, 24, 31                   |T..?|
+0x1d7e00: 40820194  beq(2) 0x1d7f94                            |@...|
+0x1d7e04: 80170068  lwz r0, 104(r23)                           |...h|
+0x1d7e08: 28000000  cmplwi r0, r0, 0                           |(...|
+0x1d7e0c: 41820188  bne(2) 0x1d7f94                            |A...|
+0x1d7e10: 7ee4bb78  or r23, r4, r23                            |~..x|
+0x1d7e14: 80a1009c  lwz r5, 156(r1)                            |....|
+0x1d7e18: 81970004  lwz r12, 4(r23)                            |....|
+0x1d7e1c: 38610044  addi r3, r1, 68                            |8a.D|
+0x1d7e20: 80c100a0  lwz r6, 160(r1)                            |....|
+0x1d7e24: 39200000  addi r9, r0, 0                             |9 ..|
+0x1d7e28: 80f70018  lwz r7, 24(r23)                            |....|
+0x1d7e2c: 811e0008  lwz r8, 8(r30)                             |....|
+0x1d7e30: 818c0008  lwz r12, 8(r12)                            |....|
+0x1d7e34: 483cabad  bl 0x5a29e0                                 ; .sub_5a29e0 |H<..|
+0x1d7e38: 80410014  lwz r2, 20(r1)                             |.A..|
+0x1d7e3c: 5740063f  rlwinm r0, r26, 0, 24, 31                  |W@.?|
+0x1d7e40: 80010044  lwz r0, 68(r1)                             |...D|
+0x1d7e44: 80970028  lwz r4, 40(r23)                            |...(|
+0x1d7e48: 80770030  lwz r3, 48(r23)                            |.w.0|
+0x1d7e4c: 90010040  stw r0, 64(r1)                             |...@|
+0x1d7e50: 7ca41850  subf r5, r4, r3                            ||..P|
+0x1d7e54: 8077002c  lwz r3, 44(r23)                            |.w.,|
+0x1d7e58: 80170034  lwz r0, 52(r23)                            |...4|
+0x1d7e5c: 54a40ffe  rlwinm r4, r5 bit31(rS)                    |T...|
+0x1d7e60: 7c842a14  add r4, r4, r5                             ||.*.|
+0x1d7e64: 813e0000  lwz r9, 0(r30)                             |.>..|
+0x1d7e68: 7c630050  subf r3, r3, r0                            ||c.P|
+0x1d7e6c: 54600ffe  rlwinm r0, r3 bit31(rS)                    |T`..|
+0x1d7e70: 81170170  lwz r8, 368(r23)                           |...p|
+0x1d7e74: 7c850e70  srawi r5, r4, 1                            ||..p|
+0x1d7e78: 7c001a14  add r0, r0, r3                             ||...|
+0x1d7e7c: a8810042  lha r4, 66(r1)                             |...B|
+0x1d7e80: 7c030e70  srawi r3, r0, 1                            ||..p|
+0x1d7e84: a8010040  lha r0, 64(r1)                             |...@|
+0x1d7e88: 7fa94214  add r29, r9, r8                            |..B.|
+0x1d7e8c: 7c852050  subf r4, r5, r4                            ||. P|
+0x1d7e90: 80fe0004  lwz r7, 4(r30)                             |....|
+0x1d7e94: 7c030050  subf r0, r3, r0                            ||..P|
+0x1d7e98: 80d70174  lwz r6, 372(r23)                           |...t|
+0x1d7e9c: 7f44e850  subf r26, r4, r29                          |.D.P|
+0x1d7ea0: 7f073214  add r24, r7, r6                            |..2.|
+0x1d7ea4: 7ec0c050  subf r22, r0, r24                          |~..P|
+0x1d7ea8: 4182001c  bne(2) 0x1d7ec4                            |A...|
+0x1d7eac: 38770000  addi r3, r23, 0                            |8w..|
+0x1d7eb0: 389a0000  addi r4, r26, 0                            |8...|
+0x1d7eb4: 38b60000  addi r5, r22, 0                            |8...|
+0x1d7eb8: 38c00001  addi r6, r0, 1                             |8...|
+0x1d7ebc: 4bffee55  bl 0x1d6d10                                 ; .sub_1d6d10 |K..U|
+0x1d7ec0: 480000d4  b 0x1d7f94                                  ; -> 1d7f94 |H...|
+0x1d7ec4: 801701a4  lwz r0, 420(r23)                           |....|
+0x1d7ec8: 2c000000  cmpwi r0, r0, 0                            |,...|
+0x1d7ecc: 40820080  beq(2) 0x1d7f4c                            |@...|
+0x1d7ed0: 38770184  addi r3, r23, 388                          |8w..|
+0x1d7ed4: 38800001  addi r4, r0, 1                             |8...|
+0x1d7ed8: 4802a469  bl 0x202340                                 ; .SetScrollIsConstantTime__15XSmoothScrollerFi |H..i|
+0x1d7edc: 809b0000  lwz r4, 0(r27)                             |....|
+0x1d7ee0: 38770184  addi r3, r23, 388                          |8w..|
+0x1d7ee4: 4802a4ad  bl 0x202390                                 ; .SetScrollDuration__15XSmoothScrollerFUl |H...|
+0x1d7ee8: 389d0000  addi r4, r29, 0                            |8...|
+0x1d7eec: 38770184  addi r3, r23, 388                          |8w..|
+0x1d7ef0: 38ba0000  addi r5, r26, 0                            |8...|
+0x1d7ef4: 38d80000  addi r6, r24, 0                            |8...|
+0x1d7ef8: 38f60000  addi r7, r22, 0                            |8...|
+0x1d7efc: 5728063e  rlwinm r8, r25, 0, 24, 31                  |W(.>|
+0x1d7f00: 4802a831  bl 0x202730                                 ; .StartScrolling__15XSmoothScrollerFiiiii |H..1|
+0x1d7f04: 38800001  addi r4, r0, 1                             |8...|
+0x1d7f08: 9897017a  stb r4, 378(r23)                           |...z|
+0x1d7f0c: 88170179  lbz r0, 377(r23)                           |...y|
+0x1d7f10: 28000001  cmplwi r0, r0, 1                           |(...|
+0x1d7f14: 41820080  bne(2) 0x1d7f94                            |A...|
+0x1d7f18: 88170178  lbz r0, 376(r23)                           |...x|
+0x1d7f1c: 28000000  cmplwi r0, r0, 0                           |(...|
+0x1d7f20: 41820074  bne(2) 0x1d7f94                            |A..t|
+0x1d7f24: 881f0000  lbz r0, 0(r31)                             |....|
+0x1d7f28: 28000000  cmplwi r0, r0, 0                           |(...|
+0x1d7f2c: 40820068  beq(2) 0x1d7f94                            |@..h|
+0x1d7f30: 8062aaf8  lwz r3, -21768(r2)                         |.b..|
+0x1d7f34: 989f0000  stb r4, 0(r31)                             |....|
+0x1d7f38: c03c0000  lfs f1, 0(28)                              |.<..|
+0x1d7f3c: c003001c  lfs f0, 28(3)                              |....|
+0x1d7f40: d03701b8  stfs f1, 440(23)                           |.7..|
+0x1d7f44: d01c0000  stfs f0, 0(28)                             |....|
+0x1d7f48: 4800004c  b 0x1d7f94                                  ; -> 1d7f94 |H..L|
+0x1d7f4c: 38770184  addi r3, r23, 388                          |8w..|
+0x1d7f50: 38800001  addi r4, r0, 1                             |8...|
+0x1d7f54: 4802a3ed  bl 0x202340                                 ; .SetScrollIsConstantTime__15XSmoothScrollerFi |H...|
+0x1d7f58: 809b0000  lwz r4, 0(r27)                             |....|
+0x1d7f5c: 38770184  addi r3, r23, 388                          |8w..|
+0x1d7f60: 4802a431  bl 0x202390                                 ; .SetScrollDuration__15XSmoothScrollerFUl |H..1|
+0x1d7f64: 38770184  addi r3, r23, 388                          |8w..|
+0x1d7f68: 4802a579  bl 0x2024e0                                 ; .GetY__15XSmoothScrollerFv |H..y|
+0x1d7f6c: 3b030000  addi r24, r3, 0                            |;...|
+0x1d7f70: 38770184  addi r3, r23, 388                          |8w..|
+0x1d7f74: 4802a68d  bl 0x202600                                 ; .GetX__15XSmoothScrollerFv |H...|
+0x1d7f78: 38830000  addi r4, r3, 0                             |8...|
+0x1d7f7c: 38770184  addi r3, r23, 388                          |8w..|
+0x1d7f80: 38ba0000  addi r5, r26, 0                            |8...|
+0x1d7f84: 38d80000  addi r6, r24, 0                            |8...|
+0x1d7f88: 38f60000  addi r7, r22, 0                            |8...|
+0x1d7f8c: 5728063e  rlwinm r8, r25, 0, 24, 31                  |W(.>|
+0x1d7f90: 4802a7a1  bl 0x202730                                 ; .StartScrolling__15XSmoothScrollerFiiiii |H...|
+0x1d7f94: 80010088  lwz r0, 136(r1)                            |....|
+0x1d7f98: 38210080  addi r1, r1, 128                           |8!..|
+0x1d7f9c: bac1ffd8  lmw r22, -40(r1)                           |....|
+0x1d7fa0: 7c0803a6  mtxer r0                                   ||...|
+0x1d7fa4: 4e800020  bclr                                       |N.. |
+0x1d7fa8: 00000000  .long                                      |....|
+0x1d7fac: 00092041  .long                                      |.. A|

@@ -1,0 +1,236 @@
+0028d6e0: bge      0x28d6fc
+0028d6e4: lfs      f0, 0x18(r31)
+0028d6e8: fsubs    f0, f1, f0
+0028d6ec: fctiwz   f0, f0
+0028d6f0: stfd     f0, 0xf0(r1)
+0028d6f4: lwz      r0, 0xf4(r1)
+0028d6f8: b        0x28d718
+0028d6fc: lfs      f0, 0x18(r31)
+0028d700: fadds    f0, f0, f1
+0028d704: fctiwz   f0, f0
+0028d708: stfd     f0, 0xf0(r1)
+0028d70c: lwz      r0, 0xf4(r1)
+0028d710: b        0x28d718
+0028d714: li       r0, 0
+0028d718: xoris    r3, r0, 0x8000
+0028d71c: lwz      r4, -0x4f9c(r2)
+0028d720: lis      r0, 0x4330
+0028d724: stw      r3, 0xf4(r1)
+0028d728: lfd      f1, 0(r4)
+0028d72c: stw      r0, 0xf0(r1)
+0028d730: lfs      f4, 0x20(r31)
+0028d734: lfd      f0, 0xf0(r1)
+0028d738: lfs      f5, 0x1c(r31)
+0028d73c: fsubs    f3, f0, f1
+0028d740: lfs      f2, 0x24(r31)
+0028d744: lfs      f1, 0x28(r31)
+0028d748: lfs      f0, 0x14(r31)
+0028d74c: fadds    f3, f4, f3
+0028d750: fmuls    f3, f5, f3
+0028d754: fdivs    f2, f3, f2
+0028d758: fsubs    f1, f2, f1
+0028d760: bge      0x28d788
+0028d764: lfs      f0, 0x18(r31)
+0028d768: fsubs    f0, f1, f0
+0028d76c: fctiwz   f0, f0
+0028d770: stfd     f0, 0xf0(r1)
+0028d774: lwz      r3, 0xf4(r1)
+0028d778: cmpwi    r3, -5
+0028d77c: bge      0x28d7a8
+0028d780: li       r3, -5
+0028d784: b        0x28d7a8
+0028d788: lfs      f0, 0x18(r31)
+0028d78c: fadds    f0, f0, f1
+0028d790: fctiwz   f0, f0
+0028d794: stfd     f0, 0xf0(r1)
+0028d798: lwz      r3, 0xf4(r1)
+0028d79c: cmpwi    r3, 5
+0028d7a0: ble      0x28d7a8
+0028d7a4: li       r3, 5
+0028d7a8: lwz      r4, 0x170(r26)
+0028d7ac: cmplwi   r4, 0
+0028d7b0: beq      0x28d884
+0028d7b4: cmpwi    r3, 0
+0028d7b8: bge      0x28d884
+0028d7bc: lwz      r7, 0x14(r4)
+0028d7c0: neg      r0, r3
+0028d7c4: mulli    r0, r0, 5
+0028d7c8: stw      r7, 0x60(r1)
+0028d7cc: lwz      r3, 0x18(r4)
+0028d7d0: li       r5, 1
+0028d7d4: stw      r3, 0x64(r1)
+0028d7d8: add      r0, r3, r0
+0028d7dc: lwz      r4, 0x1c(r4)
+0028d7e0: cmpw     r4, r7
+0028d7e4: stw      r4, 0x68(r1)
+0028d7e8: stw      r0, 0x6c(r1)
+0028d7ec: ble      0x28d7fc
+0028d7f0: cmpw     r0, r3
+0028d7f4: ble      0x28d7fc
+0028d7f8: li       r5, 0
+0028d7fc: clrlwi.  r0, r5, 0x18
+0028d800: bne      0x28da6c
+0028d804: lwz      r9, 0(r29)
+0028d808: addi     r5, r1, 0x60
+0028d80c: lwz      r3, 0x64(r1)
+0028d810: addi     r6, r1, 0x70
+0028d814: add      r8, r7, r9
+0028d818: lwz      r10, 4(r29)
+0028d81c: add      r4, r4, r9
+0028d820: lwz      r0, 0x6c(r1)
+0028d824: li       r7, 0
+0028d828: add      r3, r3, r10
+0028d82c: add      r0, r0, r10
+0028d830: stw      r8, 0x70(r1)
+0028d834: stw      r4, 0x78(r1)
+0028d838: stw      r3, 0x74(r1)
+0028d83c: stw      r0, 0x7c(r1)
+0028d840: lwz      r9, 0x20(r26)
+0028d844: lwz      r10, 0x1c(r26)
+0028d848: add      r3, r3, r9
+0028d84c: add      r0, r0, r9
+0028d850: add      r8, r8, r10
+0028d854: add      r4, r4, r10
+0028d858: stw      r8, 0x70(r1)
+0028d85c: stw      r4, 0x78(r1)
+0028d860: stw      r3, 0x74(r1)
+0028d864: stw      r0, 0x7c(r1)
+0028d868: lwz      r3, 0x5c(r26)
+0028d86c: lwz      r4, 0x170(r26)
+0028d870: lwz      r12, 0(r3)
+0028d874: lwz      r12, 0xa0(r12)
+0028d878: bl       0x5a29e0
+0028d87c: lwz      r2, 0x14(r1)
+0028d880: b        0x28da6c
+0028d884: lwz      r4, 0x174(r26)
+0028d888: cmplwi   r4, 0
+0028d88c: beq      0x28d944
+0028d890: cmpwi    r3, 0
+0028d894: ble      0x28d944
+0028d898: lwz      r0, 0x14(r4)
+0028d89c: mulli    r8, r3, 5
+0028d8a0: lwz      r10, 0(r28)
+0028d8a4: addi     r5, r1, 0x80
+0028d8a8: stw      r0, 0x80(r1)
+0028d8ac: add      r9, r0, r10
+0028d8b0: lwz      r12, 0x18(r4)
+0028d8b4: addi     r6, r1, 0x90
+0028d8b8: lwz      r23, 4(r28)
+0028d8bc: li       r7, 0
+0028d8c0: stw      r12, 0x84(r1)
+0028d8c4: add      r3, r12, r23
+0028d8c8: lwz      r0, 0x1c(r4)
+0028d8cc: stw      r0, 0x88(r1)
+0028d8d0: add      r10, r0, r10
+0028d8d4: lwz      r11, 0x20(r4)
+0028d8d8: subf     r0, r12, r11
+0028d8dc: stw      r11, 0x8c(r1)
+0028d8e0: subf     r22, r8, r0
+0028d8e4: add      r8, r11, r23
+0028d8e8: add      r0, r12, r22
+0028d8ec: add      r3, r3, r22
+0028d8f0: stw      r9, 0x90(r1)
+0028d8f4: stw      r10, 0x98(r1)
+0028d8f8: stw      r8, 0x9c(r1)
+0028d8fc: stw      r3, 0x94(r1)
+0028d900: stw      r0, 0x84(r1)
+0028d904: lwz      r0, 0x20(r26)
+0028d908: lwz      r11, 0x1c(r26)
+0028d90c: add      r3, r3, r0
+0028d910: add      r0, r8, r0
+0028d914: add      r9, r9, r11
+0028d918: add      r8, r10, r11
+0028d91c: stw      r9, 0x90(r1)
+0028d920: stw      r8, 0x98(r1)
+0028d924: stw      r3, 0x94(r1)
+0028d928: stw      r0, 0x9c(r1)
+0028d92c: lwz      r3, 0x5c(r26)
+0028d930: lwz      r12, 0(r3)
+0028d934: lwz      r12, 0xa0(r12)
+0028d938: bl       0x5a29e0
+0028d93c: lwz      r2, 0x14(r1)
+0028d940: b        0x28da6c
+0028d944: lwz      r12, 0x14(r4)
+0028d948: addi     r5, r1, 0xa0
+0028d94c: lwz      r8, 4(r28)
+0028d950: addi     r6, r1, 0xb0
+0028d954: stw      r12, 0xa0(r1)
+0028d958: lwz      r9, 0(r28)
+0028d95c: li       r7, 0
+0028d960: lwz      r0, 0x18(r4)
+0028d964: stw      r0, 0xa4(r1)
+0028d968: lwz      r11, 0x1c(r4)
+0028d96c: stw      r11, 0xa8(r1)
+0028d970: lwz      r10, 0x20(r4)
+0028d974: stw      r10, 0xac(r1)
+0028d978: addi     r3, r10, -2
+0028d97c: stw      r12, 0xb0(r1)
+0028d980: stw      r0, 0xb4(r1)
+0028d984: stw      r11, 0xb8(r1)
+0028d988: stw      r10, 0xbc(r1)
+0028d98c: lwz      r0, 0x20(r26)
+0028d990: lwz      r4, 0x1c(r26)
+0028d994: add      r8, r8, r0
+0028d998: add      r0, r9, r4
+0028d99c: add      r4, r10, r8
+0028d9a0: add      r9, r12, r0
+0028d9a4: add      r8, r11, r0
+0028d9a8: addi     r0, r4, -2
+0028d9ac: stw      r9, 0xb0(r1)
+0028d9b0: stw      r8, 0xb8(r1)
+0028d9b4: stw      r4, 0xbc(r1)
+0028d9b8: stw      r3, 0xa4(r1)
+0028d9bc: stw      r0, 0xb4(r1)
+0028d9c0: lwz      r3, 0x5c(r26)
+0028d9c4: lwz      r4, 0x174(r26)
+0028d9c8: lwz      r12, 0(r3)
+0028d9cc: lwz      r12, 0xa0(r12)
+0028d9d0: bl       0x5a29e0
+0028d9d4: lwz      r2, 0x14(r1)
+0028d9d8: lwz      r4, 0x170(r26)
+0028d9dc: addi     r5, r1, 0xa0
+0028d9e0: lwz      r8, 4(r29)
+0028d9e4: addi     r6, r1, 0xb0
+0028d9e8: lwz      r27, 0x14(r4)
+0028d9ec: lwz      r10, 0(r29)
+0028d9f0: li       r7, 0
+0028d9f4: stw      r27, 0xa0(r1)
+0028d9f8: lwz      r12, 0x18(r4)
+0028d9fc: stw      r12, 0xa4(r1)
+0028da00: addi     r3, r12, 2
+0028da04: lwz      r11, 0x1c(r4)
+0028da08: stw      r11, 0xa8(r1)
+0028da0c: lwz      r0, 0x20(r4)
+0028da10: stw      r0, 0xac(r1)
+0028da14: stw      r27, 0xb0(r1)
+0028da18: stw      r12, 0xb4(r1)
+0028da1c: stw      r11, 0xb8(r1)
+0028da20: stw      r0, 0xbc(r1)
+0028da24: lwz      r0, 0x20(r26)
+0028da28: lwz      r9, 0x1c(r26)
+0028da2c: add      r8, r8, r0
+0028da30: add      r0, r10, r9
+0028da34: add      r8, r12, r8
+0028da38: add      r10, r27, r0
+0028da3c: add      r9, r11, r0
+0028da40: addi     r0, r8, 2
+0028da44: stw      r10, 0xb0(r1)
+0028da48: stw      r9, 0xb8(r1)
+0028da4c: stw      r8, 0xb4(r1)
+0028da50: stw      r3, 0xac(r1)
+0028da54: stw      r0, 0xbc(r1)
+0028da58: lwz      r3, 0x5c(r26)
+0028da5c: lwz      r12, 0(r3)
+0028da60: lwz      r12, 0xa0(r12)
+0028da64: bl       0x5a29e0
+0028da68: lwz      r2, 0x14(r1)
+0028da6c: lwz      r3, 0x5c(r26)
+0028da70: li       r4, 0x10
+0028da74: lwz      r12, 0(r3)
+0028da78: lwz      r12, 0x2c(r12)
+0028da7c: bl       0x5a29e0
+0028da80: lwz      r2, 0x14(r1)
+0028da84: li       r3, 1
+0028da88: lwz      r0, 0x138(r1)
+0028da8c: addi     r1, r1, 0x130
+0028da90: lmw      r22, -0x28(r1)

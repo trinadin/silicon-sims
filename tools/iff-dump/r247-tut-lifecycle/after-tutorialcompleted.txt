@@ -1,0 +1,25 @@
+000adbfc: 38210750  addi     r1, r1, 0x750
+000adc00: bb21ffe4  lmw      r25, -0x1c(r1)
+000adc04: 7c0803a6  mtlr     r0
+000adc08: 4e800020  blr      
+000adc0c: 00000000  .long    0x00000000
+000adc10: 00092041  .long    0x00092041
+000adc14: 80070000  lwz      r0, 0(r7)
+000adc18: 0000022c  .long    0x0000022c
+000adc1c: 00242e54  .long    0x00242e54
+000adc20: 75746f72  andis.   r20, r11, 0x6f72
+000adc24: 69616c43  xori     r1, r11, 0x6c43
+000adc28: 6f6d706c  xoris    r13, r27, 0x706c
+000adc2c: 65746564  oris     r20, r11, 0x6564
+000adc30: 5f5f3132  rlwnm    r31, r26, r6, 4, 0x19
+000adc34: 4e656967  .long    0x4e656967
+000adc38: 68626f72  xori     r2, r3, 0x6f72
+000adc3c: 686f6f64  xori     r15, r3, 0x6f64
+000adc40: 46690000  .long    0x46690000
+000adc44: 00000000  .long    0x00000000
+000adc48: 00000000  .long    0x00000000
+000adc4c: 00000000  .long    0x00000000
+000adc50: bda1ffb4  stmw     r13, -0x4c(r1)
+000adc54: 7c0802a6  mflr     r0
+000adc58: 83c28bac  lwz      r30, -0x7454(r2)
+000adc5c: 7cb02b78  mr       r16, r5

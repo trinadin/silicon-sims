@@ -1,0 +1,50 @@
+[
+  {
+    "assembly": "TheSims.dll",
+    "publish_sha256": "dc745ca2f03317be1c9d2201180400d10ec1d7f3c5b00a83a1405f48ee3b9918",
+    "packaged_sha256": "dc745ca2f03317be1c9d2201180400d10ec1d7f3c5b00a83a1405f48ee3b9918",
+    "match": true
+  },
+  {
+    "assembly": "Simitone.Client.dll",
+    "publish_sha256": "cc8a1dbd7e8c31eeb563cfc4037cf23d44e6652ac0ea3642c15789dc8a34190b",
+    "packaged_sha256": "cc8a1dbd7e8c31eeb563cfc4037cf23d44e6652ac0ea3642c15789dc8a34190b",
+    "match": true
+  },
+  {
+    "assembly": "FSO.SimAntics.dll",
+    "publish_sha256": "dd84e99cb57587d7e00d2a3c7a70afb6fd4fab3145da39f7994ce171fdd4b1ee",
+    "packaged_sha256": "dd84e99cb57587d7e00d2a3c7a70afb6fd4fab3145da39f7994ce171fdd4b1ee",
+    "match": true
+  },
+  {
+    "assembly": "FSO.Content.dll",
+    "publish_sha256": "d083325479e4caf2e5fa27a71c8f945b86f667b0d5e90bf1b1ab929a62faadf1",
+    "packaged_sha256": "d083325479e4caf2e5fa27a71c8f945b86f667b0d5e90bf1b1ab929a62faadf1",
+    "match": true
+  },
+  {
+    "assembly": "FSO.Files.dll",
+    "publish_sha256": "ae1c416c71494718e89d38b91d0f6354abd1b6513d5feac336b8a931d817e626",
+    "packaged_sha256": "ae1c416c71494718e89d38b91d0f6354abd1b6513d5feac336b8a931d817e626",
+    "match": true
+  },
+  {
+    "assembly": "FSO.SimAntics.JIT.dll",
+    "publish_sha256": "51697b51b67bf38f503b2ee3dddc7d28808e82a86a095c73cc6636a75044202a",
+    "packaged_sha256": "51697b51b67bf38f503b2ee3dddc7d28808e82a86a095c73cc6636a75044202a",
+    "match": true
+  },
+  {
+    "assembly": "FSO.LotView.dll",
+    "publish_sha256": "4f5f1b9028401d4600fdbe45f3f5bd1b73036afecd049150f98c5e181e567205",
+    "packaged_sha256": "4f5f1b9028401d4600fdbe45f3f5bd1b73036afecd049150f98c5e181e567205",
+    "match": true
+  },
+  {
+    "assembly": "FSO.Common.dll",
+    "publish_sha256": "9aa780dda645d9878f9823bb43a1f5f2dd6b71c8425691d896fe212e656d649d",
+    "packaged_sha256": "9aa780dda645d9878f9823bb43a1f5f2dd6b71c8425691d896fe212e656d649d",
+    "match": true
+  }
+]

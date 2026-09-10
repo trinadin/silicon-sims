@@ -1,0 +1,240 @@
+                ; ==== range 0x1c0000..0x1c0028 ====
+001c0000: 901f0344  stw      r0, 0x344(r31)
+001c0004: 80050014  lwz      r0, 0x14(r5)
+001c0008: 809001fc  lwz      r4, 0x1fc(r16)
+001c000c: 901f034c  stw      r0, 0x34c(r31)
+001c0010: 80050010  lwz      r0, 0x10(r5)
+001c0014: 901f0348  stw      r0, 0x348(r31)
+001c0018: 4bfea619  bl       0x1aa630   ; .__ct__11cCutawaySetFRC11cCutawaySet
+001c001c: 807001fc  lwz      r3, 0x1fc(r16)
+001c0020: 4bfe9e41  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001c0024: 39df0140  addi     r14, r31, 0x140
+                ; ==== range 0x1c0190..0x1c01d4 ====
+001c0190: 7c0dd000  cmpw     r13, r26
+001c0194: 41820098  beq      0x1c022c
+001c0198: 48102859  bl       0x2c29f0   ; .GetWallManager__11WallManagerFv
+001c019c: 38ad0000  addi     r5, r13, 0
+001c01a0: 38800000  li       r4, 0
+001c01a4: 48102ded  bl       0x2c2f90   ; .SetCutaway__11WallManagerFbi
+001c01a8: 807001fc  lwz      r3, 0x1fc(r16)
+001c01ac: 4bfe9cb5  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001c01b0: 38000001  li       r0, 1
+001c01b4: 9810004e  stb      r0, 0x4e(r16)
+001c01b8: 88100049  lbz      r0, 0x49(r16)
+001c01bc: 28000000  cmplwi   r0, 0
+001c01c0: 4182000c  beq      0x1c01cc
+001c01c4: 7e038378  mr       r3, r16
+001c01c8: 4800f079  bl       0x1cf240   ; .ResetDynamicCutaway__11HouseViewerFv
+001c01cc: 93500018  stw      r26, 0x18(r16)
+001c01d0: 7f44d378  mr       r4, r26
+                ; ==== range 0x1c07f0..0x1c0840 ====
+001c07f0: 823f00f8  lwz      r17, 0xf8(r31)
+001c07f4: 81b00018  lwz      r13, 0x18(r16)
+001c07f8: 7c0d8800  cmpw     r13, r17
+001c07fc: 41820098  beq      0x1c0894
+001c0800: 481021f1  bl       0x2c29f0   ; .GetWallManager__11WallManagerFv
+001c0804: 38ad0000  addi     r5, r13, 0
+001c0808: 38800000  li       r4, 0
+001c080c: 48102785  bl       0x2c2f90   ; .SetCutaway__11WallManagerFbi
+001c0810: 807001fc  lwz      r3, 0x1fc(r16)
+001c0814: 4bfe964d  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001c0818: 38000001  li       r0, 1
+001c081c: 9810004e  stb      r0, 0x4e(r16)
+001c0820: 88100049  lbz      r0, 0x49(r16)
+001c0824: 28000000  cmplwi   r0, 0
+001c0828: 4182000c  beq      0x1c0834
+001c082c: 7e038378  mr       r3, r16
+001c0830: 4800ea11  bl       0x1cf240   ; .ResetDynamicCutaway__11HouseViewerFv
+001c0834: 92300018  stw      r17, 0x18(r16)
+001c0838: 7e248b78  mr       r4, r17
+001c083c: 807d0000  lwz      r3, 0(r29)
+                ; ==== range 0x1c0a60..0x1c0aa0 ====
+001c0a60: 7c1cd800  cmpw     r28, r27
+001c0a64: 4182009c  beq      0x1c0b00
+001c0a68: 48101f89  bl       0x2c29f0   ; .GetWallManager__11WallManagerFv
+001c0a6c: 38bc0000  addi     r5, r28, 0
+001c0a70: 38800000  li       r4, 0
+001c0a74: 4810251d  bl       0x2c2f90   ; .SetCutaway__11WallManagerFbi
+001c0a78: 807d01fc  lwz      r3, 0x1fc(r29)
+001c0a7c: 4bfe93e5  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001c0a80: 38000001  li       r0, 1
+001c0a84: 981d004e  stb      r0, 0x4e(r29)
+001c0a88: 881d0049  lbz      r0, 0x49(r29)
+001c0a8c: 28000000  cmplwi   r0, 0
+001c0a90: 4182000c  beq      0x1c0a9c
+001c0a94: 7fa3eb78  mr       r3, r29
+001c0a98: 4800e7a9  bl       0x1cf240   ; .ResetDynamicCutaway__11HouseViewerFv
+001c0a9c: 937d0018  stw      r27, 0x18(r29)
+                ; ==== range 0x1c1050..0x1c10b8 ====
+001c1050: 4182009c  beq      0x1c10ec
+001c1054: 4810199d  bl       0x2c29f0   ; .GetWallManager__11WallManagerFv
+001c1058: 38b50000  addi     r5, r21, 0
+001c105c: 38800000  li       r4, 0
+001c1060: 48101f31  bl       0x2c2f90   ; .SetCutaway__11WallManagerFbi
+001c1064: 807001fc  lwz      r3, 0x1fc(r16)
+001c1068: 4bfe8df9  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001c106c: 38000001  li       r0, 1
+001c1070: 9810004e  stb      r0, 0x4e(r16)
+001c1074: 88100049  lbz      r0, 0x49(r16)
+001c1078: 28000000  cmplwi   r0, 0
+001c107c: 4182000c  beq      0x1c1088
+001c1080: 7e038378  mr       r3, r16
+001c1084: 4800e1bd  bl       0x1cf240   ; .ResetDynamicCutaway__11HouseViewerFv
+001c1088: 92900018  stw      r20, 0x18(r16)
+001c108c: 7e84a378  mr       r4, r20
+001c1090: 80628874  lwz      r3, -0x778c(r2)
+001c1094: 80630000  lwz      r3, 0(r3)
+001c1098: 80630000  lwz      r3, 0(r3)
+001c109c: 80630024  lwz      r3, 0x24(r3)
+001c10a0: 4bf67a41  bl       0x128ae0   ; .ComputeCutaway__11RoomManagerFi
+001c10a4: 88100049  lbz      r0, 0x49(r16)
+001c10a8: 28000000  cmplwi   r0, 0
+001c10ac: 41820010  beq      0x1c10bc
+001c10b0: 889001f8  lbz      r4, 0x1f8(r16)
+001c10b4: 7e038378  mr       r3, r16
+                ; ==== range 0x1c1600..0x1c1640 ====
+001c1600: 7c0f8800  cmpw     r15, r17
+001c1604: 4182009c  beq      0x1c16a0
+001c1608: 481013e9  bl       0x2c29f0   ; .GetWallManager__11WallManagerFv
+001c160c: 38af0000  addi     r5, r15, 0
+001c1610: 38800000  li       r4, 0
+001c1614: 4810197d  bl       0x2c2f90   ; .SetCutaway__11WallManagerFbi
+001c1618: 807001fc  lwz      r3, 0x1fc(r16)
+001c161c: 4bfe8845  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001c1620: 38000001  li       r0, 1
+001c1624: 9810004e  stb      r0, 0x4e(r16)
+001c1628: 88100049  lbz      r0, 0x49(r16)
+001c162c: 28000000  cmplwi   r0, 0
+001c1630: 4182000c  beq      0x1c163c
+001c1634: 7e038378  mr       r3, r16
+001c1638: 4800dc09  bl       0x1cf240   ; .ResetDynamicCutaway__11HouseViewerFv
+001c163c: 92300018  stw      r17, 0x18(r16)
+                ; ==== range 0x1c1dc0..0x1c1e00 ====
+001c1dc0: 41820098  beq      0x1c1e58
+001c1dc4: 48100c2d  bl       0x2c29f0   ; .GetWallManager__11WallManagerFv
+001c1dc8: 38b40000  addi     r5, r20, 0
+001c1dcc: 38800000  li       r4, 0
+001c1dd0: 481011c1  bl       0x2c2f90   ; .SetCutaway__11WallManagerFbi
+001c1dd4: 807301fc  lwz      r3, 0x1fc(r19)
+001c1dd8: 4bfe8089  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001c1ddc: 38000001  li       r0, 1
+001c1de0: 9813004e  stb      r0, 0x4e(r19)
+001c1de4: 88130049  lbz      r0, 0x49(r19)
+001c1de8: 28000000  cmplwi   r0, 0
+001c1dec: 4182000c  beq      0x1c1df8
+001c1df0: 7e639b78  mr       r3, r19
+001c1df4: 4800d44d  bl       0x1cf240   ; .ResetDynamicCutaway__11HouseViewerFv
+001c1df8: 93b30018  stw      r29, 0x18(r19)
+001c1dfc: 7fa4eb78  mr       r4, r29
+                ; ==== range 0x1c2080..0x1c20b4 ====
+001c2080: 48100971  bl       0x2c29f0   ; .GetWallManager__11WallManagerFv
+001c2084: 38ad0000  addi     r5, r13, 0
+001c2088: 38800000  li       r4, 0
+001c208c: 48100f05  bl       0x2c2f90   ; .SetCutaway__11WallManagerFbi
+001c2090: 807301fc  lwz      r3, 0x1fc(r19)
+001c2094: 4bfe7dcd  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001c2098: 38000001  li       r0, 1
+001c209c: 9813004e  stb      r0, 0x4e(r19)
+001c20a0: 88130049  lbz      r0, 0x49(r19)
+001c20a4: 28000000  cmplwi   r0, 0
+001c20a8: 4182000c  beq      0x1c20b4
+001c20ac: 7e639b78  mr       r3, r19
+001c20b0: 4800d191  bl       0x1cf240   ; .ResetDynamicCutaway__11HouseViewerFv
+                ; ==== range 0x1c24b4..0x1c24dc ====
+001c24b4: 4810053d  bl       0x2c29f0   ; .GetWallManager__11WallManagerFv
+001c24b8: 38ad0000  addi     r5, r13, 0
+001c24bc: 38800000  li       r4, 0
+001c24c0: 48100ad1  bl       0x2c2f90   ; .SetCutaway__11WallManagerFbi
+001c24c4: 807301fc  lwz      r3, 0x1fc(r19)
+001c24c8: 4bfe7999  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001c24cc: 38000001  li       r0, 1
+001c24d0: 9813004e  stb      r0, 0x4e(r19)
+001c24d4: 88130049  lbz      r0, 0x49(r19)
+001c24d8: 28000000  cmplwi   r0, 0
+                ; ==== range 0x1d66ac..0x1d66e0 ====
+001d66ac: 387c0204  addi     r3, r28, 0x204
+001d66b0: 38800000  li       r4, 0
+001d66b4: 38a00200  li       r5, 0x200
+001d66b8: 483c06b9  bl       0x596d70
+001d66bc: 807c01fc  lwz      r3, 0x1fc(r28)
+001d66c0: 4bfd37a1  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001d66c4: 38000001  li       r0, 1
+001d66c8: 981c004e  stb      r0, 0x4e(r28)
+001d66cc: 7f83e378  mr       r3, r28
+001d66d0: 819c0004  lwz      r12, 4(r28)
+001d66d4: 818c0020  lwz      r12, 0x20(r12)
+001d66d8: 483cc309  bl       0x5a29e0
+001d66dc: 80410014  lwz      r2, 0x14(r1)
+                ; ==== range 0x1d68b0..0x1d6928 ====
+001d68b0: 483c04c1  bl       0x596d70
+001d68b4: 807c01fc  lwz      r3, 0x1fc(r28)
+001d68b8: 4bfd35a9  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001d68bc: 38000001  li       r0, 1
+001d68c0: 981c004e  stb      r0, 0x4e(r28)
+001d68c4: 387c0000  addi     r3, r28, 0
+001d68c8: 38a00001  li       r5, 1
+001d68cc: 809f0008  lwz      r4, 8(r31)
+001d68d0: 38c00001  li       r6, 1
+001d68d4: 48000ead  bl       0x1d7780   ; .SetScale__11HouseViewerFibb
+001d68d8: 809f000c  lwz      r4, 0xc(r31)
+001d68dc: 387c0000  addi     r3, r28, 0
+001d68e0: 38a00001  li       r5, 1
+001d68e4: 38c00001  li       r6, 1
+001d68e8: 48000949  bl       0x1d7230   ; .SetRotation__11HouseViewerFibb
+001d68ec: 833c0018  lwz      r25, 0x18(r28)
+001d68f0: 480ec101  bl       0x2c29f0   ; .GetWallManager__11WallManagerFv
+001d68f4: 38b90000  addi     r5, r25, 0
+001d68f8: 38800000  li       r4, 0
+001d68fc: 480ec695  bl       0x2c2f90   ; .SetCutaway__11WallManagerFbi
+001d6900: 807c01fc  lwz      r3, 0x1fc(r28)
+001d6904: 4bfd355d  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001d6908: 38000001  li       r0, 1
+001d690c: 981c004e  stb      r0, 0x4e(r28)
+001d6910: 881c0049  lbz      r0, 0x49(r28)
+001d6914: 28000000  cmplwi   r0, 0
+001d6918: 4182000c  beq      0x1d6924
+001d691c: 7f83e378  mr       r3, r28
+001d6920: 4bff8921  bl       0x1cf240   ; .ResetDynamicCutaway__11HouseViewerFv
+001d6924: 933c0018  stw      r25, 0x18(r28)
+                ; ==== range 0x1d6b6c..0x1d6b90 ====
+001d6b6c: 38000001  li       r0, 1
+001d6b70: 981c0200  stb      r0, 0x200(r28)
+001d6b74: 807c01fc  lwz      r3, 0x1fc(r28)
+001d6b78: 4bfd32e9  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001d6b7c: 480000e0  b        0x1d6c5c
+001d6b80: 889c01f8  lbz      r4, 0x1f8(r28)
+001d6b84: 7f83e378  mr       r3, r28
+001d6b88: 4bff8829  bl       0x1cf3b0   ; .DoDynamicCutaway__11HouseViewerFb
+001d6b8c: 480000d0  b        0x1d6c5c
+                ; ==== range 0x1d6fbc..0x1d6fc8 ====
+001d6fbc: 4bfd2ea5  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001d6fc0: 387f0204  addi     r3, r31, 0x204
+001d6fc4: 38800000  li       r4, 0
+                ; ==== range 0x1d7154..0x1d7170 ====
+001d7154: 807d01fc  lwz      r3, 0x1fc(r29)
+001d7158: 4bfd2d09  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001d715c: 38000001  li       r0, 1
+001d7160: 981d004e  stb      r0, 0x4e(r29)
+001d7164: 881d0049  lbz      r0, 0x49(r29)
+001d7168: 28000000  cmplwi   r0, 0
+001d716c: 4182000c  beq      0x1d7178
+                ; ==== range 0x1d7cec..0x1d7d10 ====
+001d7cec: 807701fc  lwz      r3, 0x1fc(r23)
+001d7cf0: 4bfd2171  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001d7cf4: 38000001  li       r0, 1
+001d7cf8: 9817004e  stb      r0, 0x4e(r23)
+001d7cfc: 88170049  lbz      r0, 0x49(r23)
+001d7d00: 28000000  cmplwi   r0, 0
+001d7d04: 4182000c  beq      0x1d7d10
+001d7d08: 7ee3bb78  mr       r3, r23
+001d7d0c: 4bff7535  bl       0x1cf240   ; .ResetDynamicCutaway__11HouseViewerFv
+                ; ==== range 0x1c1dd8..0x1c1dfc ====
+001c1dd8: 4bfe8089  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001c1ddc: 38000001  li       r0, 1
+001c1de0: 9813004e  stb      r0, 0x4e(r19)
+001c1de4: 88130049  lbz      r0, 0x49(r19)
+001c1de8: 28000000  cmplwi   r0, 0
+001c1dec: 4182000c  beq      0x1c1df8
+001c1df0: 7e639b78  mr       r3, r19
+001c1df4: 4800d44d  bl       0x1cf240   ; .ResetDynamicCutaway__11HouseViewerFv
+001c1df8: 93b30018  stw      r29, 0x18(r19)

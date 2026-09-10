@@ -1,0 +1,68 @@
+# R153 caller graph: direct b/bl (op18) + absolute bc, whole sec0
+
+== ChangeSimBaseType__12NeighborhoodF... @ 0xa6340
+  bl from 0x0a7108 word 4bfff239  in AnyoneToDog__12NeighborhoodFRsRs (starts 0xa7020)
+  bl from 0x0a7288 word 4bfff0b9  in AnyoneToCat__12NeighborhoodFRsRs (starts 0xa71a0)
+  bl from 0x0a7408 word 4bffef39  in AnyoneToKid__12NeighborhoodFRsRs (starts 0xa7320)
+  bl from 0x0a7588 word 4bffedb9  in AnyoneToAdult__12NeighborhoodFRsRs (starts 0xa74a0)
+  TOC/data slots holding 0x9d4b0 (sec0-relative): []
+
+== LoadInterestData__12NeighborhoodFP8cXPerson @ 0xb4a80
+  bl from 0x0a6f28 word 4800db59  in ChangeSimBaseType__12NeighborhoodFP8NeighborQ221MakeNewCharacterParam15eCharacterTypesi (starts 0xa6340)
+  bl from 0x0f61cc word 4bfbe8b5  in TryCreateObject__8cXObjectFP9StackElemP10XPrimParam (starts 0xf5920)
+  bl from 0x111bdc word 4bfa2ea5  in Reset__8cXPersonFUc (starts 0x111910)
+  TOC/data slots holding 0xabbf0 (sec0-relative): []
+
+== RandomizeAllInterests__8cXPersonFv @ 0x111650
+  bl from 0x111bc8 word 4bfffa89  in Reset__8cXPersonFUc (starts 0x111910)
+  bl from 0x112014 word 4bfff63d  in Initialize__8cXPersonFv (starts 0x111cd0)
+  TOC/data slots holding 0x1087c0 (sec0-relative): []
+
+== Reset__8cXPersonFUc @ 0x111910
+  TOC/data slots holding 0x108a80 (sec0-relative): ['0xda28']
+
+== Initialize__8cXPersonFv @ 0x111cd0
+  TOC/data slots holding 0x108e40 (sec0-relative): ['0xda20']
+
+== GetNextRandomNumber__Fv @ 0x1411d0
+  bl from 0x066d58 word 480da479  in ChooseProxy__10EditPersonFiP11SuitTexListi (starts 0x66b20)
+  bl from 0x066d80 word 480da451  in ChooseProxy__10EditPersonFiP11SuitTexListi (starts 0x66b20)
+  bl from 0x0c4d90 word 4807c441  in FindGoodLocation__8cXObjectFRC22FindGoodLocationParamsP7FTilePt (starts 0xc4b50)
+  bl from 0x0c4da8 word 4807c429  in FindGoodLocation__8cXObjectFRC22FindGoodLocationParamsP7FTilePt (starts 0xc4b50)
+  bl from 0x0c4df4 word 4807c3dd  in FindGoodLocation__8cXObjectFRC22FindGoodLocationParamsP7FTilePt (starts 0xc4b50)
+  bl from 0x0c4e08 word 4807c3c9  in FindGoodLocation__8cXObjectFRC22FindGoodLocationParamsP7FTilePt (starts 0xc4b50)
+  bl from 0x0f1104 word 480500cd  in TryRandom__8cXObjectFP9StackElemP10XPrimParam (starts 0xf1070)
+  bl from 0x0f1130 word 480500a1  in TryRandom__8cXObjectFP9StackElemP10XPrimParam (starts 0xf1070)
+  bl from 0x0fa8ec word 480468e5  in TryMakeNewCharacter__8cXObjectFP9StackElemP10XPrimParam (starts 0xfa520)
+  bl from 0x0fa908 word 480468c9  in TryMakeNewCharacter__8cXObjectFP9StackElemP10XPrimParam (starts 0xfa520)
+  bl from 0x0fa9e8 word 480467e9  in TryMakeNewCharacter__8cXObjectFP9StackElemP10XPrimParam (starts 0xfa520)
+  bl from 0x109e78 word 48037359  in TryFindBestAction__8cXPersonFP9StackElem (starts 0x109860)
+  bl from 0x109e90 word 48037341  in TryFindBestAction__8cXPersonFP9StackElem (starts 0x109860)
+  bl from 0x10a578 word 48036c59  in TryChangeSuit__8cXPersonFP9StackElemP10XPrimParam (starts 0x10a4d0)
+  bl from 0x10a5bc word 48036c15  in TryChangeSuit__8cXPersonFP9StackElemP10XPrimParam (starts 0x10a4d0)
+  bl from 0x10a5c8 word 48036c09  in TryChangeSuit__8cXPersonFP9StackElemP10XPrimParam (starts 0x10a4d0)
+  bl from 0x15d610 word 4bfe3bc1  in FractallyInterpolateGrid__FP10cArray<Sc>ll (starts 0x15d260)
+  bl from 0x15d700 word 4bfe3ad1  in FractalInitializeGrid__FP10cArray<Sc>lScUc (starts 0x15d6c0)
+  bl from 0x15d8d0 word 4bfe3901  in GenerateTerrain__FP18cArray<9PackedAlt>UcUcUc (starts 0x15d870)
+  bl from 0x15d8e8 word 4bfe38e9  in GenerateTerrain__FP18cArray<9PackedAlt>UcUcUc (starts 0x15d870)
+  bl from 0x15d8f8 word 4bfe38d9  in GenerateTerrain__FP18cArray<9PackedAlt>UcUcUc (starts 0x15d870)
+  bl from 0x15dc1c word 4bfe35b5  in RandomSmooth32Bit__FP18cArray<9PackedAlt>Uc9PackedAltUcUc (starts 0x15dbb0)
+  bl from 0x15dc30 word 4bfe35a1  in RandomSmooth32Bit__FP18cArray<9PackedAlt>Uc9PackedAltUcUc (starts 0x15dbb0)
+  bl from 0x15df3c word 4bfe3295  in RandomSmooth__FP10cArray<Uc>UcUcUcUc (starts 0x15dee0)
+  bl from 0x15df50 word 4bfe3281  in RandomSmooth__FP10cArray<Uc>UcUcUcUc (starts 0x15dee0)
+  bl from 0x16c7a8 word 4bfd4a29  in ConstructGoals__6XRouteFb (starts 0x16bc10)
+  bl from 0x16ca68 word 4bfd4769  in ConstructGoals__6XRouteFb (starts 0x16bc10)
+  bl from 0x1a5548 word 4bf9bc89  in InitGrass__12cColorSwatchFi (starts 0x1a5450)
+  bl from 0x1a55b0 word 4bf9bc21  in InitGrass__12cColorSwatchFi (starts 0x1a5450)
+  bl from 0x1a55b8 word 4bf9bc19  in InitGrass__12cColorSwatchFi (starts 0x1a5450)
+  bl from 0x1a560c word 4bf9bbc5  in InitGrass__12cColorSwatchFi (starts 0x1a5450)
+  bl from 0x1a5628 word 4bf9bba9  in InitGrass__12cColorSwatchFi (starts 0x1a5450)
+  bl from 0x1a5660 word 4bf9bb71  in InitGrass__12cColorSwatchFi (starts 0x1a5450)
+  bl from 0x1a812c word 4bf990a5  in PreCompute__12cColorSwatchFv (starts 0x1a8030)
+  bl from 0x1cebec word 4bf725e5  in Censor__11HouseViewerFPC4RectiiiiP11RenderParam (starts 0x1ce890)
+  bl from 0x1cebfc word 4bf725d5  in Censor__11HouseViewerFPC4RectiiiiP11RenderParam (starts 0x1ce890)
+  bl from 0x1cec0c word 4bf725c5  in Censor__11HouseViewerFPC4RectiiiiP11RenderParam (starts 0x1ce890)
+  bl from 0x3fe5a0 word 4bd42c31  in TSOnTimerMsg__12cWinDowntownFv (starts 0x3fe530)
+  bl from 0x440e80 word 4bd00351  in TSOnTimerMsg__12cWinVacationFv (starts 0x440e10)
+  bl from 0x46ac88 word 4bcd6549  in TSOnTimerMsg__18cWinNeighborhoodULFv (starts 0x46a9b0)
+  TOC/data slots holding 0x138340 (sec0-relative): []

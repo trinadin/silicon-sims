@@ -1,0 +1,5 @@
+### BHAV 4120 'set car type from work' (4 instructions)
+ins0  T1/F253  StkObjAttr[1] = Tuning[0]
+ins1  T2/F253  Temp[0] = MyPD[56]
+ins2  T3/F253  Temp[1] = MyPD[57]
+ins3  T254/F253 StkObjAttr[1] = JobData[21]

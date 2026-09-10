@@ -1,0 +1,17 @@
+# UIText.iff STR# 129 'DesignFamilyStrs' format -3, 270 total entries, 15 English(lang=1)
+# format: [diskIndex] value | comment
+[0] 'Add a New Sim' | '6 Sim Screens: Create Family: Button:  Tooltip\r\n\r\nNotes: none'
+[1] 'Delete Selected Sim' | '6 Sim Screens: Create Family: Button: Delete Sim:  Tooltip\r\n\r\nNotes: none'
+[2] 'Edit Selected Sim' | '6 Sim Screens: Create Family: Button:  Tooltip\r\n\r\nNotes: none'
+[3] 'Done' | '6 Sim Screens: Create Family: Button: Done:  Label\r\n\r\nNotes: none'
+[4] 'Cancel' | '6 Sim Screens: Create Family: Button: Cancel:  Label\r\n\r\nNotes: none'
+[5] 'Delete Sim?' | '6 Sim Screens: Create Family: Button: Delete Sim: Dialog:  Title\r\n\r\nNotes: Appears when Delete Selected Sim button is selected.'
+[6] 'Are you sure you would like to delete this Sim?' | '6 Sim Screens: Create Family: Button: Delete Sim: Dialog: Text\r\n\r\nNotes: Appears when Delete Selected Sim button is selected.'
+[7] 'Cancel?' | '6 Sim Screens: Create Family: Button: Cancel: Dialog:  Title\r\n\r\nNotes: Appears when Cancel button is selected.'
+[8] 'Are you sure you want to cancel and lose this family?' | '6 Sim Screens: Create Family: Button: Cancel: Dialog: Text\r\n\r\nNotes: Appears when Cancel button is selected after family has been created. '
+[9] 'CREATE A FAMILY' | '6 Sim Screens: Create Family:  Screen:  Title\r\n\r\nNotes: none'
+[10] 'Done' | '!'
+[11] 'Cancel' | '!'
+[12] 'Enter Last Name:' | '6 Sim Screens: Create Family:  Screen: Label\r\n\r\nNotes: none'
+[13] 'Finished?' | '6 Sim Screens: Create Family: Button: Done: Dialog:  Title\r\n\r\nNotes: Appears when done is selected.'
+[14] 'Are you sure you are finished?  You cannot return to the Create A Family screen to edit this family again.' | '6 Sim Screens: Create Family: Button: Done: Dialog: Text\r\n\r\nNotes: Appears when done is selected.'

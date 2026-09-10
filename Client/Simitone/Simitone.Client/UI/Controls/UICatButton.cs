@@ -15,6 +15,9 @@ namespace Simitone.Client.UI.Controls
     {
         private Texture2D CatBase;
         private Texture2D Replaced;
+        // R122: original cpanel art (catalog plaques/subsort frames) mounts at its
+        // own size — skip the modern round cat_btn_base chrome behind it.
+        public bool OriginalStyle;
         public UICatButton(Texture2D tex) : base(tex)
         {
             Alpha = 1f;
@@ -68,7 +71,8 @@ namespace Simitone.Client.UI.Controls
                 default:
                     color = Color; break;
             }
-            DrawLocalTexture(SBatch, CatBase, null, new Vector2(-5), Vector2.One, color * Alpha);
+            if (!OriginalStyle)
+                DrawLocalTexture(SBatch, CatBase, null, new Vector2(-5), Vector2.One, color * Alpha);
         }
     }
 }

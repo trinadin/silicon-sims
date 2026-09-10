@@ -1,0 +1,1216 @@
+=== SYMBOL MAP (0x100000-0x108000, 0x180000-0x188000) ===
+0x102998 .SetHeadTextureDirty__11ObjSelectorFb
+0x102b78 .GetBodyStrings__11ObjSelectorFb
+0x102c44 .GetObjectStrings__11ObjSelectorFb
+0x102c88 .SetProduct__11ObjSelectorFP7Product
+0x102d0c .GetTypeAttributes__11ObjSelectorFv
+0x102d9c .CountTypeAttributes__11ObjSelectorFv
+0x102e80 .GetShortFilename__11ObjSelectorFP12StringBuffer
+0x102fb4 .GetCatalogResource__11ObjSelectorFv
+0x1030fc .GetTreeTable__11ObjSelectorFv
+0x1031b8 .GetFnTable__11ObjSelectorFv
+0x10323c .GetObjectAnimTable__11ObjSelectorFv
+0x1032cc .GetChildToAdultAnimTable__11ObjSelectorFv
+0x10335c .GetAdultToChildAnimTable__11ObjSelectorFv
+0x1033ec .GetChildAnimTable__11ObjSelectorFv
+0x10347c .GetCustomWalkAnimTable__11ObjSelectorFv
+0x10350c .GetAdultAnimTable__11ObjSelectorFv
+0x103638 .GetCatalogRating__11ObjSelectorFi
+0x103848 .HasGroupActions__11ObjSelectorFv
+0x103a20 .PeopleOnly__11ObjSelectorFv
+0x103bf0 .PetsOnly__11ObjSelectorFv
+0x103dd0 .CatsOnly__11ObjSelectorFv
+0x103fb0 .DogsOnly__11ObjSelectorFv
+0x104190 .ChildrenOnly__11ObjSelectorFv
+0x104370 .AdultsOnly__11ObjSelectorFv
+0x104578 .GetDrawGroup__11ObjSelectorFi
+0x104664 .GetMainTreeVersion__11ObjSelectorFv
+0x104754 .GetInitTreeVersion__11ObjSelectorFv
+0x10479c .GetShadowBrightness__11ObjSelectorFv
+0x1047f8 .GetIsPerson__11ObjSelectorFv
+0x104874 .GetIsMultiTileSubObject__11ObjSelectorFv
+0x1049dc .GetHasInteractions__11ObjSelectorFv
+0x104a4c .GetHasGraphics__11ObjSelectorFv
+0x104adc .GetThumbnailHasShadow__11ObjSelectorFv
+0x104b2c .GetThumbnailGraphicIndex__11ObjSelectorFv
+0x104dc0 .ComputeShadowID__11ObjSelectorFv
+0x104e38 .GetShadowID__11ObjSelectorFv
+0x104f58 .GetCatalogDescription__11ObjSelectorFv
+0x105084 .GetCatalogName__11ObjSelectorFv
+0x1051a4 .ChangedDef__11ObjSelectorFv
+0x1052e8 .SetObjectName__11ObjSelectorFPCc
+0x10532c .GetGUID__11ObjSelectorFv
+0x1053a8 .GetMasterSelector__11ObjSelectorFv
+0x1053f8 .TestFromSameFile__11ObjSelectorFP11ObjSelector
+0x1056e8 .__dt__11ObjSelectorFv
+0x10576c .__dt__13ObjectStringsFv
+0x105868 .__ct__11ObjSelectorFv
+0x105eb0 .MakeNewMenuItem__10ObjTestSimFPCcPCs
+0x105f2c .IsMenuInProgress__10ObjTestSimFv
+0x106648 .TestInteraction__10ObjTestSimFP11InteractionPP14TreeTableEntry
+0x1066e0 .SetStackObject__10ObjTestSimFP8cXObject
+0x1067d0 .__dt__10ObjTestSimFv
+0x106858 .__ct__10ObjTestSimFP8cXPersonP8cXObjectb
+0x1068b8 .__ct__10ObjTestSimFP8cXPersonb
+0x10716c .__dt__10cOffscreenFv
+0x1071cc .__ct__10cOffscreenFv
+0x107288 .Has3DToDraw__8cXPersonCFv
+0x107a68 .GetPajamasSuitTex__8cXPersonFR12StringBufferR12StringBuffer
+0x107c58 .GetJobSuitTex__8cXPersonFR12StringBufferR12StringBufferR12StringBuffer
+0x107cf4 .Track__8cXPersonFv
+0x107d28 .GetDirection__9SAnimatorFv
+0x107d68 .GetGridY__9SAnimatorFv
+0x107da8 .GetGridX__9SAnimatorFv
+0x107de8 .GetVitaBoy__8AnimatorCFv
+0x1800b0 .SetCursorVertex__12cNewWallToolFRC7CTilePt
+0x180140 .Deselect__12cNewWallToolFv
+0x18022c .Select__12cNewWallToolFv
+0x180268 .NeedsObject__12cNewWallToolFv
+0x1802cc .OnKeyUp__12cNewWallToolFUlUl
+0x180390 .OnKeyDown__12cNewWallToolFUlUl
+0x180530 .Release__12cNewWallToolF7FTilePtsP11EventRecord
+0x180b4c .Drag__12cNewWallToolF7FTilePtsP11EventRecord
+0x181124 .Click__12cNewWallToolF7FTilePtsP11EventRecord
+0x181370 .Float__12cNewWallToolF7FTilePtsP11EventRecord
+0x18144c .__dt__12cNewWallToolFv
+0x181540 .__ct__12cNewWallToolFP11UndoManager
+0x181774 .GetHandle__11ObjectStateFs
+0x1817b4 .FlushHandles__11ObjectStateFv
+0x181898 .RemoveEntry__11ObjectStateFP17ObjectHandleEntry
+0x181a9c .KillObject__11ObjectStateCFv
+0x181d68 .CreateObject__11ObjectStateCFv
+0x181f9c .InvokeOntoObject__11ObjectStateCFv
+0x18216c .AssignFromObject__11ObjectStateFs
+0x18239c .RedoSelf__14ObjectUndoableFv
+0x18259c .UndoSelf__14ObjectUndoableFv
+0x1826dc .CommitSelf__14ObjectUndoableFv
+0x1828a0 .SetAction__14ObjectUndoableFQ214ObjectUndoable6Action
+0x182e5c .__dt__14ObjectUndoableFv
+0x1830f8 .__ct__14ObjectUndoableFsQ214ObjectUndoable6ActioniP5cTool
+0x1832a0 .__dt__11ObjectStateFv
+0x1835ec .__dt__14cObjPickerToolFv
+0x183628 .NeedsObject__14cObjPickerToolFv
+0x183668 .ControlsOwnToolTips__14cObjPickerToolFv
+0x1836e0 .ResetParameter__14cObjPickerToolFv
+0x183728 .SupportsUndo__5cToolCFv
+0x18376c .GetActiveStackObject__14cObjPickerToolFv
+0x1837e0 .SetParameter__14cObjPickerToolFs
+0x1839bc .DeletingObject__14cObjPickerToolFs
+0x183ce8 .MenuItemChanged__14cObjPickerToolFP10cTSPieMenu
+0x183d6c .Key__14cObjPickerToolFcUc
+0x183e8c .OnChar__14cObjPickerToolFii
+0x184044 .MenuItemSelected__14cObjPickerToolFP10cTSPieMenu
+0x184ba8 .DoMenu__14cObjPickerToolFP9AnimTableP8cXPersonii
+0x184c64 .__dt__9MenuEntryFv
+0x184ea0 .BuildAnimList__14cObjPickerToolFP8cXPersonP8cXObject
+0x185050 .BuildTreeList__14cObjPickerToolFP8cXObjectii
+0x1850c0 .Release__14cObjPickerToolF7FTilePtsP11EventRecord
+0x185b08 .TryClick__14cObjPickerToolF7FTilePtsP11EventRecord
+0x185bd4 .GetGrass__15cRotatableWorldF7CTilePt
+0x185cec .Click__14cObjPickerToolF7FTilePtsP11EventRecord
+0x186120 .Float__14cObjPickerToolF7FTilePtsP11EventRecord
+0x186194 .Cancel__14cObjPickerToolFv
+0x1861fc .Deselect__14cObjPickerToolFv
+0x18627c .Select__14cObjPickerToolFv
+0x186388 .SetHiliteObject__14cObjPickerToolFsii
+0x1865b0 .__ct__14cObjPickerToolFv
+0x18781c .__ct__9MenuEntryFRC9MenuEntry
+
+=== FIELD-READER SITES (1035) ===
+0x010730 off102 op42 r7,102(r1)       ?
+0x011d40 off284 op36 r7,284(r1)       ?
+0x025670 off284 op36 r28,284(r4)      ?
+0x025818 off284 op36 r8,284(r5)       ?
+0x058ef0 off102 op42 r3,102(r3)       ?
+0x059620 off102 op42 r3,102(r3)       ?
+0x059688 off284 op36 r13,284(r1)      ?
+0x0596b4 off284 op36 r13,284(r1)      ?
+0x0599bc off284 op36 r13,284(r1)      ?
+0x059b54 off102 op42 r3,102(r3)       ?
+0x06097c off284 op32 r0,284(r3)       ?
+0x060a78 off284 op32 r0,284(r27)      ?
+0x076e04 off284 op32 r3,284(r4)       ?
+0x077028 off284 op36 r5,284(r29)      ?
+0x08859c off102 op42 r0,102(r3)       ?
+0x0885a4 off102 op44 r0,102(r3)       ?
+0x088600 off102 op42 r0,102(r3)       ?
+0x088608 off102 op44 r0,102(r3)       ?
+0x088664 off102 op42 r0,102(r3)       ?
+0x08866c off102 op44 r0,102(r3)       ?
+0x0886c8 off102 op42 r0,102(r3)       ?
+0x0886d0 off102 op44 r0,102(r3)       ?
+0x088718 off102 op42 r0,102(r3)       ?
+0x088720 off102 op44 r0,102(r3)       ?
+0x088774 off102 op42 r0,102(r3)       ?
+0x08877c off102 op44 r0,102(r3)       ?
+0x0887c4 off102 op42 r0,102(r3)       ?
+0x0887cc off102 op44 r0,102(r3)       ?
+0x0887e4 off102 op42 r0,102(r3)       ?
+0x0887ec off102 op44 r0,102(r3)       ?
+0x088850 off102 op42 r5,102(r5)       ?
+0x088b24 off102 op42 r0,102(r3)       ?
+0x088b40 off102 op42 r0,102(r3)       ?
+0x088b5c off102 op42 r0,102(r3)       ?
+0x088b78 off102 op42 r0,102(r3)       ?
+0x088b94 off102 op42 r0,102(r3)       ?
+0x088bb0 off102 op42 r0,102(r3)       ?
+0x088bcc off102 op42 r0,102(r3)       ?
+0x088be8 off102 op42 r0,102(r3)       ?
+0x088c04 off102 op42 r0,102(r3)       ?
+0x088ef8 off102 op42 r0,102(r4)       ?
+0x0890d8 off102 op42 r0,102(r3)       ?
+0x0891d0 off102 op42 r0,102(r3)       ?
+0x0892c8 off102 op42 r0,102(r3)       ?
+0x0893c0 off102 op42 r0,102(r3)       ?
+0x0894b8 off102 op42 r0,102(r3)       ?
+0x0895b0 off102 op42 r0,102(r3)       ?
+0x0896a8 off102 op42 r0,102(r3)       ?
+0x0897a0 off102 op42 r0,102(r3)       ?
+0x089e10 off102 op44 r0,102(r27)      ?
+0x094034 off102 op42 r0,102(r1)       ?
+0x094110 off102 op44 r3,102(r1)       ?
+0x09c81c off284 op32 r3,284(r3)       ?
+0x09c988 off284 op32 r3,284(r3)       ?
+0x09cb20 off284 op32 r3,284(r3)       ?
+0x09cd38 off284 op32 r3,284(r3)       ?
+0x09ce2c off284 op32 r3,284(r3)       ?
+0x09eac8 off1550 op42 r5,1550(r5)     ?
+0x0a0d94 off284 op32 r3,284(r4)       ?
+0x0a0f60 off284 op32 r3,284(r4)       ?
+0x0a1514 off284 op32 r3,284(r4)       ?
+0x0a2020 off284 op32 r25,284(r3)      ?
+0x0a20d4 off284 op32 r0,284(r3)       ?
+0x0a22fc off284 op32 r3,284(r28)      ?
+0x0a2318 off284 op32 r4,284(r28)      ?
+0x0a24bc off284 op32 r3,284(r3)       ?
+0x0a2a7c off284 op32 r3,284(r30)      ?
+0x0a2a98 off284 op32 r4,284(r30)      ?
+0x0a2cac off284 op32 r3,284(r28)      ?
+0x0a2d9c off284 op32 r3,284(r29)      ?
+0x0a2db8 off284 op32 r4,284(r29)      ?
+0x0a2ed0 off284 op32 r3,284(r27)      ?
+0x0a2eec off284 op32 r4,284(r27)      ?
+0x0a3044 off284 op32 r3,284(r29)      ?
+0x0a3060 off284 op32 r4,284(r29)      ?
+0x0a3178 off284 op32 r3,284(r27)      ?
+0x0a3194 off284 op32 r4,284(r27)      ?
+0x0a31c4 off284 op32 r3,284(r28)      ?
+0x0a33d0 off284 op32 r3,284(r30)      ?
+0x0a33ec off284 op32 r4,284(r30)      ?
+0x0a3670 off284 op32 r3,284(r30)      ?
+0x0a368c off284 op32 r4,284(r30)      ?
+0x0a4954 off284 op36 r0,284(r1)       ?
+0x0a70c4 off284 op32 r8,284(r8)       ?
+0x0a7244 off284 op32 r8,284(r8)       ?
+0x0a73c4 off284 op32 r8,284(r8)       ?
+0x0a7544 off284 op32 r8,284(r8)       ?
+0x0a773c off1550 op42 r18,1550(r22)   ?
+0x0a7c70 off102 op42 r0,102(r3)       ?
+0x0a7e2c off102 op42 r0,102(r3)       ?
+0x0a8250 off102 op42 r0,102(r3)       ?
+0x0a840c off102 op42 r0,102(r3)       ?
+0x0a9870 off102 op42 r0,102(r3)       ?
+0x0a9a2c off102 op42 r0,102(r3)       ?
+0x0a9dc8 off102 op42 r0,102(r4)       ?
+0x0a9e40 off102 op42 r0,102(r3)       ?
+0x0aaad0 off102 op42 r0,102(r3)       ?
+0x0aacd0 off102 op42 r0,102(r3)       ?
+0x0abc30 off102 op42 r0,102(r3)       ?
+0x0abe20 off102 op42 r0,102(r4)       ?
+0x0abff4 off284 op36 r3,284(r1)       ?
+0x0ad57c off1536 op42 r6,1536(r3)     ?
+0x0ad580 off1550 op42 r7,1550(r3)     ?
+0x0ad964 off284 op32 r4,284(r31)      ?
+0x0adfd0 off284 op36 r4,284(r3)       ?
+0x0ae0b0 off284 op36 r0,284(r3)       ?
+0x0ae198 off102 op42 r0,102(r3)       ?
+0x0ae200 off102 op42 r0,102(r3)       ?
+0x0b03c4 off284 op32 r0,284(r21)      ?
+0x0b03ec off284 op36 r3,284(r21)      ?
+0x0b04e4 off284 op32 r3,284(r5)       ?
+0x0b0660 off284 op32 r5,284(r7)       ?
+0x0b1a50 off284 op32 r3,284(r21)      ?
+0x0b1c3c off284 op36 r0,284(r23)      ?
+0x0b1f5c off284 op32 r31,284(r4)      ?
+0x0b248c off102 op42 r0,102(r4)       ?
+0x0b42ec off284 op32 r3,284(r4)       ?
+0x0b4aa8 off284 op32 r4,284(r4)       ?
+0x0b4be8 off284 op32 r4,284(r4)       ?
+0x0b5594 off284 op36 r0,284(r5)       ?
+0x0b62e0 off102 op42 r0,102(r3)       ?
+0x0b7080 off284 op36 r0,284(r31)      ?
+0x0c2934 off102 op44 r5,102(r3)       ?
+0x0c3068 off284 op32 r4,284(r3)       ?
+0x0c31ac off284 op32 r3,284(r30)      ?
+0x0c3480 off284 op32 r3,284(r29)      ?
+0x0c349c off284 op32 r4,284(r29)      ?
+0x0c35b4 off284 op32 r3,284(r28)      ?
+0x0c35d0 off284 op32 r4,284(r28)      ?
+0x0c36e8 off284 op32 r3,284(r29)      ?
+0x0c3704 off284 op32 r4,284(r29)      ?
+0x0c381c off284 op32 r3,284(r28)      ?
+0x0c3838 off284 op32 r4,284(r28)      ?
+0x0c3b50 off284 op32 r3,284(r31)      ?
+0x0c4150 off284 op32 r3,284(r3)       ?
+0x0c45a0 off284 op32 r3,284(r28)      ?
+0x0c45bc off284 op32 r4,284(r28)      ?
+0x0c463c off284 op32 r4,284(r3)       ?
+0x0c4860 off284 op32 r3,284(r3)       ?
+0x0c5b0c off284 op32 r6,284(r29)      ?
+0x0c618c off284 op32 r3,284(r29)      ?
+0x0c6f80 off284 op32 r3,284(r31)      ?
+0x0c6f98 off284 op32 r3,284(r24)      ?
+0x0c6fb4 off284 op32 r3,284(r24)      ?
+0x0c6fcc off284 op32 r3,284(r24)      ?
+0x0c6ffc off284 op32 r3,284(r31)      ?
+0x0c7020 off284 op32 r4,284(r31)      ?
+0x0c7044 off284 op32 r3,284(r24)      ?
+0x0c7068 off284 op32 r4,284(r24)      ?
+0x0c74cc off284 op32 r3,284(r21)      ?
+0x0c7570 off284 op32 r3,284(r24)      ?
+0x0c7588 off284 op32 r3,284(r24)      ?
+0x0c75a4 off284 op32 r4,284(r24)      ?
+0x0c7868 off284 op32 r3,284(r22)      ?
+0x0c78a0 off284 op32 r3,284(r22)      ?
+0x0c7b64 off284 op32 r3,284(r22)      ?
+0x0c7bb8 off284 op32 r3,284(r22)      ?
+0x0c7bd4 off284 op32 r4,284(r22)      ?
+0x0c7bf4 off284 op32 r3,284(r24)      ?
+0x0c7c10 off284 op32 r4,284(r24)      ?
+0x0c7e90 off284 op32 r3,284(r25)      ?
+0x0c7eac off284 op32 r4,284(r25)      ?
+0x0c8100 off284 op32 r3,284(r25)      ?
+0x0c8148 off284 op32 r3,284(r30)      ?
+0x0c8164 off284 op32 r4,284(r30)      ?
+0x0c817c off284 op32 r3,284(r25)      ?
+0x0c83d0 off102 op42 r0,102(r28)      ?
+0x0c8f88 off102 op42 r0,102(r3)       ?
+0x0c908c off102 op44 r0,102(r3)       ?
+0x0c9234 off102 op44 r0,102(r30)      ?
+0x0c9268 off102 op44 r6,102(r30)      ?
+0x0c93fc off102 op42 r0,102(r4)       ?
+0x0c9660 off102 op42 r7,102(r5)       ?
+0x0c96e8 off102 op42 r0,102(r5)       ?
+0x0c9710 off102 op44 r0,102(r5)       ?
+0x0c9a80 off284 op32 r4,284(r30)      ?
+0x0c9a9c off284 op36 r0,284(r30)      ?
+0x0c9c90 off284 op32 r4,284(r31)      ?
+0x0ca0ec off284 op32 r3,284(r31)      ?
+0x0ca104 off284 op32 r3,284(r31)      ?
+0x0ca120 off284 op32 r4,284(r31)      ?
+0x0ca14c off284 op32 r3,284(r31)      ?
+0x0ca15c off284 op32 r4,284(r31)      ?
+0x0ca40c off284 op32 r3,284(r30)      ?
+0x0ca450 off284 op32 r3,284(r30)      ?
+0x0ca46c off284 op32 r4,284(r30)      ?
+0x0ca484 off284 op32 r3,284(r30)      ?
+0x0ca4bc off284 op32 r4,284(r30)      ?
+0x0ca508 off284 op32 r3,284(r30)      ?
+0x0ca524 off284 op32 r4,284(r30)      ?
+0x0ca6ec off102 op42 r0,102(r30)      ?
+0x0ca7d8 off284 op32 r3,284(r30)      ?
+0x0ca7e8 off284 op32 r4,284(r30)      ?
+0x0ca8e4 off284 op32 r3,284(r30)      ?
+0x0ca900 off284 op32 r4,284(r30)      ?
+0x0ca9d8 off284 op32 r4,284(r3)       ?
+0x0caa20 off284 op32 r4,284(r31)      ?
+0x0caa64 off102 op44 r5,102(r31)      ?
+0x0caaf0 off284 op32 r3,284(r31)      ?
+0x0cabe8 off284 op36 r29,284(r31)     ?
+0x0cac10 off284 op32 r3,284(r31)      ?
+0x0cc600 off284 op32 r12,284(r12)     ?
+0x0ccac4 off284 op32 r3,284(r3)       ?
+0x0cd17c off284 op32 r3,284(r4)       ?
+0x0cd1b0 off284 op32 r3,284(r3)       ?
+0x0cd698 off284 op32 r3,284(r3)       ?
+0x0cd704 off284 op32 r4,284(r4)       ?
+0x0cde40 off284 op32 r0,284(r4)       ?
+0x0cff1c off284 op32 r3,284(r30)      ?
+0x0cff78 off284 op32 r8,284(r30)      ?
+0x0d005c off284 op32 r3,284(r30)      ?
+0x0d0190 off284 op32 r3,284(r30)      ?
+0x0d0f38 off284 op32 r3,284(r31)      ?
+0x0d12c8 off102 op38 r7,102(r1)       ?
+0x0d1da8 off102 op38 r5,102(r1)       ?
+0x0d26f4 off284 op32 r4,284(r26)      ?
+0x0d2a70 off284 op32 r12,284(r12)     ?
+0x0d4504 off1536 op36 r26,1536(r1)    ?
+0x0d6a48 off102 op42 r0,102(r3)       ?
+0x0d6aa0 off102 op42 r0,102(r3)       ?
+0x0d6af8 off102 op42 r0,102(r3)       ?
+0x0d6b50 off102 op42 r0,102(r3)       ?
+0x0d6ba8 off102 op42 r0,102(r3)       ?
+0x0d6c00 off102 op42 r0,102(r3)       ?
+0x0d6c58 off102 op42 r0,102(r3)       ?
+0x0d6cb0 off102 op42 r0,102(r3)       ?
+0x0d6d50 off102 op42 r0,102(r3)       ?
+0x0d6d9c off284 op36 r0,284(r1)       ?
+0x0d6f68 off102 op42 r0,102(r3)       ?
+0x0d6f94 off102 op42 r0,102(r3)       ?
+0x0d6fc0 off102 op42 r0,102(r3)       ?
+0x0d6fec off102 op42 r0,102(r3)       ?
+0x0d7018 off102 op42 r0,102(r3)       ?
+0x0d7044 off102 op42 r0,102(r3)       ?
+0x0d7070 off102 op42 r0,102(r3)       ?
+0x0d709c off102 op42 r0,102(r3)       ?
+0x0d70c8 off102 op42 r0,102(r3)       ?
+0x0d70f4 off102 op42 r0,102(r3)       ?
+0x0d8bac off102 op42 r0,102(r3)       ?
+0x0d8c30 off102 op42 r0,102(r3)       ?
+0x0d8cb0 off102 op42 r0,102(r3)       ?
+0x0d8d30 off102 op42 r0,102(r3)       ?
+0x0d8db0 off102 op42 r0,102(r3)       ?
+0x0d8e30 off102 op42 r0,102(r3)       ?
+0x0d8eb0 off102 op42 r0,102(r3)       ?
+0x0d8f0c off102 op42 r0,102(r3)       ?
+0x0d8f8c off102 op42 r0,102(r3)       ?
+0x0d9368 off102 op42 r0,102(r3)       ?
+0x0d940c off102 op42 r0,102(r3)       ?
+0x0d94b0 off102 op42 r0,102(r3)       ?
+0x0d9554 off102 op42 r0,102(r3)       ?
+0x0d95f8 off102 op42 r0,102(r3)       ?
+0x0d969c off102 op42 r0,102(r3)       ?
+0x0d9740 off102 op42 r0,102(r3)       ?
+0x0d97e4 off102 op42 r0,102(r3)       ?
+0x0d9888 off102 op42 r0,102(r3)       ?
+0x0df430 off284 op32 r3,284(r29)      ?
+0x0df678 off284 op32 r3,284(r29)      ?
+0x0dfe48 off102 op42 r0,102(r3)       ?
+0x0e0530 off102 op42 r0,102(r4)       ?
+0x0e0820 off284 op32 r3,284(r31)      ?
+0x0e0ebc off102 op42 r0,102(r3)       ?
+0x0e12c8 off102 op42 r0,102(r3)       ?
+0x0e1ae8 off284 op32 r4,284(r28)      ?
+0x0e1b84 off284 op32 r4,284(r24)      ?
+0x0e1bb4 off284 op32 r3,284(r24)      ?
+0x0e1cb8 off284 op32 r4,284(r27)      ?
+0x0e1de8 off284 op32 r0,284(r3)       ?
+0x0e22d8 off284 op32 r3,284(r3)       ?
+0x0e236c off284 op32 r3,284(r3)       ?
+0x0e2ad4 off284 op32 r3,284(r28)      ?
+0x0e2c08 off284 op32 r4,284(r3)       ?
+0x0e3668 off284 op32 r3,284(r30)      ?
+0x0e3888 off102 op42 r0,102(r3)       ?
+0x0e3e24 off284 op32 r4,284(r22)      ?
+0x0e4184 off284 op32 r4,284(r22)      ?
+0x0e4214 off284 op32 r4,284(r21)      ?
+0x0e439c off284 op32 r4,284(r22)      ?
+0x0e4464 off284 op32 r4,284(r16)      ?
+0x0e48f8 off284 op32 r3,284(r31)      ?
+0x0e4bb8 off284 op32 r3,284(r3)       ?
+0x0e4bf4 off284 op32 r3,284(r3)       ?
+0x0e4dac off284 op32 r3,284(r5)       ?
+0x0e5084 off284 op32 r3,284(r31)      ?
+0x0e5190 off1550 op42 r5,1550(r3)     ?
+0x0e5528 off284 op32 r0,284(r3)       ?
+0x0e5dd4 off284 op32 r3,284(r28)      ?
+0x0e5df0 off284 op32 r4,284(r28)      ?
+0x0e60c4 off102 op42 r0,102(r3)       ?
+0x0e70e4 off284 op32 r0,284(r23)      ?
+0x0e7278 off102 op42 r4,102(r4)       ?
+0x0e75bc off284 op32 r3,284(r3)       ?
+0x0e7d04 off102 op42 r0,102(r3)       ?
+0x0e7ec8 off284 op32 r0,284(r30)      ?
+0x0ed1a0 off284 op32 r4,284(r22)      ?
+0x0ed73c off284 op32 r3,284(r22)      ?
+0x0edcbc off102 op44 r0,102(r1)       ?
+0x0ede78 off284 op32 r3,284(r29)      ?
+0x0ee07c off284 op32 r3,284(r29)      ?
+0x0ee2cc off284 op32 r3,284(r29)      ?
+0x0ee568 off284 op32 r3,284(r29)      ?
+0x0eecb4 off284 op32 r3,284(r29)      ?
+0x0eece0 off284 op32 r3,284(r29)      ?
+0x0eee70 off284 op32 r3,284(r22)      ?
+0x0eee9c off284 op32 r3,284(r22)      ?
+0x0efc64 off102 op44 r0,102(r1)       ?
+0x0efe38 off284 op32 r4,284(r29)      ?
+0x0f0118 off284 op32 r4,284(r24)      ?
+0x0f037c off284 op32 r4,284(r5)       ?
+0x0f0558 off284 op32 r28,284(r27)     ?
+0x0f0768 off284 op32 r5,284(r29)      ?
+0x0f27f4 off284 op32 r4,284(r20)      ?
+0x0f284c off284 op32 r3,284(r20)      ?
+0x0f28bc off284 op32 r4,284(r24)      ?
+0x0f2a50 off284 op32 r3,284(r24)      ?
+0x0f2a5c off284 op32 r3,284(r24)      ?
+0x0f2b04 off284 op32 r4,284(r24)      ?
+0x0f2c5c off284 op32 r3,284(r24)      ?
+0x0f2c68 off284 op32 r3,284(r24)      ?
+0x0f2d10 off284 op32 r4,284(r19)      ?
+0x0f2db8 off284 op32 r3,284(r19)      ?
+0x0f2e58 off284 op32 r4,284(r19)      ?
+0x0f2efc off284 op32 r3,284(r19)      ?
+0x0f30ec off102 op44 r0,102(r1)       ?
+0x0f3100 off102 op42 r4,102(r1)       ?
+0x0f3180 off102 op42 r4,102(r1)       ?
+0x0f4298 off1550 op42 r4,1550(r3)     ?
+0x0f42f0 off284 op32 r3,284(r31)      ?
+0x0f4494 off1550 op42 r4,1550(r3)     ?
+0x0f468c off284 op32 r3,284(r24)      ?
+0x0f46e4 off284 op32 r4,284(r24)      ?
+0x0f5fbc off284 op32 r0,284(r3)       ?
+0x0f6430 off284 op32 r5,284(r18)      ?
+0x0f6640 off284 op32 r5,284(r31)      ?
+0x0f6894 off284 op32 r0,284(r3)       ?
+0x0f6ee8 off284 op32 r0,284(r3)       ?
+0x0f8114 off284 op32 r3,284(r28)      ?
+0x0f883c off284 op32 r3,284(r28)      ?
+0x0f88d8 off284 op32 r3,284(r4)       ?
+0x0f8b98 off284 op32 r3,284(r5)       ?
+0x0f8c5c off284 op32 r3,284(r4)       ?
+0x0f8d58 off284 op32 r3,284(r28)      ?
+0x0f8f9c off284 op32 r3,284(r4)       ?
+0x0f92cc off1550 op42 r0,1550(r15)    ?
+0x0f9910 off284 op32 r5,284(r26)      ?
+0x0f9c40 off284 op32 r3,284(r4)       ?
+0x0f9d18 off284 op32 r3,284(r4)       ?
+0x0fa1fc off102 op38 r7,102(r1)       ?
+0x0fa22c off102 op38 r0,102(r1)       ?
+0x0faaf4 off284 op32 r16,284(r26)     ?
+0x0fc388 off284 op32 r4,284(r4)       ?
+0x105934 off1550 op42 r3,1550(r3)     .__ct__11ObjSelectorFv+0xcc
+0x105948 off284 op32 r3,284(r5)       .__ct__11ObjSelectorFv+0xe0
+0x105978 off1536 op42 r5,1536(r4)     .__ct__11ObjSelectorFv+0x110
+0x1059a4 off1550 op42 r5,1550(r4)     .__ct__11ObjSelectorFv+0x13c
+0x105f58 TOC-28948 lwz r?, -28948(r2) .IsMenuInProgress__10ObjTestSimFv+0x2c
+0x105f88 off1550 op42 r3,1550(r3)     .IsMenuInProgress__10ObjTestSimFv+0x5c
+0x105fa0 off284 op32 r3,284(r3)       .IsMenuInProgress__10ObjTestSimFv+0x74
+0x105fb4 off284 op32 r3,284(r3)       .IsMenuInProgress__10ObjTestSimFv+0x88
+0x106450 off1536 op42 r3,1536(r29)    .IsMenuInProgress__10ObjTestSimFv+0x524
+0x106488 off1550 op42 r3,1550(r29)    .IsMenuInProgress__10ObjTestSimFv+0x55c
+0x10655c off284 op32 r4,284(r30)      .IsMenuInProgress__10ObjTestSimFv+0x630
+0x107328 off1536 op42 r3,1536(r25)    .Has3DToDraw__8cXPersonCFv+0xa0
+0x107454 off284 op32 r4,284(r25)      .Has3DToDraw__8cXPersonCFv+0x1cc
+0x1075e4 off1536 op42 r3,1536(r22)    .Has3DToDraw__8cXPersonCFv+0x35c
+0x107990 off1536 op42 r3,1536(r27)    .Has3DToDraw__8cXPersonCFv+0x708
+0x1079ec off284 op32 r4,284(r27)      .Has3DToDraw__8cXPersonCFv+0x764
+0x107b28 off1536 op42 r3,1536(r28)    .GetPajamasSuitTex__8cXPersonFR12StringBufferR12StringBuffer+0xc0
+0x107b80 off1550 op42 r0,1550(r28)    .GetPajamasSuitTex__8cXPersonFR12StringBufferR12StringBuffer+0x118
+0x107bc0 off284 op32 r4,284(r28)      .GetPajamasSuitTex__8cXPersonFR12StringBufferR12StringBuffer+0x158
+0x108438 off102 op38 r8,102(r1)       .GetVitaBoy__8AnimatorCFv+0x650
+0x1085cc off284 op32 r3,284(r30)      .GetVitaBoy__8AnimatorCFv+0x7e4
+0x1085dc off284 op32 r4,284(r30)      .GetVitaBoy__8AnimatorCFv+0x7f4
+0x1085f0 off284 op32 r3,284(r30)      .GetVitaBoy__8AnimatorCFv+0x808
+0x10860c off284 op32 r4,284(r30)      .GetVitaBoy__8AnimatorCFv+0x824
+0x1087d8 off284 op32 r3,284(r26)      .GetVitaBoy__8AnimatorCFv+0x9f0
+0x1087f4 off284 op32 r4,284(r26)      .GetVitaBoy__8AnimatorCFv+0xa0c
+0x108d18 off284 op32 r3,284(r26)      .GetVitaBoy__8AnimatorCFv+0xf30
+0x108d34 off284 op32 r4,284(r26)      .GetVitaBoy__8AnimatorCFv+0xf4c
+0x1094bc off1550 op42 r4,1550(r31)    .GetVitaBoy__8AnimatorCFv+0x16d4
+0x1098b0 off1550 op42 r3,1550(r30)    .GetVitaBoy__8AnimatorCFv+0x1ac8
+0x1098c4 TOC-28948 lwz r?, -28948(r2) .GetVitaBoy__8AnimatorCFv+0x1adc
+0x109900 off1550 op42 r4,1550(r30)    .GetVitaBoy__8AnimatorCFv+0x1b18
+0x109b58 off284 op32 r3,284(r20)      .GetVitaBoy__8AnimatorCFv+0x1d70
+0x109b70 off284 op32 r3,284(r20)      .GetVitaBoy__8AnimatorCFv+0x1d88
+0x109bb0 off1550 op42 r4,1550(r30)    .GetVitaBoy__8AnimatorCFv+0x1dc8
+0x10a2d0 off284 op32 r3,284(r29)      .GetVitaBoy__8AnimatorCFv+0x24e8
+0x10a2ec off284 op32 r4,284(r29)      .GetVitaBoy__8AnimatorCFv+0x2504
+0x10a340 off284 op32 r3,284(r29)      .GetVitaBoy__8AnimatorCFv+0x2558
+0x10a35c off284 op32 r4,284(r29)      .GetVitaBoy__8AnimatorCFv+0x2574
+0x10a3cc off284 op32 r3,284(r29)      .GetVitaBoy__8AnimatorCFv+0x25e4
+0x10a3e8 off284 op32 r4,284(r29)      .GetVitaBoy__8AnimatorCFv+0x2600
+0x10a530 off1536 op42 r3,1536(r30)    .GetVitaBoy__8AnimatorCFv+0x2748
+0x10a598 off1536 op42 r3,1536(r30)    .GetVitaBoy__8AnimatorCFv+0x27b0
+0x10ab00 off1550 op42 r4,1550(r29)    .GetVitaBoy__8AnimatorCFv+0x2d18
+0x10ad24 off284 op32 r3,284(r30)      .GetVitaBoy__8AnimatorCFv+0x2f3c
+0x10ad40 off284 op32 r4,284(r30)      .GetVitaBoy__8AnimatorCFv+0x2f58
+0x10b008 off284 op32 r4,284(r24)      .GetVitaBoy__8AnimatorCFv+0x3220
+0x10b6c8 off284 op32 r3,284(r26)      .GetVitaBoy__8AnimatorCFv+0x38e0
+0x10b6e4 off284 op32 r4,284(r26)      .GetVitaBoy__8AnimatorCFv+0x38fc
+0x10b9c8 off1536 op42 r4,1536(r3)     .GetVitaBoy__8AnimatorCFv+0x3be0
+0x10bad4 off1550 op42 r6,1550(r3)     .GetVitaBoy__8AnimatorCFv+0x3cec
+0x10c670 off284 op32 r4,284(r5)       .GetVitaBoy__8AnimatorCFv+0x4888
+0x10c710 off284 op32 r4,284(r5)       .GetVitaBoy__8AnimatorCFv+0x4928
+0x10ce10 off1550 op42 r5,1550(r26)    .GetVitaBoy__8AnimatorCFv+0x5028
+0x10ceec off284 op32 r3,284(r29)      .GetVitaBoy__8AnimatorCFv+0x5104
+0x10cf24 off1550 op42 r5,1550(r26)    .GetVitaBoy__8AnimatorCFv+0x513c
+0x10cf48 off284 op32 r3,284(r29)      .GetVitaBoy__8AnimatorCFv+0x5160
+0x10d5d8 off284 op32 r3,284(r3)       .GetVitaBoy__8AnimatorCFv+0x57f0
+0x10d678 off284 op32 r3,284(r3)       .GetVitaBoy__8AnimatorCFv+0x5890
+0x10dec8 off284 op32 r3,284(r3)       .GetVitaBoy__8AnimatorCFv+0x60e0
+0x10df68 off284 op32 r3,284(r3)       .GetVitaBoy__8AnimatorCFv+0x6180
+0x10ed38 off284 op32 r3,284(r27)      .GetVitaBoy__8AnimatorCFv+0x6f50
+0x10ee7c off284 op32 r3,284(r20)      .GetVitaBoy__8AnimatorCFv+0x7094
+0x10f0f4 off284 op32 r3,284(r20)      .GetVitaBoy__8AnimatorCFv+0x730c
+0x10f10c off284 op32 r3,284(r20)      .GetVitaBoy__8AnimatorCFv+0x7324
+0x10f4b4 off284 op32 r3,284(r31)      .GetVitaBoy__8AnimatorCFv+0x76cc
+0x10f56c off284 op32 r3,284(r31)      .GetVitaBoy__8AnimatorCFv+0x7784
+0x10f664 off284 op32 r3,284(r31)      .GetVitaBoy__8AnimatorCFv+0x787c
+0x10fe44 off284 op32 r3,284(r29)      .GetVitaBoy__8AnimatorCFv+0x805c
+0x1100d4 off284 op32 r3,284(r24)      .GetVitaBoy__8AnimatorCFv+0x82ec
+0x110190 off284 op32 r3,284(r24)      .GetVitaBoy__8AnimatorCFv+0x83a8
+0x110b64 off284 op32 r0,284(r1)       .GetVitaBoy__8AnimatorCFv+0x8d7c
+0x11142c off284 op32 r0,284(r31)      .GetVitaBoy__8AnimatorCFv+0x9644
+0x111444 off284 op32 r0,284(r31)      .GetVitaBoy__8AnimatorCFv+0x965c
+0x11145c off284 op32 r0,284(r31)      .GetVitaBoy__8AnimatorCFv+0x9674
+0x111558 off102 op42 r29,102(r3)      .GetVitaBoy__8AnimatorCFv+0x9770
+0x111564 off284 op32 r3,284(r31)      .GetVitaBoy__8AnimatorCFv+0x977c
+0x111584 off1536 op42 r3,1536(r31)    .GetVitaBoy__8AnimatorCFv+0x979c
+0x1115a8 off284 op32 r3,284(r31)      .GetVitaBoy__8AnimatorCFv+0x97c0
+0x1115c8 off284 op32 r3,284(r31)      .GetVitaBoy__8AnimatorCFv+0x97e0
+0x111a94 off284 op32 r3,284(r28)      .GetVitaBoy__8AnimatorCFv+0x9cac
+0x111ab0 off284 op32 r4,284(r28)      .GetVitaBoy__8AnimatorCFv+0x9cc8
+0x111bf8 off102 op42 r29,102(r3)      .GetVitaBoy__8AnimatorCFv+0x9e10
+0x111c04 off284 op32 r3,284(r28)      .GetVitaBoy__8AnimatorCFv+0x9e1c
+0x111c24 off1536 op42 r3,1536(r28)    .GetVitaBoy__8AnimatorCFv+0x9e3c
+0x111c48 off284 op32 r3,284(r28)      .GetVitaBoy__8AnimatorCFv+0x9e60
+0x111c68 off284 op32 r3,284(r28)      .GetVitaBoy__8AnimatorCFv+0x9e80
+0x111ec8 off284 op32 r3,284(r30)      .GetVitaBoy__8AnimatorCFv+0xa0e0
+0x111f2c off284 op32 r3,284(r30)      .GetVitaBoy__8AnimatorCFv+0xa144
+0x111f94 off284 op32 r3,284(r30)      .GetVitaBoy__8AnimatorCFv+0xa1ac
+0x1188cc off102 op34 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x10ae4
+0x118aac off102 op34 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x10cc4
+0x118c6c off102 op34 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x10e84
+0x118fcc off102 op34 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x111e4
+0x11b7a0 off284 op32 r3,284(r27)      .GetVitaBoy__8AnimatorCFv+0x139b8
+0x11cb7c off284 op32 r3,284(r29)      .GetVitaBoy__8AnimatorCFv+0x14d94
+0x12567c off102 op38 r4,102(r1)       .GetVitaBoy__8AnimatorCFv+0x1d894
+0x134cf0 off284 op32 r3,284(r27)      .GetVitaBoy__8AnimatorCFv+0x2cf08
+0x134d7c off284 op32 r3,284(r27)      .GetVitaBoy__8AnimatorCFv+0x2cf94
+0x134e10 off284 op32 r3,284(r29)      .GetVitaBoy__8AnimatorCFv+0x2d028
+0x13535c off284 op32 r3,284(r31)      .GetVitaBoy__8AnimatorCFv+0x2d574
+0x1359b8 off284 op32 r3,284(r31)      .GetVitaBoy__8AnimatorCFv+0x2dbd0
+0x136288 off284 op36 r1,284(r31)      .GetVitaBoy__8AnimatorCFv+0x2e4a0
+0x1362dc off284 op32 r1,284(r31)      .GetVitaBoy__8AnimatorCFv+0x2e4f4
+0x137dc8 off284 op32 r5,284(r28)      .GetVitaBoy__8AnimatorCFv+0x2ffe0
+0x137dcc off284 op36 r5,284(r4)       .GetVitaBoy__8AnimatorCFv+0x2ffe4
+0x13a32c off102 op42 r0,102(r3)       .GetVitaBoy__8AnimatorCFv+0x32544
+0x1565c4 off284 op32 r4,284(r26)      .GetVitaBoy__8AnimatorCFv+0x4e7dc
+0x15697c off284 op32 r4,284(r26)      .GetVitaBoy__8AnimatorCFv+0x4eb94
+0x158b5c off102 op34 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x50d74
+0x158d50 off102 op34 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x50f68
+0x158f3c off102 op34 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x51154
+0x1591dc off102 op34 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x513f4
+0x15e440 off102 op38 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x56658
+0x16c5d8 off284 op32 r3,284(r31)      .GetVitaBoy__8AnimatorCFv+0x647f0
+0x16cc28 off284 op32 r3,284(r28)      .GetVitaBoy__8AnimatorCFv+0x64e40
+0x16d928 off284 op32 r4,284(r4)       .GetVitaBoy__8AnimatorCFv+0x65b40
+0x16e06c off284 op32 r4,284(r22)      .GetVitaBoy__8AnimatorCFv+0x66284
+0x16e0a0 off284 op32 r4,284(r15)      .GetVitaBoy__8AnimatorCFv+0x662b8
+0x16e8a0 off1550 op42 r5,1550(r31)    .GetVitaBoy__8AnimatorCFv+0x66ab8
+0x170884 off284 op32 r3,284(r3)       .GetVitaBoy__8AnimatorCFv+0x68a9c
+0x170b34 off284 op32 r3,284(r30)      .GetVitaBoy__8AnimatorCFv+0x68d4c
+0x170b5c off284 op32 r4,284(r30)      .GetVitaBoy__8AnimatorCFv+0x68d74
+0x170cb8 off284 op32 r3,284(r28)      .GetVitaBoy__8AnimatorCFv+0x68ed0
+0x17317c off102 op38 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x6b394
+0x17320c off102 op34 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x6b424
+0x177114 off284 op32 r4,284(r27)      .GetVitaBoy__8AnimatorCFv+0x6f32c
+0x177348 off284 op32 r3,284(r20)      .GetVitaBoy__8AnimatorCFv+0x6f560
+0x177480 off284 op32 r3,284(r20)      .GetVitaBoy__8AnimatorCFv+0x6f698
+0x1776f8 off284 op32 r3,284(r3)       .GetVitaBoy__8AnimatorCFv+0x6f910
+0x179990 off102 op38 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x71ba8
+0x17ae70 off102 op38 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x73088
+0x17dd98 off102 op38 r0,102(r1)       .GetVitaBoy__8AnimatorCFv+0x75fb0
+0x18212c off284 op32 r0,284(r28)      .InvokeOntoObject__11ObjectStateCFv+0x190
+0x182f8c off284 op32 r3,284(r3)       .__dt__14ObjectUndoableFv+0x130
+0x183f8c off284 op32 r3,284(r29)      .OnChar__14cObjPickerToolFii+0x100
+0x184d9c off284 op32 r3,284(r31)      .__dt__9MenuEntryFv+0x138
+0x18511c TOC-28948 lwz r?, -28948(r2) .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0x5c
+0x1851a0 off1536 op42 r4,1536(r3)     .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0xe0
+0x1851bc off1550 op42 r0,1550(r3)     .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0xfc
+0x1851f4 off284 op32 r21,284(r3)      .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0x134
+0x185288 off102 op42 r0,102(r3)       .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0x1c8
+0x1852c8 off102 op42 r0,102(r3)       .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0x208
+0x185310 off102 op42 r0,102(r3)       .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0x250
+0x185358 off102 op42 r0,102(r3)       .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0x298
+0x185394 off102 op42 r0,102(r3)       .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0x2d4
+0x185850 off284 op32 r3,284(r3)       .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0x790
+0x1859b4 off284 op32 r3,284(r3)       .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0x8f4
+0x185f3c off1550 op42 r4,1550(r3)     .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x250
+0x186038 off1550 op42 r4,1550(r23)    .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x34c
+0x186064 off284 op32 r3,284(r28)      .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x378
+0x188e74 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1658
+0x1892f8 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1adc
+0x18941c off102 op38 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x1c00
+0x189824 off102 op34 r3,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x2008
+0x196d8c off102 op38 r4,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0xf570
+0x1984c4 off102 op38 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x10ca8
+0x1986dc off102 op38 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x10ec0
+0x19a7e0 off102 op38 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x12fc4
+0x19d2c8 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x15aac
+0x19d3f8 off102 op38 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x15bdc
+0x19d770 off102 op34 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x15f54
+0x19d894 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x16078
+0x19db94 off102 op34 r3,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x16378
+0x1a0fb8 off284 op36 r10,284(r1)      .__ct__9MenuEntryFRC9MenuEntry+0x1979c
+0x1a8420 off284 op36 r0,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x20c04
+0x1aa948 off284 op32 r29,284(r1)      .__ct__9MenuEntryFRC9MenuEntry+0x2312c
+0x1ae5c8 off284 op38 r0,284(r28)      .__ct__9MenuEntryFRC9MenuEntry+0x26dac
+0x1af170 off102 op42 r0,102(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x27954
+0x1af1cc off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x279b0
+0x1af228 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x27a0c
+0x1af284 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x27a68
+0x1af2e0 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x27ac4
+0x1af33c off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x27b20
+0x1af398 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x27b7c
+0x1af3f4 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x27bd8
+0x1af450 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x27c34
+0x1af528 off284 op38 r3,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x27d0c
+0x1af69c off284 op38 r3,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x27e80
+0x1af8dc off284 op38 r0,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x280c0
+0x1b4bf8 off284 op36 r1,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x2d3dc
+0x1b4c4c off284 op32 r1,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x2d430
+0x1bb6d8 off102 op34 r8,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x33ebc
+0x1c0eac off284 op36 r12,284(r31)     .__ct__9MenuEntryFRC9MenuEntry+0x39690
+0x1c16a4 off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x39e88
+0x1c21cc off102 op42 r0,102(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x3a9b0
+0x1c2c2c off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x3b410
+0x1c2c80 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x3b464
+0x1c2d58 off284 op32 r3,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x3b53c
+0x1c2dc0 off284 op32 r7,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x3b5a4
+0x1c5ca8 off102 op38 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x3e48c
+0x1c7fa0 off284 op38 r26,284(r1)      .__ct__9MenuEntryFRC9MenuEntry+0x40784
+0x1ca360 off102 op38 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x42b44
+0x1ca3ac off102 op34 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x42b90
+0x1ca47c off102 op34 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x42c60
+0x1ca510 off102 op34 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x42cf4
+0x1ca544 off102 op34 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x42d28
+0x1ca6cc off102 op34 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x42eb0
+0x1ca6f4 off102 op34 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x42ed8
+0x1cafb0 off284 op38 r3,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x43794
+0x1cc22c off102 op34 r15,102(r1)      .__ct__9MenuEntryFRC9MenuEntry+0x44a10
+0x1cc43c off102 op34 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x44c20
+0x1ccf04 off284 op36 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x456e8
+0x1ccfc4 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x457a8
+0x1cd06c off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x45850
+0x1cfc24 off102 op38 r4,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x48408
+0x1d1a18 off284 op32 r3,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x4a1fc
+0x1d1ad8 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x4a2bc
+0x1d27e0 off284 op32 r4,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x4afc4
+0x1d5848 off102 op44 r0,102(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x4e02c
+0x1d5fd8 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x4e7bc
+0x1eea94 off284 op36 r0,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x67278
+0x1f6b58 off284 op32 r19,284(r31)     .__ct__9MenuEntryFRC9MenuEntry+0x6f33c
+0x1f6bc4 off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x6f3a8
+0x1f6c60 off284 op32 r19,284(r31)     .__ct__9MenuEntryFRC9MenuEntry+0x6f444
+0x1f6cc8 off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x6f4ac
+0x1f7738 off102 op42 r0,102(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x6ff1c
+0x1f7794 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x6ff78
+0x1f77f0 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x6ffd4
+0x1f784c off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x70030
+0x1f78a8 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x7008c
+0x1f7904 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x700e8
+0x1f7960 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x70144
+0x1f79bc off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x701a0
+0x1f7a18 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x701fc
+0x1f7dbc off284 op36 r0,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x705a0
+0x1fc960 off102 op42 r8,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x75144
+0x1fca58 off102 op42 r4,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x7523c
+0x1fd6cc off284 op36 r31,284(r1)      .__ct__9MenuEntryFRC9MenuEntry+0x75eb0
+0x1fe670 off284 op36 r5,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x76e54
+0x205058 off1550 op42 r4,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x7d83c
+0x205078 TOC-28948 lwz r?, -28948(r2) .__ct__9MenuEntryFRC9MenuEntry+0x7d85c
+0x205188 off1550 op42 r4,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x7d96c
+0x2051a8 TOC-28948 lwz r?, -28948(r2) .__ct__9MenuEntryFRC9MenuEntry+0x7d98c
+0x20c460 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x84c44
+0x20c55c off284 op36 r0,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x84d40
+0x212318 off284 op36 r5,284(r7)       .__ct__9MenuEntryFRC9MenuEntry+0x8aafc
+0x216b7c off284 op32 r3,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x8f360
+0x216ba4 off284 op36 r0,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x8f388
+0x218c70 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x91454
+0x218cb0 off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x91494
+0x219948 off284 op36 r4,284(r28)      .__ct__9MenuEntryFRC9MenuEntry+0x9212c
+0x21c63c off102 op44 r3,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x94e20
+0x21c648 off102 op44 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x94e2c
+0x21c654 off102 op40 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x94e38
+0x21c65c off102 op44 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x94e40
+0x220918 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x990fc
+0x220be0 off102 op42 r4,102(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x993c4
+0x222440 off102 op42 r5,102(r5)       .__ct__9MenuEntryFRC9MenuEntry+0x9ac24
+0x225ebc off284 op32 r4,284(r27)      .__ct__9MenuEntryFRC9MenuEntry+0x9e6a0
+0x226460 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x9ec44
+0x231adc off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xaa2c0
+0x231d48 off284 op36 r4,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0xaa52c
+0x232dc8 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xab5ac
+0x235c7c off284 op32 r24,284(r25)     .__ct__9MenuEntryFRC9MenuEntry+0xae460
+0x23dce4 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb64c8
+0x23dd70 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb6554
+0x23ddc8 off1550 op42 r3,1550(r28)    .__ct__9MenuEntryFRC9MenuEntry+0xb65ac
+0x23e190 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb6974
+0x23e21c off284 op32 r3,284(r28)      .__ct__9MenuEntryFRC9MenuEntry+0xb6a00
+0x23e3d0 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb6bb4
+0x23f2e8 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb7acc
+0x23f678 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb7e5c
+0x23f8cc off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb80b0
+0x23f96c off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb8150
+0x23f9dc off284 op32 r3,284(r27)      .__ct__9MenuEntryFRC9MenuEntry+0xb81c0
+0x23fb34 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb8318
+0x23fdfc off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb85e0
+0x23ff60 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb8744
+0x2400ac off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb8890
+0x2402e0 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb8ac4
+0x2404b4 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb8c98
+0x2406a4 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb8e88
+0x2407b4 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb8f98
+0x2408d4 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb90b8
+0x240a68 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb924c
+0x240c74 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb9458
+0x240f54 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb9738
+0x241064 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb9848
+0x241268 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb9a4c
+0x241444 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb9c28
+0x2414d0 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb9cb4
+0x2415a4 off284 op32 r3,284(r28)      .__ct__9MenuEntryFRC9MenuEntry+0xb9d88
+0x2416dc off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb9ec0
+0x2417f4 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xb9fd8
+0x241a0c off284 op32 r3,284(r5)       .__ct__9MenuEntryFRC9MenuEntry+0xba1f0
+0x241aa4 off284 op32 r3,284(r5)       .__ct__9MenuEntryFRC9MenuEntry+0xba288
+0x242154 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xba938
+0x2421d0 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xba9b4
+0x242258 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbaa3c
+0x242540 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbad24
+0x242694 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbae78
+0x2427e8 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbafcc
+0x242af8 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbb2dc
+0x242e14 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbb5f8
+0x242fdc off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbb7c0
+0x24334c off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbbb30
+0x243498 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbbc7c
+0x2435e4 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbbdc8
+0x243760 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbbf44
+0x243ed8 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbc6bc
+0x2442ac off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbca90
+0x2446f4 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbced8
+0x2455c8 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xbddac
+0x250a44 TOC-28948 lwz r?, -28948(r2) .__ct__9MenuEntryFRC9MenuEntry+0xc9228
+0x253024 off284 op32 r3,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0xcb808
+0x25316c off284 op32 r3,284(r27)      .__ct__9MenuEntryFRC9MenuEntry+0xcb950
+0x2531dc off284 op32 r3,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0xcb9c0
+0x253214 off284 op32 r29,284(r29)     .__ct__9MenuEntryFRC9MenuEntry+0xcb9f8
+0x2533fc off284 op32 r3,284(r27)      .__ct__9MenuEntryFRC9MenuEntry+0xcbbe0
+0x25346c off284 op32 r3,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0xcbc50
+0x2534a4 off284 op32 r29,284(r29)     .__ct__9MenuEntryFRC9MenuEntry+0xcbc88
+0x253664 off284 op32 r3,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0xcbe48
+0x253700 off1536 op42 r3,1536(r29)    .__ct__9MenuEntryFRC9MenuEntry+0xcbee4
+0x253b74 off284 op32 r12,284(r12)     .__ct__9MenuEntryFRC9MenuEntry+0xcc358
+0x253db8 off284 op32 r12,284(r12)     .__ct__9MenuEntryFRC9MenuEntry+0xcc59c
+0x254e48 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xcd62c
+0x25e150 off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xd6934
+0x2626d4 off284 op36 r0,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xdaeb8
+0x26479c off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xdcf80
+0x2647c4 off284 op32 r5,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xdcfa8
+0x2647f4 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xdcfd8
+0x264b00 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xdd2e4
+0x2668fc off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xdf0e0
+0x266b40 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xdf324
+0x266b64 off284 op36 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xdf348
+0x266ea8 off284 op36 r26,284(r4)      .__ct__9MenuEntryFRC9MenuEntry+0xdf68c
+0x267388 off284 op36 r0,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0xdfb6c
+0x2674fc off284 op32 r4,284(r24)      .__ct__9MenuEntryFRC9MenuEntry+0xdfce0
+0x26c550 off284 op36 r0,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0xe4d34
+0x271348 off284 op32 r4,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0xe9b2c
+0x2727b4 off284 op36 r0,284(r27)      .__ct__9MenuEntryFRC9MenuEntry+0xeaf98
+0x27284c off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xeb030
+0x2728a4 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xeb088
+0x2728fc off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xeb0e0
+0x272954 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xeb138
+0x2729ac off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xeb190
+0x272a04 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xeb1e8
+0x272a5c off102 op42 r3,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xeb240
+0x272ce8 off284 op36 r5,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0xeb4cc
+0x275618 off284 op32 r0,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0xeddfc
+0x27619c off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xee980
+0x276344 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xeeb28
+0x276418 off284 op32 r3,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0xeebfc
+0x27671c off284 op32 r3,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0xeef00
+0x27ba84 off284 op32 r4,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xf4268
+0x27ba8c off284 op36 r0,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xf4270
+0x27ba98 off284 op36 r0,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xf427c
+0x27bab0 off284 op32 r4,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xf4294
+0x27babc off284 op36 r0,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xf42a0
+0x27bac8 off284 op36 r0,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xf42ac
+0x27be98 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xf467c
+0x27c0e4 off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xf48c8
+0x27c0f8 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xf48dc
+0x27c498 off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xf4c7c
+0x27c4cc off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xf4cb0
+0x27c4fc off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xf4ce0
+0x27cc38 off284 op36 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0xf541c
+0x27eb3c off284 op36 r23,284(r31)     .__ct__9MenuEntryFRC9MenuEntry+0xf7320
+0x28148c off284 op32 r0,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0xf9c70
+0x28180c off284 op32 r0,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0xf9ff0
+0x2827f8 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xfafdc
+0x2828b4 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0xfb098
+0x283604 off284 op36 r5,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0xfbde8
+0x283740 off284 op32 r0,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0xfbf24
+0x288188 off284 op32 r3,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x10096c
+0x289250 off1536 op42 r3,1536(r23)    .__ct__9MenuEntryFRC9MenuEntry+0x101a34
+0x289430 off1536 op42 r3,1536(r23)    .__ct__9MenuEntryFRC9MenuEntry+0x101c14
+0x28a6e0 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x102ec4
+0x28a754 off1550 op42 r4,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x102f38
+0x28a838 off1550 op42 r4,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x10301c
+0x28a8cc off1536 op42 r4,1536(r30)    .__ct__9MenuEntryFRC9MenuEntry+0x1030b0
+0x28a8f0 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1030d4
+0x28a908 off1550 op42 r4,1550(r30)    .__ct__9MenuEntryFRC9MenuEntry+0x1030ec
+0x28afec off284 op32 r3,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x1037d0
+0x28b078 off284 op32 r3,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x10385c
+0x28b13c off1550 op42 r4,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x103920
+0x28b4cc off1550 op42 r5,1550(r29)    .__ct__9MenuEntryFRC9MenuEntry+0x103cb0
+0x28b4ec off1536 op42 r3,1536(r29)    .__ct__9MenuEntryFRC9MenuEntry+0x103cd0
+0x28b8a0 off1550 op42 r4,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x104084
+0x28ba98 off1536 op42 r4,1536(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x10427c
+0x28bb0c off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1042f0
+0x28bb24 off1550 op42 r3,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x104308
+0x28bb6c off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x104350
+0x28bbdc off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1043c0
+0x28bc74 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x104458
+0x28bcc8 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1044ac
+0x28be80 off1550 op42 r4,1550(r29)    .__ct__9MenuEntryFRC9MenuEntry+0x104664
+0x28dd60 off284 op32 r3,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x106544
+0x28eb7c off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x107360
+0x28fd04 off284 op36 r18,284(r16)     .__ct__9MenuEntryFRC9MenuEntry+0x1084e8
+0x28fd30 off284 op32 r3,284(r16)      .__ct__9MenuEntryFRC9MenuEntry+0x108514
+0x28fd58 off284 op32 r4,284(r16)      .__ct__9MenuEntryFRC9MenuEntry+0x10853c
+0x28fd7c off284 op32 r3,284(r16)      .__ct__9MenuEntryFRC9MenuEntry+0x108560
+0x28fd90 off284 op32 r3,284(r16)      .__ct__9MenuEntryFRC9MenuEntry+0x108574
+0x290464 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x108c48
+0x293280 off1550 op42 r4,1550(r30)    .__ct__9MenuEntryFRC9MenuEntry+0x10ba64
+0x29347c off1550 op42 r4,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x10bc60
+0x294870 off284 op32 r0,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x10d054
+0x294bb0 off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x10d394
+0x294c38 off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x10d41c
+0x294df8 off284 op32 r0,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x10d5dc
+0x294e08 off284 op36 r0,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x10d5ec
+0x294e60 off284 op36 r0,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x10d644
+0x294e98 off284 op36 r0,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x10d67c
+0x297a7c off284 op36 r0,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x110260
+0x29b98c off284 op36 r11,284(r1)      .__ct__9MenuEntryFRC9MenuEntry+0x114170
+0x29b9ac off284 op36 r0,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x114190
+0x29ce94 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x115678
+0x29cec4 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1156a8
+0x29d018 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1157fc
+0x29d084 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x115868
+0x29d0a0 off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x115884
+0x29d118 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1158fc
+0x29d1fc off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1159e0
+0x29d538 off284 op36 r31,284(r29)     .__ct__9MenuEntryFRC9MenuEntry+0x115d1c
+0x29e7dc off284 op36 r0,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x116fc0
+0x2a43f4 off284 op36 r4,284(r5)       .__ct__9MenuEntryFRC9MenuEntry+0x11cbd8
+0x2a4e18 off284 op36 r21,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x11d5fc
+0x2a4e68 off284 op36 r21,284(r4)      .__ct__9MenuEntryFRC9MenuEntry+0x11d64c
+0x2a8178 off284 op32 r3,284(r28)      .__ct__9MenuEntryFRC9MenuEntry+0x12095c
+0x2a81e4 off284 op32 r0,284(r28)      .__ct__9MenuEntryFRC9MenuEntry+0x1209c8
+0x2a8d30 off284 op36 r5,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x121514
+0x2a8d50 off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x121534
+0x2a8d64 off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x121548
+0x2b04a4 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x128c88
+0x2b2f30 off284 op32 r5,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x12b714
+0x2b32c8 off284 op32 r3,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x12baac
+0x2b38bc off284 op32 r3,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x12c0a0
+0x2b455c off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x12cd40
+0x2b45a4 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x12cd88
+0x2b45ec off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x12cdd0
+0x2b4614 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x12cdf8
+0x2b4e88 off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x12d66c
+0x2b709c off284 op36 r13,284(r15)     .__ct__9MenuEntryFRC9MenuEntry+0x12f880
+0x2b70bc off284 op32 r3,284(r15)      .__ct__9MenuEntryFRC9MenuEntry+0x12f8a0
+0x2b70dc off284 op32 r3,284(r15)      .__ct__9MenuEntryFRC9MenuEntry+0x12f8c0
+0x2b711c off284 op32 r3,284(r15)      .__ct__9MenuEntryFRC9MenuEntry+0x12f900
+0x2b7130 off284 op32 r4,284(r15)      .__ct__9MenuEntryFRC9MenuEntry+0x12f914
+0x2b7138 off284 op32 r4,284(r15)      .__ct__9MenuEntryFRC9MenuEntry+0x12f91c
+0x2b7144 off284 op32 r4,284(r15)      .__ct__9MenuEntryFRC9MenuEntry+0x12f928
+0x2b7404 off284 op36 r4,284(r7)       .__ct__9MenuEntryFRC9MenuEntry+0x12fbe8
+0x2b7618 off284 op36 r4,284(r7)       .__ct__9MenuEntryFRC9MenuEntry+0x12fdfc
+0x2b7c98 off284 op32 r0,284(r15)      .__ct__9MenuEntryFRC9MenuEntry+0x13047c
+0x2b7cc8 off284 op32 r3,284(r15)      .__ct__9MenuEntryFRC9MenuEntry+0x1304ac
+0x2b8160 off284 op36 r5,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x130944
+0x2baf7c off102 op44 r4,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x133760
+0x2be76c off284 op32 r0,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x136f50
+0x2c2298 off102 op44 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x13aa7c
+0x2cab28 off284 op36 r4,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x14330c
+0x2cab6c off284 op32 r7,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x143350
+0x2cabf8 off284 op36 r4,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x1433dc
+0x2cacb4 off284 op32 r0,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x143498
+0x2cacfc off284 op32 r7,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x1434e0
+0x2cc270 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x144a54
+0x2ccfc8 off284 op32 r0,284(r28)      .__ct__9MenuEntryFRC9MenuEntry+0x1457ac
+0x2cd414 off284 op32 r0,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x145bf8
+0x2cde80 off284 op36 r0,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x146664
+0x2cded0 off284 op32 r0,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x1466b4
+0x2cdee4 off284 op36 r0,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x1466c8
+0x2ce250 off284 op32 r0,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x146a34
+0x2cf744 off284 op36 r4,284(r7)       .__ct__9MenuEntryFRC9MenuEntry+0x147f28
+0x2cf93c off284 op32 r0,284(r16)      .__ct__9MenuEntryFRC9MenuEntry+0x148120
+0x2cf950 off284 op36 r0,284(r16)      .__ct__9MenuEntryFRC9MenuEntry+0x148134
+0x2cfcb8 off284 op36 r0,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x14849c
+0x2d0170 off284 op32 r0,284(r27)      .__ct__9MenuEntryFRC9MenuEntry+0x148954
+0x2d02f0 off284 op36 r3,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x148ad4
+0x2d0360 off284 op32 r3,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x148b44
+0x2d04bc off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x148ca0
+0x2d0bf0 off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1493d4
+0x2d0cb8 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x14949c
+0x2d0cd0 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1494b4
+0x2d179c off284 op36 r21,284(r22)     .__ct__9MenuEntryFRC9MenuEntry+0x149f80
+0x2d17c8 off284 op32 r3,284(r22)      .__ct__9MenuEntryFRC9MenuEntry+0x149fac
+0x2d17d4 off284 op32 r3,284(r22)      .__ct__9MenuEntryFRC9MenuEntry+0x149fb8
+0x2d17f0 off284 op32 r3,284(r22)      .__ct__9MenuEntryFRC9MenuEntry+0x149fd4
+0x2d180c off284 op32 r3,284(r22)      .__ct__9MenuEntryFRC9MenuEntry+0x149ff0
+0x2d182c off284 op32 r4,284(r22)      .__ct__9MenuEntryFRC9MenuEntry+0x14a010
+0x2d3cd4 off102 op42 r0,102(r5)       .__ct__9MenuEntryFRC9MenuEntry+0x14c4b8
+0x2d3e58 off102 op42 r0,102(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x14c63c
+0x2d3eac off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x14c690
+0x2d4054 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x14c838
+0x2d7d58 off284 op32 r0,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x15053c
+0x2d7db4 off284 op32 r4,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x150598
+0x2d7dbc off284 op36 r0,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1505a0
+0x2d7e38 off284 op32 r4,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x15061c
+0x2d7e40 off284 op36 r0,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x150624
+0x2d951c off284 op32 r0,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x151d00
+0x2d9604 off284 op32 r4,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x151de8
+0x2d96d4 off284 op32 r0,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x151eb8
+0x2d971c off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x151f00
+0x2d97c8 off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x151fac
+0x2d9ae0 off284 op36 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1522c4
+0x2d9b00 off284 op36 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1522e4
+0x2d9bc8 off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1523ac
+0x2d9c08 off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1523ec
+0x2d9e7c off284 op32 r7,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x152660
+0x2d9f4c off284 op32 r7,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x152730
+0x2da010 off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1527f4
+0x2da570 off1550 op42 r0,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x152d54
+0x2db668 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x153e4c
+0x2db72c off284 op32 r4,284(r5)       .__ct__9MenuEntryFRC9MenuEntry+0x153f10
+0x2db738 off1550 op42 r3,1550(r4)     .__ct__9MenuEntryFRC9MenuEntry+0x153f1c
+0x2db784 off1536 op42 r3,1536(r4)     .__ct__9MenuEntryFRC9MenuEntry+0x153f68
+0x2de6d0 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x156eb4
+0x2e0f3c off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x159720
+0x2e11b8 off284 op34 r28,284(r2)      .__ct__9MenuEntryFRC9MenuEntry+0x15999c
+0x2e1440 off1536 op42 r0,1536(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x159c24
+0x2e1454 off1550 op42 r3,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x159c38
+0x2e146c off1536 op42 r3,1536(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x159c50
+0x2e1e98 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x15a67c
+0x2e2bfc off102 op42 r4,102(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x15b3e0
+0x2e5b90 off284 op32 r0,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x15e374
+0x2e9184 off284 op36 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x161968
+0x2e9194 off284 op36 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x161978
+0x2e91a4 off284 op36 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x161988
+0x2eb0b0 off284 op32 r29,284(r31)     .__ct__9MenuEntryFRC9MenuEntry+0x163894
+0x2eb0c8 off284 op36 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1638ac
+0x2eb0d8 off284 op36 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x1638bc
+0x2ec5e8 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x164dcc
+0x2ec628 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x164e0c
+0x2ec68c off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x164e70
+0x2ec6c0 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x164ea4
+0x2ec6dc off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x164ec0
+0x2ec710 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x164ef4
+0x2ec910 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1650f4
+0x2eca00 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1651e4
+0x2ecb98 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x16537c
+0x2ecc44 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x165428
+0x2ecc88 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x16546c
+0x2ece08 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1655ec
+0x2ecfcc off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1657b0
+0x2ed0b8 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x16589c
+0x2ed14c off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x165930
+0x2ed188 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x16596c
+0x2ed21c off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x165a00
+0x2ed360 off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x165b44
+0x2ed4cc off102 op42 r3,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x165cb0
+0x2ed63c off102 op42 r0,102(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x165e20
+0x2ee788 off284 op36 r4,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x166f6c
+0x355160 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1cd944
+0x355b4c off1550 op42 r4,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x1ce330
+0x3563cc off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1cebb0
+0x3567bc off284 op32 r0,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x1cefa0
+0x35732c off1550 op42 r4,1550(r5)     .__ct__9MenuEntryFRC9MenuEntry+0x1cfb10
+0x357658 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1cfe3c
+0x358438 off1550 op42 r4,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x1d0c1c
+0x359b80 off1550 op42 r5,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x1d2364
+0x35b058 off1550 op42 r0,1550(r4)     .__ct__9MenuEntryFRC9MenuEntry+0x1d383c
+0x35b8f0 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d40d4
+0x35b9ac off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d4190
+0x35ba68 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d424c
+0x35bb24 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d4308
+0x35bbe0 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d43c4
+0x35bc9c off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d4480
+0x35bd58 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d453c
+0x35be14 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d45f8
+0x35bed0 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d46b4
+0x35bf8c off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d4770
+0x35c048 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d482c
+0x35c104 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d48e8
+0x35c1c0 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d49a4
+0x35c27c off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d4a60
+0x35c338 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d4b1c
+0x35c3f4 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d4bd8
+0x35c4b0 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d4c94
+0x35c56c off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d4d50
+0x35c628 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d4e0c
+0x35c750 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d4f34
+0x35c904 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d50e8
+0x35cad0 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d52b4
+0x35cbc8 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d53ac
+0x35cc84 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d5468
+0x35ce14 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d55f8
+0x35cfe0 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d57c4
+0x35d1ac off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d5990
+0x35d378 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d5b5c
+0x35d544 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d5d28
+0x35d710 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d5ef4
+0x35d8dc off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d60c0
+0x35ddec off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d65d0
+0x35dfc0 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d67a4
+0x35e18c off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d6970
+0x35e358 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d6b3c
+0x35e524 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d6d08
+0x35e6f0 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d6ed4
+0x35e7e8 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d6fcc
+0x35e988 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d716c
+0x35ea80 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d7264
+0x35ec50 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d7434
+0x35ed28 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1d750c
+0x35ed54 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1d7538
+0x35fca0 off284 op32 r4,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1d8484
+0x35fddc off284 op32 r4,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1d85c0
+0x35ffb8 off284 op32 r4,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1d879c
+0x36010c off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d88f0
+0x360300 off284 op32 r4,284(r4)       .__ct__9MenuEntryFRC9MenuEntry+0x1d8ae4
+0x360b78 off284 op32 r3,284(r28)      .__ct__9MenuEntryFRC9MenuEntry+0x1d935c
+0x360e34 off1550 op42 r7,1550(r4)     .__ct__9MenuEntryFRC9MenuEntry+0x1d9618
+0x361470 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1d9c54
+0x361528 off1550 op44 r0,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x1d9d0c
+0x361574 off1550 op44 r0,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x1d9d58
+0x3615c0 off1550 op44 r0,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x1d9da4
+0x36160c off1550 op44 r0,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x1d9df0
+0x361658 off1550 op44 r0,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x1d9e3c
+0x3616a4 off1550 op44 r0,1550(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x1d9e88
+0x3616c8 off1536 op44 r3,1536(r4)     .__ct__9MenuEntryFRC9MenuEntry+0x1d9eac
+0x3616e8 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x1d9ecc
+0x365b48 off284 op34 r30,284(r4)      .__ct__9MenuEntryFRC9MenuEntry+0x1de32c
+0x368660 off284 op38 r0,284(r24)      .__ct__9MenuEntryFRC9MenuEntry+0x1e0e44
+0x3687b4 off284 op34 r0,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x1e0f98
+0x3687b8 off284 op38 r0,284(r25)      .__ct__9MenuEntryFRC9MenuEntry+0x1e0f9c
+0x3697e4 off284 op38 r0,284(r27)      .__ct__9MenuEntryFRC9MenuEntry+0x1e1fc8
+0x369c08 off284 op38 r0,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x1e23ec
+0x36fe94 off284 op38 r31,284(r28)     .__ct__9MenuEntryFRC9MenuEntry+0x1e8678
+0x388e9c off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x201680
+0x388fd0 off1536 op42 r0,1536(r4)     .__ct__9MenuEntryFRC9MenuEntry+0x2017b4
+0x389030 off1536 op42 r0,1536(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x201814
+0x389058 off284 op32 r3,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x20183c
+0x389068 off284 op32 r3,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x20184c
+0x389080 off284 op32 r3,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x201864
+0x389090 off284 op32 r3,284(r29)      .__ct__9MenuEntryFRC9MenuEntry+0x201874
+0x3891e0 off1536 op42 r6,1536(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x2019c4
+0x38932c off1536 op42 r6,1536(r3)     .__ct__9MenuEntryFRC9MenuEntry+0x201b10
+0x389454 off284 op32 r3,284(r3)       .__ct__9MenuEntryFRC9MenuEntry+0x201c38
+0x38957c off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x201d60
+0x3895c4 off1536 op42 r5,1536(r31)    .__ct__9MenuEntryFRC9MenuEntry+0x201da8
+0x3895d0 off1550 op42 r6,1550(r31)    .__ct__9MenuEntryFRC9MenuEntry+0x201db4
+0x389638 off1536 op42 r0,1536(r31)    .__ct__9MenuEntryFRC9MenuEntry+0x201e1c
+0x389680 off1550 op42 r0,1550(r31)    .__ct__9MenuEntryFRC9MenuEntry+0x201e64
+0x38e094 off284 op38 r0,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x206878
+0x38e0e0 off284 op38 r0,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x2068c4
+0x3af4a0 off284 op32 r12,284(r29)     .__ct__9MenuEntryFRC9MenuEntry+0x227c84
+0x3b0f28 off284 op36 r31,284(r28)     .__ct__9MenuEntryFRC9MenuEntry+0x22970c
+0x3bdee0 off284 op36 r3,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x2366c4
+0x3bf1a4 off102 op36 r0,102(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x237988
+0x3c3440 off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x23bc24
+0x3c3de0 off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x23c5c4
+0x3c444c off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x23cc30
+0x3c46dc off284 op36 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x23cec0
+0x3cb3b0 off284 op36 r4,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x243b94
+0x3cb450 off284 op36 r3,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x243c34
+0x3cb478 off284 op36 r3,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x243c5c
+0x3cb990 off284 op32 r3,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x244174
+0x3cb9e4 off284 op32 r5,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x2441c8
+0x3cbb78 off284 op32 r3,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x24435c
+0x3cc10c off284 op32 r0,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x2448f0
+0x3cc1dc off284 op32 r3,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x2449c0
+0x3cc28c off284 op32 r3,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x244a70
+0x3d03f0 off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x248bd4
+0x3d0844 off284 op32 r12,284(r31)     .__ct__9MenuEntryFRC9MenuEntry+0x249028
+0x3d0860 off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x249044
+0x3d0bbc off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x2493a0
+0x3d0ce0 off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x2494c4
+0x3d18ac off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x24a090
+0x3d18f0 off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x24a0d4
+0x3d194c off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x24a130
+0x3d1970 off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x24a154
+0x3dc874 off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x255058
+0x3dc938 off284 op36 r0,284(r30)      .__ct__9MenuEntryFRC9MenuEntry+0x25511c
+0x3dca10 off284 op36 r6,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x2551f4
+0x3dd348 off284 op32 r12,284(r28)     .__ct__9MenuEntryFRC9MenuEntry+0x255b2c
+0x3dd384 off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x255b68
+0x3dd3d4 off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x255bb8
+0x3dd4e4 off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x255cc8
+0x3dd54c off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x255d30
+0x3de154 off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x256938
+0x3de1b8 off284 op32 r12,284(r3)      .__ct__9MenuEntryFRC9MenuEntry+0x25699c
+0x3fac18 off284 op36 r0,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x2733fc
+0x3fd29c off284 op32 r12,284(r12)     .__ct__9MenuEntryFRC9MenuEntry+0x275a80
+0x3fe914 off284 op32 r7,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x2770f8
+0x3fea28 off284 op32 r9,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x27720c
+0x3feb5c off284 op32 r4,284(r26)      .__ct__9MenuEntryFRC9MenuEntry+0x277340
+0x3fee9c off284 op36 r7,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x277680
+0x3feec4 off284 op36 r0,284(r1)       .__ct__9MenuEntryFRC9MenuEntry+0x2776a8
+0x3ff088 off284 op32 r3,284(r28)      .__ct__9MenuEntryFRC9MenuEntry+0x27786c
+0x3ff0b0 off284 op36 r0,284(r28)      .__ct__9MenuEntryFRC9MenuEntry+0x277894
+0x3ff548 off284 op32 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x277d2c
+0x3ff570 off284 op36 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x277d54
+0x3ff574 off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x277d58
+0x3ff5cc off284 op36 r3,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x277db0
+0x3ff6ac off284 op32 r0,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x277e90
+0x3ff8cc off284 op32 r9,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x2780b0
+0x3ffa6c off284 op32 r4,284(r31)      .__ct__9MenuEntryFRC9MenuEntry+0x278250
+
+=== CALLERS of 0x182060 / 0x182840 ===
+0x17e5c8 bl 0x182840  from .GetVitaBoy__8AnimatorCFv+0x767e0
+0x1801c4 bl 0x182840  from .Deselect__12cNewWallToolFv+0x84
+0x18382c bl 0x182840  from .SetParameter__14cObjPickerToolFs+0x4c
+0x183a18 bl 0x182060  from .DeletingObject__14cObjPickerToolFs+0x5c
+0x184f04 bl 0x182060  from .BuildAnimList__14cObjPickerToolFP8cXPersonP8cXObject+0x64
+0x185190 bl 0x182060  from .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0xd0
+0x1851d0 bl 0x182840  from .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0x110
+0x1855f8 bl 0x182840  from .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0x538
+0x185d70 bl 0x182060  from .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x84
+0x185ddc bl 0x182840  from .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0xf0
+0x185f28 bl 0x182060  from .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x23c
+0x185f38 bl 0x182060  from .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x24c
+0x186244 bl 0x182060  from .Deselect__14cObjPickerToolFv+0x48
+0x1862d0 bl 0x182840  from .Select__14cObjPickerToolFv+0x54
+0x1862fc bl 0x182840  from .Select__14cObjPickerToolFv+0x80
+
+=== 104-off LOADS/STORES in cluster 0x180000-0x188000 ===
+0x180080 op32 104(r1)  .GetVitaBoy__8AnimatorCFv+0x78298
+0x1801d4 op32 104(r29)  .Deselect__12cNewWallToolFv+0x94
+0x180200 op32 104(r1)  .Deselect__12cNewWallToolFv+0xc0
+0x180418 op32 104(r31)  .OnKeyDown__12cNewWallToolFUlUl+0x88
+0x180440 op32 104(r31)  .OnKeyDown__12cNewWallToolFUlUl+0xb0
+0x1806d8 op32 104(r31)  .Release__12cNewWallToolF7FTilePtsP11EventRecord+0x1a8
+0x1806e4 op36 104(r31)  .Release__12cNewWallToolF7FTilePtsP11EventRecord+0x1b4
+0x18071c op32 104(r31)  .Release__12cNewWallToolF7FTilePtsP11EventRecord+0x1ec
+0x180730 op32 104(r31)  .Release__12cNewWallToolF7FTilePtsP11EventRecord+0x200
+0x1807d8 op36 104(r1)  .Release__12cNewWallToolF7FTilePtsP11EventRecord+0x2a8
+0x180874 op36 104(r1)  .Release__12cNewWallToolF7FTilePtsP11EventRecord+0x344
+0x180d4c op36 104(r1)  .Drag__12cNewWallToolF7FTilePtsP11EventRecord+0x200
+0x180e24 op36 104(r24)  .Drag__12cNewWallToolF7FTilePtsP11EventRecord+0x2d8
+0x180e58 op32 104(r24)  .Drag__12cNewWallToolF7FTilePtsP11EventRecord+0x30c
+0x181010 op32 104(r24)  .Drag__12cNewWallToolF7FTilePtsP11EventRecord+0x4c4
+0x18102c op32 104(r24)  .Drag__12cNewWallToolF7FTilePtsP11EventRecord+0x4e0
+0x181090 op32 104(r24)  .Drag__12cNewWallToolF7FTilePtsP11EventRecord+0x544
+0x1810d8 op32 104(r24)  .Drag__12cNewWallToolF7FTilePtsP11EventRecord+0x58c
+0x181214 op36 104(r30)  .Click__12cNewWallToolF7FTilePtsP11EventRecord+0xf0
+0x1814dc op36 104(r30)  .__dt__12cNewWallToolFv+0x90
+0x181744 op32 104(r1)  .__ct__12cNewWallToolFP11UndoManager+0x204
+0x181f2c op32 104(r12)  .CreateObject__11ObjectStateCFv+0x1c4
+0x181f70 op32 104(r1)  .CreateObject__11ObjectStateCFv+0x208
+0x18213c op32 104(r1)  .InvokeOntoObject__11ObjectStateCFv+0x1a0
+0x182ee8 op36 104(r24)  .__dt__14ObjectUndoableFv+0x8c
+0x1841e8 op36 104(r1)  .MenuItemSelected__14cObjPickerToolFP10cTSPieMenu+0x1a4
+0x1851d8 op32 104(r31)  .Release__14cObjPickerToolF7FTilePtsP11EventRecord+0x118
+0x185c10 op32 104(r3)  .GetGrass__15cRotatableWorldF7CTilePt+0x3c
+0x185f04 op36 104(r26)  .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x218
+0x185f20 op36 104(r26)  .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x234
+0x185f60 op36 104(r26)  .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x274
+0x185f6c op36 104(r26)  .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x280
+0x185f74 op32 104(r26)  .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x288
+0x185fe4 op36 104(r26)  .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x2f8
+0x18605c op36 104(r26)  .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x370
+0x18607c op36 104(r26)  .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x390
+0x186088 op36 104(r26)  .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x39c
+0x18609c op32 104(r26)  .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x3b0
+0x1860bc op36 104(r26)  .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x3d0
+0x1860e0 op36 104(r26)  .Click__14cObjPickerToolF7FTilePtsP11EventRecord+0x3f4
+0x186364 op32 104(r1)  .Select__14cObjPickerToolFv+0xe8
+0x186568 op36 104(r30)  .SetHiliteObject__14cObjPickerToolFsii+0x1e0
+0x186fdc op32 104(r1)  .__ct__14cObjPickerToolFv+0xa2c

@@ -1,0 +1,29 @@
+                ; ==== .Shutdown__23cTSWinTutorialHighlightFv ====
+005391a0: 93e1fffc  stw      r31, -4(r1)
+005391a4: 7c0802a6  mflr     r0
+005391a8: 7c7f1b78  mr       r31, r3
+005391ac: 90010008  stw      r0, 8(r1)
+005391b0: 9421ffb0  stwu     r1, -0x50(r1)
+005391b4: 81830000  lwz      r12, 0(r3)
+005391b8: 818c00d0  lwz      r12, 0xd0(r12)
+005391bc: 48069825  bl       0x5a29e0
+005391c0: 80410014  lwz      r2, 0x14(r1)
+005391c4: 5460063f  clrlwi.  r0, r3, 0x18
+005391c8: 4182002c  beq      0x5391f4
+005391cc: 807f00cc  lwz      r3, 0xcc(r31)
+005391d0: 28030000  cmplwi   r3, 0
+005391d4: 41820018  beq      0x5391ec
+005391d8: 81830000  lwz      r12, 0(r3)
+005391dc: 38800001  li       r4, 1
+005391e0: 818c0008  lwz      r12, 8(r12)
+005391e4: 480697fd  bl       0x5a29e0
+005391e8: 80410014  lwz      r2, 0x14(r1)
+005391ec: 38000000  li       r0, 0
+005391f0: 901f00cc  stw      r0, 0xcc(r31)
+005391f4: 7fe3fb78  mr       r3, r31
+005391f8: 4bfd0139  bl       0x509330   ; .Shutdown__6cTSWinFv
+005391fc: 80010058  lwz      r0, 0x58(r1)
+00539200: 38210050  addi     r1, r1, 0x50
+00539204: 83e1fffc  lwz      r31, -4(r1)
+00539208: 7c0803a6  mtlr     r0
+0053920c: 4e800020  blr      

@@ -1,0 +1,45 @@
+00232ba0: 4836fe41  bl       0x5a29e0
+00232ba4: 80410014  lwz      r2, 0x14(r1)
+00232ba8: 7c7a1b79  or.      r26, r3, r3
+00232bac: 4082002c  bne      0x232bd8
+00232bb0: 7fc3f378  mr       r3, r30
+00232bb4: 819e0008  lwz      r12, 8(r30)
+00232bb8: 3c805448  lis      r4, 0x5448
+00232bbc: 38dd0000  addi     r6, r29, 0
+00232bc0: 38844d42  addi     r4, r4, 0x4d42
+00232bc4: 818c0040  lwz      r12, 0x40(r12)
+00232bc8: 38a00464  li       r5, 0x464
+00232bcc: 4836fe15  bl       0x5a29e0
+00232bd0: 80410014  lwz      r2, 0x14(r1)
+00232bd4: 7c7a1b78  mr       r26, r3
+00232bd8: 281a0000  cmplwi   r26, 0
+00232bdc: 41820048  beq      0x232c24
+00232be0: 387f0058  addi     r3, r31, 0x58
+00232be4: 38800000  li       r4, 0
+00232be8: 38a00014  li       r5, 0x14
+00232bec: 48364185  bl       0x596d70
+00232bf0: 7f43d378  mr       r3, r26
+00232bf4: 4be6a82d  bl       0x9d420   ; .HGetSize__6MemoryFP10HandleNode
+00232bf8: 3b230000  addi     r25, r3, 0
+00232bfc: 387a0000  addi     r3, r26, 0
+00232c00: 4be6a9c1  bl       0x9d5c0   ; .HLock__6MemoryFP10HandleNode
+00232c04: 38830000  addi     r4, r3, 0
+00232c08: 387f0058  addi     r3, r31, 0x58
+00232c0c: 38b90000  addi     r5, r25, 0
+00232c10: 48363bb1  bl       0x5967c0
+00232c14: 387e0000  addi     r3, r30, 0
+00232c18: 389a0000  addi     r4, r26, 0
+00232c1c: 4beef6f5  bl       0x122310   ; .Release__8iResFileFP10HandleNode
+00232c20: 48000020  b        0x232c40
+00232c24: 3c608000  lis      r3, -0x8000
+00232c28: 3803ffff  addi     r0, r3, -1
+00232c2c: 901f0058  stw      r0, 0x58(r31)
+00232c30: 901f005c  stw      r0, 0x5c(r31)
+00232c34: 901f0060  stw      r0, 0x60(r31)
+00232c38: 901f0064  stw      r0, 0x64(r31)
+00232c3c: 901f0068  stw      r0, 0x68(r31)
+00232c40: 80628874  lwz      r3, -0x778c(r2)
+00232c44: 389e0000  addi     r4, r30, 0
+00232c48: 38bf001c  addi     r5, r31, 0x1c
+00232c4c: 38df0014  addi     r6, r31, 0x14
+00232c50: 80630000  lwz      r3, 0(r3)

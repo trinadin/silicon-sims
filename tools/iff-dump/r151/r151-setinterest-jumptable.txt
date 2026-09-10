@@ -1,0 +1,22 @@
+cWinInterest::SetInterest @0x405b10 jump table; TOC slot -0x491c (sec1 0x36e4) = 0x69e10
+entries are section-relative code ptrs; file = entry + 0x8e90
+
+[ 0] Travel      entry=003fccb4 case=00405b44 lha disp=0x05e8
+[ 1] Money       entry=003fccd8 case=00405b68 lha disp=0x05ea
+[ 2] Politics    entry=003fccfc case=00405b8c lha disp=0x05ec
+[ 3] The60s      entry=003fcd20 case=00405bb0 lha disp=0x05ee
+[ 4] Weather     entry=003fcd44 case=00405bd4 lha disp=0x05f0
+[ 5] Sports      entry=003fcd68 case=00405bf8 lha disp=0x05f2
+[ 6] Music       entry=003fcd8c case=00405c1c lha disp=0x05f4
+[ 7] Outdoors    entry=003fcdb0 case=00405c40 lha disp=0x05f6
+[ 8] Toys        entry=003fccb4 case=00405b44
+[ 9] Aliens      entry=003fccd8 case=00405b68
+[10] Pets        entry=003fccfc case=00405b8c
+[11] School      entry=003fcd20 case=00405bb0
+[12] Exercise    entry=003fcdd4 case=00405c64 lha disp=0x05a6
+[13] Food        entry=003fcdf8 case=00405c88 lha disp=0x05a8
+[14] Parties     entry=003fce1c case=00405cac lha disp=0x05ac
+[15] Style       entry=003fce40 case=00405cd0 lha disp=0x05b4
+[16] Hollywood   entry=003fce64 case=00405cf4 lha disp=0x05c0
+[17] Technology  entry=003fce88 case=00405d18 lha disp=0x05f8
+[18] Romance     entry=003fceac case=00405d3c lha disp=0x05fa

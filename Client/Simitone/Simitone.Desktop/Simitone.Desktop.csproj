@@ -5,8 +5,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <OutputType>Exe</OutputType>
+    <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
     <RootNamespace>Simitone.Windows</RootNamespace>
-    <AssemblyName>Simitone</AssemblyName>
+    <AssemblyName>TheSims</AssemblyName>
+    <Product>The Sims</Product>
+    <AssemblyTitle>The Sims</AssemblyTitle>
     <FileAlignment>512</FileAlignment>
     <!-- Suppress NU1605 (package downgrade) errors from FreeSO submodule dependencies -->
     <NoWarn>$(NoWarn);NU1605</NoWarn>
@@ -18,13 +21,18 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
   </ItemGroup>
   
+  <!-- Eto.Forms core - pinned to the version the platform backends resolve to (2.9.0) so the DLL is actually copied on macOS -->
+  <ItemGroup>
+    <PackageReference Include="Eto.Forms" Version="2.9.0" />
+  </ItemGroup>
+  
   <!-- Platform-specific Eto.Forms backends -->
   <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
-    <PackageReference Include="Eto.Platform.Gtk" Version="2.8.4" />
+    <PackageReference Include="Eto.Platform.Gtk" Version="2.9.0" />
   </ItemGroup>
   
   <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
-    <PackageReference Include="Eto.Platform.Mac64" Version="2.8.4" />
+    <PackageReference Include="Eto.Platform.Mac64" Version="2.9.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,6 +51,10 @@
   <PropertyGroup>
     <NuGetGlobalPackages Condition=" '$(OS)' == 'Windows_NT' ">$(USERPROFILE)\.nuget\packages</NuGetGlobalPackages>
     <NuGetGlobalPackages Condition=" '$(OS)' != 'Windows_NT' ">$(HOME)/.nuget/packages</NuGetGlobalPackages>
+  </PropertyGroup>
+  <!-- Respect a redirected NuGet cache (e.g. NUGET_PACKAGES built in CI/sandboxes) or the copy target fails with MSB3030 -->
+  <PropertyGroup Condition=" '$(NUGET_PACKAGES)' != '' ">
+    <NuGetGlobalPackages>$(NUGET_PACKAGES)</NuGetGlobalPackages>
   </PropertyGroup>
 
   <Target Name="CopyMonoGameDLLs" AfterTargets="Build">

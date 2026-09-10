@@ -1,0 +1,634 @@
+AUTOTEST enabled houses=5 checks=freewillwin,brainlive,freewill,freewillvar
+20:14:00.008 autotest: AUTOTEST START houses=[5] checks=[freewillwin,brainlive,freewill,freewillvar] timeout=1800000ms
+20:14:00.026 autotest: AUTOTEST hook-registered
+2026-09-07 20:14:00.326 TheSims[62276:39577197] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/com.thesims.macos.savedState
+20:14:00.391 exit-probe: before Run
+20:14:00.392 exit-probe: Game.Run(Sync) enter
+20:14:00.713 exit-probe: Initialize enter
+20:14:00.865 exit-probe: Initialize exit
+20:14:00.867 screen: EnterLoading
+20:14:00.933 loadscreen: DIRECT FAR mount original kSimsLogo boot screen 800x600 len=1440056 sha=8ecf9500 (from frame one; Simitone loader chrome deleted R118)
+20:14:00.934 content-init: begin
+20:14:01.085 loadscreen: IFF-mount original splashprogress strings (17) in variablesans_10 over the boot screen
+20:14:02.851 loading-screen: update frame=120 complete=False progress=InitObjects
+Unexpected TrailingZero: 617176985
+Unexpected TrailingZero: -666831736
+Unexpected TrailingZero: 1995593413
+20:14:03.870 content-init: done
+20:14:03.881 cursor-init: IFF resolve liveperson.cur -> Shared\cursors\LivePerson.cur 326 bytes
+20:14:03.883 cursor-init: IFF-first original cursors mounted livePersonLen=326
+20:14:03.900 loadscreen: IFF-mount original Community\Bus_loadscreen_1024x768.bmp
+20:14:03.904 loadscreen: IFF-mount texture 1024x768
+20:14:03.904 EnterGameMode lot= external=False
+20:14:03.920 uioriginal: IFF-mount original Downtown\LargeBack.bmp
+20:14:03.922 uinav: IFF-mount neighborhood surround 1024x768
+20:14:04.003 uioriginal: IFF-mount original Nbhd\HotspotPopupTiler.TGA
+20:14:04.015 uioriginal: IFF-mount original NghUI\banner_neighborhood.bmp
+20:14:04.016 uioriginal: IFF-mount original NghUI\Current.bmp
+20:14:04.017 uioriginal: IFF-mount original NghUI\MoveIn.bmp
+20:14:04.017 uioriginal: IFF-mount original NghUI\Bulldoze.bmp
+20:14:04.017 uioriginal: IFF-mount original NghUI\Exit.bmp
+20:14:04.018 uioriginal: IFF-mount original NghUI\InetBtn.bmp
+20:14:04.018 uioriginal: IFF-mount original Nbhd\CreditBtnEn.bmp
+20:14:04.018 uioriginal: IFF-mount original NghUI\Previous.bmp
+20:14:04.018 uioriginal: IFF-mount original NghUI\Next.bmp
+20:14:04.018 uioriginal: IFF-mount original NghUI\Import.bmp
+20:14:04.020 uioriginal: IFF-mount original NghUI\Downtown.bmp
+20:14:04.020 uioriginal: IFF-mount original NghUI\TheSimsLogo.bmp
+20:14:04.021 uioriginal: IFF-mount original NghUI\Vacation.bmp
+20:14:04.021 uioriginal: IFF-mount original NghUI\Rezone.bmp
+20:14:04.021 uioriginal: IFF-mount original NghUI\Studiotown.bmp
+20:14:04.021 uioriginal: IFF-mount original NghUI\MagicLand.bmp
+20:14:04.023 global-context: global.iff BHAVs=251
+20:14:04.025 module: PersonGlobals BHAVs=473
+20:14:04.026 module: SocialGlobals BHAVs=101
+20:14:04.027 module: CatGlobals BHAVs=179
+20:14:04.030 module: DogGlobals BHAVs=177
+20:14:04.031 module: PetSitGlobals BHAVs=22
+20:14:04.032 module: PhoneGlobals BHAVs=149
+20:14:04.032 module: VacationDirectorGlobals BHAVs=85
+20:14:04.033 autotest: AUTOTEST LOT-TRY house=5 path='/Users/nathannoom/Documents/Simitone/UserData/Houses/House05.iff'
+20:14:04.089 uioriginal: IFF-mount original shared\sys\CloseBox.bmp
+[TS1StackRepair] object=10 guid=6b264238 invalid=4096:1@6b264238(len=missing),4113:0@6b264238(len=missing) recovery=reset
+[TS1StackRepair] object=114 guid=91767a36 invalid=4096:3@91767a36(len=2) recovery=reset
+[TS1StackRepair] object=115 guid=91767a36 invalid=4096:3@91767a36(len=2) recovery=reset
+[TS1StackRepair] object=116 guid=91767a36 invalid=4096:3@91767a36(len=2) recovery=reset
+[TS1StackRepair] object=117 guid=91767a36 invalid=4096:3@91767a36(len=2) recovery=reset
+[TS1StackRepair] object=123 guid=28975923 invalid=4109:0@28975923(len=missing) recovery=reset
+[TS1StackRepair] object=131 guid=df77ee12 invalid=4109:0@df77ee12(len=missing) recovery=reset
+[TS1StackRepair] object=133 guid=d1cf9596 invalid=4096:0@d1cf9596(len=missing) recovery=reset
+[TS1StackRepair] object=134 guid=fbe586b7 invalid=4096:2@fbe586b7(len=missing) recovery=reset
+[TS1StackRepair] object=173 guid=d5ca2d74 invalid=4096:1@d5ca2d74(len=missing) recovery=reset
+[TS1StackRepair] object=174 guid=24e26386 invalid=4096:1@24e26386(len=missing) recovery=reset
+[TS1StackRepair] object=191 guid=c59350c6 invalid=4096:1@c59350c6(len=missing) recovery=reset
+[TS1StackRepair] object=192 guid=23a15547 invalid=4096:1@23a15547(len=missing) recovery=reset
+[TS1StackRepair] object=194 guid=fd746ad2 invalid=4109:0@fd746ad2(len=missing) recovery=reset
+[TS1StackRepair] object=226 guid=7d2089b6 invalid=4096:0@7d2089b6(len=missing) recovery=reset
+[TS1StackRepair] total=15
+20:14:04.332 uioriginal: IFF-mount original cpanel\Backgrounds\UniversalBack.TGA
+20:14:04.334 uioriginal: IFF-mount original cpanel\Backgrounds\LivePatch.bmp
+20:14:04.335 uioriginal: IFF-mount original cpanel\Backgrounds\BuyPatch.bmp
+20:14:04.335 uioriginal: IFF-mount original cpanel\Backgrounds\BuildPatch.bmp
+20:14:04.335 uioriginal: IFF-mount original cpanel\Backgrounds\OptionsPatch.bmp
+20:14:04.335 uioriginal: IFF-mount original cpanel\Backgrounds\CameraPatch.bmp
+20:14:04.336 uioriginal: IFF-mount original cpanel\Buttons\people.bmp
+20:14:04.336 uioriginal: IFF-mount original cpanel\Buttons\objects.bmp
+20:14:04.336 uioriginal: IFF-mount original cpanel\Buttons\arch.bmp
+20:14:04.336 uioriginal: IFF-mount original cpanel\Buttons\options.bmp
+20:14:04.337 uioriginal: IFF-mount original cpanel\Buttons\camera.bmp
+20:14:04.338 uioriginal: IFF-mount original cpanel\Buttons\zoomin.bmp
+20:14:04.338 uioriginal: IFF-mount original cpanel\Buttons\zoomout.bmp
+20:14:04.338 uioriginal: IFF-mount original cpanel\Buttons\rotleft.bmp
+20:14:04.338 uioriginal: IFF-mount original cpanel\Buttons\rotright.bmp
+20:14:04.338 uioriginal: IFF-mount original cpanel\Buttons\LevRoof.bmp
+20:14:04.338 uioriginal: IFF-mount original cpanel\Buttons\nocut.bmp
+20:14:04.338 uioriginal: IFF-mount original cpanel\Buttons\dynacut.bmp
+20:14:04.338 uioriginal: IFF-mount original cpanel\Buttons\nowall.bmp
+20:14:04.338 uioriginal: IFF-mount original cpanel\Buttons\Lev2.bmp
+20:14:04.338 uioriginal: IFF-mount original cpanel\Buttons\Lev1.bmp
+20:14:04.339 uioriginal: IFF-mount original cpanel\Buttons\pause.bmp
+20:14:04.339 uioriginal: IFF-mount original cpanel\Buttons\Speed1.bmp
+20:14:04.339 uioriginal: IFF-mount original cpanel\Buttons\Speed2.bmp
+20:14:04.339 uioriginal: IFF-mount original cpanel\Buttons\Speed3.bmp
+20:14:04.339 uioriginal: IFF-mount original cpanel\buttons\helpbutton.bmp
+20:14:04.342 uioriginal: IFF-mount original cpanel\Backgrounds\PanelBack.bmp
+20:14:04.343 panel-ctor: original toolbar backdrop mounted 804x100
+20:14:04.343 uioriginal: IFF-mount original cpanel\Backgrounds\BackPatch.bmp
+20:14:04.344 uioriginal: IFF-mount original cpanel\People\TrackingTarget.bmp
+20:14:04.344 uioriginal: IFF-mount original cpanel\People\PeopleTemplate.bmp
+20:14:04.345 uioriginal: IFF-mount original cpanel\Backgrounds\LiveGadget.bmp
+20:14:04.351 uioriginal: IFF-mount original cpanel\Greenbars.BMP
+20:14:04.351 uioriginal: IFF-mount original cpanel\Redbars.bmp
+20:14:04.352 uioriginal: IFF-mount original cpanel\Buttons\Undo.bmp
+20:14:04.352 uioriginal: IFF-mount original cpanel\Buttons\Redo.bmp
+20:14:04.353 uioriginal: IFF-mount original cpanel\Buttons\toolBtnTerrain.bmp
+20:14:04.353 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWater.bmp
+20:14:04.353 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWall.bmp
+20:14:04.353 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWallpaper.bmp
+20:14:04.353 uioriginal: IFF-mount original cpanel\Buttons\toolBtnStairs.bmp
+20:14:04.353 uioriginal: IFF-mount original cpanel\Buttons\toolBtnFireplace.bmp
+20:14:04.353 uioriginal: IFF-mount original cpanel\Buttons\toolBtnTree.bmp
+20:14:04.353 uioriginal: IFF-mount original cpanel\Buttons\toolBtnFloor.bmp
+20:14:04.353 uioriginal: IFF-mount original cpanel\Buttons\toolBtnDoor.bmp
+20:14:04.353 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWindow.bmp
+20:14:04.353 uioriginal: IFF-mount original cpanel\Buttons\toolBtnRoof.bmp
+20:14:04.353 uioriginal: IFF-mount original cpanel\Buttons\toolBtnHand.bmp
+20:14:04.354 uioriginal: IFF-mount original cpanel\Build\roofsteep.bmp
+20:14:04.354 uioriginal: IFF-mount original cpanel\Build\roofmedium.bmp
+20:14:04.354 uioriginal: IFF-mount original cpanel\Build\roofshallow.bmp
+20:14:04.354 uioriginal: IFF-mount original cpanel\Build\roofflat.bmp
+20:14:04.354 uioriginal: IFF-mount original cpanel\Buttons\ScrollLeft.bmp
+20:14:04.360 uioriginal: IFF-mount original cpanel\Buttons\ScrollRight.bmp
+20:14:04.361 uioriginal: IFF-mount original cpanel\Catalog\ThumbTemplate1Frame.BMP
+20:14:04.361 uioriginal: IFF-mount original cpanel\Catalog\ThumbTemplate.BMP
+20:14:04.361 uioriginal: IFF-mount original cpanel\Build\RoofPatternTemplate.bmp
+20:14:04.367 uioriginal: IFF-mount original cpanel\Backgrounds\BuildToothpkLeft.bmp
+20:14:04.367 uioriginal: IFF-mount original cpanel\Backgrounds\BuildToothpkRight.bmp
+20:14:04.369 uioriginal: IFF-mount original cpanel\Catalog\BuyRLiving.bmp
+20:14:04.369 uioriginal: IFF-mount original cpanel\Catalog\BuyRDining.bmp
+20:14:04.369 uioriginal: IFF-mount original cpanel\Catalog\BuyRBedroom.bmp
+20:14:04.369 uioriginal: IFF-mount original cpanel\Catalog\BuyRStudy.bmp
+20:14:04.369 uioriginal: IFF-mount original cpanel\Catalog\BuyRKitchen.bmp
+20:14:04.369 uioriginal: IFF-mount original cpanel\Catalog\BuyRBathroom.bmp
+20:14:04.369 uioriginal: IFF-mount original cpanel\Catalog\BuyROutside.bmp
+20:14:04.369 uioriginal: IFF-mount original cpanel\Catalog\BuyRMisc.bmp
+20:14:04.369 uioriginal: IFF-mount original cpanel\Catalog\BackButtons\BackRLiving.bmp
+20:14:04.370 uioriginal: IFF-mount original cpanel\Buttons\CamFrameSmall.bmp
+20:14:04.370 uioriginal: IFF-mount original cpanel\Buttons\CamFrameMed.bmp
+20:14:04.370 uioriginal: IFF-mount original cpanel\Buttons\CamFrameLarge.bmp
+20:14:04.371 uioriginal: IFF-mount original cpanel\Buttons\CamFrameCust.bmp
+20:14:04.371 uioriginal: IFF-mount original cpanel\Buttons\CamViewAlbum.bmp
+20:14:04.371 uioriginal: IFF-mount original cpanel\Buttons\CamQualLow.bmp
+20:14:04.371 uioriginal: IFF-mount original cpanel\Buttons\CamQualMed.bmp
+20:14:04.371 uioriginal: IFF-mount original cpanel\Buttons\CamQualHigh.bmp
+20:14:04.371 uioriginal: IFF-mount original cpanel\Backgrounds\CameraToothpkLeft.bmp
+20:14:04.371 uioriginal: IFF-mount original cpanel\Backgrounds\CameraToothpkRight.bmp
+20:14:04.371 panel-ctor: desktop speed cluster is on the UCP plate (R142 engine anchors)
+20:14:04.372 uioriginal: IFF-mount original cpanel\Buttons\Mood.bmp
+20:14:04.372 uioriginal: IFF-mount original cpanel\Buttons\Relationship.BMP
+20:14:04.372 uioriginal: IFF-mount original cpanel\Buttons\Job.bmp
+20:14:04.372 uioriginal: IFF-mount original cpanel\Buttons\House.bmp
+20:14:04.372 uioriginal: IFF-mount original cpanel\Buttons\Personality.bmp
+20:14:04.373 uioriginal: IFF-mount original cpanel\Buttons\Interest.bmp
+20:14:04.373 uioriginal: IFF-mount original cpanel\Buttons\Gift.bmp
+20:14:04.373 uioriginal: IFF-mount original cpanel\Buttons\ScrollLeft.BMP
+20:14:04.373 uioriginal: IFF-mount original cpanel\Buttons\ScrollRight.BMP
+20:14:04.374 autotest: AUTOTEST LOT-ACTION house=5 inlot=True vm=True
+20:14:04.375 autotest: AUTOTEST LOT-READY house=5 entities=303 avatars=3 loadErrors=0 speed=1 minute=30
+20:14:04.378 autotest: AUTOTEST freewill 'process mood' live-exec: completed (ORIGINAL periodic personality/motive brain ran on avatar thread; engine served every scope it reads)
+20:14:04.380 autotest: AUTOTEST freewill IFF-mount chain=[do idle and mood->do idle core ; do idle->do idle core ; brain process mood check hunger ; ids=8303,8301,8229,8275,8219] reach(original brain mounted + IFF-literal entry chain)=1 reachBad=0
+20:14:04.380 autotest: AUTOTEST freewill: PASS
+20:14:04.381 autotest: AUTOTEST freewillvar candidates=2 param0=[111,222] retained-distinct=True (production autonomous-score aggregation; live lot state untouched)
+20:14:04.381 autotest: AUTOTEST freewillvar: PASS
+20:14:04.385 uioriginal: IFF-mount original CPanel\TutHigh.bmp
+20:14:04.419 autotest: AUTOTEST freewillwin roster: av0=obj16 age=9 type=0 stratum=1 queue=0 | av1=obj18 age=27 type=0 stratum=3 queue=0 | av2=obj21 age=27 type=0 stratum=2 queue=0 — subject=obj21 stratum=2 (stratum-2 knob: even-id pool); house=5
+20:14:04.420 autotest: AUTOTEST freewillwin gather-census objects=80 withTtab=80 entries=821 weight>0=819 weight<=attr100=819 flags0x80=79 gender&1!=0x400=0 gender&2!=0x200=0 plain!=0x40=63 autonomyFlagSet=0 subjectGender=0 (admitted-after-static-gates=677)
+20:14:04.421 autotest: AUTOTEST freewillwin gather-census samples: obj6#tta1/act4112 w=100 flags=0x00000001 attCode=2 | obj6#tta0/act4100 w=100 flags=0x00000001 attCode=2 | obj6#tta2/act4117 w=50 flags=0x00000121 attCode=3 | obj6#tta3/act4118 w=100 flags=0x00000121 attCode=3 | obj9#tta1/act4112 w=100 flags=0x00000001 attCode=2 | obj9#tta0/act4100 w=100 flags=0x00000001 attCode=2 | obj9#tta2/act4117 w=50 flags=0x00000121 attCode=3 | obj9#tta3/act4118 w=100 flags=0x00000121 attCode=3 | obj10#tta2/act8208 w=50 flags=0x00000100 attCode=3 | obj10#tta1/act8312 w=50 flags=0x00000000 attCode=2 | obj10#tta3/act8315 w=100 flags=0x00000010 attCode=0 | obj10#tta4/act8314 w=100 flags=0x00000010 attCode=3
+20:14:04.421 autotest: AUTOTEST freewillwin serve-window census (stratum 2): act8662_minWeight=50 minOtherWeight=50 -> attr36 serve-pin NOT APPLICABLE [obj9#act4112 w=100 | obj9#act4100 w=100 | obj9#act4117 w=50 | obj9#act4118 w=100 | obj13#act4103 w=100 | obj13#act4107 w=50 | obj13#act4107 w=50 | obj17#act4103 w=100 | obj17#act4107 w=50 | obj17#act4107 w=50 | obj21#act8408 w=100 | obj21#act8410 w=50 | obj21#act8411 w=50 | obj21#act8515 w=50 | obj21#act8421 w=100 | obj21#act8270 w=50 | obj21#act8264 w=50 | obj21#act8412 w=50 | obj21#act8413 w=100 | obj21#act8262 w=50 | obj21#act8415 w=50 | obj21#act8416 w=50 | obj21#act8252 w=50 | obj21#act8418 w=50]
+20:14:04.422 autotest: AUTOTEST freewillwin seam bound: VMFindBestAction.TS1DecisionObserved (typed, landed contract)
+20:14:04.422 autotest: AUTOTEST freewillwin armed house=/Users/nathannoom/Documents/Simitone/UserData/Houses/House05.iff subject=obj21 posture=0 attr18=0 attr36=100 age=27 personType=0 fun=0 freeWill=True seamBound=True (motives pinned Fun=0 Social=50 Hunger/Energy/Hygiene=75 Bladder=100)
+20:14:04.422 autotest: AUTOTEST roomlaw room=1 base=1 outside=True pool=False area=2618 supportArea=2618 supportCount=1 impactEntities=11 sumImpact=190 score=-9 entitiesInBase=135
+20:14:04.422 autotest: AUTOTEST roomlaw room=2 base=2 outside=False pool=False area=20 supportArea=20 supportCount=1 impactEntities=2 sumImpact=60 score=15 entitiesInBase=14
+20:14:04.422 autotest: AUTOTEST roomlaw room=3 base=3 outside=False pool=False area=9 supportArea=9 supportCount=1 impactEntities=1 sumImpact=1 score=4 entitiesInBase=8
+20:14:04.422 autotest: AUTOTEST roomlaw room=4 base=4 outside=False pool=False area=35 supportArea=35 supportCount=1 impactEntities=3 sumImpact=65 score=26 entitiesInBase=26
+20:14:04.423 autotest: AUTOTEST roomlaw room=5 base=5 outside=False pool=False area=27 supportArea=27 supportCount=1 impactEntities=3 sumImpact=40 score=100 entitiesInBase=20
+20:14:04.423 autotest: AUTOTEST roomlaw room=6 base=6 outside=True pool=False area=2672 supportArea=2672 supportCount=1 impactEntities=0 sumImpact=0 score=-15 entitiesInBase=10
+20:14:04.423 autotest: AUTOTEST roomlaw room=7 base=7 outside=False pool=False area=32 supportArea=35 supportCount=2 impactEntities=1 sumImpact=10 score=5 entitiesInBase=16
+20:14:04.423 autotest: AUTOTEST roomlaw room=8 base=7 outside=False pool=False area=32 supportArea=35 supportCount=2 impactEntities=1 sumImpact=10 score=5 entitiesInBase=16
+20:14:04.423 autotest: AUTOTEST roomlaw room=9 base=9 outside=True pool=False area=2704 supportArea=2704 supportCount=1 impactEntities=0 sumImpact=0 score=-15 entitiesInBase=0
+20:14:04.423 autotest: AUTOTEST roomlaw room=10 base=10 outside=True pool=False area=2704 supportArea=2704 supportCount=1 impactEntities=0 sumImpact=0 score=-15 entitiesInBase=0
+20:14:04.423 autotest: AUTOTEST roomlaw room=11 base=11 outside=True pool=False area=2704 supportArea=2704 supportCount=1 impactEntities=0 sumImpact=0 score=-15 entitiesInBase=0
+20:14:04.424 autotest: AUTOTEST roomlaw-tiles level=1 room=65537 tile56=5162 wallTiles=62 styles=[0/0/4/0 0/0/0/0 0/0/0/0 0/0/0/0 0/0/0/0 0/0/0/0 0/0/0/0 0/0/6/0 0/0/0/0 0/0/0/0 13/0/250/0 0/13/0/250 0/13/0/250 1/13/26/250 0/13/0/250 13/0/250/0 0/0/0/0 13/0/250/0 0/0/0/0 1/0/26/0 0/0/0/0 13/0/250/0 0/0/0/0 13/0/250/0 0/0/0/4 1/0/26/4 0/0/0/4 13/0/250/4 0/0/0/0 13/0/250/0 0/0/0/0 1/0/26/0 0/0/0/0 13/0/250/0 0/0/0/0 13/0/250/0 1/0/26/0 0/0/0/0 13/0/250/0 0/0/0/0 0/0/0/0 1/0/26/0 0/0/0/0 1/0/26/0 0/0/0/0 1/0/26/0 0/0/0/0 13/0/250/0 0/0/0/0 0/0/0/0 1/0/26/5 0/0/0/0 1/0/26/0 0/1/0/26 0/1/0/26 0/1/0/26 0/1/0/26 0/1/0/26 0/1/0/26 0/1/0/26 0/1/0/26 0/1/0/26]
+20:14:04.424 autotest: AUTOTEST roomlaw-tiles level=1 room=131074 tile56=26 wallTiles=14 styles=[1/1/6/6 0/1/0/6 0/1/0/6 0/1/0/6 0/1/0/6 1/0/6/0 0/0/0/0 1/0/6/4 0/0/0/4 1/0/6/0 0/0/0/0 0/0/0/0 0/0/0/0 0/0/0/0]
+20:14:04.424 autotest: AUTOTEST roomlaw-tiles level=1 room=2147680257 tile56=1 wallTiles=1 styles=[27/1/23/0]
+20:14:04.425 autotest: AUTOTEST roomlaw-tiles level=1 room=196611 tile56=9 wallTiles=7 styles=[0/1/0/16 0/1/0/16 1/0/16/0 0/0/0/0 1/0/16/0 0/0/0/0 0/0/0/0]
+20:14:04.425 autotest: AUTOTEST roomlaw-tiles level=1 room=262148 tile56=47 wallTiles=17 styles=[1/1/25/25 0/1/0/25 0/1/0/25 0/1/0/25 1/0/25/0 0/0/0/0 1/0/25/0 0/0/0/0 1/0/25/0 0/0/0/0 1/0/25/0 1/0/25/3 0/0/5/5 1/0/25/0 0/0/5/0 0/0/0/0 0/0/0/0]
+20:14:04.425 autotest: AUTOTEST roomlaw-tiles level=1 room=327685 tile56=37 wallTiles=17 styles=[1/1/2/2 0/1/0/2 0/1/0/2 1/0/2/0 0/1/4/2 0/1/0/2 0/1/1/2 1/0/2/0 0/0/1/0 1/0/2/0 0/0/1/3 1/0/2/0 0/0/0/0 0/0/0/0 0/0/0/0 0/0/0/0 0/0/1/0]
+20:14:04.425 autotest: AUTOTEST roomlaw-tiles level=1 room=262145 tile56=1 wallTiles=1 styles=[21/1/26/0]
+20:14:04.425 autotest: AUTOTEST roomlaw-tiles level=1 room=2147549185 tile56=1 wallTiles=1 styles=[26/13/0/0]
+20:14:04.425 autotest: AUTOTEST roomlaw-tiles level=1 room=65540 tile56=1 wallTiles=1 styles=[0/1/21/0]
+20:14:04.425 autotest: AUTOTEST roomlaw-tiles level=1 room=2147549188 tile56=1 wallTiles=1 styles=[21/1/0/0]
+20:14:04.427 autotest: AUTOTEST roomlaw-shadow room=2 hypB half=13 wall=-17 t1=-32.80 t2=10.77 t3=-8.00 shadowNoObj=-47.03 amb=0 olt=100 ents=14 r60=18 winPat=4 doorPat=5
+20:14:04.427 autotest: AUTOTEST roomlaw-shadow room=2 hypC half=13 wall=-17 t1=11.43 t2=10.77 t3=-8.00 shadowNoObj=-2.80 amb=0 olt=100 ents=14 r60=18 winPat=4 doorPat=5
+20:14:04.427 autotest: AUTOTEST roomlaw-shadow room=3 hypB half=4 wall=-26 t1=-36.80 t2=8.00 t3=0.00 shadowNoObj=-54.80 amb=0 olt=100 ents=8 r60=8 winPat=0 doorPat=0
+20:14:04.427 autotest: AUTOTEST roomlaw-shadow room=3 hypC half=4 wall=-26 t1=0.00 t2=8.00 t3=0.00 shadowNoObj=-18.00 amb=0 olt=100 ents=8 r60=8 winPat=0 doorPat=0
+20:14:04.427 autotest: AUTOTEST roomlaw-shadow room=4 hypA half=23 wall=-7 t1=-4.80 t2=11.30 t3=0.00 shadowNoObj=-0.50 amb=25 olt=100 ents=26 r60=22 winPat=2 doorPat=2
+20:14:04.427 autotest: AUTOTEST roomlaw-shadow room=4 hypB half=23 wall=-7 t1=-31.20 t2=11.30 t3=0.00 shadowNoObj=-26.90 amb=25 olt=100 ents=26 r60=22 winPat=2 doorPat=2
+20:14:04.427 autotest: AUTOTEST roomlaw-shadow room=4 hypC half=23 wall=-7 t1=-6.15 t2=11.30 t3=0.00 shadowNoObj=-1.85 amb=25 olt=100 ents=26 r60=22 winPat=2 doorPat=2
+20:14:04.427 autotest: AUTOTEST roomlaw-shadow room=5 hypB half=18 wall=-12 t1=-31.20 t2=11.11 t3=0.00 shadowNoObj=-32.09 amb=0 olt=100 ents=20 r60=22 winPat=0 doorPat=1
+20:14:04.427 autotest: AUTOTEST roomlaw-shadow room=5 hypC half=18 wall=-12 t1=4.00 t2=11.11 t3=0.00 shadowNoObj=3.11 amb=0 olt=100 ents=20 r60=22 winPat=0 doorPat=1
+20:14:04.428 autotest: AUTOTEST roomlaw-shadow room=4 hypA half=0 wall=-30 t1=-36.80 t2=26.00 t3=0.00 shadowNoObj=-40.80 amb=25 olt=100 ents=26 r60=2 winPat=0 doorPat=0
+20:14:04.428 autotest: AUTOTEST roomlaw-shadow room=4 hypB half=0 wall=-30 t1=-39.20 t2=26.00 t3=0.00 shadowNoObj=-43.20 amb=25 olt=100 ents=26 r60=2 winPat=0 doorPat=0
+20:14:04.428 autotest: AUTOTEST roomlaw-shadow room=4 hypC half=0 wall=-30 t1=-36.92 t2=26.00 t3=0.00 shadowNoObj=-40.92 amb=25 olt=100 ents=26 r60=2 winPat=0 doorPat=0
+20:14:04.428 autotest: AUTOTEST roomlaw-shadow room=4 hypA half=0 wall=-30 t1=-36.80 t2=26.00 t3=0.00 shadowNoObj=-40.80 amb=25 olt=100 ents=26 r60=2 winPat=0 doorPat=0
+20:14:04.428 autotest: AUTOTEST roomlaw-shadow room=4 hypB half=0 wall=-30 t1=-39.20 t2=26.00 t3=0.00 shadowNoObj=-43.20 amb=25 olt=100 ents=26 r60=2 winPat=0 doorPat=0
+20:14:04.428 autotest: AUTOTEST roomlaw-shadow room=4 hypC half=0 wall=-30 t1=-36.92 t2=26.00 t3=0.00 shadowNoObj=-40.92 amb=25 olt=100 ents=26 r60=2 winPat=0 doorPat=0
+20:14:04.428 autotest: AUTOTEST roomlaw-tiles level=2 room=393222 tile56=5317 wallTiles=21 styles=[0/0/4/4 0/0/0/4 0/0/0/4 0/0/0/4 0/0/0/0 1/0/26/0 0/0/0/0 1/0/26/0 0/0/0/0 1/0/26/0 0/0/0/4 1/0/26/0 0/1/1/26 1/0/26/4 0/0/0/0 0/0/0/249 1/0/26/0 0/0/0/2 1/0/26/3 0/1/3/26 0/1/0/26]
+20:14:04.428 autotest: AUTOTEST roomlaw-tiles level=2 room=458759 tile56=39 wallTiles=19 styles=[1/1/25/25 0/1/0/25 0/1/0/25 0/1/0/25 14/0/251/0 0/0/0/0 14/0/251/0 0/0/0/0 14/0/251/0 0/0/0/0 1/0/25/249 0/0/249/0 1/0/25/0 1/0/25/249 0/0/0/0 1/0/25/2 0/0/0/3 0/0/3/0 0/0/0/0]
+20:14:04.429 autotest: AUTOTEST roomlaw-tiles level=2 room=524296 tile56=3 wallTiles=3 styles=[1/0/25/0 1/0/25/0 1/0/25/0]
+20:14:04.429 autotest: AUTOTEST roomlaw-tiles level=2 room=458758 tile56=1 wallTiles=1 styles=[1/1/0/0]
+20:14:04.429 autotest: AUTOTEST roomlaw-tiles level=2 room=393223 tile56=1 wallTiles=1 styles=[0/1/1/0]
+20:14:04.429 autotest: AUTOTEST roomlaw-tiles level=2 room=2147876871 tile56=1 wallTiles=1 styles=[1/1/0/0]
+20:14:04.429 autotest: AUTOTEST roomlaw-shadow room=7 hypB half=19 wall=-11 t1=-32.80 t2=8.42 t3=0.00 shadowNoObj=-35.38 amb=0 olt=100 ents=16 r60=18 winPat=1 doorPat=1
+20:14:04.429 autotest: AUTOTEST roomlaw-shadow room=7 hypC half=19 wall=-11 t1=5.00 t2=8.42 t3=0.00 shadowNoObj=2.42 amb=0 olt=100 ents=16 r60=18 winPat=1 doorPat=1
+20:14:04.429 autotest: AUTOTEST roomlaw-shadow room=8 hypB half=1 wall=-29 t1=-37.60 t2=16.00 t3=0.00 shadowNoObj=-50.60 amb=0 olt=100 ents=16 r60=6 winPat=0 doorPat=0
+20:14:04.429 autotest: AUTOTEST roomlaw-shadow room=8 hypC half=1 wall=-29 t1=-25.00 t2=16.00 t3=0.00 shadowNoObj=-38.00 amb=0 olt=100 ents=16 r60=6 winPat=0 doorPat=0
+20:14:04.429 autotest: AUTOTEST roomlaw-shadow room=7 hypB half=0 wall=-30 t1=-39.20 t2=16.00 t3=0.00 shadowNoObj=-53.20 amb=0 olt=100 ents=16 r60=2 winPat=0 doorPat=0
+20:14:04.429 autotest: AUTOTEST roomlaw-shadow room=7 hypC half=0 wall=-30 t1=-35.00 t2=16.00 t3=0.00 shadowNoObj=-49.00 amb=0 olt=100 ents=16 r60=2 winPat=0 doorPat=0
+20:14:04.429 autotest: AUTOTEST roomlaw-shadow room=7 hypB half=0 wall=-30 t1=-38.40 t2=16.00 t3=0.00 shadowNoObj=-52.40 amb=0 olt=100 ents=16 r60=4 winPat=0 doorPat=0
+20:14:04.429 autotest: AUTOTEST roomlaw-shadow room=7 hypC half=0 wall=-30 t1=-30.00 t2=16.00 t3=0.00 shadowNoObj=-44.00 amb=0 olt=100 ents=16 r60=4 winPat=0 doorPat=0
+20:14:04.430 autotest: AUTOTEST roomlaw-tiles level=3 room=589833 tile56=5408 wallTiles=0 styles=[]
+20:14:04.437 autotest: AUTOTEST roomlaw-tiles level=4 room=655370 tile56=5408 wallTiles=0 styles=[]
+20:14:04.437 autotest: AUTOTEST roomlaw-tiles level=5 room=720907 tile56=5408 wallTiles=0 styles=[]
+20:14:04.438 autotest: AUTOTEST roomlaw avatar0 obj=16 pos=440,360,1 roomAt=1 score=-9
+20:14:04.438 autotest: AUTOTEST roomlaw avatar1 obj=18 pos=440,408,1 roomAt=1 score=-9
+20:14:04.438 autotest: AUTOTEST roomlaw avatar2 obj=21 pos=424,392,1 roomAt=1 score=-9
+20:14:04.438 autotest: AUTOTEST mood load-phase av0 storedMood=80 needs=75,75,75,100,75,0,50 roomScore=-9 rowRoom=75 s7=450 hypNoRoom=64 hypEngine=55 (original-save values; engine recomputes after first decay tick)
+20:14:04.438 autotest: AUTOTEST mood load-phase av1 storedMood=81 needs=75,75,75,100,75,0,50 roomScore=-9 rowRoom=75 s7=450 hypNoRoom=64 hypEngine=55 (original-save values; engine recomputes after first decay tick)
+20:14:04.438 autotest: AUTOTEST mood load-phase av2 storedMood=83 needs=75,75,75,100,75,0,50 roomScore=-9 rowRoom=75 s7=450 hypNoRoom=64 hypEngine=55 (original-save values; engine recomputes after first decay tick)
+20:14:04.439 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=55
+20:14:04.439 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=55
+20:14:04.439 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=55
+20:14:04.440 autotest: AUTOTEST brainlive diag av0 threads=3
+20:14:04.440 autotest: AUTOTEST brainlive diag   frame0 routineID=4096 label=Main rti=Main semiGlobal=personglobals.iff
+20:14:04.440 autotest: AUTOTEST brainlive diag   frame1 routineID=8193 label=person main rti=person main semiGlobal=personglobals.iff
+20:14:04.440 autotest: AUTOTEST brainlive diag   frame2 routineID=280 label=idle rti=idle semiGlobal=personglobals.iff
+20:14:04.440 autotest: AUTOTEST brainlive diag av1 threads=3
+20:14:04.440 autotest: AUTOTEST brainlive diag   frame0 routineID=4096 label=Main rti=Main semiGlobal=personglobals.iff
+20:14:04.440 autotest: AUTOTEST brainlive diag   frame1 routineID=8193 label=person main rti=person main semiGlobal=personglobals.iff
+20:14:04.441 autotest: AUTOTEST brainlive diag   frame2 routineID=280 label=idle rti=idle semiGlobal=personglobals.iff
+20:14:04.441 autotest: AUTOTEST brainlive diag av2 threads=3
+20:14:04.441 autotest: AUTOTEST brainlive diag   frame0 routineID=4096 label=Main rti=Main semiGlobal=personglobals.iff
+20:14:04.441 autotest: AUTOTEST brainlive diag   frame1 routineID=8193 label=person main rti=person main semiGlobal=personglobals.iff
+20:14:04.441 autotest: AUTOTEST brainlive diag   frame2 routineID=280 label=idle rti=idle semiGlobal=personglobals.iff
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=33,nid=0,avatar=False] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=34,nid=0,avatar=False] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=1 stack[obj=1,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=2 stack[obj=2,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=3 stack[obj=3,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=4 stack[obj=4,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=5 stack[obj=5,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=6 stack[obj=6,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=7 stack[obj=7,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=8 stack[obj=8,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=9 stack[obj=9,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=10 stack[obj=10,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=11 stack[obj=11,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=12 stack[obj=12,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=13 stack[obj=13,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=14 stack[obj=14,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=15 stack[obj=15,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=32 stack[obj=16,nid=32,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=17 stack[obj=17,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=1 myNID=33 caller[obj=16,nid=32] targNID=32 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=1 myNID=33 caller[obj=16,nid=32] targNID=32 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=1 myNID=34 caller[obj=16,nid=32] targNID=32 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=1 myNID=34 caller[obj=16,nid=32] targNID=32 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=1 myNID=34 caller[obj=18,nid=33] targNID=33 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=1 myNID=34 caller[obj=18,nid=33] targNID=33 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=34 stack[obj=21,nid=34,avatar=True] exists=False bucketMismatch=False
+20:14:04.487 autotest: AUTOTEST mood load-phase av0 storedMood=55 needs=75,75,75,100,75,0,50 roomScore=-9 rowRoom=-9 s7=450 hypNoRoom=64 hypEngine=55 (original-save values; engine recomputes after first decay tick)
+20:14:04.488 autotest: AUTOTEST mood load-phase av1 storedMood=55 needs=75,75,75,100,75,0,50 roomScore=-9 rowRoom=-9 s7=450 hypNoRoom=64 hypEngine=55 (original-save values; engine recomputes after first decay tick)
+20:14:04.488 autotest: AUTOTEST mood load-phase av2 storedMood=55 needs=75,75,75,100,75,0,50 roomScore=-9 rowRoom=-9 s7=450 hypNoRoom=64 hypEngine=55 (original-save values; engine recomputes after first decay tick)
+20:14:04.506 uioriginal: IFF-mount original shared\dlg\GenDlg.bmp
+20:14:04.507 uioriginal: IFF-mount original shared\sys\WinBtn.bmp
+20:14:04.512 autotest: AUTOTEST forced speed 1 (stale-dialog-latch obj307 released)
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 0 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+20:14:04.716 uioriginal: IFF-mount original cpanel\Backgrounds\PopupInfoTiles.bmp
+20:14:05.154 autotest: AUTOTEST forced speed 1 (stale-dialog-latch obj306 released)
+20:14:05.155 autotest: AUTOTEST motive sample minute=32 avatars=3 moodAllOk=True elapsed=2 speed=1 (32:6 h)
+20:14:06.153 autotest: AUTOTEST freewillwin probe: 'try autonomy' 8233 PUSHED on obj21 real stack (pushed=True frame=121; natural decisions for this avatar so far=0; stack-depth=6)
+20:14:06.155 autotest: AUTOTEST motive sample minute=33 avatars=3 moodAllOk=True elapsed=3 speed=1 (33:6 h)
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+20:14:06.219 uioriginal: IFF-mount original cpanel\Buttons\IconFrame.bmp
+20:14:07.153 autotest: AUTOTEST freewillwin OFF-control engaged at elapsed=4 (120 frames; VM.FreeWillEnabled=false)
+20:14:07.154 autotest: AUTOTEST motive sample minute=34 avatars=3 moodAllOk=True elapsed=4 speed=1 (34:6 h)
+20:14:07.489 autotest: AUTOTEST forced speed 1 (stale-dialog-latch obj296 released)
+20:14:07.519 autotest: AUTOTEST forced speed 1 (stale-dialog-latch obj297 released)
+20:14:07.552 autotest: AUTOTEST forced speed 1 (stale-dialog-latch obj300 released)
+20:14:07.586 autotest: AUTOTEST forced speed 1 (stale-dialog-latch obj303 released)
+RELPROBE mode=1 myNID=33 caller[obj=21,nid=34] targNID=34 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=True
+20:14:08.152 autotest: AUTOTEST motive sample minute=35 avatars=3 moodAllOk=True elapsed=5 speed=1 (35:6 h)
+20:14:09.136 autotest: AUTOTEST freewillwin OFF-control released after 120 frames, subject decisions during OFF=0
+20:14:09.153 autotest: AUTOTEST freewillwin probe: 'try autonomy' 8233 PUSHED on obj16 real stack (pushed=True frame=301; natural decisions for this avatar so far=0; stack-depth=8)
+20:14:09.153 autotest: AUTOTEST freewillwin serve-pin: NOT APPLICABLE (act8662 advertises at the same weight as the seating head — no ad-ceiling window exists); staging a repeat subject serve-push instead
+20:14:09.153 autotest: AUTOTEST motive sample minute=36 avatars=3 moodAllOk=True elapsed=6 speed=1 (36:6 h)
+20:14:09.169 autotest: AUTOTEST freewillwin probe: 'try autonomy' 8233 PUSHED on obj21 real stack (pushed=True frame=302; natural decisions for this avatar so far=1; stack-depth=12)
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+20:14:10.152 autotest: AUTOTEST freewillwin probe: 'try autonomy' 8233 PUSHED on obj18 real stack (pushed=True frame=361; natural decisions for this avatar so far=0; stack-depth=10)
+20:14:10.154 autotest: AUTOTEST motive sample minute=37 avatars=3 moodAllOk=True elapsed=7 speed=1 (37:6 h)
+20:14:11.152 autotest: AUTOTEST motive sample minute=38 avatars=3 moodAllOk=True elapsed=8 speed=1 (38:6 h)
+20:14:12.153 autotest: AUTOTEST freewillwin state restored (window-end): motives + persondata subject obj21, motives other avatars, FreeWillEnabled=True
+20:14:12.157 autotest: AUTOTEST freewillwin observed decisions=4 subject=2 (natural=0 served=2) other-avatars=2 frames=481 seamBound=False seamFired=True queue-insertions-tracked=6 subject-queue-now=1/4098,2/4102 subject-persondata: posture=0 autonomy=50 fun=33
+20:14:12.158 autotest: AUTOTEST freewillwin decision av=obj21(subject) served frame=122 n=47 drawnIdx=2 accepted=True law=uniform/2 K=4 attr0=0 cutoff=0.000001 seed=2765993364871496002 [obj192#act8213 s=0 f=0 | obj246#act4102 s=0 f=0 | obj18#act8490 s=0 f=0 | obj132#act4102 s=0 f=0 | obj112#act4102 s=0 f=0 | obj18#act8520 s=0 f=0 | obj226#act8196 s=0 f=0 | obj16#act8508 s=0 f=0 | obj70#act4097 s=0 f=0 | obj16#act8502 s=0 f=0 | obj132#act4110 s=0 f=0 | obj118#act4098 s=0 f=0 | obj16#act8296 s=0 f=0 | obj174#act8213 s=0 f=0 | obj16#act8520 s=0 f=0 | obj216#act4097 s=0 f=0 | obj18#act8318 s=0 f=0 | obj246#act4104 s=0 f=0 | obj10#act8309 s=0 f=0 | obj18#act8273 s=0 f=0 | obj16#act8493 s=0 f=0 | obj110#act4098 s=0 f=0 | obj10#act8263 s=0 f=0 | obj118#act4107 s=0 f=0 | obj16#act8501 s=0 f=0 | obj120#act4104 s=0 f=0 | obj118#act4113 s=0 f=0 | obj16#act8318 s=0 f=0 | obj132#act4104 s=0 f=0 | obj16#act8540 s=0 f=0 | obj134#act8196 s=0 f=0 | obj16#act8522 s=0 f=0 | obj192#act8209 s=0 f=0 | obj10#act8221 s=0 f=0 | obj198#act4097 s=0 f=0 | obj18#act8322 s=0 f=0 | obj224#act4097 s=0 f=0 | obj16#act8510 s=0 f=0 | obj246#act4115 s=0 f=0 | obj18#act8296 s=0 f=0 | obj246#act4097 s=0 f=0 | obj6#act4112 s=0 f=0 | obj6#act4100 s=0 f=0 | obj10#act8325 s=0 f=0 | obj10#act8256 s=0 f=0 | obj16#act8322 s=0 f=0 | obj118#act4103 s=0 f=0]
+20:14:12.158 autotest: AUTOTEST freewillwin decision av=obj16 served frame=302 n=55 drawnIdx=2 accepted=True law=/0 K=0 attr0=0 cutoff=0.000001 seed=4520117440504113601 [obj174#act8213 s=0 f=0 | obj215#act4097 s=0 f=0 | obj25#act4097 s=0 f=0 | obj132#act4110 s=0 f=0 | obj246#act4104 s=0 f=0 | obj21#act8501 s=0 f=0 | obj192#act8213 s=0 f=0 | obj18#act8522 s=0 f=0 | obj224#act4097 s=0 f=0 | obj71#act4101 s=0 f=0 | obj118#act4103 s=0 f=0 | obj110#act4098 s=0 f=0 | obj21#act8493 s=0 f=0 | obj134#act8196 s=0 f=0 | obj18#act8497 s=0 f=0 | obj191#act8213 s=0 f=0 | obj21#act8318 s=0 f=0 | obj198#act4097 s=0 f=0 | obj18#act8508 s=0 f=0 | obj217#act4102 s=0 f=0 | obj39#act4097 s=0 f=0 | obj226#act8196 s=0 f=0 | obj21#act8538 s=0 f=0 | obj71#act4099 s=0 f=0 | obj21#act8535 s=0 f=0 | obj113#act4102 s=0 f=0 | obj111#act4104 s=0 f=0 | obj21#act8508 s=0 f=0 | obj120#act4104 s=0 f=0 | obj18#act8501 s=0 f=0 | obj133#act8196 s=0 f=0 | obj21#act8502 s=0 f=0 | obj173#act8213 s=0 f=0 | obj18#act8510 s=0 f=0 | obj191#act8209 s=0 f=0 | obj21#act8497 s=0 f=0 | obj192#act8209 s=0 f=0 | obj18#act8318 s=0 f=0 | obj197#act4101 s=0 f=0 | obj21#act8522 s=0 f=0 | obj214#act4097 s=0 f=0 | obj18#act8538 s=0 f=0 | obj216#act4097 s=0 f=0 | obj35#act4097 s=0 f=0 | obj223#act4097 s=0 f=0 | obj21#act8543 s=0 f=0 | obj225#act4097 s=0 f=0 | obj70#act4097 s=0 f=0 | obj246#act4115 s=0 f=0 | obj18#act8493 s=0 f=0 | obj18#act8543 s=0 f=0 | obj18#act8535 s=0 f=0 | obj18#act8502 s=0 f=0 | obj21#act8510 s=0 f=0 | obj112#act4102 s=0 f=0]
+20:14:12.158 autotest: AUTOTEST freewillwin decision av=obj21(subject) served frame=302 n=46 drawnIdx=1 accepted=True law=uniform/1 K=4 attr0=0 cutoff=0.000001 seed=11517925789897308982 [obj198#act4097 s=0 f=0 | obj246#act4102 s=0 f=0 | obj18#act8490 s=0 f=0 | obj134#act8196 s=0 f=0 | obj118#act4107 s=0 f=0 | obj18#act8520 s=0 f=0 | obj246#act4115 s=0 f=0 | obj16#act8508 s=0 f=0 | obj110#act4098 s=0 f=0 | obj16#act8502 s=0 f=0 | obj132#act4104 s=0 f=0 | obj118#act4113 s=0 f=0 | obj16#act8296 s=0 f=0 | obj192#act8209 s=0 f=0 | obj16#act8520 s=0 f=0 | obj224#act4097 s=0 f=0 | obj18#act8318 s=0 f=0 | obj246#act4097 s=0 f=0 | obj10#act8309 s=0 f=0 | obj18#act8273 s=0 f=0 | obj16#act8493 s=0 f=0 | obj112#act4102 s=0 f=0 | obj10#act8263 s=0 f=0 | obj118#act4098 s=0 f=0 | obj16#act8501 s=0 f=0 | obj132#act4110 s=0 f=0 | obj118#act4103 s=0 f=0 | obj16#act8318 s=0 f=0 | obj132#act4102 s=0 f=0 | obj16#act8540 s=0 f=0 | obj174#act8213 s=0 f=0 | obj16#act8522 s=0 f=0 | obj192#act8213 s=0 f=0 | obj10#act8221 s=0 f=0 | obj216#act4097 s=0 f=0 | obj18#act8322 s=0 f=0 | obj226#act8196 s=0 f=0 | obj16#act8510 s=0 f=0 | obj246#act4104 s=0 f=0 | obj18#act8296 s=0 f=0 | obj6#act4112 s=0 f=0 | obj6#act4100 s=0 f=0 | obj10#act8325 s=0 f=0 | obj10#act8256 s=0 f=0 | obj16#act8322 s=0 f=0 | obj120#act4104 s=0 f=0]
+20:14:12.158 autotest: AUTOTEST freewillwin decision av=obj18 served frame=362 n=15 drawnIdx=3 accepted=True law=/0 K=0 attr0=0 cutoff=0.000001 seed=2479219363956884400 [obj173#act8213 s=0 f=0 | obj191#act8213 s=0 f=0 | obj71#act4099 s=0 f=0 | obj133#act8196 s=0 f=0 | obj217#act4102 s=0 f=0 | obj71#act4101 s=0 f=0 | obj191#act8209 s=0 f=0 | obj21#act8490 s=0 f=0 | obj197#act4101 s=0 f=0 | obj111#act4104 s=0 f=0 | obj21#act8318 s=0 f=0 | obj223#act4097 s=0 f=0 | obj21#act8273 s=0 f=0 | obj113#act4102 s=0 f=0 | obj225#act4097 s=0 f=0]
+20:14:12.158 autotest: AUTOTEST freewillwin a-multi-candidate: PASS (2 subject decision(s) with >=2 candidates)
+20:14:12.158 autotest: AUTOTEST freewillwin b-handoff-score-law: PASS (2 drawn subject winner(s) carry a finite hand-off score (|score| up to 0); pool gather scores all lazy-0; cutoff decisions match the hand-off-score law)
+20:14:12.160 autotest: AUTOTEST freewillwin transpile self-test (verify.py group H): OK
+20:14:12.160 autotest: AUTOTEST freewillwin c-drawnidx-lawful: PASS (2 lawful / 0 unlawful)
+20:14:12.160 autotest: AUTOTEST freewillwin d-seed-replay: PASS (2 replayed-draw matches / 0 mismatch)
+20:14:12.160 autotest: AUTOTEST freewillwin f-winner-identity: PASS (2 winner identities match / 0 mismatch; transpile self-test OK)
+20:14:12.160 autotest: AUTOTEST freewillwin e-cutoff-law: PASS (2 decisions; standing=True engaged=False mismatches=0)
+20:14:12.160 autotest: AUTOTEST freewillwin queue-insertions: frame123 av21 obj18#act8490 arg0=0 <= decision frame122 drawnIdx=2 (identity+priority match) ; frame303 av16 obj25#act4097 arg0=0 <= decision frame302 drawnIdx=2 (identity+priority match) ; frame303 av21 obj246#act4102 arg0=0 <= decision frame302 drawnIdx=1 (identity+priority match) ; frame363 av18 obj133#act8196 arg0=0 <= decision frame362 drawnIdx=3 (identity+priority match)
+20:14:12.161 autotest: AUTOTEST freewillwin g-queue-crosscheck: PASS (4 serving winner(s) matched (callee+ActionRoutine+Args[0]+Autonomous priority); 0 hand-off drop(s) (0 unexcused — each is a FAIL); 0 push-path insertion(s) (disclosed); 0 queue-content violation(s))
+20:14:12.161 autotest: AUTOTEST freewillwin h-freewill-off-gate: PASS (OFF window 120 frames, subject decisions=0)
+20:14:12.161 autotest: AUTOTEST freewillwin i-state-restore: PASS (motives/personality/free-will/settings restored in finally path)
+20:14:12.161 autotest: AUTOTEST freewillwin i2-attr18-restore-proof: PASS (restored attr18=0 vs pre-pin original=0)
+20:14:12.161 autotest: AUTOTEST freewillwin j-game-data-untouched: PASS (house file sha256 unchanged across the window)
+20:14:12.254 autotest: AUTOTEST freewillwin capture 1024x768 -> /Users/nathannoom/Documents/Simitone/ui-audit/r249/freewillwin-decision.png
+20:14:12.254 autotest: AUTOTEST freewillwin DISCLOSURE natural-reach: the soak produced no natural subject decisions; the real-stack 'try autonomy'(8233) serve-push DID produce 2 — the rebuilt primitive + seam are live and the battery below ran on served decisions (the brain's autonomy gate did not open naturally inside the window)
+20:14:12.254 autotest: AUTOTEST freewillwin DISCLOSURE natural-reach: EVERY decision this run was harness-served (real-stack 'try autonomy'(8233) pushes); the natural autonomy gate never opened in-window for any avatar
+20:14:12.254 autotest: AUTOTEST freewillwin DISCLOSURE e-cutoff: no ENGAGED decision captured this run (the subject never took a directed posture mid-window); only the unconditional standing law was exercised
+20:14:12.255 autotest: AUTOTEST freewillwin VERDICT PASS sub-assertions=11 failed=0
+20:14:12.255 autotest: AUTOTEST freewillwin: PASS
+20:14:12.255 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.255 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.256 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.256 autotest: AUTOTEST motive sample minute=39 avatars=3 moodAllOk=False elapsed=9 speed=1 (39:6 h)
+20:14:12.262 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.262 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.262 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.263 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.263 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.263 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.263 uioriginal: IFF-mount original other\QueueCancel.bmp
+20:14:12.264 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.264 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.264 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.264 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.265 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.265 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.265 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.265 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.265 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.265 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.265 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.265 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.269 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.269 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.269 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.286 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.286 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.286 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.302 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.303 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.303 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.319 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.319 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.319 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.336 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.336 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.336 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.352 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.353 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.353 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.369 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.369 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.370 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.386 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.386 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.386 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.402 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.403 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.403 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.419 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.419 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.419 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.436 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.436 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.436 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.452 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.453 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.453 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.469 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.469 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.469 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.486 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.486 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.486 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.502 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.503 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.503 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.519 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.519 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.520 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.536 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.536 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.536 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.552 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.553 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.553 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.569 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.569 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.569 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.586 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.586 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.586 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.602 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.603 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.603 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.619 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.619 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.619 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.636 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.636 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.636 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.652 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.653 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.653 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.669 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.669 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.669 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.686 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.686 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.686 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.702 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.703 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.703 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.720 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.720 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.720 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.736 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.736 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.736 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.752 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.753 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.753 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.769 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.769 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.769 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.786 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.786 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.786 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.802 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.803 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.803 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.819 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.819 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.819 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.836 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.836 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.836 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.852 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.853 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.853 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.869 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.869 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.869 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.886 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.886 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.886 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.902 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.903 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.903 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.919 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.919 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.919 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.936 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.936 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.936 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.952 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.953 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.953 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.969 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.969 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.969 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:12.986 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:12.986 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:12.986 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:13.002 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:13.003 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:13.003 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:13.022 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:13.022 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:13.022 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:13.036 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:13.036 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=72
+20:14:13.036 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:13.052 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:13.053 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=76
+20:14:13.053 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:13.069 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:13.069 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=76
+20:14:13.070 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:13.086 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:13.086 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=76
+20:14:13.086 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:13.102 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:13.103 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=76
+20:14:13.103 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:13.119 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:13.119 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=76
+20:14:13.119 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:13.136 autotest: AUTOTEST mood: MISMATCH av0 storedMood=80 computed=73
+20:14:13.136 autotest: AUTOTEST mood: MISMATCH av1 storedMood=81 computed=76
+20:14:13.136 autotest: AUTOTEST mood: MISMATCH av2 storedMood=83 computed=73
+20:14:13.152 autotest: AUTOTEST motive sample minute=40 avatars=3 moodAllOk=True elapsed=10 speed=1 (40:6 h)
+20:14:13.154 autotest: AUTOTEST MOTIVE av0 deltas=[23,24,23,-25,24,29,49] over 10 sim-min
+20:14:13.154 autotest: AUTOTEST MOTIVE av0 phantom-increases=Fun+29 Social+49
+20:14:13.154 autotest: AUTOTEST MOTIVE av1 deltas=[23,24,23,-29,24,22,49] over 10 sim-min
+20:14:13.154 autotest: AUTOTEST MOTIVE av1 phantom-increases=Social+49
+20:14:13.155 autotest: AUTOTEST MOTIVE av2 deltas=[23,24,23,-29,24,33,49] over 10 sim-min
+20:14:13.155 autotest: AUTOTEST MOTIVE av2 phantom-increases=Fun+33 Social+49
+20:14:13.156 autotest: AUTOTEST brainlive pg-seen=True routine-count=10257 distinct=15 ids=280,281,4096,8193,8229,8233,8282,8283,8292,8303,8330,8331,8333,8336,8534
+20:14:13.156 autotest: AUTOTEST brainlive brain-id-hit=True (8303/8301/8229/8275/8219 = IFF-verified canonical idle/personality brain BHAVs)
+20:14:13.156 autotest: AUTOTEST brainlive: PASS
+RELPROBE SUMMARY calls=1038 misses=792 objectbucket=7 avatarStack=231
+20:14:13.157 autotest: AUTOTEST SUMMARY passed=4 failed=0 skipped=0
+20:14:13.157 autotest: AUTOTEST RESULT PASS
+AUTOTEST RESULT PASS passed=4 failed=0
+20:14:13.169 exit-probe: OnExiting cancel=True screen=TS1GameScreen
+20:14:13.190 exit-probe: OnExiting cancel=False screen=TS1GameScreen
+20:14:13.191 exit-probe: after Run
+20:14:13.210 exit-probe: after Dispose

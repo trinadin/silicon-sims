@@ -1,0 +1,816 @@
+002cd3a0: bf01ffe0  stmw     r24, -0x20(r1)
+002cd3a4: 7c0802a6  mflr     r0
+002cd3a8: 7c9b2378  mr       r27, r4
+002cd3ac: 83a29644  lwz      r29, -0x69bc(r2)   ; TOC[-0x69bc]->CODEPTR file 0x5a45d8
+002cd3b0: 2c1b0017  cmpwi    r27, 0x17
+002cd3b4: 83c28c58  lwz      r30, -0x73a8(r2)   ; TOC[-0x73a8]->DATA off 0x43270
+002cd3b8: 7c7a1b78  mr       r26, r3
+002cd3bc: 83e28e04  lwz      r31, -0x71fc(r2)   ; TOC[-0x71fc]->BSS off 0x97734
+002cd3c0: 7cbc2b78  mr       r28, r5
+002cd3c4: 90010008  stw      r0, 8(r1)
+002cd3c8: 9421f640  stwu     r1, -0x9c0(r1)
+002cd3cc: 41820c24  beq      0x2cdff0
+002cd3d0: 4080001c  bge      0x2cd3ec
+002cd3d4: 2c1b0001  cmpwi    r27, 1
+002cd3d8: 41820024  beq      0x2cd3fc
+002cd3dc: 41800c14  blt      0x2cdff0
+002cd3e0: 2c1b0016  cmpwi    r27, 0x16
+002cd3e4: 40800b38  bge      0x2cdf1c
+002cd3e8: 48000c08  b        0x2cdff0
+002cd3ec: 2c1b0019  cmpwi    r27, 0x19
+002cd3f0: 41820b40  beq      0x2cdf30
+002cd3f4: 40800bfc  bge      0x2cdff0
+002cd3f8: 48000bdc  b        0x2cdfd4
+002cd3fc: 801a0150  lwz      r0, 0x150(r26)
+002cd400: 7c1c0040  cmplw    r28, r0
+002cd404: 40820250  bne      0x2cd654
+002cd408: 881a0120  lbz      r0, 0x120(r26)
+002cd40c: 28000000  cmplwi   r0, 0
+002cd410: 40820230  bne      0x2cd640
+002cd414: 801a011c  lwz      r0, 0x11c(r26)
+002cd418: 38600004  li       r3, 4
+002cd41c: 2c000000  cmpwi    r0, 0
+002cd420: 40810040  ble      0x2cd460
+002cd424: 809a010c  lwz      r4, 0x10c(r26)
+002cd428: 38610098  addi     r3, r1, 0x98
+002cd42c: 80da0188  lwz      r6, 0x188(r26)
+002cd430: 80a400dc  lwz      r5, 0xdc(r4)
+002cd434: 8086000c  lwz      r4, 0xc(r6)
+002cd438: 80a5000c  lwz      r5, 0xc(r5)
+002cd43c: 4bd69bc5  bl       0x37000
+002cd440: 80628870  lwz      r3, -0x7790(r2)   ; TOC[-0x7790]->BSS off 0x92660
+002cd444: 38810098  addi     r4, r1, 0x98
+002cd448: 80ba0184  lwz      r5, 0x184(r26)
+002cd44c: 38c00002  li       r6, 2
+002cd450: 80630000  lwz      r3, 0(r3)
+002cd454: 80a5000c  lwz      r5, 0xc(r5)
+002cd458: 38e00000  li       r7, 0
+002cd45c: 4bf86aa5  bl       0x253f00   ; .MessageDialog__8cSimsAppFPCcPCcUlb
+002cd460: 28030004  cmplwi   r3, 4
+002cd464: 408201cc  bne      0x2cd630
+002cd468: 807a010c  lwz      r3, 0x10c(r26)
+002cd46c: 28030000  cmplwi   r3, 0
+002cd470: 41820070  beq      0x2cd4e0
+002cd474: 808300dc  lwz      r4, 0xdc(r3)
+002cd478: 80640000  lwz      r3, 0(r4)
+002cd47c: 3403ffff  addic.   r0, r3, -1
+002cd480: 7c180378  mr       r24, r0
+002cd484: 40810030  ble      0x2cd4b4
+002cd488: 2c000801  cmpwi    r0, 0x801
+002cd48c: 40810008  ble      0x2cd494
+002cd490: 3b000801  li       r24, 0x801
+002cd494: 8084000c  lwz      r4, 0xc(r4)
+002cd498: 38b80000  addi     r5, r24, 0
+002cd49c: 38610198  addi     r3, r1, 0x198
+002cd4a0: 482c9321  bl       0x5967c0
+002cd4a4: 38610198  addi     r3, r1, 0x198
+002cd4a8: 38000000  li       r0, 0
+002cd4ac: 7c03c1ae  stbx     r0, r3, r24
+002cd4b0: 4800000c  b        0x2cd4bc
+002cd4b4: 38000000  li       r0, 0
+002cd4b8: 98010198  stb      r0, 0x198(r1)
+002cd4bc: 3861004c  addi     r3, r1, 0x4c
+002cd4c0: 38810198  addi     r4, r1, 0x198
+002cd4c4: 482a41ed  bl       0x5716b0   ; .__ct__9CTGStringFPCc
+002cd4c8: 807a0114  lwz      r3, 0x114(r26)
+002cd4cc: 3881004c  addi     r4, r1, 0x4c
+002cd4d0: 4bf76621  bl       0x243af0   ; .SetName__12PersonFinderFiRC9CTGString
+002cd4d4: 3861004c  addi     r3, r1, 0x4c
+002cd4d8: 3880ffff  li       r4, -1
+002cd4dc: 482a40c5  bl       0x5715a0   ; .__dt__9CTGStringFv
+002cd4e0: 807a0110  lwz      r3, 0x110(r26)
+002cd4e4: 808300dc  lwz      r4, 0xdc(r3)
+002cd4e8: 80640000  lwz      r3, 0(r4)
+002cd4ec: 3723ffff  addic.   r25, r3, -1
+002cd4f0: 40810024  ble      0x2cd514
+002cd4f4: 8084000c  lwz      r4, 0xc(r4)
+002cd4f8: 38b90000  addi     r5, r25, 0
+002cd4fc: 38610198  addi     r3, r1, 0x198
+002cd500: 482c92c1  bl       0x5967c0
+002cd504: 38610198  addi     r3, r1, 0x198
+002cd508: 38000000  li       r0, 0
+002cd50c: 7c03c9ae  stbx     r0, r3, r25
+002cd510: 4800000c  b        0x2cd51c
+002cd514: 38000000  li       r0, 0
+002cd518: 98010198  stb      r0, 0x198(r1)
+002cd51c: 38610050  addi     r3, r1, 0x50
+002cd520: 38810198  addi     r4, r1, 0x198
+002cd524: 482a418d  bl       0x5716b0   ; .__ct__9CTGStringFPCc
+002cd528: 807a0114  lwz      r3, 0x114(r26)
+002cd52c: 38810050  addi     r4, r1, 0x50
+002cd530: 4bf764b1  bl       0x2439e0   ; .SetDescription__12PersonFinderFiRC9CTGString
+002cd534: 38610050  addi     r3, r1, 0x50
+002cd538: 3880ffff  li       r4, -1
+002cd53c: 482a4065  bl       0x5715a0   ; .__dt__9CTGStringFv
+002cd540: 3b000000  li       r24, 0
+002cd544: 3bc00000  li       r30, 0
+002cd548: 4800003c  b        0x2cd584
+002cd54c: 60000000  nop      
+002cd550: 807a0160  lwz      r3, 0x160(r26)
+002cd554: 7c63f02e  lwzx     r3, r3, r30
+002cd558: 4800af49  bl       0x2d84a0   ; .GetValue__21cWinPersonalityWidgetCFv
+002cd55c: 1c030064  mulli    r0, r3, 0x64
+002cd560: 807a0114  lwz      r3, 0x114(r26)
+002cd564: 7c190734  extsh    r25, r0
+002cd568: 4bf73a89  bl       0x240ff0   ; .GetData__12PersonFinderFi
+002cd56c: 801d0000  lwz      r0, 0(r29)
+002cd570: 3bbd0004  addi     r29, r29, 4
+002cd574: 3b180001  addi     r24, r24, 1
+002cd578: 3bde0004  addi     r30, r30, 4
+002cd57c: 5400083c  slwi     r0, r0, 1
+002cd580: 7f23032e  sthx     r25, r3, r0
+002cd584: 801a015c  lwz      r0, 0x15c(r26)
+002cd588: 7c180040  cmplw    r24, r0
+002cd58c: 4180ffc4  blt      0x2cd550
+002cd590: 807a0114  lwz      r3, 0x114(r26)
+002cd594: 4bf724ed  bl       0x23fa80   ; .GetAge__12PersonFinderFi
+002cd598: 2c030000  cmpwi    r3, 0
+002cd59c: 4082000c  bne      0x2cd5a8
+002cd5a0: 807a0114  lwz      r3, 0x114(r26)
+002cd5a4: 4bf70ced  bl       0x23e290   ; .SetupNewHDSkins__12PersonFinderFi
+002cd5a8: 881a0119  lbz      r0, 0x119(r26)
+002cd5ac: 38800001  li       r4, 1
+002cd5b0: 807a0114  lwz      r3, 0x114(r26)
+002cd5b4: 38c00001  li       r6, 1
+002cd5b8: 7c000034  cntlzw   r0, r0
+002cd5bc: 5405d97e  srwi     r5, r0, 5
+002cd5c0: 4bf73bd1  bl       0x241190   ; .EndDesignAPerson__12PersonFinderFibbb
+002cd5c4: 38000001  li       r0, 1
+002cd5c8: 981a0120  stb      r0, 0x120(r26)
+002cd5cc: 881a0118  lbz      r0, 0x118(r26)
+002cd5d0: 28000000  cmplwi   r0, 0
+002cd5d4: 4182006c  beq      0x2cd640
+002cd5d8: 833a0164  lwz      r25, 0x164(r26)
+002cd5dc: 28190000  cmplwi   r25, 0
+002cd5e0: 41820060  beq      0x2cd640
+002cd5e4: 809a0114  lwz      r4, 0x114(r26)
+002cd5e8: 38600003  li       r3, 3
+002cd5ec: 3800001f  li       r0, 0x1f
+002cd5f0: 90610058  stw      r3, 0x58(r1)
+002cd5f4: 9001005c  stw      r0, 0x5c(r1)
+002cd5f8: 90810060  stw      r4, 0x60(r1)
+002cd5fc: 41820044  beq      0x2cd640
+002cd600: 807f0000  lwz      r3, 0(r31)
+002cd604: 7f24cb78  mr       r4, r25
+002cd608: 48250ee9  bl       0x51e4f0   ; .IsWindowValid__12cTSWinMgrW95FP6cTSWin
+002cd60c: 5460063f  clrlwi.  r0, r3, 0x18
+002cd610: 41820030  beq      0x2cd640
+002cd614: 38790000  addi     r3, r25, 0
+002cd618: 38810058  addi     r4, r1, 0x58
+002cd61c: 81990000  lwz      r12, 0(r25)
+002cd620: 818c0008  lwz      r12, 8(r12)
+002cd624: 482d53bd  bl       0x5a29e0
+002cd628: 80410014  lwz      r2, 0x14(r1)
+002cd62c: 48000014  b        0x2cd640
+002cd630: 807a0150  lwz      r3, 0x150(r26)
+002cd634: 38800001  li       r4, 1
+002cd638: 4823d1f9  bl       0x50a830   ; .SetOneShot__9cTSWinBtnFb
+002cd63c: 480009c8  b        0x2ce004
+002cd640: 387a0000  addi     r3, r26, 0
+002cd644: 389b0000  addi     r4, r27, 0
+002cd648: 38bc0000  addi     r5, r28, 0
+002cd64c: 4824ca75  bl       0x51a0c0   ; .TSOnCommand__12cTSWinGenDlgFUlUl
+002cd650: 480009b8  b        0x2ce008
+002cd654: 801a0154  lwz      r0, 0x154(r26)
+002cd658: 7c1c0040  cmplw    r28, r0
+002cd65c: 40820054  bne      0x2cd6b0
+002cd660: 881a0120  lbz      r0, 0x120(r26)
+002cd664: 28000000  cmplwi   r0, 0
+002cd668: 40820034  bne      0x2cd69c
+002cd66c: 807a0114  lwz      r3, 0x114(r26)
+002cd670: 38800000  li       r4, 0
+002cd674: 38a00001  li       r5, 1
+002cd678: 38c00001  li       r6, 1
+002cd67c: 4bf73b15  bl       0x241190   ; .EndDesignAPerson__12PersonFinderFibbb
+002cd680: 38000001  li       r0, 1
+002cd684: 981a0120  stb      r0, 0x120(r26)
+002cd688: 881a0118  lbz      r0, 0x118(r26)
+002cd68c: 28000000  cmplwi   r0, 0
+002cd690: 4182000c  beq      0x2cd69c
+002cd694: 807a0114  lwz      r3, 0x114(r26)
+002cd698: 4bf660a9  bl       0x233740   ; .DeletePerson__Fi
+002cd69c: 387a0000  addi     r3, r26, 0
+002cd6a0: 389b0000  addi     r4, r27, 0
+002cd6a4: 38bc0000  addi     r5, r28, 0
+002cd6a8: 4824ca19  bl       0x51a0c0   ; .TSOnCommand__12cTSWinGenDlgFUlUl
+002cd6ac: 4800095c  b        0x2ce008
+002cd6b0: 801a0140  lwz      r0, 0x140(r26)
+002cd6b4: 7c1c0040  cmplw    r28, r0
+002cd6b8: 40820040  bne      0x2cd6f8
+002cd6bc: 807a016c  lwz      r3, 0x16c(r26)
+002cd6c0: 3403ffff  addic.   r0, r3, -1
+002cd6c4: 901a016c  stw      r0, 0x16c(r26)
+002cd6c8: 40800014  bge      0x2cd6dc
+002cd6cc: 807a0114  lwz      r3, 0x114(r26)
+002cd6d0: 4bf71741  bl       0x23ee10
+002cd6d4: 3803ffff  addi     r0, r3, -1
+002cd6d8: 901a016c  stw      r0, 0x16c(r26)
+002cd6dc: 38000001  li       r0, 1
+002cd6e0: 981a01b4  stb      r0, 0x1b4(r26)
+002cd6e4: 7f43d378  mr       r3, r26
+002cd6e8: 4bfff2c9  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cd6ec: 7f43d378  mr       r3, r26
+002cd6f0: 4bffead1  bl       0x2cc1c0
+002cd6f4: 48000910  b        0x2ce004
+002cd6f8: 801a0144  lwz      r0, 0x144(r26)
+002cd6fc: 7c1c0040  cmplw    r28, r0
+002cd700: 40820048  bne      0x2cd748
+002cd704: 807a016c  lwz      r3, 0x16c(r26)
+002cd708: 38030001  addi     r0, r3, 1
+002cd70c: 901a016c  stw      r0, 0x16c(r26)
+002cd710: 807a0114  lwz      r3, 0x114(r26)
+002cd714: 4bf716fd  bl       0x23ee10
+002cd718: 801a016c  lwz      r0, 0x16c(r26)
+002cd71c: 7c001800  cmpw     r0, r3
+002cd720: 4180000c  blt      0x2cd72c
+002cd724: 38000000  li       r0, 0
+002cd728: 901a016c  stw      r0, 0x16c(r26)
+002cd72c: 38000001  li       r0, 1
+002cd730: 981a01b4  stb      r0, 0x1b4(r26)
+002cd734: 7f43d378  mr       r3, r26
+002cd738: 4bfff279  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cd73c: 7f43d378  mr       r3, r26
+002cd740: 4bffea81  bl       0x2cc1c0
+002cd744: 480008c0  b        0x2ce004
+002cd748: 801a0148  lwz      r0, 0x148(r26)
+002cd74c: 7c1c0040  cmplw    r28, r0
+002cd750: 40820040  bne      0x2cd790
+002cd754: 807a0168  lwz      r3, 0x168(r26)
+002cd758: 3403ffff  addic.   r0, r3, -1
+002cd75c: 901a0168  stw      r0, 0x168(r26)
+002cd760: 40800014  bge      0x2cd774
+002cd764: 807a0114  lwz      r3, 0x114(r26)
+002cd768: 4bf71019  bl       0x23e780
+002cd76c: 3803ffff  addi     r0, r3, -1
+002cd770: 901a0168  stw      r0, 0x168(r26)
+002cd774: 38000001  li       r0, 1
+002cd778: 981a01b4  stb      r0, 0x1b4(r26)
+002cd77c: 7f43d378  mr       r3, r26
+002cd780: 4bfff231  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cd784: 7f43d378  mr       r3, r26
+002cd788: 4bffea39  bl       0x2cc1c0
+002cd78c: 48000878  b        0x2ce004
+002cd790: 801a014c  lwz      r0, 0x14c(r26)
+002cd794: 7c1c0040  cmplw    r28, r0
+002cd798: 40820048  bne      0x2cd7e0
+002cd79c: 807a0168  lwz      r3, 0x168(r26)
+002cd7a0: 38030001  addi     r0, r3, 1
+002cd7a4: 901a0168  stw      r0, 0x168(r26)
+002cd7a8: 807a0114  lwz      r3, 0x114(r26)
+002cd7ac: 4bf70fd5  bl       0x23e780
+002cd7b0: 801a0168  lwz      r0, 0x168(r26)
+002cd7b4: 7c001800  cmpw     r0, r3
+002cd7b8: 4180000c  blt      0x2cd7c4
+002cd7bc: 38000000  li       r0, 0
+002cd7c0: 901a0168  stw      r0, 0x168(r26)
+002cd7c4: 38000001  li       r0, 1
+002cd7c8: 981a01b4  stb      r0, 0x1b4(r26)
+002cd7cc: 7f43d378  mr       r3, r26
+002cd7d0: 4bfff1e1  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cd7d4: 7f43d378  mr       r3, r26
+002cd7d8: 4bffe9e9  bl       0x2cc1c0
+002cd7dc: 48000828  b        0x2ce004
+002cd7e0: 801a0124  lwz      r0, 0x124(r26)
+002cd7e4: 7c1c0040  cmplw    r28, r0
+002cd7e8: 408200a0  bne      0x2cd888
+002cd7ec: 809a0170  lwz      r4, 0x170(r26)
+002cd7f0: 38000001  li       r0, 1
+002cd7f4: 807a0178  lwz      r3, 0x178(r26)
+002cd7f8: 54051838  slwi     r5, r0, 3
+002cd7fc: 54842036  slwi     r4, r4, 4
+002cd800: 7c9a2214  add      r4, r26, r4
+002cd804: 80da016c  lwz      r6, 0x16c(r26)
+002cd808: 54631838  slwi     r3, r3, 3
+002cd80c: 7c641a14  add      r3, r4, r3
+002cd810: 90c301b8  stw      r6, 0x1b8(r3)
+002cd814: 38800000  li       r4, 0
+002cd818: 80da0170  lwz      r6, 0x170(r26)
+002cd81c: 807a0178  lwz      r3, 0x178(r26)
+002cd820: 54c62036  slwi     r6, r6, 4
+002cd824: 80fa0168  lwz      r7, 0x168(r26)
+002cd828: 7cda3214  add      r6, r26, r6
+002cd82c: 54631838  slwi     r3, r3, 3
+002cd830: 7c661a14  add      r3, r6, r3
+002cd834: 90e301bc  stw      r7, 0x1bc(r3)
+002cd838: 901a0178  stw      r0, 0x178(r26)
+002cd83c: 801a0170  lwz      r0, 0x170(r26)
+002cd840: 54002036  slwi     r0, r0, 4
+002cd844: 7c1a0214  add      r0, r26, r0
+002cd848: 7c602a14  add      r3, r0, r5
+002cd84c: 800301b8  lwz      r0, 0x1b8(r3)
+002cd850: 901a016c  stw      r0, 0x16c(r26)
+002cd854: 801a0170  lwz      r0, 0x170(r26)
+002cd858: 54002036  slwi     r0, r0, 4
+002cd85c: 7c1a0214  add      r0, r26, r0
+002cd860: 7c602a14  add      r3, r0, r5
+002cd864: 800301bc  lwz      r0, 0x1bc(r3)
+002cd868: 901a0168  stw      r0, 0x168(r26)
+002cd86c: 807a0114  lwz      r3, 0x114(r26)
+002cd870: 4bf71f61  bl       0x23f7d0   ; .SetAge__12PersonFinderFi9PersonAge
+002cd874: 38000001  li       r0, 1
+002cd878: 981a01b4  stb      r0, 0x1b4(r26)
+002cd87c: 7f43d378  mr       r3, r26
+002cd880: 4bfff131  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cd884: 48000780  b        0x2ce004
+002cd888: 801a0128  lwz      r0, 0x128(r26)
+002cd88c: 7c1c0040  cmplw    r28, r0
+002cd890: 408200a0  bne      0x2cd930
+002cd894: 809a0170  lwz      r4, 0x170(r26)
+002cd898: 38000000  li       r0, 0
+002cd89c: 807a0178  lwz      r3, 0x178(r26)
+002cd8a0: 54051838  slwi     r5, r0, 3
+002cd8a4: 54842036  slwi     r4, r4, 4
+002cd8a8: 7c9a2214  add      r4, r26, r4
+002cd8ac: 80da016c  lwz      r6, 0x16c(r26)
+002cd8b0: 54631838  slwi     r3, r3, 3
+002cd8b4: 7c641a14  add      r3, r4, r3
+002cd8b8: 90c301b8  stw      r6, 0x1b8(r3)
+002cd8bc: 38800001  li       r4, 1
+002cd8c0: 80da0170  lwz      r6, 0x170(r26)
+002cd8c4: 807a0178  lwz      r3, 0x178(r26)
+002cd8c8: 54c62036  slwi     r6, r6, 4
+002cd8cc: 80fa0168  lwz      r7, 0x168(r26)
+002cd8d0: 7cda3214  add      r6, r26, r6
+002cd8d4: 54631838  slwi     r3, r3, 3
+002cd8d8: 7c661a14  add      r3, r6, r3
+002cd8dc: 90e301bc  stw      r7, 0x1bc(r3)
+002cd8e0: 901a0178  stw      r0, 0x178(r26)
+002cd8e4: 801a0170  lwz      r0, 0x170(r26)
+002cd8e8: 54002036  slwi     r0, r0, 4
+002cd8ec: 7c1a0214  add      r0, r26, r0
+002cd8f0: 7c602a14  add      r3, r0, r5
+002cd8f4: 800301b8  lwz      r0, 0x1b8(r3)
+002cd8f8: 901a016c  stw      r0, 0x16c(r26)
+002cd8fc: 801a0170  lwz      r0, 0x170(r26)
+002cd900: 54002036  slwi     r0, r0, 4
+002cd904: 7c1a0214  add      r0, r26, r0
+002cd908: 7c602a14  add      r3, r0, r5
+002cd90c: 800301bc  lwz      r0, 0x1bc(r3)
+002cd910: 901a0168  stw      r0, 0x168(r26)
+002cd914: 807a0114  lwz      r3, 0x114(r26)
+002cd918: 4bf71eb9  bl       0x23f7d0   ; .SetAge__12PersonFinderFi9PersonAge
+002cd91c: 38000001  li       r0, 1
+002cd920: 981a01b4  stb      r0, 0x1b4(r26)
+002cd924: 7f43d378  mr       r3, r26
+002cd928: 4bfff089  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cd92c: 480006d8  b        0x2ce004
+002cd930: 801a012c  lwz      r0, 0x12c(r26)
+002cd934: 7c1c0040  cmplw    r28, r0
+002cd938: 4082009c  bne      0x2cd9d4
+002cd93c: 80ba0170  lwz      r5, 0x170(r26)
+002cd940: 38600001  li       r3, 1
+002cd944: 809a0178  lwz      r4, 0x178(r26)
+002cd948: 54602036  slwi     r0, r3, 4
+002cd94c: 54a52036  slwi     r5, r5, 4
+002cd950: 7cda2a14  add      r6, r26, r5
+002cd954: 80fa016c  lwz      r7, 0x16c(r26)
+002cd958: 54841838  slwi     r4, r4, 3
+002cd95c: 7cba0214  add      r5, r26, r0
+002cd960: 7c862214  add      r4, r6, r4
+002cd964: 90e401b8  stw      r7, 0x1b8(r4)
+002cd968: 38800001  li       r4, 1
+002cd96c: 80da0170  lwz      r6, 0x170(r26)
+002cd970: 801a0178  lwz      r0, 0x178(r26)
+002cd974: 54c62036  slwi     r6, r6, 4
+002cd978: 80fa0168  lwz      r7, 0x168(r26)
+002cd97c: 7cda3214  add      r6, r26, r6
+002cd980: 54001838  slwi     r0, r0, 3
+002cd984: 7cc60214  add      r6, r6, r0
+002cd988: 90e601bc  stw      r7, 0x1bc(r6)
+002cd98c: 907a0170  stw      r3, 0x170(r26)
+002cd990: 801a0178  lwz      r0, 0x178(r26)
+002cd994: 54001838  slwi     r0, r0, 3
+002cd998: 7c650214  add      r3, r5, r0
+002cd99c: 800301b8  lwz      r0, 0x1b8(r3)
+002cd9a0: 901a016c  stw      r0, 0x16c(r26)
+002cd9a4: 801a0178  lwz      r0, 0x178(r26)
+002cd9a8: 54001838  slwi     r0, r0, 3
+002cd9ac: 7c650214  add      r3, r5, r0
+002cd9b0: 800301bc  lwz      r0, 0x1bc(r3)
+002cd9b4: 901a0168  stw      r0, 0x168(r26)
+002cd9b8: 807a0114  lwz      r3, 0x114(r26)
+002cd9bc: 4bf71a95  bl       0x23f450   ; .SetGender__12PersonFinderFi12PersonGender
+002cd9c0: 38000001  li       r0, 1
+002cd9c4: 981a01b4  stb      r0, 0x1b4(r26)
+002cd9c8: 7f43d378  mr       r3, r26
+002cd9cc: 4bffefe5  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cd9d0: 48000634  b        0x2ce004
+002cd9d4: 801a0130  lwz      r0, 0x130(r26)
+002cd9d8: 7c1c0040  cmplw    r28, r0
+002cd9dc: 4082009c  bne      0x2cda78
+002cd9e0: 80ba0170  lwz      r5, 0x170(r26)
+002cd9e4: 38600000  li       r3, 0
+002cd9e8: 809a0178  lwz      r4, 0x178(r26)
+002cd9ec: 54602036  slwi     r0, r3, 4
+002cd9f0: 54a52036  slwi     r5, r5, 4
+002cd9f4: 7cda2a14  add      r6, r26, r5
+002cd9f8: 80fa016c  lwz      r7, 0x16c(r26)
+002cd9fc: 54841838  slwi     r4, r4, 3
+002cda00: 7cba0214  add      r5, r26, r0
+002cda04: 7c862214  add      r4, r6, r4
+002cda08: 90e401b8  stw      r7, 0x1b8(r4)
+002cda0c: 38800000  li       r4, 0
+002cda10: 80da0170  lwz      r6, 0x170(r26)
+002cda14: 801a0178  lwz      r0, 0x178(r26)
+002cda18: 54c62036  slwi     r6, r6, 4
+002cda1c: 80fa0168  lwz      r7, 0x168(r26)
+002cda20: 7cda3214  add      r6, r26, r6
+002cda24: 54001838  slwi     r0, r0, 3
+002cda28: 7cc60214  add      r6, r6, r0
+002cda2c: 90e601bc  stw      r7, 0x1bc(r6)
+002cda30: 907a0170  stw      r3, 0x170(r26)
+002cda34: 801a0178  lwz      r0, 0x178(r26)
+002cda38: 54001838  slwi     r0, r0, 3
+002cda3c: 7c650214  add      r3, r5, r0
+002cda40: 800301b8  lwz      r0, 0x1b8(r3)
+002cda44: 901a016c  stw      r0, 0x16c(r26)
+002cda48: 801a0178  lwz      r0, 0x178(r26)
+002cda4c: 54001838  slwi     r0, r0, 3
+002cda50: 7c650214  add      r3, r5, r0
+002cda54: 800301bc  lwz      r0, 0x1bc(r3)
+002cda58: 901a0168  stw      r0, 0x168(r26)
+002cda5c: 807a0114  lwz      r3, 0x114(r26)
+002cda60: 4bf719f1  bl       0x23f450   ; .SetGender__12PersonFinderFi12PersonGender
+002cda64: 38000001  li       r0, 1
+002cda68: 981a01b4  stb      r0, 0x1b4(r26)
+002cda6c: 7f43d378  mr       r3, r26
+002cda70: 4bffef41  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cda74: 48000590  b        0x2ce004
+002cda78: 801a0134  lwz      r0, 0x134(r26)
+002cda7c: 7c1c0040  cmplw    r28, r0
+002cda80: 408200d0  bne      0x2cdb50
+002cda84: 80ba0170  lwz      r5, 0x170(r26)
+002cda88: 38000002  li       r0, 2
+002cda8c: 809a0178  lwz      r4, 0x178(r26)
+002cda90: 38610068  addi     r3, r1, 0x68
+002cda94: 54a52036  slwi     r5, r5, 4
+002cda98: 7cda2a14  add      r6, r26, r5
+002cda9c: 80fa016c  lwz      r7, 0x16c(r26)
+002cdaa0: 54851838  slwi     r5, r4, 3
+002cdaa4: 38810074  addi     r4, r1, 0x74
+002cdaa8: 7ca62a14  add      r5, r6, r5
+002cdaac: 90e501b8  stw      r7, 0x1b8(r5)
+002cdab0: 38a00000  li       r5, 0
+002cdab4: 38c00004  li       r6, 4
+002cdab8: 811a0170  lwz      r8, 0x170(r26)
+002cdabc: 80fa0178  lwz      r7, 0x178(r26)
+002cdac0: 55082036  slwi     r8, r8, 4
+002cdac4: 813a0168  lwz      r9, 0x168(r26)
+002cdac8: 7d1a4214  add      r8, r26, r8
+002cdacc: 54e71838  slwi     r7, r7, 3
+002cdad0: 7ce83a14  add      r7, r8, r7
+002cdad4: 912701bc  stw      r9, 0x1bc(r7)
+002cdad8: 901a0174  stw      r0, 0x174(r26)
+002cdadc: 80fa0170  lwz      r7, 0x170(r26)
+002cdae0: 801a0178  lwz      r0, 0x178(r26)
+002cdae4: 54e72036  slwi     r7, r7, 4
+002cdae8: 7cfa3a14  add      r7, r26, r7
+002cdaec: 54001838  slwi     r0, r0, 3
+002cdaf0: 7ce70214  add      r7, r7, r0
+002cdaf4: 800701b8  lwz      r0, 0x1b8(r7)
+002cdaf8: 901a016c  stw      r0, 0x16c(r26)
+002cdafc: 80fa0170  lwz      r7, 0x170(r26)
+002cdb00: 801a0178  lwz      r0, 0x178(r26)
+002cdb04: 54e72036  slwi     r7, r7, 4
+002cdb08: 7cfa3a14  add      r7, r26, r7
+002cdb0c: 54001838  slwi     r0, r0, 3
+002cdb10: 7ce70214  add      r7, r7, r0
+002cdb14: 800701bc  lwz      r0, 0x1bc(r7)
+002cdb18: 901a0168  stw      r0, 0x168(r26)
+002cdb1c: 4be74845  bl       0x142360   ; .__ct__12StringBufferFPcUiUi
+002cdb20: 93c10070  stw      r30, 0x70(r1)
+002cdb24: 38610068  addi     r3, r1, 0x68
+002cdb28: 80828c34  lwz      r4, -0x73cc(r2)   ; TOC[-0x73cc]->DATA off 0x43288 "drk"
+002cdb2c: 4be746a5  bl       0x1421d0   ; .copy__12StringBufferFPCc
+002cdb30: 807a0114  lwz      r3, 0x114(r26)
+002cdb34: 38810068  addi     r4, r1, 0x68
+002cdb38: 4bf713e9  bl       0x23ef20   ; .SetColor__12PersonFinderFi11PersonColor
+002cdb3c: 38000001  li       r0, 1
+002cdb40: 981a01b4  stb      r0, 0x1b4(r26)
+002cdb44: 7f43d378  mr       r3, r26
+002cdb48: 4bffee69  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cdb4c: 480004b8  b        0x2ce004
+002cdb50: 801a0138  lwz      r0, 0x138(r26)
+002cdb54: 7c1c0040  cmplw    r28, r0
+002cdb58: 408200d0  bne      0x2cdc28
+002cdb5c: 80ba0170  lwz      r5, 0x170(r26)
+002cdb60: 38000001  li       r0, 1
+002cdb64: 809a0178  lwz      r4, 0x178(r26)
+002cdb68: 38610078  addi     r3, r1, 0x78
+002cdb6c: 54a52036  slwi     r5, r5, 4
+002cdb70: 7cda2a14  add      r6, r26, r5
+002cdb74: 80fa016c  lwz      r7, 0x16c(r26)
+002cdb78: 54851838  slwi     r5, r4, 3
+002cdb7c: 38810084  addi     r4, r1, 0x84
+002cdb80: 7ca62a14  add      r5, r6, r5
+002cdb84: 90e501b8  stw      r7, 0x1b8(r5)
+002cdb88: 38a00000  li       r5, 0
+002cdb8c: 38c00004  li       r6, 4
+002cdb90: 811a0170  lwz      r8, 0x170(r26)
+002cdb94: 80fa0178  lwz      r7, 0x178(r26)
+002cdb98: 55082036  slwi     r8, r8, 4
+002cdb9c: 813a0168  lwz      r9, 0x168(r26)
+002cdba0: 7d1a4214  add      r8, r26, r8
+002cdba4: 54e71838  slwi     r7, r7, 3
+002cdba8: 7ce83a14  add      r7, r8, r7
+002cdbac: 912701bc  stw      r9, 0x1bc(r7)
+002cdbb0: 901a0174  stw      r0, 0x174(r26)
+002cdbb4: 80fa0170  lwz      r7, 0x170(r26)
+002cdbb8: 801a0178  lwz      r0, 0x178(r26)
+002cdbbc: 54e72036  slwi     r7, r7, 4
+002cdbc0: 7cfa3a14  add      r7, r26, r7
+002cdbc4: 54001838  slwi     r0, r0, 3
+002cdbc8: 7ce70214  add      r7, r7, r0
+002cdbcc: 800701b8  lwz      r0, 0x1b8(r7)
+002cdbd0: 901a016c  stw      r0, 0x16c(r26)
+002cdbd4: 80fa0170  lwz      r7, 0x170(r26)
+002cdbd8: 801a0178  lwz      r0, 0x178(r26)
+002cdbdc: 54e72036  slwi     r7, r7, 4
+002cdbe0: 7cfa3a14  add      r7, r26, r7
+002cdbe4: 54001838  slwi     r0, r0, 3
+002cdbe8: 7ce70214  add      r7, r7, r0
+002cdbec: 800701bc  lwz      r0, 0x1bc(r7)
+002cdbf0: 901a0168  stw      r0, 0x168(r26)
+002cdbf4: 4be7476d  bl       0x142360   ; .__ct__12StringBufferFPcUiUi
+002cdbf8: 93c10080  stw      r30, 0x80(r1)
+002cdbfc: 38610078  addi     r3, r1, 0x78
+002cdc00: 80828c38  lwz      r4, -0x73c8(r2)   ; TOC[-0x73c8]->DATA off 0x4328c "med"
+002cdc04: 4be745cd  bl       0x1421d0   ; .copy__12StringBufferFPCc
+002cdc08: 807a0114  lwz      r3, 0x114(r26)
+002cdc0c: 38810078  addi     r4, r1, 0x78
+002cdc10: 4bf71311  bl       0x23ef20   ; .SetColor__12PersonFinderFi11PersonColor
+002cdc14: 38000001  li       r0, 1
+002cdc18: 981a01b4  stb      r0, 0x1b4(r26)
+002cdc1c: 7f43d378  mr       r3, r26
+002cdc20: 4bffed91  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cdc24: 480003e0  b        0x2ce004
+002cdc28: 801a013c  lwz      r0, 0x13c(r26)
+002cdc2c: 7c1c0040  cmplw    r28, r0
+002cdc30: 408200d0  bne      0x2cdd00
+002cdc34: 80ba0170  lwz      r5, 0x170(r26)
+002cdc38: 38000000  li       r0, 0
+002cdc3c: 809a0178  lwz      r4, 0x178(r26)
+002cdc40: 38610088  addi     r3, r1, 0x88
+002cdc44: 54a52036  slwi     r5, r5, 4
+002cdc48: 7cda2a14  add      r6, r26, r5
+002cdc4c: 80fa016c  lwz      r7, 0x16c(r26)
+002cdc50: 54851838  slwi     r5, r4, 3
+002cdc54: 38810094  addi     r4, r1, 0x94
+002cdc58: 7ca62a14  add      r5, r6, r5
+002cdc5c: 90e501b8  stw      r7, 0x1b8(r5)
+002cdc60: 38a00000  li       r5, 0
+002cdc64: 38c00004  li       r6, 4
+002cdc68: 811a0170  lwz      r8, 0x170(r26)
+002cdc6c: 80fa0178  lwz      r7, 0x178(r26)
+002cdc70: 55082036  slwi     r8, r8, 4
+002cdc74: 813a0168  lwz      r9, 0x168(r26)
+002cdc78: 7d1a4214  add      r8, r26, r8
+002cdc7c: 54e71838  slwi     r7, r7, 3
+002cdc80: 7ce83a14  add      r7, r8, r7
+002cdc84: 912701bc  stw      r9, 0x1bc(r7)
+002cdc88: 901a0174  stw      r0, 0x174(r26)
+002cdc8c: 80fa0170  lwz      r7, 0x170(r26)
+002cdc90: 801a0178  lwz      r0, 0x178(r26)
+002cdc94: 54e72036  slwi     r7, r7, 4
+002cdc98: 7cfa3a14  add      r7, r26, r7
+002cdc9c: 54001838  slwi     r0, r0, 3
+002cdca0: 7ce70214  add      r7, r7, r0
+002cdca4: 800701b8  lwz      r0, 0x1b8(r7)
+002cdca8: 901a016c  stw      r0, 0x16c(r26)
+002cdcac: 80fa0170  lwz      r7, 0x170(r26)
+002cdcb0: 801a0178  lwz      r0, 0x178(r26)
+002cdcb4: 54e72036  slwi     r7, r7, 4
+002cdcb8: 7cfa3a14  add      r7, r26, r7
+002cdcbc: 54001838  slwi     r0, r0, 3
+002cdcc0: 7ce70214  add      r7, r7, r0
+002cdcc4: 800701bc  lwz      r0, 0x1bc(r7)
+002cdcc8: 901a0168  stw      r0, 0x168(r26)
+002cdccc: 4be74695  bl       0x142360   ; .__ct__12StringBufferFPcUiUi
+002cdcd0: 93c10090  stw      r30, 0x90(r1)
+002cdcd4: 38610088  addi     r3, r1, 0x88
+002cdcd8: 80828c3c  lwz      r4, -0x73c4(r2)   ; TOC[-0x73c4]->DATA off 0x43290 "lgt"
+002cdcdc: 4be744f5  bl       0x1421d0   ; .copy__12StringBufferFPCc
+002cdce0: 807a0114  lwz      r3, 0x114(r26)
+002cdce4: 38810088  addi     r4, r1, 0x88
+002cdce8: 4bf71239  bl       0x23ef20   ; .SetColor__12PersonFinderFi11PersonColor
+002cdcec: 38000001  li       r0, 1
+002cdcf0: 981a01b4  stb      r0, 0x1b4(r26)
+002cdcf4: 7f43d378  mr       r3, r26
+002cdcf8: 4bffecb9  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cdcfc: 48000308  b        0x2ce004
+002cdd00: 801a017c  lwz      r0, 0x17c(r26)
+002cdd04: 7c1c0040  cmplw    r28, r0
+002cdd08: 418202fc  beq      0x2ce004
+002cdd0c: 809a01ac  lwz      r4, 0x1ac(r26)
+002cdd10: 7c1c2040  cmplw    r28, r4
+002cdd14: 408202f0  bne      0x2ce004
+002cdd18: 38610040  addi     r3, r1, 0x40
+002cdd1c: 38840054  addi     r4, r4, 0x54
+002cdd20: 48227051  bl       0x4f4d70
+002cdd24: 80610040  lwz      r3, 0x40(r1)
+002cdd28: 80030000  lwz      r0, 0(r3)
+002cdd2c: 28000000  cmplwi   r0, 0
+002cdd30: 418201dc  beq      0x2cdf0c
+002cdd34: 38610040  addi     r3, r1, 0x40
+002cdd38: 38800000  li       r4, 0
+002cdd3c: 38a00001  li       r5, 1
+002cdd40: 38c00000  li       r6, 0
+002cdd44: 38e00000  li       r7, 0
+002cdd48: 4bd85579  bl       0x532c0
+002cdd4c: 80810040  lwz      r4, 0x40(r1)
+002cdd50: 38610040  addi     r3, r1, 0x40
+002cdd54: 38a00001  li       r5, 1
+002cdd58: 80840000  lwz      r4, 0(r4)
+002cdd5c: 38c00000  li       r6, 0
+002cdd60: 38e00000  li       r7, 0
+002cdd64: 3884ffff  addi     r4, r4, -1
+002cdd68: 4bd85559  bl       0x532c0
+002cdd6c: 80610040  lwz      r3, 0x40(r1)
+002cdd70: 8063000c  lwz      r3, 0xc(r3)
+002cdd74: 4bea41ad  bl       0x171f20   ; .GetSignFromName__FPCc
+002cdd78: 7c600735  extsh.   r0, r3
+002cdd7c: 4082000c  bne      0x2cdd88
+002cdd80: 3b800001  li       r28, 1
+002cdd84: 48000018  b        0x2cdd9c
+002cdd88: 3b830001  addi     r28, r3, 1
+002cdd8c: 7f800734  extsh    r0, r28
+002cdd90: 2c00000c  cmpwi    r0, 0xc
+002cdd94: 40810008  ble      0x2cdd9c
+002cdd98: 3b800001  li       r28, 1
+002cdd9c: 38610044  addi     r3, r1, 0x44
+002cdda0: 482270d1  bl       0x4f4e70   ; .__ct__9cTSStringFv
+002cdda4: 38610048  addi     r3, r1, 0x48
+002cdda8: 482270c9  bl       0x4f4e70   ; .__ct__9cTSStringFv
+002cddac: 38610044  addi     r3, r1, 0x44
+002cddb0: 38800001  li       r4, 1
+002cddb4: 38a00000  li       r5, 0
+002cddb8: 48001fb9  bl       0x2cfd70
+002cddbc: 38610044  addi     r3, r1, 0x44
+002cddc0: 3b600028  li       r27, 0x28
+002cddc4: 38800000  li       r4, 0
+002cddc8: 4bd81c09  bl       0x4f9d0
+002cddcc: 9b630000  stb      r27, 0(r3)
+002cddd0: 38610048  addi     r3, r1, 0x48
+002cddd4: 38800001  li       r4, 1
+002cddd8: 38a00000  li       r5, 0
+002cdddc: 48001f95  bl       0x2cfd70
+002cdde0: 38610048  addi     r3, r1, 0x48
+002cdde4: 3b600029  li       r27, 0x29
+002cdde8: 38800000  li       r4, 0
+002cddec: 4bd81be5  bl       0x4f9d0
+002cddf0: 9b630000  stb      r27, 0(r3)
+002cddf4: 38610040  addi     r3, r1, 0x40
+002cddf8: 38810044  addi     r4, r1, 0x44
+002cddfc: 48226ab5  bl       0x4f48b0
+002cde00: 7f83e378  mr       r3, r28
+002cde04: 4bea41cd  bl       0x171fd0   ; .GetZodiacName__Fs
+002cde08: 7c791b78  mr       r25, r3
+002cde0c: 482cef25  bl       0x59cd30
+002cde10: 38a30000  addi     r5, r3, 0
+002cde14: 38610040  addi     r3, r1, 0x40
+002cde18: 38990000  addi     r4, r25, 0
+002cde1c: 4bdb6595  bl       0x843b0
+002cde20: 38610040  addi     r3, r1, 0x40
+002cde24: 38810048  addi     r4, r1, 0x48
+002cde28: 38a00000  li       r5, 0
+002cde2c: 38c0ffff  li       r6, -1
+002cde30: 4bd85b71  bl       0x539a0
+002cde34: 807a01ac  lwz      r3, 0x1ac(r26)
+002cde38: 38810040  addi     r4, r1, 0x40
+002cde3c: 81830000  lwz      r12, 0(r3)
+002cde40: 818c00a4  lwz      r12, 0xa4(r12)
+002cde44: 482d4b9d  bl       0x5a29e0
+002cde48: 80410014  lwz      r2, 0x14(r1)
+002cde4c: 807a01ac  lwz      r3, 0x1ac(r26)
+002cde50: 38800400  li       r4, 0x400
+002cde54: 38a00001  li       r5, 1
+002cde58: 81830000  lwz      r12, 0(r3)
+002cde5c: 818c0098  lwz      r12, 0x98(r12)
+002cde60: 482d4b81  bl       0x5a29e0
+002cde64: 80410014  lwz      r2, 0x14(r1)
+002cde68: 807a0114  lwz      r3, 0x114(r26)
+002cde6c: 4bf73185  bl       0x240ff0   ; .GetData__12PersonFinderFi
+002cde70: 7f84e378  mr       r4, r28
+002cde74: 4bea41fd  bl       0x172070   ; .SetZodiacSign__FPss
+002cde78: 38000019  li       r0, 0x19
+002cde7c: 3c6051ec  lis      r3, 0x51ec
+002cde80: 901a011c  stw      r0, 0x11c(r26)
+002cde84: 3b83851f  addi     r28, r3, -0x7ae1
+002cde88: 3b200000  li       r25, 0
+002cde8c: 3b600000  li       r27, 0
+002cde90: 48000058  b        0x2cdee8
+002cde94: 83da0160  lwz      r30, 0x160(r26)
+002cde98: 807a0114  lwz      r3, 0x114(r26)
+002cde9c: 4bf73155  bl       0x240ff0   ; .GetData__12PersonFinderFi
+002cdea0: 801d0000  lwz      r0, 0(r29)
+002cdea4: 5400083c  slwi     r0, r0, 1
+002cdea8: 7c0302ae  lhax     r0, r3, r0
+002cdeac: 7c7ed82e  lwzx     r3, r30, r27
+002cdeb0: 7c1c0096  mulhw    r0, r28, r0
+002cdeb4: 7c002e70  srawi    r0, r0, 5
+002cdeb8: 54040ffe  srwi     r4, r0, 0x1f
+002cdebc: 7c802214  add      r4, r0, r4
+002cdec0: 4800a621  bl       0x2d84e0   ; .SetValue__21cWinPersonalityWidgetFi
+002cdec4: 807a0160  lwz      r3, 0x160(r26)
+002cdec8: 7c63d82e  lwzx     r3, r3, r27
+002cdecc: 4800a5d5  bl       0x2d84a0   ; .GetValue__21cWinPersonalityWidgetCFv
+002cded0: 801a011c  lwz      r0, 0x11c(r26)
+002cded4: 3bbd0004  addi     r29, r29, 4
+002cded8: 3b390001  addi     r25, r25, 1
+002cdedc: 3b7b0004  addi     r27, r27, 4
+002cdee0: 7c030050  subf     r0, r3, r0
+002cdee4: 901a011c  stw      r0, 0x11c(r26)
+002cdee8: 801a015c  lwz      r0, 0x15c(r26)
+002cdeec: 7c190040  cmplw    r25, r0
+002cdef0: 4180ffa4  blt      0x2cde94
+002cdef4: 38610048  addi     r3, r1, 0x48
+002cdef8: 3880ffff  li       r4, -1
+002cdefc: 48226a85  bl       0x4f4980   ; .__dt__9cTSStringFv
+002cdf00: 38610044  addi     r3, r1, 0x44
+002cdf04: 3880ffff  li       r4, -1
+002cdf08: 48226a79  bl       0x4f4980   ; .__dt__9cTSStringFv
+002cdf0c: 38610040  addi     r3, r1, 0x40
+002cdf10: 3880ffff  li       r4, -1
+002cdf14: 48226a6d  bl       0x4f4980   ; .__dt__9cTSStringFv
+002cdf18: 480000ec  b        0x2ce004
+002cdf1c: 801a010c  lwz      r0, 0x10c(r26)
+002cdf20: 7c1c0040  cmplw    r28, r0
+002cdf24: 408200e0  bne      0x2ce004
+002cdf28: 4bffea89  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cdf2c: 480000d8  b        0x2ce004
+002cdf30: 833a010c  lwz      r25, 0x10c(r26)
+002cdf34: 7c1cc840  cmplw    r28, r25
+002cdf38: 4082004c  bne      0x2cdf84
+002cdf3c: 833a0110  lwz      r25, 0x110(r26)
+002cdf40: 28190000  cmplwi   r25, 0
+002cdf44: 418200c0  beq      0x2ce004
+002cdf48: 7f23cb78  mr       r3, r25
+002cdf4c: 81990000  lwz      r12, 0(r25)
+002cdf50: 38802000  li       r4, 0x2000
+002cdf54: 818c0094  lwz      r12, 0x94(r12)
+002cdf58: 482d4a89  bl       0x5a29e0
+002cdf5c: 80410014  lwz      r2, 0x14(r1)
+002cdf60: 5460063f  clrlwi.  r0, r3, 0x18
+002cdf64: 40820014  bne      0x2cdf78
+002cdf68: 807f0000  lwz      r3, 0(r31)
+002cdf6c: 7f24cb78  mr       r4, r25
+002cdf70: 482518e1  bl       0x51f850   ; .TSSetFocus__12cTSWinMgrW95FP6cTSWin
+002cdf74: 48000090  b        0x2ce004
+002cdf78: 807f0000  lwz      r3, 0(r31)
+002cdf7c: 48251895  bl       0x51f810   ; .TSGetFocus__12cTSWinMgrW95Fv
+002cdf80: 48000084  b        0x2ce004
+002cdf84: 801a0110  lwz      r0, 0x110(r26)
+002cdf88: 7c1c0040  cmplw    r28, r0
+002cdf8c: 40820078  bne      0x2ce004
+002cdf90: 28190000  cmplwi   r25, 0
+002cdf94: 41820070  beq      0x2ce004
+002cdf98: 7f23cb78  mr       r3, r25
+002cdf9c: 81990000  lwz      r12, 0(r25)
+002cdfa0: 38802000  li       r4, 0x2000
+002cdfa4: 818c0094  lwz      r12, 0x94(r12)
+002cdfa8: 482d4a39  bl       0x5a29e0
+002cdfac: 80410014  lwz      r2, 0x14(r1)
+002cdfb0: 5460063f  clrlwi.  r0, r3, 0x18
+002cdfb4: 40820014  bne      0x2cdfc8
+002cdfb8: 807f0000  lwz      r3, 0(r31)
+002cdfbc: 7f24cb78  mr       r4, r25
+002cdfc0: 48251891  bl       0x51f850   ; .TSSetFocus__12cTSWinMgrW95FP6cTSWin
+002cdfc4: 48000040  b        0x2ce004
+002cdfc8: 807f0000  lwz      r3, 0(r31)
+002cdfcc: 48251845  bl       0x51f810   ; .TSGetFocus__12cTSWinMgrW95Fv
+002cdfd0: 48000034  b        0x2ce004
+002cdfd4: 81830000  lwz      r12, 0(r3)
+002cdfd8: 38800001  li       r4, 1
+002cdfdc: 80ba0154  lwz      r5, 0x154(r26)
+002cdfe0: 818c0134  lwz      r12, 0x134(r12)
+002cdfe4: 482d49fd  bl       0x5a29e0
+002cdfe8: 80410014  lwz      r2, 0x14(r1)
+002cdfec: 48000018  b        0x2ce004
+002cdff0: 387a0000  addi     r3, r26, 0
+002cdff4: 389b0000  addi     r4, r27, 0
+002cdff8: 38bc0000  addi     r5, r28, 0
+002cdffc: 4824c0c5  bl       0x51a0c0   ; .TSOnCommand__12cTSWinGenDlgFUlUl
+002ce000: 48000008  b        0x2ce008
+002ce004: 38600001  li       r3, 1
+002ce008: 800109c8  lwz      r0, 0x9c8(r1)
+002ce00c: 382109c0  addi     r1, r1, 0x9c0
+002ce010: bb01ffe0  lmw      r24, -0x20(r1)
+002ce014: 7c0803a6  mtlr     r0
+002ce018: 4e800020  blr      
+002ce01c: 00000000  .word
+002ce020: 00092041  .word
+002ce024: 80080000  lwz      r0, 0(r8)
+002ce028: 00000c7c  .word
+002ce02c: 00282e54  .word
+002ce030: 534f6e43  rlwimi.  r15, r26, 0xd, 0x19, 1
+002ce034: 6f6d6d61  xoris    r13, r27, 0x6d61
+002ce038: 6e645f5f  xoris    r4, r19, 0x5f5f
+002ce03c: 31396357  addic    r9, r25, 0x6357
+002ce040: 696e4465  xori     r14, r11, 0x4465
+002ce044: 7369676e  andi.    r9, r27, 0x676e
+002ce048: 43686172  bdza+    0x6170
+002ce04c: 61637465  ori      r3, r11, 0x7465
+002ce050: 7246556c  andi.    r6, r18, 0x556c
+002ce054: 556c0000  rlwinm   r12, r11, 0, 0, 0
+002ce058: 00000000  .word
+002ce05c: 00000000  .word

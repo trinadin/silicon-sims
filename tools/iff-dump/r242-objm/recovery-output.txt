@@ -1,0 +1,166 @@
+{
+  "pinned_executable_words": {
+    "0x1533a4": "0x389b0008",
+    "0x1533ac": "0x4bfcb435",
+    "0xfac94": "0x80040008",
+    "0xfacb8": "0x901a0008",
+    "0xfacd0": "0x901a0008"
+  },
+  "actual_owner_routine": [
+    {
+      "source": "ExpansionPack5/ExpansionPack5.FAR!petcatlitterbox.iff",
+      "label": "Interaction - Cat - Use",
+      "node1": [
+        27,
+        29,
+        26,
+        0,
+        -512,
+        0,
+        0
+      ]
+    }
+  ],
+  "house56_sha256": "8bb39d8e613bf6e3902e4a405bc26420d5d1f00b01e3f0301e471ec51497e800",
+  "object292_frames": [
+    {
+      "stack_object": 292,
+      "tree": 4096,
+      "node": 1,
+      "locals_n": 0,
+      "params_n": 4,
+      "params": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "locals": [],
+      "primitive_state": 0,
+      "code_owner_objtype": 188
+    },
+    {
+      "stack_object": 292,
+      "tree": 8194,
+      "node": 29,
+      "locals_n": 2,
+      "params_n": 0,
+      "params": [],
+      "locals": [
+        4097,
+        254
+      ],
+      "primitive_state": 0,
+      "code_owner_objtype": 188
+    },
+    {
+      "stack_object": 292,
+      "tree": 8222,
+      "node": 30,
+      "locals_n": 0,
+      "params_n": 0,
+      "params": [],
+      "locals": [],
+      "primitive_state": 0,
+      "code_owner_objtype": 188
+    },
+    {
+      "stack_object": 333,
+      "tree": 8204,
+      "node": 2,
+      "locals_n": 0,
+      "params_n": 0,
+      "params": [],
+      "locals": [],
+      "primitive_state": 0,
+      "code_owner_objtype": 188
+    },
+    {
+      "stack_object": 333,
+      "tree": 4110,
+      "node": 1,
+      "locals_n": 3,
+      "params_n": 0,
+      "params": [],
+      "locals": [
+        4124,
+        255,
+        371
+      ],
+      "primitive_state": 2,
+      "code_owner_objtype": 146
+    },
+    {
+      "stack_object": 108,
+      "tree": 4105,
+      "node": 1,
+      "locals_n": 1,
+      "params_n": 0,
+      "params": [],
+      "locals": [
+        0
+      ],
+      "primitive_state": 0,
+      "code_owner_objtype": 164
+    },
+    {
+      "stack_object": 108,
+      "tree": 4112,
+      "node": 6,
+      "locals_n": 0,
+      "params_n": 1,
+      "params": [
+        0
+      ],
+      "locals": [],
+      "primitive_state": 15,
+      "code_owner_objtype": 164
+    }
+  ],
+  "code_owner146": {
+    "guid": "0xbedd7b26",
+    "id": 146,
+    "name": "Dunginator 9000"
+  },
+  "social2_objds": [
+    {
+      "id": 16807,
+      "label": "Smoke",
+      "guid": "0xffecf6b5"
+    },
+    {
+      "id": 16808,
+      "label": "Smoke - Rear",
+      "guid": "0x4740f763"
+    },
+    {
+      "id": 16809,
+      "label": "Smoke - Left",
+      "guid": "0xa4e8b034"
+    },
+    {
+      "id": 16810,
+      "label": "Smoke - Right",
+      "guid": "0x9087e0a2"
+    },
+    {
+      "id": 16811,
+      "label": "Smoke - Front",
+      "guid": "0x8b519fa6"
+    },
+    {
+      "id": 16812,
+      "label": "Social Attack",
+      "guid": "0x9f6954fb"
+    }
+  ],
+  "bhav4110_node1": [
+    35,
+    254,
+    253,
+    10,
+    513,
+    3,
+    0
+  ]
+}

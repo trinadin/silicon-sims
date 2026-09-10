@@ -1,0 +1,27 @@
+### BHAV 4125 'process warnings car pools' (26 instructions)
+ins0  T1/F253  Local[2] = Lit[0]
+ins1  T2/F254  MyAttr[10] != Global[0]
+ins2  T12/F253 StkObjID[0] = Lit[0]
+ins3  T8/F253  Temp[0] = StkObjPD[56]
+ins4  T5/F253  Temp[1] = StkObjPD[57]
+ins5  T6/F253  Local[0] = JobData[12]
+ins6  T9/F253  Local[0] -= Lit[2]
+ins7  T16/F12  Local[0] == Global[0]
+ins8  T12/F19  Temp[0] == Lit[0]
+ins9  T10/F7   Local[0] < Lit[0]
+ins10 T7/F253  Local[0] += Lit[24]
+ins11 T12/F253 PRIM dialogPrivateStrings (36) opd=0000020000000100
+ins12 T24/F13  setToNext Person guid=0x00000000 -> StkObjID[0] (flags=0x81)
+ins13 T254/F253 MyAttr[10] = Global[0]
+ins14 T23/F12  StkObjPD[69] > Lit[-1]
+ins15 T12/F253 PRIM dialogPrivateStrings (36) opd=002d0c0000000b08
+ins16 T21/F25  StkObjPD[58] < Lit[18]
+ins17 T18/F12  Local[2] == Lit[0]
+ins18 T22/F253 Local[2] = Lit[1]
+ins19 T20/F4   Temp[0] < Lit[0]
+ins20 T6/F253  Local[0] = Tuning[130]
+ins21 T17/F12  StkObjPD[32] == Tuning[16896]
+ins22 T15/F253 Local[3] = Lit[-1]
+ins23 T3/F12   StkObjPD[32] == Tuning[16896]
+ins24 T14/F23  StkObjPD[58] > Lit[17]
+ins25 T12/F11  StkObjPD[32] == Tuning[16903]

@@ -1,0 +1,32 @@
+002170f0: 48307c91  bl       0x51ed80   ; .TriggerToolTips__12cTSWinMgrW95Fv
+002170f4: 38610044  addi     r3, r1, 0x44
+002170f8: 3880ffff  li       r4, -1
+002170fc: 482dd885  bl       0x4f4980   ; .__dt__9cTSStringFv
+00217100: 4800005c  b        0x21715c
+00217104: 807b0000  lwz      r3, 0(r27)
+00217108: 3881005c  addi     r4, r1, 0x5c
+0021710c: 38a10060  addi     r5, r1, 0x60
+00217110: 48308561  bl       0x51f670   ; .GetCursorScreenPosition__12cTSWinMgrW95FRlRl
+00217114: 807b0000  lwz      r3, 0(r27)
+00217118: 8081005c  lwz      r4, 0x5c(r1)
+0021711c: 80a10060  lwz      r5, 0x60(r1)
+00217120: 48307361  bl       0x51e480   ; .GetWindowFromPoint__12cTSWinMgrW95Fll
+00217124: 7c1d1840  cmplw    r29, r3
+00217128: 40820034  bne      0x21715c
+0021712c: 7fa3eb78  mr       r3, r29
+00217130: 819d0000  lwz      r12, 0(r29)
+00217134: 38800400  li       r4, 0x400
+00217138: 38a00000  li       r5, 0
+0021713c: 818c0098  lwz      r12, 0x98(r12)
+00217140: 4838b8a1  bl       0x5a29e0
+00217144: 80410014  lwz      r2, 0x14(r1)
+00217148: 807b0000  lwz      r3, 0(r27)
+0021714c: 48307c35  bl       0x51ed80   ; .TriggerToolTips__12cTSWinMgrW95Fv
+00217150: 3800d8f0  li       r0, -0x2710
+00217154: 901d0170  stw      r0, 0x170(r29)
+00217158: 901d0174  stw      r0, 0x174(r29)
+0021715c: 4bf3f3f5  bl       0x156550   ; .Tut_CheckForEvents__Fv
+00217160: 881d0110  lbz      r0, 0x110(r29)
+00217164: 28000000  cmplwi   r0, 0
+00217168: 4082002c  bne      0x217194
+0021716c: 881d0111  lbz      r0, 0x111(r29)

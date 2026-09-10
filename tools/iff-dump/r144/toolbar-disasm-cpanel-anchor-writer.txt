@@ -1,0 +1,60 @@
+00270e10: 93e1fffc  stw      r31, -4(r1)
+00270e14: 7c0802a6  mflr     r0
+00270e18: 80828858  lwz      r4, -0x77a8(r2)   ; TOC[-0x77a8]->DATA off 0x7b358
+00270e1c: 38c00000  li       r6, 0
+00270e20: 90010008  stw      r0, 8(r1)
+00270e24: 80628860  lwz      r3, -0x77a0(r2)   ; TOC[-0x77a0]->DATA off 0x7b37c
+00270e28: 390000dc  li       r8, 0xdc
+00270e2c: 9421ff90  stwu     r1, -0x70(r1)
+00270e30: 38000064  li       r0, 0x64
+00270e34: 8162af68  lwz      r11, -0x5098(r2)   ; TOC[-0x5098]->BSS off 0x93228
+00270e38: c8440000  lfd      f2, 0(r4)
+00270e3c: 38e00032  li       r7, 0x32
+00270e40: c0a30000  lfs      f5, 0(r3)
+00270e44: 38a000a8  li       r5, 0xa8
+00270e48: 8082885c  lwz      r4, -0x77a4(r2)   ; TOC[-0x77a4]->DATA off 0x7b378
+00270e4c: 8142af6c  lwz      r10, -0x5094(r2)   ; TOC[-0x5094]->BSS off 0x93230
+00270e50: fc201050  fneg     f1, f2
+00270e54: c0640000  lfs      f3, 0(r4)
+00270e58: fc802850  fneg     f4, f5
+00270e5c: 8122af70  lwz      r9, -0x5090(r2)   ; TOC[-0x5090]->BSS off 0x93220
+00270e60: 80628854  lwz      r3, -0x77ac(r2)   ; TOC[-0x77ac]->DATA off 0x7b350
+00270e64: d082f658  stfs     f4, -0x9a8(r2)
+00270e68: 38810040  addi     r4, r1, 0x40
+00270e6c: c8030000  lfd      f0, 0(r3)
+00270e70: 38610050  addi     r3, r1, 0x50
+00270e74: 83e2af64  lwz      r31, -0x509c(r2)   ; TOC[-0x509c]->BSS off 0x93210
+00270e78: d0a2f65c  stfs     f5, -0x9a4(r2)
+00270e7c: d062f660  stfs     f3, -0x9a0(r2)
+00270e80: d0a2f664  stfs     f5, -0x99c(r2)
+00270e84: d822f668  stfd     f1, -0x998(r2)
+00270e88: d842f670  stfd     f2, -0x990(r2)
+00270e8c: d802f678  stfd     f0, -0x988(r2)
+00270e90: d842f680  stfd     f2, -0x980(r2)
+00270e94: 910a0000  stw      r8, 0(r10)
+00270e98: 90ea0004  stw      r7, 4(r10)
+00270e9c: 90cb0000  stw      r6, 0(r11)
+00270ea0: 90cb0004  stw      r6, 4(r11)
+00270ea4: 90a90000  stw      r5, 0(r9)
+00270ea8: 90e90004  stw      r7, 4(r9)
+00270eac: 90c10040  stw      r6, 0x40(r1)
+00270eb0: 90c10044  stw      r6, 0x44(r1)
+00270eb4: 91010048  stw      r8, 0x48(r1)
+00270eb8: 9001004c  stw      r0, 0x4c(r1)
+00270ebc: 4bffe965  bl       0x26f820
+00270ec0: 38800000  li       r4, 0
+00270ec4: 38a00000  li       r5, 0
+00270ec8: 4bffe8f9  bl       0x26f7c0   ; .OffsetRect__7cTSRectFll
+00270ecc: 80030000  lwz      r0, 0(r3)
+00270ed0: 901f0000  stw      r0, 0(r31)
+00270ed4: 80030004  lwz      r0, 4(r3)
+00270ed8: 901f0004  stw      r0, 4(r31)
+00270edc: 80030008  lwz      r0, 8(r3)
+00270ee0: 901f0008  stw      r0, 8(r31)
+00270ee4: 8003000c  lwz      r0, 0xc(r3)
+00270ee8: 901f000c  stw      r0, 0xc(r31)
+00270eec: 80010078  lwz      r0, 0x78(r1)
+00270ef0: 38210070  addi     r1, r1, 0x70
+00270ef4: 7c0803a6  mtlr     r0
+00270ef8: 83e1fffc  lwz      r31, -4(r1)
+00270efc: 4e800020  blr      

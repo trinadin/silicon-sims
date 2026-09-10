@@ -1,0 +1,73 @@
+                ; ==== .GetHouseFileInfo__12NeighborhoodFP8iResFilePiPiPiPiPiPl ====
+000b0a40: bf21ffe4  stmw     r25, -0x1c(r1)
+000b0a44: 7c0802a6  mflr     r0
+000b0a48: 3b240000  addi     r25, r4, 0
+000b0a4c: 3be50000  addi     r31, r5, 0
+000b0a50: 3b460000  addi     r26, r6, 0
+000b0a54: 3b670000  addi     r27, r7, 0
+000b0a58: 3b880000  addi     r28, r8, 0
+000b0a5c: 3ba90000  addi     r29, r9, 0
+000b0a60: 3bca0000  addi     r30, r10, 0
+000b0a64: 90010008  stw      r0, 8(r1)
+000b0a68: 9421fdd0  stwu     r1, -0x230(r1)
+000b0a6c: 38610040  addi     r3, r1, 0x40
+000b0a70: 48089921  bl       0x13a390   ; .__ct__10cSimulatorFv
+000b0a74: 80a28ce8  lwz      r5, -0x7318(r2)
+000b0a78: 7f24cb78  mr       r4, r25
+000b0a7c: 80628ce4  lwz      r3, -0x731c(r2)
+000b0a80: 7fc7f378  mr       r7, r30
+000b0a84: 80a50000  lwz      r5, 0(r5)
+000b0a88: a8c30000  lha      r6, 0(r3)
+000b0a8c: 38610040  addi     r3, r1, 0x40
+000b0a90: 4bfdcc91  bl       0x8d720
+000b0a94: 7c600735  extsh.   r0, r3
+000b0a98: 41820018  beq      0xb0ab0
+000b0a9c: 38610040  addi     r3, r1, 0x40
+000b0aa0: 3880ffff  li       r4, -1
+000b0aa4: 4808966d  bl       0x13a110   ; .__dt__10cSimulatorFv
+000b0aa8: 38600000  li       r3, 0
+000b0aac: 480000a0  b        0xb0b4c
+000b0ab0: a801007c  lha      r0, 0x7c(r1)
+000b0ab4: 38600000  li       r3, 0
+000b0ab8: 901b0000  stw      r0, 0(r27)
+000b0abc: a801009a  lha      r0, 0x9a(r1)
+000b0ac0: 901d0000  stw      r0, 0(r29)
+000b0ac4: a8010084  lha      r0, 0x84(r1)
+000b0ac8: 2c000000  cmpwi    r0, 0
+000b0acc: 901a0000  stw      r0, 0(r26)
+000b0ad0: 40820014  bne      0xb0ae4
+000b0ad4: a801007a  lha      r0, 0x7a(r1)
+000b0ad8: 2c000000  cmpwi    r0, 0
+000b0adc: 40820008  bne      0xb0ae4
+000b0ae0: 38600001  li       r3, 1
+000b0ae4: 5460063e  clrlwi   r0, r3, 0x18
+000b0ae8: 80a2a520  lwz      r5, -0x5ae0(r2)
+000b0aec: 901c0000  stw      r0, 0(r28)
+000b0af0: 3c004330  lis      r0, 0x4330
+000b0af4: 80e28d8c  lwz      r7, -0x7274(r2)
+000b0af8: 38610040  addi     r3, r1, 0x40
+000b0afc: 80c100e4  lwz      r6, 0xe4(r1)
+000b0b00: 900101f8  stw      r0, 0x1f8(r1)
+000b0b04: 3880ffff  li       r4, -1
+000b0b08: 6cc08000  xoris    r0, r6, 0x8000
+000b0b0c: c8250000  lfd      f1, 0(r5)
+000b0b10: 900101fc  stw      r0, 0x1fc(r1)
+000b0b14: c0470000  lfs      f2, 0(r7)
+000b0b18: c80101f8  lfd      f0, 0x1f8(r1)
+000b0b1c: 80a100dc  lwz      r5, 0xdc(r1)
+000b0b20: ec000828  fsubs    f0, f0, f1
+000b0b24: 800100e0  lwz      r0, 0xe0(r1)
+000b0b28: 7c050214  add      r0, r5, r0
+000b0b2c: ec020032  fmuls    f0, f2, f0
+000b0b30: fc00001e  fctiwz   f0, f0
+000b0b34: d8010200  stfd     f0, 0x200(r1)
+000b0b38: 80a10204  lwz      r5, 0x204(r1)
+000b0b3c: 7c050214  add      r0, r5, r0
+000b0b40: 901f0000  stw      r0, 0(r31)
+000b0b44: 480895cd  bl       0x13a110   ; .__dt__10cSimulatorFv
+000b0b48: 38600001  li       r3, 1
+000b0b4c: 80010238  lwz      r0, 0x238(r1)
+000b0b50: 38210230  addi     r1, r1, 0x230
+000b0b54: bb21ffe4  lmw      r25, -0x1c(r1)
+000b0b58: 7c0803a6  mtlr     r0
+000b0b5c: 4e800020  blr      

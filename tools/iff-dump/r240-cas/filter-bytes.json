@@ -1,0 +1,64 @@
+{
+  "sha256": "33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f",
+  "toc_slot": "-0x4358",
+  "code_relative_pointer": "0x59c3a8",
+  "code_file_start": "0x8e90",
+  "file_offset": "0x5a5238",
+  "20_forbidden_ASCII_bytes": [
+    92,
+    47,
+    124,
+    42,
+    63,
+    58,
+    60,
+    62,
+    34,
+    39,
+    37,
+    40,
+    41,
+    38,
+    59,
+    64,
+    33,
+    35,
+    44,
+    46
+  ],
+  "characters": "\\/|*?:<>\"'%()&;@!#,.",
+  "ranges": {
+    "character-command": [
+      "0x2cd3a0",
+      "0x2ce040"
+    ],
+    "character-ctor": [
+      "0x2cfc00",
+      "0x2cfe20"
+    ],
+    "character-initial-selection": [
+      "0x2cf960",
+      "0x2cf9e0"
+    ],
+    "sanify-suits": [
+      "0x2cc840",
+      "0x2cc9b0"
+    ],
+    "family-filter-install": [
+      "0x2d15d0",
+      "0x2d1640"
+    ],
+    "filter-setter": [
+      "0x52ee60",
+      "0x52eea0"
+    ],
+    "filter-character": [
+      "0x5336b0",
+      "0x5339e0"
+    ],
+    "filter-paste": [
+      "0x52f920",
+      "0x52fa50"
+    ]
+  }
+}

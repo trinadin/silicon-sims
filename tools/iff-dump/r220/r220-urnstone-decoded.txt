@@ -1,0 +1,54 @@
+### BHAV id=4109 label='Force Ghost' count=3
+  ins0  Temp[0] := StackObjID[0]     t=2            f=other-path
+  ins1  MyObject[11] := StackObjID[0] t=0            f=other-path
+  ins2  CALL 4100 'generate ghost'   t=RETURN_TRUE  f=RETURN_TRUE
+### BHAV id=4106 label='show death dialog' count=3
+  ins0  StackObjID[0] := MyAttr[1]   t=2            f=other-path
+  ins1  PRIM dialog-all-strings opd=0000010000000204 t=RETURN_TRUE  f=other-path
+  ins2  StackObjID[0] == Lit[0]      t=RETURN_TRUE  f=1
+### BHAV id=4100 label='generate ghost' count=22
+  ins0  Local[0] := Param[0]         t=13           f=other-path
+  ins1  PRIM create-object-instance opd=0000000006040000 t=9            f=6
+  ins2  StackObjAttr[1] != Lit[0]    t=16           f=RETURN_TRUE
+  ins3  StackObjID[0] := StackObjAttr[1] t=1            f=other-path
+  ins4  PRIM find-location-for opd=0000030000000000 t=21           f=6
+  ins5  Local[1] := Lit[0]           t=2            f=other-path
+  ins6  Local[1] == Lit[0]           t=RETURN_TRUE  f=8
+  ins7  PRIM remove-object-instance opd=0100000000000000 t=RETURN_TRUE  f=RETURN_TRUE
+  ins8  StackObjID[0] := Local[1]    t=7            f=other-path
+  ins9  Local[1] := StackObjID[0]    t=4            f=other-path
+  ins10 PRIM push-interaction opd=0000010200000000 t=RETURN_TRUE  f=6
+  ins11 StackObjID[0] := Local[1]    t=12           f=other-path
+  ins12 PRIM play-sound-event opd=3b01000000000000 t=RETURN_TRUE  f=other-path
+  ins13 StackObjID[0] := Param[0]    t=5            f=other-path
+  ins14 StackObjID[0] := Lit[0]      t=15           f=other-path
+  ins15 PRIM set-to-next opd=00000000810a0000 t=17           f=19
+  ins16 Local[2] := Lit[0]           t=14           f=other-path
+  ins17 StackObjPersonData[68] == Lit[1] t=18           f=15
+  ins18 Local[2] += Lit[1]           t=15           f=other-path
+  ins19 Local[2] < Tuning[133]       t=20           f=RETURN_FALSE
+  ins20 StackObjID[0] := Param[0]    t=3            f=other-path
+  ins21 StackObjAttr[1] := MyObject[11] t=11           f=other-path
+### BHAV id=4096 label='main' count=22
+  ins0  Local[0] := MyObject[11]     t=1            f=other-path
+  ins1  PRIM 280 opd=0100000000000000 t=15           f=other-path
+  ins2  CALL 4098 'check outside'    t=3            f=other-path
+  ins3  PRIM 280 opd=e803000000000000 t=9            f=other-path
+  ins4  PRIM 280 opd=ffffffffffffffff t=18           f=other-path
+  ins5  Global[0] >= Lit[22]         t=12           f=21
+  ins6  PRIM 280 opd=0807000000000000 t=14           f=other-path
+  ins7  CALL 4100 'generate ghost'   t=20           f=6
+  ins8  CALL 4106 'show death dialog' t=2            f=other-path
+  ins9  PRIM 280 opd=0807000000000000 t=10           f=other-path
+  ins10 MyAttr[4] += Lit[1]          t=11           f=other-path
+  ins11 MyAttr[4] > Lit[24]          t=20           f=9
+  ins12 PRIM random-number opd=0100190083001a00 t=13           f=other-path
+  ins13 Local[1] == Lit[0]           t=6            f=20
+  ins14 Temp[0] := MyObject[11]      t=7            f=other-path
+  ins15 MyAttr[5] == Lit[0]          t=16           f=2
+  ins16 MyAttr[5] := Lit[1]          t=8            f=other-path
+  ins17 MyAttr[4] += Lit[1]          t=5            f=other-path
+  ins18 MyAttr[4] <= Lit[80]         t=17           f=5
+  ins19 Temp[0] += Lit[880]          t=4            f=other-path
+  ins20 PRIM random-number opd=0000080084030700 t=19           f=other-path
+  ins21 Global[0] <= Lit[1]          t=12           f=20

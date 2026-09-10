@@ -27,7 +27,11 @@ namespace Simitone.Client.UI.Controls
         public bool Switching;
         private VMAvatar Avatar;
 
-        public UILiveButton(TS1GameScreen screen) : base(Content.Get().CustomUI.Get("plumb_bg.png").Get(GameFacade.GraphicsDevice))
+        public UILiveButton(TS1GameScreen screen) : base(
+            // R141: the live-mode button art is kPeople people.bmp (4x 50x50), NOT
+            // House.bmp — that is the kHouseBtn HOUSE TAB (Res_CPanel.RT).
+            UIOriginal.EnsureResolved("cpanel\\Buttons\\people.bmp")?.Get(GameFacade.GraphicsDevice)
+                ?? UIOriginal.ResolveOrPng("cpanel\\Buttons\\House.bmp", "btn_live.png", Content.Get().CustomUI.Get("plumb_bg.png").Get(GameFacade.GraphicsDevice)))
         {
             var ui = Content.Get().CustomUI;
             PlumbPlus = ui.Get("plumb_plus.png").Get(GameFacade.GraphicsDevice);
@@ -51,6 +55,7 @@ namespace Simitone.Client.UI.Controls
 
         public override void Draw(UISpriteBatch SBatch)
         {
+            if (!Visible) return;
             if (Switching)
             {
                 DrawLocalTexture(SBatch, SwitchIcon, new Vector2(SwitchIcon.Width, SwitchIcon.Height) / -2);

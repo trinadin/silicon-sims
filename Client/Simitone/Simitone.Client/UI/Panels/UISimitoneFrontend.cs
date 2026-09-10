@@ -64,23 +64,41 @@ namespace Simitone.Client.UI.Panels
             }
 
             CheatTextbox = new UICheatTextbox(Game.vm);
-            CheatTextbox.Position = new Vector2(10, 10);
+            // R207: engine SetArea(20,20,220,41) — the bar anchors at
+            // (20,20), not the old (10,10) eyeball.
+            CheatTextbox.Position = new Vector2(20, 20);
             CheatTextbox.Visible = false;
             Add(CheatTextbox);
+
+            // R120/R141: the desktop UCP must exist BEFORE MainPanel is placed — the panel's X is
+            // derived from the UCP's right edge (R120 fixed a 136px overlap). R141: the UCP is
+            // the ORIGINAL plate (UniversalBack.TGA 220x183) mounted flush to the bottom-left
+            // corner like the engine composes it — no 15px float margin, no 292x281 chrome.
+            if (Game.Desktop)
+            {
+                DesktopUCP = new UIDesktopUCP(screen);
+                DesktopUCP.Position = new Vector2(0, screen.ScreenHeight - 183);
+                DesktopUCP.OnModeClick += LiveButtonClicked;
+                Add(DesktopUCP);
+            }
 
             MainPanel = new UIMainPanel(screen);
             MainPanel.OnEndSelect += OnEndSelect;
             MainPanel.ModeChanged += ModeChanged;
             Add(MainPanel);
 
-            if (Game.Desktop)
-            {
-                DesktopUCP = new UIDesktopUCP(screen);
-                DesktopUCP.Position = new Vector2(15, screen.ScreenHeight - (278 + 15));
-                DesktopUCP.OnModeClick += LiveButtonClicked;
-                Add(DesktopUCP);
-            }
-            else
+            // R172: cWinCPanel paints kBackPatch in its own background before
+            // child windows are composed.  The view-control/UCP child therefore
+            // sits above the opaque 52x100 bridge wherever UniversalBack's
+            // quarter-round plate has pixels, while the bridge remains visible
+            // through the plate's transparent outside edge.  MainPanel owns the
+            // BackPatch image in this port, so keep the equivalent sibling order:
+            // toolbar first, UCP last.  Drawing MainPanel after DesktopUCP put the
+            // fully-opaque bridge over the plate's rightmost 52 pixels and made
+            // the permanent-left/swapping-right join look cut apart.
+            if (Game.Desktop) Add(DesktopUCP);
+
+            if (!Game.Desktop)
             {
                 var mode = new UIModeSwitcher(screen);
                 mode.Position = new Vector2(64 + 15, screen.ScreenHeight - (64 + 15));
@@ -91,9 +109,13 @@ namespace Simitone.Client.UI.Panels
             }
 
             MainPanel.X = 64 + 15;
-            if (Game.Desktop) MainPanel.X += 100;
+            // R142: flush against the UCP's right edge — the original composition is
+            // UCP(220) + PanelBack(804) = 1024 with no seam; the old +8 gap was ours.
+            if (Game.Desktop) MainPanel.X = (int)(DesktopUCP.X + DesktopUCP.Size.X);
             MainPanel.GameResized();
-            MainPanel.Y = screen.ScreenHeight - (128 + 15);
+            // R142: the desktop bar sits flush at the bottom — PanelBack's own
+            // 100px height (was SH-143, leaving a 15px float gap + 128px panel).
+            MainPanel.Y = Game.Desktop ? screen.ScreenHeight - 100 : screen.ScreenHeight - (128 + 15);
             MainPanel.Visible = false;
 
             if (Game.vm.GetGlobalValue(32) > 0)
@@ -104,6 +126,14 @@ namespace Simitone.Client.UI.Panels
             } else
             {
                 FSO.HIT.HITVM.Get().PlaySoundEvent(UIMusic.None);
+                // R206 ENGINE LAW (the R199 residual closed): the original
+                // composes the control panel PERMANENTLY at lot entry —
+                // cSimsApp::RebuildControlPanel 0x24de40 (new(0x108) cWinCPanel
+                // ctor 0x270d40) + CPState::EnteringHouse 0x211c80 -> SetMode;
+                // the panel exists from the FIRST frame. The port's hidden-
+                // until-first-click reveal is retired on desktop (touch keeps
+                // its mobile flow). Untweened Open() end-state.
+                if (Game.Desktop) MainPanel.ComposeAtLotEntry();
             }
         }
 
@@ -117,6 +147,7 @@ namespace Simitone.Client.UI.Panels
             {
                 case UIMainPanelMode.LIVE:
                 case UIMainPanelMode.OPTIONS:
+                case UIMainPanelMode.CAMERA:
                     hit.PlaySoundEvent(UIMusic.None); break;
                 case UIMainPanelMode.BUY:
                     switch (lotType)
@@ -162,7 +193,8 @@ namespace Simitone.Client.UI.Panels
         }
 
         /// <summary>
-        /// Programmatically switch to a different mode (Buy, Build, Live, Options).
+        /// Programmatically switch to a different mode (Buy, Build, Live,
+        /// Options, Camera).
         /// Used by eyedropper to auto-switch modes when clicking cross-mode objects.
         /// </summary>
         public void SwitchMode(UIMainPanelMode mode)
@@ -172,6 +204,31 @@ namespace Simitone.Client.UI.Panels
 
         private bool LiveButtonClicked(UIMainPanelMode mode)
         {
+            // R145: the engine's Objects-button law — every BUY activation
+            /// while already in buy mode TOGGLES room <-> function sort
+            /// (cWinViewControl::TSOnCommand 0x2b4b24; buy-catalog-law.md §2).
+            if (Game.Desktop && mode == UIMainPanelMode.BUY && MainPanel.Mode == UIMainPanelMode.BUY
+                && MainPanel.PanelActive && !MainPanel.ShowingSelect)
+            {
+                MainPanel.ToggleBuySortEngine();
+                return false;
+            }
+            // R199: CPState::SetMode @0x210790 opens with `if (this->mode ==
+            // requested && !force) return` — and every cWinViewControl::
+            // TSOnCommand mode-button case (LIVE 0x2b4bec -> SetMode(0,0),
+            // BUY 0x2b4bb0, BUILD, OPTIONS...) passes force 0 — so clicking
+            // the ALREADY-ACTIVE desktop mode button is a complete no-op.
+            // The old fallthrough into StartSelect() mounted the mobile
+            // UISwitchAvatarPanel (pswitch_bg strip) over the native panel;
+            // on desktop nothing like it exists. One port artifact: the
+            // control panel starts hidden at lot entry (the original
+            // composes it permanently), so the no-op still reveals it.
+            if (Game.Desktop && mode == MainPanel.Mode)
+            {
+                if (!MainPanel.PanelActive) MainPanel.Open();
+                MainPanel.SwitchAvatar?.Kill();
+                return false;
+            }
             var deskAuto = Game.Desktop && (mode != UIMainPanelMode.LIVE || MainPanel.Mode != UIMainPanelMode.LIVE);
             if (MainPanel.PanelActive || deskAuto)
             {
@@ -236,6 +293,13 @@ namespace Simitone.Client.UI.Panels
         public float ClockTween;
         public override void Update(UpdateState state)
         {
+            // R200: the tracking sync laws run from this always-mounted host —
+            // the engine's stops (selection change, manual camera input, the
+            // level buttons' anchor clear) are mode-independent, while the
+            // people chrome only ticks in live mode. Inert when nothing is
+            // tracked (mobile never tracks through this model).
+            Simitone.Client.UI.Panels.UIOriginalPeopleChrome.SyncTracking(Game);
+
             // Only switch Sims with Space if no text input has focus
             if (state.NewKeys.Contains(Keys.Space) && state.InputManager.GetFocus() == null)
             {
@@ -295,12 +359,14 @@ namespace Simitone.Client.UI.Panels
                 var mode = ModeSwitcher;
                 mode.Position = new Vector2(64 + 15, Game.ScreenHeight - (64 + 15));
                 ExtendPanelBtn.Position = new Vector2(mode.X + 54, mode.Y - 50);
+                MainPanel.Y = Game.ScreenHeight - (128 + 15);
             }
             else
             {
-                DesktopUCP.Position = new Vector2(15, Game.ScreenHeight - (278 + 15));
+                DesktopUCP.Position = new Vector2(0, Game.ScreenHeight - 183);   // R141: original plate, flush bottom-left
+                MainPanel.X = (int)(DesktopUCP.X + DesktopUCP.Size.X);   // R142: flush (no seam) after resize too
+                MainPanel.Y = Game.ScreenHeight - 100;   // R142: PanelBack's own height, flush bottom
             }
-            MainPanel.Y = Game.ScreenHeight - (128 + 15);
         }
     }
 }

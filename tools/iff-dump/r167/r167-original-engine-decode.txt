@@ -1,0 +1,62 @@
+# R167 original-engine decode: Generic Sims Call mode 13
+engine sha256: 33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f
+PEF packed data: file+0x5c22f0 length 0x6d834 -> 0x7bf80
+PEF unpacked data sha256: f740c1dfa1dea8187b12ebf222ca1a39223365d26ad5d2f2e353d5efba247be3
+dispatch: TOC[-0x59a0] -> data+0x485a8; entry[13] -> code-virtual 0xe9848 -> file 0xf26d8; entry[14] -> file 0xf273c
+code sha256: mode13[0xf26d8,0xf273c)=7914065c684f782e3eeec6670887d1b42616e188ac88671377f61c5f9111c9a8
+code sha256: CleanupPeople[0xe3bc0,0xe3c40)=edae6f356befb750cb8d7434e324221ca57ee83fd0419ea9b46e2498526140d7
+code sha256: cXObject::Cleanup[0xca0d0,0xca2a0)=c789780f61c31dc9879d62d94d820676f5edd1185f92824199e862f5087ec05b
+code sha256: cXPerson::Cleanup[0x1081d0,0x108d94)=52f32a941f06930695598cc3331d32d1876d07a80cca85f35f38a1a7a8173bfd
+
+recovered law:
+  target = object resolved from Stack Object ID
+  ObjectModule::CleanupPeople visits every object except target
+  each visited object receives virtual Cleanup(target) at vtable +0x40
+  base cXObject::Cleanup is a no-op for non-null target
+  a failed target lookup reports engine error 10, then still calls CleanupPeople(null)
+  null Cleanup visits every object and enters broad object/person cleanup paths
+  for valid targets cXPerson::Cleanup detects target in current object-use/stack state
+  and in either 60-byte queue-entry field at +0x08 (TargetID) or +0x0c (Icon)
+  matching queued entries are removed and their Queue Skipped path is invoked
+  current object-use/stack matches enter the original current-interaction cleanup path
+  TryGenericSimCall takes its common true return
+
+decisive TryGenericSimCall mode-13 words:
+  0x0f26d8 a8180004
+  0x0f26e0 809f00dc
+  0x0f2708 7e63002e
+  0x0f270c 28130000
+  0x0f2710 4082001c
+  0x0f272c 807f00dc
+  0x0f2730 7e649b78
+  0x0f2734 4bff148d
+  0x0f2738 480019e4
+
+decisive ObjectModule::CleanupPeople words:
+  0x0e3be0 83e30090
+  0x0e3bec 7c03f040
+  0x0e3bf0 41820018
+  0x0e3bf4 81830028
+  0x0e3bfc 818c0040
+  0x0e3c0c 801d008c
+  0x0e3c1c 7c1f0040
+
+decisive cXObject::Cleanup words:
+  0x0ca0d8 28040000
+  0x0ca0e8 408201a4
+  0x0ca28c 80010088
+
+decisive cXPerson::Cleanup words:
+  0x1081fc 281f0000
+  0x108240 801e0ab4
+  0x108258 80050000
+  0x108280 801e0a14
+  0x10865c 281f0000
+  0x108660 41820718
+  0x108664 807e0a00
+  0x108698 80040828
+  0x1086a4 8004082c
+  0x108704 80190828
+  0x108710 8019082c
+  0x108d78 3b610228
+  0x108d90 4e800020

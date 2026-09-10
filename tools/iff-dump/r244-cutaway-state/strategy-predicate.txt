@@ -1,0 +1,51 @@
+                ; ==== range 0x21cc50..0x21cc80 ====
+                ; ==== .GetCurrentStrategy__Fv ====
+0021cc50: 7c0802a6  mflr     r0
+0021cc54: 80628870  lwz      r3, -0x7790(r2)
+0021cc58: 90010008  stw      r0, 8(r1)
+0021cc5c: 9421ffc0  stwu     r1, -0x40(r1)
+0021cc60: 80630000  lwz      r3, 0(r3)
+0021cc64: 80630080  lwz      r3, 0x80(r3)
+0021cc68: 4bff5a09  bl       0x212670   ; .GetScrollingStrategy__12cDDDSimsViewFv
+0021cc6c: 80010048  lwz      r0, 0x48(r1)
+0021cc70: 38210040  addi     r1, r1, 0x40
+0021cc74: 7c0803a6  mtlr     r0
+0021cc78: 4e800020  blr      
+0021cc7c: 00000000  .long    0x00000000
+                ; ==== range 0x212670..0x2126b4 ====
+                ; ==== .GetScrollingStrategy__12cDDDSimsViewFv ====
+00212670: 93e1fffc  stw      r31, -4(r1)
+00212674: 7c0802a6  mflr     r0
+00212678: 7c7f1b78  mr       r31, r3
+0021267c: 90010008  stw      r0, 8(r1)
+00212680: 9421ffb0  stwu     r1, -0x50(r1)
+00212684: 8003016c  lwz      r0, 0x16c(r3)
+00212688: 28000000  cmplwi   r0, 0
+0021268c: 40820020  bne      0x2126ac
+00212690: 80628874  lwz      r3, -0x778c(r2)
+00212694: 80630000  lwz      r3, 0(r3)
+00212698: 80030004  lwz      r0, 4(r3)
+0021269c: 28000000  cmplwi   r0, 0
+002126a0: 4182000c  beq      0x2126ac
+002126a4: 4800a4cd  bl       0x21cb70   ; .CreateEdgeDetectStrategy__Fv
+002126a8: 907f016c  stw      r3, 0x16c(r31)
+002126ac: 807f016c  lwz      r3, 0x16c(r31)
+002126b0: 80010058  lwz      r0, 0x58(r1)
+                ; ==== range 0x1cfa64..0x1cfa88 ====
+001cfa64: 4804d1ed  bl       0x21cc50   ; .GetCurrentStrategy__Fv
+001cfa68: 28030000  cmplwi   r3, 0
+001cfa6c: 418205e4  beq      0x1d0050
+001cfa70: 81830000  lwz      r12, 0(r3)
+001cfa74: 818c005c  lwz      r12, 0x5c(r12)
+001cfa78: 483d2f69  bl       0x5a29e0
+001cfa7c: 80410014  lwz      r2, 0x14(r1)
+001cfa80: 5460063f  clrlwi.  r0, r3, 0x18
+001cfa84: 408205cc  bne      0x1d0050
+                ; ==== range 0x21a7e0..0x21a7e8 ====
+                ; ==== .IsWaitingForClick__18EdgeDetectScrollerFv ====
+0021a7e0: 88630093  lbz      r3, 0x93(r3)
+0021a7e4: 4e800020  blr      
+                ; ==== range 0x1d02c0..0x1d02c8 ====
+                ; ==== .IsWaitingForClick__17ScrollingStrategyFv ====
+001d02c0: 38600000  li       r3, 0
+001d02c4: 4e800020  blr      

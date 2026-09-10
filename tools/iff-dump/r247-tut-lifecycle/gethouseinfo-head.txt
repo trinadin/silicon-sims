@@ -1,0 +1,85 @@
+                ; ==== .GetHouseInfo__FiP9HouseInfoi ====
+00232d30: bf21ffe4  stmw     r25, -0x1c(r1)
+00232d34: 7c0802a6  mflr     r0
+00232d38: 7cb92b78  mr       r25, r5
+00232d3c: 83828874  lwz      r28, -0x778c(r2)
+00232d40: 3ba30000  addi     r29, r3, 0
+00232d44: 83e28af8  lwz      r31, -0x7508(r2)
+00232d48: 7c9e2378  mr       r30, r4
+00232d4c: 83628bb4  lwz      r27, -0x744c(r2)
+00232d50: 38a00000  li       r5, 0
+00232d54: 38c00104  li       r6, 0x104
+00232d58: 90010008  stw      r0, 8(r1)
+00232d5c: 38000000  li       r0, 0
+00232d60: 9421f600  stwu     r1, -0xa00(r1)
+00232d64: 98010040  stb      r0, 0x40(r1)
+00232d68: 3881047c  addi     r4, r1, 0x47c
+00232d6c: 807c0000  lwz      r3, 0(r28)
+00232d70: 83430024  lwz      r26, 0x24(r3)
+00232d74: 38610470  addi     r3, r1, 0x470
+00232d78: 4bf0f5e9  bl       0x142360   ; .__ct__12StringBufferFPcUiUi
+00232d7c: 93610478  stw      r27, 0x478(r1)
+00232d80: 387a0000  addi     r3, r26, 0
+00232d84: 389d0000  addi     r4, r29, 0
+00232d88: 38a10470  addi     r5, r1, 0x470
+00232d8c: 4be82365  bl       0xb50f0
+00232d90: 386100b8  addi     r3, r1, 0xb8
+00232d94: 4be64b3d  bl       0x978d0   ; .__ct__11IFFResFile2Fv
+00232d98: 386100b8  addi     r3, r1, 0xb8
+00232d9c: 38810470  addi     r4, r1, 0x470
+00232da0: 38a00000  li       r5, 0
+00232da4: 4be643cd  bl       0x97170
+00232da8: 7c600735  extsh.   r0, r3
+00232dac: 41820018  beq      0x232dc4
+00232db0: 386100b8  addi     r3, r1, 0xb8
+00232db4: 3880ffff  li       r4, -1
+00232db8: 4be64a49  bl       0x97800   ; .__dt__11IFFResFile2Fv
+00232dbc: 38600000  li       r3, 0
+00232dc0: 48000860  b        0x233620
+00232dc4: 807c0000  lwz      r3, 0(r28)
+00232dc8: a8030066  lha      r0, 0x66(r3)
+00232dcc: 540006b5  rlwinm.  r0, r0, 0, 0x1a, 0x1a
+00232dd0: 4182003c  beq      0x232e0c
+00232dd4: 2c1d005a  cmpwi    r29, 0x5a
+00232dd8: 41800018  blt      0x232df0
+00232ddc: 2c1d0063  cmpwi    r29, 0x63
+00232de0: 41810010  bgt      0x232df0
+00232de4: 38000000  li       r0, 0
+00232de8: 98010040  stb      r0, 0x40(r1)
+00232dec: 48000020  b        0x232e0c
+00232df0: 80630024  lwz      r3, 0x24(r3)
+00232df4: 7fa4eb78  mr       r4, r29
+00232df8: 4be77c29  bl       0xaaa20   ; .GetZoningType__12NeighborhoodFi
+00232dfc: 7c0300d0  neg      r0, r3
+00232e00: 7c001b78  or       r0, r0, r3
+00232e04: 54000ffe  srwi     r0, r0, 0x1f
+00232e08: 98010040  stb      r0, 0x40(r1)
+00232e0c: 389e0000  addi     r4, r30, 0
+00232e10: 386100b8  addi     r3, r1, 0xb8
+00232e14: 38b90000  addi     r5, r25, 0
+00232e18: 38c10040  addi     r6, r1, 0x40
+00232e1c: 4bfff695  bl       0x2324b0   ; .GetHouseInfo__FP8iResFileP9HouseInfoiRb
+00232e20: 5460063f  clrlwi.  r0, r3, 0x18
+00232e24: 40820018  bne      0x232e3c
+00232e28: 386100b8  addi     r3, r1, 0xb8
+00232e2c: 3880ffff  li       r4, -1
+00232e30: 4be649d1  bl       0x97800   ; .__dt__11IFFResFile2Fv
+00232e34: 38600000  li       r3, 0
+00232e38: 480007e8  b        0x233620
+00232e3c: 387a0000  addi     r3, r26, 0
+00232e40: 389d0000  addi     r4, r29, 0
+00232e44: 4be8129d  bl       0xb40e0   ; .GetFamilyInHouse__12NeighborhoodFi
+00232e48: 28030000  cmplwi   r3, 0
+00232e4c: 4182008c  beq      0x232ed8
+00232e50: 8083010c  lwz      r4, 0x10c(r3)
+00232e54: 909e0024  stw      r4, 0x24(r30)
+00232e58: 807c0000  lwz      r3, 0(r28)
+00232e5c: 80630024  lwz      r3, 0x24(r3)
+00232e60: 4be81351  bl       0xb41b0   ; .GetFamily__12NeighborhoodFi
+00232e64: 7c7a1b79  or.      r26, r3, r3
+00232e68: 41820078  beq      0x232ee0
+00232e6c: 38610690  addi     r3, r1, 0x690
+00232e70: 3881069c  addi     r4, r1, 0x69c
+00232e74: 38a00000  li       r5, 0
+00232e78: 38c00100  li       r6, 0x100
+00232e7c: 4bf0f4e5  bl       0x142360   ; .__ct__12StringBufferFPcUiUi

@@ -1,0 +1,6 @@
+                ; ==== .SetGlobal__10cSimulatorFss ====
+00138c20: 7c800734  extsh    r0, r4
+00138c24: 5400083c  slwi     r0, r0, 1
+00138c28: 7c630214  add      r3, r3, r0
+00138c2c: b0a30010  sth      r5, 0x10(r3)
+00138c30: 4e800020  blr      

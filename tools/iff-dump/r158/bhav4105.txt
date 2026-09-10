@@ -1,0 +1,10 @@
+### BHAV 4105 'send to work' (9 instructions)
+ins0  T6/F2    MyPD[58] < Lit[18]
+ins1  T0/F255  StkObjAttr[3] == Lit[1]
+ins2  T7/F253  StkObjID[0] = StkObjAttr[4]
+ins3  T254/F255 PRIM runTreeByName (28) opd=2f01000001020000
+ins4  T5/F253  StkObjID[0] = Lit[0]
+ins5  T3/F255  setToNext ObjectOfType guid=0x5092021d -> StkObjID[0] (flags=0x84)
+ins6  T4/F255  Global[0] < Tuning[130]
+ins7  T255/F8  StkObjID[0] <= Lit[0]
+ins8  T3/F255  CALL 4132 (own-iff) opd=ffffffffffffffff

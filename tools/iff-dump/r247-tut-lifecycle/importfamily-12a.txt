@@ -1,0 +1,64 @@
+000aea00: 4bfc84a1  bl       0x76ea0   ; .__dt__6FamilyFv
+000aea04: 386100b8  addi     r3, r1, 0xb8
+000aea08: 3880ffff  li       r4, -1
+000aea0c: 4bfe8df5  bl       0x97800   ; .__dt__11IFFResFile2Fv
+000aea10: 7e238b78  mr       r3, r17
+000aea14: 48000404  b        0xaee18
+000aea18: 80700000  lwz      r3, 0(r16)
+000aea1c: 80030138  lwz      r0, 0x138(r3)
+000aea20: 540007b8  rlwinm   r0, r0, 0, 0x1e, 0x1c
+000aea24: 90030138  stw      r0, 0x138(r3)
+000aea28: 80010434  lwz      r0, 0x434(r1)
+000aea2c: 540007ff  clrlwi.  r0, r0, 0x1f
+000aea30: 41820018  beq      0xaea48
+000aea34: 80700000  lwz      r3, 0(r16)
+000aea38: 80030138  lwz      r0, 0x138(r3)
+000aea3c: 5400003c  rlwinm   r0, r0, 0, 0, 0x1e
+000aea40: 60000001  ori      r0, r0, 1
+000aea44: 90030138  stw      r0, 0x138(r3)
+000aea48: 88010b58  lbz      r0, 0xb58(r1)
+000aea4c: 5400063f  clrlwi.  r0, r0, 0x18
+000aea50: 41820014  beq      0xaea64
+000aea54: b34f012c  sth      r26, 0x12c(r15)
+000aea58: 38000000  li       r0, 0
+000aea5c: b00f012e  sth      r0, 0x12e(r15)
+000aea60: 48000018  b        0xaea78
+000aea64: a80f012c  lha      r0, 0x12c(r15)
+000aea68: 7c00d000  cmpw     r0, r26
+000aea6c: 4082000c  bne      0xaea78
+000aea70: 38000000  li       r0, 0
+000aea74: b00f012c  sth      r0, 0x12c(r15)
+000aea78: 88010b58  lbz      r0, 0xb58(r1)
+000aea7c: 5400063f  clrlwi.  r0, r0, 0x18
+000aea80: 4182006c  beq      0xaeaec
+000aea84: 806d0000  lwz      r3, 0(r13)
+000aea88: 80630028  lwz      r3, 0x28(r3)
+000aea8c: 7c711b78  mr       r17, r3
+000aea90: 4802b7e1  bl       0xda270   ; .CountSelectors__12ObjectFolderFv
+000aea94: 3a03ffff  addi     r16, r3, -1
+000aea98: 4800004c  b        0xaeae4
+000aea9c: 60000000  nop      
+000aeaa0: 38710000  addi     r3, r17, 0
+000aeaa4: 38900000  addi     r4, r16, 0
+000aeaa8: 4802b5d9  bl       0xda080   ; .GetNthSelector__12ObjectFolderFi
+000aeaac: 28030000  cmplwi   r3, 0
+000aeab0: 41820030  beq      0xaeae0
+000aeab4: 80830060  lwz      r4, 0x60(r3)
+000aeab8: a80400b6  lha      r0, 0xb6(r4)
+000aeabc: 540007bd  rlwinm.  r0, r0, 0, 0x1e, 0x1e
+000aeac0: 41820020  beq      0xaeae0
+000aeac4: 4805684d  bl       0x105310   ; .GetGUID__11ObjSelectorFv
+000aeac8: 38830000  addi     r4, r3, 0
+000aeacc: 38710000  addi     r3, r17, 0
+000aead0: 480247c1  bl       0xd3290   ; .GetTypeAttrBlock__12ObjectFolderFl
+000aead4: 28030000  cmplwi   r3, 0
+000aead8: 41820008  beq      0xaeae0
+000aeadc: 4804d985  bl       0xfc460   ; .Clear__19ObjectTypeAttrBlockFv
+000aeae0: 3a10ffff  addi     r16, r16, -1
+000aeae4: 2c100000  cmpwi    r16, 0
+000aeae8: 4080ffb8  bge      0xaeaa0
+000aeaec: 386100b8  addi     r3, r1, 0xb8
+000aeaf0: 4bfe8011  bl       0x96b00   ; .Close__11IFFResFile2Fv
+000aeaf4: 2c1a0000  cmpwi    r26, 0
+000aeaf8: 418201a4  beq      0xaec9c
+000aeafc: 38610718  addi     r3, r1, 0x718

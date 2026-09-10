@@ -1,0 +1,84 @@
+0024f9f0: 48001721  bl       0x251110
+0024f9f4: 4bded1cd  bl       0x3cbc0
+0024f9f8: 38830000  addi     r4, r3, 0
+0024f9fc: 38610078  addi     r3, r1, 0x78
+0024fa00: 482a4e31  bl       0x4f4830   ; .__as__9cTSStringFPCc
+0024fa04: 48000010  b        0x24fa14
+0024fa08: 38610078  addi     r3, r1, 0x78
+0024fa0c: 3882f3a0  addi     r4, r2, -0xc60
+0024fa10: 482a4ea1  bl       0x4f48b0
+0024fa14: 3862f3a0  addi     r3, r2, -0xc60
+0024fa18: 38810078  addi     r4, r1, 0x78
+0024fa1c: 482a4e95  bl       0x4f48b0
+0024fa20: 807d0000  lwz      r3, 0(r29)
+0024fa24: 38a0fffe  li       r5, -2
+0024fa28: 80810078  lwz      r4, 0x78(r1)
+0024fa2c: 80630010  lwz      r3, 0x10(r3)
+0024fa30: 8084000c  lwz      r4, 0xc(r4)
+0024fa34: 480b99ad  bl       0x3093e0
+0024fa38: 38610078  addi     r3, r1, 0x78
+0024fa3c: 3880ffff  li       r4, -1
+0024fa40: 482a4f41  bl       0x4f4980   ; .__dt__9cTSStringFv
+0024fa44: 480013f0  b        0x250e34
+0024fa48: 3861007c  addi     r3, r1, 0x7c
+0024fa4c: 389e0856  addi     r4, r30, 0x856
+0024fa50: 482a5241  bl       0x4f4c90   ; .__ct__9cTSStringFPCc
+0024fa54: 807d0000  lwz      r3, 0(r29)
+0024fa58: 38a00000  li       r5, 0
+0024fa5c: 8081007c  lwz      r4, 0x7c(r1)
+0024fa60: 80630010  lwz      r3, 0x10(r3)
+0024fa64: 8084000c  lwz      r4, 0xc(r4)
+0024fa68: 480b9979  bl       0x3093e0
+0024fa6c: 3861007c  addi     r3, r1, 0x7c
+0024fa70: 3880ffff  li       r4, -1
+0024fa74: 482a4f0d  bl       0x4f4980   ; .__dt__9cTSStringFv
+0024fa78: 480013bc  b        0x250e34
+0024fa7c: 38610080  addi     r3, r1, 0x80
+0024fa80: 389e0861  addi     r4, r30, 0x861
+0024fa84: 482a520d  bl       0x4f4c90   ; .__ct__9cTSStringFPCc
+0024fa88: 807d0000  lwz      r3, 0(r29)
+0024fa8c: 38a00000  li       r5, 0
+0024fa90: 80810080  lwz      r4, 0x80(r1)
+0024fa94: 80630010  lwz      r3, 0x10(r3)
+0024fa98: 8084000c  lwz      r4, 0xc(r4)
+0024fa9c: 480b9945  bl       0x3093e0
+0024faa0: 38610080  addi     r3, r1, 0x80
+0024faa4: 3880ffff  li       r4, -1
+0024faa8: 482a4ed9  bl       0x4f4980   ; .__dt__9cTSStringFv
+0024faac: 48001388  b        0x250e34
+0024fab0: 807c0000  lwz      r3, 0(r28)
+0024fab4: 4800889d  bl       0x258350   ; .ResetTutorial__8cSimsAppFv
+0024fab8: 4800137c  b        0x250e34
+0024fabc: 807c0000  lwz      r3, 0(r28)
+0024fac0: 389e086b  addi     r4, r30, 0x86b
+0024fac4: 38be0894  addi     r5, r30, 0x894
+0024fac8: 38c00002  li       r6, 2
+0024facc: 38e00000  li       r7, 0
+0024fad0: 48004431  bl       0x253f00   ; .MessageDialog__8cSimsAppFPCcPCcUlb
+0024fad4: 28030004  cmplwi   r3, 4
+0024fad8: 4082135c  bne      0x250e34
+0024fadc: 80600000  lwz      r3, 0(0)
+0024fae0: 4bdca5c1  bl       0x1a0a0   ; .srand_override__FUi
+0024fae4: 48001350  b        0x250e34
+0024fae8: 807d0000  lwz      r3, 0(r29)
+0024faec: 5700063f  clrlwi.  r0, r24, 0x18
+0024faf0: 8063001c  lwz      r3, 0x1c(r3)
+0024faf4: a8a30042  lha      r5, 0x42(r3)
+0024faf8: 54a007fa  rlwinm   r0, r5, 0, 0x1f, 0x1d
+0024fafc: 7c050734  extsh    r5, r0
+0024fb00: 4182000c  beq      0x24fb0c
+0024fb04: 60a00002  ori      r0, r5, 2
+0024fb08: 7c050734  extsh    r5, r0
+0024fb0c: 38800019  li       r4, 0x19
+0024fb10: 4bee9111  bl       0x138c20   ; .SetGlobal__10cSimulatorFss
+0024fb14: 48001320  b        0x250e34
+0024fb18: 807c0000  lwz      r3, 0(r28)
+0024fb1c: 4bffe325  bl       0x24de40   ; .RebuildControlPanel__8cSimsAppFv
+0024fb20: 48001314  b        0x250e34
+0024fb24: 4bfee42d  bl       0x23df50   ; .RefreshAllFaces__12PersonFinderFv
+0024fb28: 4800130c  b        0x250e34
+0024fb2c: 4bff4375  bl       0x243ea0   ; .GetSelected__12PersonFinderFv
+0024fb30: 39e30000  addi     r15, r3, 0
+0024fb34: 2c0fffff  cmpwi    r15, -1
+0024fb38: 418212fc  beq      0x250e34
+0024fb3c: 386001d8  li       r3, 0x1d8

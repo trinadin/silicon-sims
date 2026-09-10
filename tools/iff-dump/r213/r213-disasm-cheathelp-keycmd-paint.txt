@@ -1,0 +1,31 @@
+0050de20: 7c0802a6  mflr     r0
+0050de24: 2c04001b  cmpwi    r4, 0x1b
+0050de28: 90010008  stw      r0, 8(r1)
+0050de2c: 9421ffc0  stwu     r1, -0x40(r1)
+0050de30: 4182001c  beq      0x50de4c
+0050de34: 40800020  bge      0x50de54
+0050de38: 2c04000d  cmpwi    r4, 0xd
+0050de3c: 41820008  beq      0x50de44
+0050de40: 48000014  b        0x50de54
+0050de44: 80e30104  lwz      r7, 0x104(r3)
+0050de48: 48000014  b        0x50de5c
+0050de4c: 80e30108  lwz      r7, 0x108(r3)
+0050de50: 4800000c  b        0x50de5c
+0050de54: 4bff75cd  bl       0x505420
+0050de58: 48000034  b        0x50de8c
+0050de5c: 28070000  cmplwi   r7, 0
+0050de60: 41820028  beq      0x50de88
+0050de64: 28030000  cmplwi   r3, 0
+0050de68: 41820020  beq      0x50de88
+0050de6c: 80a28e04  lwz      r5, -0x71fc(r2)
+0050de70: 7c641b78  mr       r4, r3
+0050de74: 38c00001  li       r6, 1
+0050de78: 80650000  lwz      r3, 0(r5)
+0050de7c: 38a00003  li       r5, 3
+0050de80: 39000000  li       r8, 0
+0050de84: 4800faad  bl       0x51d930
+0050de88: 38600001  li       r3, 1
+0050de8c: 80010048  lwz      r0, 0x48(r1)
+0050de90: 38210040  addi     r1, r1, 0x40
+0050de94: 7c0803a6  mtlr     r0
+0050de98: 4e800020  blr      

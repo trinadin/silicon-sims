@@ -1,0 +1,727 @@
+002b48c0: dbe1fff8  stfd     f31, -8(r1)
+002b48c4: 7c0802a6  mflr     r0
+002b48c8: 2c040001  cmpwi    r4, 1
+002b48cc: bee1ffcc  stmw     r23, -0x34(r1)
+002b48d0: 7c7f1b78  mr       r31, r3
+002b48d4: 83228af8  lwz      r25, -0x7508(r2)
+002b48d8: 7cb82b78  mr       r24, r5
+002b48dc: 83428ca4  lwz      r26, -0x735c(r2)
+002b48e0: 82e28df4  lwz      r23, -0x720c(r2)
+002b48e4: 83628870  lwz      r27, -0x7790(r2)
+002b48e8: 83828874  lwz      r28, -0x778c(r2)
+002b48ec: 83a2b210  lwz      r29, -0x4df0(r2)
+002b48f0: 83c2b214  lwz      r30, -0x4dec(r2)
+002b48f4: 90010008  stw      r0, 8(r1)
+002b48f8: 9421ff00  stwu     r1, -0x100(r1)
+002b48fc: 41820008  beq      0x2b4904
+002b4900: 48000b00  b        0x2b5400
+002b4904: 801f0104  lwz      r0, 0x104(r31)
+002b4908: 7c180040  cmplw    r24, r0
+002b490c: 40820030  bne      0x2b493c
+002b4910: 807f00cc  lwz      r3, 0xcc(r31)
+002b4914: 4bf5c6cd  bl       0x210fe0
+002b4918: 2c030001  cmpwi    r3, 1
+002b491c: 4182000c  beq      0x2b4928
+002b4920: 80770000  lwz      r3, 0(r23)
+002b4924: 4bfd3e1d  bl       0x288740
+002b4928: 807f00cc  lwz      r3, 0xcc(r31)
+002b492c: 38800001  li       r4, 1
+002b4930: 38a00000  li       r5, 0
+002b4934: 4bf5b83d  bl       0x210170
+002b4938: 48000ac8  b        0x2b5400
+002b493c: 801f0108  lwz      r0, 0x108(r31)
+002b4940: 7c180040  cmplw    r24, r0
+002b4944: 40820030  bne      0x2b4974
+002b4948: 807f00cc  lwz      r3, 0xcc(r31)
+002b494c: 4bf5c695  bl       0x210fe0
+002b4950: 2c030002  cmpwi    r3, 2
+002b4954: 4182000c  beq      0x2b4960
+002b4958: 80770000  lwz      r3, 0(r23)
+002b495c: 4bfd3de5  bl       0x288740
+002b4960: 807f00cc  lwz      r3, 0xcc(r31)
+002b4964: 38800002  li       r4, 2
+002b4968: 38a00000  li       r5, 0
+002b496c: 4bf5b805  bl       0x210170
+002b4970: 48000a90  b        0x2b5400
+002b4974: 801f010c  lwz      r0, 0x10c(r31)
+002b4978: 7c180040  cmplw    r24, r0
+002b497c: 40820018  bne      0x2b4994
+002b4980: 807f00cc  lwz      r3, 0xcc(r31)
+002b4984: 38800008  li       r4, 8
+002b4988: 38a00001  li       r5, 1
+002b498c: 4bf5b4b5  bl       0x20fe40
+002b4990: 48000a70  b        0x2b5400
+002b4994: 801f00d0  lwz      r0, 0xd0(r31)
+002b4998: 7c180040  cmplw    r24, r0
+002b499c: 40820014  bne      0x2b49b0
+002b49a0: 807f00cc  lwz      r3, 0xcc(r31)
+002b49a4: 38800001  li       r4, 1
+002b49a8: 4bf5ba79  bl       0x210420
+002b49ac: 48000a54  b        0x2b5400
+002b49b0: 801f00d4  lwz      r0, 0xd4(r31)
+002b49b4: 7c180040  cmplw    r24, r0
+002b49b8: 40820014  bne      0x2b49cc
+002b49bc: 807f00cc  lwz      r3, 0xcc(r31)
+002b49c0: 38800001  li       r4, 1
+002b49c4: 4bf5bb1d  bl       0x2104e0
+002b49c8: 48000a38  b        0x2b5400
+002b49cc: 801f00d8  lwz      r0, 0xd8(r31)
+002b49d0: 7c180040  cmplw    r24, r0
+002b49d4: 40820014  bne      0x2b49e8
+002b49d8: 807f00cc  lwz      r3, 0xcc(r31)
+002b49dc: 38800001  li       r4, 1
+002b49e0: 4bf5b971  bl       0x210350
+002b49e4: 48000a1c  b        0x2b5400
+002b49e8: 801f00dc  lwz      r0, 0xdc(r31)
+002b49ec: 7c180040  cmplw    r24, r0
+002b49f0: 40820014  bne      0x2b4a04
+002b49f4: 807f00cc  lwz      r3, 0xcc(r31)
+002b49f8: 38800001  li       r4, 1
+002b49fc: 4bf5b835  bl       0x210230
+002b4a00: 48000a00  b        0x2b5400
+002b4a04: 801f00e0  lwz      r0, 0xe0(r31)
+002b4a08: 7c180040  cmplw    r24, r0
+002b4a0c: 40820018  bne      0x2b4a24
+002b4a10: 807f00cc  lwz      r3, 0xcc(r31)
+002b4a14: 38800001  li       r4, 1
+002b4a18: 38a00001  li       r5, 1
+002b4a1c: 4bf5b425  bl       0x20fe40
+002b4a20: 480009e0  b        0x2b5400
+002b4a24: 801f00e4  lwz      r0, 0xe4(r31)
+002b4a28: 7c180040  cmplw    r24, r0
+002b4a2c: 40820018  bne      0x2b4a44
+002b4a30: 807f00cc  lwz      r3, 0xcc(r31)
+002b4a34: 38800004  li       r4, 4
+002b4a38: 38a00001  li       r5, 1
+002b4a3c: 4bf5b405  bl       0x20fe40
+002b4a40: 480009c0  b        0x2b5400
+002b4a44: 801f00e8  lwz      r0, 0xe8(r31)
+002b4a48: 7c180040  cmplw    r24, r0
+002b4a4c: 40820018  bne      0x2b4a64
+002b4a50: 807f00cc  lwz      r3, 0xcc(r31)
+002b4a54: 38800002  li       r4, 2
+002b4a58: 38a00001  li       r5, 1
+002b4a5c: 4bf5b3e5  bl       0x20fe40
+002b4a60: 480009a0  b        0x2b5400
+002b4a64: 801f00ec  lwz      r0, 0xec(r31)
+002b4a68: 7c180040  cmplw    r24, r0
+002b4a6c: 408200b8  bne      0x2b4b24
+002b4a70: 38600010  li       r3, 0x10
+002b4a74: 4bd8290d  bl       0x37380
+002b4a78: 54638ffe  rlwinm   r3, r3, 0x11, 0x1f, 0x1f
+002b4a7c: 7c0300d0  neg      r0, r3
+002b4a80: 7c001b78  or       r0, r0, r3
+002b4a84: 54180ffe  srwi     r24, r0, 0x1f
+002b4a88: 38600011  li       r3, 0x11
+002b4a8c: 4bd828f5  bl       0x37380
+002b4a90: 54638ffe  rlwinm   r3, r3, 0x11, 0x1f, 0x1f
+002b4a94: 28180000  cmplwi   r24, 0
+002b4a98: 7c0300d0  neg      r0, r3
+002b4a9c: 7c001b78  or       r0, r0, r3
+002b4aa0: 54000ffe  srwi     r0, r0, 0x1f
+002b4aa4: 4182000c  beq      0x2b4ab0
+002b4aa8: 28000000  cmplwi   r0, 0
+002b4aac: 40820954  bne      0x2b5400
+002b4ab0: 807f00cc  lwz      r3, 0xcc(r31)
+002b4ab4: 4bf5c69d  bl       0x211150
+002b4ab8: 2c030002  cmpwi    r3, 2
+002b4abc: 40820038  bne      0x2b4af4
+002b4ac0: 801f0188  lwz      r0, 0x188(r31)
+002b4ac4: 2c000000  cmpwi    r0, 0
+002b4ac8: 40820018  bne      0x2b4ae0
+002b4acc: 807f00cc  lwz      r3, 0xcc(r31)
+002b4ad0: 38800001  li       r4, 1
+002b4ad4: 38a00000  li       r5, 0
+002b4ad8: 4bf57e29  bl       0x20c900
+002b4adc: 48000924  b        0x2b5400
+002b4ae0: 807f00cc  lwz      r3, 0xcc(r31)
+002b4ae4: 38800000  li       r4, 0
+002b4ae8: 38a00000  li       r5, 0
+002b4aec: 4bf57e15  bl       0x20c900
+002b4af0: 48000910  b        0x2b5400
+002b4af4: 801f0188  lwz      r0, 0x188(r31)
+002b4af8: 2c000001  cmpwi    r0, 1
+002b4afc: 40820014  bne      0x2b4b10
+002b4b00: 807f00cc  lwz      r3, 0xcc(r31)
+002b4b04: 38800000  li       r4, 0
+002b4b08: 38a00000  li       r5, 0
+002b4b0c: 4bf57df5  bl       0x20c900
+002b4b10: 807f00cc  lwz      r3, 0xcc(r31)
+002b4b14: 38800002  li       r4, 2
+002b4b18: 38a00000  li       r5, 0
+002b4b1c: 4bf5bc75  bl       0x210790
+002b4b20: 480008e0  b        0x2b5400
+002b4b24: 801f00f0  lwz      r0, 0xf0(r31)
+002b4b28: 7c180040  cmplw    r24, r0
+002b4b2c: 40820098  bne      0x2b4bc4
+002b4b30: 801f0188  lwz      r0, 0x188(r31)
+002b4b34: 2c000001  cmpwi    r0, 1
+002b4b38: 40820014  bne      0x2b4b4c
+002b4b3c: 807f00cc  lwz      r3, 0xcc(r31)
+002b4b40: 38800000  li       r4, 0
+002b4b44: 38a00000  li       r5, 0
+002b4b48: 4bf57db9  bl       0x20c900
+002b4b4c: 807f00cc  lwz      r3, 0xcc(r31)
+002b4b50: 4bf5c601  bl       0x211150
+002b4b54: 2c030001  cmpwi    r3, 1
+002b4b58: 40820058  bne      0x2b4bb0
+002b4b5c: 807f00cc  lwz      r3, 0xcc(r31)
+002b4b60: 80030090  lwz      r0, 0x90(r3)
+002b4b64: 2c000001  cmpwi    r0, 1
+002b4b68: 4182002c  beq      0x2b4b94
+002b4b6c: 40800010  bge      0x2b4b7c
+002b4b70: 2c000000  cmpwi    r0, 0
+002b4b74: 40800014  bge      0x2b4b88
+002b4b78: 48000030  b        0x2b4ba8
+002b4b7c: 2c000003  cmpwi    r0, 3
+002b4b80: 40800028  bge      0x2b4ba8
+002b4b84: 4800001c  b        0x2b4ba0
+002b4b88: 38800001  li       r4, 1
+002b4b8c: 4bf59e35  bl       0x20e9c0
+002b4b90: 48000018  b        0x2b4ba8
+002b4b94: 38800000  li       r4, 0
+002b4b98: 4bf59e29  bl       0x20e9c0
+002b4b9c: 4800000c  b        0x2b4ba8
+002b4ba0: 38800002  li       r4, 2
+002b4ba4: 4bf59e1d  bl       0x20e9c0
+002b4ba8: 807f00cc  lwz      r3, 0xcc(r31)
+002b4bac: 4bf57965  bl       0x20c510
+002b4bb0: 807f00cc  lwz      r3, 0xcc(r31)
+002b4bb4: 38800001  li       r4, 1
+002b4bb8: 38a00000  li       r5, 0
+002b4bbc: 4bf5bbd5  bl       0x210790
+002b4bc0: 48000840  b        0x2b5400
+002b4bc4: 801f00f4  lwz      r0, 0xf4(r31)
+002b4bc8: 7c180040  cmplw    r24, r0
+002b4bcc: 40820034  bne      0x2b4c00
+002b4bd0: 801f0188  lwz      r0, 0x188(r31)
+002b4bd4: 2c000001  cmpwi    r0, 1
+002b4bd8: 40820014  bne      0x2b4bec
+002b4bdc: 807f00cc  lwz      r3, 0xcc(r31)
+002b4be0: 38800000  li       r4, 0
+002b4be4: 38a00000  li       r5, 0
+002b4be8: 4bf57d19  bl       0x20c900
+002b4bec: 807f00cc  lwz      r3, 0xcc(r31)
+002b4bf0: 38800000  li       r4, 0
+002b4bf4: 38a00000  li       r5, 0
+002b4bf8: 4bf5bb99  bl       0x210790
+002b4bfc: 48000804  b        0x2b5400
+002b4c00: 801f00f8  lwz      r0, 0xf8(r31)
+002b4c04: 7c180040  cmplw    r24, r0
+002b4c08: 40820034  bne      0x2b4c3c
+002b4c0c: 801f0188  lwz      r0, 0x188(r31)
+002b4c10: 2c000001  cmpwi    r0, 1
+002b4c14: 40820014  bne      0x2b4c28
+002b4c18: 807f00cc  lwz      r3, 0xcc(r31)
+002b4c1c: 38800000  li       r4, 0
+002b4c20: 38a00000  li       r5, 0
+002b4c24: 4bf57cdd  bl       0x20c900
+002b4c28: 807f00cc  lwz      r3, 0xcc(r31)
+002b4c2c: 38800003  li       r4, 3
+002b4c30: 38a00000  li       r5, 0
+002b4c34: 4bf5bb5d  bl       0x210790
+002b4c38: 480007c8  b        0x2b5400
+002b4c3c: 801f00fc  lwz      r0, 0xfc(r31)
+002b4c40: 7c180040  cmplw    r24, r0
+002b4c44: 40820034  bne      0x2b4c78
+002b4c48: 801f0188  lwz      r0, 0x188(r31)
+002b4c4c: 2c000001  cmpwi    r0, 1
+002b4c50: 40820014  bne      0x2b4c64
+002b4c54: 807f00cc  lwz      r3, 0xcc(r31)
+002b4c58: 38800000  li       r4, 0
+002b4c5c: 38a00000  li       r5, 0
+002b4c60: 4bf57ca1  bl       0x20c900
+002b4c64: 807f00cc  lwz      r3, 0xcc(r31)
+002b4c68: 38800004  li       r4, 4
+002b4c6c: 38a00000  li       r5, 0
+002b4c70: 4bf5bb21  bl       0x210790
+002b4c74: 4800078c  b        0x2b5400
+002b4c78: 801f0110  lwz      r0, 0x110(r31)
+002b4c7c: 7c180040  cmplw    r24, r0
+002b4c80: 40820068  bne      0x2b4ce8
+002b4c84: 807f00cc  lwz      r3, 0xcc(r31)
+002b4c88: 4bf5c329  bl       0x210fb0
+002b4c8c: 5460063f  clrlwi.  r0, r3, 0x18
+002b4c90: 41820020  beq      0x2b4cb0
+002b4c94: 807f00cc  lwz      r3, 0xcc(r31)
+002b4c98: 4bf5c2e9  bl       0x210f80
+002b4c9c: 38a30000  addi     r5, r3, 0
+002b4ca0: 387f0000  addi     r3, r31, 0
+002b4ca4: 38800000  li       r4, 0
+002b4ca8: 4bffe2e9  bl       0x2b2f90
+002b4cac: 4800001c  b        0x2b4cc8
+002b4cb0: 807f00cc  lwz      r3, 0xcc(r31)
+002b4cb4: 4bf5c2cd  bl       0x210f80
+002b4cb8: 38830000  addi     r4, r3, 0
+002b4cbc: 387f0000  addi     r3, r31, 0
+002b4cc0: 38a00000  li       r5, 0
+002b4cc4: 4bffe2cd  bl       0x2b2f90
+002b4cc8: 807f00cc  lwz      r3, 0xcc(r31)
+002b4ccc: 4bf5c2e5  bl       0x210fb0
+002b4cd0: 5460063e  clrlwi   r0, r3, 0x18
+002b4cd4: 807f00cc  lwz      r3, 0xcc(r31)
+002b4cd8: 7c000034  cntlzw   r0, r0
+002b4cdc: 5404d97e  srwi     r4, r0, 5
+002b4ce0: 4bf5b3f1  bl       0x2100d0
+002b4ce4: 4800071c  b        0x2b5400
+002b4ce8: 801f0114  lwz      r0, 0x114(r31)
+002b4cec: 7c180040  cmplw    r24, r0
+002b4cf0: 408200c8  bne      0x2b4db8
+002b4cf4: 807f00cc  lwz      r3, 0xcc(r31)
+002b4cf8: 4bf5c459  bl       0x211150
+002b4cfc: 2c030002  cmpwi    r3, 2
+002b4d00: 4082000c  bne      0x2b4d0c
+002b4d04: 38000000  li       r0, 0
+002b4d08: 981f01bc  stb      r0, 0x1bc(r31)
+002b4d0c: 807f00cc  lwz      r3, 0xcc(r31)
+002b4d10: 4bf5c2a1  bl       0x210fb0
+002b4d14: 5460063f  clrlwi.  r0, r3, 0x18
+002b4d18: 41820034  beq      0x2b4d4c
+002b4d1c: c03d0000  lfs      f1, 0(r29)
+002b4d20: c01d0004  lfs      f0, 4(r29)
+002b4d24: c85e0000  lfd      f2, 0(r30)
+002b4d28: ec010032  fmuls    f0, f1, f0
+002b4d2c: ffe2002a  fadd     f31, f2, f0
+002b4d30: fc20f890  fmr      f1, f31
+002b4d34: 482dc9ed  bl       0x591720
+002b4d38: 38a30000  addi     r5, r3, 0
+002b4d3c: 387f0000  addi     r3, r31, 0
+002b4d40: 38800000  li       r4, 0
+002b4d44: 4bffe24d  bl       0x2b2f90
+002b4d48: 4800003c  b        0x2b4d84
+002b4d4c: c03d0000  lfs      f1, 0(r29)
+002b4d50: c01d0004  lfs      f0, 4(r29)
+002b4d54: c85e0000  lfd      f2, 0(r30)
+002b4d58: ec010032  fmuls    f0, f1, f0
+002b4d5c: ffe2002a  fadd     f31, f2, f0
+002b4d60: fc20f890  fmr      f1, f31
+002b4d64: 482dc9bd  bl       0x591720
+002b4d68: 7c781b78  mr       r24, r3
+002b4d6c: 807f00cc  lwz      r3, 0xcc(r31)
+002b4d70: 4bf5c211  bl       0x210f80
+002b4d74: 38830000  addi     r4, r3, 0
+002b4d78: 387f0000  addi     r3, r31, 0
+002b4d7c: 38b80000  addi     r5, r24, 0
+002b4d80: 4bffe211  bl       0x2b2f90
+002b4d84: 807f00cc  lwz      r3, 0xcc(r31)
+002b4d88: 4bf5c3c9  bl       0x211150
+002b4d8c: 2c030002  cmpwi    r3, 2
+002b4d90: 40820010  bne      0x2b4da0
+002b4d94: 807f00cc  lwz      r3, 0xcc(r31)
+002b4d98: 38800000  li       r4, 0
+002b4d9c: 4bf5b335  bl       0x2100d0
+002b4da0: fc20f890  fmr      f1, f31
+002b4da4: 482dc97d  bl       0x591720
+002b4da8: 7c641b78  mr       r4, r3
+002b4dac: 807f00cc  lwz      r3, 0xcc(r31)
+002b4db0: 4bf5b201  bl       0x20ffb0
+002b4db4: 4800064c  b        0x2b5400
+002b4db8: 801f0118  lwz      r0, 0x118(r31)
+002b4dbc: 7c180040  cmplw    r24, r0
+002b4dc0: 408200c8  bne      0x2b4e88
+002b4dc4: 807f00cc  lwz      r3, 0xcc(r31)
+002b4dc8: 4bf5c389  bl       0x211150
+002b4dcc: 2c030002  cmpwi    r3, 2
+002b4dd0: 4082000c  bne      0x2b4ddc
+002b4dd4: 38000000  li       r0, 0
+002b4dd8: 981f01bc  stb      r0, 0x1bc(r31)
+002b4ddc: 807f00cc  lwz      r3, 0xcc(r31)
+002b4de0: 4bf5c1d1  bl       0x210fb0
+002b4de4: 5460063f  clrlwi.  r0, r3, 0x18
+002b4de8: 41820034  beq      0x2b4e1c
+002b4dec: c03d0000  lfs      f1, 0(r29)
+002b4df0: c01d0008  lfs      f0, 8(r29)
+002b4df4: c85e0000  lfd      f2, 0(r30)
+002b4df8: ec010032  fmuls    f0, f1, f0
+002b4dfc: ffe2002a  fadd     f31, f2, f0
+002b4e00: fc20f890  fmr      f1, f31
+002b4e04: 482dc91d  bl       0x591720
+002b4e08: 38a30000  addi     r5, r3, 0
+002b4e0c: 387f0000  addi     r3, r31, 0
+002b4e10: 38800000  li       r4, 0
+002b4e14: 4bffe17d  bl       0x2b2f90
+002b4e18: 4800003c  b        0x2b4e54
+002b4e1c: c03d0000  lfs      f1, 0(r29)
+002b4e20: c01d0008  lfs      f0, 8(r29)
+002b4e24: c85e0000  lfd      f2, 0(r30)
+002b4e28: ec010032  fmuls    f0, f1, f0
+002b4e2c: ffe2002a  fadd     f31, f2, f0
+002b4e30: fc20f890  fmr      f1, f31
+002b4e34: 482dc8ed  bl       0x591720
+002b4e38: 7c781b78  mr       r24, r3
+002b4e3c: 807f00cc  lwz      r3, 0xcc(r31)
+002b4e40: 4bf5c141  bl       0x210f80
+002b4e44: 38830000  addi     r4, r3, 0
+002b4e48: 387f0000  addi     r3, r31, 0
+002b4e4c: 38b80000  addi     r5, r24, 0
+002b4e50: 4bffe141  bl       0x2b2f90
+002b4e54: 807f00cc  lwz      r3, 0xcc(r31)
+002b4e58: 4bf5c2f9  bl       0x211150
+002b4e5c: 2c030002  cmpwi    r3, 2
+002b4e60: 40820010  bne      0x2b4e70
+002b4e64: 807f00cc  lwz      r3, 0xcc(r31)
+002b4e68: 38800000  li       r4, 0
+002b4e6c: 4bf5b265  bl       0x2100d0
+002b4e70: fc20f890  fmr      f1, f31
+002b4e74: 482dc8ad  bl       0x591720
+002b4e78: 7c641b78  mr       r4, r3
+002b4e7c: 807f00cc  lwz      r3, 0xcc(r31)
+002b4e80: 4bf5b131  bl       0x20ffb0
+002b4e84: 4800057c  b        0x2b5400
+002b4e88: 801f011c  lwz      r0, 0x11c(r31)
+002b4e8c: 7c180040  cmplw    r24, r0
+002b4e90: 408200ec  bne      0x2b4f7c
+002b4e94: 807f00cc  lwz      r3, 0xcc(r31)
+002b4e98: 4bf5c2b9  bl       0x211150
+002b4e9c: 2c030002  cmpwi    r3, 2
+002b4ea0: 4082000c  bne      0x2b4eac
+002b4ea4: 38000000  li       r0, 0
+002b4ea8: 981f01bc  stb      r0, 0x1bc(r31)
+002b4eac: 807f00cc  lwz      r3, 0xcc(r31)
+002b4eb0: 4bf5c101  bl       0x210fb0
+002b4eb4: 5460063f  clrlwi.  r0, r3, 0x18
+002b4eb8: 41820034  beq      0x2b4eec
+002b4ebc: c05d0000  lfs      f2, 0(r29)
+002b4ec0: c03d000c  lfs      f1, 0xc(r29)
+002b4ec4: c81e0000  lfd      f0, 0(r30)
+002b4ec8: ec220072  fmuls    f1, f2, f1
+002b4ecc: ffe0082a  fadd     f31, f0, f1
+002b4ed0: fc20f890  fmr      f1, f31
+002b4ed4: 482dc84d  bl       0x591720
+002b4ed8: 38a30000  addi     r5, r3, 0
+002b4edc: 387f0000  addi     r3, r31, 0
+002b4ee0: 38800000  li       r4, 0
+002b4ee4: 4bffe0ad  bl       0x2b2f90
+002b4ee8: 4800003c  b        0x2b4f24
+002b4eec: c05d0000  lfs      f2, 0(r29)
+002b4ef0: c03d000c  lfs      f1, 0xc(r29)
+002b4ef4: c81e0000  lfd      f0, 0(r30)
+002b4ef8: ec220072  fmuls    f1, f2, f1
+002b4efc: ffe0082a  fadd     f31, f0, f1
+002b4f00: fc20f890  fmr      f1, f31
+002b4f04: 482dc81d  bl       0x591720
+002b4f08: 7c781b78  mr       r24, r3
+002b4f0c: 807f00cc  lwz      r3, 0xcc(r31)
+002b4f10: 4bf5c071  bl       0x210f80
+002b4f14: 38830000  addi     r4, r3, 0
+002b4f18: 387f0000  addi     r3, r31, 0
+002b4f1c: 38b80000  addi     r5, r24, 0
+002b4f20: 4bffe071  bl       0x2b2f90
+002b4f24: 807f00cc  lwz      r3, 0xcc(r31)
+002b4f28: 4bf5c229  bl       0x211150
+002b4f2c: 2c030002  cmpwi    r3, 2
+002b4f30: 40820010  bne      0x2b4f40
+002b4f34: 807f00cc  lwz      r3, 0xcc(r31)
+002b4f38: 38800000  li       r4, 0
+002b4f3c: 4bf5b195  bl       0x2100d0
+002b4f40: fc20f890  fmr      f1, f31
+002b4f44: 482dc7dd  bl       0x591720
+002b4f48: 7c781b78  mr       r24, r3
+002b4f4c: 807f00cc  lwz      r3, 0xcc(r31)
+002b4f50: 4bf5c031  bl       0x210f80
+002b4f54: 38830000  addi     r4, r3, 0
+002b4f58: 387f0000  addi     r3, r31, 0
+002b4f5c: 38b80000  addi     r5, r24, 0
+002b4f60: 4bffe031  bl       0x2b2f90
+002b4f64: fc20f890  fmr      f1, f31
+002b4f68: 482dc7b9  bl       0x591720
+002b4f6c: 7c641b78  mr       r4, r3
+002b4f70: 807f00cc  lwz      r3, 0xcc(r31)
+002b4f74: 4bf5b03d  bl       0x20ffb0
+002b4f78: 48000488  b        0x2b5400
+002b4f7c: 801f0100  lwz      r0, 0x100(r31)
+002b4f80: 7c180040  cmplw    r24, r0
+002b4f84: 40820190  bne      0x2b5114
+002b4f88: 807c0000  lwz      r3, 0(r28)
+002b4f8c: 8083001c  lwz      r4, 0x1c(r3)
+002b4f90: a8040050  lha      r0, 0x50(r4)
+002b4f94: 2c000000  cmpwi    r0, 0
+002b4f98: 4082017c  bne      0x2b5114
+002b4f9c: 80630024  lwz      r3, 0x24(r3)
+002b4fa0: a8840024  lha      r4, 0x24(r4)
+002b4fa4: 4bdf5a7d  bl       0xaaa20
+002b4fa8: 20030001  subfic   r0, r3, 1
+002b4fac: 7c000034  cntlzw   r0, r0
+002b4fb0: 5400de3e  rlwinm   r0, r0, 0x1b, 0x18, 0x1f
+002b4fb4: 28000001  cmplwi   r0, 1
+002b4fb8: 4082015c  bne      0x2b5114
+002b4fbc: 807c0000  lwz      r3, 0(r28)
+002b4fc0: 38a0fffc  li       r5, -4
+002b4fc4: 8082b208  lwz      r4, -0x4df8(r2)
+002b4fc8: 80630010  lwz      r3, 0x10(r3)
+002b4fcc: 388400a8  addi     r4, r4, 0xa8
+002b4fd0: 48054411  bl       0x3093e0
+002b4fd4: 38600138  li       r3, 0x138
+002b4fd8: 482dc469  bl       0x591440
+002b4fdc: 7c781b79  or.      r24, r3, r3
+002b4fe0: 41820008  beq      0x2b4fe8
+002b4fe4: 4bfafdad  bl       0x264d90
+002b4fe8: 28180000  cmplwi   r24, 0
+002b4fec: 41820100  beq      0x2b50ec
+002b4ff0: 7f03c378  mr       r3, r24
+002b4ff4: 81980000  lwz      r12, 0(r24)
+002b4ff8: 818c0014  lwz      r12, 0x14(r12)
+002b4ffc: 482ed9e5  bl       0x5a29e0
+002b5000: 80410014  lwz      r2, 0x14(r1)
+002b5004: 5460063f  clrlwi.  r0, r3, 0x18
+002b5008: 418200e4  beq      0x2b50ec
+002b500c: 807a0000  lwz      r3, 0(r26)
+002b5010: 81830000  lwz      r12, 0(r3)
+002b5014: 818c0024  lwz      r12, 0x24(r12)
+002b5018: 482ed9c9  bl       0x5a29e0
+002b501c: 80410014  lwz      r2, 0x14(r1)
+002b5020: 81830000  lwz      r12, 0(r3)
+002b5024: 818c0010  lwz      r12, 0x10(r12)
+002b5028: 482ed9b9  bl       0x5a29e0
+002b502c: 80410014  lwz      r2, 0x14(r1)
+002b5030: 81430078  lwz      r10, 0x78(r3)
+002b5034: 81630074  lwz      r11, 0x74(r3)
+002b5038: 7c0a00d0  neg      r0, r10
+002b503c: 81030080  lwz      r8, 0x80(r3)
+002b5040: 8123007c  lwz      r9, 0x7c(r3)
+002b5044: 7ceb00d0  neg      r7, r11
+002b5048: 80d80078  lwz      r6, 0x78(r24)
+002b504c: 7d4a0214  add      r10, r10, r0
+002b5050: 7d080214  add      r8, r8, r0
+002b5054: 80b80080  lwz      r5, 0x80(r24)
+002b5058: 7d6b3a14  add      r11, r11, r7
+002b505c: 7d293a14  add      r9, r9, r7
+002b5060: 80980074  lwz      r4, 0x74(r24)
+002b5064: 7ce62850  subf     r7, r6, r5
+002b5068: 7caa4050  subf     r5, r10, r8
+002b506c: 81980000  lwz      r12, 0(r24)
+002b5070: 7cc72850  subf     r6, r7, r5
+002b5074: 8018007c  lwz      r0, 0x7c(r24)
+002b5078: 54c50ffe  srwi     r5, r6, 0x1f
+002b507c: 818c0068  lwz      r12, 0x68(r12)
+002b5080: 7ca53214  add      r5, r5, r6
+002b5084: 7cc40050  subf     r6, r4, r0
+002b5088: 7c0b4850  subf     r0, r11, r9
+002b508c: 7c860050  subf     r4, r6, r0
+002b5090: 54800ffe  srwi     r0, r4, 0x1f
+002b5094: 7ca50e70  srawi    r5, r5, 1
+002b5098: 7c002214  add      r0, r0, r4
+002b509c: 7c040e70  srawi    r4, r0, 1
+002b50a0: 7ce53a14  add      r7, r5, r7
+002b50a4: 7f03c378  mr       r3, r24
+002b50a8: 7cc43214  add      r6, r4, r6
+002b50ac: 482ed935  bl       0x5a29e0
+002b50b0: 80410014  lwz      r2, 0x14(r1)
+002b50b4: 93f80050  stw      r31, 0x50(r24)
+002b50b8: 38800001  li       r4, 1
+002b50bc: 807b0000  lwz      r3, 0(r27)
+002b50c0: 80630080  lwz      r3, 0x80(r3)
+002b50c4: 4bf5d8ad  bl       0x212970
+002b50c8: 807b0000  lwz      r3, 0(r27)
+002b50cc: 38980000  addi     r4, r24, 0
+002b50d0: 38a00001  li       r5, 1
+002b50d4: 38c00000  li       r6, 0
+002b50d8: 4bf9e839  bl       0x253910
+002b50dc: 807b0000  lwz      r3, 0(r27)
+002b50e0: 38800000  li       r4, 0
+002b50e4: 80630080  lwz      r3, 0x80(r3)
+002b50e8: 4bf5d889  bl       0x212970
+002b50ec: 28180000  cmplwi   r24, 0
+002b50f0: 41820014  beq      0x2b5104
+002b50f4: 807c0000  lwz      r3, 0(r28)
+002b50f8: 7f04c378  mr       r4, r24
+002b50fc: 80630050  lwz      r3, 0x50(r3)
+002b5100: 48268ea1  bl       0x51dfa0
+002b5104: 807f0100  lwz      r3, 0x100(r31)
+002b5108: 38800000  li       r4, 0
+002b510c: 48256245  bl       0x50b350
+002b5110: 480002f0  b        0x2b5400
+002b5114: 801f01a8  lwz      r0, 0x1a8(r31)
+002b5118: 7c180040  cmplw    r24, r0
+002b511c: 40820238  bne      0x2b5354
+002b5120: 807c0000  lwz      r3, 0(r28)
+002b5124: 8063001c  lwz      r3, 0x1c(r3)
+002b5128: a8030050  lha      r0, 0x50(r3)
+002b512c: 2c000000  cmpwi    r0, 0
+002b5130: 40820224  bne      0x2b5354
+002b5134: 38600140  li       r3, 0x140
+002b5138: 482dc309  bl       0x591440
+002b513c: 7c781b79  or.      r24, r3, r3
+002b5140: 41820008  beq      0x2b5148
+002b5144: 4bfe28dd  bl       0x297a20
+002b5148: 28180000  cmplwi   r24, 0
+002b514c: 418201e0  beq      0x2b532c
+002b5150: 7f03c378  mr       r3, r24
+002b5154: 81980000  lwz      r12, 0(r24)
+002b5158: 818c0014  lwz      r12, 0x14(r12)
+002b515c: 482ed885  bl       0x5a29e0
+002b5160: 80410014  lwz      r2, 0x14(r1)
+002b5164: 5460063f  clrlwi.  r0, r3, 0x18
+002b5168: 418201c4  beq      0x2b532c
+002b516c: 3861004c  addi     r3, r1, 0x4c
+002b5170: 4be90f81  bl       0x1460f0
+002b5174: 932100b4  stw      r25, 0xb4(r1)
+002b5178: 38600009  li       r3, 9
+002b517c: 4bdd2de5  bl       0x87f60
+002b5180: 38830000  addi     r4, r3, 0
+002b5184: 38a1004c  addi     r5, r1, 0x4c
+002b5188: 386000a2  li       r3, 0xa2
+002b518c: 38c00000  li       r6, 0
+002b5190: 4bfaa2b1  bl       0x25f440
+002b5194: 5460063f  clrlwi.  r0, r3, 0x18
+002b5198: 41820184  beq      0x2b531c
+002b519c: 3861004c  addi     r3, r1, 0x4c
+002b51a0: 38800001  li       r4, 1
+002b51a4: 38a0ffff  li       r5, -1
+002b51a8: 4be8f959  bl       0x144b00
+002b51ac: 38830000  addi     r4, r3, 0
+002b51b0: 38610040  addi     r3, r1, 0x40
+002b51b4: 4823fadd  bl       0x4f4c90
+002b51b8: 38780000  addi     r3, r24, 0
+002b51bc: 38810040  addi     r4, r1, 0x40
+002b51c0: 4bfe22f1  bl       0x2974b0
+002b51c4: 38610040  addi     r3, r1, 0x40
+002b51c8: 3880ffff  li       r4, -1
+002b51cc: 4823f7b5  bl       0x4f4980
+002b51d0: 3861004c  addi     r3, r1, 0x4c
+002b51d4: 38800002  li       r4, 2
+002b51d8: 38a0ffff  li       r5, -1
+002b51dc: 4be8f925  bl       0x144b00
+002b51e0: 38830000  addi     r4, r3, 0
+002b51e4: 38610044  addi     r3, r1, 0x44
+002b51e8: 4823faa9  bl       0x4f4c90
+002b51ec: 38780000  addi     r3, r24, 0
+002b51f0: 38810044  addi     r4, r1, 0x44
+002b51f4: 4bfe18bd  bl       0x296ab0
+002b51f8: 38610044  addi     r3, r1, 0x44
+002b51fc: 3880ffff  li       r4, -1
+002b5200: 4823f781  bl       0x4f4980
+002b5204: 3861004c  addi     r3, r1, 0x4c
+002b5208: 38800003  li       r4, 3
+002b520c: 38a0ffff  li       r5, -1
+002b5210: 4be8f8f1  bl       0x144b00
+002b5214: 38830000  addi     r4, r3, 0
+002b5218: 38610048  addi     r3, r1, 0x48
+002b521c: 4823fa75  bl       0x4f4c90
+002b5220: 38780000  addi     r3, r24, 0
+002b5224: 38810048  addi     r4, r1, 0x48
+002b5228: 38a00000  li       r5, 0
+002b522c: 4bfe2005  bl       0x297230
+002b5230: 38610048  addi     r3, r1, 0x48
+002b5234: 3880ffff  li       r4, -1
+002b5238: 4823f749  bl       0x4f4980
+002b523c: 807a0000  lwz      r3, 0(r26)
+002b5240: 81830000  lwz      r12, 0(r3)
+002b5244: 818c0024  lwz      r12, 0x24(r12)
+002b5248: 482ed799  bl       0x5a29e0
+002b524c: 80410014  lwz      r2, 0x14(r1)
+002b5250: 81830000  lwz      r12, 0(r3)
+002b5254: 818c0010  lwz      r12, 0x10(r12)
+002b5258: 482ed789  bl       0x5a29e0
+002b525c: 80410014  lwz      r2, 0x14(r1)
+002b5260: 81430078  lwz      r10, 0x78(r3)
+002b5264: 81630074  lwz      r11, 0x74(r3)
+002b5268: 7c0a00d0  neg      r0, r10
+002b526c: 81030080  lwz      r8, 0x80(r3)
+002b5270: 8123007c  lwz      r9, 0x7c(r3)
+002b5274: 7ceb00d0  neg      r7, r11
+002b5278: 80d80078  lwz      r6, 0x78(r24)
+002b527c: 7d4a0214  add      r10, r10, r0
+002b5280: 7d080214  add      r8, r8, r0
+002b5284: 80b80080  lwz      r5, 0x80(r24)
+002b5288: 7d6b3a14  add      r11, r11, r7
+002b528c: 7d293a14  add      r9, r9, r7
+002b5290: 80980074  lwz      r4, 0x74(r24)
+002b5294: 7ce62850  subf     r7, r6, r5
+002b5298: 7caa4050  subf     r5, r10, r8
+002b529c: 81980000  lwz      r12, 0(r24)
+002b52a0: 7cc72850  subf     r6, r7, r5
+002b52a4: 8018007c  lwz      r0, 0x7c(r24)
+002b52a8: 54c50ffe  srwi     r5, r6, 0x1f
+002b52ac: 818c0068  lwz      r12, 0x68(r12)
+002b52b0: 7ca53214  add      r5, r5, r6
+002b52b4: 7cc40050  subf     r6, r4, r0
+002b52b8: 7c0b4850  subf     r0, r11, r9
+002b52bc: 7c860050  subf     r4, r6, r0
+002b52c0: 54800ffe  srwi     r0, r4, 0x1f
+002b52c4: 7ca50e70  srawi    r5, r5, 1
+002b52c8: 7c002214  add      r0, r0, r4
+002b52cc: 7c040e70  srawi    r4, r0, 1
+002b52d0: 7ce53a14  add      r7, r5, r7
+002b52d4: 7f03c378  mr       r3, r24
+002b52d8: 7cc43214  add      r6, r4, r6
+002b52dc: 482ed705  bl       0x5a29e0
+002b52e0: 80410014  lwz      r2, 0x14(r1)
+002b52e4: 93f80050  stw      r31, 0x50(r24)
+002b52e8: 38800001  li       r4, 1
+002b52ec: 807b0000  lwz      r3, 0(r27)
+002b52f0: 80630080  lwz      r3, 0x80(r3)
+002b52f4: 4bf5d67d  bl       0x212970
+002b52f8: 807b0000  lwz      r3, 0(r27)
+002b52fc: 38980000  addi     r4, r24, 0
+002b5300: 38a00001  li       r5, 1
+002b5304: 38c00000  li       r6, 0
+002b5308: 4bf9e609  bl       0x253910
+002b530c: 807b0000  lwz      r3, 0(r27)
+002b5310: 38800000  li       r4, 0
+002b5314: 80630080  lwz      r3, 0x80(r3)
+002b5318: 4bf5d659  bl       0x212970
+002b531c: 932100b4  stw      r25, 0xb4(r1)
+002b5320: 3861004c  addi     r3, r1, 0x4c
+002b5324: 38800000  li       r4, 0
+002b5328: 4be8fce9  bl       0x145010
+002b532c: 28180000  cmplwi   r24, 0
+002b5330: 41820014  beq      0x2b5344
+002b5334: 807c0000  lwz      r3, 0(r28)
+002b5338: 7f04c378  mr       r4, r24
+002b533c: 80630050  lwz      r3, 0x50(r3)
+002b5340: 48268c61  bl       0x51dfa0
+002b5344: 807f01a8  lwz      r3, 0x1a8(r31)
+002b5348: 38800000  li       r4, 0
+002b534c: 48256005  bl       0x50b350
+002b5350: 480000b0  b        0x2b5400
+002b5354: 801f0120  lwz      r0, 0x120(r31)
+002b5358: 7c180040  cmplw    r24, r0
+002b535c: 408200a4  bne      0x2b5400
+002b5360: 38600180  li       r3, 0x180
+002b5364: 482dc0dd  bl       0x591440
+002b5368: 7c771b79  or.      r23, r3, r3
+002b536c: 41820010  beq      0x2b537c
+002b5370: 80828e88  lwz      r4, -0x7178(r2)
+002b5374: 80840030  lwz      r4, 0x30(r4)
+002b5378: 4bfc30f9  bl       0x278470
+002b537c: 28170000  cmplwi   r23, 0
+002b5380: 41820080  beq      0x2b5400
+002b5384: 7ee3bb78  mr       r3, r23
+002b5388: 81970000  lwz      r12, 0(r23)
+002b538c: 818c0014  lwz      r12, 0x14(r12)
+002b5390: 482ed651  bl       0x5a29e0
+002b5394: 80410014  lwz      r2, 0x14(r1)
+002b5398: 809f01c0  lwz      r4, 0x1c0(r31)
+002b539c: 7ee3bb78  mr       r3, r23
+002b53a0: 4bfc2421  bl       0x2777c0
+002b53a4: 807b0000  lwz      r3, 0(r27)
+002b53a8: 38800001  li       r4, 1
+002b53ac: 80630080  lwz      r3, 0x80(r3)
+002b53b0: 4bf5d5c1  bl       0x212970
+002b53b4: 807b0000  lwz      r3, 0(r27)
+002b53b8: 38970000  addi     r4, r23, 0
+002b53bc: 38a00001  li       r5, 1
+002b53c0: 38c00000  li       r6, 0
+002b53c4: 4bf9e54d  bl       0x253910
+002b53c8: 807b0000  lwz      r3, 0(r27)
+002b53cc: 38800000  li       r4, 0
+002b53d0: 80630080  lwz      r3, 0x80(r3)
+002b53d4: 4bf5d59d  bl       0x212970
+002b53d8: 7ee3bb78  mr       r3, r23
+002b53dc: 4bfc2445  bl       0x277820
+002b53e0: 907f01c0  stw      r3, 0x1c0(r31)
+002b53e4: 7ee4bb78  mr       r4, r23
+002b53e8: 807c0000  lwz      r3, 0(r28)
+002b53ec: 80630050  lwz      r3, 0x50(r3)
+002b53f0: 48268bb1  bl       0x51dfa0
+002b53f4: 807f0120  lwz      r3, 0x120(r31)
+002b53f8: 38800000  li       r4, 0
+002b53fc: 48255f55  bl       0x50b350
+002b5400: 38600001  li       r3, 1
+002b5404: 80010108  lwz      r0, 0x108(r1)
+002b5408: 38210100  addi     r1, r1, 0x100
+002b540c: 7c0803a6  mtlr     r0
+002b5410: cbe1fff8  lfd      f31, -8(r1)
+002b5414: bae1ffcc  lmw      r23, -0x34(r1)
+002b5418: 4e800020  blr      

@@ -1,0 +1,432 @@
+0x08bb00: 3e3e4676  addis r17, r30, 18038                      |>>Fv|
+0x08bb04: 00000000  .long                                      |....|
+0x08bb08: 00000000  .long                                      |....|
+0x08bb0c: 00000000  .long                                      |....|
+0x08bb10: 80828858  lwz r4, -30632(r2)                         |...X|
+0x08bb14: 80628860  lwz r3, -30624(r2)                         |.b.`|
+0x08bb18: c8440000  .long                                      |.D..|
+0x08bb1c: c0a30000  .long                                      |....|
+0x08bb20: 8082885c  lwz r4, -30628(r2)                         |...\|
+0x08bb24: fc201050  .long                                      |. .P|
+0x08bb28: 80628854  lwz r3, -30636(r2)                         |.b.T|
+0x08bb2c: fc802850  .long                                      |..(P|
+0x08bb30: c0640000  .long                                      |.d..|
+0x08bb34: c8030000  .long                                      |....|
+0x08bb38: d082cc28  .long                                      |...(|
+0x08bb3c: d0a2cc2c  .long                                      |...,|
+0x08bb40: d062cc30  .long                                      |.b.0|
+0x08bb44: d0a2cc34  .long                                      |...4|
+0x08bb48: d822cc38  .long                                      |.".8|
+0x08bb4c: d842cc40  .long                                      |.B.@|
+0x08bb50: d802cc48  .long                                      |...H|
+0x08bb54: d842cc50  .long                                      |.B.P|
+0x08bb58: 4e800020  bclr                                       |N.. |
+0x08bb5c: 00000000  .long                                      |....|
+0x08bb60: 00092040  .long                                      |.. @|
+0x08bb64: 00000000  .long                                      |....|
+0x08bb68: 0000004c  .long                                      |...L|
+0x08bb6c: 001d2e5f  .long                                      |..._|
+0x08bb70: 5f73696e  .long                                      |_sin|
+0x08bb74: 69745f3a  xori r11, r20, 24378                       |it_:|
+0x08bb78: 47554944  .long                                      |GUID|
+0x08bb7c: 5472616e  rlwinm r18, r3, 12, 5, 23                  |Tran|
+0x08bb80: 736c6174  andi. r27, r12, 24948                      |slat|
+0x08bb84: 696f6e5f  xori r11, r15, 28255                       |ion_|
+0x08bb88: 63707000  ori r27, r16, 28672                        |cpp.|
+0x08bb8c: 00000000  .long                                      |....|
+0x08bb90: 80630028  lwz r3, 40(r3)                             |.c.(|
+0x08bb94: 4e800020  bclr                                       |N.. |
+0x08bb98: 00000000  .long                                      |....|
+0x08bb9c: 00092040  .long                                      |.. @|
+0x08bba0: 00000000  .long                                      |....|
+0x08bba4: 00000008  .long                                      |....|
+0x08bba8: 001f2e47  .long                                      |...G|
+0x08bbac: 65744f62  oris r11, r20, 20322                       |etOb|
+0x08bbb0: 6a656374  xori r19, r5, 25460                        |ject|
+0x08bbb4: 436f756e  baBO27/15 0x93120                          |Coun|
+0x08bbb8: 745f5f31  andis. r2, r31, 24369                      |t__1|
+0x08bbbc: 30486f75  addic r2, r8, 28533                        |0Hou|
+0x08bbc0: 73655374  andi. r27, r5, 21364                       |seSt|
+0x08bbc4: 61747346  ori r11, r20, 29510                        |atsF|
+0x08bbc8: 76000000  andis. r16, r0, 0                          |v...|
+0x08bbcc: 00000000  .long                                      |....|
+0x08bbd0: 80630014  lwz r3, 20(r3)                             |.c..|
+0x08bbd4: 4e800020  bclr                                       |N.. |
+0x08bbd8: 00000000  .long                                      |....|
+0x08bbdc: 00092040  .long                                      |.. @|
+0x08bbe0: 00000000  .long                                      |....|
+0x08bbe4: 00000008  .long                                      |....|
+0x08bbe8: 001b2e47  .long                                      |...G|
+0x08bbec: 65744c6f  oris r11, r20, 19567                       |etLo|
+0x08bbf0: 7453697a  andis. r2, r19, 27002                      |tSiz|
+0x08bbf4: 655f5f31  oris r10, r31, 24369                       |e__1|
+0x08bbf8: 30486f75  addic r2, r8, 28533                        |0Hou|
+0x08bbfc: 73655374  andi. r27, r5, 21364                       |seSt|
+0x08bc00: 61747346  ori r11, r20, 29510                        |atsF|
+0x08bc04: 76000000  andis. r16, r0, 0                          |v...|
+0x08bc08: 00000000  .long                                      |....|
+0x08bc0c: 00000000  .long                                      |....|
+0x08bc10: 8063000c  lwz r3, 12(r3)                             |.c..|
+0x08bc14: 4e800020  bclr                                       |N.. |
+0x08bc18: 00000000  .long                                      |....|
+0x08bc1c: 00092040  .long                                      |.. @|
+0x08bc20: 00000000  .long                                      |....|
+0x08bc24: 00000008  .long                                      |....|
+0x08bc28: 00202e47  .long                                      |. .G|
+0x08bc2c: 65744e75  oris r11, r20, 20085                       |etNu|
+0x08bc30: 6d426174  xoris r10, r2, 24948                       |mBat|
+0x08bc34: 68726f6f  xori r3, r18, 28527                        |hroo|
+0x08bc38: 6d735f5f  xoris r11, r19, 24415                      |ms__|
+0x08bc3c: 3130486f  addic r9, r16, 18543                       |10Ho|
+0x08bc40: 75736553  andis. r11, r19, 25939                     |useS|
+0x08bc44: 74617473  andis. r3, r1, 29811                       |tats|
+0x08bc48: 46760000  .long                                      |Fv..|
+0x08bc4c: 00000000  .long                                      |....|
+0x08bc50: 80630008  lwz r3, 8(r3)                              |.c..|
+0x08bc54: 4e800020  bclr                                       |N.. |
+0x08bc58: 00000000  .long                                      |....|
+0x08bc5c: 00092040  .long                                      |.. @|
+0x08bc60: 00000000  .long                                      |....|
+0x08bc64: 00000008  .long                                      |....|
+0x08bc68: 001f2e47  .long                                      |...G|
+0x08bc6c: 65744e75  oris r11, r20, 20085                       |etNu|
+0x08bc70: 6d426564  xoris r10, r2, 25956                       |mBed|
+0x08bc74: 726f6f6d  andi. r19, r15, 28525                      |room|
+0x08bc78: 735f5f31  andi. r26, r31, 24369                      |s__1|
+0x08bc7c: 30486f75  addic r2, r8, 28533                        |0Hou|
+0x08bc80: 73655374  andi. r27, r5, 21364                       |seSt|
+0x08bc84: 61747346  ori r11, r20, 29510                        |atsF|
+0x08bc88: 76000000  andis. r16, r0, 0                          |v...|
+0x08bc8c: 00000000  .long                                      |....|
+0x08bc90: 80630018  lwz r3, 24(r3)                             |.c..|
+0x08bc94: 4e800020  bclr                                       |N.. |
+0x08bc98: 00000000  .long                                      |....|
+0x08bc9c: 00092040  .long                                      |.. @|
+0x08bca0: 00000000  .long                                      |....|
+0x08bca4: 00000008  .long                                      |....|
+0x08bca8: 001f2e47  .long                                      |...G|
+0x08bcac: 65744c61  oris r11, r20, 19553                       |etLa|
+0x08bcb0: 796f7574  .long                                      |yout|
+0x08bcb4: 53636f72  .long                                      |Scor|
+0x08bcb8: 655f5f31  oris r10, r31, 24369                       |e__1|
+0x08bcbc: 30486f75  addic r2, r8, 28533                        |0Hou|
+0x08bcc0: 73655374  andi. r27, r5, 21364                       |seSt|
+0x08bcc4: 61747346  ori r11, r20, 29510                        |atsF|
+0x08bcc8: 76000000  andis. r16, r0, 0                          |v...|
+0x08bccc: 00000000  .long                                      |....|
+0x08bcd0: 80e30028  lwz r7, 40(r3)                             |...(|
+0x08bcd4: 80c2a428  lwz r6, -23512(r2)                         |...(|
+0x08bcd8: 2c070000  cmpwi r0, r7, 0                            |,...|
+0x08bcdc: 4082000c  beq(2) 0x8bce8                             |@...|
+0x08bce0: 38600000  addi r3, r0, 0                             |8`..|
+0x08bce4: 4e800020  bclr                                       |N.. |
+0x08bce8: 80830024  lwz r4, 36(r3)                             |...$|
+0x08bcec: 3c604330  addis r3, r0, 17200                        |<`C0|
+0x08bcf0: 6ce08000  xoris r7, r0, 32768                        |l...|
+0x08bcf4: 80a2a424  lwz r5, -23516(r2)                         |...$|
+0x08bcf8: 7c843850  subf r4, r4, r7                            ||.8P|
+0x08bcfc: 6c848000  xoris r4, r4, 32768                        |l...|
+0x08bd00: 9061ffe0  stw r3, -32(r1)                            |.a..|
+0x08bd04: c8650008  .long                                      |.e..|
+0x08bd08: 9081ffe4  stw r4, -28(r1)                            |....|
+0x08bd0c: c0060000  .long                                      |....|
+0x08bd10: c821ffe0  .long                                      |.!..|
+0x08bd14: 9001ffec  stw r0, -20(r1)                            |....|
+0x08bd18: ec411828  .long                                      |.A.(|
+0x08bd1c: 9061ffe8  stw r3, -24(r1)                            |.a..|
+0x08bd20: c821ffe8  .long                                      |.!..|
+0x08bd24: ec211828  .long                                      |.!.(|
+0x08bd28: ec220824  .long                                      |.".$|
+0x08bd2c: fc010040  .long                                      |...@|
+0x08bd30: 40800008  beq(0) 0x8bd38                             |@...|
+0x08bd34: fc200090  .long                                      |. ..|
+0x08bd38: c0060004  .long                                      |....|
+0x08bd3c: fc010040  .long                                      |...@|
+0x08bd40: 40810008  beq(1) 0x8bd48                             |@...|
+0x08bd44: fc200090  .long                                      |. ..|
+0x08bd48: c0060008  .long                                      |....|
+0x08bd4c: ec000072  .long                                      |...r|
+0x08bd50: fc00001e  .long                                      |....|
+0x08bd54: d801fff0  .long                                      |....|
+0x08bd58: 8061fff4  lwz r3, -12(r1)                            |.a..|
+0x08bd5c: 4e800020  bclr                                       |N.. |
+0x08bd60: 00000000  .long                                      |....|
+0x08bd64: 00092040  .long                                      |.. @|
+0x08bd68: 00000000  .long                                      |....|
+0x08bd6c: 00000090  .long                                      |....|
+0x08bd70: 001f2e47  .long                                      |...G|
+0x08bd74: 65745570  oris r11, r20, 21872                       |etUp|
+0x08bd78: 6b656570  xori r27, r5, 25968                        |keep|
+0x08bd7c: 53636f72  .long                                      |Scor|
+0x08bd80: 655f5f31  oris r10, r31, 24369                       |e__1|
+0x08bd84: 30486f75  addic r2, r8, 28533                        |0Hou|
+0x08bd88: 73655374  andi. r27, r5, 21364                       |seSt|
+0x08bd8c: 61747346  ori r11, r20, 29510                        |atsF|
+0x08bd90: 76000000  andis. r16, r0, 0                          |v...|
+0x08bd94: 00000000  .long                                      |....|
+0x08bd98: 00000000  .long                                      |....|
+0x08bd9c: 00000000  .long                                      |....|
+0x08bda0: 80828874  lwz r4, -30604(r2)                         |...t|
+0x08bda4: 80628cf0  lwz r3, -29456(r2)                         |.b..|
+0x08bda8: 80840000  lwz r4, 0(r4)                              |....|
+0x08bdac: 80a2a428  lwz r5, -23512(r2)                         |...(|
+0x08bdb0: 80840000  lwz r4, 0(r4)                              |....|
+0x08bdb4: c0230000  .long                                      |.#..|
+0x08bdb8: 80640024  lwz r3, 36(r4)                             |.d.$|
+0x08bdbc: c0050000  .long                                      |....|
+0x08bdc0: c043004c  .long                                      |.C.L|
+0x08bdc4: ec220072  .long                                      |.".r|
+0x08bdc8: fc010040  .long                                      |...@|
+0x08bdcc: 40800008  beq(0) 0x8bdd4                             |@...|
+0x08bdd0: fc200090  .long                                      |. ..|
+0x08bdd4: c0050008  .long                                      |....|
+0x08bdd8: fc010040  .long                                      |...@|
+0x08bddc: 40810008  beq(1) 0x8bde4                             |@...|
+0x08bde0: fc200090  .long                                      |. ..|
+0x08bde4: fc00081e  .long                                      |....|
+0x08bde8: d801fff0  .long                                      |....|
+0x08bdec: 8061fff4  lwz r3, -12(r1)                            |.a..|
+0x08bdf0: 4e800020  bclr                                       |N.. |
+0x08bdf4: 00000000  .long                                      |....|
+0x08bdf8: 00092040  .long                                      |.. @|
+0x08bdfc: 00000000  .long                                      |....|
+0x08be00: 00000054  .long                                      |...T|
+0x08be04: 001d2e47  .long                                      |...G|
+0x08be08: 65745961  oris r11, r20, 22881                       |etYa|
+0x08be0c: 72645363  andi. r19, r4, 21347                       |rdSc|
+0x08be10: 6f72655f  xoris r27, r18, 25951                      |ore_|
+0x08be14: 5f313048  .long                                      |_10H|
+0x08be18: 6f757365  xoris r27, r21, 29541                      |ouse|
+0x08be1c: 53746174  .long                                      |Stat|
+0x08be20: 73467600  andi. r26, r6, 30208                       |sFv.|
+0x08be24: 00000000  .long                                      |....|
+0x08be28: 00000000  .long                                      |....|
+0x08be2c: 00000000  .long                                      |....|
+0x08be30: 80828874  lwz r4, -30604(r2)                         |...t|
+0x08be34: 3c604330  addis r3, r0, 17200                        |<`C0|
+0x08be38: 80c2a428  lwz r6, -23512(r2)                         |...(|
+0x08be3c: 80a40000  lwz r5, 0(r4)                              |....|
+0x08be40: 8082a424  lwz r4, -23516(r2)                         |...$|
+0x08be44: 80e50000  lwz r7, 0(r5)                              |....|
+0x08be48: 9061fff8  stw r3, -8(r1)                             |.a..|
+0x08be4c: 80a70020  lwz r5, 32(r7)                             |... |
+0x08be50: c8440008  .long                                      |.D..|
+0x08be54: 800500a0  lwz r0, 160(r5)                            |....|
+0x08be58: 808500a4  lwz r4, 164(r5)                            |....|
+0x08be5c: 6c008000  xoris r0, r0, 32768                        |l...|
+0x08be60: 9061fff0  stw r3, -16(r1)                            |.a..|
+0x08be64: 6c838000  xoris r4, r3, 32768                        |l...|
+0x08be68: c0060000  .long                                      |....|
+0x08be6c: 9001fffc  stw r0, -4(r1)                             |....|
+0x08be70: c0860008  .long                                      |....|
+0x08be74: c821fff8  .long                                      |.!..|
+0x08be78: 9061fff4  stw r3, -12(r1)                            |.a..|
+0x08be7c: eca11028  .long                                      |...(|
+0x08be80: c821fff0  .long                                      |.!..|
+0x08be84: fc002800  .long                                      |..(.|
+0x08be88: ec011028  .long                                      |...(|
+0x08be8c: 41820008  bne(2) 0x8be94                             |A...|
+0x08be90: ec802824  .long                                      |..($|
+0x08be94: 80e70064  lwz r7, 100(r7)                            |...d|
+0x08be98: 80870008  lwz r4, 8(r7)                              |....|
+0x08be9c: 2c040000  cmpwi r0, r4, 0                            |,...|
+0x08bea0: 4082000c  beq(2) 0x8beac                             |@...|
+0x08bea4: c0660000  .long                                      |.f..|
+0x08bea8: 480000a0  b 0x8bf48                                  |H...|
+0x08beac: 3504ffff  addic. r8, r4, -1                          |5...|
+0x08beb0: 38080001  addi r0, r8, 1                             |8...|
+0x08beb4: 7c0903a6  mtctr r0                                   ||...|
+0x08beb8: 55051838  rlwinm r5, r8 <<3                          |U..8|
+0x08bebc: 41800028  bne(0) 0x8bee4                             |A..(|
+0x08bec0: 80670000  lwz r3, 0(r7)                              |.g..|
+0x08bec4: c0060000  .long                                      |....|
+0x08bec8: 7c232c2e  .long                                      ||#,.|
+0x08becc: ec640828  .long                                      |.d.(|
+0x08bed0: fc030040  .long                                      |...@|
+0x08bed4: 41810010  bne(1) 0x8bee4                             |A...|
+0x08bed8: 38a5fff8  addi r5, r5, -8                            |8...|
+0x08bedc: 3908ffff  addi r8, r8, -1                            |9...|
+0x08bee0: 4200ffe0  bBO16/0 0x8bec0                            |B...|
+0x08bee4: 3804ffff  addi r0, r4, -1                            |8...|
+0x08bee8: 7c080000  cmp cr0, r8, r0                            ||...|
+0x08beec: 40820018  beq(2) 0x8bf04                             |@...|
+0x08bef0: 80670000  lwz r3, 0(r7)                              |.g..|
+0x08bef4: 55001838  rlwinm r0, r8 <<3                          |U..8|
+0x08bef8: 7c630214  add r3, r3, r0                             ||c..|
+0x08befc: c0630004  .long                                      |.c..|
+0x08bf00: 48000048  b 0x8bf48                                  |H..H|
+0x08bf04: 2c08ffff  cmpwi r0, r8, -1                           |,...|
+0x08bf08: 40820010  beq(2) 0x8bf18                             |@...|
+0x08bf0c: 80670000  lwz r3, 0(r7)                              |.g..|
+0x08bf10: c0630004  .long                                      |.c..|
+0x08bf14: 48000034  b 0x8bf48                                  |H..4|
+0x08bf18: 80670000  lwz r3, 0(r7)                              |.g..|
+0x08bf1c: 55051838  rlwinm r5, r8 <<3                          |U..8|
+0x08bf20: 80870004  lwz r4, 4(r7)                              |....|
+0x08bf24: 5500103a  rlwinm r0, r8 <<2                          |U..:|
+0x08bf28: 7c632a14  add r3, r3, r5                             ||c*.|
+0x08bf2c: 7c24042e  .long                                      ||$..|
+0x08bf30: c0430004  .long                                      |.C..|
+0x08bf34: c003000c  .long                                      |....|
+0x08bf38: ec630072  .long                                      |.c.r|
+0x08bf3c: ec001028  .long                                      |...(|
+0x08bf40: ec630032  .long                                      |.c.2|
+0x08bf44: ec63102a  .long                                      |.c.*|
+0x08bf48: fc00181e  .long                                      |....|
+0x08bf4c: d801fff8  .long                                      |....|
+0x08bf50: 8061fffc  lwz r3, -4(r1)                             |.a..|
+0x08bf54: 4e800020  bclr                                       |N.. |
+0x08bf58: 00000000  .long                                      |....|
+0x08bf5c: 00092040  .long                                      |.. @|
+0x08bf60: 00000000  .long                                      |....|
+0x08bf64: 00000128  .long                                      |...(|
+0x08bf68: 00242e47  .long                                      |.$.G|
+0x08bf6c: 65744675  oris r11, r20, 18037                       |etFu|
+0x08bf70: 726e6973  andi. r19, r14, 26995                      |rnis|
+0x08bf74: 68696e67  xori r3, r9, 28263                         |hing|
+0x08bf78: 7353636f  andi. r26, r19, 25455                      |sSco|
+0x08bf7c: 72655f5f  andi. r19, r5, 24415                       |re__|
+0x08bf80: 3130486f  addic r9, r16, 18543                       |10Ho|
+0x08bf84: 75736553  andis. r11, r19, 25939                     |useS|
+0x08bf88: 74617473  andis. r3, r1, 29811                       |tats|
+0x08bf8c: 46760000  .long                                      |Fv..|
+0x08bf90: 80030004  lwz r0, 4(r3)                              |....|
+0x08bf94: 80c2a428  lwz r6, -23512(r2)                         |...(|
+0x08bf98: 2c000000  cmpwi r0, r0, 0                            |,...|
+0x08bf9c: 4082000c  beq(2) 0x8bfa8                             |@...|
+0x08bfa0: 38600000  addi r3, r0, 0                             |8`..|
+0x08bfa4: 4e800020  bclr                                       |N.. |
+0x08bfa8: 80630000  lwz r3, 0(r3)                              |.c..|
+0x08bfac: 3c804330  addis r4, r0, 17200                        |<.C0|
+0x08bfb0: 6c008000  xoris r0, r0, 32768                        |l...|
+0x08bfb4: 80a2a424  lwz r5, -23516(r2)                         |...$|
+0x08bfb8: 6c638000  xoris r3, r3, 32768                        |lc..|
+0x08bfbc: 9061fff4  stw r3, -12(r1)                            |.a..|
+0x08bfc0: 80628874  lwz r3, -30604(r2)                         |.b.t|
+0x08bfc4: 9081fff0  stw r4, -16(r1)                            |....|
+0x08bfc8: c8450008  .long                                      |.E..|
+0x08bfcc: c801fff0  .long                                      |....|
+0x08bfd0: 9001fffc  stw r0, -4(r1)                             |....|
+0x08bfd4: ec201028  .long                                      |. .(|
+0x08bfd8: 80630000  lwz r3, 0(r3)                              |.c..|
+0x08bfdc: 9081fff8  stw r4, -8(r1)                             |....|
+0x08bfe0: 80630000  lwz r3, 0(r3)                              |.c..|
+0x08bfe4: c801fff8  .long                                      |....|
+0x08bfe8: 80e30060  lwz r7, 96(r3)                             |...`|
+0x08bfec: ec001028  .long                                      |...(|
+0x08bff0: 80870008  lwz r4, 8(r7)                              |....|
+0x08bff4: ec410024  .long                                      |.A.$|
+0x08bff8: 2c040000  cmpwi r0, r4, 0                            |,...|
+0x08bffc: 4082000c  beq(2) 0x8c008                             |@...|
+0x08c000: c0660000  .long                                      |.f..|
+0x08c004: 480000a4  b 0x8c0a8                                  |H...|
+0x08c008: 3504ffff  addic. r8, r4, -1                          |5...|
+0x08c00c: 38080001  addi r0, r8, 1                             |8...|
+0x08c010: 7c0903a6  mtctr r0                                   ||...|
+0x08c014: 55051838  rlwinm r5, r8 <<3                          |U..8|
+0x08c018: 4180002c  bne(0) 0x8c044                             |A..,|
+0x08c01c: 60000000  ori r0, r0, 0                              |`...|
+0x08c020: 80670000  lwz r3, 0(r7)                              |.g..|
+0x08c024: c0060000  .long                                      |....|
+0x08c028: 7c232c2e  .long                                      ||#,.|
+0x08c02c: ec620828  .long                                      |.b.(|
+0x08c030: fc030040  .long                                      |...@|
+0x08c034: 41810010  bne(1) 0x8c044                             |A...|
+0x08c038: 38a5fff8  addi r5, r5, -8                            |8...|
+0x08c03c: 3908ffff  addi r8, r8, -1                            |9...|
+0x08c040: 4200ffe0  bBO16/0 0x8c020                            |B...|
+0x08c044: 3804ffff  addi r0, r4, -1                            |8...|
+0x08c048: 7c080000  cmp cr0, r8, r0                            ||...|
+0x08c04c: 40820018  beq(2) 0x8c064                             |@...|
+0x08c050: 80670000  lwz r3, 0(r7)                              |.g..|
+0x08c054: 55001838  rlwinm r0, r8 <<3                          |U..8|
+0x08c058: 7c630214  add r3, r3, r0                             ||c..|
+0x08c05c: c0630004  .long                                      |.c..|
+0x08c060: 48000048  b 0x8c0a8                                  |H..H|
+0x08c064: 2c08ffff  cmpwi r0, r8, -1                           |,...|
+0x08c068: 40820010  beq(2) 0x8c078                             |@...|
+0x08c06c: 80670000  lwz r3, 0(r7)                              |.g..|
+0x08c070: c0630004  .long                                      |.c..|
+0x08c074: 48000034  b 0x8c0a8                                  |H..4|
+0x08c078: 80670000  lwz r3, 0(r7)                              |.g..|
+0x08c07c: 55051838  rlwinm r5, r8 <<3                          |U..8|
+0x08c080: 80870004  lwz r4, 4(r7)                              |....|
+0x08c084: 5500103a  rlwinm r0, r8 <<2                          |U..:|
+0x08c088: 7c632a14  add r3, r3, r5                             ||c*.|
+0x08c08c: 7c24042e  .long                                      ||$..|
+0x08c090: c0430004  .long                                      |.C..|
+0x08c094: c003000c  .long                                      |....|
+0x08c098: ec630072  .long                                      |.c.r|
+0x08c09c: ec001028  .long                                      |...(|
+0x08c0a0: ec630032  .long                                      |.c.2|
+0x08c0a4: ec63102a  .long                                      |.c.*|
+0x08c0a8: fc00181e  .long                                      |....|
+0x08c0ac: d801fff8  .long                                      |....|
+0x08c0b0: 8061fffc  lwz r3, -4(r1)                             |.a..|
+0x08c0b4: 4e800020  bclr                                       |N.. |
+0x08c0b8: 00000000  .long                                      |....|
+0x08c0bc: 00092040  .long                                      |.. @|
+0x08c0c0: 00000000  .long                                      |....|
+0x08c0c4: 00000128  .long                                      |...(|
+0x08c0c8: 001d2e47  .long                                      |...G|
+0x08c0cc: 65745369  oris r11, r20, 21353                       |etSi|
+0x08c0d0: 7a655363  .long                                      |zeSc|
+0x08c0d4: 6f72655f  xoris r27, r18, 25951                      |ore_|
+0x08c0d8: 5f313048  .long                                      |_10H|
+0x08c0dc: 6f757365  xoris r27, r21, 29541                      |ouse|
+0x08c0e0: 53746174  .long                                      |Stat|
+0x08c0e4: 73467600  andi. r26, r6, 30208                       |sFv.|
+0x08c0e8: 00000000  .long                                      |....|
+0x08c0ec: 00000000  .long                                      |....|
+0x08c0f0: 80630000  lwz r3, 0(r3)                              |.c..|
+0x08c0f4: 4e800020  bclr                                       |N.. |
+0x08c0f8: 00000000  .long                                      |....|
+0x08c0fc: 00092040  .long                                      |.. @|
+0x08c100: 00000000  .long                                      |....|
+0x08c104: 00000008  .long                                      |....|
+0x08c108: 001e2e47  .long                                      |...G|
+0x08c10c: 65745371  oris r11, r20, 21361                       |etSq|
+0x08c110: 75617265  andis. r11, r1, 29285                      |uare|
+0x08c114: 46656574  .long                                      |Feet|
+0x08c118: 5f5f3130  .long                                      |__10|
+0x08c11c: 486f7573  bl 0x78368c                                |Hous|
+0x08c120: 65537461  oris r10, r19, 29793                       |eSta|
+0x08c124: 74734676  andis. r3, r19, 18038                      |tsFv|
+0x08c128: 00000000  .long                                      |....|
+0x08c12c: 00000000  .long                                      |....|
+0x08c130: 38000000  addi r0, r0, 0                             |8...|
+0x08c134: 90030000  stw r0, 0(r3)                              |....|
+0x08c138: 90030004  stw r0, 4(r3)                              |....|
+0x08c13c: 90030008  stw r0, 8(r3)                              |....|
+0x08c140: 9003000c  stw r0, 12(r3)                             |....|
+0x08c144: 90030010  stw r0, 16(r3)                             |....|
+0x08c148: 90030014  stw r0, 20(r3)                             |....|
+0x08c14c: 90030018  stw r0, 24(r3)                             |....|
+0x08c150: 9003001c  stw r0, 28(r3)                             |....|
+0x08c154: 90030020  stw r0, 32(r3)                             |... |
+0x08c158: 90030024  stw r0, 36(r3)                             |...$|
+0x08c15c: 90030028  stw r0, 40(r3)                             |...(|
+0x08c160: 4e800020  bclr                                       |N.. |
+0x08c164: 00000000  .long                                      |....|
+0x08c168: 00092040  .long                                      |.. @|
+0x08c16c: 00000000  .long                                      |....|
+0x08c170: 00000034  .long                                      |...4|
+0x08c174: 00152e5f  .long                                      |..._|
+0x08c178: 5f63745f  .long                                      |_ct_|
+0x08c17c: 5f313048  .long                                      |_10H|
+0x08c180: 6f757365  xoris r27, r21, 29541                      |ouse|
+0x08c184: 53746174  .long                                      |Stat|
+0x08c188: 73467600  andi. r26, r6, 30208                       |sFv.|
+0x08c18c: 00000000  .long                                      |....|
+0x08c190: bf61ffec  stmw r27, -20(r1)                          |.a..|
+0x08c194: 7c0802a6  mfxer r0                                   ||...|
+0x08c198: 7c7c1b78  or r3, r28, r3                             |||.x|
+0x08c19c: 83e2a428  lwz r31, -23512(r2)                        |...(|
+0x08c1a0: 7c9d2378  or r4, r29, r4                             ||.#x|
+0x08c1a4: 90010008  stw r0, 8(r1)                              |....|
+0x08c1a8: 38000000  addi r0, r0, 0                             |8...|
+0x08c1ac: 9421ff70  stwu r1, -144(r1)                          |.!.p|
+0x08c1b0: 90040000  stw r0, 0(r4)                              |....|
+0x08c1b4: 90040004  stw r0, 4(r4)                              |....|
+0x08c1b8: 90040008  stw r0, 8(r4)                              |....|
+0x08c1bc: 9004000c  stw r0, 12(r4)                             |....|

@@ -65,6 +65,7 @@ namespace Simitone.Client.UI.Panels
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             DrawLocalTexture(batch, Background, null, new Vector2(264, 138), Vector2.One, UIStyle.Current.Bg * BgAnim, ((float)Math.PI / 3) * (1-BgAnim), new Vector2(263, 119));
             base.Draw(batch);
         }

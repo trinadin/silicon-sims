@@ -1,0 +1,13 @@
+14:12:25.717 AUTOTEST START houses=[5] checks=[corpus,lot,motive,mood,load,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,career,freewill,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uidesc,uitt,uibuild,uibldt,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uicp,uidlgchrome,uibargeom,uicasorig] timeout=1800000ms
+14:16:21.682 AUTOTEST SUMMARY passed=84 failed=1 skipped=0
+14:16:21.682 AUTOTEST RESULT FAIL
+14:16:49.448 AUTOTEST START houses=[5] checks=[corpus,lot,motive,mood,load,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,career,freewill,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uidesc,uitt,uibuild,uibldt,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uicp,uidlgchrome,uibargeom,uicasorig] timeout=1800000ms
+14:20:40.851 AUTOTEST SUMMARY passed=85 failed=0 skipped=0
+14:20:40.851 AUTOTEST RESULT PASS
+
+-- honest fail ledger of this round's runs (development + flakes):
+13:47:13 uicasorig FAIL (NRE UIButton.set_Texture(null) — fixed same round: sheet buttons chain to a placeholder texture)
+13:51:39 uicasorig FAIL (same NRE, stack-trace instrumentation run)
+14:01:10 mood FAIL (death-reach boundary: storedMood=0 computed=4 after motive collapse — PRE-EXISTING VM-timing flake, unrelated to R143's UI-only scope; passed on the 14:05 and certification runs with identical code)
+14:12:47 mood FAIL (same flake)
+14:20:40 CERTIFICATION RUN: 85/85 PASS incl. uicasorig

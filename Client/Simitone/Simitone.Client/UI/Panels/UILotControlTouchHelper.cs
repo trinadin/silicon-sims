@@ -316,6 +316,7 @@ namespace Simitone.Client.UI.Panels
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             //todo: rotation graphic
             UpdatesSinceDraw = 1;
         }

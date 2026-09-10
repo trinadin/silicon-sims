@@ -1,0 +1,365 @@
+                ; ==== .Init__11HouseViewerFP4RectP5House ====
+001d8980: bf61ffec  stmw     r27, -0x14(r1)
+001d8984: 7c0802a6  mflr     r0
+001d8988: 7c7c1b78  mr       r28, r3
+001d898c: 83a2aaf8  lwz      r29, -0x5508(r2)
+001d8990: 83c28cac  lwz      r30, -0x7354(r2)
+001d8994: 83e28874  lwz      r31, -0x778c(r2)
+001d8998: 90010008  stw      r0, 8(r1)
+001d899c: 9421ff30  stwu     r1, -0xd0(r1)
+001d89a0: 90a3001c  stw      r5, 0x1c(r3)
+001d89a4: 38610048  addi     r3, r1, 0x48
+001d89a8: a8040000  lha      r0, 0(r4)
+001d89ac: b01c0020  sth      r0, 0x20(r28)
+001d89b0: a8040002  lha      r0, 2(r4)
+001d89b4: b01c0022  sth      r0, 0x22(r28)
+001d89b8: a8040004  lha      r0, 4(r4)
+001d89bc: b01c0024  sth      r0, 0x24(r28)
+001d89c0: a8040006  lha      r0, 6(r4)
+001d89c4: b01c0026  sth      r0, 0x26(r28)
+001d89c8: c81c0020  lfd      f0, 0x20(r28)
+001d89cc: d8010048  stfd     f0, 0x48(r1)
+001d89d0: a881004a  lha      r4, 0x4a(r1)
+001d89d4: a8010048  lha      r0, 0x48(r1)
+001d89d8: 7c8400d0  neg      r4, r4
+001d89dc: 7c0000d0  neg      r0, r0
+001d89e0: 7c840734  extsh    r4, r4
+001d89e4: 7c050734  extsh    r5, r0
+001d89e8: 4bf44e69  bl       0x11d850   ; .OffsetRect_Sims__FP4Rectss
+001d89ec: 38600198  li       r3, 0x198
+001d89f0: 483b8a51  bl       0x591440
+001d89f4: 7c7b1b79  or.      r27, r3, r3
+001d89f8: 41820008  beq      0x1d8a00
+001d89fc: 4bfcad45  bl       0x1a3740   ; .__ct__14cAnimDeviceSubFv
+001d8a00: 937c0054  stw      r27, 0x54(r28)
+001d8a04: 387b0000  addi     r3, r27, 0
+001d8a08: 38810048  addi     r4, r1, 0x48
+001d8a0c: 4bfca8d5  bl       0x1a32e0   ; .NewWorld__14cAnimDeviceSubFP4Rect
+001d8a10: 807c0054  lwz      r3, 0x54(r28)
+001d8a14: 80030000  lwz      r0, 0(r3)
+001d8a18: 28000000  cmplwi   r0, 0
+001d8a1c: 901c0068  stw      r0, 0x68(r28)
+001d8a20: 41820104  beq      0x1d8b24
+001d8a24: 807f0000  lwz      r3, 0(r31)
+001d8a28: 80630024  lwz      r3, 0x24(r3)
+001d8a2c: 4bed7125  bl       0xafb50   ; .GetHouseNumber__12NeighborhoodFv
+001d8a30: 2c030063  cmpwi    r3, 0x63
+001d8a34: 4082007c  bne      0x1d8ab0
+001d8a38: 3882e524  addi     r4, r2, -0x1adc
+001d8a3c: 88e2e524  lbz      r7, -0x1adc(r2)
+001d8a40: 88640001  lbz      r3, 1(r4)
+001d8a44: 3ca04330  lis      r5, 0x4330
+001d8a48: 88040002  lbz      r0, 2(r4)
+001d8a4c: 38810058  addi     r4, r1, 0x58
+001d8a50: 80c2aaf4  lwz      r6, -0x550c(r2)
+001d8a54: 90e10094  stw      r7, 0x94(r1)
+001d8a58: c8860038  lfd      f4, 0x38(r6)
+001d8a5c: 90a10090  stw      r5, 0x90(r1)
+001d8a60: c07d002c  lfs      f3, 0x2c(r29)
+001d8a64: c8010090  lfd      f0, 0x90(r1)
+001d8a68: 9061009c  stw      r3, 0x9c(r1)
+001d8a6c: ec002028  fsubs    f0, f0, f4
+001d8a70: 90a10098  stw      r5, 0x98(r1)
+001d8a74: c8210098  lfd      f1, 0x98(r1)
+001d8a78: ec401824  fdivs    f2, f0, f3
+001d8a7c: 900100a4  stw      r0, 0xa4(r1)
+001d8a80: 90a100a0  stw      r5, 0xa0(r1)
+001d8a84: c80100a0  lfd      f0, 0xa0(r1)
+001d8a88: ec212028  fsubs    f1, f1, f4
+001d8a8c: ec002028  fsubs    f0, f0, f4
+001d8a90: d0410058  stfs     f2, 0x58(r1)
+001d8a94: ec211824  fdivs    f1, f1, f3
+001d8a98: ec001824  fdivs    f0, f0, f3
+001d8a9c: d021005c  stfs     f1, 0x5c(r1)
+001d8aa0: d0010060  stfs     f0, 0x60(r1)
+001d8aa4: 807c0068  lwz      r3, 0x68(r28)
+001d8aa8: 48207f19  bl       0x3e09c0   ; .SetBackgroundColor__10Viewport3DFRC14_D3DCOLORVALUE
+001d8aac: 48000078  b        0x1d8b24
+001d8ab0: 3882e520  addi     r4, r2, -0x1ae0
+001d8ab4: 88e2e520  lbz      r7, -0x1ae0(r2)
+001d8ab8: 88640001  lbz      r3, 1(r4)
+001d8abc: 3ca04330  lis      r5, 0x4330
+001d8ac0: 88040002  lbz      r0, 2(r4)
+001d8ac4: 38810058  addi     r4, r1, 0x58
+001d8ac8: 80c2aaf4  lwz      r6, -0x550c(r2)
+001d8acc: 90e100a4  stw      r7, 0xa4(r1)
+001d8ad0: c8860038  lfd      f4, 0x38(r6)
+001d8ad4: 90a100a0  stw      r5, 0xa0(r1)
+001d8ad8: c07d002c  lfs      f3, 0x2c(r29)
+001d8adc: c80100a0  lfd      f0, 0xa0(r1)
+001d8ae0: 9061009c  stw      r3, 0x9c(r1)
+001d8ae4: ec002028  fsubs    f0, f0, f4
+001d8ae8: 90a10098  stw      r5, 0x98(r1)
+001d8aec: c8210098  lfd      f1, 0x98(r1)
+001d8af0: ec401824  fdivs    f2, f0, f3
+001d8af4: 90010094  stw      r0, 0x94(r1)
+001d8af8: 90a10090  stw      r5, 0x90(r1)
+001d8afc: c8010090  lfd      f0, 0x90(r1)
+001d8b00: ec212028  fsubs    f1, f1, f4
+001d8b04: ec002028  fsubs    f0, f0, f4
+001d8b08: d0410058  stfs     f2, 0x58(r1)
+001d8b0c: ec211824  fdivs    f1, f1, f3
+001d8b10: ec001824  fdivs    f0, f0, f3
+001d8b14: d021005c  stfs     f1, 0x5c(r1)
+001d8b18: d0010060  stfs     f0, 0x60(r1)
+001d8b1c: 807c0068  lwz      r3, 0x68(r28)
+001d8b20: 48207ea1  bl       0x3e09c0   ; .SetBackgroundColor__10Viewport3DFRC14_D3DCOLORVALUE
+001d8b24: 809f0000  lwz      r4, 0(r31)
+001d8b28: 387c0028  addi     r3, r28, 0x28
+001d8b2c: 8004002c  lwz      r0, 0x2c(r4)
+001d8b30: 901c006c  stw      r0, 0x6c(r28)
+001d8b34: 80dc0068  lwz      r6, 0x68(r28)
+001d8b38: 80060070  lwz      r0, 0x70(r6)
+001d8b3c: 901c0028  stw      r0, 0x28(r28)
+001d8b40: 7c8000d0  neg      r4, r0
+001d8b44: 80060074  lwz      r0, 0x74(r6)
+001d8b48: 901c002c  stw      r0, 0x2c(r28)
+001d8b4c: 7ca000d0  neg      r5, r0
+001d8b50: 80060078  lwz      r0, 0x78(r6)
+001d8b54: 901c0030  stw      r0, 0x30(r28)
+001d8b58: 8006007c  lwz      r0, 0x7c(r6)
+001d8b5c: 901c0034  stw      r0, 0x34(r28)
+001d8b60: 4be5f111  bl       0x37c70
+001d8b64: 80bc0028  lwz      r5, 0x28(r28)
+001d8b68: 807c002c  lwz      r3, 0x2c(r28)
+001d8b6c: 809c0030  lwz      r4, 0x30(r28)
+001d8b70: 3805ff80  addi     r0, r5, -0x80
+001d8b74: 80bc0034  lwz      r5, 0x34(r28)
+001d8b78: 3863ff80  addi     r3, r3, -0x80
+001d8b7c: 38840080  addi     r4, r4, 0x80
+001d8b80: 901c0038  stw      r0, 0x38(r28)
+001d8b84: 38050080  addi     r0, r5, 0x80
+001d8b88: 909c0040  stw      r4, 0x40(r28)
+001d8b8c: 907c003c  stw      r3, 0x3c(r28)
+001d8b90: 901c0044  stw      r0, 0x44(r28)
+001d8b94: 807f0000  lwz      r3, 0(r31)
+001d8b98: 8063003c  lwz      r3, 0x3c(r3)
+001d8b9c: 28030000  cmplwi   r3, 0
+001d8ba0: 907c0070  stw      r3, 0x70(r28)
+001d8ba4: 41820024  beq      0x1d8bc8
+001d8ba8: 482aeab9  bl       0x487660   ; .AddRef__9cTSBufferFv
+001d8bac: 807c0070  lwz      r3, 0x70(r28)
+001d8bb0: 482aeab1  bl       0x487660   ; .AddRef__9cTSBufferFv
+001d8bb4: 807c0070  lwz      r3, 0x70(r28)
+001d8bb8: 8003005c  lwz      r0, 0x5c(r3)
+001d8bbc: 28000000  cmplwi   r0, 0
+001d8bc0: 40820008  bne      0x1d8bc8
+001d8bc4: 482ac20d  bl       0x484dd0   ; .CreateZBuffer__9cTSBufferFv
+001d8bc8: 801c0070  lwz      r0, 0x70(r28)
+001d8bcc: 38600064  li       r3, 0x64
+001d8bd0: 901c0084  stw      r0, 0x84(r28)
+001d8bd4: 483b886d  bl       0x591440
+001d8bd8: 7c7b1b79  or.      r27, r3, r3
+001d8bdc: 41820008  beq      0x1d8be4
+001d8be0: 482b6291  bl       0x48ee70   ; .__ct__9cTSBufferFv
+001d8be4: 281b0000  cmplwi   r27, 0
+001d8be8: 937c0074  stw      r27, 0x74(r28)
+001d8bec: 418200d4  beq      0x1d8cc0
+001d8bf0: 38800004  li       r4, 4
+001d8bf4: 807c006c  lwz      r3, 0x6c(r28)
+001d8bf8: 38000010  li       r0, 0x10
+001d8bfc: 90810050  stw      r4, 0x50(r1)
+001d8c00: 90010054  stw      r0, 0x54(r1)
+001d8c04: 481e3d5d  bl       0x3bc960   ; .GetBuffDims__10AnimDeviceCFv
+001d8c08: 7c7d1b78  mr       r29, r3
+001d8c0c: 807c006c  lwz      r3, 0x6c(r28)
+001d8c10: 481e3d51  bl       0x3bc960   ; .GetBuffDims__10AnimDeviceCFv
+001d8c14: 7c641b78  mr       r4, r3
+001d8c18: 807c0074  lwz      r3, 0x74(r28)
+001d8c1c: 80840000  lwz      r4, 0(r4)
+001d8c20: 39000000  li       r8, 0
+001d8c24: 81830000  lwz      r12, 0(r3)
+001d8c28: 39200000  li       r9, 0
+001d8c2c: 80bd0004  lwz      r5, 4(r29)
+001d8c30: 80c10050  lwz      r6, 0x50(r1)
+001d8c34: 39400000  li       r10, 0
+001d8c38: 80e10054  lwz      r7, 0x54(r1)
+001d8c3c: 818c000c  lwz      r12, 0xc(r12)
+001d8c40: 483c9da1  bl       0x5a29e0
+001d8c44: 80410014  lwz      r2, 0x14(r1)
+001d8c48: 5460063f  clrlwi.  r0, r3, 0x18
+001d8c4c: 4182004c  beq      0x1d8c98
+001d8c50: 807c0074  lwz      r3, 0x74(r28)
+001d8c54: 482ac17d  bl       0x484dd0   ; .CreateZBuffer__9cTSBufferFv
+001d8c58: 5460063f  clrlwi.  r0, r3, 0x18
+001d8c5c: 41820010  beq      0x1d8c6c
+001d8c60: 807c0074  lwz      r3, 0x74(r28)
+001d8c64: 482ae9fd  bl       0x487660   ; .AddRef__9cTSBufferFv
+001d8c68: 48000058  b        0x1d8cc0
+001d8c6c: 807c0074  lwz      r3, 0x74(r28)
+001d8c70: 28030000  cmplwi   r3, 0
+001d8c74: 41820018  beq      0x1d8c8c
+001d8c78: 81830000  lwz      r12, 0(r3)
+001d8c7c: 38800001  li       r4, 1
+001d8c80: 818c0008  lwz      r12, 8(r12)
+001d8c84: 483c9d5d  bl       0x5a29e0
+001d8c88: 80410014  lwz      r2, 0x14(r1)
+001d8c8c: 38000000  li       r0, 0
+001d8c90: 901c0074  stw      r0, 0x74(r28)
+001d8c94: 4800002c  b        0x1d8cc0
+001d8c98: 807c0074  lwz      r3, 0x74(r28)
+001d8c9c: 28030000  cmplwi   r3, 0
+001d8ca0: 41820018  beq      0x1d8cb8
+001d8ca4: 81830000  lwz      r12, 0(r3)
+001d8ca8: 38800001  li       r4, 1
+001d8cac: 818c0008  lwz      r12, 8(r12)
+001d8cb0: 483c9d31  bl       0x5a29e0
+001d8cb4: 80410014  lwz      r2, 0x14(r1)
+001d8cb8: 38000000  li       r0, 0
+001d8cbc: 901c0074  stw      r0, 0x74(r28)
+001d8cc0: 38000000  li       r0, 0
+001d8cc4: 3b610078  addi     r27, r1, 0x78
+001d8cc8: 90010078  stw      r0, 0x78(r1)
+001d8ccc: 387b0000  addi     r3, r27, 0
+001d8cd0: 38800400  li       r4, 0x400
+001d8cd4: 9001007c  stw      r0, 0x7c(r1)
+001d8cd8: 90010080  stw      r0, 0x80(r1)
+001d8cdc: 48001ad5  bl       0x1da7b0
+001d8ce0: 38000000  li       r0, 0
+001d8ce4: 389c0028  addi     r4, r28, 0x28
+001d8ce8: 90010084  stw      r0, 0x84(r1)
+001d8cec: 7f63db78  mr       r3, r27
+001d8cf0: 90010088  stw      r0, 0x88(r1)
+001d8cf4: 9801008c  stb      r0, 0x8c(r1)
+001d8cf8: 481f1fc9  bl       0x3cacc0   ; .Add__13DDDDamageListFRC7tagRECT
+001d8cfc: 3bbc0088  addi     r29, r28, 0x88
+001d8d00: 381b0000  addi     r0, r27, 0
+001d8d04: 7c1d0040  cmplw    r29, r0
+001d8d08: 41820034  beq      0x1d8d3c
+001d8d0c: 41820020  beq      0x1d8d2c
+001d8d10: 8001007c  lwz      r0, 0x7c(r1)
+001d8d14: 7fa3eb78  mr       r3, r29
+001d8d18: 80810080  lwz      r4, 0x80(r1)
+001d8d1c: 54002036  slwi     r0, r0, 4
+001d8d20: 80c10040  lwz      r6, 0x40(r1)
+001d8d24: 7ca40214  add      r5, r4, r0
+001d8d28: 48000ba9  bl       0x1d98d0
+001d8d2c: 80010084  lwz      r0, 0x84(r1)
+001d8d30: 901d000c  stw      r0, 0xc(r29)
+001d8d34: 80010088  lwz      r0, 0x88(r1)
+001d8d38: 901d0010  stw      r0, 0x10(r29)
+001d8d3c: 38610078  addi     r3, r1, 0x78
+001d8d40: 38800000  li       r4, 0
+001d8d44: 4800222d  bl       0x1daf70
+001d8d48: 387c0088  addi     r3, r28, 0x88
+001d8d4c: 481f21d5  bl       0x3caf20   ; .Optimize__13DDDDamageListFv
+001d8d50: 3c600001  lis      r3, 1
+001d8d54: 3803ffff  addi     r0, r3, -1
+001d8d58: b01c0404  sth      r0, 0x404(r28)
+001d8d5c: 387c0000  addi     r3, r28, 0
+001d8d60: 38800000  li       r4, 0
+001d8d64: 38a00000  li       r5, 0
+001d8d68: 38c00001  li       r6, 1
+001d8d6c: 4bffdfa5  bl       0x1d6d10
+001d8d70: 801c001c  lwz      r0, 0x1c(r28)
+001d8d74: 28000000  cmplwi   r0, 0
+001d8d78: 41820018  beq      0x1d8d90
+001d8d7c: 80a28fb8  lwz      r5, -0x7048(r2)
+001d8d80: 387c00b8  addi     r3, r28, 0xb8
+001d8d84: 809c0054  lwz      r4, 0x54(r28)
+001d8d88: 80a50008  lwz      r5, 8(r5)
+001d8d8c: 4802ad15  bl       0x203aa0   ; .GenerateLookupTables__13ZBufferLookupFP14cAnimDeviceSubi
+001d8d90: 807f0000  lwz      r3, 0(r31)
+001d8d94: 388000ff  li       r4, 0xff
+001d8d98: 38a00000  li       r5, 0
+001d8d9c: 8063004c  lwz      r3, 0x4c(r3)
+001d8da0: 38c00000  li       r6, 0
+001d8da4: 81830000  lwz      r12, 0(r3)
+001d8da8: 818c0104  lwz      r12, 0x104(r12)
+001d8dac: 483c9c35  bl       0x5a29e0
+001d8db0: 80410014  lwz      r2, 0x14(r1)
+001d8db4: 807f0000  lwz      r3, 0(r31)
+001d8db8: 388000ff  li       r4, 0xff
+001d8dbc: 38a00000  li       r5, 0
+001d8dc0: 8063004c  lwz      r3, 0x4c(r3)
+001d8dc4: 38c00000  li       r6, 0
+001d8dc8: 81830000  lwz      r12, 0(r3)
+001d8dcc: 818c0104  lwz      r12, 0x104(r12)
+001d8dd0: 483c9c11  bl       0x5a29e0
+001d8dd4: 80410014  lwz      r2, 0x14(r1)
+001d8dd8: 38610068  addi     r3, r1, 0x68
+001d8ddc: 4820cf95  bl       0x3e5d70   ; .__ct__13U3DLightGroupFv
+001d8de0: 8082aaf0  lwz      r4, -0x5510(r2)
+001d8de4: 38610068  addi     r3, r1, 0x68
+001d8de8: 38840185  addi     r4, r4, 0x185
+001d8dec: 4820cce5  bl       0x3e5ad0   ; .Load__13U3DLightGroupFPCc
+001d8df0: 2c030000  cmpwi    r3, 0
+001d8df4: 40820044  bne      0x1d8e38
+001d8df8: 3860005c  li       r3, 0x5c
+001d8dfc: 483b8645  bl       0x591440
+001d8e00: 7c7b1b79  or.      r27, r3, r3
+001d8e04: 4182000c  beq      0x1d8e10
+001d8e08: 38810068  addi     r4, r1, 0x68
+001d8e0c: 48003f55  bl       0x1dcd60   ; .__ct__11LightingRigFR13U3DLightGroup
+001d8e10: 281b0000  cmplwi   r27, 0
+001d8e14: 937c01c4  stw      r27, 0x1c4(r28)
+001d8e18: 41820020  beq      0x1d8e38
+001d8e1c: 7f63db78  mr       r3, r27
+001d8e20: 48003d61  bl       0x1dcb80   ; .AddRef__11LightingRigFv
+001d8e24: 7f83e378  mr       r3, r28
+001d8e28: 4bff4af9  bl       0x1cd920   ; .GetDefaultAmbientLight__11HouseViewerFv
+001d8e2c: 7c641b78  mr       r4, r3
+001d8e30: 807c01c4  lwz      r3, 0x1c4(r28)
+001d8e34: 48003d8d  bl       0x1dcbc0   ; .SetDefaultAmbient__11LightingRigFUl
+001d8e38: 38800040  li       r4, 0x40
+001d8e3c: 38000000  li       r0, 0
+001d8e40: 98810044  stb      r4, 0x44(r1)
+001d8e44: 38600080  li       r3, 0x80
+001d8e48: 98810045  stb      r4, 0x45(r1)
+001d8e4c: 98010046  stb      r0, 0x46(r1)
+001d8e50: 483b8721  bl       0x591570
+001d8e54: 88a10044  lbz      r5, 0x44(r1)
+001d8e58: 38800000  li       r4, 0
+001d8e5c: 88010045  lbz      r0, 0x45(r1)
+001d8e60: 907c01ec  stw      r3, 0x1ec(r28)
+001d8e64: 7ca50774  extsb    r5, r5
+001d8e68: 7c000774  extsb    r0, r0
+001d8e6c: 7ca50214  add      r5, r5, r0
+001d8e70: 483bdf01  bl       0x596d70
+001d8e74: 88610044  lbz      r3, 0x44(r1)
+001d8e78: 88010045  lbz      r0, 0x45(r1)
+001d8e7c: 7c630774  extsb    r3, r3
+001d8e80: 7c000774  extsb    r0, r0
+001d8e84: 7c630214  add      r3, r3, r0
+001d8e88: 483b86e9  bl       0x591570
+001d8e8c: 88a10044  lbz      r5, 0x44(r1)
+001d8e90: 38800040  li       r4, 0x40
+001d8e94: 88010045  lbz      r0, 0x45(r1)
+001d8e98: 907c01f0  stw      r3, 0x1f0(r28)
+001d8e9c: 7ca50774  extsb    r5, r5
+001d8ea0: 7c000774  extsb    r0, r0
+001d8ea4: 7ca50214  add      r5, r5, r0
+001d8ea8: 483bdec9  bl       0x596d70
+001d8eac: 387c0000  addi     r3, r28, 0
+001d8eb0: 38800001  li       r4, 1
+001d8eb4: 38a00001  li       r5, 1
+001d8eb8: 38c00001  li       r6, 1
+001d8ebc: 4bffe8c5  bl       0x1d7780   ; .SetScale__11HouseViewerFibb
+001d8ec0: 387c0000  addi     r3, r28, 0
+001d8ec4: 38800002  li       r4, 2
+001d8ec8: 38a00001  li       r5, 1
+001d8ecc: 38c00001  li       r6, 1
+001d8ed0: 4bffe8b1  bl       0x1d7780   ; .SetScale__11HouseViewerFibb
+001d8ed4: 387c0000  addi     r3, r28, 0
+001d8ed8: 38800003  li       r4, 3
+001d8edc: 38a00001  li       r5, 1
+001d8ee0: 38c00001  li       r6, 1
+001d8ee4: 4bffe89d  bl       0x1d7780   ; .SetScale__11HouseViewerFibb
+001d8ee8: 3b800000  li       r28, 0
+001d8eec: 807e0000  lwz      r3, 0(r30)
+001d8ef0: 7f84e378  mr       r4, r28
+001d8ef4: 4bf89b5d  bl       0x162a50   ; .GetRoofLayer__11cFixedWorldFi
+001d8ef8: 28030000  cmplwi   r3, 0
+001d8efc: 41820008  beq      0x1d8f04
+001d8f00: 48105a71  bl       0x2de970   ; .Init__10cRoofLayerFv
+001d8f04: 3b9c0001  addi     r28, r28, 1
+001d8f08: 2c1c0002  cmpwi    r28, 2
+001d8f0c: 4180ffe0  blt      0x1d8eec
+001d8f10: 38610068  addi     r3, r1, 0x68
+001d8f14: 3880ffff  li       r4, -1
+001d8f18: 4820ccb9  bl       0x3e5bd0   ; .__dt__13U3DLightGroupFv
+001d8f1c: 800100d8  lwz      r0, 0xd8(r1)
+001d8f20: 382100d0  addi     r1, r1, 0xd0
+001d8f24: bb61ffec  lmw      r27, -0x14(r1)
+001d8f28: 7c0803a6  mtlr     r0
+001d8f2c: 4e800020  blr

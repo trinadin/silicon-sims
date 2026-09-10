@@ -1,0 +1,8 @@
+{
+  "sha256": "33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f",
+  "round": "r250-serving",
+  "pins": 88,
+  "checks": 118,
+  "passed": 118,
+  "failures": []
+}

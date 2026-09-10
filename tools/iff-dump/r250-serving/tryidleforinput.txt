@@ -1,0 +1,243 @@
+                ; ==== .TryIdleForInput__8cXPersonFP9StackElemP10XPrimParam ====
+0010a0c0: bf61ffec  stmw     r27, -0x14(r1)
+0010a0c4: 7c0802a6  mflr     r0
+0010a0c8: 3b830000  addi     r28, r3, 0
+0010a0cc: 3ba40000  addi     r29, r4, 0
+0010a0d0: 3b650000  addi     r27, r5, 0
+0010a0d4: 90010008  stw      r0, 8(r1)
+0010a0d8: 9421ff30  stwu     r1, -0xd0(r1)
+0010a0dc: 48000925  bl       0x10aa00   ; .ShouldInterrupt__8cXPersonFv
+0010a0e0: a89b0000  lha      r4, 0(r27)
+0010a0e4: 3bc30000  addi     r30, r3, 0
+0010a0e8: 7c800735  extsh.   r0, r4
+0010a0ec: 41800010  blt      0x10a0fc
+0010a0f0: 881d0007  lbz      r0, 7(r29)
+0010a0f4: 7c040000  cmpw     r4, r0
+0010a0f8: 41800020  blt      0x10a118
+0010a0fc: 8062a71c  lwz      r3, -0x58e4(r2)
+0010a100: 38000008  li       r0, 8
+0010a104: b0010040  sth      r0, 0x40(r1)
+0010a108: 38810040  addi     r4, r1, 0x40
+0010a10c: 38630115  addi     r3, r3, 0x115
+0010a110: 38a00000  li       r5, 0
+0010a114: 4848660d  bl       0x590720
+0010a118: 7fa3eb78  mr       r3, r29
+0010a11c: 48048f25  bl       0x153040   ; .GetParams__9StackElemFv
+0010a120: 57c0063f  clrlwi.  r0, r30, 0x18
+0010a124: a89b0000  lha      r4, 0(r27)
+0010a128: 3bc30000  addi     r30, r3, 0
+0010a12c: 549f083c  slwi     r31, r4, 1
+0010a130: 40820034  bne      0x10a164
+0010a134: 7c7efaae  lhax     r3, r30, r31
+0010a138: 2c030000  cmpwi    r3, 0
+0010a13c: 40820018  bne      0x10a154
+0010a140: a81c005a  lha      r0, 0x5a(r28)
+0010a144: 38600001  li       r3, 1
+0010a148: 540006b0  rlwinm   r0, r0, 0, 0x1a, 0x18
+0010a14c: b01c005a  sth      r0, 0x5a(r28)
+0010a150: 48000324  b        0x10a474
+0010a154: 3803ffff  addi     r0, r3, -1
+0010a158: 7c1efb2e  sthx     r0, r30, r31
+0010a15c: 38600002  li       r3, 2
+0010a160: 48000314  b        0x10a474
+0010a164: a81c005a  lha      r0, 0x5a(r28)
+0010a168: 60000040  ori      r0, r0, 0x40
+0010a16c: b01c005a  sth      r0, 0x5a(r28)
+0010a170: a81b0002  lha      r0, 2(r27)
+0010a174: 2c000000  cmpwi    r0, 0
+0010a178: 4082000c  bne      0x10a184
+0010a17c: 38600001  li       r3, 1
+0010a180: 480002f4  b        0x10a474
+0010a184: 807c0a00  lwz      r3, 0xa00(r28)
+0010a188: 801c0a04  lwz      r0, 0xa04(r28)
+0010a18c: 7c030051  subf.    r0, r3, r0
+0010a190: 4082000c  bne      0x10a19c
+0010a194: 38600001  li       r3, 1
+0010a198: 480002dc  b        0x10a474
+0010a19c: 801d0008  lwz      r0, 8(r29)
+0010a1a0: 2c000001  cmpwi    r0, 1
+0010a1a4: 40820028  bne      0x10a1cc
+0010a1a8: 801c0a00  lwz      r0, 0xa00(r28)
+0010a1ac: 5400077e  clrlwi   r0, r0, 0x1d
+0010a1b0: 1c00003c  mulli    r0, r0, 0x3c
+0010a1b4: 7c7c0214  add      r3, r28, r0
+0010a1b8: 80030858  lwz      r0, 0x858(r3)
+0010a1bc: 540007bd  rlwinm.  r0, r0, 0, 0x1e, 0x1e
+0010a1c0: 4082000c  bne      0x10a1cc
+0010a1c4: 38600001  li       r3, 1
+0010a1c8: 480002ac  b        0x10a474
+0010a1cc: 38610068  addi     r3, r1, 0x68
+0010a1d0: 4bf92fb1  bl       0x9d180   ; .__ct__11InteractionFv
+0010a1d4: 807c0a00  lwz      r3, 0xa00(r28)
+0010a1d8: 801c0a04  lwz      r0, 0xa04(r28)
+0010a1dc: 7c001840  cmplw    r0, r3
+0010a1e0: 40810090  ble      0x10a270
+0010a1e4: 5460077e  clrlwi   r0, r3, 0x1d
+0010a1e8: 38610090  addi     r3, r1, 0x90
+0010a1ec: 1c00003c  mulli    r0, r0, 0x3c
+0010a1f0: 7f7c0214  add      r27, r28, r0
+0010a1f4: 801b0820  lwz      r0, 0x820(r27)
+0010a1f8: 389b0848  addi     r4, r27, 0x848
+0010a1fc: 90010068  stw      r0, 0x68(r1)
+0010a200: 801b0824  lwz      r0, 0x824(r27)
+0010a204: 9001006c  stw      r0, 0x6c(r1)
+0010a208: 801b0828  lwz      r0, 0x828(r27)
+0010a20c: 90010070  stw      r0, 0x70(r1)
+0010a210: 801b082c  lwz      r0, 0x82c(r27)
+0010a214: 90010074  stw      r0, 0x74(r1)
+0010a218: 801b0830  lwz      r0, 0x830(r27)
+0010a21c: 90010078  stw      r0, 0x78(r1)
+0010a220: c81b0834  lfd      f0, 0x834(r27)
+0010a224: d801007c  stfd     f0, 0x7c(r1)
+0010a228: 801b083c  lwz      r0, 0x83c(r27)
+0010a22c: 90010084  stw      r0, 0x84(r1)
+0010a230: a81b0840  lha      r0, 0x840(r27)
+0010a234: b0010088  sth      r0, 0x88(r1)
+0010a238: c01b0844  lfs      f0, 0x844(r27)
+0010a23c: d001008c  stfs     f0, 0x8c(r1)
+0010a240: 48467291  bl       0x5714d0
+0010a244: 801b084c  lwz      r0, 0x84c(r27)
+0010a248: 90010094  stw      r0, 0x94(r1)
+0010a24c: 801b0850  lwz      r0, 0x850(r27)
+0010a250: 90010098  stw      r0, 0x98(r1)
+0010a254: 801b0854  lwz      r0, 0x854(r27)
+0010a258: 9001009c  stw      r0, 0x9c(r1)
+0010a25c: 801b0858  lwz      r0, 0x858(r27)
+0010a260: 900100a0  stw      r0, 0xa0(r1)
+0010a264: 807c0a00  lwz      r3, 0xa00(r28)
+0010a268: 38030001  addi     r0, r3, 1
+0010a26c: 901c0a00  stw      r0, 0xa00(r28)
+0010a270: 83610070  lwz      r27, 0x70(r1)
+0010a274: 281b0000  cmplwi   r27, 0
+0010a278: 40820018  bne      0x10a290
+0010a27c: 38610090  addi     r3, r1, 0x90
+0010a280: 3880ffff  li       r4, -1
+0010a284: 4846731d  bl       0x5715a0   ; .__dt__9CTGStringFv
+0010a288: 38600002  li       r3, 2
+0010a28c: 480001e8  b        0x10a474
+0010a290: 389c0000  addi     r4, r28, 0
+0010a294: 38610048  addi     r3, r1, 0x48
+0010a298: 38bb0000  addi     r5, r27, 0
+0010a29c: 38c00000  li       r6, 0
+0010a2a0: 4bffc551  bl       0x1067f0   ; .__ct__10ObjTestSimFP8cXPersonP8cXObjectb
+0010a2a4: 38610048  addi     r3, r1, 0x48
+0010a2a8: 38810068  addi     r4, r1, 0x68
+0010a2ac: 38a00000  li       r5, 0
+0010a2b0: 4bffc021  bl       0x1062d0   ; .TestInteraction__10ObjTestSimFP11InteractionPP14TreeTableEntry
+0010a2b4: 800100a0  lwz      r0, 0xa0(r1)
+0010a2b8: 54000739  rlwinm.  r0, r0, 0, 0x1c, 0x1c
+0010a2bc: 40820068  bne      0x10a324
+0010a2c0: 83a10070  lwz      r29, 0x70(r1)
+0010a2c4: 281d0000  cmplwi   r29, 0
+0010a2c8: 4182003c  beq      0x10a304
+0010a2cc: ab9c00f0  lha      r28, 0xf0(r28)
+0010a2d0: 807d011c  lwz      r3, 0x11c(r29)
+0010a2d4: 4bff8e4d  bl       0x103120   ; .GetFnTable__11ObjSelectorFv
+0010a2d8: 38800004  li       r4, 4
+0010a2dc: 4bff29c5  bl       0xfcca0   ; .GetTreeID__10ObjFnTableF13ObjEntryPoint
+0010a2e0: 38c30000  addi     r6, r3, 0
+0010a2e4: 7cc00735  extsh.   r0, r6
+0010a2e8: 4182001c  beq      0x10a304
+0010a2ec: 809d011c  lwz      r4, 0x11c(r29)
+0010a2f0: 387d0000  addi     r3, r29, 0
+0010a2f4: 38bc0000  addi     r5, r28, 0
+0010a2f8: 8084000c  lwz      r4, 0xc(r4)
+0010a2fc: 38e00000  li       r7, 0
+0010a300: 48049bc1  bl       0x153ec0
+0010a304: 38610048  addi     r3, r1, 0x48
+0010a308: 3880ffff  li       r4, -1
+0010a30c: 4bffc405  bl       0x106710   ; .__dt__10ObjTestSimFv
+0010a310: 38610090  addi     r3, r1, 0x90
+0010a314: 3880ffff  li       r4, -1
+0010a318: 48467289  bl       0x5715a0   ; .__dt__9CTGStringFv
+0010a31c: 38600002  li       r3, 2
+0010a320: 48000154  b        0x10a474
+0010a324: a8010088  lha      r0, 0x88(r1)
+0010a328: 7c060735  extsh.   r6, r0
+0010a32c: 40820068  bne      0x10a394
+0010a330: 83a10070  lwz      r29, 0x70(r1)
+0010a334: 281d0000  cmplwi   r29, 0
+0010a338: 4182003c  beq      0x10a374
+0010a33c: ab9c00f0  lha      r28, 0xf0(r28)
+0010a340: 807d011c  lwz      r3, 0x11c(r29)
+0010a344: 4bff8ddd  bl       0x103120   ; .GetFnTable__11ObjSelectorFv
+0010a348: 38800004  li       r4, 4
+0010a34c: 4bff2955  bl       0xfcca0   ; .GetTreeID__10ObjFnTableF13ObjEntryPoint
+0010a350: 38c30000  addi     r6, r3, 0
+0010a354: 7cc00735  extsh.   r0, r6
+0010a358: 4182001c  beq      0x10a374
+0010a35c: 809d011c  lwz      r4, 0x11c(r29)
+0010a360: 387d0000  addi     r3, r29, 0
+0010a364: 38bc0000  addi     r5, r28, 0
+0010a368: 8084000c  lwz      r4, 0xc(r4)
+0010a36c: 38e00000  li       r7, 0
+0010a370: 48049b51  bl       0x153ec0
+0010a374: 38610048  addi     r3, r1, 0x48
+0010a378: 3880ffff  li       r4, -1
+0010a37c: 4bffc395  bl       0x106710   ; .__dt__10ObjTestSimFv
+0010a380: 38610090  addi     r3, r1, 0x90
+0010a384: 3880ffff  li       r4, -1
+0010a388: 48467219  bl       0x5715a0   ; .__dt__9CTGStringFv
+0010a38c: 38600002  li       r3, 2
+0010a390: 480000e4  b        0x10a474
+0010a394: 819c0028  lwz      r12, 0x28(r28)
+0010a398: 387c0000  addi     r3, r28, 0
+0010a39c: 38a1007c  addi     r5, r1, 0x7c
+0010a3a0: 818c003c  lwz      r12, 0x3c(r12)
+0010a3a4: 7f64db78  mr       r4, r27
+0010a3a8: 38e00000  li       r7, 0
+0010a3ac: 48498635  bl       0x5a29e0
+0010a3b0: 80410014  lwz      r2, 0x14(r1)
+0010a3b4: 5460063f  clrlwi.  r0, r3, 0x18
+0010a3b8: 40820068  bne      0x10a420
+0010a3bc: 83a10070  lwz      r29, 0x70(r1)
+0010a3c0: 281d0000  cmplwi   r29, 0
+0010a3c4: 4182003c  beq      0x10a400
+0010a3c8: ab9c00f0  lha      r28, 0xf0(r28)
+0010a3cc: 807d011c  lwz      r3, 0x11c(r29)
+0010a3d0: 4bff8d51  bl       0x103120   ; .GetFnTable__11ObjSelectorFv
+0010a3d4: 38800004  li       r4, 4
+0010a3d8: 4bff28c9  bl       0xfcca0   ; .GetTreeID__10ObjFnTableF13ObjEntryPoint
+0010a3dc: 38c30000  addi     r6, r3, 0
+0010a3e0: 7cc00735  extsh.   r0, r6
+0010a3e4: 4182001c  beq      0x10a400
+0010a3e8: 809d011c  lwz      r4, 0x11c(r29)
+0010a3ec: 387d0000  addi     r3, r29, 0
+0010a3f0: 38bc0000  addi     r5, r28, 0
+0010a3f4: 8084000c  lwz      r4, 0xc(r4)
+0010a3f8: 38e00000  li       r7, 0
+0010a3fc: 48049ac5  bl       0x153ec0
+0010a400: 38610048  addi     r3, r1, 0x48
+0010a404: 3880ffff  li       r4, -1
+0010a408: 4bffc309  bl       0x106710   ; .__dt__10ObjTestSimFv
+0010a40c: 38610090  addi     r3, r1, 0x90
+0010a410: 3880ffff  li       r4, -1
+0010a414: 4846718d  bl       0x5715a0   ; .__dt__9CTGStringFv
+0010a418: 38600002  li       r3, 2
+0010a41c: 48000058  b        0x10a474
+0010a420: 387c0000  addi     r3, r28, 0
+0010a424: 38810068  addi     r4, r1, 0x68
+0010a428: 4bffea39  bl       0x108e60   ; .SetCurrentAction__8cXPersonFRC11Interaction
+0010a42c: 38000000  li       r0, 0
+0010a430: 7c1efb2e  sthx     r0, r30, r31
+0010a434: 38000001  li       r0, 1
+0010a438: 387c0000  addi     r3, r28, 0
+0010a43c: 901d0008  stw      r0, 8(r29)
+0010a440: abbb00f0  lha      r29, 0xf0(r27)
+0010a444: 4804920d  bl       0x153650   ; .GetCurElem__7TreeSimFv
+0010a448: b3a30004  sth      r29, 4(r3)
+0010a44c: 38610048  addi     r3, r1, 0x48
+0010a450: 3880ffff  li       r4, -1
+0010a454: a81c005a  lha      r0, 0x5a(r28)
+0010a458: 60000040  ori      r0, r0, 0x40
+0010a45c: b01c005a  sth      r0, 0x5a(r28)
+0010a460: 4bffc2b1  bl       0x106710   ; .__dt__10ObjTestSimFv
+0010a464: 38610090  addi     r3, r1, 0x90
+0010a468: 3880ffff  li       r4, -1
+0010a46c: 48467135  bl       0x5715a0   ; .__dt__9CTGStringFv
+0010a470: 38600003  li       r3, 3
+0010a474: 800100d8  lwz      r0, 0xd8(r1)
+0010a478: 382100d0  addi     r1, r1, 0xd0
+0010a47c: bb61ffec  lmw      r27, -0x14(r1)
+0010a480: 7c0803a6  mtlr     r0
+0010a484: 4e800020  blr      

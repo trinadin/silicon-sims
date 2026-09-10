@@ -1,0 +1,964 @@
+### /Users/nathannoom/Developer/Games/The Sims/simitone-fork/game-data/The Sims/UserData/Characters (20 files)
+-- User00000.iff (len 53845)
+   rsmp id=0 sz=462 ''
+   OBJD 128 'user00000 - Bob' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, 8278, 12970, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=7777 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=497 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00001.iff (len 54060)
+   rsmp id=0 sz=464 ''
+   OBJD 128 'user00001 - Betty' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, 26716, 12881, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=7952 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=535 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00002.iff (len 52385)
+   rsmp id=0 sz=466 ''
+   OBJD 128 'user00002 - Michael' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, 23843, 12177, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=6323 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=487 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00003.iff (len 51920)
+   rsmp id=0 sz=464 ''
+   OBJD 128 'user00003 - Chris' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, 15248, 10613, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=5810 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=537 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00004.iff (len 51985)
+   rsmp id=0 sz=466 ''
+   OBJD 128 'user00004 - Melissa' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, 2421, 19637, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=5879 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=531 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00005.iff (len 53367)
+   rsmp id=0 sz=464 ''
+   OBJD 128 'user00005 - Jeff' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, 26632, -8109, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=7306 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=488 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00006.iff (len 52429)
+   rsmp id=0 sz=464 ''
+   OBJD 128 'user00006 - Diane' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, 29524, 17363, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=6324 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=532 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00007.iff (len 52381)
+   rsmp id=0 sz=466 ''
+   OBJD 128 'user00007 - Daniel' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, 13991, -26721, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=6343 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=463 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00008.iff (len 52608)
+   rsmp id=0 sz=468 ''
+   OBJD 128 'user00008 - Jennifer' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, 11889, -23463, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=6525 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=506 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00009.iff (len 53391)
+   rsmp id=0 sz=468 ''
+   OBJD 128 'user00009 - Mortimer' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, 24964, -16257, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=7328 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=486 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00010.iff (len 52255)
+   rsmp id=0 sz=464 ''
+   OBJD 128 'user00010 - Bella' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, 10638, -16186, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=6144 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=538 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00011.iff (len 51905)
+   rsmp id=0 sz=468 ''
+   OBJD 128 'user00011 - Cassandra' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, 30995, -16096, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=5821 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=507 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00013.iff (len 46201)
+   rsmp id=0 sz=466 ''
+   OBJD 128 'user00013 - Grandpa' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, -4411, -4248, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=139 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=487 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00014.iff (len 46242)
+   rsmp id=0 sz=466 ''
+   OBJD 128 'user00014 - Grandma' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, -12888, 4523, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=139 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=528 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00015.iff (len 46165)
+   rsmp id=0 sz=462 ''
+   OBJD 128 'user00015 - Boy' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, -26735, 29500, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=129 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=465 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00017.iff (len 46193)
+   rsmp id=0 sz=464 ''
+   OBJD 128 'user00017 - Uncle' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, -8624, -6097, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=132 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=488 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00020.iff (len 46237)
+   rsmp id=0 sz=466 ''
+   OBJD 128 'user00020 - Auntie' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, -17256, 7431, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=133 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=529 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00021.iff (len 46193)
+   rsmp id=0 sz=466 ''
+   OBJD 128 'user00021 - Cousin' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, -3932, 2939, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=133 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=485 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00022.iff (len 46182)
+   rsmp id=0 sz=464 ''
+   OBJD 128 'user00022 - Vegas' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, -29452, -23968, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=121 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=488 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+-- User00023.iff (len 46220)
+   rsmp id=0 sz=466 ''
+   OBJD 128 'user00023 - Bratty' datasz=216 u16fields=108
+      fields=[138, 0, 48, 0, 1, 4096, 2, 129, 128, 2, 0, 0, 0, 128, -9746, 30551, 0, 0, 0, 200, 128, 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2000, 0, 4097, 0, 0, 0, 4098, 0, 1, 0, 0, 8210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 27476, 32729, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+   CTSS id=2000 sz=138 ''
+   STR# id=300 sz=130 'Behavior editor string set'
+   STR# id=304 sz=99 'suit names'
+   STR# id=200 sz=507 'bodystring'
+   BHAV 4097 'init tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8192 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4098 'load tree'  typ=0 args=4 locs=0 n=2
+     [ 0] op=8244 T=1   F=253 | raw=ffffffffffffffff
+     [ 1] op=4100 T=254 F=253 | raw=ffffffffffffffff
+   BHAV 4096 'Main'       typ=0 args=4 locs=0 n=4
+     [ 0] op=2  T=1   F=253 | expr StackObjID[0] <- MyObject[11] op=5 packed=0x00
+     [ 1] op=8193 T=1   F=253 | raw=ffffffffffffffff
+     [ 2] op=2  T=1   F=253 | expr StackObjAttributes[0] <- Literal[1] op=5 packed=0x00
+     [ 3] op=2  T=2   F=1   | expr Parameters[0] <- Literal[-1] op=2 packed=0x00
+   BHAV 4100 'init traits' typ=0 args=4 locs=4 n=21
+     [ 0] op=2  T=1   F=253 | expr MyPersonData[20] <- Literal[5] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=20 <- Literal 5
+     [ 1] op=2  T=2   F=253 | expr Local[0] <- Literal[3] op=5 packed=0x00
+     [ 2] op=2  T=3   F=253 | expr Local[1] <- Literal[3] op=5 packed=0x00
+     [ 3] op=2  T=4   F=253 | expr Local[2] <- Literal[3] op=5 packed=0x00
+     [ 4] op=2  T=5   F=253 | expr Local[3] <- Literal[1] op=5 packed=0x00
+     [ 5] op=2  T=6   F=253 | expr Temps[0] <- Literal[46] op=5 packed=0x00
+     [ 6] op=8  T=7   F=253 | random dest=[9]0 range=[7]11
+     [ 7] op=2  T=8   F=9   | expr Parameters[0] <- Literal[0] op=2 packed=0x00
+     [ 8] op=2  T=11  F=6   | expr Local[3] <- Literal[1] op=2 packed=0x00
+     [ 9] op=2  T=12  F=10  | expr Parameters[0] <- Literal[4] op=1 packed=0x00
+     [10] op=2  T=13  F=14  | expr Parameters[0] <- Literal[7] op=1 packed=0x00
+     [11] op=2  T=18  F=253 | expr Local[3] <- Literal[0] op=5 packed=0x00
+     [12] op=2  T=15  F=6   | expr Local[2] <- Literal[0] op=0 packed=0x00
+     [13] op=2  T=16  F=6   | expr Local[1] <- Literal[0] op=0 packed=0x00
+     [14] op=2  T=17  F=6   | expr Local[0] <- Literal[0] op=0 packed=0x00
+     [15] op=2  T=18  F=253 | expr Local[2] <- Literal[1] op=4 packed=0x00
+     [16] op=2  T=18  F=253 | expr Local[1] <- Literal[1] op=4 packed=0x00
+     [17] op=2  T=18  F=253 | expr Local[0] <- Literal[1] op=4 packed=0x00
+     [18] op=2  T=19  F=253 | expr MyPersonDataByTemp[0] <- Parameters[0] op=5 packed=0x00 <<< PERSON-DATA WRITE idx=0 <- Parameters 0
+     [19] op=2  T=20  F=253 | expr Temps[0] <- Literal[1] op=3 packed=0x00
+     [20] op=2  T=254 F=6   | expr Temps[0] <- Literal[56] op=2 packed=0x00
+   BMP_ id=2002 sz=13086 'faces'
+   BMP_ id=2003 sz=24130 'rel. images'
+   BMP_ id=2004 sz=2030 'thumbnail'
+   BMP_ id=2005 sz=898 'speech_med'
+   BMP_ id=2006 sz=3202 'speech_large'
+   GLOB id=128 sz=332 'Semi-global file'
+   SLOT id=128 sz=146 ''
+### /Users/nathannoom/Developer/Games/The Sims/simitone-fork/game-data/The Sims/TemplateUserData/Characters (0 files)
+
+literal-10 person-word writes (46..55) across corpus: 0

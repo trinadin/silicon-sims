@@ -1,0 +1,12 @@
+{
+  "private_directory": "/var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/cas-serial-wmuk5i8z",
+  "owner_config_unchanged": true,
+  "owner_config_sha256": "746493d1b0bca22c8f0ceba608e3982dab1849a6b4267a621a2d065210689428",
+  "exit_code": 0,
+  "interruption": null,
+  "capture_sizes": [
+    "1024x768"
+  ],
+  "recordfmt_verdict": "AUTOTEST recordfmt passed=28 failed=0 completed=True flowFailed=0",
+  "simitone_debug_in_bundle": false
+}

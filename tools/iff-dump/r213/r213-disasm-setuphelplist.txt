@@ -1,0 +1,38 @@
+0049e590: 93e1fffc  stw      r31, -4(r1)
+0049e594: 7c0802a6  mflr     r0
+0049e598: 3be40000  addi     r31, r4, 0
+0049e59c: 93c1fff8  stw      r30, -8(r1)
+0049e5a0: 7c7e1b78  mr       r30, r3
+0049e5a4: 93a1fff4  stw      r29, -0xc(r1)
+0049e5a8: 90010008  stw      r0, 8(r1)
+0049e5ac: 9421ffb0  stwu     r1, -0x50(r1)
+0049e5b0: 8003004c  lwz      r0, 0x4c(r3)
+0049e5b4: 28000000  cmplwi   r0, 0
+0049e5b8: 40820054  bne      0x49e60c
+0049e5bc: 38600128  li       r3, 0x128
+0049e5c0: 480f2e81  bl       0x591440
+0049e5c4: 7c7d1b79  or.      r29, r3, r3
+0049e5c8: 41820010  beq      0x49e5d8
+0049e5cc: 389e0000  addi     r4, r30, 0
+0049e5d0: 38bf0000  addi     r5, r31, 0
+0049e5d4: 480702ed  bl       0x50e8c0
+0049e5d8: 281d0000  cmplwi   r29, 0
+0049e5dc: 93be004c  stw      r29, 0x4c(r30)
+0049e5e0: 4182002c  beq      0x49e60c
+0049e5e4: 7fa3eb78  mr       r3, r29
+0049e5e8: 819d0000  lwz      r12, 0(r29)
+0049e5ec: 818c0014  lwz      r12, 0x14(r12)
+0049e5f0: 481043f1  bl       0x5a29e0
+0049e5f4: 80410014  lwz      r2, 0x14(r1)
+0049e5f8: 807e004c  lwz      r3, 0x4c(r30)
+0049e5fc: 81830000  lwz      r12, 0(r3)
+0049e600: 818c00a0  lwz      r12, 0xa0(r12)
+0049e604: 481043dd  bl       0x5a29e0
+0049e608: 80410014  lwz      r2, 0x14(r1)
+0049e60c: 80010058  lwz      r0, 0x58(r1)
+0049e610: 38210050  addi     r1, r1, 0x50
+0049e614: 83e1fffc  lwz      r31, -4(r1)
+0049e618: 83c1fff8  lwz      r30, -8(r1)
+0049e61c: 7c0803a6  mtlr     r0
+0049e620: 83a1fff4  lwz      r29, -0xc(r1)
+0049e624: 4e800020  blr      

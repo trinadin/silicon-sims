@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -6,6 +6,8 @@
     <Nullable>disable</Nullable>
     <OutputType>Library</OutputType>
     <RootNamespace>Simitone.Client</RootNamespace>
+    <!-- FSO.Content and this project both ship Content\3D\TEX_1.png to the same publish path (NETSDK1152); identical default-texture fallbacks, tolerate the duplicate. -->
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <AssemblyName>Simitone.Client</AssemblyName>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -617,6 +619,51 @@
     <Content Include="Content\uigraphics\live\motive_bg.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\uigraphics\live\orig_panel_back.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\orig_speedstrip.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\btn_mood.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\btn_job.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\btn_personality.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\btn_relationship.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\btn_people.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\bars_green.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\bars_red.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\btn_live.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\btn_options.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\btn_pause.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\btn_exit.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\btn_objects.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\uigraphics\live\gauge_live.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\uigraphics\ngbh\ngbh_back.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -691,6 +738,7 @@
     <ProjectReference Include="..\..\..\FreeSO\TSOClient\tso.common\FSO.Common.csproj" />
     <ProjectReference Include="..\..\..\FreeSO\TSOClient\tso.files\FSO.Files.csproj" />
     <ProjectReference Include="..\..\..\FreeSO\TSOClient\tso.simantics\FSO.SimAntics.csproj" />
+<ProjectReference Include="..\..\..\FreeSO\TSOClient\tso.sound\FSO.HIT.csproj" />
     <ProjectReference Include="..\..\..\FreeSO\TSOClient\tso.vitaboy.engine\FSO.Vitaboy.Engine.csproj" />
     <ProjectReference Include="..\..\..\FreeSO\TSOClient\tso.vitaboy.model\FSO.Vitaboy.csproj" />
     <ProjectReference Include="..\..\..\FreeSO\TSOClient\tso.world\FSO.LotView.csproj" />

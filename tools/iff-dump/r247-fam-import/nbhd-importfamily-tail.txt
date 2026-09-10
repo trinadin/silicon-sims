@@ -1,0 +1,170 @@
+000aeb8c: 38810938  addi     r4, r1, 0x938
+000aeb90: 480934b1  bl       0x142040   ; .copy__12StringBufferFRC16StringEditBuffer
+000aeb94: 38610828  addi     r3, r1, 0x828
+000aeb98: 38810718  addi     r4, r1, 0x718
+000aeb9c: 48093575  bl       0x142110
+000aeba0: 38610828  addi     r3, r1, 0x828
+000aeba4: 388e00f8  addi     r4, r14, 0xf8
+000aeba8: 38a0ffff  li       r5, -1
+000aebac: 48093685  bl       0x142230   ; .append__12StringBufferFPCci
+000aebb0: 484a1451  bl       0x550000
+000aebb4: 80810718  lwz      r4, 0x718(r1)
+000aebb8: 80a10828  lwz      r5, 0x828(r1)
+000aebbc: 4849b535  bl       0x54a0f0   ; .MoveFileA__14CTGFileManagerFPCcPCc
+000aebc0: 5460063f  clrlwi.  r0, r3, 0x18
+000aebc4: 40820050  bne      0xaec14
+000aebc8: 8061006c  lwz      r3, 0x6c(r1)
+000aebcc: 28030000  cmplwi   r3, 0
+000aebd0: 41820008  beq      0xaebd8
+000aebd4: 484e294d  bl       0x591520
+000aebd8: 80610060  lwz      r3, 0x60(r1)
+000aebdc: 28030000  cmplwi   r3, 0
+000aebe0: 41820008  beq      0xaebe8
+000aebe4: 484e293d  bl       0x591520
+000aebe8: 386100e8  addi     r3, r1, 0xe8
+000aebec: 3880ffff  li       r4, -1
+000aebf0: 48094201  bl       0x142df0   ; .__dt__14StringSetMultiFv
+000aebf4: 386102fc  addi     r3, r1, 0x2fc
+000aebf8: 3880ffff  li       r4, -1
+000aebfc: 4bfc82a5  bl       0x76ea0   ; .__dt__6FamilyFv
+000aec00: 386100b8  addi     r3, r1, 0xb8
+000aec04: 3880ffff  li       r4, -1
+000aec08: 4bfe8bf9  bl       0x97800   ; .__dt__11IFFResFile2Fv
+000aec0c: 3860ffce  li       r3, -0x32
+000aec10: 48000208  b        0xaee18
+000aec14: 484a13ed  bl       0x550000
+000aec18: 80810bcc  lwz      r4, 0xbcc(r1)
+000aec1c: 80a10718  lwz      r5, 0x718(r1)
+000aec20: 80840000  lwz      r4, 0(r4)
+000aec24: 4849b4cd  bl       0x54a0f0   ; .MoveFileA__14CTGFileManagerFPCcPCc
+000aec28: 5460063f  clrlwi.  r0, r3, 0x18
+000aec2c: 40820060  bne      0xaec8c
+000aec30: 484a13d1  bl       0x550000
+000aec34: 80810828  lwz      r4, 0x828(r1)
+000aec38: 80a10718  lwz      r5, 0x718(r1)
+000aec3c: 4849b4b5  bl       0x54a0f0   ; .MoveFileA__14CTGFileManagerFPCcPCc
+000aec40: 8061006c  lwz      r3, 0x6c(r1)
+000aec44: 28030000  cmplwi   r3, 0
+000aec48: 41820008  beq      0xaec50
+000aec4c: 484e28d5  bl       0x591520
+000aec50: 80610060  lwz      r3, 0x60(r1)
+000aec54: 28030000  cmplwi   r3, 0
+000aec58: 41820008  beq      0xaec60
+000aec5c: 484e28c5  bl       0x591520
+000aec60: 386100e8  addi     r3, r1, 0xe8
+000aec64: 3880ffff  li       r4, -1
+000aec68: 48094189  bl       0x142df0   ; .__dt__14StringSetMultiFv
+000aec6c: 386102fc  addi     r3, r1, 0x2fc
+000aec70: 3880ffff  li       r4, -1
+000aec74: 4bfc822d  bl       0x76ea0   ; .__dt__6FamilyFv
+000aec78: 386100b8  addi     r3, r1, 0xb8
+000aec7c: 3880ffff  li       r4, -1
+000aec80: 4bfe8b81  bl       0x97800   ; .__dt__11IFFResFile2Fv
+000aec84: 3860ffce  li       r3, -0x32
+000aec88: 48000190  b        0xaee18
+000aec8c: 484a1375  bl       0x550000
+000aec90: 80810828  lwz      r4, 0x828(r1)
+000aec94: 4849b74d  bl       0x54a3e0   ; .DeleteFileA__14CTGFileManagerFPCc
+000aec98: 48000014  b        0xaecac
+000aec9c: 484a1365  bl       0x550000
+000aeca0: 80810bcc  lwz      r4, 0xbcc(r1)
+000aeca4: 80840000  lwz      r4, 0(r4)
+000aeca8: 4849b739  bl       0x54a3e0   ; .DeleteFileA__14CTGFileManagerFPCc
+000aecac: 4bf636d5  bl       0x12380   ; .UpdateAll__16CQuickTimePlayerFv
+000aecb0: 808d0000  lwz      r4, 0(r13)
+000aecb4: 7de37b78  mr       r3, r15
+000aecb8: 80840044  lwz      r4, 0x44(r4)
+000aecbc: 48006765  bl       0xb5420   ; .Save__12NeighborhoodFl
+000aecc0: 2c1a0000  cmpwi    r26, 0
+000aecc4: 4182010c  beq      0xaedd0
+000aecc8: 38600074  li       r3, 0x74
+000aeccc: 484e2775  bl       0x591440
+000aecd0: 7c6f1b79  or.      r15, r3, r3
+000aecd4: 41820058  beq      0xaed2c
+000aecd8: 38800000  li       r4, 0
+000aecdc: 39af0028  addi     r13, r15, 0x28
+000aece0: 908f0000  stw      r4, 0(r15)
+000aece4: 3800ffff  li       r0, -1
+000aece8: 39cf0000  addi     r14, r15, 0
+000aecec: 908f0004  stw      r4, 4(r15)
+000aecf0: 7da36b78  mr       r3, r13
+000aecf4: 908f0008  stw      r4, 8(r15)
+000aecf8: 908f000c  stw      r4, 0xc(r15)
+000aecfc: 908f0010  stw      r4, 0x10(r15)
+000aed00: 908f0014  stw      r4, 0x14(r15)
+000aed04: 908f0018  stw      r4, 0x18(r15)
+000aed08: 908f001c  stw      r4, 0x1c(r15)
+000aed0c: 900f0024  stw      r0, 0x24(r15)
+000aed10: 484c2b81  bl       0x571890   ; .__ct__9CTGStringFv
+000aed14: 38000000  li       r0, 0
+000aed18: 900d0004  stw      r0, 4(r13)
+000aed1c: 900d0008  stw      r0, 8(r13)
+000aed20: 900d000c  stw      r0, 0xc(r13)
+000aed24: 900d0010  stw      r0, 0x10(r13)
+000aed28: 900e0040  stw      r0, 0x40(r14)
+000aed2c: 387a0000  addi     r3, r26, 0
+000aed30: 388f0000  addi     r4, r15, 0
+000aed34: 38a00000  li       r5, 0
+000aed38: 48183ff9  bl       0x232d30   ; .GetHouseInfo__FiP9HouseInfoi
+000aed3c: 5460063f  clrlwi.  r0, r3, 0x18
+000aed40: 41820084  beq      0xaedc4
+000aed44: 800f0040  lwz      r0, 0x40(r15)
+000aed48: 2c000044  cmpwi    r0, 0x44
+000aed4c: 40810078  ble      0xaedc4
+000aed50: 2c000046  cmpwi    r0, 0x46
+000aed54: 40800070  bge      0xaedc4
+000aed58: 806f0024  lwz      r3, 0x24(r15)
+000aed5c: 2c030000  cmpwi    r3, 0
+000aed60: 40810064  ble      0xaedc4
+000aed64: 38000000  li       r0, 0
+000aed68: 3881008c  addi     r4, r1, 0x8c
+000aed6c: 9001008c  stw      r0, 0x8c(r1)
+000aed70: 90010090  stw      r0, 0x90(r1)
+000aed74: 90010094  stw      r0, 0x94(r1)
+000aed78: 48184b19  bl       0x233890
+000aed7c: 39c00000  li       r14, 0
+000aed80: 39a00000  li       r13, 0
+000aed84: 48000024  b        0xaeda8
+000aed88: 60000000  nop      
+000aed8c: 80610094  lwz      r3, 0x94(r1)
+000aed90: 3880001f  li       r4, 0x1f
+000aed94: 38a00001  li       r5, 1
+000aed98: 7c63682e  lwzx     r3, r3, r13
+000aed9c: 48196755  bl       0x2454f0   ; .GenerateBitmaps__12PersonFinderFiQ212PersonFinder12eBitmapTypesQ212PersonFinder15eGenerationType
+000aeda0: 39ce0001  addi     r14, r14, 1
+000aeda4: 39ad0004  addi     r13, r13, 4
+000aeda8: 80010090  lwz      r0, 0x90(r1)
+000aedac: 7c0e0040  cmplw    r14, r0
+000aedb0: 4180ffdc  blt      0xaed8c
+000aedb4: 80610094  lwz      r3, 0x94(r1)
+000aedb8: 28030000  cmplwi   r3, 0
+000aedbc: 41820008  beq      0xaedc4
+000aedc0: 484e2761  bl       0x591520
+000aedc4: 386f0000  addi     r3, r15, 0
+000aedc8: 38800001  li       r4, 1
+000aedcc: 48185335  bl       0x234100   ; .__dt__9HouseInfoFv
+000aedd0: 8061006c  lwz      r3, 0x6c(r1)
+000aedd4: 28030000  cmplwi   r3, 0
+000aedd8: 41820008  beq      0xaede0
+000aeddc: 484e2745  bl       0x591520
+000aede0: 80610060  lwz      r3, 0x60(r1)
+000aede4: 28030000  cmplwi   r3, 0
+000aede8: 41820008  beq      0xaedf0
+000aedec: 484e2735  bl       0x591520
+000aedf0: 386100e8  addi     r3, r1, 0xe8
+000aedf4: 3880ffff  li       r4, -1
+000aedf8: 48093ff9  bl       0x142df0   ; .__dt__14StringSetMultiFv
+000aedfc: 386102fc  addi     r3, r1, 0x2fc
+000aee00: 3880ffff  li       r4, -1
+000aee04: 4bfc809d  bl       0x76ea0   ; .__dt__6FamilyFv
+000aee08: 386100b8  addi     r3, r1, 0xb8
+000aee0c: 3880ffff  li       r4, -1
+000aee10: 4bfe89f1  bl       0x97800   ; .__dt__11IFFResFile2Fv
+000aee14: 38600000  li       r3, 0
+000aee18: 80010bb8  lwz      r0, 0xbb8(r1)
+000aee1c: 38210bb0  addi     r1, r1, 0xbb0
+000aee20: b9a1ffb4  lmw      r13, -0x4c(r1)
+000aee24: 7c0803a6  mtlr     r0
+000aee28: 4e800020  blr      
+000aee2c: 00000000  .long    0x00000000
+000aee30: 00092041  .long    0x00092041

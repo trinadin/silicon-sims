@@ -27,12 +27,46 @@ namespace Simitone.Client.UI.Panels
             { "klapaucius", VMCheatContext.VMCheatType.Budget },
             { "rosebud", VMCheatContext.VMCheatType.Budget },
             // gives the user the submitted amount of money
-            { "giveMoney", VMCheatContext.VMCheatType.Budget }
+            { "giveMoney", VMCheatContext.VMCheatType.Budget },
+            // R247 (r247-tut-lifecycle §A cheat registry): `tutorial` (id 0x3d,
+            // type 2 — "on"/"off"/numeric modifier) and `restore_tut` (id 0x2d,
+            // type 0 — no parameters). Both dispatch through VMCheatContext via
+            // the VMNetCheatCmd this console sends on ts1VM.SendCommand.
+            { "tutorial", VMCheatContext.VMCheatType.Tutorial },
+            { "restore_tut", VMCheatContext.VMCheatType.RestoreTut }
         };
 
         private UITextBox baseTextbox;
         private Texture2D baseTexture;
         private VM ts1VM;
+
+        // R207: gate-readable surfaces.
+        public UITextBox TextBoxForProbe { get { return baseTextbox; } }
+        public Texture2D BackgroundTextureForProbe { get { return baseTexture; } }
+
+        // R213 'uicheathelp' (tools/iff-dump/r213/r213-cheat-help-law.md): the
+        // cTSWinCheatHelp surface — the registered-command autocomplete that
+        // opens with the bar (edit event 1 -> full list) and filters as you
+        // type (event 2 -> prefix filter), Enter completing the selected name
+        // into the bar (the OK law: SetText + refocus + close the help;
+        // submitting is a SECOND Enter), Escape closing only the help.
+        private UIContainer HelpPanel;
+        private List<Simitone.Client.UI.Controls.UIOriginalText> HelpRows = new List<Simitone.Client.UI.Controls.UIOriginalText>();
+        private Simitone.Client.UI.Controls.UIOriginalText HelpNoMatchGlyph;
+        private List<string> HelpMatches = new List<string>();
+        private int HelpSelectedIndex = -1;
+        private string HelpLastText;
+        private bool HelpDismissed; // Escape/OK removed the help from the chain; only a bar re-show re-arms it
+        private Texture2D HelpTexture;
+        public static int HelpOpens, HelpCompletions;
+
+        public bool HelpVisibleForProbe { get { return HelpPanel != null && HelpPanel.Visible; } }
+        public int HelpCountForProbe { get { return HelpMatches.Count; } }
+        public int HelpSelectedForProbe { get { return HelpSelectedIndex; } }
+        public string HelpSelectedTextForProbe
+        {
+            get { return (HelpSelectedIndex >= 0 && HelpSelectedIndex < HelpMatches.Count) ? HelpMatches[HelpSelectedIndex] : null; }
+        }
 
         /// <summary>
         /// An empty UICheatTextbox
@@ -58,36 +92,169 @@ namespace Simitone.Client.UI.Panels
                 ID = "UICheatTextboxBase",
                 
             };
+            // R207 ENGINE LAW (tools/iff-dump/r207/r207-cheat-bar-law.md):
+            // cSimsApp::FinishSlowInit 0x24d6f4 creates the cheat bar as a
+            // cTSWinTextEdit2 (new(0x198)) with SetArea(0x14, 0x14, 0xdc,
+            // 0x29) = (20,20)-(220,41) — 200x21 top-left — SetCapacity(255),
+            // SetLinesAllowed(1), SetTransparent(FALSE: opaque), SetTextColor
+            // WHITE, SetColors(*(BSS 0x9297c) = RGB(0x40,0x5D,0x5F), white,
+            // white) — the InitSimsColors palette (r143 cas-layout-law §5).
+            // Font = engine font table index 10 (the funds/CAS-name face).
             baseTexture = new Texture2D(GameFacade.GraphicsDevice, 1, 1);
-            baseTexture.SetData(new Color[] { new Color((byte)67, (byte)93, (byte)90, (byte)255) });
+            baseTexture.SetData(new Color[] { new Color((byte)0x40, (byte)0x5D, (byte)0x5F, (byte)255) });
             baseTextbox.SetBackgroundTexture(baseTexture, 0, 0, 0, 0);
-            Size = new Vector2(200, 23);
-            baseTextbox.SetSize(200, 23);
+            baseTextbox.MaxChars = 255;
+            baseTextbox.TextStyle = baseTextbox.TextStyle.Clone();
+            baseTextbox.TextStyle.Color = new Color((byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF);
+            Size = new Vector2(200, 21);
+            baseTextbox.SetSize(200, 21);
+            // R142: the container starts hidden — the inner box must too, or it reads
+            // as a visible element in survey trees until the first Update sync.
+            baseTextbox.Visible = false;
             Add(baseTextbox);
+            BuildHelpPanel();
+        }
+
+        /// The cTSWinCheatHelp surface. The engine window's own rects are BSS
+        /// (disclosed): the port places it directly under the (20,20)-(220,41)
+        /// bar with the system-dialog fill RGB(0,0,82) (the R142 msgbox law)
+        /// and original-glyph rows on the cheat face (font 10).
+        private void BuildHelpPanel()
+        {
+            try
+            {
+                HelpPanel = new UIContainer();
+                HelpTexture = new Texture2D(GameFacade.GraphicsDevice, 1, 1);
+                HelpTexture.SetData(new Color[] { new Color((byte)0, (byte)0, (byte)0x52, (byte)255) });
+                var back = new UIImage(HelpTexture);
+                back.SetSize(200, 21 + 8 * 11);
+                HelpPanel.Add(back);
+                var font = Simitone.Client.UI.Controls.OriginalGlyphFont.LoadByIndex(10, GameFacade.GraphicsDevice);
+                for (int i = 0; i < 8; i++)
+                {
+                    var idx = i; // closure capture
+                    var row = new Simitone.Client.UI.Controls.UIOriginalText("", font)
+                    {
+                        Color = Color.White,
+                        Position = new Vector2(2, 23 + i * 11),
+                    };
+                    row.Size = new Vector2(196, 11);
+                    row.ListenForMouse(new Rectangle(0, 23 + i * 11, 200, 11), (evt, state) =>
+                    {
+                        if (evt != FSO.Common.Rendering.Framework.IO.UIMouseEventType.MouseUp) return;
+                        if (idx < HelpMatches.Count) { HelpSelectedIndex = idx; RefreshHelpRows(); }
+                    });
+                    HelpPanel.Add(row);
+                    HelpRows.Add(row);
+                }
+                HelpNoMatchGlyph = new Simitone.Client.UI.Controls.UIOriginalText(UIOriginalCheatHelpLaw.NoMatchText, font)
+                {
+                    Color = Color.White,
+                    Position = new Vector2(2, 4),
+                };
+                HelpNoMatchGlyph.Size = new Vector2(196, 16);
+                HelpPanel.Add(HelpNoMatchGlyph);
+                HelpPanel.Position = new Vector2(0, 24); // under the bar: absolute (20,44)
+                HelpPanel.Visible = false;
+                Add(HelpPanel);
+            }
+            catch (Exception he) { Simitone.Client.GameLog.Write("cheat-help ctor EXC " + he.GetType().Name + " " + he.Message); HelpPanel = null; }
+        }
+
+        /// Open 0x50da20: (re)fill the list from the filter, select the exact
+        /// match else index 0, show the no-match label when empty.
+        public void CheatHelpOpen(string prefix)
+        {
+            if (HelpPanel == null) return;
+            HelpMatches = UIOriginalCheatHelpLaw.Filter(prefix);
+            HelpSelectedIndex = UIOriginalCheatHelpLaw.SelectIndex(HelpMatches, prefix);
+            HelpLastText = baseTextbox != null ? baseTextbox.CurrentText : null;
+            HelpPanel.Visible = true;
+            HelpDismissed = false;
+            HelpOpens++;
+            RefreshHelpRows();
+        }
+
+        private void RefreshHelpRows()
+        {
+            for (int i = 0; i < HelpRows.Count; i++)
+            {
+                var row = HelpRows[i];
+                var has = i < HelpMatches.Count;
+                row.Text = has ? HelpMatches[i] : "";
+                row.Color = (has && i == HelpSelectedIndex)
+                    ? new Color(0, 255, 255) : Color.White;
+                row.Visible = has;
+            }
+            if (HelpNoMatchGlyph != null) HelpNoMatchGlyph.Visible = HelpMatches.Count == 0;
+        }
+
+        /// The OK/Cancel/close paths all remove the window from view.
+        public void CheatHelpHide()
+        {
+            if (HelpPanel != null) HelpPanel.Visible = false;
+            HelpSelectedIndex = -1;
+            HelpMatches.Clear();
+            if (HelpNoMatchGlyph != null) HelpNoMatchGlyph.Visible = false;
         }
         public override void Update(UpdateState state)
         {
             base.Update(state);
-            var pressedKeys = state.KeyboardState.GetPressedKeys();         
-            //not sure if ts1 allowed you to use right ctrl or right shift but i dont discriminate
+            var pressedKeys = state.KeyboardState.GetPressedKeys();
+            // R207: the engine chord accepts BOTH keys — cTSMainWindowW95::
+            // TSOnKeyDown 0x4d5b48 gates (modifiers & 3) == 3 then matches
+            // 0x63/0x43 ('c'/'C') at 0x4d5ba4 AND 0x62/0x42 ('b'/'B') at
+            // 0x4d5b68, both calling ShowCheatWidget(true).
             if ((pressedKeys.Contains(Keys.LeftControl) || pressedKeys.Contains(Keys.RightControl))
                 && (pressedKeys.Contains(Keys.LeftShift) || pressedKeys.Contains(Keys.RightShift))
-                && state.NewKeys.Contains(Keys.C)) //prevent change over multiple frames
+                && (state.NewKeys.Contains(Keys.C) || state.NewKeys.Contains(Keys.B)))
             {
                 Visible = !Visible;
-                if (!Visible) state.InputManager.SetFocus(null);
-                else state.InputManager.SetFocus(baseTextbox);
+                if (!Visible) { state.InputManager.SetFocus(null); CheatHelpHide(); }
+                else
+                {
+                    state.InputManager.SetFocus(baseTextbox);
+                    // CheatCodeMgrCallback edit event 1: the bar opening shows
+                    // the FULL registered list (Open(null)).
+                    CheatHelpOpen(null);
+                }
             }
             baseTextbox.Visible = Visible;
+            if (HelpPanel != null && Visible && !HelpDismissed
+                && baseTextbox.CurrentText != HelpLastText)
+            {
+                // edit event 2: every text change re-opens filtered.
+                CheatHelpOpen(baseTextbox.CurrentText);
+            }
             if (Visible)
             {
+                if (HelpPanel != null && HelpPanel.Visible && state.NewKeys.Contains(Keys.Escape))
+                {
+                    CheatHelpHide(); // Cancel: closes the help, the bar stays
+                    HelpDismissed = true;
+                    return;
+                }
                 if (state.NewKeys.Contains(Keys.Enter))
                 {
+                    // The help window's OK law: with a selection, Enter
+                    // COMPLETES the text and closes the help (SetText +
+                    // refocus + remove); submitting is a second Enter.
+                    if (HelpPanel != null && HelpPanel.Visible)
+                    {
+                        if (HelpSelectedIndex >= 0 && HelpSelectedIndex < HelpMatches.Count)
+                        {
+                            baseTextbox.CurrentText = HelpMatches[HelpSelectedIndex] + " ";
+                            HelpCompletions++;
+                        }
+                        CheatHelpHide(); // OK: complete-or-close, never submit
+                        HelpDismissed = true;
+                        return;
+                    }
                     commandEntered(baseTextbox.CurrentText, out bool shouldHide);
                     Visible = !shouldHide;
-                    if (!Visible) state.InputManager.SetFocus(null); // Clear focus when hiding
+                    if (!Visible) { state.InputManager.SetFocus(null); CheatHelpHide(); } // Clear focus when hiding
                 }
-            }               
+            }
         }
 
         /// <summary>
@@ -164,7 +331,10 @@ namespace Simitone.Client.UI.Panels
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        private VMCheatContext parseCommandString(string command)
+        /// <remarks>internal: this is the production parse entry the R247
+        /// battery drives directly (the console path — commandEntered — is
+        /// exercised separately through reflection).</remarks>
+        internal VMCheatContext parseCommandString(string command)
         {
             if (command.Length == 0)
                 return null;

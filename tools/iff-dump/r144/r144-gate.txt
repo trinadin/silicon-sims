@@ -1,0 +1,18 @@
+17:30:32.642 autotest: AUTOTEST uichrome tree: btn=True (128x39) bar=True (27x25)
+17:30:32.643 autotest: AUTOTEST uitoolbar tree: live=True (200x50) gauge=True (108x100)
+17:30:32.643 autotest: AUTOTEST uimpanel desktop bottom-bar composition: ok=True ucp=0,585 220x183 panel=220,668 ucpRight=220 screen=1024x768 viewport=1024x768 dpi=1
+17:30:32.649 autotest: AUTOTEST uilive IFF-literal Live.iff Motives+Personality + subpanel twins: motiveCanon=True (Motives/289) traitCanon=True (Personality/714) motiveTwinned=True motiveTextCanon=True traitTwinned=True traitTextCanon=True
+17:30:32.649 autotest: AUTOTEST uilive: PASS
+17:30:33.508 autotest: AUTOTEST uigauge original live mood gauge: str=True art=True (9 pins) live=True
+17:30:33.508 autotest: AUTOTEST uigauge: PASS
+17:30:33.510 autotest: AUTOTEST uirate ratings family: art=True (9 pins) math=True live=True
+17:30:33.510 autotest: AUTOTEST uirate: PASS
+17:30:33.789 autotest: AUTOTEST uisurvey dump live 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-live.png
+17:30:34.346 autotest: AUTOTEST uicp original-plate+patches+buttons+speed-cluster: OK 
+17:30:34.346 autotest: AUTOTEST uicp: PASS
+17:30:34.610 autotest: AUTOTEST uibargeom original-bar-composition: OK panel=220,668 back=804x100 sub=504x100@r1024
+17:30:34.611 autotest: AUTOTEST uibargeom: PASS
+17:30:32.229 autotest: chunks FAILEDCOUNT 0
+17:34:18.476 autotest: AUTOTEST carseek RESULT minute=615 car-entity-max=2 career-frames=43813 ids=[280,281,368,4096,4099,4100,4102,4106,4125] jobPerfLvlChanged=False iff4100process=True
+17:34:18.477 autotest: AUTOTEST RESULT PASS
+AUTOTEST RESULT PASS passed=85 failed=0

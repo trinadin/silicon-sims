@@ -1,0 +1,90 @@
+                ; ==== .DoStream__14TreeTableEntryFP11ReconBuffers ====
+001551a0: bf61ffec  stmw     r27, -0x14(r1)
+001551a4: 7c0802a6  mflr     r0
+001551a8: 3ba50000  addi     r29, r5, 0
+001551ac: 3b630000  addi     r27, r3, 0
+001551b0: 3b840000  addi     r28, r4, 0
+001551b4: 90010008  stw      r0, 8(r1)
+001551b8: 7fa00734  extsh    r0, r29
+001551bc: 2c000006  cmpwi    r0, 6
+001551c0: 9421ff90  stwu     r1, -0x70(r1)
+001551c4: 4080000c  bge      0x1551d0
+001551c8: 4bfffac9  bl       0x154c90   ; .DoOldStream__14TreeTableEntryFP11ReconBuffers
+001551cc: 48000120  b        0x1552ec
+001551d0: 387c0000  addi     r3, r28, 0
+001551d4: 389b0002  addi     r4, r27, 2
+001551d8: 38a00001  li       r5, 1
+001551dc: 4bfc97e5  bl       0x11e9c0   ; .Recon16__11ReconBufferFPsi
+001551e0: 387c0000  addi     r3, r28, 0
+001551e4: 389b0000  addi     r4, r27, 0
+001551e8: 38a00001  li       r5, 1
+001551ec: 4bfc97d5  bl       0x11e9c0   ; .Recon16__11ReconBufferFPsi
+001551f0: 387c0000  addi     r3, r28, 0
+001551f4: 389b0004  addi     r4, r27, 4
+001551f8: 38a00001  li       r5, 1
+001551fc: 4bfc9775  bl       0x11e970   ; .ReconInt__11ReconBufferFPii
+00155200: 387c0000  addi     r3, r28, 0
+00155204: 389b0014  addi     r4, r27, 0x14
+00155208: 38a00001  li       r5, 1
+0015520c: 4bfc9765  bl       0x11e970   ; .ReconInt__11ReconBufferFPii
+00155210: 387c0000  addi     r3, r28, 0
+00155214: 389b0018  addi     r4, r27, 0x18
+00155218: 38a00001  li       r5, 1
+0015521c: 4bfc9755  bl       0x11e970   ; .ReconInt__11ReconBufferFPii
+00155220: 801b000c  lwz      r0, 0xc(r27)
+00155224: 387c0000  addi     r3, r28, 0
+00155228: 38810040  addi     r4, r1, 0x40
+0015522c: 90010040  stw      r0, 0x40(r1)
+00155230: 38a00001  li       r5, 1
+00155234: 4bfc973d  bl       0x11e970   ; .ReconInt__11ReconBufferFPii
+00155238: 80010040  lwz      r0, 0x40(r1)
+0015523c: 387c0000  addi     r3, r28, 0
+00155240: 389b0010  addi     r4, r27, 0x10
+00155244: 901b000c  stw      r0, 0xc(r27)
+00155248: 38a00001  li       r5, 1
+0015524c: 4bfc9405  bl       0x11e650   ; .ReconFloat__11ReconBufferFPfi
+00155250: 387c0000  addi     r3, r28, 0
+00155254: 389b001c  addi     r4, r27, 0x1c
+00155258: 38a00001  li       r5, 1
+0015525c: 4bfc9715  bl       0x11e970   ; .ReconInt__11ReconBufferFPii
+00155260: 387c0000  addi     r3, r28, 0
+00155264: 389b0020  addi     r4, r27, 0x20
+00155268: 38a00001  li       r5, 1
+0015526c: 4bfc9705  bl       0x11e970   ; .ReconInt__11ReconBufferFPii
+00155270: 3bc00000  li       r30, 0
+00155274: 3be00000  li       r31, 0
+00155278: 48000050  b        0x1552c8
+0015527c: 801b0008  lwz      r0, 8(r27)
+00155280: 389f0002  addi     r4, r31, 2
+00155284: 387c0000  addi     r3, r28, 0
+00155288: 7c802214  add      r4, r0, r4
+0015528c: 38a00001  li       r5, 1
+00155290: 4bfc9731  bl       0x11e9c0   ; .Recon16__11ReconBufferFPsi
+00155294: 801b0008  lwz      r0, 8(r27)
+00155298: 389f0004  addi     r4, r31, 4
+0015529c: 387c0000  addi     r3, r28, 0
+001552a0: 7c802214  add      r4, r0, r4
+001552a4: 38a00001  li       r5, 1
+001552a8: 4bfc9719  bl       0x11e9c0   ; .Recon16__11ReconBufferFPsi
+001552ac: 801b0008  lwz      r0, 8(r27)
+001552b0: 387c0000  addi     r3, r28, 0
+001552b4: 38a00001  li       r5, 1
+001552b8: 7c80fa14  add      r4, r0, r31
+001552bc: 4bfc9705  bl       0x11e9c0   ; .Recon16__11ReconBufferFPsi
+001552c0: 3bff0006  addi     r31, r31, 6
+001552c4: 3bde0001  addi     r30, r30, 1
+001552c8: 801b0004  lwz      r0, 4(r27)
+001552cc: 7c1e0000  cmpw     r30, r0
+001552d0: 4180ffac  blt      0x15527c
+001552d4: 7fa00734  extsh    r0, r29
+001552d8: 2c000007  cmpwi    r0, 7
+001552dc: 40820010  bne      0x1552ec
+001552e0: 387c0000  addi     r3, r28, 0
+001552e4: 389b0024  addi     r4, r27, 0x24
+001552e8: 4bfc90a9  bl       0x11e390   ; .ReconString__11ReconBufferFR9CTGString
+001552ec: 80010078  lwz      r0, 0x78(r1)
+001552f0: 38210070  addi     r1, r1, 0x70
+001552f4: bb61ffec  lmw      r27, -0x14(r1)
+001552f8: 7c0803a6  mtlr     r0
+001552fc: 4e800020  blr      
+00155300: 00000000  .long    0x00000000

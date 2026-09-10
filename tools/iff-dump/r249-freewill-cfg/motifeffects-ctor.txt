@@ -1,0 +1,64 @@
+                ; ==== .__ct__13MotiveEffectsFP8cXPerson ====
+0009fd80: 93e1fffc  stw      r31, -4(r1)
+0009fd84: 7c0802a6  mflr     r0
+0009fd88: 83e2a4d4  lwz      r31, -0x5b2c(r2)
+0009fd8c: 38c00014  li       r6, 0x14
+0009fd90: 93c1fff8  stw      r30, -8(r1)
+0009fd94: 80a28d38  lwz      r5, -0x72c8(r2)
+0009fd98: 38e00009  li       r7, 9
+0009fd9c: 93a1fff4  stw      r29, -0xc(r1)
+0009fda0: 3ba40000  addi     r29, r4, 0
+0009fda4: 80828d3c  lwz      r4, -0x72c4(r2)
+0009fda8: 9381fff0  stw      r28, -0x10(r1)
+0009fdac: 7c7c1b78  mr       r28, r3
+0009fdb0: 387c0008  addi     r3, r28, 8
+0009fdb4: 90010008  stw      r0, 8(r1)
+0009fdb8: 38000009  li       r0, 9
+0009fdbc: 9421ffa0  stwu     r1, -0x60(r1)
+0009fdc0: 907c0000  stw      r3, 0(r28)
+0009fdc4: 901c0004  stw      r0, 4(r28)
+0009fdc8: 484f1219  bl       0x590fe0
+0009fdcc: 93bc00bc  stw      r29, 0xbc(r28)
+0009fdd0: 381d078c  addi     r0, r29, 0x78c
+0009fdd4: c03f000c  lfs      f1, 0xc(r31)
+0009fdd8: 3ba00000  li       r29, 0
+0009fddc: 901c00c0  stw      r0, 0xc0(r28)
+0009fde0: c01f0010  lfs      f0, 0x10(r31)
+0009fde4: 3bc00000  li       r30, 0
+0009fde8: d0210040  stfs     f1, 0x40(r1)
+0009fdec: 83e2a4c8  lwz      r31, -0x5b38(r2)
+0009fdf0: d0210044  stfs     f1, 0x44(r1)
+0009fdf4: d0010048  stfs     f0, 0x48(r1)
+0009fdf8: d001004c  stfs     f0, 0x4c(r1)
+0009fdfc: 48000050  b        0x9fe4c
+0009fe00: 80bf0000  lwz      r5, 0(r31)
+0009fe04: 381e0010  addi     r0, r30, 0x10
+0009fe08: 807c0000  lwz      r3, 0(r28)
+0009fe0c: 38800004  li       r4, 4
+0009fe10: 7ca3012e  stwx     r5, r3, r0
+0009fe14: 801c0000  lwz      r0, 0(r28)
+0009fe18: 7c60f214  add      r3, r0, r30
+0009fe1c: 48077f55  bl       0x117d70   ; .SetMaxPoints__11PiecewiseFnFi
+0009fe20: 801c0000  lwz      r0, 0(r28)
+0009fe24: 38810040  addi     r4, r1, 0x40
+0009fe28: 7c60f214  add      r3, r0, r30
+0009fe2c: 48077d15  bl       0x117b40   ; .AddPoint__11PiecewiseFnFRC11PiecewisePt
+0009fe30: 801c0000  lwz      r0, 0(r28)
+0009fe34: 38810048  addi     r4, r1, 0x48
+0009fe38: 7c60f214  add      r3, r0, r30
+0009fe3c: 48077d05  bl       0x117b40   ; .AddPoint__11PiecewiseFnFRC11PiecewisePt
+0009fe40: 3bde0014  addi     r30, r30, 0x14
+0009fe44: 3bff0004  addi     r31, r31, 4
+0009fe48: 3bbd0001  addi     r29, r29, 1
+0009fe4c: 801c0004  lwz      r0, 4(r28)
+0009fe50: 7c1d0000  cmpw     r29, r0
+0009fe54: 4180ffac  blt      0x9fe00
+0009fe58: 7f83e378  mr       r3, r28
+0009fe5c: 80010068  lwz      r0, 0x68(r1)
+0009fe60: 38210060  addi     r1, r1, 0x60
+0009fe64: 7c0803a6  mtlr     r0
+0009fe68: 83e1fffc  lwz      r31, -4(r1)
+0009fe6c: 83c1fff8  lwz      r30, -8(r1)
+0009fe70: 83a1fff4  lwz      r29, -0xc(r1)
+0009fe74: 8381fff0  lwz      r28, -0x10(r1)
+0009fe78: 4e800020  blr      

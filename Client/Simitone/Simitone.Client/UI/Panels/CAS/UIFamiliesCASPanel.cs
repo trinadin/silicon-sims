@@ -55,7 +55,8 @@ namespace Simitone.Client.UI.Panels.CAS
 
             Title = new UILabel();
             Title.NewStyle(UIStyle.Current.Text, 37);
-            Title.Caption = "Select a Family";
+            // R116: original UIText.iff 128 PickFamilyStrs [8] (the original is uppercase)
+            Title.Caption = GameFacade.Strings.GetString("128", "8");
             Title.Size = new Vector2(sw, 60);
             Title.Alignment = TextAlignment.Middle | TextAlignment.Center;
             Title.Y = -85;
@@ -115,6 +116,7 @@ namespace Simitone.Client.UI.Panels.CAS
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             var y = TitleI * 100 - 85;
             Title.Y = y;
             NewButton.X = UIScreen.Current.ScreenWidth - 140 * TitleI;
@@ -128,5 +130,29 @@ namespace Simitone.Client.UI.Panels.CAS
             Title.Visible = true;
             Title.Draw(batch);
         }
+
+        // R116: title twin in the caption table _10, centered across the screen like the
+        // modern label; mounted on first Update (font retry), modern label hidden.
+        public static int FamiliesTitleTwinned = 0;
+        public Simitone.Client.UI.Controls.UIOriginalText TitleTwin;
+
+        public override void Update(FSO.Common.Rendering.Framework.Model.UpdateState state)
+        {
+            base.Update(state);
+            if (TitleTwin == null)
+            {
+                var font = Simitone.Client.UI.Controls.OriginalGlyphFont.LoadCaption(GameFacade.GraphicsDevice);
+                if (font != null && font.Atlas != null)
+                {
+                    TitleTwin = new Simitone.Client.UI.Controls.UIOriginalText(Title.Caption, font) { Color = UIStyle.Current.Text };
+                    var sw = UIScreen.Current.ScreenWidth;
+                    TitleTwin.Position = new Microsoft.Xna.Framework.Vector2((sw - font.Measure(Title.Caption)) / 2f, Title.Y + 20);
+                    Add(TitleTwin);
+                    Title.Visible = false;
+                    FamiliesTitleTwinned++;
+                }
+            }
+        }
+
     }
 }

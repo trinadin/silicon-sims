@@ -1,0 +1,56 @@
+### BHAV 4103 'get paid' (55 instructions)
+ins0  T6/F253  Temp[0] = MyPD[56]
+ins1  T17/F253 Local[0] = JobData[1]
+ins2  T4/F253  Local[1] += Lit[30]
+ins3  T2/F253  PRIM random (8) opd=0100190032000700
+ins4  T49/F7   Local[1] < MyPD[63]
+ins5  T51/F253 PRIM dialogPrivateStrings (36) opd=002e030010000408
+ins6  T39/F253 Temp[1] = MyPD[57]
+ins7  T8/F253  Temp[0] = MyPD[56]
+ins8  T1/F253  Temp[1] = MyPD[57]
+ins9  T254/F254 PRIM ? (25) opd=0319000002000100
+ins10 T12/F253 MyPD[57] += Lit[1]
+ins11 T44/F253 Local[0] = JobData[1]
+ins12 T13/F253 Temp[0] = MyPD[56]
+ins13 T11/F253 Temp[1] = MyPD[57]
+ins14 T9/F253  PRIM dialogPrivateStrings (36) opd=002e050010000408
+ins15 T49/F54  CALL 4104 (own-iff) opd=ffffffffffffffff
+ins16 T30/F253 StkObjID[0] = MyObj[11]
+ins17 T48/F253 StkObjID[0] = MyObj[11]
+ins18 T22/F7   Local[1] > MyPD[63]
+ins19 T20/F253 PRIM random (8) opd=0100190046000700
+ins20 T29/F253 Local[1] += Lit[30]
+ins21 T23/F253 MyPD[57] -= Lit[1]
+ins22 T7/F50   MyPD[57] == Lit[0]
+ins23 T24/F253 Temp[0] = MyPD[56]
+ins24 T25/F253 Temp[1] = MyPD[57]
+ins25 T26/F253 Local[0] = JobData[1]
+ins26 T33/F253 StkObjID[0] = MyObj[11]
+ins27 T9/F253  PRIM dialogPrivateStrings (36) opd=002e060010000408
+ins28 T7/F19   MyPD[63] > Lit[0]
+ins29 T18/F253 Local[1] *= Lit[-1]
+ins30 T31/F253 Local[2] = JobData[12]
+ins31 T34/F253 Local[3] = JobData[13]
+ins32 T36/F253 Local[3] = JobData[13]
+ins33 T32/F253 Local[2] = JobData[12]
+ins34 T35/F253 Local[4] = MyPD[56]
+ins35 T46/F253 Local[5] = MyPD[57]
+ins36 T37/F253 Local[4] = MyPD[56]
+ins37 T47/F253 Local[5] = MyPD[57]
+ins38 T21/F7   MyPD[57] != Lit[0]
+ins39 T40/F253 PRIM random (8) opd=0600190064000700
+ins40 T41/F253 PRIM random (8) opd=0700190064000700
+ins41 T42/F43  Local[7] < Local[6]
+ins42 T43/F253 Local[6] = Local[7]
+ins43 T15/F54  MyPD[63] > Local[6]
+ins44 T45/F253 Local[8] = Local[0]
+ins45 T16/F253 Local[8] *= Tuning[132]
+ins46 T52/F253 PRIM playSound (23) opd=3801000000000000
+ins47 T53/F253 PRIM playSound (23) opd=3701000000000000
+ins48 T14/F253 Local[4] = MyPD[56]
+ins49 T10/F253 MyPD[24] = Lit[0]
+ins50 T38/F253 MyPD[24] = Lit[0]
+ins51 T9/F9    PRIM ? (25) opd=0319080002000200
+ins52 T5/F253  PRIM changeSuit (6) opd=0301000000000000
+ins53 T27/F253 PRIM changeSuit (6) opd=0301000000000000
+ins54 T7/F28   CALL 4134 (own-iff) opd=ffffffffffffffff

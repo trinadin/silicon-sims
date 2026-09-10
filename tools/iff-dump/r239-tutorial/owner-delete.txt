@@ -1,0 +1,7 @@
+000ca270: 807f00dc  lwz      r3, 0xdc(r31)
+000ca274: 48018b0d  bl       0xe2d80   ; .GetTutorialObject__12ObjectModuleFv
+000ca278: 7c03f840  cmplw    r3, r31
+000ca27c: 40820010  bne      0xca28c
+000ca280: 807f00dc  lwz      r3, 0xdc(r31)
+000ca284: 38800000  li       r4, 0
+000ca288: 480189e9  bl       0xe2c70   ; .SetTutorialObject__12ObjectModuleFP8cXObject

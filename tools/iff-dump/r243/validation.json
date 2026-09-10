@@ -1,0 +1,49 @@
+[
+  {
+    "run": "focused-final",
+    "passed": 17,
+    "failed": 0,
+    "captures": 45,
+    "log": "focused-final.log",
+    "manifest_verified": true
+  },
+  {
+    "run": "default-final",
+    "passed": 139,
+    "failed": 0,
+    "captures": 87,
+    "log": "default-final.log",
+    "manifest_verified": true
+  },
+  {
+    "run": "800x600",
+    "passed": 24,
+    "failed": 0,
+    "captures": 98,
+    "log": "size-800x600.log",
+    "manifest_verified": true,
+    "logical": "800x600",
+    "effective_dpi": 1.0
+  },
+  {
+    "run": "1280x800",
+    "passed": 24,
+    "failed": 0,
+    "captures": 98,
+    "log": "size-1280x800.log",
+    "manifest_verified": true,
+    "logical": "1280x800",
+    "effective_dpi": 1.0
+  },
+  {
+    "run": "800x600@2x",
+    "passed": 24,
+    "failed": 0,
+    "captures": 98,
+    "log": "size-800x600@2x.log",
+    "manifest_verified": true,
+    "logical": "939x600",
+    "effective_dpi": 1.7033333,
+    "physical_viewport": "1600x1022"
+  }
+]

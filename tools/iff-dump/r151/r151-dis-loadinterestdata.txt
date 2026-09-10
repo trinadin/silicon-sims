@@ -1,0 +1,66 @@
+0x0b4a80: 93e1fffc  stw r31, -4(r1)                            |....|
+0x0b4a84: 7c0802a6  mfxer r0                                   ||...|
+0x0b4a88: 3be00000  addi r31, r0, 0                            |;...|
+0x0b4a8c: 93c1fff8  stw r30, -8(r1)                            |....|
+0x0b4a90: 7c9e2378  or r4, r30, r4                             ||.#x|
+0x0b4a94: 90010008  stw r0, 8(r1)                              |....|
+0x0b4a98: 9421ffb0  stwu r1, -80(r1)                           |.!..|
+0x0b4a9c: 8003014c  lwz r0, 332(r3)                            |...L|
+0x0b4aa0: 80e30150  lwz r7, 336(r3)                            |...P|
+0x0b4aa4: 5400103a  rlwinm r0, r0 <<2                          |T..:|
+0x0b4aa8: 8084011c  lwz r4, 284(r4)                            |....|
+0x0b4aac: 7cc70214  add r6, r7, r0                             ||...|
+0x0b4ab0: 48000030  b 0xb4ae0                                  |H..0|
+0x0b4ab4: 60000000  ori r0, r0, 0                              |`...|
+0x0b4ab8: 80a70000  lwz r5, 0(r7)                              |....|
+0x0b4abc: 28050000  cmplwi r0, r5, 0                           |(...|
+0x0b4ac0: 4182001c  bne(2) 0xb4adc                             |A...|
+0x0b4ac4: 80050008  lwz r0, 8(r5)                              |....|
+0x0b4ac8: 7c002040  cmpl cr0, r0, r4                           ||. @|
+0x0b4acc: 40820010  beq(2) 0xb4adc                             |@...|
+0x0b4ad0: 281f0000  cmplwi r0, r31, 0                          |(...|
+0x0b4ad4: 40820008  beq(2) 0xb4adc                             |@...|
+0x0b4ad8: 7cbf2b78  or r5, r31, r5                             ||.+x|
+0x0b4adc: 38e70004  addi r7, r7, 4                             |8...|
+0x0b4ae0: 7c073040  cmpl cr0, r7, r6                           ||.0@|
+0x0b4ae4: 4082ffd4  beq(2) 0xb4ab8                             |@...|
+0x0b4ae8: 281f0000  cmplwi r0, r31, 0                          |(...|
+0x0b4aec: 40820018  beq(2) 0xb4b04                             |@...|
+0x0b4af0: 38a0ffff  addi r5, r0, -1                            |8...|
+0x0b4af4: 4800025d  bl 0xb4d50                                 |H..]|
+0x0b4af8: a8030000  lha r0, 0(r3)                              |....|
+0x0b4afc: b01e05ca  sth r0, 1482(r30)                          |....|
+0x0b4b00: 48000068  b 0xb4b68                                  |H..h|
+0x0b4b04: a81f0000  lha r0, 0(r31)                             |....|
+0x0b4b08: b01e05ca  sth r0, 1482(r30)                          |....|
+0x0b4b0c: 801f0018  lwz r0, 24(r31)                            |....|
+0x0b4b10: 2c000000  cmpwi r0, r0, 0                            |,...|
+0x0b4b14: 41820054  bne(2) 0xb4b68                             |A..T|
+0x0b4b18: 4bfef809  bl 0xa4320                                 |K...|
+0x0b4b1c: 80c30008  lwz r6, 8(r3)                              |....|
+0x0b4b20: 48000030  b 0xb4b50                                  |H..0|
+0x0b4b24: 809f0018  lwz r4, 24(r31)                            |....|
+0x0b4b28: 80060004  lwz r0, 4(r6)                              |....|
+0x0b4b2c: 7c040000  cmp cr0, r4, r0                            ||...|
+0x0b4b30: 4180001c  bne(0) 0xb4b4c                             |A...|
+0x0b4b34: 80060000  lwz r0, 0(r6)                              |....|
+0x0b4b38: 5405083c  rlwinm r5, r0 <<1                          |T..<|
+0x0b4b3c: 38850074  addi r4, r5, 116                           |8..t|
+0x0b4b40: 3805058c  addi r0, r5, 1420                          |8...|
+0x0b4b44: 7c9f22ae  .long                                      ||.".|
+0x0b4b48: 7c9e032e  sthx r4, r0, r30                           ||...|
+0x0b4b4c: 38c60008  addi r6, r6, 8                             |8...|
+0x0b4b50: 80030004  lwz r0, 4(r3)                              |....|
+0x0b4b54: 80830008  lwz r4, 8(r3)                              |....|
+0x0b4b58: 54001838  rlwinm r0, r0 <<3                          |T..8|
+0x0b4b5c: 7c040214  add r0, r4, r0                             ||...|
+0x0b4b60: 7c060040  cmpl cr0, r6, r0                           ||..@|
+0x0b4b64: 4082ffc0  beq(2) 0xb4b24                             |@...|
+0x0b4b68: 80010058  lwz r0, 88(r1)                             |...X|
+0x0b4b6c: 38210050  addi r1, r1, 80                            |8!.P|
+0x0b4b70: 83e1fffc  lwz r31, -4(r1)                            |....|
+0x0b4b74: 7c0803a6  mtxer r0                                   ||...|
+0x0b4b78: 83c1fff8  lwz r30, -8(r1)                            |....|
+0x0b4b7c: 4e800020  bclr                                       |N.. |
+0x0b4b80: 00000000  .long                                      |....|
+0x0b4b84: 00092041  .long                                      |.. A|

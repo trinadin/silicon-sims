@@ -1,0 +1,193 @@
+R124 OBJD MiscFlags (field 89) EMPIRICAL SCAN — every object IFF on disk
+Master objects only (SubIndex==0). CTSS name via CatalogStringsID (field 39).
+
+FARs scanned: 58 + 0 loose UserObjects iffs
+members: 1203 IFFs, 5125 OBJD chunks, 1571 masters, 0 skipped (non-IFF/undecodable)
+
+==== MiscFlags (field 89) bit histogram (masters) ====
+bit 0 (0x0001): 1 masters: Objects.far!Fire.iff
+bit 2 (0x0004): 1 masters: ExpansionPack7.far!NPC-FX.iff
+
+==== CTSS English layout (empirical: catalog CTSS = 2 entries x N languages) ====
+lang-1 entry-count histogram: {3: 17, 2: 1274, 1: 59, 0: 188, 4: 33}
+==== CTSS[0]/[1] + OBJD price samples (anchor names) ====
+"Stray-Away" Pet Prevention  | price=15    | desc='Are you tired of the extra work and hassle t'
+Hot Dog                      | price=15    | desc='d'
+Pete Dropinsky               | price=0     | desc='This is the description for the party crashe'
+"Toy With Me" Toy Display    | price=2415  | desc='To kids and infantile adults, toys provide e'
+PerpetuBloom Floral Spray    | price=180   | desc='Always innovating, PerpetuBloom  brings you '
+PerpetuLux-style Table       | price=226   | desc='PerpetuLux spells value. Hygienic, seamless,'
+"King Head" Outdoor Chess Ta | price=999   | desc='Into mental materialism AND people watching?'
+Kastle Oí Toys by Magical My | price=3696  | desc='Erect one of these beauties in your toyshop '
+Pet on a Shingle             | price=99    | desc='Return to a time when a simple hanging sign '
+Blue Dog Collar              | price=0     | desc='Collars come in a variety of colors and styl'
+Blue Dog Ribbon              | price=0     | desc='Collars come in a variety of colors and styl'
+Brown Dog Collar             | price=0     | desc='Collars come in a variety of colors and styl'
+Pink Dog Collar              | price=0     | desc='Collars come in a variety of colors and styl'
+Pink Dog Ribbon              | price=0     | desc='Collars come in a variety of colors and styl'
+Red Dog Collar               | price=0     | desc='Collars come in a variety of colors and styl'
+Red Dog Ribbon               | price=0     | desc='Collars come in a variety of colors and styl'
+Spiked Dog Collar            | price=0     | desc='Collars come in a variety of colors and styl'
+SqueakNip Pet Toys           | price=1739  | desc='Has the zest in your pet come up a bit flat?'
+Aquaversatile Pet Display    | price=3899  | desc='What pet store would be complete without a w'
+Praisem High Pet Treat Displ | price=799   | desc='Praise, itís what you give good pets. Praise'
+Fluffy Puppy Pet Bin         | price=6999  | desc='Based on proven "touch and feel" marketing, '
+Gnawhide Pet Toy             | price=0     | desc='There is NO dog on the planet which will den'
+Squeaky Tara Pet Toy         | price=0     | desc='The Squeaky Tara was designed with one thing'
+Pet Treats!                  | price=0     | desc='New improved... uhh... wheat germ to feed yo'
+Pet Judge                    | price=0     | desc=''
+Pet Judge                    | price=0     | desc=''
+
+==== WIDE histogram: every OBJD field 78..103, sparse-bit name lists ====
+fields: 78 BHAV_Repair, 79 WallStyleSpriteID, 80-86 Ratings, 87 RatingSkillFlags,
+        88 NumTypeAttributes, 89 MiscFlags, 90-91 TypeAttrGUID, 92 FunctionSubsort,
+        93 DTSubsort, 94 KeepBuying, 95 VacationSubsort, 96 ResetLotAction,
+        97 CommunitySubsort, 98 DreamFlags, 99 RenderFlags, 100 VitaboyFlags,
+        101 STSubsort, 102 MTSubsort  (v138 masters)
+v138 named masters: 1378
+field 78: all zero
+field 79: all zero
+field 80: 27/1378 nonzero
+  bit  0 (0x0001): 18 masters: Olde Thyme Victual Pre; Olde Thyme Restored Ov; CiaoTime 360 Moderna C; Punchucopia Extraordin; Never Cold Food Hold ; Pantry De Provence; Thermacotta Dual-Fuel ; Help System - Magic; Superstar Help System; Dialectric(tm) Free St
+  bit  1 (0x0002): 10 masters: CiaoTime 360 Moderna C; Pantry De Provence; Pet PlaCater; Standard-Plus Brick Ov; La Frigorifero by Belc; XLR8R Food Processor; The "Pyrotorre" Gas Ra; Positive Potential Mic; Llamark Refrigerator; Porcina Refrigerator M
+  bit  2 (0x0004): 17 masters: CiaoTime 360 Moderna C; "Light My Fire" BBQ; GluttoNibble XL BBQ  ; Never Cold Food Hold ; Pantry De Provence; Pet PlaCater; Standard-Plus Brick Ov; Help System - Magic; Superstar Help System; Dialectric(tm) Free St
+  bit  3 (0x0008): 6 masters: Olde Thyme Victual Pre; Olde Thyme Restored Ov; Annapurna Pet Feeder ; La Frigorifero by Belc; Thermacotta Dual-Fuel ; Freeze Secret Refriger
+field 81: 68/1378 nonzero
+  bit  0 (0x0001): 36 masters: "Sella Solaria" Dining; The Sammy SandDollar S; Egg Chair; Etherette Lounger; Ebonized Victorian Cha; The Manchester; Satinistics Reproducti; The M Chair; Sir Laxalot Dinette Ch; El Tomayo Dining Chair
+  bit  1 (0x0002): 44 masters: "Sella Solaria" Dining; Steeling Beauty Deck C; The Sammy SandDollar S; Egg Chair; The Manchester; Frogg; Satinistics Reproducti; Sir Laxalot Dinette Ch; Surplus Theatre Seatin;  RustyRedneck Barrel C
+  bit  2 (0x0004): 27 masters: "Sella Solaria" Dining; "Curulis Etrurius" Rom; Egg Chair; Etherette Lounger; The Manchester; Frogg; The M Chair; Plushie Mushie Pleasur; Tropi-Cane Island Chai; FormÌ Dining Chair
+  bit  3 (0x0008): 9 masters: The "Bunda"; Duke of Earle Throne C; Ebonized Victorian Cha; El Tomayo Dining Chair; Cowch Country Lounger; Pad Prolifique; Persian Plush Pet Bed; Simply Modern Leather ; Papa's Chair
+field 82: 16/1378 nonzero
+  bit  0 (0x0001): 9 masters: Fontis Publicus; Stonewash Sink; In-house Outhouse; Wicked Breeze Surf Sho; Chr¯me Faucet System; Claymore Ceramic Sink; Really Rustic Kitchen ; Medicine Cabinet; Epikouros Kitchen Sink
+  bit  1 (0x0002): 13 masters: Fontis Publicus; "Hygiene Machine" by E; Stonewash Sink; In-house Outhouse; Chr¯me Concept Shower ; Chr¯me Faucet System; Savage Salvage Sink; Claymore Ceramic Sink; Really Rustic Kitchen ; SpaceMiser Shower
+  bit  2 (0x0004): 3 masters: In-house Outhouse; Wicked Breeze Surf Sho; SpaceMiser Shower
+  bit  3 (0x0008): 3 masters: Aluminumb Shower Syste; In-house Outhouse; Chr¯me Concept Shower 
+  bit  4 (0x0010): 1 masters: In-house Outhouse
+  bit  5 (0x0020): 1 masters: In-house Outhouse
+  bit  6 (0x0040): 1 masters: In-house Outhouse
+  bit  7 (0x0080): 1 masters: In-house Outhouse
+  bit  8 (0x0100): 1 masters: In-house Outhouse
+  bit  9 (0x0200): 1 masters: In-house Outhouse
+  bit 10 (0x0400): 1 masters: In-house Outhouse
+  bit 11 (0x0800): 1 masters: In-house Outhouse
+  bit 12 (0x1000): 1 masters: In-house Outhouse
+  bit 13 (0x2000): 1 masters: In-house Outhouse
+  bit 14 (0x4000): 1 masters: In-house Outhouse
+  bit 15 (0x8000): 1 masters: In-house Outhouse
+field 83: 11/1378 nonzero
+  bit  0 (0x0001): 1 masters: Mr. Regular-Joe Coffee
+  bit  1 (0x0002): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit  2 (0x0004): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit  3 (0x0008): 11 masters: ExcreSys "Ejectament" ; Commoda Cloacina; In-house Outhouse; Boggs Memorial Commode; Dunginator 9000; Toilet of Gold Replica; Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Hygeia-O-Matic Toilet; Flush Force 5 XLT
+  bit  4 (0x0010): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit  5 (0x0020): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit  6 (0x0040): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit  7 (0x0080): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit  8 (0x0100): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit  9 (0x0200): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit 10 (0x0400): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit 11 (0x0800): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit 12 (0x1000): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit 13 (0x2000): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit 14 (0x4000): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+  bit 15 (0x8000): 3 masters: Colonial Duties Tea Se; Mr. Regular-Joe Coffee; Gagmia Simore Espresso
+field 84: 8/1378 nonzero
+  bit  0 (0x0001): 4 masters: Pad Prolifique; Persian Plush Pet Bed; Happy Paws Cuddle Sack; Mr. Regular-Joe Coffee
+  bit  1 (0x0002): 5 masters: Critter Condo; Dura-Bean Pet Bed; Happy Paws Cuddle Sack; Colonial Duties Tea Se; Gagmia Simore Espresso
+  bit  2 (0x0004): 3 masters: Critter Condo; Dura-Bean Pet Bed; Happy Paws Cuddle Sack
+  bit  3 (0x0008): 2 masters: Pad Prolifique; Persian Plush Pet Bed
+field 85: 148/1378 nonzero
+  bit  0 (0x0001): 40 masters: Birthday Cake; SSRI Virtual Reality S; Wurl 'N' Hurl Retro Ju; "The Swing" Bookshelf; Genie Gold Pile; SSRI Virtual Reality S; SSRI Virtual Reality S; SSRI Virtual Reality S; Little Voodoo Dolly; Galvanator Bookshelf
+  bit  1 (0x0002): 134 masters: Birthday Cake; SSRI Virtual Reality S; Guinea Pig; Wurl 'N' Hurl Retro Ju; Viva PGT Home Casino; Un Snacker; "The Swing" Bookshelf; Genie Gold Pile; Beejaphone Guitar; SSRI Virtual Reality S
+  bit  2 (0x0004): 32 masters: SSRI Virtual Reality S; Genie Gold Pile; SSRI Virtual Reality S; SSRI Virtual Reality S; SSRI Virtual Reality S; Spazmatronic Plasmatro; SSRI Virtual Reality S; MAXSIMUM; Victors' Digest; The Avarix
+  bit  3 (0x0008): 1 masters: Meet Marco
+field 86: 390/1378 nonzero
+  bit  0 (0x0001): 288 masters: "Sella Solaria" Dining; "Curulis Etrurius" Rom; Mystery Sundial; Aluminumb Shower Syste; Fontis Publicus; La Table Non-Formidabl; Turkish Turmoil Wall S; Smoky Topaz Wall Sconc; Neon Flamingo Sign; Sandy Shoreline Shadow
+  bit  1 (0x0002): 118 masters: Caesar Psychopathus; Mystery Sundial; Fontis Publicus; Commoda Cloacina; Cuckoo Clock; Wurl 'N' Hurl Retro Ju; What a Gas! Party Ball; Potted Palm; Bird of Paradise; Duke of Earle Throne C
+  bit  2 (0x0004): 17 masters: The Manchester; Judith Peynter - Self ; Highbrau Coat of Arms; Head in Jar Curio; Estate Sale Conversati; Ali`i Kahuna Ceremonia; RandImage CafÈ Decorat; Forgotten Jungle Terra; "Epith y Oraia Eleny" ; McLeod's Chandelier of
+  bit  3 (0x0008): 21 masters: Caesar Psychopathus; Black Tree Tapestry; Suit of Armor; "La Gargouille" Orname; Shabycratah Figure; "Curse of Aphrodite" S; Admiral Landgraab Port; Sham-Shag Polar Bear R; Cascading Corporate Wa; Platinum Album Keepsak
+field 87: 21/1378 nonzero
+  bit  2 (0x0004): 3 masters: "King Head" Outdoor Ch; Checker Set Too; Chuck Matewell Chess S
+  bit  4 (0x0010): 2 masters: Beejaphone Guitar; "Dimanche" Folding Eas
+  bit  5 (0x0020): 12 masters: Baroque Optilopticon; "Bezique's Folly" Card; FlatterMe Wall Mirror; Shaker Floor Mirror; Reflecto Wall Mirror; Speaky Scarlet ; Mr. Beau; Mirror to the World; The Face of Shakespear; Medicine Cabinet
+  bit  6 (0x0040): 4 masters: Moneywell Computer; The Brahma 2000; Microscotch Covetta Q6; Meet Marco
+  skillflags value 0x0004: "King Head" Outdoor Chess Table; Checker Set Too; Chuck Matewell Chess Set
+  skillflags value 0x0010: Beejaphone Guitar; "Dimanche" Folding Easel
+  skillflags value 0x0020: Baroque Optilopticon; "Bezique's Folly" Card Game; FlatterMe Wall Mirror; Shaker Floor Mirror
+  skillflags value 0x0040: Moneywell Computer; The Brahma 2000; Microscotch Covetta Q628-1500JA; Meet Marco
+field 88: 9/1378 nonzero
+  bit  0 (0x0001): 2 masters: Lana; Vacation Director Kana
+  bit  1 (0x0002): 1 masters: Spellbound Wand Charge
+  bit  3 (0x0008): 2 masters: Spellbound Wand Charge; Dialectric(tm) Free St
+  bit  4 (0x0010): 1 masters: Dialectric(tm) Free St
+  bit  5 (0x0020): 5 masters: Help System - Magic; Superstar Help System; Dialectric(tm) Free St; Dialectric(tm) Free St; Dialectric(tm) Free St
+field 89: all zero
+field 90: all zero
+field 91: all zero
+field 92: 539/1378 nonzero
+  bit  0 (0x0001): 132 masters: "Sella Solaria" Dining; ExcreSys "Ejectament" ; Commoda Cloacina; Steeling Beauty Deck C; The Sammy SandDollar S; Amber Ashes Outdoor Ca; Electric `Ukulele Lady; Sandy Shoreline Shadow; Viva PGT Home Casino; Cornerstone Counter
+  bit  1 (0x0002): 119 masters: "Curulis Etrurius" Rom; The "Bunda"; Caesar Psychopathus; Mystery Sundial; Aluminumb Shower Syste; Steeling Beauty Deck T; The Tabletop Treasure; Olde Thyme Victual Pre; Duke of Earle Throne C; Egg Chair
+  bit  2 (0x0004): 79 masters: Fontis Publicus; "Hygiene Machine" by E; La Table Non-Formidabl; EmerGen Table; Wurl 'N' Hurl Retro Ju; Turkish Turmoil Wall S; Smoky Topaz Wall Sconc; Neon Flamingo Sign; Top Brass Sconce; Oval Glass Sconce
+  bit  3 (0x0008): 42 masters: Cobalt-60 Column; Um Archum Uh Aqueductu; Numantian Column-Arch; Promotional Balloon Fe; Cytherea Asilus Casses; Potted Palm; Bird of Paradise; Baroque Optilopticon; Recycled Pay Phone; PerpetuBloom Floral Sp
+  bit  4 (0x0010): 13 masters: Birthday Cake; Granny Raymond's Holid; Mistletoe Ceiling Orna; Guinea Pig; What a Gas! Party Ball; SimFarm Turkey Dinner; Madame Blahbatfry Crys; Antique Lamp; Little Voodoo Dolly; Punchucopia Extraordin
+  bit  5 (0x0020): 15 masters: Critter Condo; Pad Prolifique; Persian Plush Pet Bed; Dura-Bean Pet Bed; Happy Paws Cuddle Sack; Love in a Cage; Dunginator 9000; Classic Goldfish Bowl; Pet PlaCater; Annapurna Pet Feeder 
+  bit  6 (0x0040): 4 masters: Spellbound Wand Charge; A Hole in the Ground; The Start Here Spell B; The Start Here Spell B
+  bit  7 (0x0080): 135 masters: Cuckoo Clock; Nouveau Nites Party Li; Queen Vivanco Roses; Creative Ceramics Art ; Jack-O'-lantern; "Stray-Away" Pet Preve; Elephant Foot Trash Ca; Professional Trash Can; The Fiery Friary Medie; Greek Fire Garden Lamp
+field 93: 563/1378 nonzero
+  bit  0 (0x0001): 367 masters: "Sella Solaria" Dining; Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; Cuckoo Clock; Steeling Beauty Deck C; The Sammy SandDollar S; Mistletoe Ceiling Orna; Nouveau Nites Party Li
+  bit  1 (0x0002): 476 masters: "Sella Solaria" Dining; "Curulis Etrurius" Rom; The "Bunda"; Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; La Table Non-Formidabl; EmerGen Table; Cuckoo Clock
+  bit  2 (0x0004): 80 masters: Mystery Sundial; Nouveau Nites Party Li; Jack-O'-lantern; "Stray-Away" Pet Preve; The Tabletop Treasure; Suit of Armor; "La Gargouille" Orname; Shabycratah Figure; Granite Guard Lion; Ali`i Kahuna Ceremonia
+  bit  3 (0x0008): 71 masters: Mystery Sundial; Nouveau Nites Party Li; Jack-O'-lantern; Suit of Armor; "La Gargouille" Orname; Shabycratah Figure; Granite Guard Lion; Dungeon Dumpster; Ali`i Kahuna Ceremonia; "Black Bile Bear"
+  bit  7 (0x0080): 384 masters: Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; La Table Non-Formidabl; EmerGen Table; Cuckoo Clock; Steeling Beauty Deck C; Mistletoe Ceiling Orna; Nouveau Nites Party Li
+field 94: 85/1378 nonzero
+  bit  0 (0x0001): 85 masters: "Sella Solaria" Dining; Steeling Beauty Deck C; The Sammy SandDollar S; Nouveau Nites Party Li; Cornerstone Counter; The M Chair; Sir Laxalot Dinette Ch; El Tomayo Dining Chair; Neukum Stereo Speakers; Surplus Theatre Seatin
+field 95: 511/1378 nonzero
+  bit  0 (0x0001): 402 masters: "Sella Solaria" Dining; "Curulis Etrurius" Rom; The "Bunda"; Caesar Psychopathus; Mystery Sundial; Aluminumb Shower Syste; Fontis Publicus; "Hygiene Machine" by E; La Table Non-Formidabl; EmerGen Table
+  bit  1 (0x0002): 410 masters: "Sella Solaria" Dining; "Curulis Etrurius" Rom; The "Bunda"; Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; La Table Non-Formidabl; EmerGen Table; Cuckoo Clock
+  bit  2 (0x0004): 46 masters: Wurl 'N' Hurl Retro Ju; Sky Scorcher Fireworks; Neukum Stereo Speakers; Spazmatronic Plasmatro; Audible Enlightenment ; Nonstop Noise Wall Spe; "Light My Fire" BBQ; CafÈffete CafÈ Table; CafÈffete Iron Chair; "King Head" Outdoor Ch
+  bit  3 (0x0008): 88 masters: Fontis Publicus; "Hygiene Machine" by E; ExcreSys "Ejectament" ; Commoda Cloacina; Nouveau Nites Party Li; Creative Ceramics Art ; Elephant Foot Trash Ca; Professional Trash Can; Baroque Optilopticon; Stonewash Sink
+  bit  7 (0x0080): 246 masters: Caesar Psychopathus; Mystery Sundial; Cuckoo Clock; Steeling Beauty Deck C; Creative Ceramics Art ; Wurl 'N' Hurl Retro Ju; Amber Ashes Outdoor Ca; Electric `Ukulele Lady; Turkish Turmoil Wall S; Smoky Topaz Wall Sconc
+field 96: 13/1378 nonzero
+  bit  0 (0x0001): 3 masters: Treasure Hunt; Mechanique Cash Regist; Kurrency Kiosk LX
+  bit  1 (0x0002): 10 masters: SSRI Virtual Reality S; Volley Ball; Eek! Mice!; Magic - Controller - Q; Meal; Hamburgers; Hamburger; Meal; Meal; Destination
+field 97: 551/1378 nonzero
+  bit  0 (0x0001): 345 masters: "Sella Solaria" Dining; Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; Cuckoo Clock; Steeling Beauty Deck C; The Sammy SandDollar S; Nouveau Nites Party Li; Queen Vivanco Roses
+  bit  1 (0x0002): 472 masters: "Sella Solaria" Dining; "Curulis Etrurius" Rom; The "Bunda"; Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; La Table Non-Formidabl; EmerGen Table; Cuckoo Clock
+  bit  2 (0x0004): 82 masters: Mystery Sundial; Nouveau Nites Party Li; "Stray-Away" Pet Preve; The Tabletop Treasure; Suit of Armor; "La Gargouille" Orname; Shabycratah Figure; Granite Guard Lion; Ali`i Kahuna Ceremonia; "Black Bile Bear"
+  bit  3 (0x0008): 71 masters: Mystery Sundial; Nouveau Nites Party Li; Suit of Armor; "La Gargouille" Orname; Shabycratah Figure; Granite Guard Lion; Dungeon Dumpster; Ali`i Kahuna Ceremonia; "Black Bile Bear"; "Amaizing" Lawn Orname
+  bit  7 (0x0080): 379 masters: Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; La Table Non-Formidabl; EmerGen Table; Cuckoo Clock; Steeling Beauty Deck C; The Sammy SandDollar S; Nouveau Nites Party Li
+field 98: 24/1378 nonzero
+  bit  0 (0x0001): 17 masters: Red Fire Hydrant; Bunny Rabbit; Purinal Fire Plug; 2nd Prize; 1st Prize; 3rd Prize; Booby Prize; Persian Plush Pet Bed; Dura-Bean Pet Bed; Happy Paws Cuddle Sack
+  bit  1 (0x0002): 22 masters: Bunny Rabbit; 2nd Prize; 1st Prize; 3rd Prize; Booby Prize; Persian Plush Pet Bed; Dura-Bean Pet Bed; Happy Paws Cuddle Sack; Love in a Cage; Dunginator 9000
+field 99: 17/1378 nonzero
+  bit  0 (0x0001): 17 masters: Cloak of Protection; Neo Grec Window Dressi; Aquaversatile Pet Disp; Stacked Box Display Ca; Ornitharium Bird Displ; Fluffy Puppy Pet Bin; Licentious Luminance P; Love in a Cage; Classic Goldfish Bowl; Forgotten Jungle Terra
+field 100: all zero
+field 101: 454/1378 nonzero
+  bit  0 (0x0001): 275 masters: "Sella Solaria" Dining; Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; ExcreSys "Ejectament" ; Cuckoo Clock; Steeling Beauty Deck C; The Sammy SandDollar S; Nouveau Nites Party Li
+  bit  1 (0x0002): 376 masters: "Sella Solaria" Dining; "Curulis Etrurius" Rom; The "Bunda"; Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; La Table Non-Formidabl; EmerGen Table; ExcreSys "Ejectament" 
+  bit  2 (0x0004): 209 masters: Aluminumb Shower Syste; Fontis Publicus; "Hygiene Machine" by E; ExcreSys "Ejectament" ; Creative Ceramics Art ; Wurl 'N' Hurl Retro Ju; Electric `Ukulele Lady; Smoky Topaz Wall Sconc; Neon Flamingo Sign; Cytherea Asilus Casses
+  bit  3 (0x0008): 78 masters: Caesar Psychopathus; Mystery Sundial; Aluminumb Shower Syste; Fontis Publicus; "Hygiene Machine" by E; ExcreSys "Ejectament" ; Commoda Cloacina; Creative Ceramics Art ; Cytherea Asilus Casses; Potted Palm
+  bit  7 (0x0080): 339 masters: Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; La Table Non-Formidabl; EmerGen Table; ExcreSys "Ejectament" ; Commoda Cloacina; Cuckoo Clock; Steeling Beauty Deck C
+field 102: 444/1378 nonzero
+  bit  0 (0x0001): 292 masters: "Sella Solaria" Dining; Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; ExcreSys "Ejectament" ; Commoda Cloacina; Cuckoo Clock; Steeling Beauty Deck C; The Sammy SandDollar S
+  bit  1 (0x0002): 358 masters: "Sella Solaria" Dining; "Curulis Etrurius" Rom; The "Bunda"; Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; La Table Non-Formidabl; EmerGen Table; ExcreSys "Ejectament" 
+  bit  2 (0x0004): 128 masters: Fontis Publicus; "Hygiene Machine" by E; ExcreSys "Ejectament" ; Commoda Cloacina; Nouveau Nites Party Li; Creative Ceramics Art ; Jack-O'-lantern; Amber Ashes Outdoor Ca; Cytherea Asilus Casses; Potted Palm
+  bit  3 (0x0008): 110 masters: Caesar Psychopathus; Mystery Sundial; Fontis Publicus; ExcreSys "Ejectament" ; Commoda Cloacina; The Sammy SandDollar S; Nouveau Nites Party Li; Jack-O'-lantern; The Tabletop Treasure; Elephant Foot Trash Ca
+  bit  7 (0x0080): 359 masters: "Sella Solaria" Dining; "Curulis Etrurius" Rom; The "Bunda"; Caesar Psychopathus; Mystery Sundial; Fontis Publicus; "Hygiene Machine" by E; La Table Non-Formidabl; EmerGen Table; ExcreSys "Ejectament" 
+field 103: all zero
+
+==== R124 DERIVED CONCLUSIONS (data-derived; see r124-descpanel-canon.md) ====
+1. Ratings: OBJD fields 80..86 are SIGNED VALUES in exactly STR# 160 [0..6] caption
+   order (Hunger,Comfort,Hygiene,Bladder,Energy,Fun,Room); coffee = 0xFFF8 = -8 proof.
+2. Skills: field 87 bits 0..6 = STR# 160 [7..13], data-validated (chess=Logic 0x0004,
+   guitar/easel=Creativity 0x0010, mirrors=Charisma 0x0020, computers=Study 0x0040).
+3. NEGATIVE SPACE (STR# 160 [14..19] adults/kids/group/pets/dogs/cats): NO corpus data
+   encodes usage restrictions - MiscFlags(89) all-zero corpus-wide except 2 FX objects;
+   the only pets-clustered bits are f92 bit5 = the PETS SUBSORT (catalog placement,
+   doghouse carries it without being pets-only) and f98 = pet DREAM flags (doghouse 0,
+   chew toys 0); CTSS = exactly 2 English entries (name+description, no price string,
+   no rating tags); CTSS comments = Maxis authoring notes; per-object STR# = behavior/
+   animation strings. The port must NOT invent flag display.
+4. Price: OBJD field 16 only (CTSS carries no price entry).
+5. SCAN FIX: ExpansionPack5.FAR (Unleashed, ALL pet objects) is UPPERCASE - the first
+   glob (*.far, case-sensitive FS) silently missed it; scan now matches case-insensitively.

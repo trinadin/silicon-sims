@@ -1,0 +1,58 @@
+001c4e10: 93e1fffc  stw      r31, -4(r1)
+001c4e14: 7c0802a6  mflr     r0
+001c4e18: 7c7f1b78  mr       r31, r3
+001c4e1c: 80628fb8  lwz      r3, -0x7048(r2)
+001c4e20: 90010008  stw      r0, 8(r1)
+001c4e24: 38000001  li       r0, 1
+001c4e28: 28060000  cmplwi   r6, 0
+001c4e2c: 9421ffb0  stwu     r1, -0x50(r1)
+001c4e30: 981f04d8  stb      r0, 0x4d8(r31)
+001c4e34: 81440000  lwz      r10, 0(r4)
+001c4e38: 915f04dc  stw      r10, 0x4dc(r31)
+001c4e3c: 81240004  lwz      r9, 4(r4)
+001c4e40: 913f04e0  stw      r9, 0x4e0(r31)
+001c4e44: 81040008  lwz      r8, 8(r4)
+001c4e48: 911f04e4  stw      r8, 0x4e4(r31)
+001c4e4c: 80e4000c  lwz      r7, 0xc(r4)
+001c4e50: 90ff04e8  stw      r7, 0x4e8(r31)
+001c4e54: 80030000  lwz      r0, 0(r3)
+001c4e58: 80630004  lwz      r3, 4(r3)
+001c4e5c: 7c8000d0  neg      r4, r0
+001c4e60: 7c0a2214  add      r0, r10, r4
+001c4e64: 7c882214  add      r4, r8, r4
+001c4e68: 901f04dc  stw      r0, 0x4dc(r31)
+001c4e6c: 7c0300d0  neg      r0, r3
+001c4e70: 7c690214  add      r3, r9, r0
+001c4e74: 7c070214  add      r0, r7, r0
+001c4e78: 909f04e4  stw      r4, 0x4e4(r31)
+001c4e7c: 907f04e0  stw      r3, 0x4e0(r31)
+001c4e80: 901f04e8  stw      r0, 0x4e8(r31)
+001c4e84: 98bf04ec  stb      r5, 0x4ec(r31)
+001c4e88: 41820014  beq      0x1c4e9c
+001c4e8c: 38860000  addi     r4, r6, 0
+001c4e90: 387f04f0  addi     r3, r31, 0x4f0
+001c4e94: 4832f99d  bl       0x4f4830
+001c4e98: 4800001c  b        0x1c4eb4
+001c4e9c: 387f04f0  addi     r3, r31, 0x4f0
+001c4ea0: 38800000  li       r4, 0
+001c4ea4: 38a0ffff  li       r5, -1
+001c4ea8: 38c00000  li       r6, 0
+001c4eac: 38e00000  li       r7, 0
+001c4eb0: 4be8e411  bl       0x532c0
+001c4eb4: 7fe3fb78  mr       r3, r31
+001c4eb8: 819f0004  lwz      r12, 4(r31)
+001c4ebc: 818c0050  lwz      r12, 0x50(r12)
+001c4ec0: 483ddb21  bl       0x5a29e0
+001c4ec4: 80410014  lwz      r2, 0x14(r1)
+001c4ec8: 80828874  lwz      r4, -0x778c(r2)
+001c4ecc: 38a0fffc  li       r5, -4
+001c4ed0: 8062aaf0  lwz      r3, -0x5510(r2)
+001c4ed4: 80c40000  lwz      r6, 0(r4)
+001c4ed8: 3883000b  addi     r4, r3, 0xb
+001c4edc: 80660010  lwz      r3, 0x10(r6)
+001c4ee0: 48144501  bl       0x3093e0
+001c4ee4: 80010058  lwz      r0, 0x58(r1)
+001c4ee8: 38210050  addi     r1, r1, 0x50
+001c4eec: 83e1fffc  lwz      r31, -4(r1)
+001c4ef0: 7c0803a6  mtlr     r0
+001c4ef4: 4e800020  blr

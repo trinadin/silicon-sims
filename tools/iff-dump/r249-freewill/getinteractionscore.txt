@@ -1,0 +1,131 @@
+                ; ==== .GetInteractionScore__13MotiveEffectsFP11TreeTableAd ====
+0009f9d0: 93e1fffc  stw      r31, -4(r1)
+0009f9d4: 80a2a4d4  lwz      r5, -0x5b2c(r2)
+0009f9d8: 80c30004  lwz      r6, 4(r3)
+0009f9dc: 81030000  lwz      r8, 0(r3)
+0009f9e0: 1ce60014  mulli    r7, r6, 0x14
+0009f9e4: 8002a4d0  lwz      r0, -0x5b30(r2)
+0009f9e8: c0c50000  lfs      f6, 0(r5)
+0009f9ec: 39280000  addi     r9, r8, 0
+0009f9f0: 7ce83a14  add      r7, r8, r7
+0009f9f4: 480001b0  b        0x9fba4
+0009f9f8: 81490010  lwz      r10, 0x10(r9)
+0009f9fc: 816300c0  lwz      r11, 0xc0(r3)
+0009fa00: 1d0a0006  mulli    r8, r10, 6
+0009fa04: 7d044214  add      r8, r4, r8
+0009fa08: a9880000  lha      r12, 0(r8)
+0009fa0c: 554a103a  slwi     r10, r10, 2
+0009fa10: 7cab542e  lfsx     f5, r11, r10
+0009fa14: 7d8a0735  extsh.   r10, r12
+0009fa18: 41820094  beq      0x9faac
+0009fa1c: 1d4c000c  mulli    r10, r12, 0xc
+0009fa20: 818300bc  lwz      r12, 0xbc(r3)
+0009fa24: 7d405214  add      r10, r0, r10
+0009fa28: 816a0004  lwz      r11, 4(r10)
+0009fa2c: 814a0008  lwz      r10, 8(r10)
+0009fa30: 556b083c  slwi     r11, r11, 1
+0009fa34: 396b058c  addi     r11, r11, 0x58c
+0009fa38: 2c0a0000  cmpwi    r10, 0
+0009fa3c: 7d6c5aae  lhax     r11, r12, r11
+0009fa40: 41820008  beq      0x9fa48
+0009fa44: 216b03e8  subfic   r11, r11, 0x3e8
+0009fa48: a9480004  lha      r10, 4(r8)
+0009fa4c: 3d804330  lis      r12, 0x4330
+0009fa50: 6d6b8000  xoris    r11, r11, 0x8000
+0009fa54: 83e2a4cc  lwz      r31, -0x5b34(r2)
+0009fa58: 6d4a8000  xoris    r10, r10, 0x8000
+0009fa5c: 9161ffdc  stw      r11, -0x24(r1)
+0009fa60: a9080002  lha      r8, 2(r8)
+0009fa64: 9181ffd8  stw      r12, -0x28(r1)
+0009fa68: c87f0000  lfd      f3, 0(r31)
+0009fa6c: 6d088000  xoris    r8, r8, 0x8000
+0009fa70: c801ffd8  lfd      f0, -0x28(r1)
+0009fa74: 9141ffe4  stw      r10, -0x1c(r1)
+0009fa78: ec401828  fsubs    f2, f0, f3
+0009fa7c: c0050004  lfs      f0, 4(r5)
+0009fa80: 9181ffe0  stw      r12, -0x20(r1)
+0009fa84: c821ffe0  lfd      f1, -0x20(r1)
+0009fa88: 9101ffd4  stw      r8, -0x2c(r1)
+0009fa8c: ec211828  fsubs    f1, f1, f3
+0009fa90: 9181ffd0  stw      r12, -0x30(r1)
+0009fa94: ec220072  fmuls    f1, f2, f1
+0009fa98: c841ffd0  lfd      f2, -0x30(r1)
+0009fa9c: ec421828  fsubs    f2, f2, f3
+0009faa0: ec010024  fdivs    f0, f1, f0
+0009faa4: ec22002a  fadds    f1, f2, f0
+0009faa8: 48000030  b        0x9fad8
+0009faac: a9880002  lha      r12, 2(r8)
+0009fab0: 3d404330  lis      r10, 0x4330
+0009fab4: a9080004  lha      r8, 4(r8)
+0009fab8: 8162a4cc  lwz      r11, -0x5b34(r2)
+0009fabc: 7d0c4214  add      r8, r12, r8
+0009fac0: 9141ffe0  stw      r10, -0x20(r1)
+0009fac4: 6d088000  xoris    r8, r8, 0x8000
+0009fac8: c82b0000  lfd      f1, 0(r11)
+0009facc: 9101ffe4  stw      r8, -0x1c(r1)
+0009fad0: c801ffe0  lfd      f0, -0x20(r1)
+0009fad4: ec200828  fsubs    f1, f0, f1
+0009fad8: c0050008  lfs      f0, 8(r5)
+0009fadc: 81490008  lwz      r10, 8(r9)
+0009fae0: ec210032  fmuls    f1, f1, f0
+0009fae4: 2c0a0000  cmpwi    r10, 0
+0009fae8: 4082000c  bne      0x9faf4
+0009faec: c0050000  lfs      f0, 0(r5)
+0009faf0: 480000ac  b        0x9fb9c
+0009faf4: 37eaffff  addic.   r31, r10, -1
+0009faf8: ec45082a  fadds    f2, f5, f1
+0009fafc: 391f0001  addi     r8, r31, 1
+0009fb00: 7d0903a6  mtctr    r8
+0009fb04: 57eb1838  slwi     r11, r31, 3
+0009fb08: 4180002c  blt      0x9fb34
+0009fb0c: 60000000  nop      
+0009fb10: 81090000  lwz      r8, 0(r9)
+0009fb14: c0050000  lfs      f0, 0(r5)
+0009fb18: 7c285c2e  lfsx     f1, r8, r11
+0009fb1c: ec820828  fsubs    f4, f2, f1
+0009fb20: fc040040  .long    0xfc040040
+0009fb24: 41810010  bgt      0x9fb34
+0009fb28: 396bfff8  addi     r11, r11, -8
+0009fb2c: 3bffffff  addi     r31, r31, -1
+0009fb30: 4200ffe0  bdnz     0x9fb10
+0009fb34: 390affff  addi     r8, r10, -1
+0009fb38: 7c1f4000  cmpw     r31, r8
+0009fb3c: 40820018  bne      0x9fb54
+0009fb40: 57e81838  slwi     r8, r31, 3
+0009fb44: 81490000  lwz      r10, 0(r9)
+0009fb48: 39080004  addi     r8, r8, 4
+0009fb4c: 7c0a442e  lfsx     f0, r10, r8
+0009fb50: 4800004c  b        0x9fb9c
+0009fb54: 2c1fffff  cmpwi    r31, -1
+0009fb58: 40820010  bne      0x9fb68
+0009fb5c: 81090000  lwz      r8, 0(r9)
+0009fb60: c0080004  lfs      f0, 4(r8)
+0009fb64: 48000038  b        0x9fb9c
+0009fb68: 81490000  lwz      r10, 0(r9)
+0009fb6c: 57e81838  slwi     r8, r31, 3
+0009fb70: 81890004  lwz      r12, 4(r9)
+0009fb74: 57eb103a  slwi     r11, r31, 2
+0009fb78: 7d0a4214  add      r8, r10, r8
+0009fb7c: 7c2c5c2e  lfsx     f1, r12, r11
+0009fb80: c0480004  lfs      f2, 4(r8)
+0009fb84: c008000c  lfs      f0, 0xc(r8)
+0009fb88: ec840072  fmuls    f4, f4, f1
+0009fb8c: ec001028  fsubs    f0, f0, f2
+0009fb90: ec840032  fmuls    f4, f4, f0
+0009fb94: ec84102a  fadds    f4, f4, f2
+0009fb98: fc002090  fmr      f0, f4
+0009fb9c: ecc6002a  fadds    f6, f6, f0
+0009fba0: 39290014  addi     r9, r9, 0x14
+0009fba4: 7c093840  cmplw    r9, r7
+0009fba8: 4082fe50  bne      0x9f9f8
+0009fbac: 6cc38000  xoris    r3, r6, 0x8000
+0009fbb0: 8082a4cc  lwz      r4, -0x5b34(r2)
+0009fbb4: 3c004330  lis      r0, 0x4330
+0009fbb8: 9061ffe4  stw      r3, -0x1c(r1)
+0009fbbc: c8240000  lfd      f1, 0(r4)
+0009fbc0: 9001ffe0  stw      r0, -0x20(r1)
+0009fbc4: c801ffe0  lfd      f0, -0x20(r1)
+0009fbc8: ec000828  fsubs    f0, f0, f1
+0009fbcc: ec260024  fdivs    f1, f6, f0
+0009fbd0: 83e1fffc  lwz      r31, -4(r1)
+0009fbd4: 4e800020  blr      

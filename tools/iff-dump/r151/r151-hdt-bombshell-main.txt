@@ -1,0 +1,7 @@
+TemplateNPCs/HDT_Bombshell_MM.iff BHAV 4096 'Main' person-data writes (op2 Lhs scope 18):
+  [1] MyPersonData[29] = 0
+  [2] MyPersonData[6] = 900
+  [3] MyPersonData[2] = 800
+  [6] MyPersonData[7] = 400
+  [7] MyPersonData[5] = 300
+  [8] MyPersonData[3] = 100

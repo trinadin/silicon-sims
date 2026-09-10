@@ -1,0 +1,11 @@
+variablesans_07: chars=224 atlas=256x83 | 'The Sims'=50 | 'Lot 20'=36 | '12:05 AM'=49 | 'Options'=43 | 'Bella'=27 | '1234567'=45
+variablesans_08: chars=224 atlas=256x107 | 'The Sims'=54 | 'Lot 20'=38 | '12:05 AM'=52 | 'Options'=42 | 'Bella'=26 | '1234567'=47
+variablesans_09: chars=224 atlas=256x115 | 'The Sims'=58 | 'Lot 20'=41 | '12:05 AM'=58 | 'Options'=47 | 'Bella'=30 | '1234567'=53
+variablesans_10: chars=224 atlas=256x121 | 'The Sims'=61 | 'Lot 20'=43 | '12:05 AM'=60 | 'Options'=50 | 'Bella'=32 | '1234567'=55
+variablesans_11: chars=224 atlas=256x152 | 'The Sims'=70 | 'Lot 20'=49 | '12:05 AM'=69 | 'Options'=56 | 'Bella'=35 | '1234567'=63
+variablesans_12: chars=224 atlas=256x180 | 'The Sims'=71 | 'Lot 20'=52 | '12:05 AM'=73 | 'Options'=60 | 'Bella'=37 | '1234567'=68
+variablesans_14: chars=224 atlas=256x224 | 'The Sims'=88 | 'Lot 20'=62 | '12:05 AM'=88 | 'Options'=75 | 'Bella'=46 | '1234567'=83
+variablesans_16: chars=224 atlas=256x316 | 'The Sims'=91 | 'Lot 20'=63 | '12:05 AM'=90 | 'Options'=76 | 'Bella'=46 | '1234567'=84
+variablesans_18: chars=224 atlas=256x325 | 'The Sims'=103 | 'Lot 20'=70 | '12:05 AM'=102 | 'Options'=86 | 'Bella'=54 | '1234567'=96
+variablesans_20: chars=224 atlas=256x427 | 'The Sims'=115 | 'Lot 20'=79 | '12:05 AM'=115 | 'Options'=97 | 'Bella'=58 | '1234567'=108
+all known-value cross-checks reproduced

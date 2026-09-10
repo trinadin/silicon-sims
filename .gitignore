@@ -243,3 +243,22 @@ ModelManifest.xml
 
 Client/Simitone/Simitone/
 Client/Simitone/TS1.Scripts
+# Local macOS build artifacts
+publish/
+dist/
+.nuget-packages/
+.dotnet-cli/
+publish-r1.log
+game-data/
+SimsComplete.iso
+drive.py
+.DS_Store
+__pycache__/
+
+# R156: generated native app icon (built at pack time from tools/make_native_icon.py)
+build/NativeIcon.icns
+build/NativeIcon.icns.iconset/
+
+# REL-09 F1: original Maxis IFF files are proprietary — never track them
+# (evidence copies stay on local disk only)
+tools/iff-dump/**/*.iff

@@ -1,0 +1,7 @@
+R86 toolbar canon - engine-independent raw IFF scan (game-data/The Sims/UIGraphics/UIGraphics.far)
+kLiveModeGauge idx=113 bytes=6612 108x100
+kHouseBtn idx=171 bytes=3900 108x30
+kObjects idx=211 bytes=6008 180x47
+kOptionExit idx=213 bytes=3162 200x40
+kOptions idx=215 bytes=2632 92x23
+kPause idx=224 bytes=2438 60x30

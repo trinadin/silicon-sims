@@ -1,0 +1,32 @@
+00153ec0: bf01ffe0  stmw     r24, -0x20(r1)
+00153ec4: 7c0802a6  mflr     r0
+00153ec8: 83a28eb4  lwz      r29, -0x714c(r2)
+00153ecc: 3b230000  addi     r25, r3, 0
+00153ed0: 83c2a838  lwz      r30, -0x57c8(r2)
+00153ed4: 7c982378  mr       r24, r4
+00153ed8: 3b850000  addi     r28, r5, 0
+00153edc: 3b660000  addi     r27, r6, 0
+00153ee0: 3b470000  addi     r26, r7, 0
+00153ee4: 90010008  stw      r0, 8(r1)
+00153ee8: 9421ff70  stwu     r1, -0x90(r1)
+00153eec: a8030024  lha      r0, 0x24(r3)
+00153ef0: 3be10000  addi     r31, r1, 0
+00153ef4: 2c000000  cmpwi    r0, 0
+00153ef8: 4182000c  beq      0x153f04
+00153efc: 38600000  li       r3, 0
+00153f00: 4800017c  b        0x15407c
+00153f04: 38c00000  li       r6, 0
+00153f08: 38790004  addi     r3, r25, 4
+00153f0c: 38e0ffff  li       r7, -1
+00153f10: b0df0046  sth      r6, 0x46(r31)
+00153f14: 38000001  li       r0, 1
+00153f18: 389f0044  addi     r4, r31, 0x44
+00153f1c: 901f004c  stw      r0, 0x4c(r31)
+00153f20: 38a00000  li       r5, 0
+00153f24: 90df0050  stw      r6, 0x50(r31)
+00153f28: b0ff0044  sth      r7, 0x44(r31)
+00153f2c: b0df0048  sth      r6, 0x48(r31)
+00153f30: 98df004a  stb      r6, 0x4a(r31)
+00153f34: 98df004b  stb      r6, 0x4b(r31)
+00153f38: 4bffec09  bl       0x152b40   ; .Push__9TreeStackFPC9StackElemPCs
+00153f3c: 38790000  addi     r3, r25, 0

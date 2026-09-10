@@ -1,0 +1,34 @@
+00250128: 5700063e  clrlwi   r0, r24, 0x18
+0025012c: 80628d84  lwz      r3, -0x727c(r2)
+00250130: 7c000034  cntlzw   r0, r0
+00250134: 5400de3e  rlwinm   r0, r0, 0x1b, 0x18, 0x1f
+00250138: 90030000  stw      r0, 0(r3)
+0025013c: 48000cf8  b        0x250e34
+00250140: 4bfeaa21  bl       0x23ab60   ; .GetOptionsMgr__11cOptionsMgrFv
+00250144: 7f04c378  mr       r4, r24
+00250148: 4bfe9a19  bl       0x239b60   ; .SetExportHTML__11cOptionsMgrFb
+0025014c: 48000ce8  b        0x250e34
+00250150: 806294a0  lwz      r3, -0x6b60(r2)
+00250154: 9b030000  stb      r24, 0(r3)
+00250158: 48000cdc  b        0x250e34
+0025015c: 8062933c  lwz      r3, -0x6cc4(r2)
+00250160: 9b030000  stb      r24, 0(r3)
+00250164: 48000cd0  b        0x250e34
+00250168: 80a28ebc  lwz      r5, -0x7144(r2)
+0025016c: 7f04c378  mr       r4, r24
+00250170: 807c0000  lwz      r3, 0(r28)
+00250174: 9b050000  stb      r24, 0(r5)
+00250178: 80630080  lwz      r3, 0x80(r3)
+0025017c: 4bfc26f5  bl       0x212870   ; .ShowSoundEventLog__12cDDDSimsViewFb
+00250180: 48000cb4  b        0x250e34
+00250184: 807c0000  lwz      r3, 0(r28)
+00250188: 389e08cf  addi     r4, r30, 0x8cf
+0025018c: 38be0925  addi     r5, r30, 0x925
+00250190: 38c00002  li       r6, 2
+00250194: 38e00000  li       r7, 0
+00250198: 48003d69  bl       0x253f00   ; .MessageDialog__8cSimsAppFPCcPCcUlb
+0025019c: 28030004  cmplwi   r3, 4
+002501a0: 40820c94  bne      0x250e34
+002501a4: 386101a0  addi     r3, r1, 0x1a0
+002501a8: 4bdc7fc9  bl       0x18170
+002501ac: a0a101a0  lhz      r5, 0x1a0(r1)

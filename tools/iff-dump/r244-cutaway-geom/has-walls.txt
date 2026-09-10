@@ -1,0 +1,50 @@
+                ; ==== .HasWalls__15cRotatableWorldF7CTilePtQ29TileWalls7Segment ====
+001259e0: 80030084  lwz      r0, 0x84(r3)
+001259e4: 80c28c1c  lwz      r6, -0x73e4(r2)
+001259e8: 20000004  subfic   r0, r0, 4
+001259ec: 540007bf  clrlwi.  r0, r0, 0x1e
+001259f0: 4182004c  beq      0x125a3c
+001259f4: 88e40000  lbz      r7, 0(r4)
+001259f8: 54086824  slwi     r8, r0, 0xd
+001259fc: 88040001  lbz      r0, 1(r4)
+00125a00: 7cc64214  add      r6, r6, r8
+00125a04: 7ce70774  extsb    r7, r7
+00125a08: 54e73830  slwi     r7, r7, 7
+00125a0c: 7c000774  extsb    r0, r0
+00125a10: 7ce63a14  add      r7, r6, r7
+00125a14: 5400083c  slwi     r0, r0, 1
+00125a18: 7cc70214  add      r6, r7, r0
+00125a1c: 8806e000  lbz      r0, -0x2000(r6)
+00125a20: 98040000  stb      r0, 0(r4)
+00125a24: 88040001  lbz      r0, 1(r4)
+00125a28: 7c000774  extsb    r0, r0
+00125a2c: 5400083c  slwi     r0, r0, 1
+00125a30: 7cc70214  add      r6, r7, r0
+00125a34: 8806e001  lbz      r0, -0x1fff(r6)
+00125a38: 98040001  stb      r0, 1(r4)
+00125a3c: 88040002  lbz      r0, 2(r4)
+00125a40: 54a7103a  slwi     r7, r5, 2
+00125a44: 88a40000  lbz      r5, 0(r4)
+00125a48: 7c060774  extsb    r6, r0
+00125a4c: 88040001  lbz      r0, 1(r4)
+00125a50: 54c4103a  slwi     r4, r6, 2
+00125a54: 80c30084  lwz      r6, 0x84(r3)
+00125a58: 7c632214  add      r3, r3, r4
+00125a5c: 81028dec  lwz      r8, -0x7214(r2)
+00125a60: 80830040  lwz      r4, 0x40(r3)
+00125a64: 7ca30774  extsb    r3, r5
+00125a68: 7c000774  extsb    r0, r0
+00125a6c: 8084000c  lwz      r4, 0xc(r4)
+00125a70: 20c60004  subfic   r6, r6, 4
+00125a74: 5463103a  slwi     r3, r3, 2
+00125a78: 1c00000e  mulli    r0, r0, 0xe
+00125a7c: 7c64182e  lwzx     r3, r4, r3
+00125a80: 54c545ae  rlwinm   r5, r6, 8, 0x16, 0x17
+00125a84: 7c0300ae  lbzx     r0, r3, r0
+00125a88: 7c882a14  add      r4, r8, r5
+00125a8c: 7c87202e  lwzx     r4, r7, r4
+00125a90: 7c800038  and      r0, r4, r0
+00125a94: 7c040050  subf     r0, r4, r0
+00125a98: 7c000034  cntlzw   r0, r0
+00125a9c: 5403d97e  srwi     r3, r0, 5
+00125aa0: 4e800020  blr      

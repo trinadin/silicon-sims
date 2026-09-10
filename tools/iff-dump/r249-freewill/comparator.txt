@@ -1,0 +1,16 @@
+                ; ==== .CompareScoredInteractions__FPCvPCv ====
+0010a040: c0240008  lfs      f1, 8(r4)
+0010a044: c0030008  lfs      f0, 8(r3)
+0010a048: 8062a718  lwz      r3, -0x58e8(r2)
+0010a04c: ec210028  fsubs    f1, f1, f0
+0010a050: c0030024  lfs      f0, 0x24(r3)
+0010a054: fc010040  .long    0xfc010040
+0010a058: 4081000c  ble      0x10a064
+0010a05c: 38600001  li       r3, 1
+0010a060: 4e800020  blr      
+0010a064: c0030028  lfs      f0, 0x28(r3)
+0010a068: fc010040  .long    0xfc010040
+0010a06c: 7c000026  mfcr     r0
+0010a070: 54000ffe  srwi     r0, r0, 0x1f
+0010a074: 7c6000d0  neg      r3, r0
+0010a078: 4e800020  blr      

@@ -1,0 +1,49 @@
+                ; ==== .ShowWindow__23cTSWinTutorialHighlightFv ====
+00538c40: 93e1fffc  stw      r31, -4(r1)
+00538c44: 7c0802a6  mflr     r0
+00538c48: 83e2bcb8  lwz      r31, -0x4348(r2)
+00538c4c: 38800001  li       r4, 1
+00538c50: 93c1fff8  stw      r30, -8(r1)
+00538c54: 7c7e1b78  mr       r30, r3
+00538c58: 90010008  stw      r0, 8(r1)
+00538c5c: 9421ffa0  stwu     r1, -0x60(r1)
+00538c60: 81830000  lwz      r12, 0(r3)
+00538c64: 818c0094  lwz      r12, 0x94(r12)
+00538c68: 48069d79  bl       0x5a29e0
+00538c6c: 80410014  lwz      r2, 0x14(r1)
+00538c70: 5460063f  clrlwi.  r0, r3, 0x18
+00538c74: 4082006c  bne      0x538ce0
+00538c78: 38000000  li       r0, 0
+00538c7c: 901e00dc  stw      r0, 0xdc(r30)
+00538c80: 38000001  li       r0, 1
+00538c84: 901e00d8  stw      r0, 0xd8(r30)
+00538c88: 881e00e0  lbz      r0, 0xe0(r30)
+00538c8c: 28000000  cmplwi   r0, 0
+00538c90: 40820050  bne      0x538ce0
+00538c94: c03e00d4  lfs      f1, 0xd4(r30)
+00538c98: c01f0000  lfs      f0, 0(r31)
+00538c9c: fc010040  .long    0xfc010040
+00538ca0: 40810040  ble      0x538ce0
+00538ca4: c01f000c  lfs      f0, 0xc(r31)
+00538ca8: 7fc4f378  mr       r4, r30
+00538cac: 80628e04  lwz      r3, -0x71fc(r2)
+00538cb0: 38c00000  li       r6, 0
+00538cb4: ec200824  fdivs    f1, f0, f1
+00538cb8: c05f0008  lfs      f2, 8(r31)
+00538cbc: c01f0004  lfs      f0, 4(r31)
+00538cc0: 80630000  lwz      r3, 0(r3)
+00538cc4: ec02007a  fmadds   f0, f2, f1, f0
+00538cc8: fc00001e  fctiwz   f0, f0
+00538ccc: d8010040  stfd     f0, 0x40(r1)
+00538cd0: 80a10044  lwz      r5, 0x44(r1)
+00538cd4: 4bfe382d  bl       0x51c500   ; .SubscribeTimerMsg__12cTSWinMgrW95FP6cTSWinlUl
+00538cd8: 38000001  li       r0, 1
+00538cdc: 981e00e0  stb      r0, 0xe0(r30)
+00538ce0: 7fc3f378  mr       r3, r30
+00538ce4: 4bfc9ced  bl       0x5029d0   ; .ShowWindow__6cTSWinFv
+00538ce8: 80010068  lwz      r0, 0x68(r1)
+00538cec: 38210060  addi     r1, r1, 0x60
+00538cf0: 83e1fffc  lwz      r31, -4(r1)
+00538cf4: 7c0803a6  mtlr     r0
+00538cf8: 83c1fff8  lwz      r30, -8(r1)
+00538cfc: 4e800020  blr      

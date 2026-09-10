@@ -1,0 +1,65 @@
+                ; ==== .LoadInterestData__12NeighborhoodFP8cXPerson ====
+000b4a80: 93e1fffc  stw      r31, -4(r1)
+000b4a84: 7c0802a6  mflr     r0
+000b4a88: 3be00000  li       r31, 0
+000b4a8c: 93c1fff8  stw      r30, -8(r1)
+000b4a90: 7c9e2378  mr       r30, r4
+000b4a94: 90010008  stw      r0, 8(r1)
+000b4a98: 9421ffb0  stwu     r1, -0x50(r1)
+000b4a9c: 8003014c  lwz      r0, 0x14c(r3)
+000b4aa0: 80e30150  lwz      r7, 0x150(r3)
+000b4aa4: 5400103a  slwi     r0, r0, 2
+000b4aa8: 8084011c  lwz      r4, 0x11c(r4)
+000b4aac: 7cc70214  add      r6, r7, r0
+000b4ab0: 48000030  b        0xb4ae0
+000b4ab4: 60000000  nop      
+000b4ab8: 80a70000  lwz      r5, 0(r7)
+000b4abc: 28050000  cmplwi   r5, 0
+000b4ac0: 4182001c  beq      0xb4adc
+000b4ac4: 80050008  lwz      r0, 8(r5)
+000b4ac8: 7c002040  cmplw    r0, r4
+000b4acc: 40820010  bne      0xb4adc
+000b4ad0: 281f0000  cmplwi   r31, 0
+000b4ad4: 40820008  bne      0xb4adc
+000b4ad8: 7cbf2b78  mr       r31, r5
+000b4adc: 38e70004  addi     r7, r7, 4
+000b4ae0: 7c073040  cmplw    r7, r6
+000b4ae4: 4082ffd4  bne      0xb4ab8
+000b4ae8: 281f0000  cmplwi   r31, 0
+000b4aec: 40820018  bne      0xb4b04
+000b4af0: 38a0ffff  li       r5, -1
+000b4af4: 4800025d  bl       0xb4d50   ; .AddNewNeighbor__12NeighborhoodFP11ObjSelectors
+000b4af8: a8030000  lha      r0, 0(r3)
+000b4afc: b01e05ca  sth      r0, 0x5ca(r30)
+000b4b00: 48000068  b        0xb4b68
+000b4b04: a81f0000  lha      r0, 0(r31)
+000b4b08: b01e05ca  sth      r0, 0x5ca(r30)
+000b4b0c: 801f0018  lwz      r0, 0x18(r31)
+000b4b10: 2c000000  cmpwi    r0, 0
+000b4b14: 41820054  beq      0xb4b68
+000b4b18: 4bfef809  bl       0xa4320   ; .GetInterestPersistentDataFields__8NeighborFv
+000b4b1c: 80c30008  lwz      r6, 8(r3)
+000b4b20: 48000030  b        0xb4b50
+000b4b24: 809f0018  lwz      r4, 0x18(r31)
+000b4b28: 80060004  lwz      r0, 4(r6)
+000b4b2c: 7c040000  cmpw     r4, r0
+000b4b30: 4180001c  blt      0xb4b4c
+000b4b34: 80060000  lwz      r0, 0(r6)
+000b4b38: 5405083c  slwi     r5, r0, 1
+000b4b3c: 38850074  addi     r4, r5, 0x74
+000b4b40: 3805058c  addi     r0, r5, 0x58c
+000b4b44: 7c9f22ae  lhax     r4, r31, r4
+000b4b48: 7c9e032e  sthx     r4, r30, r0
+000b4b4c: 38c60008  addi     r6, r6, 8
+000b4b50: 80030004  lwz      r0, 4(r3)
+000b4b54: 80830008  lwz      r4, 8(r3)
+000b4b58: 54001838  slwi     r0, r0, 3
+000b4b5c: 7c040214  add      r0, r4, r0
+000b4b60: 7c060040  cmplw    r6, r0
+000b4b64: 4082ffc0  bne      0xb4b24
+000b4b68: 80010058  lwz      r0, 0x58(r1)
+000b4b6c: 38210050  addi     r1, r1, 0x50
+000b4b70: 83e1fffc  lwz      r31, -4(r1)
+000b4b74: 7c0803a6  mtlr     r0
+000b4b78: 83c1fff8  lwz      r30, -8(r1)
+000b4b7c: 4e800020  blr      

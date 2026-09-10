@@ -1,0 +1,40 @@
+000b0500: 2c000000  cmpwi    r0, 0
+000b0504: 40820018  bne      0xb051c
+000b0508: 807f0164  lwz      r3, 0x164(r31)
+000b050c: a8050612  lha      r0, 0x612(r5)
+000b0510: 7c030000  cmpw     r3, r0
+000b0514: 41820008  beq      0xb051c
+000b0518: 38800001  li       r4, 1
+000b051c: 5480063f  clrlwi.  r0, r4, 0x18
+000b0520: 41820014  beq      0xb0534
+000b0524: a88500f0  lha      r4, 0xf0(r5)
+000b0528: 7fa3eb78  mr       r3, r29
+000b052c: 48036535  bl       0xe6a60   ; .KillObject__12ObjectModuleFs
+000b0530: 4bffff98  b        0xb04c8
+000b0534: 38e70004  addi     r7, r7, 4
+000b0538: 7c073040  cmplw    r7, r6
+000b053c: 4082ffa4  bne      0xb04e0
+000b0540: 80628d84  lwz      r3, -0x727c(r2)
+000b0544: 80030000  lwz      r0, 0(r3)
+000b0548: 2c000000  cmpwi    r0, 0
+000b054c: 40820058  bne      0xb05a4
+000b0550: a81f012a  lha      r0, 0x12a(r31)
+000b0554: 2c000003  cmpwi    r0, 3
+000b0558: 4080004c  bge      0xb05a4
+000b055c: a81b0044  lha      r0, 0x44(r27)
+000b0560: 2c000000  cmpwi    r0, 0
+000b0564: 41820040  beq      0xb05a4
+000b0568: 3c80c325  lis      r4, -0x3cdb
+000b056c: 387d0000  addi     r3, r29, 0
+000b0570: 38849a1d  addi     r4, r4, -0x65e3
+000b0574: 480370dd  bl       0xe7650   ; .GetObjectByGUID__12ObjectModuleFl
+000b0578: 28030000  cmplwi   r3, 0
+000b057c: 40820028  bne      0xb05a4
+000b0580: 80b70000  lwz      r5, 0(r23)
+000b0584: 3c60c325  lis      r3, -0x3cdb
+000b0588: 38839a1d  addi     r4, r3, -0x65e3
+000b058c: 80650028  lwz      r3, 0x28(r5)
+000b0590: 48029b51  bl       0xda0e0   ; .GetSelectorByGUID__12ObjectFolderFl
+000b0594: 7c641b79  or.      r4, r3, r3
+000b0598: 4182000c  beq      0xb05a4
+000b059c: 7fa3eb78  mr       r3, r29

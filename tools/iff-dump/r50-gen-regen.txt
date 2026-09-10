@@ -1,0 +1,5 @@
+corpus behavioral canon entries: 1114
+  0x9fb223ce -> [4096, 129, 0, 4098, 0, 0, 4111]
+  0xfdef7fc2 -> [0, 129, 0, 0, 0, 0, 0]
+  0x00e22e1e -> [0, 129, 0, 0, 0, 0, 0]
+canon written tools/iff-dump/r50-corpus-bhavs-canon.cs

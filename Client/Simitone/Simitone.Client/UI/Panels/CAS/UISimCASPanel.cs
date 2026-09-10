@@ -80,7 +80,8 @@ namespace Simitone.Client.UI.Panels.CAS
             Add(BioTabButton);
 
             FirstNameTitle = new UILabel();
-            FirstNameTitle.Caption = "First Name";
+            // R116: original UIText.iff 130 DesignCharStrs [26] (the port shortened it to "First Name")
+            FirstNameTitle.Caption = GameFacade.Strings.GetString("130", "26");
             FirstNameTitle.Position = new Vector2(96, 6);
             InitLabel(FirstNameTitle, 15);
             FirstNameTitle.CaptionStyle.Color = UIStyle.Current.SecondaryText;
@@ -97,6 +98,8 @@ namespace Simitone.Client.UI.Panels.CAS
             // SIM TAB
 
             SimGenderTitle = new UILabel();
+            // R116 provenance: no original label exists (130 has the VALUES [2]/[3] Female/Male);
+            // port-authored, disclosed.
             SimGenderTitle.Caption = "Gender";
             SimGenderTitle.Size = Vector2.One;
             SimGenderTitle.Position = new Vector2(113 + 32, 95);
@@ -104,14 +107,14 @@ namespace Simitone.Client.UI.Panels.CAS
             InitLabel(SimGenderTitle, 15);
 
             SimAgeTitle = new UILabel();
-            SimAgeTitle.Caption = "Age";
+            SimAgeTitle.Caption = "Age"; // R116: no original label (130 [0]/[1] Adult/Child are the terms)
             SimAgeTitle.Size = Vector2.One;
             SimAgeTitle.Position = new Vector2(212 + 32, 95);
             SimAgeTitle.Alignment = TextAlignment.Middle | TextAlignment.Center;
             InitLabel(SimAgeTitle, 15);
 
             SimSkinTitle = new UILabel();
-            SimSkinTitle.Caption = "Skin Color";
+            SimSkinTitle.Caption = "Skin Color"; // R116: 'Skin' appears nowhere in the corpus; 130 [4]-[6] Light/Medium/Dark
             SimSkinTitle.Size = Vector2.One;
             SimSkinTitle.Position = new Vector2(302 + 45, 95);
             SimSkinTitle.Alignment = TextAlignment.Middle | TextAlignment.Center;
@@ -159,35 +162,35 @@ namespace Simitone.Client.UI.Panels.CAS
             PerNeatTitle.Position = new Vector2(99, 85);
             PerNeatTitle.Size = new Vector2(110, 1);
             PerNeatTitle.Alignment = TextAlignment.Right;
-            PerNeatTitle.Caption = "Neat:";
+            PerNeatTitle.Caption = GameFacade.Strings.GetString("130", "17"); // R116: original DesignCharStrs [17] (no colon in canon)
             InitLabel(PerNeatTitle, 15);
 
             PerOutgoingTitle = new UILabel();
             PerOutgoingTitle.Position = new Vector2(99, 122);
             PerOutgoingTitle.Size = new Vector2(110, 1);
             PerOutgoingTitle.Alignment = TextAlignment.Right;
-            PerOutgoingTitle.Caption = "Outgoing:";
+            PerOutgoingTitle.Caption = GameFacade.Strings.GetString("130", "18"); // R116: [18]
             InitLabel(PerOutgoingTitle, 15);
 
             PerActiveTitle = new UILabel();
             PerActiveTitle.Position = new Vector2(99, 160);
             PerActiveTitle.Size = new Vector2(110, 1);
             PerActiveTitle.Alignment = TextAlignment.Right;
-            PerActiveTitle.Caption = "Active:";
+            PerActiveTitle.Caption = GameFacade.Strings.GetString("130", "19"); // R116: [19]
             InitLabel(PerActiveTitle, 15);
 
             PerPlayfulTitle = new UILabel();
             PerPlayfulTitle.Position = new Vector2(99, 200);
             PerPlayfulTitle.Size = new Vector2(110, 1);
             PerPlayfulTitle.Alignment = TextAlignment.Right;
-            PerPlayfulTitle.Caption = "Playful:";
+            PerPlayfulTitle.Caption = GameFacade.Strings.GetString("130", "20"); // R116: [20]
             InitLabel(PerPlayfulTitle, 15);
 
             PerNiceTitle = new UILabel();
             PerNiceTitle.Position = new Vector2(99, 238);
             PerNiceTitle.Size = new Vector2(110, 1);
             PerNiceTitle.Alignment = TextAlignment.Right;
-            PerNiceTitle.Caption = "Nice:";
+            PerNiceTitle.Caption = GameFacade.Strings.GetString("130", "21"); // R116: [21]
             InitLabel(PerNiceTitle, 15);
 
             PersonalityTex = ui.Get("skill.png").Get(gd);
@@ -202,7 +205,7 @@ namespace Simitone.Client.UI.Panels.CAS
             //BIO TAB
             BioTitle = new UILabel();
             BioTitle.Position = new Vector2(99, 85);
-            BioTitle.Caption = "Bio:";
+            BioTitle.Caption = GameFacade.Strings.GetString("130", "24"); // R116: original [24] 'BIO'
             InitLabel(BioTitle, 15);
 
             BioBG = new UIImage(ui.Get("cas_bio_bg.png").Get(gd)).With9Slice(15, 15, 15, 15);
@@ -282,6 +285,7 @@ namespace Simitone.Client.UI.Panels.CAS
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             //draw backgrounds
             var px = TextureGenerator.GetPxWhite(GameFacade.GraphicsDevice);
             DrawLocalTexture(batch, px, null, new Vector2(90, 0), new Vector2(410, 70), UIStyle.Current.Bg);
@@ -302,6 +306,15 @@ namespace Simitone.Client.UI.Panels.CAS
                     DrawLocalTexture(batch, PersonalityTex, null, new Vector2(490, 255-i*7), Vector2.One, col, (float)(Math.PI / 2));
                 }
             }
+        }
+
+        private UIOriginalText TwinOf(UILabel label, OriginalGlyphFont font)
+        {
+            var t = new UIOriginalText(label.Caption, font) { Color = UIStyle.Current.Text };
+            t.Position = label.Position;
+            Add(t);
+            label.Visible = false;
+            return t;
         }
 
         private void InitLabel(UILabel label, int fontSize)
@@ -339,6 +352,37 @@ namespace Simitone.Client.UI.Panels.CAS
             SimSkinDrkBtn.Selected = SkinType == "drk";
 
             OnCollectionChange?.Invoke();
+        }
+
+        // R116: static-label twins in the caption table _10 (captions are fixed after
+        // construction, so a mount-once retry is enough; placement mirrors each label's
+        // alignment - right-aligned traits get measure-based X).
+        public static int CASTwinsMounted = 0;
+        public UIOriginalText FirstNameTwin;
+        public UIOriginalText[] TraitTwins;
+        public UIOriginalText BioTwin;
+
+        public override void Update(UpdateState state)
+        {
+            base.Update(state);
+            if (FirstNameTwin == null)
+            {
+                var font = OriginalGlyphFont.LoadCaption(GameFacade.GraphicsDevice);
+                var v = GameFacade.Strings.GetString("130", "26");
+                if (font != null && font.Atlas != null && !string.IsNullOrEmpty(v))
+                {
+                    FirstNameTwin = TwinOf(FirstNameTitle, font);
+                    var traits = new UILabel[] { PerNeatTitle, PerOutgoingTitle, PerActiveTitle, PerPlayfulTitle, PerNiceTitle };
+                    TraitTwins = new UIOriginalText[5];
+                    for (int i = 0; i < 5; i++)
+                    {
+                        TraitTwins[i] = TwinOf(traits[i], font);
+                        TraitTwins[i].X = traits[i].X + 110 - font.Measure(traits[i].Caption); // right-align like the label
+                    }
+                    BioTwin = TwinOf(BioTitle, font);
+                    CASTwinsMounted++;
+                }
+            }
         }
     }
 

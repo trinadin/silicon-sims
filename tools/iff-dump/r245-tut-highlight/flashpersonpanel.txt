@@ -1,0 +1,55 @@
+                ; ==== .Tut_FlashPersonPanelButton__Fsb ====
+00156440: 93e1fffc  stw      r31, -4(r1)
+00156444: 7c0802a6  mflr     r0
+00156448: 80a28874  lwz      r5, -0x778c(r2)
+0015644c: 93c1fff8  stw      r30, -8(r1)
+00156450: 7c9e2378  mr       r30, r4
+00156454: 7c640734  extsh    r4, r3
+00156458: 90010008  stw      r0, 8(r1)
+0015645c: 9421ffa0  stwu     r1, -0x60(r1)
+00156460: 80a50000  lwz      r5, 0(r5)
+00156464: 80650024  lwz      r3, 0x24(r5)
+00156468: 4bf5eb89  bl       0xb4ff0   ; .FindNeighborByID__12NeighborhoodFi
+0015646c: 28030000  cmplwi   r3, 0
+00156470: 41820090  beq      0x156500
+00156474: 4bf4dc0d  bl       0xa4080   ; .GetGUID__8NeighborFv
+00156478: 480edee9  bl       0x244360   ; .GetHandle__12PersonFinderFl
+0015647c: 38030000  addi     r0, r3, 0
+00156480: 38610040  addi     r3, r1, 0x40
+00156484: 7c1f0378  mr       r31, r0
+00156488: 38800000  li       r4, 0
+0015648c: 4841ba05  bl       0x571e90   ; .__ct__11ImageHandleFP9cTSBuffer
+00156490: 387f0000  addi     r3, r31, 0
+00156494: 38810040  addi     r4, r1, 0x40
+00156498: 480ee949  bl       0x244de0   ; .GetPictureBuffer__12PersonFinderFiR11ImageHandle
+0015649c: 5460063f  clrlwi.  r0, r3, 0x18
+001564a0: 41820054  beq      0x1564f4
+001564a4: 80628ca4  lwz      r3, -0x735c(r2)
+001564a8: 80630000  lwz      r3, 0(r3)
+001564ac: 81830000  lwz      r12, 0(r3)
+001564b0: 818c0020  lwz      r12, 0x20(r12)
+001564b4: 4844c52d  bl       0x5a29e0
+001564b8: 80410014  lwz      r2, 0x14(r1)
+001564bc: 483c7745  bl       0x51dc00   ; .GetMainWindow__12cTSWinMgrW95Fv
+001564c0: 3be30000  addi     r31, r3, 0
+001564c4: 38610040  addi     r3, r1, 0x40
+001564c8: 4841b8b9  bl       0x571d80   ; .AsBuffer__11ImageHandleCFv
+001564cc: 38830000  addi     r4, r3, 0
+001564d0: 387f0000  addi     r3, r31, 0
+001564d4: 4800119d  bl       0x157670   ; .FindButton__FP6cTSWinP9cTSBuffer
+001564d8: 28030000  cmplwi   r3, 0
+001564dc: 41820018  beq      0x1564f4
+001564e0: 81830000  lwz      r12, 0(r3)
+001564e4: 7fc4f378  mr       r4, r30
+001564e8: 818c0168  lwz      r12, 0x168(r12)
+001564ec: 4844c4f5  bl       0x5a29e0
+001564f0: 80410014  lwz      r2, 0x14(r1)
+001564f4: 38610040  addi     r3, r1, 0x40
+001564f8: 3880ffff  li       r4, -1
+001564fc: 4841b905  bl       0x571e00   ; .__dt__11ImageHandleFv
+00156500: 80010068  lwz      r0, 0x68(r1)
+00156504: 38210060  addi     r1, r1, 0x60
+00156508: 83e1fffc  lwz      r31, -4(r1)
+0015650c: 7c0803a6  mtlr     r0
+00156510: 83c1fff8  lwz      r30, -8(r1)
+00156514: 4e800020  blr      

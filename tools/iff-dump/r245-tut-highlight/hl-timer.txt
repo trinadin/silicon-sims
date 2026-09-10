@@ -1,0 +1,72 @@
+                ; ==== .TSOnTimerMsg__23cTSWinTutorialHighlightFv ====
+00538d40: 93e1fffc  stw      r31, -4(r1)
+00538d44: 7c0802a6  mflr     r0
+00538d48: 83e28e04  lwz      r31, -0x71fc(r2)
+00538d4c: 93c1fff8  stw      r30, -8(r1)
+00538d50: 83c2bcb8  lwz      r30, -0x4348(r2)
+00538d54: 93a1fff4  stw      r29, -0xc(r1)
+00538d58: 7c7d1b78  mr       r29, r3
+00538d5c: 90010008  stw      r0, 8(r1)
+00538d60: 9421ffa0  stwu     r1, -0x60(r1)
+00538d64: 880300e0  lbz      r0, 0xe0(r3)
+00538d68: 28000000  cmplwi   r0, 0
+00538d6c: 41820018  beq      0x538d84
+00538d70: 807f0000  lwz      r3, 0(r31)
+00538d74: 7fa4eb78  mr       r4, r29
+00538d78: 4bfe33e9  bl       0x51c160   ; .UnsubscribeTimerMsg__12cTSWinMgrW95FP6cTSWin
+00538d7c: 38000000  li       r0, 0
+00538d80: 981d00e0  stb      r0, 0xe0(r29)
+00538d84: 801d00d8  lwz      r0, 0xd8(r29)
+00538d88: 2c000000  cmpwi    r0, 0
+00538d8c: 40810024  ble      0x538db0
+00538d90: 807d00d0  lwz      r3, 0xd0(r29)
+00538d94: 809d00dc  lwz      r4, 0xdc(r29)
+00538d98: 3803ffff  addi     r0, r3, -1
+00538d9c: 7c040000  cmpw     r4, r0
+00538da0: 40820028  bne      0x538dc8
+00538da4: 3800ffff  li       r0, -1
+00538da8: 901d00d8  stw      r0, 0xd8(r29)
+00538dac: 4800001c  b        0x538dc8
+00538db0: 40800018  bge      0x538dc8
+00538db4: 801d00dc  lwz      r0, 0xdc(r29)
+00538db8: 2c000000  cmpwi    r0, 0
+00538dbc: 4082000c  bne      0x538dc8
+00538dc0: 38000001  li       r0, 1
+00538dc4: 901d00d8  stw      r0, 0xd8(r29)
+00538dc8: 809d00dc  lwz      r4, 0xdc(r29)
+00538dcc: 7fa3eb78  mr       r3, r29
+00538dd0: 801d00d8  lwz      r0, 0xd8(r29)
+00538dd4: 7c040214  add      r0, r4, r0
+00538dd8: 901d00dc  stw      r0, 0xdc(r29)
+00538ddc: 819d0000  lwz      r12, 0(r29)
+00538de0: 818c0170  lwz      r12, 0x170(r12)
+00538de4: 48069bfd  bl       0x5a29e0
+00538de8: 80410014  lwz      r2, 0x14(r1)
+00538dec: 881d00e0  lbz      r0, 0xe0(r29)
+00538df0: 28000000  cmplwi   r0, 0
+00538df4: 4082004c  bne      0x538e40
+00538df8: c03d00d4  lfs      f1, 0xd4(r29)
+00538dfc: c01e0000  lfs      f0, 0(r30)
+00538e00: fc010040  .long    0xfc010040
+00538e04: 4081003c  ble      0x538e40
+00538e08: c01e000c  lfs      f0, 0xc(r30)
+00538e0c: 7fa4eb78  mr       r4, r29
+00538e10: c05e0008  lfs      f2, 8(r30)
+00538e14: 38c00000  li       r6, 0
+00538e18: ec200824  fdivs    f1, f0, f1
+00538e1c: c01e0004  lfs      f0, 4(r30)
+00538e20: 807f0000  lwz      r3, 0(r31)
+00538e24: ec02007a  fmadds   f0, f2, f1, f0
+00538e28: fc00001e  fctiwz   f0, f0
+00538e2c: d8010040  stfd     f0, 0x40(r1)
+00538e30: 80a10044  lwz      r5, 0x44(r1)
+00538e34: 4bfe36cd  bl       0x51c500   ; .SubscribeTimerMsg__12cTSWinMgrW95FP6cTSWinlUl
+00538e38: 38000001  li       r0, 1
+00538e3c: 981d00e0  stb      r0, 0xe0(r29)
+00538e40: 80010068  lwz      r0, 0x68(r1)
+00538e44: 38210060  addi     r1, r1, 0x60
+00538e48: 83e1fffc  lwz      r31, -4(r1)
+00538e4c: 83c1fff8  lwz      r30, -8(r1)
+00538e50: 7c0803a6  mtlr     r0
+00538e54: 83a1fff4  lwz      r29, -0xc(r1)
+00538e58: 4e800020  blr      

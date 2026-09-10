@@ -1,0 +1,28 @@
+002d15d0: 40820008  bne      0x2d15d8
+002d15d4: 38800005  li       r4, 5
+002d15d8: 80b80000  lwz      r5, 0(r24)
+002d15dc: 807f010c  lwz      r3, 0x10c(r31)
+002d15e0: 7ca62b78  mr       r6, r5
+002d15e4: 4825eaad  bl       0x530090   ; .SetColors__15cTSWinTextEdit2FUlUlUl
+002d15e8: 807f010c  lwz      r3, 0x10c(r31)
+002d15ec: 38800018  li       r4, 0x18
+002d15f0: 4825e731  bl       0x52fd20   ; .SetCapacity__15cTSWinTextEdit2Fi
+002d15f4: 807f010c  lwz      r3, 0x10c(r31)
+002d15f8: 38800001  li       r4, 1
+002d15fc: 4825e9c5  bl       0x52ffc0   ; .SetFlashFrameOnEmpty__15cTSWinTextEdit2Fb
+002d1600: 807f010c  lwz      r3, 0x10c(r31)
+002d1604: 38802000  li       r4, 0x2000
+002d1608: 38a00000  li       r5, 0
+002d160c: 81830000  lwz      r12, 0(r3)
+002d1610: 818c0098  lwz      r12, 0x98(r12)
+002d1614: 482d13cd  bl       0x5a29e0
+002d1618: 80410014  lwz      r2, 0x14(r1)
+002d161c: 807f010c  lwz      r3, 0x10c(r31)
+002d1620: 38800000  li       r4, 0
+002d1624: 4825e92d  bl       0x52ff50   ; .SetDrawFrameOnFocus__15cTSWinTextEdit2Fb
+002d1628: 807f010c  lwz      r3, 0x10c(r31)
+002d162c: 38800001  li       r4, 1
+002d1630: 4825d831  bl       0x52ee60   ; .SetFilterFileChars__15cTSWinTextEdit2Fb
+002d1634: 7fe3fb78  mr       r3, r31
+002d1638: 809f010c  lwz      r4, 0x10c(r31)
+002d163c: 819f0000  lwz      r12, 0(r31)

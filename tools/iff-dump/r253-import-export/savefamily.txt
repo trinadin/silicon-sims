@@ -1,0 +1,101 @@
+                ; ==== .SaveFamily__6FamilyFP8iResFilel ====
+00076370: 93e1fffc  stw      r31, -4(r1)
+00076374: 7c0802a6  mflr     r0
+00076378: 3be40000  addi     r31, r4, 0
+0007637c: 93c1fff8  stw      r30, -8(r1)
+00076380: 7c7e1b78  mr       r30, r3
+00076384: 90010008  stw      r0, 8(r1)
+00076388: 9421fee0  stwu     r1, -0x120(r1)
+0007638c: 8003010c  lwz      r0, 0x10c(r3)
+00076390: 2c00ffff  cmpwi    r0, -1
+00076394: 4082000c  bne      0x763a0
+00076398: 38600000  li       r3, 0
+0007639c: 480001b0  b        0x7654c
+000763a0: 807e0148  lwz      r3, 0x148(r30)
+000763a4: 28030000  cmplwi   r3, 0
+000763a8: 41820008  beq      0x763b0
+000763ac: 481d2355  bl       0x248700   ; .CommitChanges__10cScrapbookFv
+000763b0: 801e010c  lwz      r0, 0x10c(r30)
+000763b4: 3c804641  lis      r4, 0x4641
+000763b8: 387e0000  addi     r3, r30, 0
+000763bc: 38a44d49  addi     r5, r4, 0x4d49
+000763c0: 389f0000  addi     r4, r31, 0
+000763c4: 7c060734  extsh    r6, r0
+000763c8: 38e00009  li       r7, 9
+000763cc: 48000f95  bl       0x77360
+000763d0: 7c600735  extsh.   r0, r3
+000763d4: 40820174  bne      0x76548
+000763d8: 38610040  addi     r3, r1, 0x40
+000763dc: 480ce1b5  bl       0x144590   ; .__ct__14StringSetMultiFv
+000763e0: 801e010c  lwz      r0, 0x10c(r30)
+000763e4: 3cc04641  lis      r6, 0x4641
+000763e8: 389f0000  addi     r4, r31, 0
+000763ec: 38610040  addi     r3, r1, 0x40
+000763f0: 7c050734  extsh    r5, r0
+000763f4: 38c64d73  addi     r6, r6, 0x4d73
+000763f8: 38e00000  li       r7, 0
+000763fc: 3900ffff  li       r8, -1
+00076400: 480cefb1  bl       0x1453b0   ; .SetInfo__13StringSetBaseFP8iResFilesUlbc
+00076404: 80be0000  lwz      r5, 0(r30)
+00076408: 38610040  addi     r3, r1, 0x40
+0007640c: 38800001  li       r4, 1
+00076410: 38c0ffff  li       r6, -1
+00076414: 480cc86d  bl       0x142c80
+00076418: 38610040  addi     r3, r1, 0x40
+0007641c: 480cdab5  bl       0x143ed0   ; .Save__14StringSetMultiFv
+00076420: 7c600735  extsh.   r0, r3
+00076424: 40820110  bne      0x76534
+00076428: 801e0140  lwz      r0, 0x140(r30)
+0007642c: 28000000  cmplwi   r0, 0
+00076430: 418200c8  beq      0x764f8
+00076434: 386100b8  addi     r3, r1, 0xb8
+00076438: 388100c4  addi     r4, r1, 0xc4
+0007643c: 38a00000  li       r5, 0
+00076440: 38c00040  li       r6, 0x40
+00076444: 480cbf1d  bl       0x142360   ; .__ct__12StringBufferFPcUiUi
+00076448: 80028bac  lwz      r0, -0x7454(r2)
+0007644c: 386100b8  addi     r3, r1, 0xb8
+00076450: 8082a3fc  lwz      r4, -0x5c04(r2)
+00076454: 38a0ffff  li       r5, -1
+00076458: 900100c0  stw      r0, 0xc0(r1)
+0007645c: 3884000e  addi     r4, r4, 0xe
+00076460: 480cbdd1  bl       0x142230   ; .append__12StringBufferFPCci
+00076464: 7fe3fb78  mr       r3, r31
+00076468: 801e010c  lwz      r0, 0x10c(r30)
+0007646c: 819f0008  lwz      r12, 8(r31)
+00076470: 3ca04641  lis      r5, 0x4641
+00076474: 809e0140  lwz      r4, 0x140(r30)
+00076478: 38a54d68  addi     r5, r5, 0x4d68
+0007647c: 818c007c  lwz      r12, 0x7c(r12)
+00076480: 7c060734  extsh    r6, r0
+00076484: 38e100b8  addi     r7, r1, 0xb8
+00076488: 39000001  li       r8, 1
+0007648c: 4852c555  bl       0x5a29e0
+00076490: 80410014  lwz      r2, 0x14(r1)
+00076494: 807e0140  lwz      r3, 0x140(r30)
+00076498: 48027129  bl       0x9d5c0   ; .HLock__6MemoryFP10HandleNode
+0007649c: 3880000c  li       r4, 0xc
+000764a0: 480a76f1  bl       0x11db90   ; .Swizzle2LE__12ReconBuilderFPvl
+000764a4: 807e0140  lwz      r3, 0x140(r30)
+000764a8: 480270d9  bl       0x9d580   ; .HUnlock__6MemoryFP10HandleNode
+000764ac: 7fe3fb78  mr       r3, r31
+000764b0: 809e0140  lwz      r4, 0x140(r30)
+000764b4: 819f0008  lwz      r12, 8(r31)
+000764b8: 818c0084  lwz      r12, 0x84(r12)
+000764bc: 4852c525  bl       0x5a29e0
+000764c0: 80410014  lwz      r2, 0x14(r1)
+000764c4: 807e0140  lwz      r3, 0x140(r30)
+000764c8: 480270f9  bl       0x9d5c0   ; .HLock__6MemoryFP10HandleNode
+000764cc: 3880000c  li       r4, 0xc
+000764d0: 480a7721  bl       0x11dbf0   ; .Swizzle__12ReconBuilderFPvl
+000764d4: 807e0140  lwz      r3, 0x140(r30)
+000764d8: 480270a9  bl       0x9d580   ; .HUnlock__6MemoryFP10HandleNode
+000764dc: 7fe3fb78  mr       r3, r31
+000764e0: 809e0140  lwz      r4, 0x140(r30)
+000764e4: 819f0008  lwz      r12, 8(r31)
+000764e8: 818c006c  lwz      r12, 0x6c(r12)
+000764ec: 4852c4f5  bl       0x5a29e0
+000764f0: 80410014  lwz      r2, 0x14(r1)
+000764f4: 4800002c  b        0x76520
+000764f8: 807e0144  lwz      r3, 0x144(r30)
+000764fc: 28030000  cmplwi   r3, 0

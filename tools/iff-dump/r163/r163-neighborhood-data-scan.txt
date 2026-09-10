@@ -1,0 +1,69 @@
+R163 NEIGHBORHOOD-DATA SCOPE CORPUS SCAN
+corpus: game-data/The Sims (owned original assets; no bytes copied)
+scope: VMVariableScope.NeighborhoodData = 34
+enumeration: every loose/FAR-member IFF/FAM; deterministic case-folded path order
+mounted view: final physical record for each case-insensitive member basename
+operand schema coverage: opcodes 2,8,11,12,15,25,26,29,31,32,67
+parser: checked-in R154 resynchronizing IFF/FAR reader
+
+physical corpus:
+  IFF records: 2238
+  BHAV chunks: 28158
+  BHAV instructions: 391945
+  scope-34 operand references: 30
+  references which read: 30
+  references which write: 0
+  opcodes: 2:30
+  expression operators: Equals:30
+  operand roles: lhs:11, rhs:19
+  data indices: 1:3, 2:27
+
+basename-last-wins mounted view:
+  IFF records: 1375
+  BHAV chunks: 28041
+  BHAV instructions: 390293
+  scope-34 operand references: 30
+  references which read: 30
+  references which write: 0
+  opcodes: 2:30
+  expression operators: Equals:30
+  operand roles: lhs:11, rhs:19
+  data indices: 1:3, 2:27
+
+physical and mounted hit fingerprints identical: YES
+regression verdict: PASS
+
+PHYSICAL HIT LIST
+Downloads/BirthdayCake/BirthdayCake.far!birthdaycake.iff | BHAV 1296 'can this person visit?' | ins=3 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+Downloads/Christmas2000/Christmas2000.far!ChristmasCookies.iff | BHAV 1296 'can this person visit?' | ins=3 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+Downloads/PartyBalloons/PartyBalloons.far!PartyBalloons.iff | BHAV 2320 'can this person visit?' | ins=3 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+Downloads/Turkey/Turkey.far!turkey.iff | BHAV 1296 'can this person visit?' | ins=3 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack/ExpansionPack.far!GenieLantern.iff | BHAV 5648 'can this person visit?' | ins=2 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack3/ExpansionPack3.far!DTController.iff | BHAV 4624 'can visit?' | ins=2 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack3/ExpansionPack3.far!PedMarkers.iff | BHAV 1552 'Can this person visit?' | ins=2 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack3/ExpansionPack3.far!PedMarkers.iff | BHAV 1552 'Can this person visit?' | ins=5 opcode=2 | lhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack4/ExpansionPack4.far!VacationController.iff | BHAV 4624 'can visit?' | ins=2 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack5/ExpansionPack5.FAR!carvisitortrolley.iff | BHAV 5136 'can visit?' | ins=1 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack5/ExpansionPack5.FAR!villagecontrol.iff | BHAV 1040 'can visit?' | ins=1 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack6/ExpansionPack6.far!CarLimoBlack.iff | BHAV 3856 'can visit?' | ins=0 opcode=2 | lhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack6/ExpansionPack6.far!CarLimoBlack.iff | BHAV 3856 'can visit?' | ins=2 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack6/ExpansionPack6.far!CarLimoPink.iff | BHAV 3856 'can visit?' | ins=0 opcode=2 | lhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack6/ExpansionPack6.far!CarLimoPink.iff | BHAV 3856 'can visit?' | ins=2 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack6/ExpansionPack6.far!CarLimoWhite.iff | BHAV 3856 'can visit?' | ins=0 opcode=2 | lhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack6/ExpansionPack6.far!CarLimoWhite.iff | BHAV 3856 'can visit?' | ins=2 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack6/ExpansionPack6.far!CarStudioCarpool.iff | BHAV 3856 'can visit?' | ins=0 opcode=2 | lhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack6/ExpansionPack6.far!CarStudioCarpool.iff | BHAV 3856 'can visit?' | ins=2 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack6/ExpansionPack6.far!ControllerStudioLot.iff | BHAV 4624 'can visit?' | ins=0 opcode=2 | lhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack6/ExpansionPack6.far!ControllerStudioLot.iff | BHAV 4624 'can visit?' | ins=2 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack6/ExpansionPack6.far!PedMarkersStudio.iff | BHAV 1552 'Can this person visit?' | ins=2 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack6/ExpansionPack6.far!PedMarkersStudio.iff | BHAV 1552 'Can this person visit?' | ins=5 opcode=2 | lhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack7/ExpansionPack7.far!PedMarkersMagic.iff | BHAV 1552 'Can this person visit?' | ins=2 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+ExpansionPack7/ExpansionPack7.far!PedMarkersMagic.iff | BHAV 1552 'Can this person visit?' | ins=5 opcode=2 | lhs read NeighborhoodData[2] | operator=2:Equals
+GameData/Objects/Objects.far!Tutorial.iff | BHAV 528 'setup' | ins=0 opcode=2 | lhs read NeighborhoodData[1] | operator=2:Equals
+GameData/Objects/Objects.far!Tutorial.iff | BHAV 528 'setup' | ins=17 opcode=2 | lhs read NeighborhoodData[1] | operator=2:Equals
+GameData/Objects/Objects.far!Tutorial.iff | BHAV 528 'setup' | ins=18 opcode=2 | lhs read NeighborhoodData[1] | operator=2:Equals
+GameData/Objects/Objects.far!VisitGenerator.iff | BHAV 1296 'do generate' | ins=26 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+GameData/Objects/Objects.far!VisitGenerator.iff | BHAV 1552 'can this person visit?' | ins=3 opcode=2 | rhs read NeighborhoodData[2] | operator=2:Equals
+
+Interpretation: all effective scope-34 references are equality operands, so both
+LHS and RHS occurrences are reads. No decoded primitive operand writes scope 34.

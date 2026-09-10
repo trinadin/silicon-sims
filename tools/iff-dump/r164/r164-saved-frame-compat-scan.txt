@@ -1,0 +1,46 @@
+R164 House05 saved-frame compatibility diagnostic
+verdict: PASS
+
+inputs (local owned-data metadata only)
+  House05.iff sha256=a6d18d81c5072c507b118b68598ee12ea57403634d6507c39b7a04ad4c6cdd99
+  Objects.far sha256=b029f449a91289b0a789810ff226da0e3a578b0931f1b5bcd104433e316efbf0
+  Global.far sha256=c301952612dc2adfc4a94b9d9e6e78c3cef5635b989e1cb4342b29989d13b5fb
+  parser=tools/iff-dump/r154/r154-callers-scan.py
+  objm_version=62 objt_entries=114
+
+house census
+  instances=245
+  saved_frames=522
+  unresolved_character_resource_frames=9 object_ids=16,18,21 (excluded; character IFFs are outside Objects.far)
+
+missing routine frames
+  frames=12 objects=11 object_ids=10,123,131,133,134,173,174,191,192,194,226
+  object_id=10 depth=0 routine=4096 ip=1 owner_type=49 owner_guid=6b264238 owner_name="SCTC Cordless Wall Phone" resource=phones.iff scope=private:phones.iff
+  object_id=10 depth=1 routine=4113 ip=0 owner_type=49 owner_guid=6b264238 owner_name="SCTC Cordless Wall Phone" resource=phones.iff scope=private:phones.iff
+  object_id=123 depth=1 routine=4109 ip=0 owner_type=39 owner_guid=28975923 owner_name="SC Electric Co. Antique Lamp" resource=Lamps.iff scope=private:Lamps.iff
+  object_id=131 depth=1 routine=4109 ip=0 owner_type=37 owner_guid=df77ee12 owner_name="Bottle Lamp" resource=Lamps.iff scope=private:Lamps.iff
+  object_id=133 depth=0 routine=4096 ip=0 owner_type=45 owner_guid=d1cf9596 owner_name="" resource=Paintings.iff scope=private:Paintings.iff
+  object_id=134 depth=0 routine=4096 ip=2 owner_type=44 owner_guid=fbe586b7 owner_name="" resource=Paintings.iff scope=private:Paintings.iff
+  object_id=173 depth=0 routine=4096 ip=1 owner_type=64 owner_guid=d5ca2d74 owner_name="" resource=Sofas.iff scope=private:Sofas.iff
+  object_id=174 depth=0 routine=4096 ip=1 owner_type=65 owner_guid=24e26386 owner_name="" resource=Sofas.iff scope=private:Sofas.iff
+  object_id=191 depth=0 routine=4096 ip=1 owner_type=62 owner_guid=c59350c6 owner_name="" resource=Sofas.iff scope=private:Sofas.iff
+  object_id=192 depth=0 routine=4096 ip=1 owner_type=63 owner_guid=23a15547 owner_name="" resource=Sofas.iff scope=private:Sofas.iff
+  object_id=194 depth=1 routine=4109 ip=0 owner_type=38 owner_guid=fd746ad2 owner_name="Elite Reflections Chrome Lamp" resource=Lamps.iff scope=private:Lamps.iff
+  object_id=226 depth=0 routine=4096 ip=0 owner_type=46 owner_guid=7d2089b6 owner_name="\"Tragic Clown\" Painting" resource=Paintings.iff scope=private:Paintings.iff
+
+out-of-bounds instruction frames
+  frames=4 objects=4 object_ids=114,115,116,117
+  object_id=114 depth=0 routine=4096 ip=3 instructions=2 owner_type=14 owner_guid=91767a36 owner_name="Tiled Counter" resource=Counters.iff scope=private:Counters.iff
+  object_id=115 depth=0 routine=4096 ip=3 instructions=2 owner_type=14 owner_guid=91767a36 owner_name="Tiled Counter" resource=Counters.iff scope=private:Counters.iff
+  object_id=116 depth=0 routine=4096 ip=3 instructions=2 owner_type=14 owner_guid=91767a36 owner_name="Tiled Counter" resource=Counters.iff scope=private:Counters.iff
+  object_id=117 depth=0 routine=4096 ip=3 instructions=2 owner_type=14 owner_guid=91767a36 owner_name="Tiled Counter" resource=Counters.iff scope=private:Counters.iff
+
+current replacement mains
+  resource=Counters.iff affected_object_ids=114,115,116,117 saved_main_versions=5 main_id=4096 main_version=2 instructions=2 label="main" scope=private:Counters.iff
+  resource=Lamps.iff affected_object_ids=123,131,194 saved_main_versions=3 main_id=8197 main_version=2 instructions=5 label="main - non - animated" scope=semiglobal:LightGlobals.iff
+  resource=Paintings.iff affected_object_ids=133,134,226 saved_main_versions=6 main_id=8194 main_version=1 instructions=8 label="main - painting" scope=semiglobal:ArtGlobals.iff
+  resource=phones.iff affected_object_ids=10 saved_main_versions=2 main_id=8284 main_version=4 instructions=13 label="main" scope=semiglobal:PhoneGlobals.iff
+  resource=Sofas.iff affected_object_ids=173,174,191,192 saved_main_versions=5 main_id=8208 main_version=6 instructions=7 label="main" scope=semiglobal:SofaGlobals.iff
+
+pinned invalid continuation object_ids=10,114,115,116,117,123,131,133,134,173,174,191,192,194,226
+classification: 12 missing-routine frames plus 4 stale-IP frames; these are saved continuation incompatibilities against current replacement resources.

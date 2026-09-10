@@ -1,0 +1,55 @@
+                ; ==== .GetPackedAlt__15cRotatableWorldF7CTilePt ====
+00161e00: 80040084  lwz      r0, 0x84(r4)
+00161e04: 80c2a870  lwz      r6, -0x5790(r2)
+00161e08: 20000004  subfic   r0, r0, 4
+00161e0c: 80e28c1c  lwz      r7, -0x73e4(r2)
+00161e10: 540007bf  clrlwi.  r0, r0, 0x1e
+00161e14: 4182004c  beq      0x161e60
+00161e18: 89050000  lbz      r8, 0(r5)
+00161e1c: 54096824  slwi     r9, r0, 0xd
+00161e20: 88050001  lbz      r0, 1(r5)
+00161e24: 7ce74a14  add      r7, r7, r9
+00161e28: 7d080774  extsb    r8, r8
+00161e2c: 55083830  slwi     r8, r8, 7
+00161e30: 7c000774  extsb    r0, r0
+00161e34: 7d074214  add      r8, r7, r8
+00161e38: 5400083c  slwi     r0, r0, 1
+00161e3c: 7ce80214  add      r7, r8, r0
+00161e40: 8807e000  lbz      r0, -0x2000(r7)
+00161e44: 98050000  stb      r0, 0(r5)
+00161e48: 88050001  lbz      r0, 1(r5)
+00161e4c: 7c000774  extsb    r0, r0
+00161e50: 5400083c  slwi     r0, r0, 1
+00161e54: 7ce80214  add      r7, r8, r0
+00161e58: 8807e001  lbz      r0, -0x1fff(r7)
+00161e5c: 98050001  stb      r0, 1(r5)
+00161e60: 81240014  lwz      r9, 0x14(r4)
+00161e64: 88e50000  lbz      r7, 0(r5)
+00161e68: 80040084  lwz      r0, 0x84(r4)
+00161e6c: 7ce80774  extsb    r8, r7
+00161e70: 88850001  lbz      r4, 1(r5)
+00161e74: 5407103a  slwi     r7, r0, 2
+00161e78: 8149000c  lwz      r10, 0xc(r9)
+00161e7c: 5509103a  slwi     r9, r8, 2
+00161e80: 38a70001  addi     r5, r7, 1
+00161e84: 7c880774  extsb    r8, r4
+00161e88: 38870002  addi     r4, r7, 2
+00161e8c: 38070003  addi     r0, r7, 3
+00161e90: 7d4a482e  lwzx     r10, r10, r9
+00161e94: 5509103a  slwi     r9, r8, 2
+00161e98: 7d0638ae  lbzx     r8, r6, r7
+00161e9c: 7d2a4a14  add      r9, r10, r9
+00161ea0: 7ce628ae  lbzx     r7, r6, r5
+00161ea4: 7ca620ae  lbzx     r5, r6, r4
+00161ea8: 7c8600ae  lbzx     r4, r6, r0
+00161eac: 7d0848ae  lbzx     r8, r8, r9
+00161eb0: 7cc748ae  lbzx     r6, r7, r9
+00161eb4: 7ca548ae  lbzx     r5, r5, r9
+00161eb8: 7c0448ae  lbzx     r0, r4, r9
+00161ebc: 9901fff0  stb      r8, -0x10(r1)
+00161ec0: 98c1fff1  stb      r6, -0xf(r1)
+00161ec4: 98a1fff2  stb      r5, -0xe(r1)
+00161ec8: 9801fff3  stb      r0, -0xd(r1)
+00161ecc: 8001fff0  lwz      r0, -0x10(r1)
+00161ed0: 90030000  stw      r0, 0(r3)
+00161ed4: 4e800020  blr      

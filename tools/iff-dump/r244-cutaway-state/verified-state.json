@@ -1,0 +1,153 @@
+{
+  "executable_sha256": "33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f",
+  "code_pins": {
+    "0x1d0338": "0xabda000c",
+    "0x1d03d0": "0x57e0063f",
+    "0x1d03d8": "0x88180049",
+    "0x1d03e0": "0x41820278",
+    "0x1d03b4": "0x48040d9d",
+    "0x1d03b8": "0x2c030004",
+    "0x1d0490": "0x80180018",
+    "0x1d04b0": "0x4bfa9f11",
+    "0x1d061c": "0x2804fffb",
+    "0x1d0624": "0x807801fc",
+    "0x1d0628": "0x4bfd9a09",
+    "0x1d063c": "0x4bfd99f5",
+    "0x1d0648": "0x4bffed69",
+    "0x1d048c": "0x408201c4",
+    "0x1d65a4": "0x2c0000e4",
+    "0x1d6678": "0x2c000105",
+    "0x1d66c0": "0x4bfd37a1",
+    "0x1d6b70": "0x981c0200",
+    "0x1d6b78": "0x4bfd32e9",
+    "0x1d6b80": "0x889c01f8",
+    "0x2b4b10": "0x807f00cc",
+    "0x2b4b14": "0x38800002",
+    "0x2b4b1c": "0x4bf5bc75",
+    "0x2b4bb4": "0x38800001",
+    "0x2b4bf0": "0x38800000",
+    "0x2b4c2c": "0x38800003",
+    "0x2b4c68": "0x38800004",
+    "0x2107f0": "0x2c1b0002",
+    "0x210800": "0x4be7beb1",
+    "0x1cfa64": "0x4804d1ed",
+    "0x1cfa70": "0x81830000",
+    "0x1cfa74": "0x818c005c",
+    "0x21a7e0": "0x88630093",
+    "0x21a7e4": "0x4e800020",
+    "0x1d02c0": "0x38600000",
+    "0x1cffcc": "0x807d0000",
+    "0x1d0038": "0x81830028",
+    "0x1d0044": "0x818c0048",
+    "0x1d0040": "0x38be0204",
+    "0x1726b0": "0x90bf0028",
+    "0x191934": "0x88030024",
+    "0x17412c": "0x88030024",
+    "0x1cfb10": "0x7c841830",
+    "0x1cfb1c": "0x5484103a",
+    "0x1cfb28": "0x7c052214",
+    "0x1cfba0": "0x889b000c",
+    "0x1cfba8": "0x88db000d",
+    "0x1d025c": "0x88bb000f",
+    "0x1d0260": "0x889b0010",
+    "0x1cfbe0": "0x4bf49311",
+    "0x1cfcd8": "0x54a0063f",
+    "0x1cfdc4": "0x5743063f",
+    "0x1cfdc8": "0x41820204",
+    "0x1cf768": "0x7c850774",
+    "0x1cf7b8": "0x408202ac",
+    "0x1cf7d0": "0x54046824",
+    "0x1cf7f4": "0x8864e000",
+    "0x1cf7f8": "0x8804e001",
+    "0x1cf820": "0x39200004",
+    "0x109468": "0xa0830aac",
+    "0x1094b4": "0xb3bf0aac",
+    "0xc49e8": "0x837a0110",
+    "0xc49ec": "0x480fb035",
+    "0x1183f0": "0x7c050000",
+    "0x11841c": "0x4bffff65",
+    "0x591b10": "0x21050020",
+    "0x611a4": "0x3880ffff",
+    "0x611b0": "0x989f000c",
+    "0x611b8": "0x989f000d",
+    "0x611c8": "0x38800001",
+    "0x611d4": "0x989f000f",
+    "0x611dc": "0x989f0010"
+  },
+  "data_section_unpacked": "0x7bf80",
+  "vtable_chain": {
+    "eds_vptr_slot": "0x136c=0x50910",
+    "eds_slot5c_word": "0x5096c=0xf198",
+    "eds_iswaiting_code": "0x21a7e0",
+    "ctool_second_vptr_slot": "0x10b8=0x4d280",
+    "ctool_slot18_word": "0x4d2c8=0xe668",
+    "ctool_adjust_base_code": "0x191910",
+    "cmovetool_slot18_word": "0x4c598=0xe1a8",
+    "cmovetool_adjust_code": "0x174100",
+    "ctool_slot19_word": "0x4d2cc=0xdf30",
+    "ctool_modifycursor_code": "0x1579d0",
+    "cdddsimsview_vptr_slot": "0x1354=0x50450",
+    "viewer_vt2_pointtotile_word": "0x4ea4c=0xeaa0",
+    "viewer_pointtotile_code": "0x1d3b00"
+  },
+  "setmode_hook_strings": {
+    "23": "Entering Build Mode",
+    "61": "Entering Live Mode",
+    "80": "Entering Camera Mode",
+    "101": "Entering Options Mode"
+  },
+  "fixtures": {
+    "insert_eviction": {
+      "model": [
+        "12-13-14",
+        "13-14-15"
+      ],
+      "cap": 3
+    },
+    "mouse_y_adjust": {
+      "zoom0": 132,
+      "zoom1": 164,
+      "zoom2": 228,
+      "zoom3": 356
+    },
+    "cursor_rect": {
+      "center_4x4": 16,
+      "edge_tiles": [
+        [
+          0,
+          0
+        ]
+      ],
+      "offworld_empty": true
+    },
+    "person_rect": {
+      "center_k4": 16,
+      "edge_k1": 1
+    },
+    "direction_constants": {
+      "dir1_0xc": [
+        -1,
+        -1,
+        0
+      ],
+      "dir2_0xf": [
+        1,
+        1,
+        0
+      ]
+    },
+    "cpstate_modes": {
+      "0": "Build",
+      "1": "Buy",
+      "2": "Live",
+      "3": "Options",
+      "4": "Camera",
+      "hook_strings": {
+        "23": "Entering Build Mode",
+        "61": "Entering Live Mode",
+        "80": "Entering Camera Mode",
+        "101": "Entering Options Mode"
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+                ; ==== .SetTrackedObject__8AnimatorFP8cXObject ====
+0047cb10: 7c0802a6  mflr     r0
+0047cb14: 80828f48  lwz      r4, -0x70b8(r2)
+0047cb18: 90010008  stw      r0, 8(r1)
+0047cb1c: 28030000  cmplwi   r3, 0
+0047cb20: 9421ffc0  stwu     r1, -0x40(r1)
+0047cb24: 90640000  stw      r3, 0(r4)
+0047cb28: 41820010  beq      0x47cb38
+0047cb2c: 386000f7  li       r3, 0xf7
+0047cb30: 38800000  li       r4, 0
+0047cb34: 4bbe416d  bl       0x60ca0   ; .GlobalDispatch__Fsl
+0047cb38: 80010048  lwz      r0, 0x48(r1)
+0047cb3c: 38210040  addi     r1, r1, 0x40
+0047cb40: 7c0803a6  mtlr     r0
+0047cb44: 4e800020  blr

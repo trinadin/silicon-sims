@@ -1,0 +1,58 @@
+000f0634: a81e0004  lha      r0, 4(r30)
+000f0638: 3b600000  li       r27, 0
+000f063c: 809d00dc  lwz      r4, 0xdc(r29)
+000f0640: 7c050735  extsh.   r5, r0
+000f0644: 40810024  ble      0xf0668
+000f0648: 8064001c  lwz      r3, 0x1c(r4)
+000f064c: 38030001  addi     r0, r3, 1
+000f0650: 7c050040  cmplw    r5, r0
+000f0654: 40800014  bge      0xf0668
+000f0658: 3805ffff  addi     r0, r5, -1
+000f065c: 80640020  lwz      r3, 0x20(r4)
+000f0660: 5400103a  slwi     r0, r0, 2
+000f0664: 7f63002e  lwzx     r27, r3, r0
+000f0668: 281b0000  cmplwi   r27, 0
+000f066c: 4082001c  bne      0xf0688
+000f0670: 38000015  li       r0, 0x15
+000f0674: 38810044  addi     r4, r1, 0x44
+000f0678: b0010044  sth      r0, 0x44(r1)
+000f067c: 387f0000  addi     r3, r31, 0
+000f0680: 38a00000  li       r5, 0
+000f0684: 484a009d  bl       0x590720
+000f0688: 7f63db78  mr       r3, r27
+000f068c: 48062ee5  bl       0x153570   ; .GetMainSimElem__7TreeSimFv
+000f0690: 7c7c1b79  or.      r28, r3, r3
+000f0694: 41820080  beq      0xf0714
+000f0698: 48061e19  bl       0x1524b0   ; .GetTreeID__9StackElemCFv
+000f069c: 7c641b78  mr       r4, r3
+000f06a0: 807c000c  lwz      r3, 0xc(r28)
+000f06a4: a8bc0002  lha      r5, 2(r28)
+000f06a8: 4bf4ffe9  bl       0x40690   ; .GetNodeRef__8BehaviorFss
+000f06ac: 28030000  cmplwi   r3, 0
+000f06b0: 41820064  beq      0xf0714
+000f06b4: a8030000  lha      r0, 0(r3)
+000f06b8: 5403045e  rlwinm   r3, r0, 0, 0x11, 0xf
+000f06bc: 7c600735  extsh.   r0, r3
+000f06c0: 40820038  bne      0xf06f8
+000f06c4: 387c0000  addi     r3, r28, 0
+000f06c8: 3ba00000  li       r29, 0
+000f06cc: 48062975  bl       0x153040   ; .GetParams__9StackElemFv
+000f06d0: b3a30000  sth      r29, 0(r3)
+000f06d4: 809b00dc  lwz      r4, 0xdc(r27)
+000f06d8: a87b00f0  lha      r3, 0xf0(r27)
+000f06dc: 8084002c  lwz      r4, 0x2c(r4)
+000f06e0: 3803ffff  addi     r0, r3, -1
+000f06e4: 5403103a  slwi     r3, r0, 2
+000f06e8: 7c04182e  lwzx     r0, r4, r3
+000f06ec: 5400001e  rlwinm   r0, r0, 0, 0, 0xf
+000f06f0: 7c04192e  stwx     r0, r4, r3
+000f06f4: 48000020  b        0xf0714
+000f06f8: 7c600734  extsh    r0, r3
+000f06fc: 2c000011  cmpwi    r0, 0x11
+000f0700: 40820014  bne      0xf0714
+000f0704: 387c0000  addi     r3, r28, 0
+000f0708: 3ba00000  li       r29, 0
+000f070c: 48062935  bl       0x153040   ; .GetParams__9StackElemFv
+000f0710: b3a30000  sth      r29, 0(r3)
+000f0714: 3b400001  li       r26, 1
+000f0718: 4800058c  b        0xf0ca4

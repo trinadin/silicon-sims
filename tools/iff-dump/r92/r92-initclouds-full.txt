@@ -1,0 +1,136 @@
+0x57c890: bf01ffe0  stmw r24, -32(r1)                          |....|
+0x57c894: 3b830000  addi r28, r3, 0                            |;...|
+0x57c898: 7c0802a6  mfxer r0                                   ||...|
+0x57c89c: 3c605555  addis r3, r0, 21845                        |<`UU|
+0x57c8a0: 3b7c0000  addi r27, r28, 0                           |;|..|
+0x57c8a4: 3ba35556  addi r29, r3, 21846                        |;.UV|
+0x57c8a8: 3b000000  addi r24, r0, 0                            |;...|
+0x57c8ac: 90010008  stw r0, 8(r1)                              |....|
+0x57c8b0: 9421ffa0  stwu r1, -96(r1)                           |.!..|
+0x57c8b4: 60000000  ori r0, r0, 0                              |`...|
+0x57c8b8: 4ba9d819  bl 0x57a0d0                                |K...|
+0x57c8bc: 7c9d1896  mulhw r29, r4, r3                          ||...|
+0x57c8c0: 54800ffe  rlwinm r0, r4 bit31(rS)                    |T...|
+0x57c8c4: 7c040214  add r4, r0, r0                             ||...|
+0x57c8c8: 1c000003  mulli r0, r0, 3                            |....|
+0x57c8cc: 7c001850  subf r0, r0, r3                            ||..P|
+0x57c8d0: 901b0098  stw r0, 152(r27)                           |....|
+0x57c8d4: 38600001  addi r3, r0, 1                             |8`..|
+0x57c8d8: 3800ff92  addi r0, r0, -110                          |8...|
+0x57c8dc: 907b009c  stw r3, 156(r27)                           |.{..|
+0x57c8e0: 901b00a0  stw r0, 160(r27)                           |....|
+0x57c8e4: 4ba9d7ed  bl 0x57a0d0                                |K...|
+0x57c8e8: 54640ffe  rlwinm r4, r3 bit31(rS)                    |Td..|
+0x57c8ec: 3b180001  addi r24, r24, 1                           |;...|
+0x57c8f0: 546007fe  rlwinm r0, r3 &1                           |T`..|
+0x57c8f4: 2c180015  cmpwi r0, r24, 21                          |,...|
+0x57c8f8: 7c002278  .long                                      ||."x|
+0x57c8fc: 7c640050  subf r4, r3, r0                            ||d.P|
+0x57c900: 38030002  addi r0, r3, 2                             |8...|
+0x57c904: 901b00a4  stw r0, 164(r27)                           |....|
+0x57c908: 3be00000  addi r31, r0, 0                            |;...|
+0x57c90c: 93fb0094  stw r31, 148(r27)                          |....|
+0x57c910: 93fb0090  stw r31, 144(r27)                          |....|
+0x57c914: 93fb00a8  stw r31, 168(r27)                          |....|
+0x57c918: 93fb00ac  stw r31, 172(r27)                          |....|
+0x57c91c: 3b7b0024  addi r27, r27, 36                          |;{.$|
+0x57c920: 4180ff98  bne(0) 0x57c8b8                            |A...|
+0x57c924: 3c606666  addis r3, r0, 26214                        |<`ff|
+0x57c928: 3b7f0000  addi r27, r31, 0                           |;...|
+0x57c92c: 3bc36667  addi r30, r3, 26215                        |;.fg|
+0x57c930: 3b3c0000  addi r25, r28, 0                           |;<..|
+0x57c934: 3b5f0000  addi r26, r31, 0                           |;_..|
+0x57c938: 3b00003c  addi r24, r0, 60                           |;..<|
+0x57c93c: 3ba00002  addi r29, r0, 2                            |;...|
+0x57c940: 93190094  stw r24, 148(r25)                          |....|
+0x57c944: 93f900ac  stw r31, 172(r25)                          |....|
+0x57c948: 4ba9d789  bl 0x57a0d0                                |K...|
+0x57c94c: 7c1e1896  mulhw r30, r0, r3                          ||...|
+0x57c950: 3b180010  addi r24, r24, 16                          |;...|
+0x57c954: 7c000e70  srawi r0, r0, 1                            ||..p|
+0x57c958: 54040ffe  rlwinm r4, r0 bit31(rS)                    |T...|
+0x57c95c: 7c002214  add r0, r0, r4                             ||.".|
+0x57c960: 1c000005  mulli r0, r0, 5                            |....|
+0x57c964: 7c001850  subf r0, r0, r3                            ||..P|
+0x57c968: 7c7b01d6  mullw r27, r3, r0                          ||{..|
+0x57c96c: 3b7b0001  addi r27, r27, 1                           |;{..|
+0x57c970: 2c1b0008  cmpwi r0, r27, 8                           |,...|
+0x57c974: 201a0156  .long                                      | ..V|
+0x57c978: 7c601a14  add r0, r3, r3                             ||`..|
+0x57c97c: 201a01ce  .long                                      | ...|
+0x57c980: 90790090  stw r3, 144(r25)                           |.y..|
+0x57c984: 3b5a0020  addi r26, r26, 32                          |;Z. |
+0x57c988: 901900a8  stw r0, 168(r25)                           |....|
+0x57c98c: 93b900b0  stw r29, 176(r25)                          |....|
+0x57c990: 3b390024  addi r25, r25, 36                          |;9.$|
+0x57c994: 4180ffac  bne(0) 0x57c940                            |A...|
+0x57c998: 3c606666  addis r3, r0, 26214                        |<`ff|
+0x57c99c: 3bdc0168  addi r30, r28, 360                         |;..h|
+0x57c9a0: 3ba36667  addi r29, r3, 26215                        |;.fg|
+0x57c9a4: 3b60000a  addi r27, r0, 10                           |;`..|
+0x57c9a8: 389bfff6  addi r4, r27, -10                          |8...|
+0x57c9ac: 54832036  rlwinm r3, r4 <<4                          |T. 6|
+0x57c9b0: 3803003c  addi r0, r3, 60                            |8..<|
+0x57c9b4: 901e0094  stw r0, 148(r30)                           |....|
+0x57c9b8: 38000000  addi r0, r0, 0                             |8...|
+0x57c9bc: 1fe40030  mulli r31, r4, 48                          |...0|
+0x57c9c0: 901e00ac  stw r0, 172(r30)                           |....|
+0x57c9c4: 4ba9d70d  bl 0x57a0d0                                |K...|
+0x57c9c8: 7c1d1896  mulhw r29, r0, r3                          ||...|
+0x57c9cc: 7c000e70  srawi r0, r0, 1                            ||..p|
+0x57c9d0: 54040ffe  rlwinm r4, r0 bit31(rS)                    |T...|
+0x57c9d4: 7c002214  add r0, r0, r4                             ||.".|
+0x57c9d8: 1c000005  mulli r0, r0, 5                            |....|
+0x57c9dc: 7c001850  subf r0, r0, r3                            ||..P|
+0x57c9e0: 7c7b01d6  mullw r27, r3, r0                          ||{..|
+0x57c9e4: 3b7b0001  addi r27, r27, 1                           |;{..|
+0x57c9e8: 2c1b0010  cmpwi r0, r27, 16                          |,...|
+0x57c9ec: 201f011a  .long                                      | ...|
+0x57c9f0: 7c001a14  add r0, r0, r3                             ||...|
+0x57c9f4: 901e0090  stw r0, 144(r30)                           |....|
+0x57c9f8: 207f01ce  .long                                      | ...|
+0x57c9fc: 38000003  addi r0, r0, 3                             |8...|
+0x57ca00: 907e00a8  stw r3, 168(r30)                           |.~..|
+0x57ca04: 901e00b0  stw r0, 176(r30)                           |....|
+0x57ca08: 3bde0024  addi r30, r30, 36                          |;..$|
+0x57ca0c: 4180ff9c  bne(0) 0x57c9a8                            |A...|
+0x57ca10: 3c606666  addis r3, r0, 26214                        |<`ff|
+0x57ca14: 3bbc0264  addi r29, r28, 612                         |;..d|
+0x57ca18: 3be36667  addi r31, r3, 26215                        |;.fg|
+0x57ca1c: 3bc00011  addi r30, r0, 17                           |;...|
+0x57ca20: 3b9effef  addi r28, r30, -17                         |;...|
+0x57ca24: 1c7c000a  mulli r3, r28, 10                          |.|..|
+0x57ca28: 3803003c  addi r0, r3, 60                            |8..<|
+0x57ca2c: 901d0094  stw r0, 148(r29)                           |....|
+0x57ca30: 38000000  addi r0, r0, 0                             |8...|
+0x57ca34: 901d00ac  stw r0, 172(r29)                           |....|
+0x57ca38: 4ba9d699  bl 0x57a0d0                                |K...|
+0x57ca3c: 7c1f1896  mulhw r31, r0, r3                          ||...|
+0x57ca40: 7c000e70  srawi r0, r0, 1                            ||..p|
+0x57ca44: 54040ffe  rlwinm r4, r0 bit31(rS)                    |T...|
+0x57ca48: 7c002214  add r0, r0, r4                             ||.".|
+0x57ca4c: 1c000005  mulli r0, r0, 5                            |....|
+0x57ca50: 7c001850  subf r0, r0, r3                            ||..P|
+0x57ca54: 7c7c01d6  mullw r28, r3, r0                          |||..|
+0x57ca58: 3803008e  addi r0, r3, 142                           |8...|
+0x57ca5c: 901d0090  stw r0, 144(r29)                           |....|
+0x57ca60: 4ba9d671  bl 0x57a0d0                                |K..q|
+0x57ca64: 7c1f1896  mulhw r31, r0, r3                          ||...|
+0x57ca68: 3bde0001  addi r30, r30, 1                           |;...|
+0x57ca6c: 2c1e0015  cmpwi r0, r30, 21                          |,...|
+0x57ca70: 7c000e70  srawi r0, r0, 1                            ||..p|
+0x57ca74: 54040ffe  rlwinm r4, r0 bit31(rS)                    |T...|
+0x57ca78: 7c002214  add r0, r0, r4                             ||.".|
+0x57ca7c: 1c000005  mulli r0, r0, 5                            |....|
+0x57ca80: 7c001850  subf r0, r0, r3                            ||..P|
+0x57ca84: 7c7c01d6  mullw r28, r3, r0                          |||..|
+0x57ca88: 38030106  addi r0, r3, 262                           |8...|
+0x57ca8c: 901d00a8  stw r0, 168(r29)                           |....|
+0x57ca90: 38000002  addi r0, r0, 2                             |8...|
+0x57ca94: 901d00b0  stw r0, 176(r29)                           |....|
+0x57ca98: 3bbd0024  addi r29, r29, 36                          |;..$|
+0x57ca9c: 4180ff84  bne(0) 0x57ca20                            |A...|
+0x57caa0: 80010068  lwz r0, 104(r1)                            |...h|
+0x57caa4: 38210060  addi r1, r1, 96                            |8!.`|
+0x57caa8: bb01ffe0  lmw r24, -32(r1)                           |....|
+0x57caac: 7c0803a6  mtxer r0                                   ||...|

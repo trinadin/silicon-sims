@@ -1,0 +1,164 @@
+{
+  "800x600": {
+    "captures": 54,
+    "physical_dimensions": [
+      [
+        800,
+        600
+      ]
+    ],
+    "logical_dimensions": [
+      800,
+      600
+    ],
+    "effective_scale": 1.0,
+    "options": {
+      "graphics": {
+        "panel_rgb_identical": true,
+        "whole_frame_refresh_diff": [
+          0,
+          0,
+          800,
+          477
+        ],
+        "whole_frame_click_diff": null,
+        "panel_crop": [
+          220,
+          500,
+          800,
+          600
+        ]
+      },
+      "sound": {
+        "panel_rgb_identical": true,
+        "whole_frame_refresh_diff": null,
+        "whole_frame_click_diff": null,
+        "panel_crop": [
+          220,
+          500,
+          800,
+          600
+        ]
+      },
+      "play": {
+        "panel_rgb_identical": true,
+        "whole_frame_refresh_diff": null,
+        "whole_frame_click_diff": null,
+        "panel_crop": [
+          220,
+          500,
+          800,
+          600
+        ]
+      }
+    }
+  },
+  "1280x800": {
+    "captures": 54,
+    "physical_dimensions": [
+      [
+        1280,
+        800
+      ]
+    ],
+    "logical_dimensions": [
+      1280,
+      800
+    ],
+    "effective_scale": 1.0,
+    "options": {
+      "graphics": {
+        "panel_rgb_identical": true,
+        "whole_frame_refresh_diff": [
+          7,
+          0,
+          1280,
+          800
+        ],
+        "whole_frame_click_diff": null,
+        "panel_crop": [
+          220,
+          700,
+          1024,
+          800
+        ]
+      },
+      "sound": {
+        "panel_rgb_identical": true,
+        "whole_frame_refresh_diff": null,
+        "whole_frame_click_diff": null,
+        "panel_crop": [
+          220,
+          700,
+          1024,
+          800
+        ]
+      },
+      "play": {
+        "panel_rgb_identical": true,
+        "whole_frame_refresh_diff": null,
+        "whole_frame_click_diff": null,
+        "panel_crop": [
+          220,
+          700,
+          1024,
+          800
+        ]
+      }
+    }
+  },
+  "800x600@2x": {
+    "captures": 54,
+    "physical_dimensions": [
+      [
+        1600,
+        1022
+      ]
+    ],
+    "logical_dimensions": [
+      939,
+      600
+    ],
+    "effective_scale": 1.7033333,
+    "options": {
+      "graphics": {
+        "panel_rgb_identical": true,
+        "whole_frame_refresh_diff": [
+          0,
+          0,
+          1600,
+          1022
+        ],
+        "whole_frame_click_diff": null,
+        "panel_crop": [
+          375,
+          852,
+          1599,
+          1021
+        ]
+      },
+      "sound": {
+        "panel_rgb_identical": true,
+        "whole_frame_refresh_diff": null,
+        "whole_frame_click_diff": null,
+        "panel_crop": [
+          375,
+          852,
+          1599,
+          1021
+        ]
+      },
+      "play": {
+        "panel_rgb_identical": true,
+        "whole_frame_refresh_diff": null,
+        "whole_frame_click_diff": null,
+        "panel_crop": [
+          375,
+          852,
+          1599,
+          1021
+        ]
+      }
+    }
+  }
+}

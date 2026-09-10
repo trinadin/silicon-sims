@@ -1,0 +1,81 @@
+[
+  {
+    "display": "800x600",
+    "physical_size": [
+      800,
+      600
+    ],
+    "bottom_strip": [
+      0,
+      500,
+      800,
+      600
+    ],
+    "changed_rgba_pixels": 0,
+    "equal": true,
+    "difference_bounds_within_strip": null,
+    "needs_interior": [
+      520,
+      508,
+      700,
+      598
+    ],
+    "needs_changed_rgba_pixels": 0
+  },
+  {
+    "display": "1280x800",
+    "physical_size": [
+      1280,
+      800
+    ],
+    "bottom_strip": [
+      0,
+      700,
+      1280,
+      800
+    ],
+    "changed_rgba_pixels": 14423,
+    "equal": false,
+    "difference_bounds_within_strip": [
+      1024,
+      0,
+      1280,
+      100
+    ],
+    "needs_interior": [
+      520,
+      708,
+      700,
+      798
+    ],
+    "needs_changed_rgba_pixels": 0
+  },
+  {
+    "display": "800x600@2x",
+    "physical_size": [
+      1600,
+      1022
+    ],
+    "bottom_strip": [
+      0,
+      852,
+      1600,
+      1022
+    ],
+    "changed_rgba_pixels": 714,
+    "equal": false,
+    "difference_bounds_within_strip": [
+      0,
+      169,
+      1596,
+      170
+    ],
+    "needs_interior": [
+      886,
+      865,
+      1192,
+      1019
+    ],
+    "needs_changed_rgba_pixels": 0
+  }
+]

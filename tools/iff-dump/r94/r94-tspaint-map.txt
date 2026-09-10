@@ -1,0 +1,4 @@
+TSPaint/DoWater symbol-string map (function-name strings, all at function ENDs):
+  cWinDowntown TSPaint 0x3fef28 | cWinVacation TSPaint 0x441808 | cWinNeighborhoodUL TSPaint 0x46b270 | cWinNeighborhoodVC TSPaint 0x473808 | cWinStudiotown TSPaint 0x47a908 | cWinMagicland TSPaint 0x5857cc
+Only cMagiclandSprites has DoWater (0x57c76c string) / DrawWater (0x57c068 string); every other screen draws water inline in TSPaint.
+DT water load ids 5400-5405 -> this+460..480 ticks 4 @0x3ff6cc..0x3ff724 (load path, NOT TSPaint).

@@ -1,0 +1,242 @@
+                ; ==== .TryGosubFoundAction__8cXPersonFP9StackElem ====
+0010fdc0: bf61ffec  stmw     r27, -0x14(r1)
+0010fdc4: 7c0802a6  mflr     r0
+0010fdc8: 83c2a71c  lwz      r30, -0x58e4(r2)
+0010fdcc: 7c9b2378  mr       r27, r4
+0010fdd0: 3be30000  addi     r31, r3, 0
+0010fdd4: 90010008  stw      r0, 8(r1)
+0010fdd8: 9421ff50  stwu     r1, -0xb0(r1)
+0010fddc: a8040004  lha      r0, 4(r4)
+0010fde0: 2c000000  cmpwi    r0, 0
+0010fde4: 4082001c  bne      0x10fe00
+0010fde8: 38000015  li       r0, 0x15
+0010fdec: 387e0115  addi     r3, r30, 0x115
+0010fdf0: b0010040  sth      r0, 0x40(r1)
+0010fdf4: 38810040  addi     r4, r1, 0x40
+0010fdf8: 38a00000  li       r5, 0
+0010fdfc: 48480925  bl       0x590720
+0010fe00: a81b0004  lha      r0, 4(r27)
+0010fe04: 3ba00000  li       r29, 0
+0010fe08: 809f00dc  lwz      r4, 0xdc(r31)
+0010fe0c: 7c050735  extsh.   r5, r0
+0010fe10: 40810024  ble      0x10fe34
+0010fe14: 8064001c  lwz      r3, 0x1c(r4)
+0010fe18: 38030001  addi     r0, r3, 1
+0010fe1c: 7c050040  cmplw    r5, r0
+0010fe20: 40800014  bge      0x10fe34
+0010fe24: 3805ffff  addi     r0, r5, -1
+0010fe28: 80640020  lwz      r3, 0x20(r4)
+0010fe2c: 5400103a  slwi     r0, r0, 2
+0010fe30: 7fa3002e  lwzx     r29, r3, r0
+0010fe34: 281d0000  cmplwi   r29, 0
+0010fe38: 4082000c  bne      0x10fe44
+0010fe3c: 38600000  li       r3, 0
+0010fe40: 48000114  b        0x10ff54
+0010fe44: 807d011c  lwz      r3, 0x11c(r29)
+0010fe48: 4bff3199  bl       0x102fe0   ; .GetTreeTable__11ObjSelectorFv
+0010fe4c: 28030000  cmplwi   r3, 0
+0010fe50: 4082000c  bne      0x10fe5c
+0010fe54: 38600000  li       r3, 0
+0010fe58: 480000fc  b        0x10ff54
+0010fe5c: 8003000c  lwz      r0, 0xc(r3)
+0010fe60: ab7f0072  lha      r27, 0x72(r31)
+0010fe64: 28000000  cmplwi   r0, 0
+0010fe68: 41820038  beq      0x10fea0
+0010fe6c: 80030000  lwz      r0, 0(r3)
+0010fe70: 38a00000  li       r5, 0
+0010fe74: 2c000000  cmpwi    r0, 0
+0010fe78: 7c0903a6  mtctr    r0
+0010fe7c: 40810024  ble      0x10fea0
+0010fe80: 8083000c  lwz      r4, 0xc(r3)
+0010fe84: 7f84282e  lwzx     r28, r4, r5
+0010fe88: 801c0018  lwz      r0, 0x18(r28)
+0010fe8c: 7c1b0000  cmpw     r27, r0
+0010fe90: 40820008  bne      0x10fe98
+0010fe94: 48000010  b        0x10fea4
+0010fe98: 38a50004  addi     r5, r5, 4
+0010fe9c: 4200ffe4  bdnz     0x10fe80
+0010fea0: 3b800000  li       r28, 0
+0010fea4: 281c0000  cmplwi   r28, 0
+0010fea8: 4082001c  bne      0x10fec4
+0010feac: 38000016  li       r0, 0x16
+0010feb0: 387e0115  addi     r3, r30, 0x115
+0010feb4: b0010042  sth      r0, 0x42(r1)
+0010feb8: 38810042  addi     r4, r1, 0x42
+0010febc: 38a00000  li       r5, 0
+0010fec0: 48480861  bl       0x590720
+0010fec4: 281c0000  cmplwi   r28, 0
+0010fec8: 4082000c  bne      0x10fed4
+0010fecc: 38600000  li       r3, 0
+0010fed0: 48000084  b        0x10ff54
+0010fed4: a8dc0002  lha      r6, 2(r28)
+0010fed8: 38000000  li       r0, 0
+0010fedc: 387f0000  addi     r3, r31, 0
+0010fee0: 38a10048  addi     r5, r1, 0x48
+0010fee4: 90010048  stw      r0, 0x48(r1)
+0010fee8: 7fa4eb78  mr       r4, r29
+0010feec: 9001004c  stw      r0, 0x4c(r1)
+0010fef0: 38e00000  li       r7, 0
+0010fef4: 819f0028  lwz      r12, 0x28(r31)
+0010fef8: 818c003c  lwz      r12, 0x3c(r12)
+0010fefc: 48492ae5  bl       0x5a29e0
+0010ff00: 80410014  lwz      r2, 0x14(r1)
+0010ff04: 5460063f  clrlwi.  r0, r3, 0x18
+0010ff08: 41820048  beq      0x10ff50
+0010ff0c: 389f0000  addi     r4, r31, 0
+0010ff10: 38610050  addi     r3, r1, 0x50
+0010ff14: 38bd0000  addi     r5, r29, 0
+0010ff18: 38db0000  addi     r6, r27, 0
+0010ff1c: 38e00002  li       r7, 2
+0010ff20: 4bf8cb71  bl       0x9ca90   ; .__ct__11InteractionFP8cXPersonP8cXObjectii
+0010ff24: 38610050  addi     r3, r1, 0x50
+0010ff28: 38810048  addi     r4, r1, 0x48
+0010ff2c: 4bf8cb05  bl       0x9ca30   ; .SetStackVars__11InteractionFPs
+0010ff30: 387f0000  addi     r3, r31, 0
+0010ff34: 38810050  addi     r4, r1, 0x50
+0010ff38: 4bff8f29  bl       0x108e60   ; .SetCurrentAction__8cXPersonFRC11Interaction
+0010ff3c: 38610078  addi     r3, r1, 0x78
+0010ff40: 3880ffff  li       r4, -1
+0010ff44: 4846165d  bl       0x5715a0   ; .__dt__9CTGStringFv
+0010ff48: 38600003  li       r3, 3
+0010ff4c: 48000008  b        0x10ff54
+0010ff50: 3860ffff  li       r3, -1
+0010ff54: 800100b8  lwz      r0, 0xb8(r1)
+0010ff58: 382100b0  addi     r1, r1, 0xb0
+0010ff5c: bb61ffec  lmw      r27, -0x14(r1)
+0010ff60: 7c0803a6  mtlr     r0
+0010ff64: 4e800020  blr      
+0010ff68: 00000000  .long    0x00000000
+0010ff6c: 00092041  .long    0x00092041
+0010ff70: 80050000  lwz      r0, 0(r5)
+0010ff74: 000001a8  .long    0x000001a8
+0010ff78: 002b2e54  .long    0x002b2e54
+0010ff7c: 7279476f  andi.    r25, r19, 0x476f
+0010ff80: 73756246  andi.    r21, r27, 0x6246
+0010ff84: 6f756e64  xoris    r21, r27, 0x6e64
+0010ff88: 41637469  bdztl    so, 0x1173f0
+0010ff8c: 6f6e5f5f  xoris    r14, r27, 0x5f5f
+0010ff90: 38635850  addi     r3, r3, 0x5850
+0010ff94: 6572736f  oris     r18, r11, 0x736f
+0010ff98: 6e465039  xoris    r6, r18, 0x5039
+0010ff9c: 53746163  rlwimi.  r20, r27, 0xc, 5, 0x11
+0010ffa0: 6b456c65  xori     r5, r26, 0x6c65
+0010ffa4: 6d000000  xoris    r0, r8, 0
+0010ffa8: 00000000  .long    0x00000000
+0010ffac: 00000000  .long    0x00000000
+                ; ==== .TryChangeLots__8cXPersonFssss ====
+0010ffb0: be61ffcc  stmw     r19, -0x34(r1)
+0010ffb4: 7c0802a6  mflr     r0
+0010ffb8: 83c28874  lwz      r30, -0x778c(r2)
+0010ffbc: 7c7c1b78  mr       r28, r3
+0010ffc0: 7c9a2378  mr       r26, r4
+0010ffc4: 82a28870  lwz      r21, -0x7790(r2)
+0010ffc8: 7cb72b78  mr       r23, r5
+0010ffcc: 7cd63378  mr       r22, r6
+0010ffd0: 7cfb3b78  mr       r27, r7
+0010ffd4: 90010008  stw      r0, 8(r1)
+0010ffd8: 9421ff20  stwu     r1, -0xe0(r1)
+0010ffdc: 81030118  lwz      r8, 0x118(r3)
+0010ffe0: 807e0000  lwz      r3, 0(r30)
+0010ffe4: 8088001c  lwz      r4, 0x1c(r8)
+0010ffe8: 80630024  lwz      r3, 0x24(r3)
+0010ffec: 4bfa4f25  bl       0xb4f10   ; .FindNeighborByGUID__12NeighborhoodFl
+0010fff0: 28030000  cmplwi   r3, 0
+0010fff4: 4082000c  bne      0x110000
+0010fff8: 38600001  li       r3, 1
+0010fffc: 48000788  b        0x110784
+00110000: 80be0000  lwz      r5, 0(r30)
+00110004: a8830000  lha      r4, 0(r3)
+00110008: 80650024  lwz      r3, 0x24(r5)
+0011000c: 4bf9c675  bl       0xac680   ; .GetInventoryByNeighbourID__12NeighborhoodFs
+00110010: 7c7f1b79  or.      r31, r3, r3
+00110014: 4082000c  bne      0x110020
+00110018: 38600001  li       r3, 1
+0011001c: 48000768  b        0x110784
+00110020: 7f400734  extsh    r0, r26
+00110024: 2c00ffff  cmpwi    r0, -1
+00110028: 3b000000  li       r24, 0
+0011002c: 3a800000  li       r20, 0
+00110030: 3ba00000  li       r29, 0
+00110034: 408200f4  bne      0x110128
+00110038: 807e0000  lwz      r3, 0(r30)
+0011003c: 38800000  li       r4, 0
+00110040: 80630024  lwz      r3, 0x24(r3)
+00110044: 4bfa416d  bl       0xb41b0   ; .GetFamily__12NeighborhoodFi
+00110048: 809e0000  lwz      r4, 0(r30)
+0011004c: 80840000  lwz      r4, 0(r4)
+00110050: 90640010  stw      r3, 0x10(r4)
+00110054: 807e0000  lwz      r3, 0(r30)
+00110058: a89c0606  lha      r4, 0x606(r28)
+0011005c: 80630024  lwz      r3, 0x24(r3)
+00110060: 4bfa4151  bl       0xb41b0   ; .GetFamily__12NeighborhoodFi
+00110064: 80630110  lwz      r3, 0x110(r3)
+00110068: 7f600735  extsh.   r0, r27
+0011006c: 7c790734  extsh    r25, r3
+00110070: 40820094  bne      0x110104
+00110074: 3800ffff  li       r0, -1
+00110078: 38a10040  addi     r5, r1, 0x40
+0011007c: b0010040  sth      r0, 0x40(r1)
+00110080: 387f0000  addi     r3, r31, 0
+00110084: 38800003  li       r4, 3
+00110088: 38c00000  li       r6, 0
+0011008c: 482f0cb5  bl       0x400d40   ; .SetToNextToken__12SimInventoryFQ217SimInventoryToken11eTokenTypesRsl
+00110090: a8810040  lha      r4, 0x40(r1)
+00110094: 2c04ffff  cmpwi    r4, -1
+00110098: 41820148  beq      0x1101e0
+0011009c: 38c00000  li       r6, 0
+001100a0: 38a10044  addi     r5, r1, 0x44
+001100a4: 38000001  li       r0, 1
+001100a8: 90c10044  stw      r6, 0x44(r1)
+001100ac: 7fe3fb78  mr       r3, r31
+001100b0: 90c10048  stw      r6, 0x48(r1)
+001100b4: b001004c  sth      r0, 0x4c(r1)
+001100b8: 482f0bb9  bl       0x400c70   ; .GetTokenAtIndex__12SimInventoryFsR17SimInventoryToken
+001100bc: 80610048  lwz      r3, 0x48(r1)
+001100c0: 481342a1  bl       0x244360   ; .GetHandle__12PersonFinderFl
+001100c4: 481345cd  bl       0x244690   ; .GetInstance__12PersonFinderFi
+001100c8: 7c781b79  or.      r24, r3, r3
+001100cc: 41820114  beq      0x1101e0
+001100d0: 809e0000  lwz      r4, 0(r30)
+001100d4: 8078011c  lwz      r3, 0x11c(r24)
+001100d8: 82840024  lwz      r20, 0x24(r4)
+001100dc: 4bff5235  bl       0x105310   ; .GetGUID__11ObjSelectorFv
+001100e0: 38830000  addi     r4, r3, 0
+001100e4: 38740000  addi     r3, r20, 0
+001100e8: 4bfa4e29  bl       0xb4f10   ; .FindNeighborByGUID__12NeighborhoodFl
+001100ec: 80be0000  lwz      r5, 0(r30)
+001100f0: a8830000  lha      r4, 0(r3)
+001100f4: 80650024  lwz      r3, 0x24(r5)
+001100f8: 4bf9c589  bl       0xac680   ; .GetInventoryByNeighbourID__12NeighborhoodFs
+001100fc: 7c741b78  mr       r20, r3
+00110100: 480000e0  b        0x1101e0
+00110104: 7f600734  extsh    r0, r27
+00110108: 2c000001  cmpwi    r0, 1
+0011010c: 408200d4  bne      0x1101e0
+00110110: 807e0000  lwz      r3, 0(r30)
+00110114: a89c0606  lha      r4, 0x606(r28)
+00110118: 80630024  lwz      r3, 0x24(r3)
+0011011c: 4bfa4095  bl       0xb41b0   ; .GetFamily__12NeighborhoodFi
+00110120: 7c7d1b78  mr       r29, r3
+00110124: 480000bc  b        0x1101e0
+00110128: 7f600735  extsh.   r0, r27
+0011012c: 3b3a0000  addi     r25, r26, 0
+00110130: 40820090  bne      0x1101c0
+00110134: 3800ffff  li       r0, -1
+00110138: 38a10042  addi     r5, r1, 0x42
+0011013c: b0010042  sth      r0, 0x42(r1)
+00110140: 38800001  li       r4, 1
+00110144: 38c00000  li       r6, 0
+00110148: 482f0bf9  bl       0x400d40   ; .SetToNextToken__12SimInventoryFQ217SimInventoryToken11eTokenTypesRsl
+0011014c: a8810042  lha      r4, 0x42(r1)
+00110150: 2c04ffff  cmpwi    r4, -1
+00110154: 4182008c  beq      0x1101e0
+00110158: 38c00000  li       r6, 0
+0011015c: 38a10050  addi     r5, r1, 0x50
+00110160: 38000001  li       r0, 1
+00110164: 90c10050  stw      r6, 0x50(r1)
+00110168: 7fe3fb78  mr       r3, r31
+0011016c: 90c10054  stw      r6, 0x54(r1)
+00110170: b0010058  sth      r0, 0x58(r1)
+00110174: 482f0afd  bl       0x400c70   ; .GetTokenAtIndex__12SimInventoryFsR17SimInventoryToken
+00110178: 80610054  lwz      r3, 0x54(r1)
+0011017c: 481341e5  bl       0x244360   ; .GetHandle__12PersonFinderFl

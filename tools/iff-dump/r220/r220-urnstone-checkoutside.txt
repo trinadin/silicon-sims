@@ -1,0 +1,32 @@
+### BHAV id=4098 label='check outside' count=17
+  ins0  StackObjID[0] := MyObject[11] t=2            f=other-path
+  ins1  MyAttr[0] == Tuning[1]       t=RETURN_TRUE  f=2
+  ins2  MyAttr[0] := Tuning[0]       t=10           f=other-path
+  ins3  PRIM 301 opd=ffffffffffffffff t=16           f=15
+  ins4  Local[0] += Lit[1]           t=13           f=other-path
+  ins5  MyAttr[0] := Tuning[1]       t=6            f=other-path
+  ins6  PRIM random-number opd=0000190003000700 t=4            f=other-path
+  ins7  Temp[0] := Local[0]          t=8            f=other-path
+  ins8  PRIM 256 opd=ffffffffffffffff t=9            f=other-path
+  ins9  MyObject[30] := Lit[0]       t=RETURN_TRUE  f=other-path
+  ins10 Local[0] := Lit[0]           t=3            f=other-path
+  ins11 MyAttr[3] == Lit[-1]         t=5            f=12
+  ins12 Local[0] := MyAttr[3]        t=7            f=other-path
+  ins13 MyAttr[3] := Local[0]        t=7            f=other-path
+  ins14 MyObject[2] == Lit[0]        t=11           f=7
+  ins15 MyObject[43] ClearFlag Lit[5] t=7            f=other-path
+  ins16 MyObject[43] SetFlag Lit[5]  t=14           f=other-path
+### BHAV id=4103 label='Ghost Walk' count=13
+  ins0  Local[0] := Lit[5]           t=11           f=other-path
+  ins1  CALL 4112 'wander'           t=10           f=other-path
+  ins2  Local[1] := Lit[0]           t=6            f=other-path
+  ins3  Local[1] ++< Lit[8]          t=6            f=RETURN_TRUE
+  ins4  PRIM goto-routing-slot opd=0100010000000000 t=9            f=9
+  ins5  PRIM goto-relative-position opd=0000feff00000000 t=3            f=3
+  ins6  MyObject[34] := Lit[0]       t=8            f=other-path
+  ins7  MyObject[34] := Lit[0]       t=5            f=other-path
+  ins8  CALL 4111 'Ghost Scare'      t=RETURN_TRUE  f=12
+  ins9  CALL 4111 'Ghost Scare'      t=RETURN_TRUE  f=7
+  ins10 Local[0] --> Lit[0]          t=11           f=2
+  ins11 PRIM play-sound-event opd=0000000000000000 t=1            f=other-path
+  ins12 PRIM play-sound-event opd=0000000000000000 t=4            f=other-path

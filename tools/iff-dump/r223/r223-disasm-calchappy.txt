@@ -1,0 +1,89 @@
+0x10b9c4: 38a00000  addi r5, r0, 0                             |8...|
+0x10b9c8: a8830600  lha r4, 1536(r3)                           |....|
+0x10b9cc: c0c80004  lfs f6, 4(8)                               |....|
+0x10b9d0: 7c800735  extsh. r4, r0, r0                          ||..5|
+0x10b9d4: fca03090  fmr f5, f6                                 |..0.|
+0x10b9d8: 41820010  bne(2) 0x10b9e8                            |A...|
+0x10b9dc: 2c040012  cmpwi r0, r4, 18                           |,...|
+0x10b9e0: 40800008  beq(0) 0x10b9e8                            |@...|
+0x10b9e4: 38a00001  addi r5, r0, 1                             |8...|
+0x10b9e8: 54a0063f  rlwinm r0, r5, 0, 24, 31                   |T..?|
+0x10b9ec: 4182000c  bne(2) 0x10b9f8                            |A...|
+0x10b9f0: 8082a704  lwz r4, -22780(r2)                         |....|
+0x10b9f4: 48000008  b 0x10b9fc                                 |H...|
+0x10b9f8: 8082a700  lwz r4, -22784(r2)                         |....|
+0x10b9fc: 80040004  lwz r0, 4(r4)                              |....|
+0x10ba00: 80840000  lwz r4, 0(r4)                              |....|
+0x10ba04: 1c000014  mulli r0, r0, 20                           |....|
+0x10ba08: 7d240214  add r9, r4, r0                             |}$..|
+0x10ba0c: 48000100  b 0x10bb0c                                 |H...|
+0x10ba10: 80040010  lwz r0, 16(r4)                             |....|
+0x10ba14: 80c40008  lwz r6, 8(r4)                              |....|
+0x10ba18: 5405103a  rlwinm r5, r0 <<2                          |T..:|
+0x10ba1c: 3805078c  addi r0, r5, 1932                          |8...|
+0x10ba20: 2c060000  cmpwi r0, r6, 0                            |,...|
+0x10ba24: 7c83042e  lfsx f4, r3, r0                            ||...|
+0x10ba28: 4082000c  beq(2) 0x10ba34                            |@...|
+0x10ba2c: c0280004  lfs f1, 4(8)                               |.(..|
+0x10ba30: 480000a4  b 0x10bad4                                 |H...|
+0x10ba34: 3546ffff  addic. r10, r6, -1                         |5F..|
+0x10ba38: 380a0001  addi r0, r10, 1                            |8...|
+0x10ba3c: 7c0903a6  mtctr r0                                   ||...|
+0x10ba40: 55471838  rlwinm r7, r10 <<3                         |UG.8|
+0x10ba44: 41800028  bne(0) 0x10ba6c                            |A..(|
+0x10ba48: 80a40000  lwz r5, 0(r4)                              |....|
+0x10ba4c: c0080004  lfs f0, 4(8)                               |....|
+0x10ba50: 7c253c2e  lfsx f1, r5, r7                            ||%<.|
+0x10ba54: ec640828  fsubs f3, f4, f1                           |.d.(|
+0x10ba58: fc030040  fcmpo cr0, f3, f0                          |...@|
+0x10ba5c: 41810010  bne(1) 0x10ba6c                            |A...|
+0x10ba60: 38e7fff8  addi r7, r7, -8                            |8...|
+0x10ba64: 394affff  addi r10, r10, -1                          |9J..|
+0x10ba68: 4200ffe0  bBO16/0 0x10ba48                           |B...|
+0x10ba6c: 3806ffff  addi r0, r6, -1                            |8...|
+0x10ba70: 7c0a0000  cmp cr0, r10, r0                           ||...|
+0x10ba74: 40820018  beq(2) 0x10ba8c                            |@...|
+0x10ba78: 55451838  rlwinm r5, r10 <<3                         |UE.8|
+0x10ba7c: 80c40000  lwz r6, 0(r4)                              |....|
+0x10ba80: 38050004  addi r0, r5, 4                             |8...|
+0x10ba84: 7c26042e  lfsx f1, r6, r0                            ||&..|
+0x10ba88: 4800004c  b 0x10bad4                                 |H..L|
+0x10ba8c: 2c0affff  cmpwi r0, r10, -1                          |,...|
+0x10ba90: 40820010  beq(2) 0x10baa0                            |@...|
+0x10ba94: 80a40000  lwz r5, 0(r4)                              |....|
+0x10ba98: c0250004  lfs f1, 4(5)                               |.%..|
+0x10ba9c: 48000038  b 0x10bad4                                 |H..8|
+0x10baa0: 80a40000  lwz r5, 0(r4)                              |....|
+0x10baa4: 55401838  rlwinm r0, r10 <<3                         |U@.8|
+0x10baa8: 80e40004  lwz r7, 4(r4)                              |....|
+0x10baac: 5546103a  rlwinm r6, r10 <<2                         |UF.:|
+0x10bab0: 7ca50214  add r5, r5, r0                             ||...|
+0x10bab4: 7c27342e  lfsx f1, r7, r6                            ||'4.|
+0x10bab8: c0450004  lfs f2, 4(5)                               |.E..|
+0x10babc: c005000c  lfs f0, 12(5)                              |....|
+0x10bac0: ec630072  .long                                      |.c.r|
+0x10bac4: ec001028  fsubs f0, f0, f2                           |...(|
+0x10bac8: ec630032  fmuls f3, f3, f0                           |.c.2|
+0x10bacc: ec63102a  fadds f3, f3, f2                           |.c.*|
+0x10bad0: fc201890  fmr f1, f3                                 |. ..|
+0x10bad4: a8c3060e  lha r6, 1550(r3)                           |....|
+0x10bad8: 38000001  addi r0, r0, 1                             |8...|
+0x10badc: 7cc00278  .long                                      ||..x|
+0x10bae0: 7c050e70  srawi r5, r0, 1                            ||..p|
+0x10bae4: 7c003038  and r0, r0, r6                             ||.08|
+0x10bae8: 7c002850  subf r0, r0, r5                            ||.(P|
+0x10baec: 54000fff  rlwinm r0, r0 bit31(rS)                    |T...|
+0x10baf0: 41820010  bne(2) 0x10bb00                            |A...|
+0x10baf4: c0080030  lfs f0, 48(8)                              |...0|
+0x10baf8: fc002000  fcmpu cr0, f0, f4                          |.. .|
+0x10bafc: 4182000c  bne(2) 0x10bb08                            |A...|
+0x10bb00: ecc4307a  .long                                      |..0z|
+0x10bb04: eca5082a  fadds f5, f5, f1                           |...*|
+0x10bb08: 38840014  addi r4, r4, 20                            |8...|
+0x10bb0c: 7c044840  cmpl cr0, r4, r9                           ||.H@|
+0x10bb10: 4082ff00  beq(2) 0x10ba10                            |@...|
+0x10bb14: ec062824  fdivs f0, f6, f5                           |..($|
+0x10bb18: d0030798  stfs f0, 1944(3)                           |....|
+0x10bb1c: 4e800020  bclr                                       |N.. |
+0x10bb20: 00000000  .long                                      |....|
+0x10bb24: 00092040  .long                                      |.. @|

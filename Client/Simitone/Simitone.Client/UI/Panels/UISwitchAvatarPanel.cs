@@ -62,6 +62,7 @@ namespace Simitone.Client.UI.Panels
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             DrawLocalTexture(batch, Bg, new Rectangle(0, 0, Bg.Width / 2, Bg.Height), new Vector2(60, 0));
             DrawLocalTexture(batch, Bg, new Rectangle(Bg.Width / 2, 0, Bg.Width / 2, Bg.Height), new Vector2(60 + Bg.Width / 2, 0), new Vector2(12, 1));
             base.Draw(batch);
@@ -86,6 +87,7 @@ namespace Simitone.Client.UI.Panels
 
         public override void Draw(UISpriteBatch SBatch)
         {
+            if (!Visible) return;
             DrawLocalTexture(SBatch, Texture, null, new Vector2(Texture.Width, Texture.Height) / -2, Vector2.One, new Color(104, 164, 184, 255));
             if (Icon != null) DrawLocalTexture(SBatch, Icon, new Vector2(Icon.Width, Icon.Height) / -2);
             if (Outlined) DrawLocalTexture(SBatch, Outline, null, new Vector2(Outline.Width, Outline.Height) / -2, Vector2.One, UIStyle.Current.ActiveSelection);

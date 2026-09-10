@@ -1,0 +1,6 @@
+8483913954ec040c460477176a122b1cb79b0dd32dbac510a3f6b879d060b9b8  TheSims.dll  publish=dist
+9a01bb4d03b0568a98609a7070df5fd1f444ed540bc19fc293c082e3df962981  Simitone.Client.dll  publish=dist
+cd94ec2faf4aa6a21b7c14f26d0896333d57194122086ab8b7cc9f504994d063  FSO.SimAntics.dll  publish=dist
+0485e778514499739aa82c4783b99c3e513bae6bb1655cb414c09070dc9f4e4a  FSO.Content.dll  publish=dist
+dbc0200291d1e5f3583d5321d18ddef50878db31a37ec86e6aebdfe1d6800c89  FSO.Files.dll  publish=dist
+502f5c35094e23f81f693e188591b17a722aa25b21726e9d59c78af3b14a0dfa  FSO.SimAntics.JIT.dll  publish=dist

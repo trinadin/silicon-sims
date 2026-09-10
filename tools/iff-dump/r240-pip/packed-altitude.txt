@@ -1,0 +1,90 @@
+                ; ==== .GetPackedAlt__15cRotatableWorldF7CTilePt ====
+00161e00: 80040084  lwz      r0, 0x84(r4)
+00161e04: 80c2a870  lwz      r6, -0x5790(r2)
+00161e08: 20000004  subfic   r0, r0, 4
+00161e0c: 80e28c1c  lwz      r7, -0x73e4(r2)
+00161e10: 540007bf  clrlwi.  r0, r0, 0x1e
+00161e14: 4182004c  beq      0x161e60
+00161e18: 89050000  lbz      r8, 0(r5)
+00161e1c: 54096824  slwi     r9, r0, 0xd
+00161e20: 88050001  lbz      r0, 1(r5)
+00161e24: 7ce74a14  add      r7, r7, r9
+00161e28: 7d080774  extsb    r8, r8
+00161e2c: 55083830  slwi     r8, r8, 7
+00161e30: 7c000774  extsb    r0, r0
+00161e34: 7d074214  add      r8, r7, r8
+00161e38: 5400083c  slwi     r0, r0, 1
+00161e3c: 7ce80214  add      r7, r8, r0
+00161e40: 8807e000  lbz      r0, -0x2000(r7)
+00161e44: 98050000  stb      r0, 0(r5)
+00161e48: 88050001  lbz      r0, 1(r5)
+00161e4c: 7c000774  extsb    r0, r0
+00161e50: 5400083c  slwi     r0, r0, 1
+00161e54: 7ce80214  add      r7, r8, r0
+00161e58: 8807e001  lbz      r0, -0x1fff(r7)
+00161e5c: 98050001  stb      r0, 1(r5)
+00161e60: 81240014  lwz      r9, 0x14(r4)
+00161e64: 88e50000  lbz      r7, 0(r5)
+00161e68: 80040084  lwz      r0, 0x84(r4)
+00161e6c: 7ce80774  extsb    r8, r7
+00161e70: 88850001  lbz      r4, 1(r5)
+00161e74: 5407103a  slwi     r7, r0, 2
+00161e78: 8149000c  lwz      r10, 0xc(r9)
+00161e7c: 5509103a  slwi     r9, r8, 2
+00161e80: 38a70001  addi     r5, r7, 1
+00161e84: 7c880774  extsb    r8, r4
+00161e88: 38870002  addi     r4, r7, 2
+00161e8c: 38070003  addi     r0, r7, 3
+00161e90: 7d4a482e  lwzx     r10, r10, r9
+00161e94: 5509103a  slwi     r9, r8, 2
+00161e98: 7d0638ae  lbzx     r8, r6, r7
+00161e9c: 7d2a4a14  add      r9, r10, r9
+00161ea0: 7ce628ae  lbzx     r7, r6, r5
+00161ea4: 7ca620ae  lbzx     r5, r6, r4
+00161ea8: 7c8600ae  lbzx     r4, r6, r0
+00161eac: 7d0848ae  lbzx     r8, r8, r9
+00161eb0: 7cc748ae  lbzx     r6, r7, r9
+00161eb4: 7ca548ae  lbzx     r5, r5, r9
+00161eb8: 7c0448ae  lbzx     r0, r4, r9
+00161ebc: 9901fff0  stb      r8, -0x10(r1)
+00161ec0: 98c1fff1  stb      r6, -0xf(r1)
+00161ec4: 98a1fff2  stb      r5, -0xe(r1)
+00161ec8: 9801fff3  stb      r0, -0xd(r1)
+00161ecc: 8001fff0  lwz      r0, -0x10(r1)
+00161ed0: 90030000  stw      r0, 0(r3)
+00161ed4: 4e800020  blr
+00161ed8: 00000000  .long    0x00000000
+00161edc: 00092040  .long    0x00092040
+00161ee0: 00000000  .long    0x00000000
+00161ee4: 000000d8  .long    0x000000d8
+00161ee8: 00292e47  .long    0x00292e47
+00161eec: 65745061  oris     r20, r11, 0x5061
+00161ef0: 636b6564  ori      r11, r27, 0x6564
+00161ef4: 416c745f  bdztla   4*cr3+lt, 0x745c
+00161ef8: 5f313563  rlwnm.   r17, r25, r6, 0x15, 0x11
+00161efc: 526f7461  rlwimi.  r15, r19, 0xe, 0x11, 0x10
+00161f00: 7461626c  andis.   r1, r3, 0x626c
+00161f04: 65576f72  oris     r23, r10, 0x6f72
+00161f08: 6c644637  xoris    r4, r3, 0x4637
+00161f0c: 4354696c  bdz-     0x168878
+00161f10: 65507400  oris     r16, r10, 0x7400
+00161f14: 00000000  .long    0x00000000
+00161f18: 00000000  .long    0x00000000
+00161f1c: 00000000  .long    0x00000000
+                ; ==== .SetPackedAlt__15cRotatableWorldFRC7CTilePt9PackedAlt ====
+00161f20: 93e1fffc  stw      r31, -4(r1)
+00161f24: 7c0802a6  mflr     r0
+00161f28: 7c7f1b78  mr       r31, r3
+00161f2c: 90010008  stw      r0, 8(r1)
+00161f30: 38e00040  li       r7, 0x40
+00161f34: 9421ff70  stwu     r1, -0x90(r1)
+00161f38: 88040000  lbz      r0, 0(r4)
+00161f3c: 90a100b0  stw      r5, 0xb0(r1)
+00161f40: 38a10044  addi     r5, r1, 0x44
+00161f44: 7c000774  extsb    r0, r0
+00161f48: 90010040  stw      r0, 0x40(r1)
+00161f4c: 88040001  lbz      r0, 1(r4)
+00161f50: 38810040  addi     r4, r1, 0x40
+00161f54: 7c000774  extsb    r0, r0
+00161f58: 90010044  stw      r0, 0x44(r1)
+00161f5c: 80030084  lwz      r0, 0x84(r3)

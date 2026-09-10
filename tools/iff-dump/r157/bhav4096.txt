@@ -1,0 +1,11 @@
+### BHAV 4096 'main' (10 instructions)
+ins0  T3/F253  CALL 280 (global.iff) opd=1e00000000000000
+ins1  T9/F253  CALL 280 (global.iff) opd=0807000000000000
+ins2  T4/F253  CALL 4100 (own-iff) opd=ffffffffffffffff
+ins3  T2/F0    Global[5] < Lit[5]
+ins4  T1/F0    Global[5] < Lit[5]
+ins5  T6/F2    CALL 321 (global.iff) opd=ffffffffffffffff
+ins6  T7/F253  Temp[0] = StkObjID[0]
+ins7  T8/F253  StkObjID[0] = Lit[0]
+ins8  T1/F2    setToNext ObjectOfType guid=0xa7c2e4b1 -> StkObjID[0] (flags=0x84)
+ins9  T5/F2    Global[20] flagSet Lit[4]

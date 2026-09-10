@@ -64,9 +64,35 @@ namespace Simitone.Windows
                     userDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Simitone/");
                 }
             }
+            // Explicit test-only isolation must precede GlobalSettings.Default.
+            // Separate checkouts otherwise still share Documents/Simitone/config.ini.
+            int testDirIndex = Array.IndexOf(args, "-autotest-userdir");
+            if (testDirIndex >= 0)
+            {
+                if (!args.Contains("-autotest") || testDirIndex + 1 >= args.Length
+                    || args[testDirIndex + 1].StartsWith("-"))
+                    throw new ArgumentException("-autotest-userdir requires -autotest and a directory.");
+                userDir = Path.GetFullPath(args[testDirIndex + 1]).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            }
             userDir = userDir.Replace('\\', '/');
             FSOEnvironment.UserDir = userDir;
-            Directory.CreateDirectory(FSOEnvironment.UserDir);
+            // Byte-level diagnostics to /tmp (userDir can resolve differently between launch
+            // modes; /tmp is always readable from the harness).
+            try { File.AppendAllText(Path.Combine(Path.GetTempPath(), "simitone_diag.log"),
+                DateTime.Now.ToString("HH:mm:ss.fff") + " boot args=[" + string.Join(" | ", args) + "] userdir=" + userDir + Environment.NewLine); } catch {}
+            try
+            {
+                Directory.CreateDirectory(FSOEnvironment.UserDir);
+            }
+            catch
+            {
+                if (testDirIndex >= 0) throw;
+                // macOS sandbox / read-only Documents: fall back to the application bundle directory.
+                Console.WriteLine("Warning: could not create user data directory '" + userDir + "'. Using the application directory instead.");
+                userDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Simitone/").Replace('\\', '/');
+                Directory.CreateDirectory(userDir);
+                FSOEnvironment.UserDir = userDir;
+            }
 
             ILocator gameLocator;
             if (linux && Directory.Exists("/Users"))
@@ -97,6 +123,31 @@ namespace Simitone.Windows
             #region User resolution parameters
 
             FSOEnvironment.Args = string.Join(" ", args);
+
+            // AUTOTEST pre-scan (-autotest[\"H1,H2\"] -autotest-opts terms -autotest-timeout ms -autotest-noexit)
+            bool autotestEnabled = false;
+            string autotestHouses = null;
+            string autotestChecks = null;
+            int autotestTimeout = 0;
+            bool autotestNoExit = false;
+            bool textdiagEnabled = false;
+            for (int i = 0; i < args.Length; i++)
+            {
+                var a = args[i];
+                if (a == "-autotest")
+                {
+                    autotestEnabled = true;
+                    if (i + 1 < args.Length && !args[i + 1].StartsWith("-")) autotestHouses = args[++i];
+                }
+                else if (a == "-autotest-opts") autotestChecks = args[++i];
+                else if (a == "-autotest-timeout") int.TryParse(args[++i], out autotestTimeout);
+                else if (a == "-autotest-noexit") autotestNoExit = true;
+                else if (a.StartsWith("-autotest\"")) autotestHouses = a.Substring(10).Trim('\"');
+                else if (a.StartsWith("-autotest-opts\"")) autotestChecks = a.Substring(15).Trim('\"');
+                else if (a.StartsWith("-autotest-timeout\"")) { int.TryParse(a.Substring(18).Trim('\"'), out autotestTimeout); autotestEnabled = true; }
+                else if (a == "-textdiag") textdiagEnabled = true;
+            }
+
 
             foreach (var arg in args)
             {
@@ -209,7 +260,7 @@ namespace Simitone.Windows
                             // GUI failed, show console error
                             Console.WriteLine("GUI unavailable. Could not find The Sims 1 installation.");
                             Console.WriteLine("Please use the -path argument to specify the location:");
-                            Console.WriteLine("  ./Simitone -path\"/path/to/The Sims/\"");
+                            Console.WriteLine("  ./TheSims -path\"/path/to/The Sims/\"");
                             Console.WriteLine();
                             Console.WriteLine("Common locations:");
                             if (linux && Directory.Exists("/Users"))
@@ -316,7 +367,9 @@ namespace Simitone.Windows
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             FSOEnvironment.SoftwareDepth = false;
-            FSOEnvironment.UseMRT = true;
+            // MRT needs DirectX; on OpenGL backends (macOS/Linux) disable like the iOS/Droid
+            // builds do — Apple's GL driver flagged the MRT texture path (GLD_TEXTURE_INDEX_2D).
+            FSOEnvironment.UseMRT = useDX;
 
             if (path != null)
             {
@@ -347,14 +400,41 @@ namespace Simitone.Windows
                 if (jit) assemblies.InitAOT();
                 FSO.SimAntics.Engine.VMTranslator.INSTANCE = new FSO.SimAntics.JIT.Runtime.VMAOTTranslator(assemblies);
 
+
+                // Headless -autotest: register the engine-side fidelity checks before the
+                // game loop runs; driven entirely from the game thread via GameThread hooks.
+                if (autotestEnabled)
+                {
+                    Console.WriteLine("AUTOTEST enabled houses=" + (autotestHouses ?? "(default)") + " checks=" + (autotestChecks ?? "(default)"));
+                    Simitone.Client.AutotestRunner.Begin(autotestHouses, autotestChecks, autotestTimeout, !autotestNoExit);
+                }
+
+                // R138 -textdiag: pixel-level text rendering diagnostics (prints
+                // ASCII art of the rendered glyphs to stdout, then exits).
+                if (textdiagEnabled)
+                {
+                    Simitone.Client.TextDiagnostics.Begin();
+                }
+
+                Simitone.Client.Utils.MacSDLClipboard.Install();
+
                 var start = new GameStartProxy();
-                start.Start(useDX);
+                try
+                {
+                    start.Start(useDX);
+                }
+                catch (Exception ex)
+                {
+                    CrashLog("Unhandled exception in game loop: " + ex);
+                    Console.Error.WriteLine("FATAL: " + ex);
+                    throw;
+                }
             }
             else
             {
                 Console.WriteLine("Error: Could not find The Sims 1 installation.");
                 Console.WriteLine("Please use the -path argument to specify the location:");
-                Console.WriteLine("  ./Simitone -path\"/path/to/The Sims/\"");
+                Console.WriteLine("  ./TheSims -path\"/path/to/The Sims/\"");
                 Console.WriteLine();
                 Console.WriteLine("Common locations:");
                 Console.WriteLine("  Steam Play/Proton: ~/.steam/steam/steamapps/common/The Sims/");
@@ -407,10 +487,11 @@ namespace Simitone.Windows
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             var exception = e.ExceptionObject;
+            CrashLog("FATAL: " + (exception != null ? exception.ToString() : "unknown unhandled exception"));
             if (exception is OutOfMemoryException)
             {
                 Console.Error.WriteLine("=== FATAL ERROR ===");
-                Console.Error.WriteLine("Out of Memory! Simitone needs to close.");
+                Console.Error.WriteLine("Out of Memory! The Sims needs to close.");
                 Console.Error.WriteLine(e.ExceptionObject.ToString());
             }
             else
@@ -418,6 +499,24 @@ namespace Simitone.Windows
                 Console.Error.WriteLine("=== FATAL ERROR ===");
                 Console.Error.WriteLine("A fatal error occurred! Please report this issue on GitHub or Discord.");
                 Console.Error.WriteLine(e.ExceptionObject.ToString());
+            }
+        }
+
+        private static void CrashLog(string message)
+        {
+            // R145a: write BOTH next to the binary and into the UserDir — a
+            // deploy rsync --delete over the app bundle silently destroyed the
+            // one crash-log copy we had (the 2026-08-27 SIGABRT left no trace).
+            foreach (var dir in new[] { AppDomain.CurrentDomain.BaseDirectory, FSOEnvironment.UserDir })
+            {
+                try
+                {
+                    var file = Path.Combine(dir, "simitone-crash.log");
+                    File.AppendAllText(file, DateTime.Now.ToString("s") + " " + message + Environment.NewLine);
+                }
+                catch
+                {
+                }
             }
         }
 

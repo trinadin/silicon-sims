@@ -1,0 +1,28 @@
+00472e30: 2c000000  cmpwi    r0, 0
+00472e34: 4182002c  beq      0x472e60
+00472e38: 809f0000  lwz      r4, 0(r31)
+00472e3c: 80840024  lwz      r4, 0x24(r4)
+00472e40: a804012e  lha      r0, 0x12e(r4)
+00472e44: 2c000000  cmpwi    r0, 0
+00472e48: 40820018  bne      0x472e60
+00472e4c: 81830000  lwz      r12, 0(r3)
+00472e50: 38800001  li       r4, 1
+00472e54: 818c0168  lwz      r12, 0x168(r12)
+00472e58: 4812fb89  bl       0x5a29e0
+00472e5c: 80410014  lwz      r2, 0x14(r1)
+00472e60: 3b7b0001  addi     r27, r27, 1
+00472e64: 3b9c0004  addi     r28, r28, 4
+00472e68: 2c1b000a  cmpwi    r27, 0xa
+00472e6c: 4180ffb4  blt      0x472e20
+00472e70: 7fa3eb78  mr       r3, r29
+00472e74: 4bffc5ed  bl       0x46f460   ; .CheckForNewImports__18cWinNeighborhoodVCFv
+00472e78: 807f0000  lwz      r3, 0(r31)
+00472e7c: 80630024  lwz      r3, 0x24(r3)
+00472e80: 4bc39971  bl       0xac7f0   ; .CheckForNewUserDataDirectories__12NeighborhoodFv
+00472e84: 807e0000  lwz      r3, 0(r30)
+00472e88: 389d0000  addi     r4, r29, 0
+00472e8c: 38a003e8  li       r5, 0x3e8
+00472e90: 38c00000  li       r6, 0
+00472e94: 480a966d  bl       0x51c500   ; .SubscribeTimerMsg__12cTSWinMgrW95FP6cTSWinlUl
+00472e98: 80010088  lwz      r0, 0x88(r1)
+00472e9c: 38210080  addi     r1, r1, 0x80

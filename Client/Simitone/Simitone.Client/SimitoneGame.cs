@@ -1,4 +1,4 @@
-﻿/*
+/*
 This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
 If a copy of the MPL was not distributed with this file, You can obtain one at
 http://mozilla.org/MPL/2.0/.
@@ -37,6 +37,58 @@ namespace Simitone.Client
         public _3DLayer SceneMgr;
         private bool HasUpdated;
 
+        // R87: IFF-first mount of the ORIGINAL UIGraphics.far .cur cursors (IFF-literalism: the
+        // member bytes ARE the original game cursor files). Driven from LoadingGameScreen right after
+        // the IFF content mount; guarded so any cursor that fails keeps today's fallback and never
+        // breaks startup.
+        internal static void R87CursorMount()
+        {
+            try
+            {
+                GameFacade.Cursor.Init(GlobalSettings.Default.TS1HybridPath, true, R87IffCursor);
+                Simitone.Client.GameLog.Write("cursor-init: IFF-first original cursors mounted livePersonLen=" + FSO.Common.Rendering.Framework.CursorManager.LastMountedLivePersonLen);
+            }
+            catch (Exception e)
+            {
+                Simitone.Client.GameLog.Write("cursor-init: EXC " + e.GetType().Name + " " + e.Message);
+            }
+        }
+
+        // R87 IFF-first resolver: serves the ORIGINAL UIGraphics.far .cur member bytes (matched by
+        // the member basename, e.g. "liveperson.cur" -> Shared\cursors\LivePerson.cur), byte-verbatim
+        // from the live FAR1 mount table. Returns null when IFF data is unavailable.
+        private static byte[] R87IffCursor(string name)
+        {
+            try
+            {
+                var ts1 = FSO.Content.Content.Get()?.TS1Global;
+                if (ts1 == null) return null;
+                var entries = ts1.GetFarEntries(".cur");
+                if (entries == null) return null;
+                foreach (var en in entries)
+                {
+                    if (en?.FarEntry?.Filename == null) continue;
+                    // IFF-literalism: the raw FAR stored name is the ORIGINAL game path, e.g.
+                    // Shared\cursors\LivePerson.cur. Path.GetFileName does not split on backslashes
+                    // on macOS, so normalize both separators explicitly.
+                    var fn = en.FarEntry.Filename;
+                    var idx = fn.LastIndexOfAny(new char[] { '/', '\\' });
+                    var baseName = idx >= 0 ? fn.Substring(idx + 1) : fn;
+                    if (string.Equals(baseName, name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var raw = en.Archive.GetEntry(en.FarEntry);
+                        if (string.Equals(name, "liveperson.cur", StringComparison.OrdinalIgnoreCase))
+                            Simitone.Client.GameLog.Write("cursor-init: IFF resolve " + name + " -> " + en.FarEntry.Filename + " " + (raw == null ? -1 : raw.Length) + " bytes");
+                        return raw;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return null;
+        }
+
         public SimitoneGame() : base()
         {
             GameFacade.Game = this;
@@ -53,7 +105,14 @@ namespace Simitone.Client
 
             if (!FSOEnvironment.SoftwareKeyboard)
             {
-                Graphics.SynchronizeWithVerticalRetrace = true;
+                if (!float.IsFinite(FSOEnvironment.DPIScaleFactor) || FSOEnvironment.DPIScaleFactor <= 0)
+                    FSOEnvironment.DPIScaleFactor = 1;
+                // Vsync off: SDL_GL_SwapWindow on macOS parks the game loop in a vsync
+                // wait when vblank events are scarce (headless/remote sessions), freezing
+                // every Update frame (Observed: content-init completes in ~1.1s yet the
+                // UI never advances past EnterLoading; main thread 100% in
+                // Cocoa_GL_SwapWindow). Without a swap-wait the loop runs freely.
+                Graphics.SynchronizeWithVerticalRetrace = false;
                 Graphics.PreferredBackBufferWidth = (int)(GlobalSettings.Default.GraphicsWidth * FSOEnvironment.DPIScaleFactor);
                 Graphics.PreferredBackBufferHeight = (int)(GlobalSettings.Default.GraphicsHeight * FSOEnvironment.DPIScaleFactor);
                 Graphics.HardwareModeSwitch = false;
@@ -74,27 +133,84 @@ namespace Simitone.Client
         }
 
         bool newChange = false;
+
+        // The original desktop composition requires an 800x600 logical canvas.
+        // The window manager may allocate less than requested (notably at 2x).
+        // Keep the owner's requested density whenever it fits, otherwise reduce
+        // only the runtime uniform scale; never rewrite the stored preference.
+        internal static float FitDesktopDpiScale(float requested, int viewportWidth, int viewportHeight)
+        {
+            if (!float.IsFinite(requested) || requested <= 0) requested = 1;
+            var limit = Math.Min(Math.Max(1, viewportWidth) / 800.0,
+                Math.Max(1, viewportHeight) / 600.0);
+            var fitted = (float)Math.Min(requested, limit);
+            // A rounded-up float would turn the limiting logical dimension
+            // into 599.999... when divided back, then truncate it to599.
+            return fitted > limit ? MathF.BitDecrement(fitted) : fitted;
+        }
+
+        private void UpdateDesktopViewport(int viewportWidth, int viewportHeight, bool rememberWindowSize = false)
+        {
+            var previousScale = FSOEnvironment.DPIScaleFactor;
+            var settings = GlobalSettings.Default;
+            var requestedScale = settings.DPIScaleFactor;
+            if (!float.IsFinite(requestedScale) || requestedScale <= 0) requestedScale = 1;
+            var scale = FitDesktopDpiScale(requestedScale, viewportWidth, viewportHeight);
+            FSOEnvironment.DPIScaleFactor = scale;
+            if (rememberWindowSize)
+            {
+                // Remember an actual resize in units of the requested density,
+                // never the fitted density. Startup fitting leaves the owner's
+                // configured resolution intact.
+                settings.GraphicsWidth = Math.Max(1, (int)Math.Round(viewportWidth / (double)requestedScale));
+                settings.GraphicsHeight = Math.Max(1, (int)Math.Round(viewportHeight / (double)requestedScale));
+            }
+            // Guard the one-unit float truncation at a limiting viewport edge.
+            settings.SetRuntimeViewport(Math.Max(800, (int)(viewportWidth / scale)),
+                Math.Max(600, (int)(viewportHeight / scale)));
+            var screen = uiLayer?.CurrentUIScreen;
+            if (screen != null)
+            {
+                screen.ScaleX = screen.ScaleY = scale;
+                screen.InvalidateMatrix();
+            }
+            if (previousScale != scale)
+                GameLog.Write("ui-fit: viewport=" + viewportWidth + "x" + viewportHeight
+                    + " requested=" + GlobalSettings.Default.DPIScaleFactor + " effective=" + scale
+                    + " logical=" + GlobalSettings.Default.GraphicsWidth + "x" + GlobalSettings.Default.GraphicsHeight);
+        }
+
         void Window_ClientSizeChanged(object sender, EventArgs e)
         {
             if (newChange || !GlobalSettings.Default.Windowed) return;
             if (Window.ClientBounds.Width == 0 || Window.ClientBounds.Height == 0) return;
             newChange = true;
-            var width = Math.Max(1, Window.ClientBounds.Width);
-            var height = Math.Max(1, Window.ClientBounds.Height);
-            Graphics.PreferredBackBufferWidth = width;
-            Graphics.PreferredBackBufferHeight = height;
-            Graphics.ApplyChanges();
+            try
+            {
+                Graphics.PreferredBackBufferWidth = Math.Max(1, Window.ClientBounds.Width);
+                Graphics.PreferredBackBufferHeight = Math.Max(1, Window.ClientBounds.Height);
+                Graphics.ApplyChanges();
 
-            GlobalSettings.Default.GraphicsWidth = width;
-            GlobalSettings.Default.GraphicsHeight = height;
-
-            newChange = false;
-            if (uiLayer?.CurrentUIScreen == null) return;
-
-            uiLayer.SpriteBatch.ResizeBuffer(GlobalSettings.Default.GraphicsWidth, GlobalSettings.Default.GraphicsHeight);
-            GlobalSettings.Default.GraphicsWidth = (int)(width / FSOEnvironment.DPIScaleFactor);
-            GlobalSettings.Default.GraphicsHeight = (int)(height / FSOEnvironment.DPIScaleFactor);
-            uiLayer.CurrentUIScreen.GameResized();
+                // R120: the DEVICE VIEWPORT is the single source of truth after the swap.
+                // ClientBounds can be in points (macOS retina) while the backbuffer is in
+                // pixels; reading the viewport keeps the batch buffer and the logical
+                // settings consistent with what actually got allocated. The old code also
+                // returned early (before the /DPI recompute) when no screen existed yet,
+                // leaving GraphicsWidth/Height in PHYSICAL units — every later layout was
+                // laid out at DPIScale x units and drawn at DPIScale x again (the
+                // oversized-doubled UI observed after resizing during load).
+                var vw = Math.Max(1, GraphicsDevice.Viewport.Width);
+                var vh = Math.Max(1, GraphicsDevice.Viewport.Height);
+                uiLayer?.SpriteBatch.ResizeBuffer(vw, vh);
+                if (!FSOEnvironment.SoftwareKeyboard) UpdateDesktopViewport(vw, vh, true);
+                else
+                {
+                    GlobalSettings.Default.GraphicsWidth = Math.Max(1, (int)(vw / FSOEnvironment.DPIScaleFactor));
+                    GlobalSettings.Default.GraphicsHeight = Math.Max(1, (int)(vh / FSOEnvironment.DPIScaleFactor));
+                }
+                uiLayer?.CurrentUIScreen?.GameResized();
+            }
+            finally { newChange = false; }
         }
 
         /// <summary>
@@ -105,9 +221,12 @@ namespace Simitone.Client
         /// </summary>
         protected override void Initialize()
         {
+            GameLog.Write("exit-probe: Initialize enter");
 
             var settings = GlobalSettings.Default;
-            if (FSOEnvironment.DPIScaleFactor != 1 || FSOEnvironment.SoftwareDepth)
+            if (!FSOEnvironment.SoftwareKeyboard)
+                UpdateDesktopViewport(Math.Max(1, GraphicsDevice.Viewport.Width), Math.Max(1, GraphicsDevice.Viewport.Height));
+            else if (FSOEnvironment.DPIScaleFactor != 1 || FSOEnvironment.SoftwareDepth)
             {
                 settings.GraphicsWidth = (int)(GraphicsDevice.Viewport.Width / FSOEnvironment.DPIScaleFactor);
                 settings.GraphicsHeight = (int)(GraphicsDevice.Viewport.Height / FSOEnvironment.DPIScaleFactor);
@@ -160,10 +279,14 @@ namespace Simitone.Client
             GameFacade.GraphicsDevice = GraphicsDevice;
             GameFacade.GraphicsDeviceManager = Graphics;
             GameFacade.Cursor = new CursorManager(GraphicsDevice);
+            // R87: IFF-first original-cursor mount on EVERY platform (macOS included - the previous
+            // GameFacade.Linux skip kept the ORIGINAL UIGraphics.far .cur cursors from ever mounting
+            // here). Init now runs from LoadingGameScreen right after the IFF content mount, so the
+            // resolver serves the ORIGINAL .cur member bytes (IFF-first). BmpLoaderFunc is required
+            // by CurLoader and is harmless to set unconditionally.
+            CurLoader.BmpLoaderFunc = ImageLoader.BaseFunction;
             if (!GameFacade.Linux)
             {
-                CurLoader.BmpLoaderFunc = ImageLoader.BaseFunction;
-                GameFacade.Cursor.Init(GlobalSettings.Default.TS1HybridPath, true);
                 SimitoneCursors.Init(GraphicsDevice);
             }
 
@@ -210,6 +333,8 @@ namespace Simitone.Client
             {
                 GameFacade.GraphicsDeviceManager.ToggleFullScreen();
             }
+
+            GameLog.Write("exit-probe: Initialize exit");
         }
 
         private void SaveGraphicsModePreference(GlobalGraphicsMode obj)
@@ -223,6 +348,7 @@ namespace Simitone.Client
         /// </summary>
         public new void Run()
         {
+            GameLog.Write("exit-probe: Game.Run(Sync) enter");
             Run(GameRunBehavior.Synchronous);
         }
 
@@ -324,7 +450,12 @@ namespace Simitone.Client
                 //GameFacade.EdithFont.AddSize(12, Content.Load<SpriteFont>("Fonts/Trebuchet_12px"));
                 //GameFacade.EdithFont.AddSize(14, Content.Load<SpriteFont>("Fonts/Trebuchet_14px"));
 
-                GameFacade.VectorFont = new FSO.UI.Framework.MSDFFont(Content.Load<FieldFont>("../Fonts/mobile"));
+                // R119: the engine-wide default text renderer is the ORIGINAL
+                // variablesans .ffn family (tables 07-20, 'uiglyph'-pinned) —
+                // every label/button/dialog/list/text-edit/tooltip renders
+                // original glyphs at native size instead of MSDF. MSDF remains
+                // only for the Edith debug font below.
+                GameFacade.VectorFont = Simitone.Client.UI.Controls.OriginalVectorFont.CreateRoot();
                 GameFacade.EdithVectorFont = new FSO.UI.Framework.MSDFFont(Content.Load<FieldFont>("../Fonts/trebuchet"));
                 GameFacade.EdithVectorFont.VectorScale = 0.366f;
                 GameFacade.EdithVectorFont.Height = 15;
@@ -362,7 +493,20 @@ namespace Simitone.Client
         {
             base.OnExiting(sender, args);
             GameThread.SetKilled();
-            args.Cancel = !(GameFacade.Screens.CurrentUIScreen?.CloseAttempt() ?? true);
+            var closeOk = GameFacade.Screens.CurrentUIScreen?.CloseAttempt() ?? true;
+            args.Cancel = !closeOk;
+            if (args.Cancel)
+            {
+                // Engine-exit fix: TS1GameScreen.CloseAttempt() defers (raises a "Save
+                // before quitting?" confirm dialog via GameThread.NextUpdate) and returns
+                // false, so MonoGame consumes _shouldExit once and never calls EndRun ->
+                // the process hangs after Exit() (observed on mac-port, intermittent).
+                // Re-arm Exit for the next update: once the dialog is up CloseAttempt()
+                // returns true again and EndRun() proceeds.
+                GameThread.NextUpdate(x => Exit());
+            }
+            GameLog.Write("exit-probe: OnExiting cancel=" + args.Cancel + " screen=" +
+                (GameFacade.Screens.CurrentUIScreen?.GetType().Name ?? "null"));
         }
 
         /// <summary>
@@ -376,7 +520,9 @@ namespace Simitone.Client
             {
                 this.IsMouseVisible = true;
                 if (!FSOEnvironment.SoftwareKeyboard) AddTextInput();
-                this.Window.Title = "Simitone";
+                // R118: original game name in the title bar (was "Simitone" - residue
+                // called out in the loader round).
+                this.Window.Title = "The Sims";
                 HasUpdated = true;
                 GameFacade.Screens = uiLayer;
                 GameController.EnterLoading();

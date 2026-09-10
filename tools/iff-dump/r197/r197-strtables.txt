@@ -1,0 +1,144 @@
+== STR# 131 'EvictModeStrs' (format -3, 23 en entries, chunk sha c52417bd20a734ba) ==
+[0] Bulldoze House?
+[1] Do you want to bulldoze this house?
+[2] Evict Family?
+[3] The %s family has net worth of %s.  Do you want to evict them?
+[4] Nothing to Bulldoze
+[5] There is nothing here to bulldoze.
+[6] Are You Sure?
+[7] The %s family has net worth of %s. You cannot rezone this lot until the family that is living there is evicted. Proceed with the eviction?
+[8] Are you sure?
+[9] You cannot rezone this lot until it has been bulldozed. Proceed with the bulldoze?
+[10] Error
+[11] Could not evict!
+[12] Sorry
+[13] You cannot bulldoze the tutorial house.
+[14] Bulldoze Lot?
+[15] Do you want to bulldoze this lot?
+[16] This family is currently on vacation. Strict laws forbid evictions of Sims while they are away from home.
+[17] Not So Fast!
+[18] There is a family on vacation on this lot. If you evict them from the lot, the family will be sent home. Are you sure you want to evict this family?
+[19] Are you sure?
+[20] A family is visiting this lot. You have to send them home before you can bulldoze this lot.
+[21] Unable To Import
+[22] You cannot import to this location, because there is a family on vacation here. Please send them home first, then try importing again.
+
+== STR# 132 'MoveInModeStrs' (format -3, 24 en entries, chunk sha 888ee3da3ae26fff) ==
+[0] Purchase House?
+[1] Are you sure you want to buy this house?
+[2] Sorry
+[3] You can't afford it.
+[4] Nothing to Bulldoze
+[5] There is no house here to bulldoze.
+[6] Purchase Lot?
+[7] Do you want to buy this lot?
+[8] Purchase Pre-Made?
+[9] Do you want to buy a pre-made home?
+[10] Sorry
+[11] You must first place this family in a house.
+[12] Community Lot
+[13] You cannot move a family into a community lot.
+[14] House Occupied
+[15] This house is occupied by another family.
+[16] Tutorial House
+[17] This is a tutorial house.  Families may not move into it.
+[18] Error!
+[19] Could not move in!
+[20] Pick another lot please
+[21] A family is already on vacation there you'll have to go somewhere else.
+[22] Magic Town Lot
+[23] You cannot move a family into the lots in Calamity Forest. They are reserved for public use. Please select a lot in Creepy Hollow to move into.
+
+== STR# 134 'NghRollover' (format -3, 39 en entries, chunk sha 70a5d2a201722be1) ==
+[0] The %s Family\r
+Net Worth: %s\r
+Friends: %d
+[1] %s\r
+%s\r
+Cost: %s\r
+Pick or create a family and move them in to play.
+[2] %s\r
+%s\r
+Cost: %s\r
+The %s family only has %s.  They can't afford this house.
+[3] %s\r
+%s\r
+Cost: %s\r
+This could be the house of your dreams!  If you buy, the family will have %s to spend on household items.
+[4] %s\r
+%s\r
+Cost: %s\r
+The %s family only has %s.  They can't afford this lot.
+[5] %s\r
+%s\r
+Cost: %s\r
+This could be the lot of your dreams!  If you buy this lot, the family will have %s to spend to build a house and buy household items.
+[6] To learn how to play the game...
+[7] %s Sim Lane
+[8] Can't move in to the tutorial house!
+[9] The %s Family\r
+Net Worth: %s\r
+Friends: %d\r
+Click to evict this family.
+[10] Click to demolish this house.
+[11] There is no one to evict and nothing to demolish.
+[12] You cannot bulldoze the tutorial house until after you do the tutorial.
+[13] %s Wright Way
+[14] %s Main Street
+[15] %s Old Volcano Way
+[16] %s Lagoon Moon Road
+[17] %s\r
+%s\r
+This is a community lot.
+[18] %s\r
+%s\r
+You cannot move in here. It is not a residential lot. 
+[19] %s\r
+%s\r
+Click to rezone this lot.
+[20] %s\r
+%s\r
+This is a Residential lot. You cannot visit here.
+[21] %s\r
+%s\r
+This is a Community lot. Please click here to visit.
+[22] No Name
+[23] No Description
+[24] %s Sunrise Boulevard
+[25] %s Studio Town Drive
+[26] 
+[27] %s Calamity Forest
+[28] %s\r
+%s\r
+This is a private Creepy Hollow lot. You cannot visit here.
+[29] %s\r
+%s\r
+Cost: %s   MagiCoins: %s\r
+Pick or create a family and move them in to play.
+[30] 
+[31] %s\r
+%s\r
+Cost: %s   MagiCoins: %s\r
+This could be the house of your dreams, or other people's nightmares! You have enough Simoleons and MagiCoins to move in.
+[32] 1500
+[33] 1000
+[34] The %s Family\r
+Net Worth: %s  MagiCoins: %s\r
+Friends: %d
+[35] The %s Family\r
+Net Worth: %s  MagiCoins: %s\r
+Friends: %d\r
+Click to evict this family.
+[36] %s\r
+%s\r
+Cost: %s   MagiCoins: %s\r
+The %s family has %s MagiCoins. They don't have enough MagiCoins to move in.
+[37] %s\r
+%s\r
+Cost: %s   MagiCoins: %s\r
+The %s family has %s MagiCoins. They don't have enough MagiCoins or Simoleons to move in.
+[38] %s\r
+%s\r
+Cost: %s   MagiCoins: %s\r
+The %s family only has %s. They can't afford this house.
+

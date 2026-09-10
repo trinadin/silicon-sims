@@ -1,0 +1,11 @@
+### BHAV 4119 'Create School Bus' (10 instructions)
+ins0  T8/F253  StkObjID[0] = Lit[0]
+ins1  T2/F253  Local[0] = StkObjID[0]
+ins2  T3/F253  StkObjID[0] = Lit[0]
+ins3  T254/F6  setToNext ObjectOfType guid=0x50ac15bf -> StkObjID[0] (flags=0x84)
+ins4  T5/F255  PRIM createObjectInstance (42) opd=bf15ac5006200000
+ins5  T9/F7    PRIM findLocationFor (16) opd=0300030000000000
+ins6  T4/F253  StkObjID[0] = Local[0]
+ins7  T255/F255 PRIM removeObjectInstance (18) opd=0100000000000000
+ins8  T1/F255  setToNext ObjectOfType guid=0x865a6812 -> StkObjID[0] (flags=0x84)
+ins9  T254/F254 PRIM runTreeByName (28) opd=2f01000003020000

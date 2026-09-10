@@ -1,0 +1,24 @@
+0x451d80: 80c29180  lwz r6, -28288(r2)                         |....|
+0x451d84: 54a0502a  rlwinm r0, r5 <<10                         |T.P*|
+0x451d88: 5485d5b4  rlwinm r5, r4, 26, 22, 26                  |T...|
+0x451d8c: 7d060214  add r8, r6, r0                             |}...|
+0x451d90: 5480fdb4  rlwinm r0, r4, 31, 22, 26                  |T...|
+0x451d94: 7cc82a14  add r6, r8, r5                             ||.*.|
+0x451d98: 5467aefe  rlwinm r7, r3, 21, 27, 31                  |Tg..|
+0x451d9c: 7c080214  add r0, r8, r0                             ||...|
+0x451da0: 5465d6fe  rlwinm r5, r3, 26, 27, 31                  |Te..|
+0x451da4: 7cc730ae  lbzx r6, r6, r7                            ||.0.|
+0x451da8: 7c0500ae  lbzx r0, r0, r5                            ||...|
+0x451dac: 54842db4  rlwinm r4, r4, 5, 22, 26                   |T.-.|
+0x451db0: 546506fe  rlwinm r5, r3, 0, 27, 31                   |Te..|
+0x451db4: 7c882214  add r4, r8, r4                             ||.".|
+0x451db8: 54c35828  rlwinm r3, r6 <<11                         |T.X(|
+0x451dbc: 54003032  rlwinm r0, r0 <<6                          |T.02|
+0x451dc0: 7c8520ae  lbzx r4, r4, r5                            ||. .|
+0x451dc4: 7c600378  or r3, r0, r0                              ||`.x|
+0x451dc8: 7c830378  or r4, r3, r0                              ||..x|
+0x451dcc: 4e800020  bclr                                       |N.. |
+0x451dd0: 00000000  .long                                      |....|
+0x451dd4: 00092040  .long                                      |.. @|
+0x451dd8: 00000000  .long                                      |....|
+0x451ddc: 00000050  .long                                      |...P|

@@ -1,0 +1,84 @@
+002b3b60: 93e1fffc  stw      r31, -4(r1)
+002b3b64: 7c0802a6  mflr     r0
+002b3b68: 7c7f1b78  mr       r31, r3
+002b3b6c: 93c1fff8  stw      r30, -8(r1)
+002b3b70: 83c28874  lwz      r30, -0x778c(r2)
+002b3b74: 93a1fff4  stw      r29, -0xc(r1)
+002b3b78: 9381fff0  stw      r28, -0x10(r1)
+002b3b7c: 90010008  stw      r0, 8(r1)
+002b3b80: 9421ffb0  stwu     r1, -0x50(r1)
+002b3b84: 80030188  lwz      r0, 0x188(r3)
+002b3b88: 7c002000  cmpw     r0, r4
+002b3b8c: 418201c8  beq      0x2b3d54
+002b3b90: 909f0188  stw      r4, 0x188(r31)
+002b3b94: 80628870  lwz      r3, -0x7790(r2)
+002b3b98: 80630000  lwz      r3, 0(r3)
+002b3b9c: 83a30084  lwz      r29, 0x84(r3)
+002b3ba0: 281d0000  cmplwi   r29, 0
+002b3ba4: 418201b0  beq      0x2b3d54
+002b3ba8: 4bf86fb9  bl       0x23ab60   ; .GetOptionsMgr__11cOptionsMgrFv
+002b3bac: 4bf86cc5  bl       0x23a870   ; .GetBoboVision__11cOptionsMgrFv
+002b3bb0: 5460063f  clrlwi.  r0, r3, 0x18
+002b3bb4: 41820080  beq      0x2b3c34
+002b3bb8: 801f0188  lwz      r0, 0x188(r31)
+002b3bbc: 2c000000  cmpwi    r0, 0
+002b3bc0: 40820028  bne      0x2b3be8
+002b3bc4: 7fa3eb78  mr       r3, r29
+002b3bc8: 819d0000  lwz      r12, 0(r29)
+002b3bcc: 38800001  li       r4, 1
+002b3bd0: 38a00000  li       r5, 0
+002b3bd4: 818c00b0  lwz      r12, 0xb0(r12)
+002b3bd8: 38c00000  li       r6, 0
+002b3bdc: 482eee05  bl       0x5a29e0
+002b3be0: 80410014  lwz      r2, 0x14(r1)
+002b3be4: 480000cc  b        0x2b3cb0
+002b3be8: 7fa3eb78  mr       r3, r29
+002b3bec: 819d0000  lwz      r12, 0(r29)
+002b3bf0: 38800000  li       r4, 0
+002b3bf4: 38a00000  li       r5, 0
+002b3bf8: 818c00b0  lwz      r12, 0xb0(r12)
+002b3bfc: 38c00000  li       r6, 0
+002b3c00: 482eede1  bl       0x5a29e0
+002b3c04: 80410014  lwz      r2, 0x14(r1)
+002b3c08: 387d0000  addi     r3, r29, 0
+002b3c0c: 38800001  li       r4, 1
+002b3c10: 4824fc11  bl       0x503820   ; .SetOverlapsScrollArea__6cTSWinFb
+002b3c14: 807e0000  lwz      r3, 0(r30)
+002b3c18: 80a3003c  lwz      r5, 0x3c(r3)
+002b3c1c: 80630004  lwz      r3, 4(r3)
+002b3c20: 80850018  lwz      r4, 0x18(r5)
+002b3c24: 80050020  lwz      r0, 0x20(r5)
+002b3c28: 7c840050  subf     r4, r4, r0
+002b3c2c: 4bf116c5  bl       0x1c52f0   ; .SetViewportHeight__11HouseViewerFi
+002b3c30: 48000080  b        0x2b3cb0
+002b3c34: 807e0000  lwz      r3, 0(r30)
+002b3c38: 801f0188  lwz      r0, 0x188(r31)
+002b3c3c: 8083003c  lwz      r4, 0x3c(r3)
+002b3c40: 2c000000  cmpwi    r0, 0
+002b3c44: 80640018  lwz      r3, 0x18(r4)
+002b3c48: 80040020  lwz      r0, 0x20(r4)
+002b3c4c: 7f830050  subf     r28, r3, r0
+002b3c50: 4082003c  bne      0x2b3c8c
+002b3c54: 7fa3eb78  mr       r3, r29
+002b3c58: 819d0000  lwz      r12, 0(r29)
+002b3c5c: 818c009c  lwz      r12, 0x9c(r12)
+002b3c60: 482eed81  bl       0x5a29e0
+002b3c64: 80410014  lwz      r2, 0x14(r1)
+002b3c68: 807d0078  lwz      r3, 0x78(r29)
+002b3c6c: 801d0080  lwz      r0, 0x80(r29)
+002b3c70: 809e0000  lwz      r4, 0(r30)
+002b3c74: 7c630050  subf     r3, r3, r0
+002b3c78: 3803ffce  addi     r0, r3, -0x32
+002b3c7c: 80640004  lwz      r3, 4(r4)
+002b3c80: 7c80e050  subf     r4, r0, r28
+002b3c84: 4bf1166d  bl       0x1c52f0   ; .SetViewportHeight__11HouseViewerFi
+002b3c88: 48000028  b        0x2b3cb0
+002b3c8c: 7fa3eb78  mr       r3, r29
+002b3c90: 819d0000  lwz      r12, 0(r29)
+002b3c94: 818c00a0  lwz      r12, 0xa0(r12)
+002b3c98: 482eed49  bl       0x5a29e0
+002b3c9c: 80410014  lwz      r2, 0x14(r1)
+002b3ca0: 807e0000  lwz      r3, 0(r30)
+002b3ca4: 7f84e378  mr       r4, r28
+002b3ca8: 80630004  lwz      r3, 4(r3)
+002b3cac: 4bf11645  bl       0x1c52f0   ; .SetViewportHeight__11HouseViewerFi

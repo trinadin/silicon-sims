@@ -1,0 +1,137 @@
+                ; ==== .UpdateConstants__23AutonomyConstantsClientFv ====
+00112750: 93e1fffc  stw      r31, -4(r1)
+00112754: 7c0802a6  mflr     r0
+00112758: 83e2a71c  lwz      r31, -0x58e4(r2)
+0011275c: 93c1fff8  stw      r30, -8(r1)
+00112760: 83c2a718  lwz      r30, -0x58e8(r2)
+00112764: 93a1fff4  stw      r29, -0xc(r1)
+00112768: 9381fff0  stw      r28, -0x10(r1)
+0011276c: 7c7c1b78  mr       r28, r3
+00112770: 90010008  stw      r0, 8(r1)
+00112774: 9421ff90  stwu     r1, -0x70(r1)
+00112778: 81830000  lwz      r12, 0(r3)
+0011277c: 818c0008  lwz      r12, 8(r12)
+00112780: 48490261  bl       0x5a29e0
+00112784: 80410014  lwz      r2, 0x14(r1)
+00112788: 38030000  addi     r0, r3, 0
+0011278c: 387c0000  addi     r3, r28, 0
+00112790: 819c0000  lwz      r12, 0(r28)
+00112794: 7c1c0378  mr       r28, r0
+00112798: 818c000c  lwz      r12, 0xc(r12)
+0011279c: 48490245  bl       0x5a29e0
+001127a0: 80410014  lwz      r2, 0x14(r1)
+001127a4: 38030000  addi     r0, r3, 0
+001127a8: 38610040  addi     r3, r1, 0x40
+001127ac: 7c1d0378  mr       r29, r0
+001127b0: 4bf73cb1  bl       0x86460   ; .__ct__14FloatConstantsFv
+001127b4: 389c0000  addi     r4, r28, 0
+001127b8: 38610040  addi     r3, r1, 0x40
+001127bc: 38bd0000  addi     r5, r29, 0
+001127c0: 4bf73721  bl       0x85ee0   ; .Load__14FloatConstantsFP8iResFiles
+001127c4: c03e0048  lfs      f1, 0x48(r30)
+001127c8: 38610040  addi     r3, r1, 0x40
+001127cc: 389f0192  addi     r4, r31, 0x192
+001127d0: 38c00001  li       r6, 1
+001127d4: 4bf7395d  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+001127d8: 80a28f40  lwz      r5, -0x70c0(r2)
+001127dc: 38610040  addi     r3, r1, 0x40
+001127e0: 389f01b0  addi     r4, r31, 0x1b0
+001127e4: d0250000  stfs     f1, 0(r5)
+001127e8: 38c00001  li       r6, 1
+001127ec: c03e004c  lfs      f1, 0x4c(r30)
+001127f0: 4bf73941  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+001127f4: 80a28f44  lwz      r5, -0x70bc(r2)
+001127f8: 38610040  addi     r3, r1, 0x40
+001127fc: 389f01d0  addi     r4, r31, 0x1d0
+00112800: d0250000  stfs     f1, 0(r5)
+00112804: 38c00001  li       r6, 1
+00112808: c03e0050  lfs      f1, 0x50(r30)
+0011280c: 4bf73925  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+00112810: 80a28f20  lwz      r5, -0x70e0(r2)
+00112814: 38610040  addi     r3, r1, 0x40
+00112818: 389f01e0  addi     r4, r31, 0x1e0
+0011281c: d0250000  stfs     f1, 0(r5)
+00112820: 38c00001  li       r6, 1
+00112824: c03e0054  lfs      f1, 0x54(r30)
+00112828: 4bf73909  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+0011282c: 80a28f1c  lwz      r5, -0x70e4(r2)
+00112830: 38610040  addi     r3, r1, 0x40
+00112834: 389f01f5  addi     r4, r31, 0x1f5
+00112838: d0250000  stfs     f1, 0(r5)
+0011283c: 38c00001  li       r6, 1
+00112840: c03e0058  lfs      f1, 0x58(r30)
+00112844: 4bf738ed  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+00112848: 80a28f18  lwz      r5, -0x70e8(r2)
+0011284c: 38610040  addi     r3, r1, 0x40
+00112850: 389f0206  addi     r4, r31, 0x206
+00112854: d0250000  stfs     f1, 0(r5)
+00112858: 38c00001  li       r6, 1
+0011285c: c03e0050  lfs      f1, 0x50(r30)
+00112860: 4bf738d1  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+00112864: 80a28f14  lwz      r5, -0x70ec(r2)
+00112868: 38610040  addi     r3, r1, 0x40
+0011286c: 389f021e  addi     r4, r31, 0x21e
+00112870: d0250000  stfs     f1, 0(r5)
+00112874: 38c00001  li       r6, 1
+00112878: c03e0054  lfs      f1, 0x54(r30)
+0011287c: 4bf738b5  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+00112880: 80a28f10  lwz      r5, -0x70f0(r2)
+00112884: 38610040  addi     r3, r1, 0x40
+00112888: 389f023b  addi     r4, r31, 0x23b
+0011288c: d0250000  stfs     f1, 0(r5)
+00112890: 38c00001  li       r6, 1
+00112894: c03e0058  lfs      f1, 0x58(r30)
+00112898: 4bf73899  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+0011289c: 80a28f0c  lwz      r5, -0x70f4(r2)
+001128a0: 38610040  addi     r3, r1, 0x40
+001128a4: 389f0254  addi     r4, r31, 0x254
+001128a8: d0250000  stfs     f1, 0(r5)
+001128ac: 38c00001  li       r6, 1
+001128b0: c03e0048  lfs      f1, 0x48(r30)
+001128b4: 4bf7387d  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+001128b8: 80a28f34  lwz      r5, -0x70cc(r2)
+001128bc: 38610040  addi     r3, r1, 0x40
+001128c0: 389f0273  addi     r4, r31, 0x273
+001128c4: d0250000  stfs     f1, 0(r5)
+001128c8: 38c00001  li       r6, 1
+001128cc: c03e005c  lfs      f1, 0x5c(r30)
+001128d0: 4bf73861  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+001128d4: fc00081e  fctiwz   f0, f1
+001128d8: 80a28f38  lwz      r5, -0x70c8(r2)
+001128dc: c03e0060  lfs      f1, 0x60(r30)
+001128e0: 38610040  addi     r3, r1, 0x40
+001128e4: 389f028a  addi     r4, r31, 0x28a
+001128e8: d8010050  stfd     f0, 0x50(r1)
+001128ec: 38c00001  li       r6, 1
+001128f0: 80010054  lwz      r0, 0x54(r1)
+001128f4: 90050000  stw      r0, 0(r5)
+001128f8: 4bf73839  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+001128fc: fc00081e  fctiwz   f0, f1
+00112900: 80a28d94  lwz      r5, -0x726c(r2)
+00112904: c03e0008  lfs      f1, 8(r30)
+00112908: 38610040  addi     r3, r1, 0x40
+0011290c: 389f029f  addi     r4, r31, 0x29f
+00112910: d8010058  stfd     f0, 0x58(r1)
+00112914: 38c00001  li       r6, 1
+00112918: 8001005c  lwz      r0, 0x5c(r1)
+0011291c: 90050000  stw      r0, 0(r5)
+00112920: 4bf73811  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+00112924: 80c28eb0  lwz      r6, -0x7150(r2)
+00112928: 389c0000  addi     r4, r28, 0
+0011292c: 38bd0000  addi     r5, r29, 0
+00112930: 38610040  addi     r3, r1, 0x40
+00112934: d0260000  stfs     f1, 0(r6)
+00112938: 4bf73539  bl       0x85e70   ; .Save__14FloatConstantsFP8iResFiles
+0011293c: 38000001  li       r0, 1
+00112940: 38610040  addi     r3, r1, 0x40
+00112944: 9802d335  stb      r0, -0x2ccb(r2)
+00112948: 38800000  li       r4, 0
+0011294c: 4bf75135  bl       0x87a80
+00112950: 80010078  lwz      r0, 0x78(r1)
+00112954: 38210070  addi     r1, r1, 0x70
+00112958: 83e1fffc  lwz      r31, -4(r1)
+0011295c: 83c1fff8  lwz      r30, -8(r1)
+00112960: 7c0803a6  mtlr     r0
+00112964: 83a1fff4  lwz      r29, -0xc(r1)
+00112968: 8381fff0  lwz      r28, -0x10(r1)
+0011296c: 4e800020  blr      

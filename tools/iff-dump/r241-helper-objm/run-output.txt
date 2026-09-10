@@ -1,0 +1,402 @@
+{
+  "files": 648,
+  "objm": 648,
+  "objects": 283433,
+  "stacks": 283433,
+  "frames": 547889,
+  "phase": {
+    "2": 24,
+    "1": 8
+  },
+  "state_values": {
+    "0": 547793,
+    "3": 56,
+    "2": 24,
+    "15": 8,
+    "1": 8
+  },
+  "errors": [],
+  "versions": {
+    "51": 8,
+    "62": 34,
+    "56": 8,
+    "66": 80,
+    "68": 72,
+    "69": 248,
+    "72": 72,
+    "73": 80,
+    "63": 46
+  },
+  "mark_self_ok": 283433,
+  "mark_bad": 0,
+  "owners_nonzero": 24,
+  "final_marks": {
+    "0": 648
+  },
+  "sizes": {
+    "512": 283433
+  }
+}
+
+SAMPLE FRAMES:
+{
+ "file": "House01.iff",
+ "obj": 61,
+ "stack_bytes": 512,
+ "bitpos_after_stack": 1777,
+ "mark_pos": 228,
+ "frames": [
+  {
+   "stack_object": 0,
+   "tree": 4096,
+   "node": 0,
+   "locals_n": 3,
+   "params_n": 0,
+   "params": [],
+   "locals": [
+    0,
+    0,
+    0
+   ],
+   "primitive_state": 0,
+   "code_owner_objtype": 6
+  },
+  {
+   "stack_object": 0,
+   "tree": 280,
+   "node": 0,
+   "locals_n": 0,
+   "params_n": 1,
+   "params": [
+    1800
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 6
+  }
+ ]
+}
+{
+ "file": "House01.iff",
+ "obj": 59,
+ "stack_bytes": 512,
+ "bitpos_after_stack": 2393,
+ "mark_pos": 309,
+ "frames": [
+  {
+   "stack_object": 59,
+   "tree": 4096,
+   "node": 1,
+   "locals_n": 0,
+   "params_n": 4,
+   "params": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 4
+  },
+  {
+   "stack_object": 59,
+   "tree": 280,
+   "node": 0,
+   "locals_n": 0,
+   "params_n": 1,
+   "params": [
+    200
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 4
+  }
+ ]
+}
+{
+ "file": "House01.iff",
+ "obj": 6,
+ "stack_bytes": 512,
+ "bitpos_after_stack": 3018,
+ "mark_pos": 384,
+ "frames": [
+  {
+   "stack_object": 0,
+   "tree": 4110,
+   "node": 0,
+   "locals_n": 0,
+   "params_n": 0,
+   "params": [],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 5
+  },
+  {
+   "stack_object": 0,
+   "tree": 280,
+   "node": 0,
+   "locals_n": 0,
+   "params_n": 1,
+   "params": [
+    10000
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 5
+  }
+ ]
+}
+{
+ "file": "House01.iff",
+ "obj": 58,
+ "stack_bytes": 512,
+ "bitpos_after_stack": 3574,
+ "mark_pos": 453,
+ "frames": [
+  {
+   "stack_object": 0,
+   "tree": 4096,
+   "node": 0,
+   "locals_n": 0,
+   "params_n": 4,
+   "params": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 9
+  },
+  {
+   "stack_object": 0,
+   "tree": 280,
+   "node": 0,
+   "locals_n": 0,
+   "params_n": 1,
+   "params": [
+    1800
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 9
+  }
+ ]
+}
+{
+ "file": "House01.iff",
+ "obj": 5,
+ "stack_bytes": 512,
+ "bitpos_after_stack": 4178,
+ "mark_pos": 528,
+ "frames": [
+  {
+   "stack_object": 0,
+   "tree": 4096,
+   "node": 0,
+   "locals_n": 0,
+   "params_n": 4,
+   "params": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 19
+  },
+  {
+   "stack_object": 0,
+   "tree": 4098,
+   "node": 0,
+   "locals_n": 0,
+   "params_n": 0,
+   "params": [],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 19
+  },
+  {
+   "stack_object": 0,
+   "tree": 367,
+   "node": 1,
+   "locals_n": 0,
+   "params_n": 1,
+   "params": [
+    15
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 19
+  },
+  {
+   "stack_object": 0,
+   "tree": 280,
+   "node": 0,
+   "locals_n": 0,
+   "params_n": 1,
+   "params": [
+    450
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 19
+  }
+ ]
+}
+{
+ "file": "House01.iff",
+ "obj": 3,
+ "stack_bytes": 512,
+ "bitpos_after_stack": 4736,
+ "mark_pos": 598,
+ "frames": [
+  {
+   "stack_object": 0,
+   "tree": 4096,
+   "node": 0,
+   "locals_n": 1,
+   "params_n": 4,
+   "params": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "locals": [
+    48
+   ],
+   "primitive_state": 0,
+   "code_owner_objtype": 7
+  },
+  {
+   "stack_object": 0,
+   "tree": 280,
+   "node": 0,
+   "locals_n": 0,
+   "params_n": 1,
+   "params": [
+    200
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 7
+  }
+ ]
+}
+{
+ "file": "House01.iff",
+ "obj": 2,
+ "stack_bytes": 512,
+ "bitpos_after_stack": 5287,
+ "mark_pos": 667,
+ "frames": [
+  {
+   "stack_object": 0,
+   "tree": 4096,
+   "node": 0,
+   "locals_n": 0,
+   "params_n": 4,
+   "params": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 3
+  },
+  {
+   "stack_object": 0,
+   "tree": 280,
+   "node": 0,
+   "locals_n": 0,
+   "params_n": 1,
+   "params": [
+    30000
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 3
+  }
+ ]
+}
+{
+ "file": "House01.iff",
+ "obj": 1,
+ "stack_bytes": 512,
+ "bitpos_after_stack": 5825,
+ "mark_pos": 734,
+ "frames": [
+  {
+   "stack_object": 0,
+   "tree": 4096,
+   "node": 1,
+   "locals_n": 0,
+   "params_n": 4,
+   "params": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 1
+  },
+  {
+   "stack_object": 0,
+   "tree": 259,
+   "node": 1,
+   "locals_n": 0,
+   "params_n": 4,
+   "params": [
+    60,
+    0,
+    0,
+    0
+   ],
+   "locals": [],
+   "primitive_state": 0,
+   "code_owner_objtype": 1
+  }
+ ]
+}
+
+IN-PROGRESS OPCODE35 CANDIDATES (primitive_state 1/2): 32
+{"file": "House56.iff", "obj": 292, "stack_object": 333, "tree": 4110, "node": 1, "locals_n": 3, "params_n": 0, "params": [], "locals": [4124, 255, 371], "primitive_state": 2, "code_owner_objtype": 146}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 281, "node": 4, "locals_n": 0, "params_n": 2, "params": [0, 1], "locals": [], "primitive_state": 1, "code_owner_objtype": 176}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 4355, "node": 11, "locals_n": 2, "params_n": 0, "params": [], "locals": [121, 254], "primitive_state": 2, "code_owner_objtype": 172}
+{"file": "House76.iff", "obj": 35, "stack_object": 266, "tree": 4105, "node": 0, "locals_n": 1, "params_n": 0, "params": [], "locals": [0], "primitive_state": 2, "code_owner_objtype": 31}
+{"file": "House56.iff", "obj": 292, "stack_object": 333, "tree": 4110, "node": 1, "locals_n": 3, "params_n": 0, "params": [], "locals": [4124, 255, 371], "primitive_state": 2, "code_owner_objtype": 146}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 281, "node": 4, "locals_n": 0, "params_n": 2, "params": [0, 1], "locals": [], "primitive_state": 1, "code_owner_objtype": 176}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 4355, "node": 11, "locals_n": 2, "params_n": 0, "params": [], "locals": [121, 254], "primitive_state": 2, "code_owner_objtype": 172}
+{"file": "House76.iff", "obj": 35, "stack_object": 266, "tree": 4105, "node": 0, "locals_n": 1, "params_n": 0, "params": [], "locals": [0], "primitive_state": 2, "code_owner_objtype": 31}
+{"file": "House56.iff", "obj": 292, "stack_object": 333, "tree": 4110, "node": 1, "locals_n": 3, "params_n": 0, "params": [], "locals": [4124, 255, 371], "primitive_state": 2, "code_owner_objtype": 146}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 281, "node": 4, "locals_n": 0, "params_n": 2, "params": [0, 1], "locals": [], "primitive_state": 1, "code_owner_objtype": 176}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 4355, "node": 11, "locals_n": 2, "params_n": 0, "params": [], "locals": [121, 254], "primitive_state": 2, "code_owner_objtype": 172}
+{"file": "House76.iff", "obj": 35, "stack_object": 266, "tree": 4105, "node": 0, "locals_n": 1, "params_n": 0, "params": [], "locals": [0], "primitive_state": 2, "code_owner_objtype": 31}
+{"file": "House56.iff", "obj": 292, "stack_object": 333, "tree": 4110, "node": 1, "locals_n": 3, "params_n": 0, "params": [], "locals": [4124, 255, 371], "primitive_state": 2, "code_owner_objtype": 146}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 281, "node": 4, "locals_n": 0, "params_n": 2, "params": [0, 1], "locals": [], "primitive_state": 1, "code_owner_objtype": 176}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 4355, "node": 11, "locals_n": 2, "params_n": 0, "params": [], "locals": [121, 254], "primitive_state": 2, "code_owner_objtype": 172}
+{"file": "House76.iff", "obj": 35, "stack_object": 266, "tree": 4105, "node": 0, "locals_n": 1, "params_n": 0, "params": [], "locals": [0], "primitive_state": 2, "code_owner_objtype": 31}
+{"file": "House56.iff", "obj": 292, "stack_object": 333, "tree": 4110, "node": 1, "locals_n": 3, "params_n": 0, "params": [], "locals": [4124, 255, 371], "primitive_state": 2, "code_owner_objtype": 146}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 281, "node": 4, "locals_n": 0, "params_n": 2, "params": [0, 1], "locals": [], "primitive_state": 1, "code_owner_objtype": 176}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 4355, "node": 11, "locals_n": 2, "params_n": 0, "params": [], "locals": [121, 254], "primitive_state": 2, "code_owner_objtype": 172}
+{"file": "House76.iff", "obj": 35, "stack_object": 266, "tree": 4105, "node": 0, "locals_n": 1, "params_n": 0, "params": [], "locals": [0], "primitive_state": 2, "code_owner_objtype": 31}
+{"file": "House56.iff", "obj": 292, "stack_object": 333, "tree": 4110, "node": 1, "locals_n": 3, "params_n": 0, "params": [], "locals": [4124, 255, 371], "primitive_state": 2, "code_owner_objtype": 146}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 281, "node": 4, "locals_n": 0, "params_n": 2, "params": [0, 1], "locals": [], "primitive_state": 1, "code_owner_objtype": 176}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 4355, "node": 11, "locals_n": 2, "params_n": 0, "params": [], "locals": [121, 254], "primitive_state": 2, "code_owner_objtype": 172}
+{"file": "House76.iff", "obj": 35, "stack_object": 266, "tree": 4105, "node": 0, "locals_n": 1, "params_n": 0, "params": [], "locals": [0], "primitive_state": 2, "code_owner_objtype": 31}
+{"file": "House56.iff", "obj": 292, "stack_object": 333, "tree": 4110, "node": 1, "locals_n": 3, "params_n": 0, "params": [], "locals": [4124, 255, 371], "primitive_state": 2, "code_owner_objtype": 146}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 281, "node": 4, "locals_n": 0, "params_n": 2, "params": [0, 1], "locals": [], "primitive_state": 1, "code_owner_objtype": 176}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 4355, "node": 11, "locals_n": 2, "params_n": 0, "params": [], "locals": [121, 254], "primitive_state": 2, "code_owner_objtype": 172}
+{"file": "House76.iff", "obj": 35, "stack_object": 266, "tree": 4105, "node": 0, "locals_n": 1, "params_n": 0, "params": [], "locals": [0], "primitive_state": 2, "code_owner_objtype": 31}
+{"file": "House56.iff", "obj": 292, "stack_object": 333, "tree": 4110, "node": 1, "locals_n": 3, "params_n": 0, "params": [], "locals": [4124, 255, 371], "primitive_state": 2, "code_owner_objtype": 146}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 281, "node": 4, "locals_n": 0, "params_n": 2, "params": [0, 1], "locals": [], "primitive_state": 1, "code_owner_objtype": 176}
+{"file": "House63.iff", "obj": 323, "stack_object": 79, "tree": 4355, "node": 11, "locals_n": 2, "params_n": 0, "params": [], "locals": [121, 254], "primitive_state": 2, "code_owner_objtype": 172}
+{"file": "House76.iff", "obj": 35, "stack_object": 266, "tree": 4105, "node": 0, "locals_n": 1, "params_n": 0, "params": [], "locals": [0], "primitive_state": 2, "code_owner_objtype": 31}

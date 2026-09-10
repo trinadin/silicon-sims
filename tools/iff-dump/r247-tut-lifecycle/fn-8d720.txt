@@ -1,0 +1,164 @@
+0008d720: 93e1fffc  stw      r31, -4(r1)
+0008d724: 7c0802a6  mflr     r0
+0008d728: 83e28ccc  lwz      r31, -0x7334(r2)
+0008d72c: 90010008  stw      r0, 8(r1)
+0008d730: 9421ffa0  stwu     r1, -0x60(r1)
+0008d734: 90610048  stw      r3, 0x48(r1)
+0008d738: 38610040  addi     r3, r1, 0x40
+0008d73c: 90a1004c  stw      r5, 0x4c(r1)
+0008d740: 38a40000  addi     r5, r4, 0
+0008d744: 38810044  addi     r4, r1, 0x44
+0008d748: 93e10044  stw      r31, 0x44(r1)
+0008d74c: 48090645  bl       0x11dd90   ; .Reconstitute__12ReconBuilderFP11ReconObjectP8iResFilesPl
+0008d750: 93e10044  stw      r31, 0x44(r1)
+0008d754: 3be30000  addi     r31, r3, 0
+0008d758: 38610044  addi     r3, r1, 0x44
+0008d75c: 38800000  li       r4, 0
+0008d760: 480903c1  bl       0x11db20   ; .__dt__11ReconObjectFv
+0008d764: 7fe3fb78  mr       r3, r31
+0008d768: 80010068  lwz      r0, 0x68(r1)
+0008d76c: 38210060  addi     r1, r1, 0x60
+0008d770: 7c0803a6  mtlr     r0
+0008d774: 83e1fffc  lwz      r31, -4(r1)
+0008d778: 4e800020  blr      
+0008d77c: 00000000  .long    0x00000000
+0008d780: 00092041  .long    0x00092041
+0008d784: 80010000  lwz      r0, 0(r1)
+0008d788: 0000005c  .long    0x0000005c
+0008d78c: 003e2e52  .long    0x003e2e52
+0008d790: 65636f6e  oris     r3, r11, 0x6f6e
+0008d794: 4c6f6164  .long    0x4c6f6164
+0008d798: 4f626a65  .long    0x4f626a65
+0008d79c: 63743c31  ori      r20, r27, 0x3c31
+0008d7a0: 30635369  addic    r3, r3, 0x5369
+0008d7a4: 6d756c61  xoris    r21, r11, 0x6c61
+0008d7a8: 746f723e  andis.   r15, r3, 0x723e
+0008d7ac: 5f5f4650  rlwnm    r31, r26, r8, 0x19, 8
+0008d7b0: 31306353  addic    r9, r16, 0x6353
+0008d7b4: 696d756c  xori     r13, r11, 0x756c
+0008d7b8: 61746f72  ori      r20, r11, 0x6f72
+0008d7bc: 50386952  rlwimi   r24, r1, 0xd, 5, 9
+0008d7c0: 65734669  oris     r19, r11, 0x4669
+0008d7c4: 6c656c73  xoris    r5, r3, 0x6c73
+0008d7c8: 506c5f73  rlwimi.  r12, r3, 0xb, 0x1d, 0x19
+0008d7cc: 00000000  .long    0x00000000
+0008d7d0: 93e1fffc  stw      r31, -4(r1)
+0008d7d4: 7c0802a6  mflr     r0
+0008d7d8: 3be40000  addi     r31, r4, 0
+0008d7dc: 93c1fff8  stw      r30, -8(r1)
+0008d7e0: 7c7e1b79  or.      r30, r3, r3
+0008d7e4: 90010008  stw      r0, 8(r1)
+0008d7e8: 9421ffb0  stwu     r1, -0x50(r1)
+0008d7ec: 41820024  beq      0x8d810
+0008d7f0: 80028ccc  lwz      r0, -0x7334(r2)
+0008d7f4: 38800000  li       r4, 0
+0008d7f8: 901e0000  stw      r0, 0(r30)
+0008d7fc: 48090325  bl       0x11db20   ; .__dt__11ReconObjectFv
+0008d800: 7fe00735  extsh.   r0, r31
+0008d804: 4081000c  ble      0x8d810
+0008d808: 7fc3f378  mr       r3, r30
+0008d80c: 48503d15  bl       0x591520
+0008d810: 7fc3f378  mr       r3, r30
+0008d814: 80010058  lwz      r0, 0x58(r1)
+0008d818: 38210050  addi     r1, r1, 0x50
+0008d81c: 7c0803a6  mtlr     r0
+0008d820: 83e1fffc  lwz      r31, -4(r1)
+0008d824: 83c1fff8  lwz      r30, -8(r1)
+0008d828: 4e800020  blr      
+0008d82c: 00000000  .long    0x00000000
+0008d830: 00092041  .long    0x00092041
+0008d834: 80020000  lwz      r0, 0(r2)
+0008d838: 0000005c  .long    0x0000005c
+0008d83c: 002a2e5f  .long    0x002a2e5f
+0008d840: 5f64745f  rlwnm.   r4, r27, r14, 0x11, 0xf
+0008d844: 5f333153  rlwnm.   r19, r25, r6, 5, 9
+0008d848: 696d706c  xori     r13, r11, 0x706c
+0008d84c: 65526563  oris     r18, r10, 0x6563
+0008d850: 6f6e4f62  xoris    r14, r27, 0x4f62
+0008d854: 6a656374  xori     r5, r19, 0x6374
+0008d858: 3c313063  addis    r1, r17, 0x3063
+0008d85c: 53696d75  rlwimi.  r9, r27, 0xd, 0x15, 0x1a
+0008d860: 6c61746f  xoris    r1, r3, 0x746f
+0008d864: 723e4676  andi.    r30, r17, 0x4676
+0008d868: 00000000  .long    0x00000000
+0008d86c: 00000000  .long    0x00000000
+0008d870: 93e1fffc  stw      r31, -4(r1)
+0008d874: 7c0802a6  mflr     r0
+0008d878: 83e28cc8  lwz      r31, -0x7338(r2)
+0008d87c: 90010008  stw      r0, 8(r1)
+0008d880: 9421ffa0  stwu     r1, -0x60(r1)
+0008d884: 90610048  stw      r3, 0x48(r1)
+0008d888: 38610040  addi     r3, r1, 0x40
+0008d88c: 90a1004c  stw      r5, 0x4c(r1)
+0008d890: 38a40000  addi     r5, r4, 0
+0008d894: 38810044  addi     r4, r1, 0x44
+0008d898: 93e10044  stw      r31, 0x44(r1)
+0008d89c: 480904f5  bl       0x11dd90   ; .Reconstitute__12ReconBuilderFP11ReconObjectP8iResFilesPl
+0008d8a0: 93e10044  stw      r31, 0x44(r1)
+0008d8a4: 3be30000  addi     r31, r3, 0
+0008d8a8: 38610044  addi     r3, r1, 0x44
+0008d8ac: 38800000  li       r4, 0
+0008d8b0: 48090271  bl       0x11db20   ; .__dt__11ReconObjectFv
+0008d8b4: 7fe3fb78  mr       r3, r31
+0008d8b8: 80010068  lwz      r0, 0x68(r1)
+0008d8bc: 38210060  addi     r1, r1, 0x60
+0008d8c0: 7c0803a6  mtlr     r0
+0008d8c4: 83e1fffc  lwz      r31, -4(r1)
+0008d8c8: 4e800020  blr      
+0008d8cc: 00000000  .long    0x00000000
+0008d8d0: 00092041  .long    0x00092041
+0008d8d4: 80010000  lwz      r0, 0(r1)
+0008d8d8: 0000005c  .long    0x0000005c
+0008d8dc: 00322e52  .long    0x00322e52
+0008d8e0: 65636f6e  oris     r3, r11, 0x6f6e
+0008d8e4: 4c6f6164  .long    0x4c6f6164
+0008d8e8: 4f626a65  .long    0x4f626a65
+0008d8ec: 63743c35  ori      r20, r27, 0x3c35
+0008d8f0: 486f7573  bla      0x6f7570
+0008d8f4: 653e5f5f  oris     r30, r9, 0x5f5f
+0008d8f8: 46503548  .long    0x46503548
+0008d8fc: 6f757365  xoris    r21, r27, 0x7365
+0008d900: 50386952  rlwimi   r24, r1, 0xd, 5, 9
+0008d904: 65734669  oris     r19, r11, 0x4669
+0008d908: 6c656c73  xoris    r5, r3, 0x6c73
+0008d90c: 506c5f73  rlwimi.  r12, r3, 0xb, 0x1d, 0x19
+0008d910: 93e1fffc  stw      r31, -4(r1)
+0008d914: 7c0802a6  mflr     r0
+0008d918: 3be40000  addi     r31, r4, 0
+0008d91c: 93c1fff8  stw      r30, -8(r1)
+0008d920: 7c7e1b79  or.      r30, r3, r3
+0008d924: 90010008  stw      r0, 8(r1)
+0008d928: 9421ffb0  stwu     r1, -0x50(r1)
+0008d92c: 41820024  beq      0x8d950
+0008d930: 80028cc8  lwz      r0, -0x7338(r2)
+0008d934: 38800000  li       r4, 0
+0008d938: 901e0000  stw      r0, 0(r30)
+0008d93c: 480901e5  bl       0x11db20   ; .__dt__11ReconObjectFv
+0008d940: 7fe00735  extsh.   r0, r31
+0008d944: 4081000c  ble      0x8d950
+0008d948: 7fc3f378  mr       r3, r30
+0008d94c: 48503bd5  bl       0x591520
+0008d950: 7fc3f378  mr       r3, r30
+0008d954: 80010058  lwz      r0, 0x58(r1)
+0008d958: 38210050  addi     r1, r1, 0x50
+0008d95c: 7c0803a6  mtlr     r0
+0008d960: 83e1fffc  lwz      r31, -4(r1)
+0008d964: 83c1fff8  lwz      r30, -8(r1)
+0008d968: 4e800020  blr      
+0008d96c: 00000000  .long    0x00000000
+0008d970: 00092041  .long    0x00092041
+0008d974: 80020000  lwz      r0, 0(r2)
+0008d978: 0000005c  .long    0x0000005c
+0008d97c: 00242e5f  .long    0x00242e5f
+0008d980: 5f64745f  rlwnm.   r4, r27, r14, 0x11, 0xf
+0008d984: 5f323553  rlwnm.   r18, r25, r6, 0x15, 9
+0008d988: 696d706c  xori     r13, r11, 0x706c
+0008d98c: 65526563  oris     r18, r10, 0x6563
+0008d990: 6f6e4f62  xoris    r14, r27, 0x4f62
+0008d994: 6a656374  xori     r5, r19, 0x6374
+0008d998: 3c35486f  addis    r1, r21, 0x486f
+0008d99c: 7573653e  andis.   r19, r11, 0x653e
+0008d9a0: 46760000  .long    0x46760000
+0008d9a4: 00000000  .long    0x00000000
+0008d9a8: 00000000  .long    0x00000000
+0008d9ac: 00000000  .long    0x00000000

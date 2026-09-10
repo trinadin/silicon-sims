@@ -19,6 +19,19 @@ namespace Simitone.Client.UI.Panels
 {
     public class UIPieMenu : UIContainer
     {
+        // The bitmap glyph tables can have a final-glyph overhang beyond their
+        // layout advance. Four pixels per side (the old mobile value) left
+        // labels such as "Go Here" touching or crossing the PieButt caps.
+        // Keep one 4px safety inset in addition to that logical margin.
+        public const int OriginalButtonMargin = 8;
+
+        // R142: exposed for the autotest gate (uidlgchrome) — the engine's exact
+        // slice-count band law from cTSPieMenu::Layout @ 0x5292b8.
+        public static int SliceCount(int count)
+        {
+            return (count == 0) ? 1 : (count <= 2) ? count + 2 : (count <= 4) ? count + 4 : count + 8;
+        }
+
         public UIPieMenuItem m_PieTree;
         public List<UIButton> m_PieButtons;
         public UIPieMenuItem m_CurrentItem;
@@ -53,21 +66,30 @@ namespace Simitone.Client.UI.Panels
             this.m_Obj = obj;
             this.m_Caller = caller;
             this.m_Parent = parent;
+            // R142: the ORIGINAL cTSPieMenu palette, decoded this round
+            // (dialog-chrome-law.md §5): interaction pie label color RGB(187,187,187),
+            // highlight RGB(0,255,255), selected RGB(255,255,255), lowlight
+            // RGB(185,185,208) — the old (165,195,214)/yellow pair was the TSO look.
             this.ButtonStyle = new TextStyle
             {
                 Font = GameFacade.MainFont,
                 VFont = GameFacade.VectorFont,
                 Size = 12,
-                Color = new Color(0xA5, 0xC3, 0xD6),
-                SelectedColor = new Color(0x00, 0xFF, 0xFF),
+                Color = new Color(187, 187, 187),
+                SelectedColor = new Color(0, 255, 255),
                 CursorColor = new Color(255, 255, 255)
             };
 
             HighlightStyle = ButtonStyle.Clone();
-            HighlightStyle.Color = Color.Yellow;
+            HighlightStyle.Color = new Color(185, 185, 208);
 
             lerpSpeed = 0.125f * (60.0f / FSOEnvironment.RefreshRate);
-            m_Bg = new UIImage(TextureGenerator.GetPieBG(GameFacade.GraphicsDevice));
+            // R142: the ORIGINAL interaction-pie background — SMCtrlMgrRes-adjacent
+            // RT 825 cpanel\ViewMenuBackground.bmp (17x17 disc tile), max radius 90
+            // per cDDDSimsView::Init. The old TextureGenerator radial-blue was TSO's.
+            var pieBgTex = Simitone.Client.UI.Model.UIOriginal.EnsureResolved("cpanel\\ViewMenuBackground.bmp")?.Get(GameFacade.GraphicsDevice)
+                ?? TextureGenerator.GetPieBG(GameFacade.GraphicsDevice);
+            m_Bg = new UIImage(pieBgTex);
             m_Bg.SetSize(2, 2); //is scaled up later
             m_Bg.Position = new Vector2(-1, -1);
             this.AddAt(0, m_Bg);
@@ -156,6 +178,22 @@ namespace Simitone.Client.UI.Panels
             GameFacade.Scenes.AddExternal(HeadScene); //AddExternal(HeadScene);
         }
 
+        // R142: shared\sys\PieButt.bmp (17x17) — cached; falls back to the old
+        // generated pill if the FAR member ever fails to mount.
+        private static Microsoft.Xna.Framework.Graphics.Texture2D _pieButt;
+        private static Microsoft.Xna.Framework.Graphics.Texture2D PieButtonTexture()
+        {
+            if (_pieButt != null) return _pieButt;
+            try
+            {
+                var tx = Simitone.Client.UI.Model.UIOriginal.EnsureResolved("shared\\sys\\PieButt.bmp");
+                if (tx != null) _pieButt = tx.Get(GameFacade.GraphicsDevice);
+            }
+            catch { }
+            if (_pieButt == null) _pieButt = TextureGenerator.GetPieButtonImg(GameFacade.GraphicsDevice);
+            return _pieButt;
+        }
+
         public void RotateHeadCam(Vector2 point)
         {
             curRot = Vector2.Lerp(curRot, currentTarget, lerpSpeed);
@@ -204,10 +242,11 @@ namespace Simitone.Client.UI.Panels
             m_PieButtons.Clear();
 
             var elems = m_CurrentItem.Children;
-            int dirConfig;
-            if (elems.Count > 4) dirConfig = 8;
-            else if (elems.Count > 2) dirConfig = 4;
-            else dirConfig = 2;
+            // R142: the ORIGINAL slice-count quantizer (cTSPieMenu::Layout
+            // 0x5290c0, band logic decoded with corrected branch senses):
+            // 0 -> 1 slice; 1-2 items -> count+2; 3-4 -> count+4; >=5 -> count+8.
+            // The old fixed 2/4/8 configs were the port's own spacing.
+            int dirConfig = SliceCount(elems.Count);
 
             for (int i = 0; i < dirConfig; i++)
             {
@@ -219,31 +258,35 @@ namespace Simitone.Client.UI.Panels
                     Caption = elem.Name, // + ((elem.Category) ? "..." : ""),
                     CaptionStyle = (elem.ColorMod > 0) ? HighlightStyle : ButtonStyle,
                     ImageStates = 1,
-                    Texture = TextureGenerator.GetPieButtonImg(GameFacade.GraphicsDevice)
+                    // R142: the ORIGINAL pie disc tile — shared\sys\PieButt.bmp
+                    // 17x17 (ctrl-mgr slot 15), stretched to the label rect by the
+                    // engine. TSO's generated pill replaced.
+                    Texture = PieButtonTexture()
                 };
 
+                // R142: original interaction-pie radius 90 (was 60).
                 double dir = (((double)i) / dirConfig) * Math.PI * 2;
-                but.AutoMargins = 4;
+                but.AutoMargins = OriginalButtonMargin;
 
                 if (i == 0)
                 { //top
-                    but.X = (float)(Math.Sin(dir) * 60 - but.Width / 2);
-                    but.Y = (float)((Math.Cos(dir) * -60) - but.Size.Y);
+                    but.X = (float)(Math.Sin(dir) * 90 - but.Width / 2);
+                    but.Y = (float)((Math.Cos(dir) * -90) - but.Size.Y);
                 }
                 else if (i == dirConfig / 2)
                 { //bottom
-                    but.X = (float)(Math.Sin(dir) * 60 - but.Width / 2);
-                    but.Y = (float)((Math.Cos(dir) * -60));
+                    but.X = (float)(Math.Sin(dir) * 90 - but.Width / 2);
+                    but.Y = (float)((Math.Cos(dir) * -90));
                 }
                 else if (i < dirConfig / 2) //on right side
                 {
-                    but.X = (float)(Math.Sin(dir) * 60);
-                    but.Y = (float)((Math.Cos(dir) * -60) - but.Size.Y / 2);
+                    but.X = (float)(Math.Sin(dir) * 90);
+                    but.Y = (float)((Math.Cos(dir) * -90) - but.Size.Y / 2);
                 }
                 else //on left side
                 {
-                    but.X = (float)(Math.Sin(dir) * 60 - but.Width);
-                    but.Y = (float)((Math.Cos(dir) * -60) - but.Size.Y / 2);
+                    but.X = (float)(Math.Sin(dir) * 90 - but.Width);
+                    but.Y = (float)((Math.Cos(dir) * -90) - but.Size.Y / 2);
                 }
 
                 this.Add(but);
@@ -264,7 +307,7 @@ namespace Simitone.Client.UI.Panels
                     ImageStates = 1,
                     Texture = TextureGenerator.GetPieButtonImg(GameFacade.GraphicsDevice)
                 };
-                but.AutoMargins = 4;
+                but.AutoMargins = OriginalButtonMargin;
 
                 but.X = (float)(-but.Width / 2);
                 if (top)
@@ -291,11 +334,11 @@ namespace Simitone.Client.UI.Panels
                     Caption = m_CurrentItem.Name,
                     CaptionStyle = ButtonStyle.Clone(),
                     ImageStates = 1,
-                    Texture = TextureGenerator.GetPieButtonImg(GameFacade.GraphicsDevice)
+                    Texture = PieButtonTexture()
                 };
 
                 but.CaptionStyle.Color = but.CaptionStyle.SelectedColor;
-                but.AutoMargins = 4;
+                but.AutoMargins = OriginalButtonMargin;
                 but.X = (float)(-but.Width / 2);
                 but.Y = (float)(-but.Size.Y / 2);
                 this.Add(but);
@@ -395,6 +438,7 @@ namespace Simitone.Client.UI.Panels
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             base.Draw(batch);
             if (m_CurrentItem == m_PieTree)
             {

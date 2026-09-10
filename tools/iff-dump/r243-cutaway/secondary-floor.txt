@@ -1,0 +1,29 @@
+001c1048: 82b00018  lwz      r21, 0x18(r16)
+001c104c: 7c15a000  cmpw     r21, r20
+001c1050: 4182009c  beq      0x1c10ec
+001c1054: 4810199d  bl       0x2c29f0   ; .GetWallManager__11WallManagerFv
+001c1058: 38b50000  addi     r5, r21, 0
+001c105c: 38800000  li       r4, 0
+001c1060: 48101f31  bl       0x2c2f90   ; .SetCutaway__11WallManagerFbi
+001c1064: 807001fc  lwz      r3, 0x1fc(r16)
+001c1068: 4bfe8df9  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001c106c: 38000001  li       r0, 1
+001c1070: 9810004e  stb      r0, 0x4e(r16)
+001c1074: 88100049  lbz      r0, 0x49(r16)
+001c1078: 28000000  cmplwi   r0, 0
+001c107c: 4182000c  beq      0x1c1088
+001c1080: 7e038378  mr       r3, r16
+001c1084: 4800e1bd  bl       0x1cf240   ; .ResetDynamicCutaway__11HouseViewerFv
+001c1088: 92900018  stw      r20, 0x18(r16)
+001c108c: 7e84a378  mr       r4, r20
+001c1090: 80628874  lwz      r3, -0x778c(r2)
+001c1094: 80630000  lwz      r3, 0(r3)
+001c1098: 80630000  lwz      r3, 0(r3)
+001c109c: 80630024  lwz      r3, 0x24(r3)
+001c10a0: 4bf67a41  bl       0x128ae0   ; .ComputeCutaway__11RoomManagerFi
+001c10a4: 88100049  lbz      r0, 0x49(r16)
+001c10a8: 28000000  cmplwi   r0, 0
+001c10ac: 41820010  beq      0x1c10bc
+001c10b0: 889001f8  lbz      r4, 0x1f8(r16)
+001c10b4: 7e038378  mr       r3, r16
+001c10b8: 4800e2f9  bl       0x1cf3b0   ; .DoDynamicCutaway__11HouseViewerFb

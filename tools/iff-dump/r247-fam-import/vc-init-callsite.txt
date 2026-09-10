@@ -1,0 +1,24 @@
+00474980: 981f006c  stb      r0, 0x6c(r31)
+00474984: 38800000  li       r4, 0
+00474988: 38a00001  li       r5, 1
+0047498c: 80750000  lwz      r3, 0(r21)
+00474990: 80030214  lwz      r0, 0x214(r3)
+00474994: 901f01ac  stw      r0, 0x1ac(r31)
+00474998: 80750000  lwz      r3, 0(r21)
+0047499c: 93e30214  stw      r31, 0x214(r3)
+004749a0: 80750000  lwz      r3, 0(r21)
+004749a4: 480a7d6d  bl       0x51c710   ; .SetGlobalCursor__12cTSWinMgrW95FP9cTSCursorb
+004749a8: 80750000  lwz      r3, 0(r21)
+004749ac: 480a6d65  bl       0x51b710   ; .FlushInputEvents__12cTSWinMgrW95Fv
+004749b0: 7fe3fb78  mr       r3, r31
+004749b4: 4bffaaad  bl       0x46f460   ; .CheckForNewImports__18cWinNeighborhoodVCFv
+004749b8: 80790000  lwz      r3, 0(r25)
+004749bc: 28030000  cmplwi   r3, 0
+004749c0: 41820018  beq      0x4749d8
+004749c4: 8063002c  lwz      r3, 0x2c(r3)
+004749c8: 28030000  cmplwi   r3, 0
+004749cc: 4182000c  beq      0x4749d8
+004749d0: 38000064  li       r0, 0x64
+004749d4: 90030070  stw      r0, 0x70(r3)
+004749d8: 80628870  lwz      r3, -0x7790(r2)
+004749dc: 80630000  lwz      r3, 0(r3)

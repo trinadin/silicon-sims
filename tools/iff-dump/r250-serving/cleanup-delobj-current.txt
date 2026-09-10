@@ -1,0 +1,56 @@
+00108b60: a801016c  lha      r0, 0x16c(r1)
+00108b64: b01e0a64  sth      r0, 0xa64(r30)
+00108b68: c0010170  lfs      f0, 0x170(r1)
+00108b6c: d01e0a68  stfs     f0, 0xa68(r30)
+00108b70: 48468961  bl       0x5714d0
+00108b74: 80010178  lwz      r0, 0x178(r1)
+00108b78: 38610174  addi     r3, r1, 0x174
+00108b7c: 3880ffff  li       r4, -1
+00108b80: 901e0a70  stw      r0, 0xa70(r30)
+00108b84: 8001017c  lwz      r0, 0x17c(r1)
+00108b88: 901e0a74  stw      r0, 0xa74(r30)
+00108b8c: 80010180  lwz      r0, 0x180(r1)
+00108b90: 901e0a78  stw      r0, 0xa78(r30)
+00108b94: 80010184  lwz      r0, 0x184(r1)
+00108b98: 901e0a7c  stw      r0, 0xa7c(r30)
+00108b9c: 48468a05  bl       0x5715a0   ; .__dt__9CTGStringFv
+00108ba0: 48000018  b        0x108bb8
+00108ba4: 801e0a50  lwz      r0, 0xa50(r30)
+00108ba8: 7c00f840  cmplw    r0, r31
+00108bac: 4082000c  bne      0x108bb8
+00108bb0: 38000000  li       r0, 0
+00108bb4: 901e0a50  stw      r0, 0xa50(r30)
+00108bb8: 801e0a10  lwz      r0, 0xa10(r30)
+00108bbc: 7c00f840  cmplw    r0, r31
+00108bc0: 40820028  bne      0x108be8
+00108bc4: 38610188  addi     r3, r1, 0x188
+00108bc8: 4bf945b9  bl       0x9d180   ; .__ct__11InteractionFv
+00108bcc: 387e0000  addi     r3, r30, 0
+00108bd0: 38810188  addi     r4, r1, 0x188
+00108bd4: 4800028d  bl       0x108e60   ; .SetCurrentAction__8cXPersonFRC11Interaction
+00108bd8: 386101b0  addi     r3, r1, 0x1b0
+00108bdc: 3880ffff  li       r4, -1
+00108be0: 484689c1  bl       0x5715a0   ; .__dt__9CTGStringFv
+00108be4: 48000018  b        0x108bfc
+00108be8: 801e0a14  lwz      r0, 0xa14(r30)
+00108bec: 7c00f840  cmplw    r0, r31
+00108bf0: 4082000c  bne      0x108bfc
+00108bf4: 38000000  li       r0, 0
+00108bf8: 901e0a14  stw      r0, 0xa14(r30)
+00108bfc: 807f0118  lwz      r3, 0x118(r31)
+00108c00: a8030012  lha      r0, 0x12(r3)
+00108c04: 2c000002  cmpwi    r0, 2
+00108c08: 40820160  bne      0x108d68
+00108c0c: 80de0aa8  lwz      r6, 0xaa8(r30)
+00108c10: 38a00001  li       r5, 1
+00108c14: 38800000  li       r4, 0
+00108c18: 48000020  b        0x108c38
+00108c1c: 80060080  lwz      r0, 0x80(r6)
+00108c20: 7c00f840  cmplw    r0, r31
+00108c24: 40820010  bne      0x108c34
+00108c28: 98a60084  stb      r5, 0x84(r6)
+00108c2c: 90860080  stw      r4, 0x80(r6)
+00108c30: 90860090  stw      r4, 0x90(r6)
+00108c34: 38c6009c  addi     r6, r6, 0x9c
+00108c38: 801e0aa4  lwz      r0, 0xaa4(r30)
+00108c3c: 807e0aa8  lwz      r3, 0xaa8(r30)

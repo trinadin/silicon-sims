@@ -1,0 +1,39 @@
+== xref cXObject::RunTree(Behavior*,char const*,short*) @0xefd30: 17 sites
+   bl from 0x0ad97c in CancelTutorial__12NeighborhoodFv+0x4c
+   bl from 0x0e2c20 in ShowTutorialInfo__12ObjectModuleFv+0x30
+   bl from 0x10c680 in TryReach__8cXPersonFP9StackElemP10XPrimParam+0x1b0
+   bl from 0x10c720 in TryReach__8cXPersonFP9StackElemP10XPrimParam+0x250
+   bl from 0x1565dc in Tut_CheckForEvents__Fv+0x8c
+   bl from 0x156994 in Tut_CheckForEvents__Fv+0x444
+   bl from 0x35fcac in TryAnimate__9SAnimatorFP9StackElemPC15AnimateNewParam+0x1dc
+   bl from 0x35fde8 in TryAnimate__9SAnimatorFP9StackElemPC15AnimateNewParam+0x318
+   bl from 0x35ffc4 in TryAnimate__9SAnimatorFP9StackElemPC15AnimateNewParam+0x4f4
+   bl from 0x480084 in TryAnimate__8AnimatorFP9StackElemPC15AnimateNewParam+0x1a4
+   bl from 0x4801dc in TryAnimate__8AnimatorFP9StackElemPC15AnimateNewParam+0x2fc
+   bl from 0x58a248 in GetKidCharmDescription__13CWinMagicBookFi+0xf8
+   bl from 0x58a428 in GetKidCharmTitle__13CWinMagicBookFi+0xf7
+   bl from 0x58a608 in GetSpellDescription__13CWinMagicBookFi+0xf8
+   bl from 0x58a838 in GetSpellTitle__13CWinMagicBookFi+0xf8
+   bl from 0x58bb6c in Init__13CWinMagicBookFv+0x90c
+   bl from 0x58bc08 in Init__13CWinMagicBookFv+0x9a8
+
+== xref Behavior::GetTree(short) @0x407b0: 4 sites
+   bl from 0x0ed380 in Backtrace__8cXObjectFPQ23std39basic_ostream<c,Q23std14char_traits<c>>+0x210
+   bl from 0x153a98 in DoNodeAction__7TreeSimFP9StackElem+0x1d8
+   bl from 0x15413c in Gosub__7TreeSimFP8BehaviorPCss+0x6c
+   bl from 0x23562c in Search__17ObjectDlgStubListFP11ObjSelector+0x25c
+
+== load-immediate scan (addi/li + ori) for [8486, 8345]
+   total: 0
+
+== context (8 words) before each li site
+
+== raw 32-bit BE constant scan (whole file)
+   0x00002126: 1 raw hits
+     @0x05b0edb (sec0/code) ctx=e0 80 00 02 1c 20 00 00 00 00 21 26 50 80 00 00 c4 20 00 00
+   0x00002099: 1 raw hits
+     @0x05b0b7b (sec0/code) ctx=30 80 00 00 a4 10 00 00 00 00 20 99 e0 00 00 00 f8 00 02 3f
+
+== RunTree call sites with constant li within 12 instrs before
+(end)
+wrote /Users/nathannoom/Developer/Games/The Sims/simitone-fork/tools/iff-dump/r154/r154-engine-constscan.txt

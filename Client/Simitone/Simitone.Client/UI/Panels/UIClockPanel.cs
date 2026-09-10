@@ -23,6 +23,8 @@ namespace Simitone.Client.UI.Panels
         public UIImage InnerBg;
 
         public UILabel TimeLabel;
+        // R99: the ORIGINAL-styled time readout twin (small .ffn table).
+        private Simitone.Client.UI.Controls.UIOriginalText TimeOriginal;
         public UILabel TimeLabelShadow;
 
         public UIButton Speed1;
@@ -86,6 +88,15 @@ namespace Simitone.Client.UI.Panels
 
             Add(TimeLabelShadow);
             Add(TimeLabel);
+            // R99: the ORIGINAL-styled time readout twin (small .ffn table).
+            var smallFont = Simitone.Client.UI.Controls.OriginalGlyphFont.LoadSmall(GameFacade.GraphicsDevice);
+            if (smallFont != null)
+            {
+                TimeOriginal = new Simitone.Client.UI.Controls.UIOriginalText("", smallFont);
+                TimeOriginal.Y = 14;
+                Add(TimeOriginal);
+                TimeLabel.Visible = TimeLabelShadow.Visible = false;
+            }
 
             Size = new Microsoft.Xna.Framework.Vector2(334, 50);
             //full size is 334 wide
@@ -128,6 +139,13 @@ namespace Simitone.Client.UI.Panels
                 LastClock = text;
                 TimeLabel.Caption = text;
                 TimeLabelShadow.Caption = text;
+                if (TimeOriginal != null)
+                {
+                    TimeOriginal.Text = text;
+                    TimeOriginal.X = System.Math.Max(148, 148 + (133 - TimeOriginal.Font.Measure(text)) / 2);
+                    Invalidated = true;
+                    Simitone.Client.UI.Controls.UIOriginalText.ToolbarReadoutsDrawn++;
+                }
             }
 
             MouseEvent.Region = OuterBg.GetBounds();

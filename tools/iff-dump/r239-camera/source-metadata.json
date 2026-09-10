@@ -1,0 +1,90 @@
+{
+  "owned_binary_sha256": "33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f",
+  "toc": {
+    "-0x5c04": {
+      "pointer": "0x43474",
+      "strings": {
+        "0x0": "PhotoAlbum/",
+        "0xc": "_"
+      }
+    },
+    "-0x5254": {
+      "pointer": "0x52e6c",
+      "strings": {
+        "0x0": "_",
+        "0x2": ".txt",
+        "0x7": "_thumb.jpg",
+        "0x12": ".jpg"
+      }
+    },
+    "-0x5510": {
+      "pointer": "0x4eb70",
+      "strings": {
+        "0xb": "ui_camera_photo"
+      }
+    }
+  },
+  "symbols": "tools/iff-dump/r153/r153-symbols.txt",
+  "ranges": {
+    "frame-snapshot": [
+      "0x1c4e10",
+      "0x1c51c4"
+    ],
+    "camera-state": [
+      "0x20ca20",
+      "0x20cd40"
+    ],
+    "album-storage": [
+      "0x247d60",
+      "0x248c18"
+    ],
+    "album-pages": [
+      "0x249520",
+      "0x24a874"
+    ],
+    "family-album": [
+      "0x75fd0",
+      "0x76310"
+    ],
+    "family-stream": [
+      "0x765a0",
+      "0x767e0"
+    ],
+    "family-load": [
+      "0x767e0",
+      "0x76a60"
+    ],
+    "pip-dispatch": [
+      "0x2130c0",
+      "0x2135a8"
+    ],
+    "pip-window": [
+      "0x298c90",
+      "0x29a5a0"
+    ],
+    "mouse-track": [
+      "0x1d0310",
+      "0x1d0680"
+    ],
+    "frame-paint-a": [
+      "0x1d09a0",
+      "0x1d0d70"
+    ],
+    "frame-paint-b": [
+      "0x1d48c0",
+      "0x1d4cf0"
+    ],
+    "frame-paint-c": [
+      "0x1d5ab0",
+      "0x1d60e0"
+    ],
+    "frame-outline": [
+      "0x1c6ef0",
+      "0x1c7250"
+    ],
+    "key-down": [
+      "0x217590",
+      "0x217e24"
+    ]
+  }
+}

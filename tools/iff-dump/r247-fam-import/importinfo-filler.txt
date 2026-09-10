@@ -1,0 +1,184 @@
+00231fd0: bf21ffe4  stmw     r25, -0x1c(r1)
+00231fd4: 7c0802a6  mflr     r0
+00231fd8: 3ba30000  addi     r29, r3, 0
+00231fdc: 3bc40000  addi     r30, r4, 0
+00231fe0: 3be50000  addi     r31, r5, 0
+00231fe4: 90010008  stw      r0, 8(r1)
+00231fe8: 9421fce0  stwu     r1, -0x320(r1)
+00231fec: 3861006c  addi     r3, r1, 0x6c
+00231ff0: 4be658e1  bl       0x978d0   ; .__ct__11IFFResFile2Fv
+00231ff4: 389d0000  addi     r4, r29, 0
+00231ff8: 3861006c  addi     r3, r1, 0x6c
+00231ffc: 38a00001  li       r5, 1
+00232000: 4be65171  bl       0x97170
+00232004: 3861006c  addi     r3, r1, 0x6c
+00232008: 4be646c9  bl       0x966d0   ; .ValidFile__11IFFResFile2Fv
+0023200c: 5460063f  clrlwi.  r0, r3, 0x18
+00232010: 40820018  bne      0x232028
+00232014: 3861006c  addi     r3, r1, 0x6c
+00232018: 3880ffff  li       r4, -1
+0023201c: 4be657e5  bl       0x97800   ; .__dt__11IFFResFile2Fv
+00232020: 38600000  li       r3, 0
+00232024: 48000228  b        0x23224c
+00232028: 38610058  addi     r3, r1, 0x58
+0023202c: 4be854d5  bl       0xb7500   ; .__ct__13ExpFamilyInfoFv
+00232030: 38610058  addi     r3, r1, 0x58
+00232034: 3881006c  addi     r4, r1, 0x6c
+00232038: 4be85459  bl       0xb7490   ; .Load__13ExpFamilyInfoFP8iResFile
+0023203c: 7c600735  extsh.   r0, r3
+00232040: 41820018  beq      0x232058
+00232044: 3861006c  addi     r3, r1, 0x6c
+00232048: 3880ffff  li       r4, -1
+0023204c: 4be657b5  bl       0x97800   ; .__dt__11IFFResFile2Fv
+00232050: 38600000  li       r3, 0
+00232054: 480001f8  b        0x23224c
+00232058: 88010058  lbz      r0, 0x58(r1)
+0023205c: 38610098  addi     r3, r1, 0x98
+00232060: 38800000  li       r4, 0
+00232064: 981e0188  stb      r0, 0x188(r30)
+00232068: 38a0ffff  li       r5, -1
+0023206c: 4be44f45  bl       0x76fb0   ; .__ct__6FamilyFP12ObjectModulei
+00232070: a8a1005a  lha      r5, 0x5a(r1)
+00232074: 38610098  addi     r3, r1, 0x98
+00232078: 3881006c  addi     r4, r1, 0x6c
+0023207c: 4be44765  bl       0x767e0   ; .LoadFamily__6FamilyFP8iResFilei
+00232080: 5460063f  clrlwi.  r0, r3, 0x18
+00232084: 40820024  bne      0x2320a8
+00232088: 38610098  addi     r3, r1, 0x98
+0023208c: 3880ffff  li       r4, -1
+00232090: 4be44e11  bl       0x76ea0   ; .__dt__6FamilyFv
+00232094: 3861006c  addi     r3, r1, 0x6c
+00232098: 3880ffff  li       r4, -1
+0023209c: 4be65765  bl       0x97800   ; .__dt__11IFFResFile2Fv
+002320a0: 38600000  li       r3, 0
+002320a4: 480001a8  b        0x23224c
+002320a8: 386101f4  addi     r3, r1, 0x1f4
+002320ac: 38810200  addi     r4, r1, 0x200
+002320b0: 38a00000  li       r5, 0
+002320b4: 38c00100  li       r6, 0x100
+002320b8: 4bf102a9  bl       0x142360   ; .__ct__12StringBufferFPcUiUi
+002320bc: 80028c60  lwz      r0, -0x73a0(r2)
+002320c0: 38610098  addi     r3, r1, 0x98
+002320c4: 388101f4  addi     r4, r1, 0x1f4
+002320c8: 900101fc  stw      r0, 0x1fc(r1)
+002320cc: 4be44b85  bl       0x76c50   ; .GetName__6FamilyFP12StringBuffer
+002320d0: 808101f4  lwz      r4, 0x1f4(r1)
+002320d4: 387e013c  addi     r3, r30, 0x13c
+002320d8: 4833f369  bl       0x571440   ; .__as__9CTGStringFPCc
+002320dc: 38610098  addi     r3, r1, 0x98
+002320e0: 4be44a71  bl       0x76b50   ; .GetNetWorth__6FamilyFv
+002320e4: 907e0140  stw      r3, 0x140(r30)
+002320e8: 38000000  li       r0, 0
+002320ec: 38610098  addi     r3, r1, 0x98
+002320f0: 901e0144  stw      r0, 0x144(r30)
+002320f4: 800101a8  lwz      r0, 0x1a8(r1)
+002320f8: 901e0148  stw      r0, 0x148(r30)
+002320fc: 4be44965  bl       0x76a60   ; .GetMagiCoins__6FamilyFv
+00232100: 907e014c  stw      r3, 0x14c(r30)
+00232104: 387e018c  addi     r3, r30, 0x18c
+00232108: 48002639  bl       0x234740
+0023210c: 3b210048  addi     r25, r1, 0x48
+00232110: 38790000  addi     r3, r25, 0
+00232114: 4833f77d  bl       0x571890   ; .__ct__9CTGStringFv
+00232118: 3b81004c  addi     r28, r1, 0x4c
+0023211c: 387c0000  addi     r3, r28, 0
+00232120: 4833f771  bl       0x571890   ; .__ct__9CTGStringFv
+00232124: 3b610058  addi     r27, r1, 0x58
+00232128: 3b200000  li       r25, 0
+0023212c: 4800008c  b        0x2321b8
+00232130: 60000000  nop      
+00232134: 38610050  addi     r3, r1, 0x50
+00232138: 4833f759  bl       0x571890   ; .__ct__9CTGStringFv
+0023213c: 801e0190  lwz      r0, 0x190(r30)
+00232140: 387e018c  addi     r3, r30, 0x18c
+00232144: 809e0194  lwz      r4, 0x194(r30)
+00232148: 38c10050  addi     r6, r1, 0x50
+0023214c: 54001838  slwi     r0, r0, 3
+00232150: 7c840214  add      r4, r4, r0
+00232154: 38a00001  li       r5, 1
+00232158: 480020e9  bl       0x234240
+0023215c: 38610050  addi     r3, r1, 0x50
+00232160: 3880ffff  li       r4, -1
+00232164: 4833f43d  bl       0x5715a0   ; .__dt__9CTGStringFv
+00232168: 80be0190  lwz      r5, 0x190(r30)
+0023216c: 38610048  addi     r3, r1, 0x48
+00232170: 80de0194  lwz      r6, 0x194(r30)
+00232174: 3881006c  addi     r4, r1, 0x6c
+00232178: 3805ffff  addi     r0, r5, -1
+0023217c: 54001838  slwi     r0, r0, 3
+00232180: a8bb0004  lha      r5, 4(r27)
+00232184: 7f460214  add      r26, r6, r0
+00232188: 38c00001  li       r6, 1
+0023218c: 4be2b385  bl       0x5d510   ; .Load__15CatalogResourceFP8iResFilesb
+00232190: 387a0000  addi     r3, r26, 0
+00232194: 38810048  addi     r4, r1, 0x48
+00232198: 4833f339  bl       0x5714d0
+0023219c: a89b0004  lha      r4, 4(r27)
+002321a0: 3861006c  addi     r3, r1, 0x6c
+002321a4: 38ba0004  addi     r5, r26, 4
+002321a8: 38c00004  li       r6, 4
+002321ac: 48184285  bl       0x3b6430   ; .LoadBuffer__10nsSMResFacFP8iResFilelPP9cTSBufferQ218cTSBufferColorType10eColorType
+002321b0: 3b7b0002  addi     r27, r27, 2
+002321b4: 3b390001  addi     r25, r25, 1
+002321b8: 2c190008  cmpwi    r25, 8
+002321bc: 40800010  bge      0x2321cc
+002321c0: a81b0004  lha      r0, 4(r27)
+002321c4: 2c000000  cmpwi    r0, 0
+002321c8: 4082ff6c  bne      0x232134
+002321cc: 38000000  li       r0, 0
+002321d0: 3861006c  addi     r3, r1, 0x6c
+002321d4: 981e0110  stb      r0, 0x110(r30)
+002321d8: 38bf0000  addi     r5, r31, 0
+002321dc: 389e0114  addi     r4, r30, 0x114
+002321e0: 38c10040  addi     r6, r1, 0x40
+002321e4: 98010040  stb      r0, 0x40(r1)
+002321e8: 480002c9  bl       0x2324b0   ; .GetHouseInfo__FP8iResFileP9HouseInfoiRb
+002321ec: 5460063f  clrlwi.  r0, r3, 0x18
+002321f0: 4182001c  beq      0x23220c
+002321f4: 38000001  li       r0, 1
+002321f8: 981e0110  stb      r0, 0x110(r30)
+002321fc: 3800fffe  li       r0, -2
+00232200: 901e0138  stw      r0, 0x138(r30)
+00232204: 800101a8  lwz      r0, 0x1a8(r1)
+00232208: 901e0150  stw      r0, 0x150(r30)
+0023220c: 387e0000  addi     r3, r30, 0
+00232210: 389d0000  addi     r4, r29, 0
+00232214: 4bf0fefd  bl       0x142110
+00232218: 387c0000  addi     r3, r28, 0
+0023221c: 3880ffff  li       r4, -1
+00232220: 4833f381  bl       0x5715a0   ; .__dt__9CTGStringFv
+00232224: 38610048  addi     r3, r1, 0x48
+00232228: 3880ffff  li       r4, -1
+0023222c: 4833f375  bl       0x5715a0   ; .__dt__9CTGStringFv
+00232230: 38610098  addi     r3, r1, 0x98
+00232234: 3880ffff  li       r4, -1
+00232238: 4be44c69  bl       0x76ea0   ; .__dt__6FamilyFv
+0023223c: 3861006c  addi     r3, r1, 0x6c
+00232240: 3880ffff  li       r4, -1
+00232244: 4be655bd  bl       0x97800   ; .__dt__11IFFResFile2Fv
+00232248: 38600001  li       r3, 1
+0023224c: 80010328  lwz      r0, 0x328(r1)
+00232250: 38210320  addi     r1, r1, 0x320
+00232254: bb21ffe4  lmw      r25, -0x1c(r1)
+00232258: 7c0803a6  mtlr     r0
+0023225c: 4e800020  blr      
+00232260: 00000000  .long    0x00000000
+00232264: 00092041  .long    0x00092041
+00232268: 80070000  lwz      r0, 0(r7)
+0023226c: 00000290  .long    0x00000290
+00232270: 003a2e47  .long    0x003a2e47
+00232274: 6574496d  oris     r20, r11, 0x496d
+00232278: 706f7274  andi.    r15, r3, 0x7274
+0023227c: 496e666f  bla      0x16e666c
+00232280: 466f7246  sc       0x12
+00232284: 696c655f  xori     r12, r11, 0x655f
+00232288: 5f465243  rlwnm.   r6, r26, r10, 9, 1
+0023228c: 31365374  addic    r9, r22, 0x5374
+00232290: 61636b53  ori      r3, r11, 0x6b53
+00232294: 7472696e  andis.   r18, r3, 0x696e
+00232298: 673c3236  oris     r28, r25, 0x3236
+0023229c: 303e5031  addic    r1, r30, 0x5031
+002322a0: 30496d70  addic    r2, r9, 0x6d70
+002322a4: 6f727449  xoris    r18, r27, 0x7449
+002322a8: 6e666f69  xoris    r6, r19, 0x6f69
+002322ac: 00000000  .long    0x00000000

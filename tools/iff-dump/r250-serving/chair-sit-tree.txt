@@ -1,0 +1,158 @@
+Source: game-data/The Sims/GameData/Objects/Objects.far member ChairsLR1Tile.iff (raw offsets within the member).
+Instruction format (sig 0x8002): header 12 bytes {u16 ver, u16 count, u8 type, u8 args, u16 locals, u16 flags, u16 pad};
+instructions 12 bytes {u16 opcode LE, u8 true, u8 false, 8-byte operand}. opcode>=256 = gosub tree#; else engine prim.
+
+=== BHAV id=528 'Sit in Chair test' ver=0x8002 count=4 type=0 args=4 locals=0 flags=0x0000 treeReturn=0x00 ===
+  [ 0] op=0x0002 T->254 F->  1  00 00 0b 00 00 02 10 03  ; Expression
+  [ 1] op=0x0002 T->  3 F->255  00 00 00 00 00 02 10 07  ; Expression
+  [ 2] op=0x0002 T->255 F->254  00 00 01 00 00 02 12 07  ; Expression
+  [ 3] op=0x0002 T->  2 F->254  00 00 01 00 00 02 09 07  ; Expression
+
+=== BHAV id=16 'main' ver=0x8002 count=6 type=22 args=4 locals=0 flags=0x0000 treeReturn=0x03 ===
+  [ 0] op=0x0118 T->  1 F->253  20 4e 00 00 00 00 00 00  ; GOSUB tree 280
+  [ 1] op=0x0002 T->  0 F->  3  00 00 00 00 00 02 14 07  ; Expression
+  [ 2] op=0x0002 T->  5 F->  0  09 00 02 00 00 02 15 07  ; Expression
+  [ 3] op=0x0002 T->  2 F->253  00 00 00 00 00 05 0a 14  ; Expression
+  [ 4] op=0x0118 T->  1 F->253  3c 00 00 00 00 00 00 00  ; GOSUB tree 280
+  [ 5] op=0x100d T->  4 F->253  ff ff ff ff ff ff ff ff  ; GOSUB tree 4109
+
+=== BHAV id=1040 'sit function' ver=0x8002 count=3 type=0 args=4 locals=0 flags=0x0000 treeReturn=0x00 ===
+  [ 0] op=0x0002 T->254 F->  1  00 00 0b 00 00 02 10 03  ; Expression
+  [ 1] op=0x1003 T->  2 F->255  ff ff ff ff ff ff ff ff  ; GOSUB tree 4099
+  [ 2] op=0x0031 T->254 F->253  ff ff ff ff ff ff ff ff  ; NotifyOutOfIdle
+
+=== BHAV id=272 'Sit' ver=0x8002 count=1 type=0 args=4 locals=0 flags=0x0000 treeReturn=0x00 ===
+  [ 0] op=0x1004 T->254 F->255  ff ff ff ff ff ff ff ff  ; GOSUB tree 4100
+
+=== BHAV id=784 'sit core' ver=0x8002 count=40 type=0 args=1 locals=1 flags=0x0000 treeReturn=0x11 ===
+  [ 0] op=0x002d T->  1 F->255  01 00 02 00 00 00 00 00  ; GoToRoutingSlot
+  [ 1] op=0x0002 T-> 25 F->255  00 00 00 00 00 02 10 07  ; Expression
+  [ 2] op=0x0002 T->  7 F->  3  25 00 01 00 00 02 12 07  ; Expression
+  [ 3] op=0x0002 T-> 10 F->  4  25 00 04 00 00 02 12 07  ; Expression
+  [ 4] op=0x0002 T->  9 F->  5  25 00 10 00 00 02 12 07  ; Expression
+  [ 5] op=0x0002 T->  8 F->  6  25 00 40 00 00 02 12 07  ; Expression
+  [ 6] op=0x000f T->254 F->253  01 00 07 00 00 00 00 00  ; BreakPoint
+  [ 7] op=0x002c T-> 12 F-> 22  01 00 00 00 00 40 00 00  ; AnimateSim
+  [ 8] op=0x002c T-> 12 F-> 22  03 00 00 00 00 40 00 00  ; AnimateSim
+  [ 9] op=0x002c T-> 12 F-> 22  02 00 00 00 00 40 00 00  ; AnimateSim
+  [10] op=0x002c T-> 12 F-> 22  04 00 00 00 00 40 00 00  ; AnimateSim
+  [11] op=0x0002 T->  2 F->253  00 00 01 00 00 05 12 07  ; Expression
+  [12] op=0x002c T-> 13 F-> 12  00 00 00 00 00 00 00 00  ; AnimateSim
+  [13] op=0x002e T-> 16 F-> 14  06 00 03 00 00 00 00 00  ; Snap
+  [14] op=0x000f T->254 F->253  01 00 07 00 00 00 00 00  ; BreakPoint
+  [15] op=0x0017 T->  2 F->253  00 00 00 00 02 00 00 00  ; PlaySound
+  [16] op=0x0020 T-> 19 F-> 17  55 0f 92 22 00 00 0a 00  ; TestObjectType
+  [17] op=0x0020 T-> 19 F-> 18  47 05 12 99 00 00 0a 00  ; TestObjectType
+  [18] op=0x0020 T-> 20 F->254  c2 89 9a f7 00 00 0a 00  ; TestObjectType
+  [19] op=0x0017 T->254 F->253  05 00 00 00 00 00 00 00  ; PlaySound
+  [20] op=0x0017 T->254 F->253  04 00 00 00 00 00 00 00  ; PlaySound
+  [21] op=0x0017 T->254 F->253  05 00 00 00 00 00 00 00  ; PlaySound
+  [22] op=0x0020 T-> 23 F-> 15  47 05 12 99 00 00 0a 00  ; TestObjectType
+  [23] op=0x0017 T->  2 F->253  06 00 00 00 02 00 00 00  ; PlaySound
+  [24] op=0x002e T-> 29 F-> 35  00 00 03 00 04 00 00 00  ; Snap
+  [25] op=0x0002 T-> 26 F->253  00 00 00 00 00 05 19 07  ; Expression
+  [26] op=0x0002 T-> 27 F-> 30  25 00 10 00 00 02 12 07  ; Expression
+  [27] op=0x0002 T-> 28 F->253  00 00 06 00 00 05 19 07  ; Expression
+  [28] op=0x0002 T-> 24 F->253  49 00 00 00 00 05 12 19  ; Expression
+  [29] op=0x0002 T-> 11 F->253  49 00 00 00 00 05 12 07  ; Expression
+  [30] op=0x0002 T-> 31 F-> 32  25 00 40 00 00 02 12 07  ; Expression
+  [31] op=0x0002 T-> 28 F->253  00 00 00 60 00 05 19 07  ; Expression
+  [32] op=0x0002 T-> 33 F-> 28  25 00 04 00 00 02 12 07  ; Expression
+  [33] op=0x0002 T-> 28 F->253  00 00 60 00 00 05 19 07  ; Expression
+  [34] op=0x018e T->255 F->253  ff ff ff ff ff ff ff ff  ; GOSUB tree 398
+  [35] op=0x0002 T-> 37 F->253  01 00 36 00 00 05 08 03  ; Expression
+  [36] op=0x0002 T-> 34 F->253  00 00 0b 00 00 05 08 07  ; Expression
+  [37] op=0x0002 T-> 36 F-> 38  36 00 00 00 00 02 03 07  ; Expression
+  [38] op=0x0002 T-> 34 F->253  00 00 08 00 00 05 08 07  ; Expression
+  [39] op=0x0002 T->253 F->253  00 00 06 60 00 05 19 07  ; Expression
+
+=== BHAV id=1552 'stand function' ver=0x8002 count=40 type=0 args=1 locals=4 flags=0x0000 treeReturn=0x05 ===
+  [ 0] op=0x0002 T->  1 F->253  02 00 00 00 00 05 19 07  ; Expression
+  [ 1] op=0x0002 T->  2 F->253  00 00 00 00 00 05 19 07  ; Expression
+  [ 2] op=0x0002 T-> 13 F->  9  25 00 01 00 00 02 12 07  ; Expression
+  [ 3] op=0x002c T->  5 F->  3  06 00 80 00 00 40 00 00  ; AnimateSim
+  [ 4] op=0x002c T->  5 F->  4  05 00 5e 00 00 40 00 00  ; AnimateSim
+  [ 5] op=0x002c T->  6 F->  5  00 00 00 00 01 00 00 00  ; AnimateSim
+  [ 6] op=0x0002 T->254 F->253  00 00 00 00 00 05 12 07  ; Expression
+  [ 7] op=0x002c T->  5 F->  7  07 00 80 00 00 40 00 00  ; AnimateSim
+  [ 8] op=0x002c T->  5 F->  8  08 00 80 00 00 40 00 00  ; AnimateSim
+  [ 9] op=0x0002 T-> 14 F-> 10  25 00 04 00 00 02 12 07  ; Expression
+  [10] op=0x0002 T-> 15 F-> 11  25 00 10 00 00 02 12 07  ; Expression
+  [11] op=0x0002 T-> 16 F-> 17  25 00 40 00 00 02 12 07  ; Expression
+  [12] op=0x0002 T-> 20 F-> 21  00 00 00 00 00 08 19 08  ; Expression
+  [13] op=0x0002 T-> 18 F->253  01 00 00 00 00 05 19 07  ; Expression
+  [14] op=0x0002 T-> 18 F->253  01 00 02 00 00 05 19 07  ; Expression
+  [15] op=0x0002 T-> 18 F->253  01 00 04 00 00 05 19 07  ; Expression
+  [16] op=0x0002 T-> 18 F->253  01 00 06 00 00 05 19 07  ; Expression
+  [17] op=0x0002 T-> 18 F->253  01 00 00 00 00 05 19 07  ; Expression
+  [18] op=0x0002 T-> 19 F->253  00 00 01 00 00 05 08 19  ; Expression
+  [19] op=0x0002 T-> 12 F->253  00 00 01 00 00 03 08 07  ; Expression
+  [20] op=0x0002 T-> 32 F-> 22  00 00 55 00 00 02 19 07  ; Expression
+  [21] op=0x0002 T-> 24 F->253  00 00 00 00 00 09 19 08  ; Expression
+  [22] op=0x0002 T-> 23 F->253  01 00 02 00 00 03 19 07  ; Expression
+  [23] op=0x0002 T-> 18 F->253  01 00 08 00 00 0c 19 07  ; Expression
+  [24] op=0x0002 T-> 25 F->253  00 00 01 00 00 05 08 19  ; Expression
+  [25] op=0x0002 T-> 38 F->253  01 00 02 00 00 05 08 19  ; Expression
+  [26] op=0x0002 T-> 30 F-> 22  34 00 01 00 00 02 03 07  ; Expression
+  [27] op=0x0172 T-> 29 F->253  14 00 00 00 00 00 00 00  ; GOSUB tree 370
+  [28] op=0x0002 T-> 39 F->253  01 00 00 00 00 05 08 07  ; Expression
+  [29] op=0x0002 T-> 28 F->253  00 00 01 00 00 05 08 19  ; Expression
+  [30] op=0x0002 T-> 27 F->253  03 00 04 00 00 05 19 07  ; Expression
+  [31] op=0x0002 T-> 27 F->255  03 00 00 00 00 11 19 07  ; Expression
+  [32] op=0x0002 T-> 33 F->255  02 00 00 00 00 02 19 07  ; Expression
+  [33] op=0x0002 T->  1 F->253  02 00 01 00 00 05 19 07  ; Expression
+  [34] op=0x0002 T->  4 F-> 35  01 00 00 00 00 02 19 07  ; Expression
+  [35] op=0x0002 T->  8 F-> 36  01 00 02 00 00 02 19 07  ; Expression
+  [36] op=0x0002 T->  3 F-> 37  01 00 04 00 00 02 19 07  ; Expression
+  [37] op=0x0002 T->  7 F->253  01 00 06 00 00 02 19 07  ; Expression
+  [38] op=0x100b T-> 34 F-> 26  ff ff ff ff ff ff ff ff  ; GOSUB tree 4107
+  [39] op=0x100b T-> 34 F-> 31  ff ff ff ff ff ff ff ff  ; GOSUB tree 4107
+
+=== BHAV id=2832 'snap out of chair' ver=0x8002 count=19 type=0 args=2 locals=0 flags=0x0000 treeReturn=0x02 ===
+  [ 0] op=0x0002 T->  2 F->  4  00 00 00 00 00 02 09 07  ; Expression
+  [ 1] op=0x002e T->254 F->255  02 00 03 00 02 00 00 00  ; Snap
+  [ 2] op=0x0002 T->  1 F->  3  01 00 00 00 00 10 09 07  ; Expression
+  [ 3] op=0x002e T->254 F->255  02 00 03 00 00 00 00 00  ; Snap
+  [ 4] op=0x0002 T->  6 F->  8  00 00 02 00 00 02 09 07  ; Expression
+  [ 5] op=0x002e T->254 F->255  05 00 03 00 02 00 00 00  ; Snap
+  [ 6] op=0x0002 T->  5 F->  7  01 00 00 00 00 10 09 07  ; Expression
+  [ 7] op=0x002e T->254 F->255  05 00 03 00 00 00 00 00  ; Snap
+  [ 8] op=0x0002 T-> 10 F-> 12  00 00 04 00 00 02 09 07  ; Expression
+  [ 9] op=0x002e T-> 17 F-> 18  03 00 03 00 06 00 00 00  ; Snap
+  [10] op=0x0002 T->  9 F-> 11  01 00 00 00 00 10 09 07  ; Expression
+  [11] op=0x002e T-> 17 F-> 18  03 00 03 00 04 00 00 00  ; Snap
+  [12] op=0x0002 T-> 14 F->253  00 00 06 00 00 02 09 07  ; Expression
+  [13] op=0x002e T->254 F->255  04 00 03 00 02 00 00 00  ; Snap
+  [14] op=0x0002 T-> 13 F-> 15  01 00 00 00 00 10 09 07  ; Expression
+  [15] op=0x002e T->254 F->255  04 00 03 00 00 00 00 00  ; Snap
+  [16] op=0x0002 T-> 10 F->253  49 00 00 60 00 05 12 07  ; Expression
+  [17] op=0x0002 T->254 F->253  49 00 00 00 00 05 12 07  ; Expression
+  [18] op=0x0002 T->255 F->253  49 00 00 00 00 05 12 07  ; Expression
+
+=== BHAV id=1296 'CT - sit comfort' ver=0x8002 count=10 type=0 args=0 locals=0 flags=0x0000 treeReturn=0x02 ===
+  [ 0] op=0x0002 T->254 F->254  01 00 00 00 00 02 01 1a  ; Expression
+  [ 1] op=0x0002 T->  2 F->  8  01 00 00 00 00 02 01 1a  ; Expression
+  [ 2] op=0x0002 T->  5 F->254  06 00 83 00 00 0f 0e 1a  ; Expression
+  [ 3] op=0x0002 T->  6 F->254  06 00 84 00 00 0f 0e 1a  ; Expression
+  [ 4] op=0x0002 T->  7 F->254  06 00 85 00 00 0f 0e 1a  ; Expression
+  [ 5] op=0x0002 T->254 F->253  06 00 86 00 00 03 0e 1a  ; Expression
+  [ 6] op=0x0002 T->254 F->253  06 00 87 00 00 03 0e 1a  ; Expression
+  [ 7] op=0x0002 T->254 F->253  06 00 88 00 00 03 0e 1a  ; Expression
+  [ 8] op=0x0002 T->  3 F->  9  01 00 01 00 00 02 01 1a  ; Expression
+  [ 9] op=0x0002 T->  4 F->254  01 00 02 00 00 02 01 1a  ; Expression
+
+=== BHAV id=3344 'inc comfort' ver=0x8002 count=13 type=0 args=0 locals=1 flags=0x0000 treeReturn=0x02 ===
+  [ 0] op=0x0002 T->  1 F->253  00 00 0b 00 00 05 0a 03  ; Expression
+  [ 1] op=0x0002 T-> 10 F->  8  01 00 00 00 00 02 01 1a  ; Expression
+  [ 2] op=0x0002 T->  5 F->254  06 00 83 00 00 0f 0f 1a  ; Expression
+  [ 3] op=0x0002 T->  6 F->254  06 00 84 00 00 0f 0f 1a  ; Expression
+  [ 4] op=0x0002 T->  7 F->254  06 00 85 00 00 0f 0f 1a  ; Expression
+  [ 5] op=0x0002 T->254 F->253  06 00 86 00 00 03 0f 1a  ; Expression
+  [ 6] op=0x0002 T->254 F->253  06 00 87 00 00 03 0f 1a  ; Expression
+  [ 7] op=0x0002 T->254 F->253  06 00 88 00 00 03 0f 1a  ; Expression
+  [ 8] op=0x0002 T-> 11 F->  9  01 00 01 00 00 02 01 1a  ; Expression
+  [ 9] op=0x0002 T-> 12 F->254  01 00 02 00 00 02 01 1a  ; Expression
+  [10] op=0x0002 T->  2 F->253  00 00 00 00 00 05 0a 10  ; Expression
+  [11] op=0x0002 T->  3 F->253  00 00 00 00 00 05 0a 10  ; Expression
+  [12] op=0x0002 T->  4 F->253  00 00 00 00 00 05 0a 10  ; Expression
+

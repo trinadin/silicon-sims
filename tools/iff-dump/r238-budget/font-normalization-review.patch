@@ -1,0 +1,203 @@
+--- a/Client/Simitone/Simitone.Client/UI/Controls/UIOriginalText.cs
++++ b/Client/Simitone/Simitone.Client/UI/Controls/UIOriginalText.cs
+@@ -92,6 +92,12 @@
+             }
+         }
+
++        // InitBitmapped 0x4b4640–47dc normalizes every runtime glyph offset
++        // by the minimum nonempty, non-NBSP top. Preserve raw FFN T2 for
++        // byte-level evidence; only destinations use the normalized offset.
++        public int RuntimeTopOffset { get; private set; }
++        public int GlyphY(Glyph glyph) => glyph.T2 + RuntimeTopOffset;
++
+         public static OriginalGlyphFont FromFFN(byte[] d, GraphicsDevice gd)
+         {
+             var f = new OriginalGlyphFont();
+@@ -115,6 +121,8 @@
+                     T0 = (sbyte)d[o + 8], T1 = (sbyte)d[o + 9], T2 = (sbyte)d[o + 10],
+                 };
+                 f.Glyphs[k] = g;
++                if (g.Char != 160 && g.W != 0 && g.H != 0)
++                    f.RuntimeTopOffset = System.Math.Max(f.RuntimeTopOffset, -g.T2);
+                 if (!f.ByChar.ContainsKey(g.Char)) f.ByChar[g.Char] = g;
+             }
+             // shape record -> white-on-transparent atlas, alpha from the nibbles
+@@ -313,13 +321,13 @@
+
+         // cTSWinBtn caption paint 0x50cb28–90 centers the capital-A ink
+         // bounds, then subtracts its draw offset. This is expressed in the
+-        // same raw-T2 draw space used by UIOriginalText. Any common runtime
++        // same normalized draw space used by UIOriginalText. Any common runtime
+         // glyph offset cancels between the caption origin and glyph drawing.
+         public int ButtonCaptionY(int height)
+         {
+             Glyph capitalA;
+             return ByChar.TryGetValue('A', out capitalA)
+-                ? (height - capitalA.H) / 2 - capitalA.T2
++                ? (height - capitalA.H) / 2 - GlyphY(capitalA)
+                 : (height - LineHeight) / 2;
+         }
+
+@@ -335,7 +343,7 @@
+                 if (ByChar.TryGetValue(ch, out g) && g.W > 1)
+                 {
+                     var src = new Rectangle(g.U, g.V, g.W, g.H);
+-                    batch.Draw(Atlas, new Vector2(x, pos.Y + g.T2), src, color);
++                    batch.Draw(Atlas, new Vector2(x, pos.Y + GlyphY(g)), src, color);
+                 }
+                 x += Advance(ch);
+             }
+@@ -399,7 +407,7 @@
+                 {
+                     DrawLocalTexture(batch, Font.Atlas,
+                         new Rectangle(g.U, g.V, g.W, g.H),
+-                        new Vector2(x, g.T2), Vector2.One, col);
++                        new Vector2(x, Font.GlyphY(g)), Vector2.One, col);
+                 }
+                 x += Font.Advance(ch);
+             }
+--- a/Client/Simitone/Simitone.Client/UI/Controls/OriginalVectorFont.cs
++++ b/Client/Simitone/Simitone.Client/UI/Controls/OriginalVectorFont.cs
+@@ -177,7 +177,7 @@
+                 OriginalGlyphFont.Glyph g;
+                 if (f.ByChar.TryGetValue(ch, out g) && g.W > 1)
+                 {
+-                    _batch.Draw(f.Atlas, new Vector2(x, pos.Y + g.T2 * s),
++                    _batch.Draw(f.Atlas, new Vector2(x, pos.Y + f.GlyphY(g) * s),
+                         new Rectangle(g.U, g.V, g.W, g.H), color, 0f, Vector2.Zero,
+                         new Vector2(s, s), SpriteEffects.None, 0f);
+                     GlyphsDrawn++;
+--- a/Client/Simitone/Simitone.Client/UI/Controls/UIBigButton.cs
++++ b/Client/Simitone/Simitone.Client/UI/Controls/UIBigButton.cs
+@@ -86,7 +86,7 @@
+                 {
+                     DrawLocalTexture(batch, font.Atlas,
+                         new Microsoft.Xna.Framework.Rectangle(g.U, g.V, g.W, g.H),
+-                        new Vector2(x + cx, y + g.T2), Vector2.One, keep.Color);
++                        new Vector2(x + cx, y + font.GlyphY(g)), Vector2.One, keep.Color);
+                 }
+                 cx += font.Advance(ch);
+             }
+--- a/Client/Simitone/Simitone.Client/UI/Controls/UIOriginalTextEdit.cs
++++ b/Client/Simitone/Simitone.Client/UI/Controls/UIOriginalTextEdit.cs
+@@ -348,7 +348,7 @@
+                     OriginalGlyphFont.Glyph glyph;
+                     if (Font.ByChar.TryGetValue(c, out glyph) && glyph.W > 1)
+                     {
+-                        var dest = new Rectangle(x, y + glyph.T2, glyph.W, glyph.H);
++                        var dest = new Rectangle(x, y + Font.GlyphY(glyph), glyph.W, glyph.H);
+                         if (selected)
+                         {
+                             // TSDrawChar(selected=true) reverses the glyph mask:
+--- a/Client/Simitone/Simitone.Client/UI/Controls/UIOriginalTextList.cs
++++ b/Client/Simitone/Simitone.Client/UI/Controls/UIOriginalTextList.cs
+@@ -205,7 +205,7 @@
+                     OriginalGlyphFont.Glyph g;
+                     if (Font.ByChar.TryGetValue(c, out g) && g.W > 1)
+                     {
+-                        var dst = new Rectangle(x, g.T2, g.W, g.H);
++                        var dst = new Rectangle(x, Font.GlyphY(g), g.W, g.H);
+                         var clip = Rectangle.Intersect(dst, new Rectangle(0, 0, WidthPixels, HeightPixels));
+                         if (clip.Width > 0 && clip.Height > 0)
+                             DrawLocalTexture(batch, Font.Atlas,
+--- a/Client/Simitone/Simitone.Client/UI/Panels/UIOriginalHelpDialog.cs
++++ b/Client/Simitone/Simitone.Client/UI/Panels/UIOriginalHelpDialog.cs
+@@ -169,7 +169,7 @@
+                         OriginalGlyphFont.Glyph glyph;
+                         if (Font.ByChar.TryGetValue(c, out glyph) && glyph.W > 1)
+                         {
+-                            var target = new Rectangle(x, (int)line.Y + glyph.T2, glyph.W, glyph.H);
++                            var target = new Rectangle(x, (int)line.Y + Font.GlyphY(glyph), glyph.W, glyph.H);
+                             var clip = Rectangle.Intersect(target, new Rectangle(0, 0, WidthPixels, HeightPixels));
+                             if (clip.Width > 0 && clip.Height > 0)
+                                 DrawLocalTexture(batch, Font.Atlas,
+--- a/Client/Simitone/Simitone.Client/UI/Panels/LiveSubpanels/UIJobSubpanel.cs
++++ b/Client/Simitone/Simitone.Client/UI/Panels/LiveSubpanels/UIJobSubpanel.cs
+@@ -125,7 +125,7 @@
+                 {
+                     DrawLocalTexture(batch, Font.Atlas,
+                         new Rectangle(glyph.U, glyph.V, glyph.W, glyph.H),
+-                        new Vector2(x, y + glyph.T2), Vector2.One, color);
++                        new Vector2(x, y + Font.GlyphY(glyph)), Vector2.One, color);
+                 }
+                 x += Font.Advance(ch);
+             }
+@@ -386,7 +386,7 @@
+                 {
+                     DrawLocalTexture(batch, Font.Atlas,
+                         new Rectangle(glyph.U, glyph.V, glyph.W, glyph.H),
+-                        new Vector2(x, glyph.T2), Vector2.One, color);
++                        new Vector2(x, Font.GlyphY(glyph)), Vector2.One, color);
+                 }
+                 x += Font.Advance(ch);
+             }
+--- a/Client/Simitone/Simitone.Client/UI/Panels/UINeighbourhoodSwitcher.cs
++++ b/Client/Simitone/Simitone.Client/UI/Panels/UINeighbourhoodSwitcher.cs
+@@ -106,9 +106,6 @@
+
+         // R160 gate evidence: every mounted strip registers its law snapshot.
+         public static int StripsMounted, ButtonsMounted, BannersMounted;
+-        // variablesans_12 minT2=-4; original InitBitmapped subtracts minT2
+-        // from every runtime glyph record before the current-number draw.
+-        internal const int CurrentNumberGlyphT2Normalization = 4;
+         public string LastBannerMember, LastTitleText;
+         public readonly List<string> LastMembers = new List<string>();
+
+@@ -229,12 +226,8 @@
+                     var rectAnchor = new Vector2(124, 3);
+                     var textAnchor = new Vector2(
+                         124 + indTex.Width / 2 - 1 - textWidth / 2,
+-                        // InitBitmapped normalizes every runtime glyph T2 by
+-                        // -minT2. variablesans_12 has minT2=-4; UIOriginalText
+-                        // intentionally retains raw FFN T2, so apply that exact
+-                        // font-local normalization only to this engine draw.
+-                        3 + indTex.Height / 2 - 1 - textHeight / 2
+-                            + CurrentNumberGlyphT2Normalization);
++                        // The shared font now normalizes glyph destinations.
++                        3 + indTex.Height / 2 - 1 - textHeight / 2);
+                     CurrentNumberInset = textAnchor - rectAnchor;
+                     CurrentNumber = new UIOriginalText(number, font) { Color = Color.White };
+                     RegisterAnchor(CurrentNumber, textAnchor, true);
+--- a/Client/Simitone/Simitone.Client/AutotestRunner.cs
++++ b/Client/Simitone/Simitone.Client/AutotestRunner.cs
+@@ -10428,11 +10428,10 @@
+                 else
+                 {
+                     homeStrip = homeStrip
+-                        && Simitone.Client.UI.Panels.UINeighbourhoodSwitcher.CurrentNumberGlyphT2Normalization == 4;
++                        && numberFont.RuntimeTopOffset == 4;
+                     var expectedNumber = new Vector2(
+                         124 + 23 / 2 - 1 - numberFont.Measure("1") / 2 + shifted.X,
+                         3 + 30 / 2 - 1 - numberFont.LineHeight / 2
+-                            + Simitone.Client.UI.Panels.UINeighbourhoodSwitcher.CurrentNumberGlyphT2Normalization
+                             + shifted.Y);
+                     homeStrip = homeStrip && nav.CurrentNumberPositionForProbe == expectedNumber;
+                 }
+--- a/FreeSO/TSOClient/FSO.UI/UILayer.cs
++++ b/FreeSO/TSOClient/FSO.UI/UILayer.cs
+@@ -352,14 +352,12 @@
+             // size 7 (0x3b9884-0x3b98a0). SetToolTip then sizes the window to
+             // textWidth + 6 by charHeight + 2 and paints at x=3, y=1
+             // (0x3b9428-0x3b9448, 0x3b9634-0x3b964c). The shipped _07 FFN's
+-            // cached glyph sheet normalizes its -2 top bearing, while our raw
+-            // FFN renderer leaves that bearing on every glyph. Add those two
+-            // pixels here so the visible ink lands at the original baseline.
++            // cached glyph sheet normalizes its -2 top bearing; the shared
++            // FFN renderer now applies the same normalization to destinations.
+             const int tooltipFontSize = 7;
+             const int tooltipLineHeight = 13;
+             const int tooltipXInset = 3;
+             const int tooltipYInset = 1;
+-            const int tooltipGlyphTopNormalization = 2;
+             style.Size = (int)(tooltipFontSize * toolScale);
+
+             var scale = new Vector2(1, 1);
+@@ -389,7 +387,7 @@
+             batch.Draw(whiteRectangle, new Rectangle((int)position.X, (int)position.Y, width, 1), color * opacity);
+
+             position.Y -= height;
+-            position.Y += (tooltipYInset + tooltipGlyphTopNormalization) * toolScale;
++            position.Y += tooltipYInset * toolScale;
+
+             for (int i = 0; i < wrapped.Lines.Count; i++)
+             {

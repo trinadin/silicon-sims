@@ -1,0 +1,35 @@
+0x4b3e40: 93e1fffc  stw r31, -4(r1)                            |....|
+0x4b3e44: 7c0802a6  mfxer r0                                   ||...|
+0x4b3e48: 3be00000  addi r31, r0, 0                            |;...|
+0x4b3e4c: 93c1fff8  stw r30, -8(r1)                            |....|
+0x4b3e50: 3bc30000  addi r30, r3, 0                            |;...|
+0x4b3e54: 38640000  addi r3, r4, 0                             |8d..|
+0x4b3e58: 90010008  stw r0, 8(r1)                              |....|
+0x4b3e5c: 9421ffb0  stwu r1, -80(r1)                           |.!..|
+0x4b3e60: 81840000  lwz r12, 0(r4)                             |....|
+0x4b3e64: 38800040  addi r4, r0, 64                            |8..@|
+0x4b3e68: 818c0028  lwz r12, 40(r12)                           |...(|
+0x4b3e6c: 480eeb75  bl 0x5a29e0                                |H..u|
+0x4b3e70: 80410014  lwz r2, 20(r1)                             |.A..|
+0x4b3e74: 5460063f  rlwinm r0, r3, 0, 24, 31                   |T`.?|
+0x4b3e78: 41820028  bne(2) 0x4b3ea0                            |A..(|
+0x4b3e7c: 807e002c  lwz r3, 44(r30)                            |.~.,|
+0x4b3e80: 38800040  addi r4, r0, 64                            |8..@|
+0x4b3e84: 81830000  lwz r12, 0(r3)                             |....|
+0x4b3e88: 818c0028  lwz r12, 40(r12)                           |...(|
+0x4b3e8c: 480eeb55  bl 0x5a29e0                                |H..U|
+0x4b3e90: 80410014  lwz r2, 20(r1)                             |.A..|
+0x4b3e94: 5460063f  rlwinm r0, r3, 0, 24, 31                   |T`.?|
+0x4b3e98: 41820008  bne(2) 0x4b3ea0                            |A...|
+0x4b3e9c: 3be00001  addi r31, r0, 1                            |;...|
+0x4b3ea0: 7fe3fb78  or r31, r3, r31                            |...x|
+0x4b3ea4: 80010058  lwz r0, 88(r1)                             |...X|
+0x4b3ea8: 38210050  addi r1, r1, 80                            |8!.P|
+0x4b3eac: 7c0803a6  mtxer r0                                   ||...|
+0x4b3eb0: 83e1fffc  lwz r31, -4(r1)                            |....|
+0x4b3eb4: 83c1fff8  lwz r30, -8(r1)                            |....|
+0x4b3eb8: 4e800020  bclr                                       |N.. |
+0x4b3ebc: 00000000  .long                                      |....|
+0x4b3ec0: 00092041  .long                                      |.. A|
+0x4b3ec4: 80020000  lwz r0, 0(r2)                              |....|
+0x4b3ec8: 0000007c  .long                                      |...||

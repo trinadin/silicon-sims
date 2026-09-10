@@ -1,0 +1,78 @@
+# body 0x8be30-0x8bf64 (77 insns)
+0x0008be30: 80828874  lwz r4, -30604(r2)                               |...t|
+0x0008be34: 3c604330  addis r3, r0, 17200                              |<`C0|
+0x0008be38: 80c2a428  lwz r6, -23512(r2)                               |...(|
+0x0008be3c: 80a40000  lwz r5, 0(r4)                                    |....|
+0x0008be40: 8082a424  lwz r4, -23516(r2)                               |...$|
+0x0008be44: 80e50000  lwz r7, 0(r5)                                    |....|
+0x0008be48: 9061fff8  stw r3, -8(r1)                                   |.a..|
+0x0008be4c: 80a70020  lwz r5, 32(r7)                                   |... |
+0x0008be50: c8440008  lfd f2, 8(r4)                                    |.D..|
+0x0008be54: 800500a0  lwz r0, 160(r5)                                  |....|
+0x0008be58: 808500a4  lwz r4, 164(r5)                                  |....|
+0x0008be5c: 6c008000  xoris r0, r0, 32768                              |l...|
+0x0008be60: 9061fff0  stw r3, -16(r1)                                  |.a..|
+0x0008be64: 6c838000  xoris r4, r3, 32768                              |l...|
+0x0008be68: c0060000  lfs f0, 0(r6)                                    |....|
+0x0008be6c: 9001fffc  stw r0, -4(r1)                                   |....|
+0x0008be70: c0860008  lfs f4, 8(r6)                                    |....|
+0x0008be74: c821fff8  lfd f1, -8(r1)                                   |.!..|
+0x0008be78: 9061fff4  stw r3, -12(r1)                                  |.a..|
+0x0008be7c: eca11028  fsubs f5, f1, f2                                 |...(|
+0x0008be80: c821fff0  lfd f1, -16(r1)                                  |.!..|
+0x0008be84: fc002800  fcmpo cr0, f0, f5                                |..(.|
+0x0008be88: ec011028  fsubs f0, f1, f2                                 |...(|
+0x0008be8c: 41820008  beq 0x8be94                                      |A...|
+0x0008be90: ec802824  fdivs f4, f0, f5                                 |..($|
+0x0008be94: 80e70064  lwz r7, 100(r7)                                  |...d|
+0x0008be98: 80870008  lwz r4, 8(r7)                                    |....|
+0x0008be9c: 2c040000  cmpwi r0, r4, 0                                  |,...|
+0x0008bea0: 4082000c  ne 0x8beac                                       |@...|
+0x0008bea4: c0660000  lfs f3, 0(r6)                                    |.f..|
+0x0008bea8: 480000a0  b 0x8bf48                                        |H...|
+0x0008beac: 3504ffff  addic. r8, r4, -1                                |5...|
+0x0008beb0: 38080001  addi r0, r8, 1                                   |8...|
+0x0008beb4: 7c0903a6  mtctr r0                                         ||...|
+0x0008beb8: 55051838  rlwinm r5, r8 <<3                                |U..8|
+0x0008bebc: 41800028  blt 0x8bee4                                      |A..(|
+0x0008bec0: 80670000  lwz r3, 0(r7)                                    |.g..|
+0x0008bec4: c0060000  lfs f0, 0(r6)                                    |....|
+0x0008bec8: 7c232c2e  lfsx f1, r3, r5                                  ||#,.|
+0x0008becc: ec640828  fsubs f3, f4, f1                                 |.d.(|
+0x0008bed0: fc030040  fcmpu cr0, f3, f0                                |...@|
+0x0008bed4: 41810010  bgt 0x8bee4                                      |A...|
+0x0008bed8: 38a5fff8  addi r5, r5, -8                                  |8...|
+0x0008bedc: 3908ffff  addi r8, r8, -1                                  |9...|
+0x0008bee0: 4200ffe0  bdnz 0x8bec0                                     |B...|
+0x0008bee4: 3804ffff  addi r0, r4, -1                                  |8...|
+0x0008bee8: 7c080000  cmp cr0, r8, r0                                  ||...|
+0x0008beec: 40820018  ne 0x8bf04                                       |@...|
+0x0008bef0: 80670000  lwz r3, 0(r7)                                    |.g..|
+0x0008bef4: 55001838  rlwinm r0, r8 <<3                                |U..8|
+0x0008bef8: 7c630214  add r3, r3, r0                                   ||c..|
+0x0008befc: c0630004  lfs f3, 4(r3)                                    |.c..|
+0x0008bf00: 48000048  b 0x8bf48                                        |H..H|
+0x0008bf04: 2c08ffff  cmpwi r0, r8, -1                                 |,...|
+0x0008bf08: 40820010  ne 0x8bf18                                       |@...|
+0x0008bf0c: 80670000  lwz r3, 0(r7)                                    |.g..|
+0x0008bf10: c0630004  lfs f3, 4(r3)                                    |.c..|
+0x0008bf14: 48000034  b 0x8bf48                                        |H..4|
+0x0008bf18: 80670000  lwz r3, 0(r7)                                    |.g..|
+0x0008bf1c: 55051838  rlwinm r5, r8 <<3                                |U..8|
+0x0008bf20: 80870004  lwz r4, 4(r7)                                    |....|
+0x0008bf24: 5500103a  rlwinm r0, r8 <<2                                |U..:|
+0x0008bf28: 7c632a14  add r3, r3, r5                                   ||c*.|
+0x0008bf2c: 7c24042e  lfsx f1, r4, r0                                  ||$..|
+0x0008bf30: c0430004  lfs f2, 4(r3)                                    |.C..|
+0x0008bf34: c003000c  lfs f0, 12(r3)                                   |....|
+0x0008bf38: ec630072  fmuls f3, f3, f1                                 |.c.r|
+0x0008bf3c: ec001028  fsubs f0, f0, f2                                 |...(|
+0x0008bf40: ec630032  fmuls f3, f3, f0                                 |.c.2|
+0x0008bf44: ec63102a  fadds f3, f3, f2                                 |.c.*|
+0x0008bf48: fc00181e  fctiwz f0, f3                                    |....|
+0x0008bf4c: d801fff8  stfd f0, -8(r1)                                  |....|
+0x0008bf50: 8061fffc  lwz r3, -4(r1)                                   |.a..|
+0x0008bf54: 4e800020  bclr                                             |N.. |
+0x0008bf58: 00000000  .long                                            |....|
+0x0008bf5c: 00092040  .long                                            |.. @|
+0x0008bf60: 00000000  .long                                            |....|

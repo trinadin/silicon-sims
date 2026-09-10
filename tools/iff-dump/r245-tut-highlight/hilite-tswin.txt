@@ -1,0 +1,84 @@
+                ; ==== .HiliteForTutorial__6cTSWinFb ====
+005034c0: 93e1fffc  stw      r31, -4(r1)
+005034c4: 7c0802a6  mflr     r0
+005034c8: 83e28e04  lwz      r31, -0x71fc(r2)
+005034cc: 93c1fff8  stw      r30, -8(r1)
+005034d0: 93a1fff4  stw      r29, -0xc(r1)
+005034d4: 7c7d1b78  mr       r29, r3
+005034d8: 90010008  stw      r0, 8(r1)
+005034dc: 5480063f  clrlwi.  r0, r4, 0x18
+005034e0: 9421ffb0  stwu     r1, -0x50(r1)
+005034e4: 809f0000  lwz      r4, 0(r31)
+005034e8: 83c4020c  lwz      r30, 0x20c(r4)
+005034ec: 418200f0  beq      0x5035dc
+005034f0: 81830000  lwz      r12, 0(r3)
+005034f4: 38800001  li       r4, 1
+005034f8: 818c0094  lwz      r12, 0x94(r12)
+005034fc: 4809f4e5  bl       0x5a29e0
+00503500: 80410014  lwz      r2, 0x14(r1)
+00503504: 5460063f  clrlwi.  r0, r3, 0x18
+00503508: 418200d4  beq      0x5035dc
+0050350c: 80de0074  lwz      r6, 0x74(r30)
+00503510: 7fc3f378  mr       r3, r30
+00503514: 80be007c  lwz      r5, 0x7c(r30)
+00503518: 809d0074  lwz      r4, 0x74(r29)
+0050351c: 801d007c  lwz      r0, 0x7c(r29)
+00503520: 7ca62850  subf     r5, r6, r5
+00503524: 811e0078  lwz      r8, 0x78(r30)
+00503528: 7c040050  subf     r0, r4, r0
+0050352c: 80fe0080  lwz      r7, 0x80(r30)
+00503530: 7cc50050  subf     r6, r5, r0
+00503534: 809d000c  lwz      r4, 0xc(r29)
+00503538: 54c00ffe  srwi     r0, r6, 0x1f
+0050353c: 80bd0010  lwz      r5, 0x10(r29)
+00503540: 7c003214  add      r0, r0, r6
+00503544: 7ce83850  subf     r7, r8, r7
+00503548: 38c70003  addi     r6, r7, 3
+0050354c: 7c000e70  srawi    r0, r0, 1
+00503550: 7ca62850  subf     r5, r6, r5
+00503554: 7c840214  add      r4, r4, r0
+00503558: 4bd5d649  bl       0x260ba0   ; .TSWinMoveTo__6cTSWinFll
+0050355c: 7fc3f378  mr       r3, r30
+00503560: 819e0000  lwz      r12, 0(r30)
+00503564: 818c009c  lwz      r12, 0x9c(r12)
+00503568: 4809f479  bl       0x5a29e0
+0050356c: 80410014  lwz      r2, 0x14(r1)
+00503570: 7fc3f378  mr       r3, r30
+00503574: 819e0000  lwz      r12, 0(r30)
+00503578: 818c004c  lwz      r12, 0x4c(r12)
+0050357c: 4809f465  bl       0x5a29e0
+00503580: 80410014  lwz      r2, 0x14(r1)
+00503584: 807f0000  lwz      r3, 0(r31)
+00503588: 480000b9  bl       0x503640   ; .GetCursorManager__12cTSWinMgrW95Fv
+0050358c: 38800000  li       r4, 0
+00503590: 4bf93d41  bl       0x4972d0   ; .GetStandardCursor__16cTSCursorManagerFQ29cTSCursor14StandardCursor
+00503594: 801e0068  lwz      r0, 0x68(r30)
+00503598: 7c801850  subf     r4, r0, r3
+0050359c: 907e0068  stw      r3, 0x68(r30)
+005035a0: 7c030050  subf     r0, r3, r0
+005035a4: 7c800378  or       r0, r4, r0
+005035a8: 54000fff  rlwinm.  r0, r0, 1, 0x1f, 0x1f
+005035ac: 41820044  beq      0x5035f0
+005035b0: 7fc3f378  mr       r3, r30
+005035b4: 819e0000  lwz      r12, 0(r30)
+005035b8: 38800001  li       r4, 1
+005035bc: 818c0094  lwz      r12, 0x94(r12)
+005035c0: 4809f421  bl       0x5a29e0
+005035c4: 80410014  lwz      r2, 0x14(r1)
+005035c8: 5460063f  clrlwi.  r0, r3, 0x18
+005035cc: 41820024  beq      0x5035f0
+005035d0: 807f0000  lwz      r3, 0(r31)
+005035d4: 4801893d  bl       0x51bf10   ; .PumpMouseMoveMsg__12cTSWinMgrW95Fv
+005035d8: 48000018  b        0x5035f0
+005035dc: 7fc3f378  mr       r3, r30
+005035e0: 819e0000  lwz      r12, 0(r30)
+005035e4: 818c00a0  lwz      r12, 0xa0(r12)
+005035e8: 4809f3f9  bl       0x5a29e0
+005035ec: 80410014  lwz      r2, 0x14(r1)
+005035f0: 80010058  lwz      r0, 0x58(r1)
+005035f4: 38210050  addi     r1, r1, 0x50
+005035f8: 83e1fffc  lwz      r31, -4(r1)
+005035fc: 83c1fff8  lwz      r30, -8(r1)
+00503600: 7c0803a6  mtlr     r0
+00503604: 83a1fff4  lwz      r29, -0xc(r1)
+00503608: 4e800020  blr      

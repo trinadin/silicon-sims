@@ -1,0 +1,44 @@
+000b83b0: 93e1fffc  stw      r31, -4(r1)
+000b83b4: 7c0802a6  mflr     r0
+000b83b8: 83e28d60  lwz      r31, -0x72a0(r2)
+000b83bc: 90010008  stw      r0, 8(r1)
+000b83c0: 9421ffa0  stwu     r1, -0x60(r1)
+000b83c4: 90610048  stw      r3, 0x48(r1)
+000b83c8: 38610040  addi     r3, r1, 0x40
+000b83cc: 90a1004c  stw      r5, 0x4c(r1)
+000b83d0: 38a40000  addi     r5, r4, 0
+000b83d4: 38810044  addi     r4, r1, 0x44
+000b83d8: 93e10044  stw      r31, 0x44(r1)
+000b83dc: 480659b5  bl       0x11dd90   ; .Reconstitute__12ReconBuilderFP11ReconObjectP8iResFilesPl
+000b83e0: 93e10044  stw      r31, 0x44(r1)
+000b83e4: 3be30000  addi     r31, r3, 0
+000b83e8: 38610044  addi     r3, r1, 0x44
+000b83ec: 38800000  li       r4, 0
+000b83f0: 48065731  bl       0x11db20   ; .__dt__11ReconObjectFv
+000b83f4: 7fe3fb78  mr       r3, r31
+000b83f8: 80010068  lwz      r0, 0x68(r1)
+000b83fc: 38210060  addi     r1, r1, 0x60
+000b8400: 7c0803a6  mtlr     r0
+000b8404: 83e1fffc  lwz      r31, -4(r1)
+000b8408: 4e800020  blr      
+000b840c: 00000000  .long    0x00000000
+000b8410: 00092041  .long    0x00092041
+000b8414: 80010000  lwz      r0, 0(r1)
+000b8418: 0000005c  .long    0x0000005c
+000b841c: 00422e52  .long    0x00422e52
+000b8420: 65636f6e  oris     r3, r11, 0x6f6e
+000b8424: 4c6f6164  .long    0x4c6f6164
+000b8428: 4f626a65  .long    0x4f626a65
+000b842c: 63743c31  ori      r20, r27, 0x3c31
+000b8430: 324e6569  addic    r18, r14, 0x6569
+000b8434: 6768626f  oris     r8, r27, 0x626f
+000b8438: 72686f6f  andi.    r8, r19, 0x6f6f
+000b843c: 643e5f5f  oris     r30, r1, 0x5f5f
+000b8440: 46503132  sc       9
+000b8444: 4e656967  .long    0x4e656967
+000b8448: 68626f72  xori     r2, r3, 0x6f72
+000b844c: 686f6f64  xori     r15, r3, 0x6f64
+000b8450: 50386952  rlwimi   r24, r1, 0xd, 5, 9
+000b8454: 65734669  oris     r19, r11, 0x4669
+000b8458: 6c656c73  xoris    r5, r3, 0x6c73
+000b845c: 506c5f73  rlwimi.  r12, r3, 0xb, 0x1d, 0x19

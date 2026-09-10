@@ -1,0 +1,137 @@
+                ; ==== .CheckForNewImports__18cWinNeighborhoodVCFv ====
+0046f460: bf41ffe8  stmw     r26, -0x18(r1)
+0046f464: 7c0802a6  mflr     r0
+0046f468: 83c28870  lwz      r30, -0x7790(r2)
+0046f46c: 7c7d1b78  mr       r29, r3
+0046f470: 83e2b95c  lwz      r31, -0x46a4(r2)
+0046f474: 90010008  stw      r0, 8(r1)
+0046f478: 9421fce0  stwu     r1, -0x320(r1)
+0046f47c: 88030190  lbz      r0, 0x190(r3)
+0046f480: 28000000  cmplwi   r0, 0
+0046f484: 408201e0  bne      0x46f664
+0046f488: 38610040  addi     r3, r1, 0x40
+0046f48c: 480859e5  bl       0x4f4e70   ; .__ct__9cTSStringFv
+0046f490: 807e0000  lwz      r3, 0(r30)
+0046f494: 38810040  addi     r4, r1, 0x40
+0046f498: 4bde85c9  bl       0x257a60   ; .FindDataDirectory__8cSimsAppFR9cTSString
+0046f49c: 38600058  li       r3, 0x58
+0046f4a0: 4bc18ac1  bl       0x87f60
+0046f4a4: 7c7c1b78  mr       r28, r3
+0046f4a8: 4812d889  bl       0x59cd30
+0046f4ac: 38a30000  addi     r5, r3, 0
+0046f4b0: 38610040  addi     r3, r1, 0x40
+0046f4b4: 389c0000  addi     r4, r28, 0
+0046f4b8: 4bc14ef9  bl       0x843b0
+0046f4bc: 387f009c  addi     r3, r31, 0x9c
+0046f4c0: 4812d871  bl       0x59cd30
+0046f4c4: 38a30000  addi     r5, r3, 0
+0046f4c8: 38610040  addi     r3, r1, 0x40
+0046f4cc: 389f009c  addi     r4, r31, 0x9c
+0046f4d0: 4bc14ee1  bl       0x843b0
+0046f4d4: 38610040  addi     r3, r1, 0x40
+0046f4d8: 4803ab39  bl       0x4aa010   ; .DoesAnyEntryExistThatMatchesPattern__12cTSDirectoryFRC9cTSString
+0046f4dc: 80bd0130  lwz      r5, 0x130(r29)
+0046f4e0: 5460063e  clrlwi   r0, r3, 0x18
+0046f4e4: 88850160  lbz      r4, 0x160(r5)
+0046f4e8: 7c040040  cmplw    r4, r0
+0046f4ec: 4182001c  beq      0x46f508
+0046f4f0: 98650160  stb      r3, 0x160(r5)
+0046f4f4: 7ca32b78  mr       r3, r5
+0046f4f8: 81850000  lwz      r12, 0(r5)
+0046f4fc: 818c0170  lwz      r12, 0x170(r12)
+0046f500: 481334e1  bl       0x5a29e0
+0046f504: 80410014  lwz      r2, 0x14(r1)
+0046f508: 38610044  addi     r3, r1, 0x44
+0046f50c: 48085965  bl       0x4f4e70   ; .__ct__9cTSStringFv
+0046f510: 807e0000  lwz      r3, 0(r30)
+0046f514: 38810044  addi     r4, r1, 0x44
+0046f518: 4bde8549  bl       0x257a60   ; .FindDataDirectory__8cSimsAppFR9cTSString
+0046f51c: 38600058  li       r3, 0x58
+0046f520: 4bc18a41  bl       0x87f60
+0046f524: 7c7c1b78  mr       r28, r3
+0046f528: 4812d809  bl       0x59cd30
+0046f52c: 38a30000  addi     r5, r3, 0
+0046f530: 38610044  addi     r3, r1, 0x44
+0046f534: 389c0000  addi     r4, r28, 0
+0046f538: 4bc14e79  bl       0x843b0
+0046f53c: 387f00a2  addi     r3, r31, 0xa2
+0046f540: 4812d7f1  bl       0x59cd30
+0046f544: 38a30000  addi     r5, r3, 0
+0046f548: 38610044  addi     r3, r1, 0x44
+0046f54c: 389f00a2  addi     r4, r31, 0xa2
+0046f550: 4bc14e61  bl       0x843b0
+0046f554: 38610044  addi     r3, r1, 0x44
+0046f558: 4803f389  bl       0x4ae8e0
+0046f55c: 5460063f  clrlwi.  r0, r3, 0x18
+0046f560: 418200e4  beq      0x46f644
+0046f564: 38610044  addi     r3, r1, 0x44
+0046f568: 3b400000  li       r26, 0
+0046f56c: 3b600000  li       r27, 0
+0046f570: 480851a1  bl       0x4f4710   ; .ToChar__9cTSStringCFv
+0046f574: 3b830000  addi     r28, r3, 0
+0046f578: 38610050  addi     r3, r1, 0x50
+0046f57c: 3881005c  addi     r4, r1, 0x5c
+0046f580: 38a00000  li       r5, 0
+0046f584: 38c00104  li       r6, 0x104
+0046f588: 4bcd2dd9  bl       0x142360   ; .__ct__12StringBufferFPcUiUi
+0046f58c: 80028bb4  lwz      r0, -0x744c(r2)
+0046f590: 389c0000  addi     r4, r28, 0
+0046f594: 38610050  addi     r3, r1, 0x50
+0046f598: 90010058  stw      r0, 0x58(r1)
+0046f59c: 38a0ffff  li       r5, -1
+0046f5a0: 4bcd2c91  bl       0x142230   ; .append__12StringBufferFPCci
+0046f5a4: 38610160  addi     r3, r1, 0x160
+0046f5a8: 4bdc2759  bl       0x231d00   ; .__ct__10ImportInfoFv
+0046f5ac: 38610050  addi     r3, r1, 0x50
+0046f5b0: 38810160  addi     r4, r1, 0x160
+0046f5b4: 38a00000  li       r5, 0
+0046f5b8: 4bdc2a19  bl       0x231fd0
+0046f5bc: 5460063f  clrlwi.  r0, r3, 0x18
+0046f5c0: 41820054  beq      0x46f614
+0046f5c4: 38610160  addi     r3, r1, 0x160
+0046f5c8: 38810048  addi     r4, r1, 0x48
+0046f5cc: 4bdc2825  bl       0x231df0   ; .ImportFamily__FP10ImportInfoPi
+0046f5d0: 5460063f  clrlwi.  r0, r3, 0x18
+0046f5d4: 41820028  beq      0x46f5fc
+0046f5d8: 88010270  lbz      r0, 0x270(r1)
+0046f5dc: 3b400001  li       r26, 1
+0046f5e0: 28000000  cmplwi   r0, 0
+0046f5e4: 41820030  beq      0x46f614
+0046f5e8: 800102b0  lwz      r0, 0x2b0(r1)
+0046f5ec: 2c000000  cmpwi    r0, 0
+0046f5f0: 41820024  beq      0x46f614
+0046f5f4: 3b600001  li       r27, 1
+0046f5f8: 4800001c  b        0x46f614
+0046f5fc: 807e0000  lwz      r3, 0(r30)
+0046f600: 389f00af  addi     r4, r31, 0xaf
+0046f604: 38bf00ca  addi     r5, r31, 0xca
+0046f608: 38c00000  li       r6, 0
+0046f60c: 38e00000  li       r7, 0
+0046f610: 4bde48f1  bl       0x253f00   ; .MessageDialog__8cSimsAppFPCcPCcUlb
+0046f614: 5740063f  clrlwi.  r0, r26, 0x18
+0046f618: 4182000c  beq      0x46f624
+0046f61c: 807e0000  lwz      r3, 0(r30)
+0046f620: 4bddcb71  bl       0x24c190   ; .ReportMissingTextures__8cSimsAppFv
+0046f624: 5760063f  clrlwi.  r0, r27, 0x18
+0046f628: 41820010  beq      0x46f638
+0046f62c: 807e0000  lwz      r3, 0(r30)
+0046f630: 38800001  li       r4, 1
+0046f634: 4bde5f7d  bl       0x2555b0   ; .DoNbhdScreen__8cSimsAppFb
+0046f638: 38610160  addi     r3, r1, 0x160
+0046f63c: 3880ffff  li       r4, -1
+0046f640: 4bdc25c1  bl       0x231c00   ; .__dt__10ImportInfoFv
+0046f644: 38000000  li       r0, 0
+0046f648: 38610044  addi     r3, r1, 0x44
+0046f64c: 981d0190  stb      r0, 0x190(r29)
+0046f650: 3880ffff  li       r4, -1
+0046f654: 4808532d  bl       0x4f4980   ; .__dt__9cTSStringFv
+0046f658: 38610040  addi     r3, r1, 0x40
+0046f65c: 3880ffff  li       r4, -1
+0046f660: 48085321  bl       0x4f4980   ; .__dt__9cTSStringFv
+0046f664: 80010328  lwz      r0, 0x328(r1)
+0046f668: 38210320  addi     r1, r1, 0x320
+0046f66c: bb41ffe8  lmw      r26, -0x18(r1)
+0046f670: 7c0803a6  mtlr     r0
+0046f674: 4e800020  blr      
+0046f678: 00000000  .long    0x00000000
+0046f67c: 00092041  .long    0x00092041

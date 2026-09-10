@@ -1,0 +1,127 @@
+GLVersion=Reach adapter=Apple M4 Max
+xnb=33280B  mgfx@141 -> 33139B
+effect loaded OK, techniques=7
+TYPE Microsoft.Xna.Framework.Graphics.Effect :
+   EffectParameterCollection <Parameters>k__BackingField
+   EffectTechniqueCollection <Techniques>k__BackingField
+   EffectTechnique <CurrentTechnique>k__BackingField
+   ConstantBuffer[] <ConstantBuffers>k__BackingField
+   Shader[] _shaders
+   Boolean _isClone
+TYPE Microsoft.Xna.Framework.Graphics.ConstantBuffer :
+   Byte[] _buffer
+   Int32[] _parameters
+   Int32[] _offsets
+   String _name
+   UInt64 _stateKey
+   Boolean _dirty
+   ShaderProgram _shaderProgram
+   Int32 _location
+   Int32 <HashKey>k__BackingField
+   ConstantBuffer _lastConstantBufferApplied
+TYPE Microsoft.Xna.Framework.Graphics.Shader :
+   Int32 <HashKey>k__BackingField
+   SamplerInfo[] <Samplers>k__BackingField
+   Int32[] <CBuffers>k__BackingField
+   ShaderStage <Stage>k__BackingField
+   VertexAttribute[] <Attributes>k__BackingField
+   Int32 _shaderHandle
+   String _glslCode
+  tech[0] NoSSAA passes=1
+  tech[1] ObjIDMode passes=1
+  tech[2] AdvancedLighting passes=1
+  tech[3] SSAA passes=1
+  tech[4] ShadowTech passes=1
+  tech[5] AdvancedLightingDirection passes=1
+  tech[6] HeadObject passes=1
+  param[0] AmbientLight class=Vector type=Single rows=1 cols=4 elems=0 structMembers=0
+  param[1] depthOutMode class=Scalar type=Bool rows=1 cols=1 elems=0 structMembers=0
+  param[2] SkelBindings class=Matrix type=Single rows=4 cols=4 elems=50 structMembers=0
+  param[3] World class=Matrix type=Single rows=4 cols=4 elems=0 structMembers=0
+  param[4] View class=Matrix type=Single rows=4 cols=4 elems=0 structMembers=0
+  param[5] Projection class=Matrix type=Single rows=4 cols=4 elems=0 structMembers=0
+  param[6] ObjectID class=Scalar type=Single rows=1 cols=1 elems=0 structMembers=0
+  param[7] WorldToLightFactor class=Vector type=Single rows=1 cols=3 elems=0 structMembers=0
+  param[8] LightOffset class=Vector type=Single rows=1 cols=2 elems=0 structMembers=0
+  param[9] MapLayout class=Vector type=Single rows=1 cols=2 elems=0 structMembers=0
+  param[10] Level class=Scalar type=Single rows=1 cols=1 elems=0 structMembers=0
+  param[11] LightingAdjust class=Vector type=Single rows=1 cols=3 elems=0 structMembers=0
+  param[12] SoftwareDepth class=Scalar type=Bool rows=1 cols=1 elems=0 structMembers=0
+  param[13] LightPosition class=Vector type=Single rows=1 cols=2 elems=0 structMembers=0
+  param[14] OutsideDark class=Vector type=Single rows=1 cols=4 elems=0 structMembers=0
+  param[15] HOToonSpecThresh class=Scalar type=Single rows=1 cols=1 elems=0 structMembers=0
+  param[16] HOToonSpecColor class=Vector type=Single rows=1 cols=3 elems=0 structMembers=0
+  param[17] HOCameraPosition class=Vector type=Single rows=1 cols=3 elems=0 structMembers=0
+  param[18] MeshTex class=Object type=Texture2D rows=0 cols=0 elems=0 structMembers=0
+  param[19] advancedLight class=Object type=Texture2D rows=0 cols=0 elems=0 structMembers=0
+  param[20] depthMap class=Object type=Texture2D rows=0 cols=0 elems=0 structMembers=0
+  param[21] advancedDirection class=Object type=Texture2D rows=0 cols=0 elems=0 structMembers=0
+  CB name=ps_uniforms_vec4 bufLen=32 params=0@0,1@16
+  CB name=vs_uniforms_vec4 bufLen=3392 params=2@0,3@3200,4@3264,5@3328
+  CB name=ps_uniforms_vec4 bufLen=16 params=6@0
+  CB name=ps_uniforms_vec4 bufLen=112 params=7@0,8@16,9@32,10@48,11@64,0@80,1@96
+  CB name=ps_uniforms_vec4 bufLen=48 params=12@0,1@16,13@32
+  CB name=vs_uniforms_vec4 bufLen=3408 params=2@0,3@3200,4@3264,5@3328,13@3392
+  CB name=ps_uniforms_vec4 bufLen=128 params=14@0,7@16,8@32,9@48,10@64,11@80,0@96,1@112
+  CB name=ps_uniforms_vec4 bufLen=144 params=7@0,8@16,9@32,10@48,0@64,1@80,15@96,16@112,17@128
+  CB name=vs_uniforms_vec4 bufLen=192 params=3@0,4@64,5@128
+  shader[0] stage=Pixel glslLen=1223 attrs=0
+  shader[1] stage=Vertex glslLen=3884 attrs=5
+     attr usage=Position index=0 name=vs_v0 location=0
+     attr usage=TextureCoordinate index=0 name=vs_v1 location=0
+     attr usage=TextureCoordinate index=1 name=vs_v2 location=0
+     attr usage=TextureCoordinate index=2 name=vs_v3 location=0
+     attr usage=Normal index=0 name=vs_v4 location=0
+  shader[2] stage=Pixel glslLen=458 attrs=0
+  shader[3] stage=Pixel glslLen=3775 attrs=0
+  shader[4] stage=Pixel glslLen=1939 attrs=0
+  shader[5] stage=Pixel glslLen=2387 attrs=0
+  shader[6] stage=Vertex glslLen=4070 attrs=2
+     attr usage=Position index=0 name=vs_v0 location=0
+     attr usage=TextureCoordinate index=0 name=vs_v1 location=0
+  shader[7] stage=Pixel glslLen=4464 attrs=0
+  shader[8] stage=Pixel glslLen=2281 attrs=0
+  shader[9] stage=Vertex glslLen=2318 attrs=3
+     attr usage=Position index=0 name=vs_v0 location=0
+     attr usage=TextureCoordinate index=0 name=vs_v1 location=0
+     attr usage=TextureCoordinate index=1 name=vs_v2 location=0
+  DRAW NoSSAA [CCW idx, defaultCull]: colored=0 EMPTY
+  DRAW NoSSAA [CCW idx, CullNone]: colored=0 EMPTY
+  DRAW NoSSAA [CW idx, defaultCull]: colored=0 EMPTY
+  DRAW ObjIDMode [CCW idx, defaultCull]: colored=0 EMPTY
+  DRAW ObjIDMode [CCW idx, CullNone]: colored=65536 RENDERED
+  DRAW ObjIDMode [CW idx, defaultCull]: colored=65536 RENDERED
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 1 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+  DRAW AdvancedLighting [CCW idx, defaultCull]: colored=0 EMPTY
+  DRAW AdvancedLighting [CCW idx, CullNone]: colored=65536 RENDERED
+  DRAW AdvancedLighting [CW idx, defaultCull]: colored=65536 RENDERED
+  DRAW SSAA [CCW idx, defaultCull]: colored=0 EMPTY
+  DRAW SSAA [CCW idx, CullNone]: colored=65536 RENDERED
+  DRAW SSAA [CW idx, defaultCull]: colored=65536 RENDERED
+  DRAW ShadowTech [CCW idx, defaultCull]: colored=0 EMPTY
+  DRAW ShadowTech [CCW idx, CullNone]: colored=24494 RENDERED
+  DRAW ShadowTech [CW idx, defaultCull]: colored=24494 RENDERED
+  DRAW AdvancedLightingDirection [CCW idx, defaultCull]: colored=0 EMPTY
+  DRAW AdvancedLightingDirection [CCW idx, CullNone]: colored=65536 RENDERED
+  DRAW AdvancedLightingDirection [CW idx, defaultCull]: colored=65536 RENDERED
+  DRAW HeadObject [CCW idx, defaultCull]: colored=0 EMPTY
+  DRAW HeadObject [CCW idx, CullNone]: colored=65536 RENDERED
+  DRAW HeadObject [CW idx, defaultCull]: colored=65536 RENDERED
+  POST CB name=ps_uniforms_vec4 bufLen=32 nonzeroVec4s=4 u[0].x=1 u[200].x=0 _location=2 _shaderProgram=SET _dirty=False
+  POST CB name=vs_uniforms_vec4 bufLen=3392 nonzeroVec4s=212 u[0].x=1 u[200].x=1 _location=11 _shaderProgram=SET _dirty=False
+  POST CB name=ps_uniforms_vec4 bufLen=16 nonzeroVec4s=0 u[0].x=0 u[200].x=0 _location=1 _shaderProgram=SET _dirty=False
+  POST CB name=ps_uniforms_vec4 bufLen=112 nonzeroVec4s=4 u[0].x=0 u[200].x=0 _location=2 _shaderProgram=SET _dirty=False
+  POST CB name=ps_uniforms_vec4 bufLen=48 nonzeroVec4s=0 u[0].x=0 u[200].x=0 _location=2 _shaderProgram=SET _dirty=False
+  POST CB name=vs_uniforms_vec4 bufLen=3408 nonzeroVec4s=212 u[0].x=1 u[200].x=1 _location=5 _shaderProgram=SET _dirty=False
+  POST CB name=ps_uniforms_vec4 bufLen=128 nonzeroVec4s=4 u[0].x=0 u[200].x=0 _location=2 _shaderProgram=SET _dirty=False
+  POST CB name=ps_uniforms_vec4 bufLen=144 nonzeroVec4s=4 u[0].x=0 u[200].x=0 _location=2 _shaderProgram=SET _dirty=False
+  POST CB name=vs_uniforms_vec4 bufLen=192 nonzeroVec4s=12 u[0].x=1 u[200].x=1 _location=11 _shaderProgram=SET _dirty=False
+  CONTROL BasicEffect [CCW, defaultCull]: colored=0 EMPTY
+  CONTROL BasicEffect [CCW, CullNone]: colored=65536 RENDERED
+  CONTROL RCObject loaded, techniques=6
+  CONTROL RCObject Draw: colored=65536 RENDERED
+  CONTROL RCObject DepthClear: colored=65536 RENDERED
+  CONTROL RCObject DisabledDraw: colored=65536 RENDERED
+  CONTROL RCObject WallDraw: colored=0 EMPTY
+  CONTROL RCObject WallLMap: colored=65280 RENDERED
+  CONTROL RCObject LMapDraw: colored=65536 RENDERED

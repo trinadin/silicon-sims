@@ -43,7 +43,10 @@ namespace Simitone.Client.UI.Panels.LotControls
         public UISelectSkinAlert(VMAvatar target, string type, VM vm)
         {
             var pet = type == "cat" || type == "dog";
-            Caption = pet ? "Adopt a Pet" : "Please Select Outfit";
+            // R115: original values — 221 'Pet Dialog Strings' [4] 'Please Select Your Pet'
+            // (the port's "Adopt a Pet" has no verbatim original) and 220 'Clothing Dialog
+            // Text' [4] 'Please Select Outfit' (exact).
+            Caption = pet ? GameFacade.Strings.GetString("221", "4") : GameFacade.Strings.GetString("220", "4");
             SetHeight(600);
             NPanel = new UISelectSkinPanel(target, type, vm);
             NPanel.Position = new Microsoft.Xna.Framework.Vector2((Width - 1030) / 2, 110);
@@ -54,7 +57,8 @@ namespace Simitone.Client.UI.Panels.LotControls
         public override void GameResized()
         {
             base.GameResized();
-            NPanel.Position = new Microsoft.Xna.Framework.Vector2((Width - 1030) / 2, 110);
+            if (NPanel != null)
+                NPanel.Position = new Microsoft.Xna.Framework.Vector2((Width - 1030) / 2, 110);
         }
     }
 
@@ -159,6 +163,7 @@ namespace Simitone.Client.UI.Panels.LotControls
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             base.Draw(batch);
             DrawLocalTexture(batch, Scene.Target, new Vector2(0, 0));
         }

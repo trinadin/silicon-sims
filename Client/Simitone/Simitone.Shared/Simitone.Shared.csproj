@@ -16,7 +16,7 @@
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
     
     <!-- Eto.Forms core - platform backends loaded at runtime -->
-    <PackageReference Include="Eto.Forms" Version="2.8.4" />
+    <PackageReference Include="Eto.Forms" Version="2.9.0" />
   </ItemGroup>
 
   <ItemGroup>

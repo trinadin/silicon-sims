@@ -1,0 +1,79 @@
+000f0b80: 38a00000  li       r5, 0
+000f0b84: 4849fb9d  bl       0x590720
+000f0b88: a81e0004  lha      r0, 4(r30)
+000f0b8c: 3b800000  li       r28, 0
+000f0b90: 809d00dc  lwz      r4, 0xdc(r29)
+000f0b94: 7c050735  extsh.   r5, r0
+000f0b98: 40810024  ble      0xf0bbc
+000f0b9c: 8064001c  lwz      r3, 0x1c(r4)
+000f0ba0: 38030001  addi     r0, r3, 1
+000f0ba4: 7c050040  cmplw    r5, r0
+000f0ba8: 40800014  bge      0xf0bbc
+000f0bac: 3805ffff  addi     r0, r5, -1
+000f0bb0: 80640020  lwz      r3, 0x20(r4)
+000f0bb4: 5400103a  slwi     r0, r0, 2
+000f0bb8: 7f83002e  lwzx     r28, r3, r0
+000f0bbc: 281c0000  cmplwi   r28, 0
+000f0bc0: 4082001c  bne      0xf0bdc
+000f0bc4: 38000017  li       r0, 0x17
+000f0bc8: 3881004c  addi     r4, r1, 0x4c
+000f0bcc: b001004c  sth      r0, 0x4c(r1)
+000f0bd0: 387f0000  addi     r3, r31, 0
+000f0bd4: 38a00000  li       r5, 0
+000f0bd8: 4849fb49  bl       0x590720
+000f0bdc: 387b0000  addi     r3, r27, 0
+000f0be0: 389c0000  addi     r4, r28, 0
+000f0be4: 4bfd523d  bl       0xc5e20   ; .CalcShortDistance__8cXObjectFP8cXObject
+000f0be8: fc00081e  fctiwz   f0, f1
+000f0bec: a8010058  lha      r0, 0x58(r1)
+000f0bf0: 3b400001  li       r26, 1
+000f0bf4: 5400083c  slwi     r0, r0, 1
+000f0bf8: d80101d0  stfd     f0, 0x1d0(r1)
+000f0bfc: 7c7d0214  add      r3, r29, r0
+000f0c00: 800101d4  lwz      r0, 0x1d4(r1)
+000f0c04: b003003a  sth      r0, 0x3a(r3)
+000f0c08: 4800009c  b        0xf0ca4
+000f0c0c: 7f65db78  mr       r5, r27
+000f0c10: 480001c1  bl       0xf0dd0   ; .TryDirectionTo__8cXObjectFP9StackElemP10XPrimParam
+000f0c14: 7c7a1b78  mr       r26, r3
+000f0c18: 4800008c  b        0xf0ca4
+000f0c1c: 7f65db78  mr       r5, r27
+000f0c20: 4bfff2b1  bl       0xefed0   ; .TryPlaySound__8cXObjectFP9StackElemP14PlaySoundParam
+000f0c24: 7c7a1b78  mr       r26, r3
+000f0c28: 4800007c  b        0xf0ca4
+000f0c2c: 7f65db78  mr       r5, r27
+000f0c30: 4bfff661  bl       0xf0290   ; .TryKillSounds__8cXObjectFP9StackElemP15KillSoundsParam
+000f0c34: 7c7a1b78  mr       r26, r3
+000f0c38: 4800006c  b        0xf0ca4
+000f0c3c: 7f65db78  mr       r5, r27
+000f0c40: 48003c01  bl       0xf4840
+000f0c44: 7c7a1b78  mr       r26, r3
+000f0c48: 4800005c  b        0xf0ca4
+000f0c4c: 7f65db78  mr       r5, r27
+000f0c50: 48005951  bl       0xf65a0   ; .TryBurn__8cXObjectFP9StackElemP10XPrimParam
+000f0c54: 7c7a1b78  mr       r26, r3
+000f0c58: 4800004c  b        0xf0ca4
+000f0c5c: 7f65db78  mr       r5, r27
+000f0c60: 48006421  bl       0xf7080   ; .TryTutorial__8cXObjectFP9StackElemP10XPrimParam
+000f0c64: 7c7a1b78  mr       r26, r3
+000f0c68: 4800003c  b        0xf0ca4
+000f0c6c: 7f65db78  mr       r5, r27
+000f0c70: 4800a001  bl       0xfac70   ; .TryUserEvent__8cXObjectFP9StackElemP10XPrimParam
+000f0c74: 7c7a1b78  mr       r26, r3
+000f0c78: 4800002c  b        0xf0ca4
+000f0c7c: 7f65db78  mr       r5, r27
+000f0c80: 4bffb041  bl       0xebcc0   ; .TryInventoryAction__8cXObjectFP9StackElemP10XPrimParam
+000f0c84: 7c7a1b78  mr       r26, r3
+000f0c88: 4800001c  b        0xf0ca4
+000f0c8c: 38000005  li       r0, 5
+000f0c90: 38810040  addi     r4, r1, 0x40
+000f0c94: b0010040  sth      r0, 0x40(r1)
+000f0c98: 387f0000  addi     r3, r31, 0
+000f0c9c: 38a00000  li       r5, 0
+000f0ca0: 4849fa81  bl       0x590720
+000f0ca4: 7f43d378  mr       r3, r26
+000f0ca8: 80010208  lwz      r0, 0x208(r1)
+000f0cac: 38210200  addi     r1, r1, 0x200
+000f0cb0: 7c0803a6  mtlr     r0
+000f0cb4: bb41ffe8  lmw      r26, -0x18(r1)
+000f0cb8: 4e800020  blr      

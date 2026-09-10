@@ -1,0 +1,66 @@
+000f17f0: 38da0000  addi     r6, r26, 0
+000f17f4: 4bff200d  bl       0xe3800   ; .EnqueueObjectDialog__12ObjectModuleFP8cXObjectP9StackElemP11DialogParam
+000f17f8: 38600001  li       r3, 1
+000f17fc: 480006c4  b        0xf1ec0
+000f1800: 881a0005  lbz      r0, 5(r26)
+000f1804: 5400067e  clrlwi   r0, r0, 0x19
+000f1808: 2c000005  cmpwi    r0, 5
+000f180c: 4082003c  bne      0xf1848
+000f1810: 807800dc  lwz      r3, 0xdc(r24)
+000f1814: a88300ee  lha      r4, 0xee(r3)
+000f1818: 7c800735  extsh.   r0, r4
+000f181c: 40820014  bne      0xf1830
+000f1820: 3800ffff  li       r0, -1
+000f1824: b00300ee  sth      r0, 0xee(r3)
+000f1828: 38600002  li       r3, 2
+000f182c: 48000694  b        0xf1ec0
+000f1830: b098003a  sth      r4, 0x3a(r24)
+000f1834: 38000000  li       r0, 0
+000f1838: 38600001  li       r3, 1
+000f183c: 809800dc  lwz      r4, 0xdc(r24)
+000f1840: b00400ee  sth      r0, 0xee(r4)
+000f1844: 4800067c  b        0xf1ec0
+000f1848: 2c000008  cmpwi    r0, 8
+000f184c: 4082003c  bne      0xf1888
+000f1850: 807800dc  lwz      r3, 0xdc(r24)
+000f1854: a88300f6  lha      r4, 0xf6(r3)
+000f1858: 7c800735  extsh.   r0, r4
+000f185c: 40820014  bne      0xf1870
+000f1860: 3800ffff  li       r0, -1
+000f1864: b00300f6  sth      r0, 0xf6(r3)
+000f1868: 38600002  li       r3, 2
+000f186c: 48000654  b        0xf1ec0
+000f1870: b098003a  sth      r4, 0x3a(r24)
+000f1874: 38000000  li       r0, 0
+000f1878: 38600001  li       r3, 1
+000f187c: 809800dc  lwz      r4, 0xdc(r24)
+000f1880: b00400f6  sth      r0, 0xf6(r4)
+000f1884: 4800063c  b        0xf1ec0
+000f1888: 2c000007  cmpwi    r0, 7
+000f188c: 4082003c  bne      0xf18c8
+000f1890: 807800dc  lwz      r3, 0xdc(r24)
+000f1894: a88300f0  lha      r4, 0xf0(r3)
+000f1898: 7c800735  extsh.   r0, r4
+000f189c: 40820014  bne      0xf18b0
+000f18a0: 3800ffff  li       r0, -1
+000f18a4: b00300f0  sth      r0, 0xf0(r3)
+000f18a8: 38600002  li       r3, 2
+000f18ac: 48000614  b        0xf1ec0
+000f18b0: b098003a  sth      r4, 0x3a(r24)
+000f18b4: 38000000  li       r0, 0
+000f18b8: 38600001  li       r3, 1
+000f18bc: 809800dc  lwz      r4, 0xdc(r24)
+000f18c0: b00400f0  sth      r0, 0xf0(r4)
+000f18c4: 480005fc  b        0xf1ec0
+000f18c8: 2c00000b  cmpwi    r0, 0xb
+000f18cc: 4082003c  bne      0xf1908
+000f18d0: 807800dc  lwz      r3, 0xdc(r24)
+000f18d4: a88300f2  lha      r4, 0xf2(r3)
+000f18d8: 7c800735  extsh.   r0, r4
+000f18dc: 40820014  bne      0xf18f0
+000f18e0: 3800ffff  li       r0, -1
+000f18e4: b00300f2  sth      r0, 0xf2(r3)
+000f18e8: 38600002  li       r3, 2
+000f18ec: 480005d4  b        0xf1ec0
+000f18f0: b098003a  sth      r4, 0x3a(r24)
+000f18f4: 38000000  li       r0, 0

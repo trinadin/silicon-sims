@@ -1,0 +1,37 @@
+                ; ==== .SetDynamicCutaway__11HouseViewerFb ====
+001d6f70: 93e1fffc  stw      r31, -4(r1)
+001d6f74: 7c0802a6  mflr     r0
+001d6f78: 5485063e  clrlwi   r5, r4, 0x18
+001d6f7c: 90010008  stw      r0, 8(r1)
+001d6f80: 7c7f1b78  mr       r31, r3
+001d6f84: 9421ffb0  stwu     r1, -0x50(r1)
+001d6f88: 88030049  lbz      r0, 0x49(r3)
+001d6f8c: 7c050040  cmplw    r5, r0
+001d6f90: 4182004c  beq      0x1d6fdc
+001d6f94: 989f0049  stb      r4, 0x49(r31)
+001d6f98: 38800000  li       r4, 0
+001d6f9c: 38000001  li       r0, 1
+001d6fa0: 989f0048  stb      r4, 0x48(r31)
+001d6fa4: 981f004e  stb      r0, 0x4e(r31)
+001d6fa8: 81830004  lwz      r12, 4(r3)
+001d6fac: 818c0050  lwz      r12, 0x50(r12)
+001d6fb0: 483cba31  bl       0x5a29e0
+001d6fb4: 80410014  lwz      r2, 0x14(r1)
+001d6fb8: 807f01fc  lwz      r3, 0x1fc(r31)
+001d6fbc: 4bfd2ea5  bl       0x1a9e60   ; .clear__11cCutawaySetFv
+001d6fc0: 387f0204  addi     r3, r31, 0x204
+001d6fc4: 38800000  li       r4, 0
+001d6fc8: 38a00200  li       r5, 0x200
+001d6fcc: 483bfda5  bl       0x596d70
+001d6fd0: 889f01f8  lbz      r4, 0x1f8(r31)
+001d6fd4: 7fe3fb78  mr       r3, r31
+001d6fd8: 4bff83d9  bl       0x1cf3b0   ; .DoDynamicCutaway__11HouseViewerFb
+001d6fdc: 80010058  lwz      r0, 0x58(r1)
+001d6fe0: 38210050  addi     r1, r1, 0x50
+001d6fe4: 83e1fffc  lwz      r31, -4(r1)
+001d6fe8: 7c0803a6  mtlr     r0
+001d6fec: 4e800020  blr
+001d6ff0: 00000000  .long    0x00000000
+001d6ff4: 00092041  .long    0x00092041
+001d6ff8: 80010000  lwz      r0, 0(r1)
+001d6ffc: 00000080  .long    0x00000080

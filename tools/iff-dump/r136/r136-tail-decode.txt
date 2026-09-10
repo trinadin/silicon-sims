@@ -1,0 +1,133 @@
+==============================================================================
+SECTION 1: the const pools (raw bytes from file)
+==============================================================================
+pool @0x5a2fb4:
+  +0: 0x00000000 = 0.0
+  +4: 0x3f800000 = 1.0
+  +8: 0x42c80000 = 100.0
+  +12: 0x40100000 = 2.25
+pool @0x5a2fc0:
+  +0: 0x4010000000000000 = 4.0
+  +8: 0x4330000080000000 = 4503601774854144.0
+  +16: 0x4059000000000000 = 100.0
+  +24: 0x00c800c900ca00cb = 6.836300422052786e-305
+
+==============================================================================
+SECTION 2: symbolic execution of GetHouseStats tail 0x8c2e0-0x8c3e0
+==============================================================================
+0x08c2e0: 807c0010  .long                                | r3 = MEM(House+16)
+0x08c2e4: 4bfea92d  .long                                | bl 0x76c10
+0x08c2e8: 907d0004  .long                                | MEM(stats+4) = MEM(House+16)
+0x08c2ec: 809c0030  .long                                | r4 = MEM(House+48)
+0x08c2f0: 801c0038  .long                                | r0 = MEM(House+56)
+0x08c2f4: 807c0040  .long                                | r3 = MEM(House+64)
+0x08c2f8: 7ce40214  .long                                | r7 = (MEM(House+48) + MEM(House+56))
+0x08c2fc: 801c0048  .long                                | r0 = MEM(House+72)
+0x08c300: 7ce71a14  .long                                | r7 = ((MEM(House+48) + MEM(House+56)) + MEM(House+64))
+0x08c304: 80dc0034  .long                                | r6 = MEM(House+52)
+0x08c308: 809c003c  .long                                | r4 = MEM(House+60)
+0x08c30c: 7ce70214  .long                                | r7 = (((MEM(House+48) + MEM(House+56)) + MEM(House+64)) + MEM(House+72))
+0x08c310: 807c0050  .long                                | r3 = MEM(House+80)
+0x08c314: 80bc0044  .long                                | r5 = MEM(House+68)
+0x08c318: 7cc62214  .long                                | r6 = (MEM(House+52) + MEM(House+60))
+0x08c31c: 801c0058  .long                                | r0 = MEM(House+88)
+0x08c320: 7ce71a14  .long                                | r7 = ((((MEM(House+48) + MEM(House+56)) + MEM(House+64)) + MEM(House+72)) + MEM(House+80))
+0x08c324: 809c004c  .long                                | r4 = MEM(House+76)
+0x08c328: 7cc62a14  .long                                | r6 = ((MEM(House+52) + MEM(House+60)) + MEM(House+68))
+0x08c32c: 7ce70214  .long                                | r7 = (((((MEM(House+48) + MEM(House+56)) + MEM(House+64)) + MEM(House+72)) + MEM(House+80)) + MEM(House+88))
+0x08c330: 807c0054  .long                                | r3 = MEM(House+84)
+0x08c334: 7cc62214  .long                                | r6 = (((MEM(House+52) + MEM(House+60)) + MEM(House+68)) + MEM(House+76))
+0x08c338: 2c070001  .long                                | cmpwi cr0, (((((MEM(House+48) + MEM(House+56)) + MEM(House+64)) + MEM(House+72)) + MEM(House+80)) + MEM(House+88)), 1
+0x08c33c: 801c005c  .long                                | r0 = MEM(House+92)
+0x08c340: 7cc61a14  .long                                | r6 = ((((MEM(House+52) + MEM(House+60)) + MEM(House+68)) + MEM(House+76)) + MEM(House+84))
+0x08c344: 7cc60214  .long                                | r6 = (((((MEM(House+52) + MEM(House+60)) + MEM(House+68)) + MEM(House+76)) + MEM(House+84)) + MEM(House+92))
+0x08c348: 40800008  .long                                | bcr0.LT clear -> 0x8c350
+0x08c34c: 38e00001  .long                                | r7 = 0x1
+0x08c350: 54c0083c  .long                                | r0 = (2*((((((MEM(House+52) + MEM(House+60)) + MEM(House+68)) + MEM(House+76)) + MEM(House+84)) + MEM(House+92)))) & 0x7fffffff
+0x08c354: 80a2a424  .long                                | r5 = [TOC-23516]
+0x08c358: 3c604330  .long                                | r3 = 0x43300000
+0x08c35c: c01f0000  lfs f0, 0(r31)                       | f0 = (float)MEM([TOC-23512]+0)
+0x08c360: 6ce48000  .long                                | r7 = (MEM(House+76) ^ 0x80000000)
+0x08c364: 90610048  .long                                | [sp72] = 0x43300000
+0x08c368: 6c008000  .long                                | r0 = ((2*((((((MEM(House+52) + MEM(House+60)) + MEM(House+68)) + MEM(House+76)) + MEM(House+84)) + MEM(House+92)))) & 0x7fffffff ^ 0x80000000)
+0x08c36c: c8850008  lfd f4, 8(r5)                        | f4 = (double)MEM([TOC-23516]+8)
+0x08c370: 9081004c  .long                                | [sp76] = MEM(House+76)
+0x08c374: c8210048  lfd f1, 72(r1)                       | f1 = dbl{HI=['0x43300000'], LO=['MEM(House+76)'] }
+0x08c378: 90010054  .long                                | [sp84] = ((2*((((((MEM(House+52) + MEM(House+60)) + MEM(House+68)) + MEM(House+76)) + MEM(House+84)) + MEM(House+92)))) & 0x7fffffff ^ 0x80000000)
+0x08c37c: ec612028  fsubs f3, f1, f4                     | f3 = (dbl{HI=['0x43300000'], LO=['MEM(House+76)'] } - (double)MEM([TOC-23516]+8))
+0x08c380: 90610050  .long                                | [sp80] = 0x43300000
+0x08c384: c8210050  lfd f1, 80(r1)                       | f1 = dbl{HI=['0x43300000'], LO=['((2*((((((MEM(House+52) + MEM(House+60)) + MEM(House+68)) + MEM(House+76)) + MEM(House+84)) + MEM(House+92)))) & 0x7fffffff ^ 0x80000000)'] }
+0x08c388: 9081005c  .long                                | [sp92] = MEM(House+76)
+0x08c38c: ec412028  fsubs f2, f1, f4                     | f2 = (dbl{HI=['0x43300000'], LO=['((2*((((((MEM(House+52) + MEM(House+60)) + MEM(House+68)) + MEM(House+76)) + MEM(House+84)) + MEM(House+92)))) & 0x7fffffff ^ 0x80000000)'] } - (double)MEM([TOC-23516]+8))
+0x08c390: 90610058  .long                                | [sp88] = 0x43300000
+0x08c394: c8210058  lfd f1, 88(r1)                       | f1 = dbl{HI=['0x43300000'], LO=['MEM(House+76)'] }
+0x08c398: ec431028  fsubs f2, f3, f2                     | f2 = ((dbl{HI=['0x43300000'], LO=['MEM(House+76)'] } - (double)MEM([TOC-23516]+8)) - (dbl{HI=['0x43300000'], LO=['((2*((((((MEM(House+52) + MEM(House+60)) + MEM(House+68)) + MEM(House+76)) + MEM(House+84)) + MEM(House+92)))) & 0x7fffffff ^ 0x80000000)'] } - (double)MEM([TOC-23516]+8)))
+0x08c39c: ec212028  fsubs f1, f1, f4                     | f1 = (dbl{HI=['0x43300000'], LO=['MEM(House+76)'] } - (double)MEM([TOC-23516]+8))
+0x08c3a0: ec220824  fdivs f1, f2, f1                     | f1 = (((dbl{HI=['0x43300000'], LO=['MEM(House+76)'] } - (double)MEM([TOC-23516]+8)) - (dbl{HI=['0x43300000'], LO=['((2*((((((MEM(House+52) + MEM(House+60)) + MEM(House+68)) + MEM(House+76)) + MEM(House+84)) + MEM(House+92)))) & 0x7fffffff ^ 0x80000000)'] } - (double)MEM([TOC-23516]+8))) / (dbl{HI=['0x43300000'], LO=['MEM(House+76)'] } - (double)MEM([TOC-23516]+8)))
+0x08c3a4: fc010040  fcmpo cr0, f1, f0                    | fcmpo (((dbl{HI=['0x43300000'], LO=['MEM(House+76)'] } - (double)MEM([TOC-23516]+8)) - (dbl{HI=['0x43300000'], LO=['((2*((((((MEM(House+52) + MEM(House+60)) + MEM(House+68)) + MEM(House+76)) + MEM(House+84)) + MEM(House+92)))) & 0x7fffffff ^ 0x80000000)'] } - (double)MEM([TOC-23516]+8))) / (dbl{HI=['0x43300000'], LO=['MEM(House+76)'] } - (double)MEM([TOC-23516]+8))) vs (float)MEM([TOC-23512]+0)
+0x08c3a8: 40800008  .long                                | bcr0.LT clear -> 0x8c3b0
+0x08c3ac: fc200090  fmr f1, f0                           | f1 = f0
+0x08c3b0: c01f0004  lfs f0, 4(r31)                       | f0 = (float)MEM([TOC-23512]+4)
+0x08c3b4: fc010040  fcmpo cr0, f1, f0                    | fcmpo (float)MEM([TOC-23512]+0) vs (float)MEM([TOC-23512]+4)
+0x08c3b8: 40810008  .long                                | bcr0.GT clear -> 0x8c3c0
+0x08c3bc: fc200090  fmr f1, f0                           | f1 = f0
+0x08c3c0: 8062a424  .long                                | r3 = [TOC-23516]
+0x08c3c4: c8030010  lfd f0, 16(r3)                       | f0 = (double)MEM([TOC-23516]+16)
+0x08c3c8: fc000072  fmul f0, f0, f1                      | f0 = ((double)MEM([TOC-23516]+16) * (float)MEM([TOC-23512]+4))
+0x08c3cc: fc00001e  fctiwz f0, f0                        | f0 = (int)((double)MEM([TOC-23516]+16) * (float)MEM([TOC-23512]+4))
+0x08c3d0: d8010060  stfd f0, 96(r1)                      | [sp96..] = dbl((int)((double)MEM([TOC-23516]+16) * (float)MEM([TOC-23512]+4)))
+0x08c3d4: 80010064  .long                                | r0 = MEM(None+100)
+0x08c3d8: 901d0018  .long                                | MEM(stats+24) = MEM(None+100)
+0x08c3dc: 80010098  .long                                | r0 = MEM(None+152)
+
+==============================================================================
+SECTION 3: ClearRouteHistory 0x8c430 (init constant via [TOC-29460])
+==============================================================================
+0x08c430: 38800000  .long                                | r4 = 0x0
+0x08c434: 80a28cec  .long                                | r5 = [TOC-29460]
+0x08c438: 90830030  .long                                | MEM(r3?+48) = 0x0
+0x08c43c: 90830034  .long                                | MEM(r3?+52) = 0x0
+0x08c440: 80050000  .long                                | r0 = MEM([TOC-29460]+0)
+0x08c444: 90030034  .long                                | MEM(r3?+52) = MEM([TOC-29460]+0)
+0x08c448: 80050000  .long                                | r0 = MEM([TOC-29460]+0)
+0x08c44c: 90030030  .long                                | MEM(r3?+48) = MEM([TOC-29460]+0)
+0x08c450: 90830038  .long                                | MEM(r3?+56) = 0x0
+0x08c454: 9083003c  .long                                | MEM(r3?+60) = 0x0
+0x08c458: 80050000  .long                                | r0 = MEM([TOC-29460]+0)
+0x08c45c: 9003003c  .long                                | MEM(r3?+60) = MEM([TOC-29460]+0)
+0x08c460: 80050000  .long                                | r0 = MEM([TOC-29460]+0)
+0x08c464: 90030038  .long                                | MEM(r3?+56) = MEM([TOC-29460]+0)
+0x08c468: 90830040  .long                                | MEM(r3?+64) = 0x0
+0x08c46c: 90830044  .long                                | MEM(r3?+68) = 0x0
+0x08c470: 80050000  .long                                | r0 = MEM([TOC-29460]+0)
+0x08c474: 90030044  .long                                | MEM(r3?+68) = MEM([TOC-29460]+0)
+0x08c478: 80050000  .long                                | r0 = MEM([TOC-29460]+0)
+0x08c47c: 90030040  .long                                | MEM(r3?+64) = MEM([TOC-29460]+0)
+0x08c480: 90830048  .long                                | MEM(r3?+72) = 0x0
+0x08c484: 9083004c  .long                                | MEM(r3?+76) = 0x0
+0x08c488: 80050000  .long                                | r0 = MEM([TOC-29460]+0)
+0x08c48c: 9003004c  .long                                | MEM(r3?+76) = MEM([TOC-29460]+0)
+0x08c490: 80050000  .long                                | r0 = MEM([TOC-29460]+0)
+0x08c494: 90030048  .long                                | MEM(r3?+72) = MEM([TOC-29460]+0)
+0x08c498: 90830050  .long                                | MEM(r3?+80) = 0x0
+0x08c49c: 90830054  .long                                | MEM(r3?+84) = 0x0
+0x08c4a0: 80050000  .long                                | r0 = MEM([TOC-29460]+0)
+0x08c4a4: 90030054  .long                                | MEM(r3?+84) = MEM([TOC-29460]+0)
+0x08c4a8: 80050000  .long                                | r0 = MEM([TOC-29460]+0)
+0x08c4ac: 90030050  .long                                | MEM(r3?+80) = MEM([TOC-29460]+0)
+0x08c4b0: 90830058  .long                                | MEM(r3?+88) = 0x0
+0x08c4b4: 9083005c  .long                                | MEM(r3?+92) = 0x0
+0x08c4b8: 4e800020  .long                                | 
+
+[TOC-29460] @sec1+0xcec = 0x852a0
+  code-rel file 0x8e130: u32=0x3bc40000  bytes=3bc4000093a1fff47c7d1b789381fff0
+
+==============================================================================
+SECTION 4: bl callers of AddLayoutTick(0x8c4f0) / ClearRouteHistory(0x8c430)
+==============================================================================
+AddLayoutTick: 1 callers
+  call at 0x10c2d8
+ClearRouteHistory: 3 callers
+  call at 0xb05f4
+  call at 0xb1684
+  call at 0xb1c20

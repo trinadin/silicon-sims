@@ -1,0 +1,164 @@
+{
+  "bytePins": 20,
+  "vtablePins": 10,
+  "checks": "PASS",
+  "assumptions": "normal PIP flags, no capture buffer, full parent redraw",
+  "examples": [
+    {
+      "opening": true,
+      "elapsed": 0,
+      "alpha": 0,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": true,
+      "elapsed": 9,
+      "alpha": 7,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": true,
+      "elapsed": 10,
+      "alpha": 8,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": true,
+      "elapsed": 100,
+      "alpha": 77,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": true,
+      "elapsed": 166,
+      "alpha": 127,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": true,
+      "elapsed": 322,
+      "alpha": 247,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": true,
+      "elapsed": 323,
+      "alpha": 247,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": true,
+      "elapsed": 324,
+      "alpha": 248,
+      "normalPipCopiesPixels": true,
+      "logicallyVisible": true
+    },
+    {
+      "opening": true,
+      "elapsed": 332,
+      "alpha": 254,
+      "normalPipCopiesPixels": true,
+      "logicallyVisible": true
+    },
+    {
+      "opening": true,
+      "elapsed": 333,
+      "alpha": 255,
+      "normalPipCopiesPixels": true,
+      "logicallyVisible": true
+    },
+    {
+      "opening": false,
+      "elapsed": 0,
+      "alpha": 255,
+      "normalPipCopiesPixels": true,
+      "logicallyVisible": true
+    },
+    {
+      "opening": false,
+      "elapsed": 9,
+      "alpha": 248,
+      "normalPipCopiesPixels": true,
+      "logicallyVisible": true
+    },
+    {
+      "opening": false,
+      "elapsed": 10,
+      "alpha": 247,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": false,
+      "elapsed": 100,
+      "alpha": 178,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": false,
+      "elapsed": 166,
+      "alpha": 128,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": false,
+      "elapsed": 322,
+      "alpha": 8,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": false,
+      "elapsed": 323,
+      "alpha": 8,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": false,
+      "elapsed": 324,
+      "alpha": 7,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": false,
+      "elapsed": 332,
+      "alpha": 1,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": true
+    },
+    {
+      "opening": false,
+      "elapsed": 333,
+      "alpha": 0,
+      "normalPipCopiesPixels": false,
+      "logicallyVisible": false
+    }
+  ],
+  "reversals": [
+    {
+      "oldDirection": "closing",
+      "currentValue": 0.75,
+      "newStart": 0.25,
+      "newEnd": 1.0,
+      "duration": 83
+    },
+    {
+      "oldDirection": "opening",
+      "currentValue": 0.25,
+      "newStart": 0.25,
+      "newEnd": 0.0,
+      "duration": 83
+    }
+  ]
+}

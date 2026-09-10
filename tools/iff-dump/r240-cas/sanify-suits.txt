@@ -1,0 +1,94 @@
+                ; ==== .SanifySuits__19cWinDesignCharacterFv ====
+002cc840: 93e1fffc  stw      r31, -4(r1)
+002cc844: 7c0802a6  mflr     r0
+002cc848: 93c1fff8  stw      r30, -8(r1)
+002cc84c: 7c7e1b78  mr       r30, r3
+002cc850: 90010008  stw      r0, 8(r1)
+002cc854: 9421ffb0  stwu     r1, -0x50(r1)
+002cc858: 80630114  lwz      r3, 0x114(r3)
+002cc85c: 2c03ffff  cmpwi    r3, -1
+002cc860: 4182008c  beq      0x2cc8ec
+002cc864: 4bf725ad  bl       0x23ee10
+002cc868: 7c7f1b78  mr       r31, r3
+002cc86c: 807e0114  lwz      r3, 0x114(r30)
+002cc870: 4bf71f11  bl       0x23e780
+002cc874: 2c030000  cmpwi    r3, 0
+002cc878: 40820010  bne      0x2cc888
+002cc87c: 3800ffff  li       r0, -1
+002cc880: 901e0168  stw      r0, 0x168(r30)
+002cc884: 4800002c  b        0x2cc8b0
+002cc888: 801e0168  lwz      r0, 0x168(r30)
+002cc88c: 2c000000  cmpwi    r0, 0
+002cc890: 40800010  bge      0x2cc8a0
+002cc894: 38000000  li       r0, 0
+002cc898: 901e0168  stw      r0, 0x168(r30)
+002cc89c: 48000014  b        0x2cc8b0
+002cc8a0: 7c001800  cmpw     r0, r3
+002cc8a4: 4180000c  blt      0x2cc8b0
+002cc8a8: 3803ffff  addi     r0, r3, -1
+002cc8ac: 901e0168  stw      r0, 0x168(r30)
+002cc8b0: 2c1f0000  cmpwi    r31, 0
+002cc8b4: 40820010  bne      0x2cc8c4
+002cc8b8: 3800ffff  li       r0, -1
+002cc8bc: 901e016c  stw      r0, 0x16c(r30)
+002cc8c0: 4800002c  b        0x2cc8ec
+002cc8c4: 801e016c  lwz      r0, 0x16c(r30)
+002cc8c8: 2c000000  cmpwi    r0, 0
+002cc8cc: 40800010  bge      0x2cc8dc
+002cc8d0: 38000000  li       r0, 0
+002cc8d4: 901e016c  stw      r0, 0x16c(r30)
+002cc8d8: 48000014  b        0x2cc8ec
+002cc8dc: 7c00f800  cmpw     r0, r31
+002cc8e0: 4180000c  blt      0x2cc8ec
+002cc8e4: 381fffff  addi     r0, r31, -1
+002cc8e8: 901e016c  stw      r0, 0x16c(r30)
+002cc8ec: 807e0114  lwz      r3, 0x114(r30)
+002cc8f0: 809e016c  lwz      r4, 0x16c(r30)
+002cc8f4: 4bf722ed  bl       0x23ebe0   ; .SetBodySuit__12PersonFinderFii
+002cc8f8: 807e0114  lwz      r3, 0x114(r30)
+002cc8fc: 809e0168  lwz      r4, 0x168(r30)
+002cc900: 4bf71c51  bl       0x23e550   ; .SetHeadSuit__12PersonFinderFii
+002cc904: 80010058  lwz      r0, 0x58(r1)
+002cc908: 38210050  addi     r1, r1, 0x50
+002cc90c: 83e1fffc  lwz      r31, -4(r1)
+002cc910: 7c0803a6  mtlr     r0
+002cc914: 83c1fff8  lwz      r30, -8(r1)
+002cc918: 4e800020  blr
+002cc91c: 00000000  .long    0x00000000
+002cc920: 00092041  .long    0x00092041
+002cc924: 80020000  lwz      r0, 0(r2)
+002cc928: 000000dc  .long    0x000000dc
+002cc92c: 00252e53  .long    0x00252e53
+002cc930: 616e6966  ori      r14, r11, 0x6966
+002cc934: 79537569  rldic.   r19, r10, 0xe, 0x35
+002cc938: 74735f5f  andis.   r19, r3, 0x5f5f
+002cc93c: 31396357  addic    r9, r25, 0x6357
+002cc940: 696e4465  xori     r14, r11, 0x4465
+002cc944: 7369676e  andi.    r9, r27, 0x676e
+002cc948: 43686172  bdza+    0x6170
+002cc94c: 61637465  ori      r3, r11, 0x7465
+002cc950: 72467600  andi.    r6, r18, 0x7600
+002cc954: 00000000  .long    0x00000000
+002cc958: 00000000  .long    0x00000000
+002cc95c: 00000000  .long    0x00000000
+                ; ==== .SetMessageTarget__19cWinDesignCharacterFP6cTSWin ====
+002cc960: 90830164  stw      r4, 0x164(r3)
+002cc964: 4e800020  blr
+002cc968: 00000000  .long    0x00000000
+002cc96c: 00092040  .long    0x00092040
+002cc970: 00000000  .long    0x00000000
+002cc974: 00000008  .long    0x00000008
+002cc978: 00312e53  .long    0x00312e53
+002cc97c: 65744d65  oris     r20, r11, 0x4d65
+002cc980: 73736167  andi.    r19, r27, 0x6167
+002cc984: 65546172  oris     r20, r10, 0x6172
+002cc988: 6765745f  oris     r5, r27, 0x745f
+002cc98c: 5f313963  rlwnm.   r17, r25, r7, 5, 0x11
+002cc990: 57696e44  rlwinm   r9, r27, 0xd, 0x19, 2
+002cc994: 65736967  oris     r19, r11, 0x6967
+002cc998: 6e436861  xoris    r3, r18, 0x6861
+002cc99c: 72616374  andi.    r1, r19, 0x6374
+002cc9a0: 65724650  oris     r18, r11, 0x4650
+002cc9a4: 36635453  addic.   r19, r3, 0x5453
+002cc9a8: 57696e00  rlwinm   r9, r27, 0xd, 0x18, 0
+002cc9ac: 00000000  .long    0x00000000

@@ -1,0 +1,109 @@
+                ; ==== .RunTree__8cXObjectFP8BehaviorsPCcPs ====
+000efd30: bf61ffec  stmw     r27, -0x14(r1)
+000efd34: 7c0802a6  mflr     r0
+000efd38: 3ba50000  addi     r29, r5, 0
+000efd3c: 3bc60000  addi     r30, r6, 0
+000efd40: 3b630000  addi     r27, r3, 0
+000efd44: 3b840000  addi     r28, r4, 0
+000efd48: 3be70000  addi     r31, r7, 0
+000efd4c: 38a00000  li       r5, 0
+000efd50: 38c00040  li       r6, 0x40
+000efd54: 90010008  stw      r0, 8(r1)
+000efd58: 9421ff50  stwu     r1, -0xb0(r1)
+000efd5c: 38610040  addi     r3, r1, 0x40
+000efd60: 3881004c  addi     r4, r1, 0x4c
+000efd64: 480525fd  bl       0x142360   ; .__ct__12StringBufferFPcUiUi
+000efd68: 80028bac  lwz      r0, -0x7454(r2)
+000efd6c: 389e0000  addi     r4, r30, 0
+000efd70: 38610040  addi     r3, r1, 0x40
+000efd74: 90010048  stw      r0, 0x48(r1)
+000efd78: 38a0ffff  li       r5, -1
+000efd7c: 480524b5  bl       0x142230   ; .append__12StringBufferFPCci
+000efd80: 387c0000  addi     r3, r28, 0
+000efd84: 38810040  addi     r4, r1, 0x40
+000efd88: 4bf501b9  bl       0x3ff40
+000efd8c: 38c30000  addi     r6, r3, 0
+000efd90: 7cc00735  extsh.   r0, r6
+000efd94: 4182001c  beq      0xefdb0
+000efd98: 387b0000  addi     r3, r27, 0
+000efd9c: 389c0000  addi     r4, r28, 0
+000efda0: 38bd0000  addi     r5, r29, 0
+000efda4: 38ff0000  addi     r7, r31, 0
+000efda8: 48064119  bl       0x153ec0
+000efdac: 48000008  b        0xefdb4
+000efdb0: 38600000  li       r3, 0
+000efdb4: 800100b8  lwz      r0, 0xb8(r1)
+000efdb8: 382100b0  addi     r1, r1, 0xb0
+000efdbc: bb61ffec  lmw      r27, -0x14(r1)
+000efdc0: 7c0803a6  mtlr     r0
+000efdc4: 4e800020  blr
+000efdc8: 00000000  .long    0x00000000
+000efdcc: 00092041  .long    0x00092041
+000efdd0: 80050000  lwz      r0, 0(r5)
+000efdd4: 00000098  .long    0x00000098
+000efdd8: 00242e52  .long    0x00242e52
+000efddc: 756e5472  andis.   r14, r11, 0x5472
+000efde0: 65655f5f  oris     r5, r11, 0x5f5f
+000efde4: 3863584f  addi     r3, r3, 0x584f
+000efde8: 626a6563  ori      r10, r19, 0x6563
+000efdec: 74465038  andis.   r6, r2, 0x5038
+000efdf0: 42656861  bdzl     0xf6650
+000efdf4: 76696f72  andis.   r9, r19, 0x6f72
+000efdf8: 73504363  andi.    r16, r26, 0x4363
+000efdfc: 50730000  rlwimi   r19, r3, 0, 0, 0
+000efe00: 93e1fffc  stw      r31, -4(r1)
+000efe04: 7c0802a6  mflr     r0
+000efe08: 3be60000  addi     r31, r6, 0
+000efe0c: 93c1fff8  stw      r30, -8(r1)
+000efe10: 3bc50000  addi     r30, r5, 0
+000efe14: 93a1fff4  stw      r29, -0xc(r1)
+000efe18: 3ba40000  addi     r29, r4, 0
+000efe1c: 9381fff0  stw      r28, -0x10(r1)
+000efe20: 3b830000  addi     r28, r3, 0
+000efe24: 90010008  stw      r0, 8(r1)
+000efe28: 9421ffb0  stwu     r1, -0x50(r1)
+000efe2c: 806300dc  lwz      r3, 0xdc(r3)
+000efe30: a89c00f0  lha      r4, 0xf0(r28)
+000efe34: 4bff20fd  bl       0xe1f30   ; .ClearIdleStatus__12ObjectModuleFi
+000efe38: 809d011c  lwz      r4, 0x11c(r29)
+000efe3c: 387c0000  addi     r3, r28, 0
+000efe40: 38be0000  addi     r5, r30, 0
+000efe44: 8084000c  lwz      r4, 0xc(r4)
+000efe48: 7fe6fb78  mr       r6, r31
+000efe4c: 48064285  bl       0x1540d0
+000efe50: 5460063f  clrlwi.  r0, r3, 0x18
+000efe54: 4182001c  beq      0xefe70
+000efe58: abfd00f0  lha      r31, 0xf0(r29)
+000efe5c: 7f83e378  mr       r3, r28
+000efe60: 480637f1  bl       0x153650   ; .GetCurElem__7TreeSimFv
+000efe64: b3e30004  sth      r31, 4(r3)
+000efe68: 38600001  li       r3, 1
+000efe6c: 48000008  b        0xefe74
+000efe70: 38600000  li       r3, 0
+000efe74: 80010058  lwz      r0, 0x58(r1)
+000efe78: 38210050  addi     r1, r1, 0x50
+000efe7c: 83e1fffc  lwz      r31, -4(r1)
+000efe80: 83c1fff8  lwz      r30, -8(r1)
+000efe84: 7c0803a6  mtlr     r0
+000efe88: 83a1fff4  lwz      r29, -0xc(r1)
+000efe8c: 8381fff0  lwz      r28, -0x10(r1)
+000efe90: 4e800020  blr
+000efe94: 00000000  .long    0x00000000
+000efe98: 00092041  .long    0x00092041
+000efe9c: 80040000  lwz      r0, 0(r4)
+000efea0: 00000094  .long    0x00000094
+000efea4: 002a2e47  .long    0x002a2e47
+000efea8: 6f737562  xoris    r19, r27, 0x7562
+000efeac: 4f626a65  .long    0x4f626a65
+000efeb0: 63745472  ori      r20, r27, 0x5472
+000efeb4: 65655f5f  oris     r5, r11, 0x5f5f
+000efeb8: 3863584f  addi     r3, r3, 0x584f
+000efebc: 626a6563  ori      r10, r19, 0x6563
+000efec0: 74465038  andis.   r6, r2, 0x5038
+000efec4: 63584f62  ori      r24, r26, 0x4f62
+000efec8: 6a656374  xori     r5, r19, 0x6374
+000efecc: 50737362  rlwimi   r19, r3, 0xe, 0xd, 0x11
+000efed0: be41ffc8  stmw     r18, -0x38(r1)
+000efed4: 7c0802a6  mflr     r0
+000efed8: 83428eb8  lwz      r26, -0x7148(r2)
+000efedc: 7c721b78  mr       r18, r3

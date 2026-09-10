@@ -1,0 +1,65 @@
+                ; ==== .StackJustPopped__8cXPersonFv ====
+00109050: 93e1fffc  stw      r31, -4(r1)
+00109054: 7c0802a6  mflr     r0
+00109058: 7c7f1b78  mr       r31, r3
+0010905c: 90010008  stw      r0, 8(r1)
+00109060: 9421ff70  stwu     r1, -0x90(r1)
+00109064: 4804a44d  bl       0x1534b0   ; .GetStackSize__7TreeSimFv
+00109068: 801f0ab4  lwz      r0, 0xab4(r31)
+0010906c: 7c660734  extsh    r6, r3
+00109070: 28000000  cmplwi   r0, 0
+00109074: 418200c8  beq      0x10913c
+00109078: 801f0ab4  lwz      r0, 0xab4(r31)
+0010907c: 80bf0ab8  lwz      r5, 0xab8(r31)
+00109080: 1c60000c  mulli    r3, r0, 0xc
+00109084: 3883fff4  addi     r4, r3, -0xc
+00109088: 7c852214  add      r4, r5, r4
+0010908c: 80640004  lwz      r3, 4(r4)
+00109090: 3803ffff  addi     r0, r3, -1
+00109094: 7c060000  cmpw     r6, r0
+00109098: 40820058  bne      0x1090f0
+0010909c: 80a40000  lwz      r5, 0(r4)
+001090a0: a86500c6  lha      r3, 0xc6(r5)
+001090a4: 3803ffff  addi     r0, r3, -1
+001090a8: b00500c6  sth      r0, 0xc6(r5)
+001090ac: 80bf0ab8  lwz      r5, 0xab8(r31)
+001090b0: 4800001c  b        0x1090cc
+001090b4: 88050008  lbz      r0, 8(r5)
+001090b8: 28000000  cmplwi   r0, 0
+001090bc: 4182000c  beq      0x1090c8
+001090c0: 80050000  lwz      r0, 0(r5)
+001090c4: 901f0a14  stw      r0, 0xa14(r31)
+001090c8: 38a5000c  addi     r5, r5, 0xc
+001090cc: 801f0ab4  lwz      r0, 0xab4(r31)
+001090d0: 807f0ab8  lwz      r3, 0xab8(r31)
+001090d4: 1c00000c  mulli    r0, r0, 0xc
+001090d8: 7c030214  add      r0, r3, r0
+001090dc: 7c050040  cmplw    r5, r0
+001090e0: 4082ffd4  bne      0x1090b4
+001090e4: 387f0ab0  addi     r3, r31, 0xab0
+001090e8: 4800c779  bl       0x115860
+001090ec: 48000024  b        0x109110
+001090f0: 7c061800  cmpw     r6, r3
+001090f4: 4080001c  bge      0x109110
+001090f8: 80c40000  lwz      r6, 0(r4)
+001090fc: 387f0ab0  addi     r3, r31, 0xab0
+00109100: a8a600c6  lha      r5, 0xc6(r6)
+00109104: 3805ffff  addi     r0, r5, -1
+00109108: b00600c6  sth      r0, 0xc6(r6)
+0010910c: 4800c755  bl       0x115860
+00109110: 801f0ab4  lwz      r0, 0xab4(r31)
+00109114: 28000000  cmplwi   r0, 0
+00109118: 40820024  bne      0x10913c
+0010911c: 38610040  addi     r3, r1, 0x40
+00109120: 4bf94061  bl       0x9d180   ; .__ct__11InteractionFv
+00109124: 387f0000  addi     r3, r31, 0
+00109128: 38810040  addi     r4, r1, 0x40
+0010912c: 4bfffd35  bl       0x108e60   ; .SetCurrentAction__8cXPersonFRC11Interaction
+00109130: 38610068  addi     r3, r1, 0x68
+00109134: 3880ffff  li       r4, -1
+00109138: 48468469  bl       0x5715a0   ; .__dt__9CTGStringFv
+0010913c: 80010098  lwz      r0, 0x98(r1)
+00109140: 38210090  addi     r1, r1, 0x90
+00109144: 83e1fffc  lwz      r31, -4(r1)
+00109148: 7c0803a6  mtlr     r0
+0010914c: 4e800020  blr      

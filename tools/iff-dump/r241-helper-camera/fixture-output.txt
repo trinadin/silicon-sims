@@ -1,0 +1,45 @@
+[PASS] executable SHA256 matches r240 evidence
+[PASS] GetLevel__11HouseViewerCFv == { lwz r3,24(r3); blr }
+[PASS] SetLevel body order: GetWallManager, SetCutaway, clear cCutawaySet, ResetDynamicCutaway, ComputeCutaway, DoDynamicCutaway
+[PASS] SetLevel stores the new level into viewer+0x18 (stw r30,24(r29) @0x1d7178)
+[PASS] CPState::SetLevel stores the level at CPState+0x2c (stw r4,44(r31) @0x210190)
+[PASS] CPState::SetLevel tail-calls HouseViewer::SetLevel
+[PASS] GetLevel__7CPStateFv == { lwz r3,44(r3); blr } (CPState+0x2c)
+[PASS] DrawPictureInPicture cutaway block at 0x1c1054 (GetWallManager, SetCutaway, clear)
+[PASS] DrawPictureInPicture cutaway block at 0x1c1608 (GetWallManager, SetCutaway, clear)
+[PASS] cutaway enter block: ComputeCutaway(roommgr, level) bl @0x1c10a0
+[PASS] cutaway restore block: ComputeCutaway(roommgr, savedLevel) bl @0x1c1654
+[PASS] enter guard compares viewer+0x18 with the level arg (lwz r21,24(r16) @0x1c1048)
+[PASS] restore guard compares viewer+0x18 with the saved level (lwz r15,24(r16) @0x1c15fc)
+[PASS] enter block skipped when level unchanged (beq @0x1c1050)
+[PASS] DrawPictureInPicture calls ScrollToTile with (tile, level, 0, 1) @0x1c1188
+[PASS] traceback name DrawPictureInPicture__11HouseViewerFP9cTSBufferRC7FTilePtiii follows the body
+[PASS] BuildImage loads the level from target+0x110 (lwz r31,272(r3) @0x299278)
+[PASS] BuildImage null-target fallback: virtual slot at vtbl+64 (lwz r12,64(r12) @0x29928c)
+[PASS] BuildImage tail-calls DrawPictureInPicture @0x2992c8 with r8=window+0xd8 zoom
+[PASS] BuildImage checks center>=0 (blt out) after GetCenterOnPt @0x299134/0x299140
+[PASS] MouseDownL reads target+0x110 as the ScrollToTile level (lwz r6,272(r4) @0x299794)
+[PASS] MouseDownL calls ScrollToTile on the main viewer @0x2997c8
+[PASS] MouseDownL ends with Fade(false) (li r4,0 @0x2997f0, bl @0x2997f4)
+[PASS] TSOnTimerMsg unsubscribes the timer and clears +0xd4 (stw r0,212(r31) @0x299628)
+[PASS] TSOnTimerMsg ends with Fade(false) (li r4,0 @0x299630, bl @0x299634)
+[PASS] Open stores duration at +0xd4, zoom at +0xd8, open-flag byte at +0xde
+[PASS] Open subscribes one timer with the duration, then Fade(true) (@0x299f34/@0x299f40)
+[PASS] Open refuses a different target while a duration is active (li r3,0 return @0x299abc)
+[PASS] Close only acts when the passed object equals the current target (bne over the body @0x2999cc)
+[PASS] Close clears the target, clears +0xde, Fade(false), unsubscribes (@0x2999d0-0x299a04)
+[PASS] close-button command (TSOnCommand param==1) routes to the same clear+Fade(false)
+[PASS] ESC (key 27) fades out (cmplwi r4,27 @0x299584, li r4,0 @0x299594)
+[PASS] Fade reads GetBoboVision first (bl @0x299880)
+[PASS] Fade(false, bobo off) -> vtbl+160 (lwz r12,160(r12) @0x29994c)
+[PASS] Fade(true, bobo off) -> vtbl+156 (lwz r12,156(r12) @0x299934)
+[PASS] Fade(bool, bobo on) -> vtbl+176 (lwz r12,176(r12) @0x2998cc/@0x2998f0)
+[PASS] BoboVision byte is cOptionsMgr+1 (SetBoboVision stb r4,1(r3); GetBoboVision lbz r3,1(r3))
+[PASS] RestoreFactorySettings stores 1 into BoboVision (li r0,1 @0x238068, stb r0,1(r27) @0x23806c)
+[PASS] animated route default ramp length 333 (li r29,333 @0x502fa0)
+[PASS] animated route drives a RampGenerator on the window (this+0xb4) (SetupConstantTimeRamp calls inside AsyncShowHideWin)
+[PASS] cWinPictureInPicture::GetWantsFadeCapture == { li r3,0; blr }
+[PASS] cTSWin::GetWantsFadeCapture == { li r3,1; blr }
+[PASS] TSPaint gates BuildImage on byte +0xde and GetLivePIP (@0x29a084-0x29a0a4)
+
+43/43 checks passed

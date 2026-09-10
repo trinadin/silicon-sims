@@ -124,6 +124,7 @@ namespace Simitone.Client.UI.Controls
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             DrawLocalTexture(batch, Px, null, Vector2.Zero, new Vector2(ESize.X*SelectPct, ESize.Y), UIStyle.Current.SecondaryText);
             base.Draw(batch);
         }

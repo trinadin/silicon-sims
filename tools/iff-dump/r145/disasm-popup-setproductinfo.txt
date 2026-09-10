@@ -1,0 +1,33 @@
+0026e140: 93e1fffc  stw      r31, -4(r1)
+0026e144: 7c0802a6  mflr     r0
+0026e148: 93c1fff8  stw      r30, -8(r1)
+0026e14c: 7c7e1b78  mr       r30, r3
+0026e150: 80628ca4  lwz      r3, -0x735c(r2)
+0026e154: 90010008  stw      r0, 8(r1)
+0026e158: 9421ffb0  stwu     r1, -0x50(r1)
+0026e15c: 909e00d8  stw      r4, 0xd8(r30)
+0026e160: 80630000  lwz      r3, 0(r3)
+0026e164: 81830000  lwz      r12, 0(r3)
+0026e168: 818c000c  lwz      r12, 0xc(r12)
+0026e16c: 48334875  bl       0x5a29e0
+0026e170: 80410014  lwz      r2, 0x14(r1)
+0026e174: 7c601b78  mr       r0, r3
+0026e178: 807e00d8  lwz      r3, 0xd8(r30)
+0026e17c: 7c1f0378  mr       r31, r0
+0026e180: 4bf9d341  bl       0x20b4c0
+0026e184: 819f0000  lwz      r12, 0(r31)
+0026e188: 38a30000  addi     r5, r3, 0
+0026e18c: 7ca4fe70  srawi    r4, r5, 0x1f
+0026e190: 38de00dc  addi     r6, r30, 0xdc
+0026e194: 818c0084  lwz      r12, 0x84(r12)
+0026e198: 387f0000  addi     r3, r31, 0
+0026e19c: 48334845  bl       0x5a29e0
+0026e1a0: 80410014  lwz      r2, 0x14(r1)
+0026e1a4: 7fc3f378  mr       r3, r30
+0026e1a8: 4bfff0d9  bl       0x26d280   ; .BuildMyBuffer__16cWinCatalogPopupFv
+0026e1ac: 80010058  lwz      r0, 0x58(r1)
+0026e1b0: 38210050  addi     r1, r1, 0x50
+0026e1b4: 83e1fffc  lwz      r31, -4(r1)
+0026e1b8: 7c0803a6  mtlr     r0
+0026e1bc: 83c1fff8  lwz      r30, -8(r1)
+0026e1c0: 4e800020  blr      

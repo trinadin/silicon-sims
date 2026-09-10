@@ -39,12 +39,26 @@ namespace Simitone.Client.UI.Model
                     result = GenHeadTex(ava);
                     AvatarHeadCache[id] = result;
                 }
+                UIArtProvenance.NoteOriginal(result, "icon-head"); // R210: rendered from the original head outfit
                 return result;
             }
             else if (obj is VMGameObject)
             {
-                if (obj.Object.OBJ.GUID == 0x000007C4) return Content.Get().CustomUI.Get("int_gohere.png").Get(GameFacade.GraphicsDevice);
-                else return obj.GetIcon(GameFacade.GraphicsDevice, 0);
+                if (obj.Object.OBJ.GUID == 0x000007C4)
+                {
+                    // R210: the Go Here interaction icon is a PORT addition
+                    // with no original counterpart (disclosed) — the engine
+                    // draws its ground marker, not a catalog icon.
+                    var gohere = Content.Get().CustomUI.Get("int_gohere.png").Get(GameFacade.GraphicsDevice);
+                    UIArtProvenance.NoteDisclosed(gohere);
+                    return gohere;
+                }
+                else
+                {
+                    var icon = obj.GetIcon(GameFacade.GraphicsDevice, 0);
+                    UIArtProvenance.NoteOriginal(icon, "icon-dgrp"); // R210: the object's own DGRP render
+                    return icon;
+                }
             }
             return null;
         }

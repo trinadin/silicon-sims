@@ -1,0 +1,116 @@
+0x29a1c0: 93e1fffc  stw r31, -4(r1)                            |....|
+0x29a1c4: 7c0802a6  mfxer r0                                   ||...|
+0x29a1c8: 83e28af8  lwz r31, -29960(r2)                        |....|
+0x29a1cc: 93c1fff8  stw r30, -8(r1)                            |....|
+0x29a1d0: 7c7e1b78  or r3, r30, r3                             ||~.x|
+0x29a1d4: 93a1fff4  stw r29, -12(r1)                           |....|
+0x29a1d8: 90010008  stw r0, 8(r1)                              |....|
+0x29a1dc: 9421ff30  stwu r1, -208(r1)                          |.!.0|
+0x29a1e0: 81830000  lwz r12, 0(r3)                             |....|
+0x29a1e4: 818c00d0  lwz r12, 208(r12)                          |....|
+0x29a1e8: 483087f9  bl 0x5a29e0                                 ; .sub_5a29e0 |H0..|
+0x29a1ec: 80410014  lwz r2, 20(r1)                             |.A..|
+0x29a1f0: 5460063f  rlwinm r0, r3, 0, 24, 31                   |T`.?|
+0x29a1f4: 41820010  bne(2) 0x29a204                            |A...|
+0x29a1f8: 7fc3f378  or r30, r3, r30                            |...x|
+0x29a1fc: 4826f1f5  bl 0x5093f0                                 ; .Init__6cTSWinFv |H&..|
+0x29a200: 4800016c  b 0x29a36c                                  ; -> 29a36c |H..l|
+0x29a204: 7fc3f378  or r30, r3, r30                            |...x|
+0x29a208: 4826f1e9  bl 0x5093f0                                 ; .Init__6cTSWinFv |H&..|
+0x29a20c: 5460063f  rlwinm r0, r3, 0, 24, 31                   |T`.?|
+0x29a210: 4082000c  beq(2) 0x29a21c                            |@...|
+0x29a214: 38600000  addi r3, r0, 0                             |8`..|
+0x29a218: 48000154  b 0x29a36c                                  ; -> 29a36c |H..T|
+0x29a21c: 7fc3f378  or r30, r3, r30                            |...x|
+0x29a220: 819e0000  lwz r12, 0(r30)                            |....|
+0x29a224: 38800001  addi r4, r0, 1                             |8...|
+0x29a228: 38a00000  addi r5, r0, 0                             |8...|
+0x29a22c: 818c017c  lwz r12, 380(r12)                          |...||
+0x29a230: 483087b1  bl 0x5a29e0                                 ; .sub_5a29e0 |H0..|
+0x29a234: 80410014  lwz r2, 20(r1)                             |.A..|
+0x29a238: 387e0000  addi r3, r30, 0                            |8~..|
+0x29a23c: 38800001  addi r4, r0, 1                             |8...|
+0x29a240: 482695e1  bl 0x503820                                 ; .SetOverlapsScrollArea__6cTSWinFb |H&..|
+0x29a244: 80628e04  lwz r3, -29180(r2)                         |.b..|
+0x29a248: 38800000  addi r4, r0, 0                             |8...|
+0x29a24c: 80630000  lwz r3, 0(r3)                              |.c..|
+0x29a250: 80630190  lwz r3, 400(r3)                            |.c..|
+0x29a254: 481fd07d  bl 0x4972d0                                 ; .GetStandardCursor__16cTSCursorManagerFQ29cTSCursor14StandardCursor |H..}|
+0x29a258: 38830000  addi r4, r3, 0                             |8...|
+0x29a25c: 387e0000  addi r3, r30, 0                            |8~..|
+0x29a260: 48269ca1  bl 0x503f00                                 ; .SetCursor__6cTSWinFP9cTSCursor |H&..|
+0x29a264: 38610048  addi r3, r1, 72                            |8a.H|
+0x29a268: 4beabe89  bl 0x1460f0                                 ; .__ct__13StringSetBaseFv |K...|
+0x29a26c: 93e100b0  stw r31, 176(r1)                           |....|
+0x29a270: 38600009  addi r3, r0, 9                             |8`..|
+0x29a274: 4bdedced  bl 0x87f60                                  ; .sub_87f60 |K...|
+0x29a278: 38830000  addi r4, r3, 0                             |8...|
+0x29a27c: 38a10048  addi r5, r1, 72                            |8..H|
+0x29a280: 3860009c  addi r3, r0, 156                           |8`..|
+0x29a284: 38c00000  addi r6, r0, 0                             |8...|
+0x29a288: 4bfc51b9  bl 0x25f440                                 ; .LoadUIStrings__FiPCcP9StringSetb |K.Q.|
+0x29a28c: 5460063f  rlwinm r0, r3, 0, 24, 31                   |T`.?|
+0x29a290: 41820038  bne(2) 0x29a2c8                            |A..8|
+0x29a294: 38610048  addi r3, r1, 72                            |8a.H|
+0x29a298: 38800001  addi r4, r0, 1                             |8...|
+0x29a29c: 38a0ffff  addi r5, r0, -1                            |8...|
+0x29a2a0: 4beaa861  bl 0x144b00                                 ; .GetString__13StringSetBaseFic |K..a|
+0x29a2a4: 38830000  addi r4, r3, 0                             |8...|
+0x29a2a8: 38610044  addi r3, r1, 68                            |8a.D|
+0x29a2ac: 4825a9e5  bl 0x4f4c90                                 ; .__ct__9cTSStringFPCc |H%..|
+0x29a2b0: 387e0000  addi r3, r30, 0                            |8~..|
+0x29a2b4: 38810044  addi r4, r1, 68                            |8..D|
+0x29a2b8: 4826a819  bl 0x504ad0                                 ; .sub_504ad0 |H&..|
+0x29a2bc: 38610044  addi r3, r1, 68                            |8a.D|
+0x29a2c0: 3880ffff  addi r4, r0, -1                            |8...|
+0x29a2c4: 4825a6bd  bl 0x4f4980                                 ; .__dt__9cTSStringFv |H%..|
+0x29a2c8: 38810040  addi r4, r1, 64                            |8..@|
+0x29a2cc: 3860001e  addi r3, r0, 30                            |8`..|
+0x29a2d0: 38a00004  addi r5, r0, 4                             |8...|
+0x29a2d4: 4811bebd  bl 0x3b6190                                 ; .LoadBuffer__10nsSMResFacFlPP9cTSBufferQ218cTSBufferColorType10eColorType |H...|
+0x29a2d8: 80610040  lwz r3, 64(r1)                             |.a.@|
+0x29a2dc: 28030000  cmplwi r0, r3, 0                           |(...|
+0x29a2e0: 41820078  bne(2) 0x29a358                            |A..x|
+0x29a2e4: 80828df8  lwz r4, -29192(r2)                         |....|
+0x29a2e8: 81830000  lwz r12, 0(r3)                             |....|
+0x29a2ec: 80840000  lwz r4, 0(r4)                              |....|
+0x29a2f0: 818c0070  lwz r12, 112(r12)                          |...p|
+0x29a2f4: 483086ed  bl 0x5a29e0                                 ; .sub_5a29e0 |H0..|
+0x29a2f8: 80410014  lwz r2, 20(r1)                             |.A..|
+0x29a2fc: 3860018c  addi r3, r0, 396                           |8`..|
+0x29a300: 482f7141  bl 0x591440                                 ; .sub_591440 |H/qA|
+0x29a304: 7c7d1b79  or. r3, r29, r3                            ||}.y|
+0x29a308: 41820008  bne(2) 0x29a310                            |A...|
+0x29a30c: 48273415  bl 0x50d720                                 ; .__ct__9cTSWinBtnFv |H'4.|
+0x29a310: 93be00e4  stw r29, 228(r30)                          |....|
+0x29a314: 387d0000  addi r3, r29, 0                            |8}..|
+0x29a318: 38a00004  addi r5, r0, 4                             |8...|
+0x29a31c: 819d0000  lwz r12, 0(r29)                            |....|
+0x29a320: 38c00001  addi r6, r0, 1                             |8...|
+0x29a324: 80810040  lwz r4, 64(r1)                             |...@|
+0x29a328: 818c01a4  lwz r12, 420(r12)                          |....|
+0x29a32c: 483086b5  bl 0x5a29e0                                 ; .sub_5a29e0 |H0..|
+0x29a330: 80410014  lwz r2, 20(r1)                             |.A..|
+0x29a334: 809e00e4  lwz r4, 228(r30)                           |....|
+0x29a338: 38000001  addi r0, r0, 1                             |8...|
+0x29a33c: 387e0000  addi r3, r30, 0                            |8~..|
+0x29a340: 98040163  stb r0, 355(r4)                            |...c|
+0x29a344: 819e0000  lwz r12, 0(r30)                            |....|
+0x29a348: 809e00e4  lwz r4, 228(r30)                           |....|
+0x29a34c: 818c0028  lwz r12, 40(r12)                           |...(|
+0x29a350: 48308691  bl 0x5a29e0                                 ; .sub_5a29e0 |H0..|
+0x29a354: 80410014  lwz r2, 20(r1)                             |.A..|
+0x29a358: 93e100b0  stw r31, 176(r1)                           |....|
+0x29a35c: 38610048  addi r3, r1, 72                            |8a.H|
+0x29a360: 38800000  addi r4, r0, 0                             |8...|
+0x29a364: 4beaacad  bl 0x145010                                 ; .__dt__13StringSetBaseFv |K...|
+0x29a368: 38600001  addi r3, r0, 1                             |8`..|
+0x29a36c: 800100d8  lwz r0, 216(r1)                            |....|
+0x29a370: 382100d0  addi r1, r1, 208                           |8!..|
+0x29a374: 83e1fffc  lwz r31, -4(r1)                            |....|
+0x29a378: 83c1fff8  lwz r30, -8(r1)                            |....|
+0x29a37c: 7c0803a6  mtxer r0                                   ||...|
+0x29a380: 83a1fff4  lwz r29, -12(r1)                           |....|
+0x29a384: 4e800020  bclr                                       |N.. |
+0x29a388: 00000000  .long                                      |....|
+0x29a38c: 00092041  .long                                      |.. A|

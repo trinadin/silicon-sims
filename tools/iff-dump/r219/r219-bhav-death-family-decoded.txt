@@ -1,0 +1,201 @@
+### BHAV id=8309 label='swim bladder failure' count=6
+  ins0  CALL 8307 'do swimming idle' t=2            f=other-path
+  ins1  MyMotives[Bladder] := Lit[80] t=5            f=other-path
+  ins2  MyMotives[Bladder] := Lit[80] t=3            f=other-path
+  ins3  MyMotives[Comfort] -= Lit[30] t=4            f=other-path
+  ins4  MyMotives[Hygiene] := Lit[-100] t=1            f=other-path
+  ins5  MyMotives[Comfort] -= Lit[30] t=RETURN_TRUE  f=other-path
+### BHAV id=8219 label='check hunger' count=37
+  ins0  MyPersonData[64] == Lit[1]   t=19           f=10
+  ins1  StackObjMotives[Hunger] > Lit[70] t=11           f=RETURN_TRUE
+  ins2  PRIM animate-sim opd=2400000003080000 t=18           f=2
+  ins3  StackObjMotives[Hunger] < Lit[-40] t=21           f=29
+  ins4  PRIM set-balloon-headline opd=00000003ffff0001 t=12           f=other-path
+  ins5  PRIM set-balloon-headline opd=0000050000000001 t=RETURN_TRUE  f=other-path
+  ins6  PRIM look-towards opd=0100000000000000 t=7            f=7
+  ins7  StackObjMotives[Hunger] < Lit[-80] t=28           f=26
+  ins8  PRIM set-balloon-headline opd=00000003ffff0101 t=12           f=other-path
+  ins9  PRIM animate-sim opd=4c00000003000000 t=17           f=9
+  ins10 StackObjMotives[Hunger] < Lit[-60] t=6            f=3
+  ins11 StackObjPersonData[0] == Lit[0] t=16           f=14
+  ins12 StackObjPersonData[0] == Lit[0] t=15           f=13
+  ins13 CALL 8194 'sitting anim delay' t=21           f=other-path
+  ins14 CALL 8194 'sitting anim delay' t=RETURN_TRUE  f=other-path
+  ins15 CALL 8292 'reset idle'       t=9            f=other-path
+  ins16 CALL 8292 'reset idle'       t=27           f=other-path
+  ins17 PRIM animate-sim opd=0000000002000000 t=21           f=21
+  ins18 PRIM animate-sim opd=0000000002000000 t=RETURN_TRUE  f=18
+  ins19 StackObjMotives[Hunger] < Lit[-40] t=20           f=RETURN_TRUE
+  ins20 PRIM set-balloon-headline opd=0000000364000001 t=RETURN_TRUE  f=other-path
+  ins21 StackObjPersonData[0] == Lit[0] t=24           f=23
+  ins22 PRIM animate-sim opd=1b00000003280000 t=36           f=34
+  ins23 CALL 8194 'sitting anim delay' t=5            f=other-path
+  ins24 CALL 8292 'reset idle'       t=32           f=other-path
+  ins25 PRIM animate-sim opd=0000000002000000 t=5            f=5
+  ins26 PRIM play-sound-event opd=4701000000000000 t=4            f=other-path
+  ins27 PRIM play-sound-event opd=6301000000000000 t=2            f=other-path
+  ins28 PRIM play-sound-event opd=4701000000000000 t=8            f=other-path
+  ins29 StackObjPersonData[32] == Tuning[16897] t=30           f=1
+  ins30 StackObjMotives[Hunger] < Lit[-25] t=21           f=1
+  ins31 PRIM play-sound-event opd=6201000000000000 t=22           f=other-path
+  ins32 PRIM animate-sim opd=5b00000003280000 t=22           f=33
+  ins33 PRIM 363 opd=ffffffffffffffff t=35           f=32
+  ins34 PRIM 363 opd=ffffffffffffffff t=22           f=31
+  ins35 PRIM play-sound-event opd=6201000000000000 t=32           f=other-path
+  ins36 PRIM animate-sim opd=5b00000003220000 t=25           f=36
+### BHAV id=8340 label='PC - Check Motive Failures' count=19
+  ins0  StackObjMotives[Energy] < Lit[-98] t=10           f=1
+  ins1  StackObjMotives[Hunger] < Lit[-98] t=12           f=5
+  ins2  CALL 8310 'get me out of pool' t=3            f=3
+  ins3  PRIM set-balloon-headline opd=00000003ffff0001 t=18           f=other-path
+  ins4  PRIM set-balloon-headline opd=0000050000000000 t=13           f=other-path
+  ins5  StackObjMotives[Bladder] < Lit[-98] t=14           f=RETURN_TRUE
+  ins6  CALL 8309 'swim bladder failure' t=15           f=other-path
+  ins7  MyPersonData[64] == Lit[1]   t=6            f=8
+  ins8  PRIM set-balloon-headline opd=00000103ffff0100 t=16           f=other-path
+  ins9  PRIM set-balloon-headline opd=0000050000000000 t=15           f=other-path
+  ins10 StackObjPersonData[71] := Lit[1] t=17           f=other-path
+  ins11 StackObjPersonData[71] := Lit[0] t=RETURN_TRUE  f=other-path
+  ins12 StackObjPersonData[71] := Lit[1] t=2            f=other-path
+  ins13 StackObjPersonData[71] := Lit[0] t=RETURN_TRUE  f=other-path
+  ins14 StackObjPersonData[71] := Lit[1] t=7            f=other-path
+  ins15 StackObjPersonData[71] := Lit[0] t=RETURN_TRUE  f=other-path
+  ins16 CALL 8341 'PC - Bladder Failure' t=9            f=other-path
+  ins17 CALL 8343 'PC - Sleep Failure' t=11           f=11
+  ins18 MyMotives[Hunger] := Lit[0]  t=4            f=other-path
+### BHAV id=8216 label='check a motive' count=22
+  ins0  Temp[0] := Param[0]          t=19           f=other-path
+  ins1  Temp[0] < Lit[10]            t=2            f=21
+  ins2  Temp[0] == Lit[5]            t=15           f=3
+  ins3  Temp[0] == Lit[6]            t=11           f=4
+  ins4  Temp[0] == Lit[7]            t=12           f=5
+  ins5  Temp[0] == Lit[8]            t=13           f=6
+  ins6  Temp[0] == Lit[9]            t=14           f=RETURN_FALSE
+  ins7  Temp[0] == Lit[11]           t=RETURN_FALSE f=1
+  ins8  Temp[0] == Lit[13]           t=16           f=9
+  ins9  Temp[0] == Lit[14]           t=17           f=10
+  ins10 Temp[0] == Lit[15]           t=18           f=RETURN_FALSE
+  ins11 CALL 8218 'check comfort'    t=RETURN_TRUE  f=other-path
+  ins12 CALL 8219 'check hunger'     t=RETURN_TRUE  f=other-path
+  ins13 CALL 8220 'check hygiene'    t=RETURN_TRUE  f=other-path
+  ins14 CALL 8221 'check bladder'    t=RETURN_TRUE  f=other-path
+  ins15 CALL 8222 'check energy'     t=RETURN_TRUE  f=other-path
+  ins16 CALL 8224 'check environment' t=RETURN_TRUE  f=other-path
+  ins17 CALL 8225 'check social'     t=RETURN_TRUE  f=other-path
+  ins18 CALL 8226 'check entertained' t=RETURN_TRUE  f=other-path
+  ins19 Temp[0] < Lit[5]             t=RETURN_FALSE f=20
+  ins20 Temp[0] == Lit[10]           t=RETURN_FALSE f=7
+  ins21 MyPersonData[64] == Lit[1]   t=RETURN_TRUE  f=8
+### BHAV id=8197 label='failure sleep' count=53
+  ins0  Local[0] := Lit[0]           t=19           f=other-path
+  ins1  StackObjMotives[SleepState] := Lit[-50] t=5            f=other-path
+  ins2  CALL 8200 'stand up'         t=18           f=22
+  ins3  PRIM animate-sim opd=1400010003200000 t=11           f=36
+  ins4  PRIM animate-sim opd=1600000003000000 t=14           f=4
+  ins5  StackObjMotives[Energy] > Lit[0] t=21           f=10
+  ins6  CALL 8202 'sleep anim'       t=8            f=other-path
+  ins7  Local[0] == Lit[1]           t=6            f=43
+  ins8  MyMotives[Comfort] -= Lit[4] t=5            f=other-path
+  ins9  StackObjMotives[SleepState] := Lit[0] t=27           f=other-path
+  ins10 StackObjMotives[SleepState] == Lit[0] t=21           f=25
+  ins11 Local[0] := Lit[1]           t=22           f=other-path
+  ins12 Local[0] == Lit[1]           t=4            f=44
+  ins13 PRIM 387 opd=ffffffffffffffff t=3            f=42
+  ins14 PRIM 388 opd=ffffffffffffffff t=17           f=other-path
+  ins15 PRIM animate-sim opd=13000c0003000000 t=RETURN_TRUE  f=15
+  ins16 PRIM play-sound-event opd=4f01000000000000 t=50           f=other-path
+  ins17 MyMotives[Energy] < Lit[100] t=38           f=RETURN_TRUE
+  ins18 PRIM play-sound-event opd=5301000000000000 t=13           f=other-path
+  ins19 StackObjID[0] := MyObject[11] t=20           f=other-path
+  ins20 PRIM special-effect opd=0a00010243000000 t=24           f=other-path
+  ins21 PRIM stop-all-sounds opd=0000000000000000 t=23           f=other-path
+  ins22 PRIM play-sound-event opd=5601000000000000 t=1            f=other-path
+  ins23 PRIM play-sound-event opd=5901000000000000 t=9            f=other-path
+  ins24 CALL 8310 'get me out of pool' t=2            f=28
+  ins25 MyPersonData[64] == Lit[1]   t=26           f=7
+  ins26 PRIM 280 opd=3c00000000000000 t=8            f=other-path
+  ins27 MyPersonData[64] == Lit[1]   t=29           f=12
+  ins28 PRIM set-balloon-headline opd=00000403ffff0001 t=31           f=other-path
+  ins29 PRIM set-balloon-headline opd=0000000300000000 t=RETURN_TRUE  f=other-path
+  ins30 PRIM 280 opd=5a00000000000000 t=46           f=other-path
+  ins31 PRIM play-sound-event opd=5601000000000000 t=30           f=other-path
+  ins32 CALL 8310 'get me out of pool' t=18           f=34
+  ins33 PRIM 393 opd=ffffffffffffffff t=RETURN_TRUE  f=other-path
+  ins34 PRIM play-sound-event opd=3d01000000000000 t=52           f=other-path
+  ins35 PRIM special-effect opd=0a00010259040000 t=33           f=other-path
+  ins36 Local[1] == Lit[101]         t=37           f=3
+  ins37 PRIM play-sound-event opd=6501000000000000 t=3            f=other-path
+  ins38 MyMotives[Energy] < Lit[-80] t=39           f=16
+  ins39 MyMotives[Energy] := Lit[-90] t=16           f=other-path
+  ins40 PRIM animate-sim opd=5c00010003200000 t=22           f=40
+  ins41 PRIM animate-sim opd=5d00010003200000 t=8            f=41
+  ins42 StackObjPersonData[0] == Lit[0] t=40           f=47
+  ins43 StackObjPersonData[0] == Lit[0] t=41           f=48
+  ins44 StackObjPersonData[0] == Lit[0] t=45           f=49
+  ins45 PRIM animate-sim opd=5e00010003200000 t=17           f=45
+  ins46 MyMotives[Energy] := Lit[-90] t=32           f=other-path
+  ins47 PRIM animate-sim opd=5f00010003200000 t=22           f=47
+  ins48 PRIM animate-sim opd=6000010003200000 t=5            f=48
+  ins49 PRIM animate-sim opd=6100010003200000 t=17           f=49
+  ins50 StackObjPersonData[0] == Lit[0] t=15           f=51
+  ins51 PRIM animate-sim opd=62000c0003000000 t=RETURN_TRUE  f=51
+  ins52 PRIM 309 opd=ffffffffffffffff t=35           f=other-path
+### BHAV id=8306 label='ghost main' count=5
+  ins0  Local[0] := MyObject[11]     t=1            f=other-path
+  ins1  PRIM create-object-instance opd=c407000006000000 t=2            f=RETURN_TRUE
+  ins2  PRIM find-location-for opd=0200010000000000 t=3            f=4
+  ins3  Local[0] := MyObject[11]     t=other-path   f=other-path
+  ins4  PRIM remove-object-instance opd=0100000000000000 t=RETURN_TRUE  f=RETURN_TRUE
+### BHAV id=8305 label='burn to death' count=22
+  ins0  StackObjID[0] := MyObject[11] t=16           f=other-path
+  ins1  StackObjID[0] := MyObject[11] t=3            f=other-path
+  ins2  PRIM play-sound-event opd=3d01000000000000 t=5            f=other-path
+  ins3  PRIM play-sound-event opd=3f01000000000000 t=4            f=other-path
+  ins4  PRIM animate-sim opd=5700000003200000 t=8            f=4
+  ins5  PRIM 393 opd=ffffffffffffffff t=RETURN_TRUE  f=other-path
+  ins6  PRIM special-effect opd=0a00010219010000 t=15           f=other-path
+  ins7  PRIM animate-sim opd=5a00000003200000 t=2            f=7
+  ins8  Local[1] := Lit[5]           t=9            f=other-path
+  ins9  PRIM random-number opd=0200190002000700 t=10           f=other-path
+  ins10 Local[2] == Lit[0]           t=11           f=12
+  ins11 PRIM animate-sim opd=5800000003200000 t=13           f=11
+  ins12 PRIM animate-sim opd=5800000003200000 t=13           f=12
+  ins13 Local[1] --> Lit[0]          t=9            f=21
+  ins14 PRIM 309 opd=ffffffffffffffff t=6            f=other-path
+  ins15 PRIM stop-all-sounds opd=0000000000000000 t=7            f=other-path
+  ins16 PRIM set-to-next opd=00000000880a0000 t=17           f=20
+  ins17 StackObjID[0] != MyObject[11] t=18           f=20
+  ins18 PRIM test-object-type opd=995fc92400000a00 t=19           f=16
+  ins19 StackObjAttr[2] == Lit[0]    t=16           f=1
+  ins20 MyObject[8] ClearFlag Lit[10] t=RETURN_TRUE  f=other-path
+  ins21 MyPersonData[32] == Tuning[16903] t=15           f=14
+### BHAV id=8327 label='try burn to death' count=2
+  ins0  MyObject[8] HasFlag Lit[10]  t=1            f=RETURN_TRUE
+  ins1  CALL 8305 'burn to death'    t=RETURN_TRUE  f=other-path
+### BHAV id=8641 label='Ghost - Main Loop' count=26
+  ins0  Local[0] := Lit[5]           t=15           f=other-path
+  ins1  Local[1] := Lit[0]           t=5            f=other-path
+  ins2  Local[1] ++< Lit[8]          t=21           f=RETURN_TRUE
+  ins3  PRIM goto-routing-slot opd=0b00020000000000 t=6            f=6
+  ins4  PRIM goto-relative-position opd=0000feff00000000 t=2            f=2
+  ins5  MyObject[34] := Lit[0]       t=18           f=other-path
+  ins6  MyObject[34] := Lit[0]       t=20           f=other-path
+  ins7  Local[0] --> Lit[0]          t=9            f=1
+  ins8  CALL 8638 'Ghost - Wander'   t=16           f=other-path
+  ins9  CALL 8642 'Ghost - Play Haunt Sound' t=8            f=other-path
+  ins10 CALL 8642 'Ghost - Play Haunt Sound' t=25           f=other-path
+  ins11 CALL 8640 'Ghost - Scare'    t=RETURN_TRUE  f=10
+  ins12 StackObjID[0] := Local[4]    t=13           f=other-path
+  ins13 PRIM 287 opd=ffffffffffffffff t=4            f=23
+  ins14 PRIM goto-routing-slot opd=0b00020000000000 t=2            f=2
+  ins15 Local[4] := StackObjID[0]    t=9            f=other-path
+  ins16 PRIM 281 opd=0100010000000000 t=7            f=7
+  ins17 CALL 8638 'Ghost - Wander'   t=6            f=other-path
+  ins18 PRIM random-number opd=02001900e8030700 t=19           f=other-path
+  ins19 Local[2] <= Lit[600]         t=11           f=22
+  ins20 PRIM 281 opd=0100010000000000 t=12           f=12
+  ins21 PRIM 281 opd=0100010000000000 t=5            f=5
+  ins22 CALL 8642 'Ghost - Play Haunt Sound' t=17           f=other-path
+  ins23 StackObjID[0] := MyObject[11] t=14           f=other-path
+  ins24 PRIM 287 opd=ffffffffffffffff t=3            f=6
+  ins25 StackObjID[0] := Local[4]    t=24           f=other-path

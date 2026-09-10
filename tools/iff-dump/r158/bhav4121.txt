@@ -1,0 +1,30 @@
+### BHAV 4121 'create car from work' (29 instructions)
+ins0  T1/F253  Local[0] = StkObjID[0]
+ins1  T6/F4    StkObjAttr[1] == Tuning[1]
+ins2  T254/F253 StkObjAttr[3] = Lit[1]
+ins3  T2/F253  StkObjAttr[4] = StkObjID[0]
+ins4  T5/F8    StkObjAttr[1] == Tuning[2]
+ins5  T7/F255  PRIM createObjectInstance (42) opd=9aedf5a606200000
+ins6  T7/F255  PRIM createObjectInstance (42) opd=7d6eeec806200000
+ins7  T22/F255 PRIM findLocationFor (16) opd=0300030000000000
+ins8  T9/F10   StkObjAttr[1] == Tuning[3]
+ins9  T7/F255  PRIM createObjectInstance (42) opd=a7edec7606200000
+ins10 T11/F12  StkObjAttr[1] == Tuning[4]
+ins11 T7/F255  PRIM createObjectInstance (42) opd=44ec2af706200000
+ins12 T13/F14  StkObjAttr[1] == Tuning[5]
+ins13 T7/F255  PRIM createObjectInstance (42) opd=63ec3d1d06200000
+ins14 T15/F16  StkObjAttr[1] == Tuning[6]
+ins15 T7/F255  PRIM createObjectInstance (42) opd=18ec3abc06200000
+ins16 T17/F18  StkObjAttr[1] == Tuning[7]
+ins17 T7/F255  PRIM createObjectInstance (42) opd=22ecac1706200000
+ins18 T19/F23  StkObjAttr[1] == Tuning[8]
+ins19 T7/F255  PRIM createObjectInstance (42) opd=daec714b06200000
+ins20 T7/F255  PRIM createObjectInstance (42) opd=b2ed6ddb06200000
+ins21 T3/F253  Local[0] = StkObjID[0]
+ins22 T21/F21  PRIM runTreeByName (28) opd=2f01000003020000
+ins23 T24/F25  StkObjAttr[1] == Tuning[9]
+ins24 T7/F255  PRIM createObjectInstance (42) opd=e17608cd06200000
+ins25 T26/F27  StkObjAttr[1] == Tuning[10]
+ins26 T7/F255  PRIM createObjectInstance (42) opd=fe76781406200000
+ins27 T28/F20  StkObjAttr[1] == Tuning[11]
+ins28 T7/F255  PRIM createObjectInstance (42) opd=8876be6f06200000

@@ -1,0 +1,24 @@
+# R167 TS1 Generic Sims Call mode 13 corpus scan
+# corpus: /Users/nathannoom/Developer/Games/The Sims/simitone-fork/game-data/The Sims
+# match law: BHAV opcode == 1 and first operand byte == 13
+# routine-entry law: expression opcode 2, operand 00 00 0b 00 00 05 0a 03
+# decoded routine entry: Stack Object ID := My Object.ObjectId
+# files walked: 8871; IFFs scanned: 2238; BHAV chunks: 28246
+# call sites: 2 instances; 2 unique call-site signatures; 2 unique routine instruction payload hashes
+
+## unique call-site signatures
+[1] BHAV 8252 'import lot' instruction[1] T=254 F=253 operand=0d 00 00 00 00 00 00 00
+    routine entry instruction[0]: opcode=2 T=1 F=253 operand=00 00 0b 00 00 05 0a 03
+    incoming control transfers: instruction[0] opcode=2 T=1 F=253
+    routine instruction payload: instructions=2 sha256=6ac6bb6ca589640ccfc4b857fb752eef905bd66187efed6fa5477083b82c220e
+    instances=1
+      GameData/Global/Global.far!PhoneGlobals.iff
+[2] BHAV 8284 'main' instruction[1] T=5 F=253 operand=0d 00 00 00 00 00 00 00
+    routine entry instruction[0]: opcode=2 T=6 F=253 operand=00 00 0b 00 00 05 0a 03
+    incoming control transfers: instruction[12] opcode=8197 T=1 F=1
+    routine instruction payload: instructions=13 sha256=7f81534e9514558fe18a5da09c85dda881ede0db6dc5eb3128264201e01597f2
+    instances=1
+      GameData/Global/Global.far!PhoneGlobals.iff
+
+## container-family counts
+   2  GameData/Global/Global.far

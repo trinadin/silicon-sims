@@ -1,0 +1,93 @@
+# R168 TS1 Generic Sims Call mode 14 corpus scan
+# corpus: /Users/nathannoom/Developer/Games/The Sims/simitone-fork/game-data/The Sims
+# match law: BHAV opcode == 1 and first operand byte == 14
+# call operand: 0e 00 00 00 00 00 00 00
+# files walked: 8871; IFFs scanned: 2238; BHAV chunks: 28246
+# strict structure: every IFF consumed exactly; deeper nested FARs: 0
+# call sites: 18 instances in 13 IFFs; 11 unique call-site signatures; 11 unique routine instruction payload hashes
+# setup: 9 parameter sites, 4 literal-2 sites, 5 tuning sites; 22 exact incoming Temp0 assignment paths
+# all calls use only the true successor; every false pointer is 253
+
+## unique call-site signatures
+[1] BHAV 4096 'main' instruction[17] T=2 F=253 operand=0e 00 00 00 00 00 00 00
+    routine instruction payload: instructions=18 sha256=7dae1948c2265cdb018fe15a5b1049ebcebf1f472111956da3da30722cedfa2d
+    instances=1
+      ExpansionPack6/ExpansionPack6.far!StereoSpeakersSuperstar.iff
+        incoming instruction[16] T=17 F=253 operand=00 00 09 03 00 05 08 1a (Temp0 := local tuning 0x309)
+[2] BHAV 4096 'main' instruction[8] T=9 F=253 operand=0e 00 00 00 00 00 00 00
+    routine instruction payload: instructions=34 sha256=1f6f77a10dca1b657eadfba898a74f85e51ee622564b12b0621fa71eaad10c61
+    instances=1
+      ExpansionPack6/ExpansionPack6.far!StereoWallSuperStar.iff
+        incoming instruction[14] T=8 F=253 operand=00 00 8b 02 00 05 08 1a (Temp0 := local tuning 0x28b)
+        incoming instruction[33] T=8 F=253 operand=00 00 8d 02 00 05 08 1a (Temp0 := local tuning 0x28d)
+[3] BHAV 4096 'main' instruction[8] T=9 F=253 operand=0e 00 00 00 00 00 00 00
+    routine instruction payload: instructions=34 sha256=759586e5aacc00fb45fabbd2b170250ebe5bb8c6d276b11d914e3bdf69cdb3e9
+    instances=1
+      ExpansionPack5/ExpansionPack5.FAR!stereowallunleashed.iff
+        incoming instruction[14] T=8 F=253 operand=00 00 8b 02 00 05 08 1a (Temp0 := local tuning 0x28b)
+        incoming instruction[33] T=8 F=253 operand=00 00 8c 02 00 05 08 1a (Temp0 := local tuning 0x28c)
+[4] BHAV 4096 'main' instruction[9] T=10 F=253 operand=0e 00 00 00 00 00 00 00
+    routine instruction payload: instructions=29 sha256=374194cae7db23951cfb0cbe99445f29b26b0b9e392805aeec13886c5f810db8
+    instances=1
+      ExpansionPack3/ExpansionPack3.far!Stereos2.iff
+        incoming instruction[8] T=9 F=253 operand=00 00 89 02 00 05 08 1a (Temp0 := local tuning 0x289)
+        incoming instruction[16] T=9 F=253 operand=00 00 8a 02 00 05 08 1a (Temp0 := local tuning 0x28a)
+[5] BHAV 4117 'play piano npc' instruction[25] T=27 F=253 operand=0e 00 00 00 00 00 00 00
+    routine instruction payload: instructions=29 sha256=f98ed5256be62aa657cbfd4f10c01b55295809209154bc6c631b21969bb27aa8
+    instances=1
+      GameData/Objects/Objects.far!piano.iff
+        incoming instruction[24] T=25 F=253 operand=00 00 02 00 00 05 08 07 (Temp0 := literal 2)
+[6] BHAV 4118 'SubSwitch' instruction[8] T=7 F=253 operand=0e 00 00 00 00 00 00 00
+    routine instruction payload: instructions=11 sha256=19b1469784c1ca5c1569a0d9cad1ec52428e55e6adf8d0a7e20f34e278179179
+    instances=3
+      ExpansionPack3/ExpansionPack3.far!Stereos2.iff
+        incoming instruction[1] T=8 F=253 operand=00 00 00 00 00 05 08 09 (Temp0 := Param0)
+      ExpansionPack5/ExpansionPack5.FAR!stereowallunleashed.iff
+        incoming instruction[1] T=8 F=253 operand=00 00 00 00 00 05 08 09 (Temp0 := Param0)
+      ExpansionPack6/ExpansionPack6.far!StereoWallSuperStar.iff
+        incoming instruction[1] T=8 F=253 operand=00 00 00 00 00 05 08 09 (Temp0 := Param0)
+[7] BHAV 4118 'SubSwitch' instruction[8] T=7 F=253 operand=0e 00 00 00 00 00 00 00
+    routine instruction payload: instructions=11 sha256=d695822167dc9e2688458d5c21f8ec54c3d324385a5fa76899e8aff4f2e7c004
+    instances=2
+      ExpansionPack6/ExpansionPack6.far!StereoSuperstar.iff
+        incoming instruction[1] T=8 F=253 operand=00 00 00 00 00 05 08 09 (Temp0 := Param0)
+      GameData/Objects/Objects.far!Stereos.iff
+        incoming instruction[1] T=8 F=253 operand=00 00 00 00 00 05 08 09 (Temp0 := Param0)
+[8] BHAV 4118 'SubSwitch' instruction[9] T=8 F=253 operand=0e 00 00 00 00 00 00 00
+    routine instruction payload: instructions=12 sha256=ba85fea91d4aa9eedfe4f3d903091013f2423e53d9736d21850875089a39f348
+    instances=1
+      Downloads/Jukebox/Jukebox.far!JukeBox.iff
+        incoming instruction[2] T=9 F=253 operand=00 00 00 00 00 05 08 09 (Temp0 := Param0)
+[9] BHAV 4118 'play piano npc' instruction[25] T=28 F=253 operand=0e 00 00 00 00 00 00 00
+    routine instruction payload: instructions=29 sha256=48a738287c1df63cd376f287a32a5609672e9134619e5829ac9a5cf2b9eeeea8
+    instances=3
+      ExpansionPack/ExpansionPack.far!piano2.iff
+        incoming instruction[24] T=25 F=253 operand=00 00 02 00 00 05 08 07 (Temp0 := literal 2)
+      ExpansionPack3/ExpansionPack3.far!Piano3.iff
+        incoming instruction[24] T=25 F=253 operand=00 00 02 00 00 05 08 07 (Temp0 := literal 2)
+      ExpansionPack6/ExpansionPack6.far!PianoSuperstar.iff
+        incoming instruction[24] T=25 F=253 operand=00 00 02 00 00 05 08 07 (Temp0 := literal 2)
+[10] BHAV 4136 'Station Change' instruction[3] T=2 F=253 operand=0e 00 00 00 00 00 00 00
+    routine instruction payload: instructions=5 sha256=4cbac74b250728b5beef7ad5a19c6cd7515efe855d4b961574d4ad91a4f588a8
+    instances=3
+      ExpansionPack2/ExpansionPack2.far!DJBooth.iff
+        incoming instruction[0] T=3 F=253 operand=00 00 00 00 00 05 08 09 (Temp0 := Param0)
+      ExpansionPack2/ExpansionPack2.far!StereoSpeakers.iff
+        incoming instruction[0] T=3 F=253 operand=00 00 00 00 00 05 08 09 (Temp0 := Param0)
+      ExpansionPack6/ExpansionPack6.far!StereoSpeakersSuperstar.iff
+        incoming instruction[0] T=3 F=253 operand=00 00 00 00 00 05 08 09 (Temp0 := Param0)
+[11] BHAV 4152 'Turn On Specific' instruction[12] T=8 F=253 operand=0e 00 00 00 00 00 00 00
+    routine instruction payload: instructions=15 sha256=150123c183e8881572bf7e339ae72402abb13859b6b3353b8a2585929e6baa87
+    instances=1
+      Downloads/Jukebox/Jukebox.far!JukeBox.iff
+        incoming instruction[11] T=12 F=253 operand=00 00 81 02 00 05 08 1a (Temp0 := local tuning 0x281)
+        incoming instruction[14] T=12 F=253 operand=00 00 87 02 00 05 08 1a (Temp0 := local tuning 0x287)
+
+## container-family counts
+   2  Downloads/Jukebox/Jukebox.far
+   1  ExpansionPack/ExpansionPack.far
+   2  ExpansionPack2/ExpansionPack2.far
+   3  ExpansionPack3/ExpansionPack3.far
+   2  ExpansionPack5/ExpansionPack5.FAR
+   6  ExpansionPack6/ExpansionPack6.far
+   2  GameData/Objects/Objects.far

@@ -18,6 +18,7 @@ namespace Simitone.Client.UI.Controls
 
         public override void Draw(UISpriteBatch SBatch)
         {
+            if (!Visible) return;
             var oldOpacity = Opacity;
             if (Disabled) Opacity = 0.5f;
             var col = BlendColor;

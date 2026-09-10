@@ -1,0 +1,22 @@
+                ; ==== .__dt__12ImportMemberFv ====
+002322b0: 93e1fffc  stw      r31, -4(r1)
+002322b4: 7c0802a6  mflr     r0
+002322b8: 3be40000  addi     r31, r4, 0
+002322bc: 93c1fff8  stw      r30, -8(r1)
+002322c0: 7c7e1b79  or.      r30, r3, r3
+002322c4: 90010008  stw      r0, 8(r1)
+002322c8: 9421ffb0  stwu     r1, -0x50(r1)
+002322cc: 4182001c  beq      0x2322e8
+002322d0: 3880ffff  li       r4, -1
+002322d4: 4833f2cd  bl       0x5715a0   ; .__dt__9CTGStringFv
+002322d8: 7fe00735  extsh.   r0, r31
+002322dc: 4081000c  ble      0x2322e8
+002322e0: 7fc3f378  mr       r3, r30
+002322e4: 4835f23d  bl       0x591520
+002322e8: 7fc3f378  mr       r3, r30
+002322ec: 80010058  lwz      r0, 0x58(r1)
+002322f0: 38210050  addi     r1, r1, 0x50
+002322f4: 7c0803a6  mtlr     r0
+002322f8: 83e1fffc  lwz      r31, -4(r1)
+002322fc: 83c1fff8  lwz      r30, -8(r1)
+00232300: 4e800020  blr      

@@ -1,0 +1,25 @@
+                ; ==== .TryDialog__8cXObjectFP9StackElemP10XPrimParam ====
+000f1770: bee1ffdc  stmw     r23, -0x24(r1)
+000f1774: 7c0802a6  mflr     r0
+000f1778: 7c781b78  mr       r24, r3
+000f177c: 83828870  lwz      r28, -0x7790(r2)
+000f1780: 7c992378  mr       r25, r4
+000f1784: 82e28874  lwz      r23, -0x778c(r2)
+000f1788: 7cba2b78  mr       r26, r5
+000f178c: 83a2a6a8  lwz      r29, -0x5958(r2)
+000f1790: 7f04c378  mr       r4, r24
+000f1794: 83c28c00  lwz      r30, -0x7400(r2)
+000f1798: 83e28da4  lwz      r31, -0x725c(r2)
+000f179c: 90010008  stw      r0, 8(r1)
+000f17a0: 9421ff80  stwu     r1, -0x80(r1)
+000f17a4: 806300dc  lwz      r3, 0xdc(r3)
+000f17a8: 4bff2399  bl       0xe3b40   ; .GetCurrentDialog__12ObjectModuleFP8cXObject
+000f17ac: 7c7b1b79  or.      r27, r3, r3
+000f17b0: 41820028  beq      0xf17d8
+000f17b4: 801b0044  lwz      r0, 0x44(r27)
+000f17b8: 2c000001  cmpwi    r0, 1
+000f17bc: 40820010  bne      0xf17cc
+000f17c0: 4bfdac01  bl       0xcc3c0   ; .Abort__12ObjectDialogFv
+000f17c4: 3b600000  li       r27, 0
+000f17c8: 48000010  b        0xf17d8
+000f17cc: 2c000005  cmpwi    r0, 5

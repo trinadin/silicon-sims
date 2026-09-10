@@ -1,0 +1,40 @@
+00270d40: 93e1fffc  stw      r31, -4(r1)
+00270d44: 7c0802a6  mflr     r0
+00270d48: 3be40000  addi     r31, r4, 0
+00270d4c: 93c1fff8  stw      r30, -8(r1)
+00270d50: 3bc30000  addi     r30, r3, 0
+00270d54: 90010008  stw      r0, 8(r1)
+00270d58: 9421ffb0  stwu     r1, -0x50(r1)
+00270d5c: 482988b5  bl       0x509610   ; .__ct__6cTSWinFv
+00270d60: 806295e4  lwz      r3, -0x6a1c(r2)   ; TOC[-0x6a1c]->DATA off 0x56748
+00270d64: 38000000  li       r0, 0
+00270d68: 281f0000  cmplwi   r31, 0
+00270d6c: 907e0000  stw      r3, 0(r30)
+00270d70: 901e00d4  stw      r0, 0xd4(r30)
+00270d74: 901e00d8  stw      r0, 0xd8(r30)
+00270d78: 901e00dc  stw      r0, 0xdc(r30)
+00270d7c: 901e00e0  stw      r0, 0xe0(r30)
+00270d80: 901e00e4  stw      r0, 0xe4(r30)
+00270d84: 901e00ec  stw      r0, 0xec(r30)
+00270d88: 901e00e8  stw      r0, 0xe8(r30)
+00270d8c: 901e00f0  stw      r0, 0xf0(r30)
+00270d90: 93fe00f4  stw      r31, 0xf4(r30)
+00270d94: 41820010  beq      0x270da4
+00270d98: 387f0000  addi     r3, r31, 0
+00270d9c: 389e0000  addi     r4, r30, 0
+00270da0: 4bfa10f1  bl       0x211e90   ; .SetControlPanel__7CPStateFP10cWinCPanel
+00270da4: 38000000  li       r0, 0
+00270da8: 981e00cc  stb      r0, 0xcc(r30)
+00270dac: 7fc3f378  mr       r3, r30
+00270db0: 981e00cd  stb      r0, 0xcd(r30)
+00270db4: 901e00d0  stw      r0, 0xd0(r30)
+00270db8: 901e00f8  stw      r0, 0xf8(r30)
+00270dbc: 901e00fc  stw      r0, 0xfc(r30)
+00270dc0: 901e0100  stw      r0, 0x100(r30)
+00270dc4: 901e0104  stw      r0, 0x104(r30)
+00270dc8: 80010058  lwz      r0, 0x58(r1)
+00270dcc: 38210050  addi     r1, r1, 0x50
+00270dd0: 7c0803a6  mtlr     r0
+00270dd4: 83e1fffc  lwz      r31, -4(r1)
+00270dd8: 83c1fff8  lwz      r30, -8(r1)
+00270ddc: 4e800020  blr      

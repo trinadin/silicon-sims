@@ -1,0 +1,48 @@
+000f7080: 93e1fffc  stw      r31, -4(r1)
+000f7084: 7c0802a6  mflr     r0
+000f7088: 3be0ffff  li       r31, -1
+000f708c: 93c1fff8  stw      r30, -8(r1)
+000f7090: 3bc30000  addi     r30, r3, 0
+000f7094: 90010008  stw      r0, 8(r1)
+000f7098: 9421ffa0  stwu     r1, -0x60(r1)
+000f709c: 88050000  lbz      r0, 0(r5)
+000f70a0: 2c000001  cmpwi    r0, 1
+000f70a4: 41820038  beq      0xf70dc
+000f70a8: 40800068  bge      0xf7110
+000f70ac: 2c000000  cmpwi    r0, 0
+000f70b0: 40800008  bge      0xf70b8
+000f70b4: 4800005c  b        0xf7110
+000f70b8: 807e00dc  lwz      r3, 0xdc(r30)
+000f70bc: 7fc4f378  mr       r4, r30
+000f70c0: 4bfebbb1  bl       0xe2c70   ; .SetTutorialObject__12ObjectModuleFP8cXObject
+000f70c4: 2c030000  cmpwi    r3, 0
+000f70c8: 4182000c  beq      0xf70d4
+000f70cc: 3be00001  li       r31, 1
+000f70d0: 48000058  b        0xf7128
+000f70d4: 3be00000  li       r31, 0
+000f70d8: 48000050  b        0xf7128
+000f70dc: 807e00dc  lwz      r3, 0xdc(r30)
+000f70e0: 4bfebca1  bl       0xe2d80   ; .GetTutorialObject__12ObjectModuleFv
+000f70e4: 7c1e1840  cmplw    r30, r3
+000f70e8: 40820020  bne      0xf7108
+000f70ec: 807e00dc  lwz      r3, 0xdc(r30)
+000f70f0: 38800000  li       r4, 0
+000f70f4: 4bfebb7d  bl       0xe2c70   ; .SetTutorialObject__12ObjectModuleFP8cXObject
+000f70f8: 2c030000  cmpwi    r3, 0
+000f70fc: 4182000c  beq      0xf7108
+000f7100: 3be00001  li       r31, 1
+000f7104: 48000024  b        0xf7128
+000f7108: 3be00000  li       r31, 0
+000f710c: 4800001c  b        0xf7128
+000f7110: 38000035  li       r0, 0x35
+000f7114: 8062a6a8  lwz      r3, -0x5958(r2)
+000f7118: b0010040  sth      r0, 0x40(r1)
+000f711c: 38810040  addi     r4, r1, 0x40
+000f7120: 38a00000  li       r5, 0
+000f7124: 484995fd  bl       0x590720
+000f7128: 7fe3fb78  mr       r3, r31
+000f712c: 80010068  lwz      r0, 0x68(r1)
+000f7130: 38210060  addi     r1, r1, 0x60
+000f7134: 7c0803a6  mtlr     r0
+000f7138: 83e1fffc  lwz      r31, -4(r1)
+000f713c: 83c1fff8  lwz      r30, -8(r1)

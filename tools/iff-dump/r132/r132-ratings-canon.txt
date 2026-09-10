@@ -1,0 +1,23 @@
+== R132 ratings/tracking family: FAR ground truth ==
+cpanel\buttons\housebars.bmp                   len=2776    63x26  bpp=8 comp=1 sha=a0d09dbd40080ff631fb81cb9e88ecc52921fde57e0fb6c22432c1f349a10d9a
+cpanel\buttons\jobbars.bmp                     len=2764    63x26  bpp=8 comp=1 sha=50463f1f8e6db99513d55a0dc17d4eeeaa5b5a942d62a387df999a24739444a8
+cpanel\buttons\relbars.bmp                     len=2740    63x26  bpp=8 comp=1 sha=b71beff520ff0888f8c31ff3f81f0a1b736d2ba407c4f818e40755b5800fff3f
+cpanel\housesubbars.bmp                        len=1976    40x16  bpp=24 comp=0 sha=83a6513e05b431493f6678fbbc47e6399e0212cf932a31f914bb8045750057c9
+cpanel\jobsubbars.bmp                          len=1376    40x11  bpp=24 comp=0 sha=9321ea64c486488fb9b71be56f4d1143a7c96fadd1d283d02b25223bb6a83273
+cpanel\famesubbars.bmp                         len=1608    80x16  bpp=8 comp=1 sha=66256153d51d25d53658e3dea7209aad4e1483e62e0ef0bef58212895fd4702f
+cpanel\backgrounds\housesubbarsoff.bmp         len=1718    40x16  bpp=8 comp=0 sha=05d084b921497ca50e7a12aefef58dee152312087d1791af65640ed45329cf98
+cpanel\backgrounds\jobsubbarsoff.bmp           len=1518    40x11  bpp=8 comp=0 sha=7a12bea361ce39fd52cd0112ff8b5e12c8a7de02ae2515f4e5d335bd800d8f68
+cpanel\backgrounds\famesubbarsoff.bmp          len=2040    80x16  bpp=8 comp=1 sha=b65257244c09578afe80d344526fe1271ffd10de4453caa102a00568d70d681f
+cpanel\people\trackingtarget.bmp               len=1354    45x45  bpp=8 comp=1 sha=24a8e71bc06e7855f1ceeae3cc07c7866918655c41bb0cdf19f1bda02fe60d83
+
+== gate rows (path,len,W,H,sha256) ==
+    new string[] { "cpanel\\buttons\\housebars.bmp", "2776", "63", "26", "a0d09dbd40080ff631fb81cb9e88ecc52921fde57e0fb6c22432c1f349a10d9a" },
+    new string[] { "cpanel\\buttons\\jobbars.bmp", "2764", "63", "26", "50463f1f8e6db99513d55a0dc17d4eeeaa5b5a942d62a387df999a24739444a8" },
+    new string[] { "cpanel\\buttons\\relbars.bmp", "2740", "63", "26", "b71beff520ff0888f8c31ff3f81f0a1b736d2ba407c4f818e40755b5800fff3f" },
+    new string[] { "cpanel\\housesubbars.bmp", "1976", "40", "16", "83a6513e05b431493f6678fbbc47e6399e0212cf932a31f914bb8045750057c9" },
+    new string[] { "cpanel\\jobsubbars.bmp", "1376", "40", "11", "9321ea64c486488fb9b71be56f4d1143a7c96fadd1d283d02b25223bb6a83273" },
+    new string[] { "cpanel\\famesubbars.bmp", "1608", "80", "16", "66256153d51d25d53658e3dea7209aad4e1483e62e0ef0bef58212895fd4702f" },
+    new string[] { "cpanel\\backgrounds\\housesubbarsoff.bmp", "1718", "40", "16", "05d084b921497ca50e7a12aefef58dee152312087d1791af65640ed45329cf98" },
+    new string[] { "cpanel\\backgrounds\\jobsubbarsoff.bmp", "1518", "40", "11", "7a12bea361ce39fd52cd0112ff8b5e12c8a7de02ae2515f4e5d335bd800d8f68" },
+    new string[] { "cpanel\\backgrounds\\famesubbarsoff.bmp", "2040", "80", "16", "b65257244c09578afe80d344526fe1271ffd10de4453caa102a00568d70d681f" },
+    new string[] { "cpanel\\people\\trackingtarget.bmp", "1354", "45", "45", "24a8e71bc06e7855f1ceeae3cc07c7866918655c41bb0cdf19f1bda02fe60d83" },

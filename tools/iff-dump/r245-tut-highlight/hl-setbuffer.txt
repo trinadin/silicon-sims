@@ -1,0 +1,77 @@
+                ; ==== .SetBuffer__23cTSWinTutorialHighlightFP9cTSBufferif ====
+00538ea0: dbe1fff8  stfd     f31, -8(r1)
+00538ea4: 7c0802a6  mflr     r0
+00538ea8: ffe00890  fmr      f31, f1
+00538eac: 93e1ffec  stw      r31, -0x14(r1)
+00538eb0: 3be50000  addi     r31, r5, 0
+00538eb4: 93c1ffe8  stw      r30, -0x18(r1)
+00538eb8: 3bc40000  addi     r30, r4, 0
+00538ebc: 93a1ffe4  stw      r29, -0x1c(r1)
+00538ec0: 7c7d1b78  mr       r29, r3
+00538ec4: 90010008  stw      r0, 8(r1)
+00538ec8: 9421ffa0  stwu     r1, -0x60(r1)
+00538ecc: 806300cc  lwz      r3, 0xcc(r3)
+00538ed0: 7c03f040  cmplw    r3, r30
+00538ed4: 41820020  beq      0x538ef4
+00538ed8: 28030000  cmplwi   r3, 0
+00538edc: 41820018  beq      0x538ef4
+00538ee0: 81830000  lwz      r12, 0(r3)
+00538ee4: 38800001  li       r4, 1
+00538ee8: 818c0008  lwz      r12, 8(r12)
+00538eec: 48069af5  bl       0x5a29e0
+00538ef0: 80410014  lwz      r2, 0x14(r1)
+00538ef4: 93dd00cc  stw      r30, 0xcc(r29)
+00538ef8: 281e0000  cmplwi   r30, 0
+00538efc: 93fd00d0  stw      r31, 0xd0(r29)
+00538f00: d3fd00d4  stfs     f31, 0xd4(r29)
+00538f04: 418200ac  beq      0x538fb0
+00538f08: 80bd00d0  lwz      r5, 0xd0(r29)
+00538f0c: 2c050000  cmpwi    r5, 0
+00538f10: 4182003c  beq      0x538f4c
+00538f14: 809e0014  lwz      r4, 0x14(r30)
+00538f18: 7fa3eb78  mr       r3, r29
+00538f1c: 801e001c  lwz      r0, 0x1c(r30)
+00538f20: 819d0000  lwz      r12, 0(r29)
+00538f24: 7c040050  subf     r0, r4, r0
+00538f28: 809d0074  lwz      r4, 0x74(r29)
+00538f2c: 7c002bd6  divw     r0, r0, r5
+00538f30: 80bd0078  lwz      r5, 0x78(r29)
+00538f34: 80fd0080  lwz      r7, 0x80(r29)
+00538f38: 818c0068  lwz      r12, 0x68(r12)
+00538f3c: 7cc02214  add      r6, r0, r4
+00538f40: 48069aa1  bl       0x5a29e0
+00538f44: 80410014  lwz      r2, 0x14(r1)
+00538f48: 48000034  b        0x538f7c
+00538f4c: 819d0000  lwz      r12, 0(r29)
+00538f50: 7fa3eb78  mr       r3, r29
+00538f54: 80de0014  lwz      r6, 0x14(r30)
+00538f58: 801e001c  lwz      r0, 0x1c(r30)
+00538f5c: 809d0074  lwz      r4, 0x74(r29)
+00538f60: 7c060050  subf     r0, r6, r0
+00538f64: 80bd0078  lwz      r5, 0x78(r29)
+00538f68: 80fd0080  lwz      r7, 0x80(r29)
+00538f6c: 7cc02214  add      r6, r0, r4
+00538f70: 818c0068  lwz      r12, 0x68(r12)
+00538f74: 48069a6d  bl       0x5a29e0
+00538f78: 80410014  lwz      r2, 0x14(r1)
+00538f7c: 80bd00cc  lwz      r5, 0xcc(r29)
+00538f80: 7fa3eb78  mr       r3, r29
+00538f84: 819d0000  lwz      r12, 0(r29)
+00538f88: 80850018  lwz      r4, 0x18(r5)
+00538f8c: 80050020  lwz      r0, 0x20(r5)
+00538f90: 80bd0078  lwz      r5, 0x78(r29)
+00538f94: 7c040050  subf     r0, r4, r0
+00538f98: 809d0074  lwz      r4, 0x74(r29)
+00538f9c: 80dd007c  lwz      r6, 0x7c(r29)
+00538fa0: 7ce02a14  add      r7, r0, r5
+00538fa4: 818c0068  lwz      r12, 0x68(r12)
+00538fa8: 48069a39  bl       0x5a29e0
+00538fac: 80410014  lwz      r2, 0x14(r1)
+00538fb0: 80010068  lwz      r0, 0x68(r1)
+00538fb4: 38210060  addi     r1, r1, 0x60
+00538fb8: cbe1fff8  lfd      f31, -8(r1)
+00538fbc: 83e1ffec  lwz      r31, -0x14(r1)
+00538fc0: 7c0803a6  mtlr     r0
+00538fc4: 83c1ffe8  lwz      r30, -0x18(r1)
+00538fc8: 83a1ffe4  lwz      r29, -0x1c(r1)
+00538fcc: 4e800020  blr      

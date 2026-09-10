@@ -1,0 +1,130 @@
+R121 canon dump — UIText.iff STR# 145 'optionstrs' + neighbors 140..160
+Source: /Users/nathannoom/Developer/Games/The Sims/simitone-fork/game-data/The Sims/GameData/UIText.iff (2300704 bytes; full-file sha256 b229da197eb9678370844c4da7c88640c3d1ce9a5e528654bfd71df6ef12a9ad)
+Parser: 60-byte Maxis header, first chunk @0x40, 76-byte chunk headers, BE sizes; STR# data LE, format -3 = language pairs {u8 lang, cstring value, cstring comment}, lang 1 = English; full-chunk sha includes the 76-byte header (gate convention).
+Total chunks walked: 75 (74 STR# tables)
+
+################ TARGET ################
+
+=== STR# 145 'optionstrs' (chunkSize 216296; 1512 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x388f5..0x6d5dd  flags=0x0010
+full-chunk sha256 b4f0ecd775cb614758f005fea4f218df5dbc12f481208edcc7be0159da503ea6
+body-only  sha256 34b96437145cf11b4d771b591c975d348b944d22c46fc55af0d49beb66c502d2
+languages present: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 1512 = 84 English x 18 languages
+trailer: 1512 bytes, all 0xA3 padding (FreeSo STR writer quirk)
+
+English entries [0..83], verbatim (mac_roman):
+  0  (  6 B)  '(88;6)'  sha256=516b9243a3f38b9d609ef0010d9e409a5602814b9cfa33c6c7ec66a877c74949
+  1  ( 12 B)  'Neighborhood'  sha256=1e99f126692fb20f877b69ef0702c492174986d5c237b01226acb72165a86628
+  2  (  6 B)  '(29;6)'  sha256=887e95e7b845be70f674acef76a6d6487e84c8dbc0e038389932d5d998b3e450
+  3  (  4 B)  'Save'  sha256=1509f561f2416598629b886ad7d3c05a7e221e4e0675c84bbff4ee6d9e03913d
+  4  (  7 B)  '(159;6)'  sha256=52a1fad30785b95205047fa886294f5859568a4472a0f4d5612daa9fd68a0789
+  5  (  4 B)  'Quit'  sha256=b3eb37acb66ba4bbe8fb1ba296815daf194be94f5a5fb50dab2fb5e4a57ba29e
+  6  (  7 B)  '(29;58)'  sha256=3f947c6f37a6869ace2914cdb5d61a904f02214bbafe6c13014b7b6d9d633017
+  7  ( 16 B)  'Graphics Options'  sha256=7dcc82a53b2bd94c9e48270793927f61c2382812d992255069a8862e00e8e422
+  8  (  7 B)  '(89;58)'  sha256=c1ef37de0488434279034a39f6b8f0291dde652de7bcc223c6abdbe4866c96e3
+  9  ( 13 B)  'Sound Options'  sha256=2b3795dfde202d8df7ad8945356bf64cdd83b80839c774d154eec07dcf1442a5
+ 10  (  8 B)  '(151;58)'  sha256=86c2d07d7d68b429d5993554691e764a76310fd53d8e0e9f94ba9ca5b2ef1323
+ 11  ( 12 B)  'Play Options'  sha256=3588a717641294aba17a9cf71c44b5db9c4e7f8b193c75f27e30258a957b8913
+ 12  (  7 B)  '(275;9)'  sha256=a65d43fdf5880b94c554d961acd4ab2170f11b24285c166dc7bc2ff770e06ae9
+ 13  (  8 B)  '(200;20)'  sha256=9d8493f6669e45346f4927c22ef38219e6412382fdba0e76512f9c643ee0eb07
+ 14  ( 10 B)  'Anti-alias'  sha256=b0ce1255503edb64f5b65419ebea08418dc515c9b002a92459ae89c59067a34d
+ 15  ( 19 B)  'About Anti-aliasing'  sha256=1794a60bcb62b9810c24d1d63479311c0c1cfceb1f0f2c27960b9b4994637108
+ 16  (179 B)  'The anti-alias feature makes the edges of objects look smoother and less jaggy. Turning anti-alias off will show edges that are less smooth, but the game performance will improve.'  sha256=c88e33628eea311579cecc599a671b5191df2f5d0ef6ce9804d2f2bd9dffb819
+ 17  (  7 B)  'Shadows'  sha256=2a19bdc09aa3bd9d5ba8c9707687136c2825da0e2af28b7c5de7c65b9c50f365
+ 18  ( 13 B)  'About Shadows'  sha256=a2ff2cc755d83c8d77f9cf8a952ffa8ef7a221a228ffe328ad0227a2ac504a45
+ 19  (139 B)  'Shadows appear under some objects to enhance their look. Turning shadows off will remove the shadows and will improve the game performance.'  sha256=7ac84295a5e07a5224dec8275340312aa7e6ea701372e75a5b0fb889a24b7943
+ 20  (  8 B)  'Lighting'  sha256=07607d609f9a3592484e9a0eace33d5a5530379335466648e41279517f7d5859
+ 21  ( 14 B)  'About Lighting'  sha256=272ac4b9b91d4ce3a74a19809242482596cbd7599c0ebc911ec892594991fc3f
+ 22  (247 B)  'The game screen is always lighted by a certain amount of ambient light. In addition certain objects such as lamps can be used to provide additional light. This option allows you to turn off the light cast by objects that improves game performance.'  sha256=573bb74c1ae2fd939bf52b4988e9093c95869b5e6e480f962980f80b4662044b
+ 23  ( 17 B)  'Interface Effects'  sha256=a5aa195984b3a8eaf6b3cf80114c3eccbc77efcf471314582c597bbaaa2a44c0
+ 24  ( 23 B)  'About Interface Effects'  sha256=3ce75b45e9a610d73e2906d88130c6e8f5cdd8b769dc0f0eafbd7718290ebecb
+ 25  ( 94 B)  'This option activates many user interface special effects. Turn it off for faster performance.'  sha256=104dbc649f8015519df9bf3dd82ffd3d33624ea2e7670cf67a502e48484d78e5
+ 26  (  8 B)  '(480;30)'  sha256=db47a107c0792fc710470bd715572a991cce6a9dac2cf01b02a1c4af20f87450
+ 27  (  8 B)  '(200;26)'  sha256=09aa6996d15cd1205749de7538e194aca1a15519aa2f9e17b171db3476359c73
+ 28  ( 14 B)  'Terrain Detail'  sha256=820e4b29c6d6e85759ff435e46a8fccd30112fa11950a4c9c8374b293f1e1944
+ 29  ( 20 B)  'About Terrain Detail'  sha256=574853b3d1703fb7f14545d2647605b77fb33e63865c9616fac3ce1586465b97
+ 30  (161 B)  'Terrain Detail refers to the level of detail of the grass. High detail shows many blades of grass. Low detail means fewer blades of grass and faster performance.'  sha256=5bd520116e9fae922599184780141a1622ac2061b0f2c7e20cb60994dcaa4740
+ 31  ( 16 B)  'Character Detail'  sha256=ae61abb6dd21e179120fdf295c58e94fc32e4495b7ce0c09a3d8246de2785dca
+ 32  ( 22 B)  'About Character Detail'  sha256=66e94927efa563d6797462102cac6e3c8b2c07acfd91fcda006850c7471fd444
+ 33  (180 B)  'Character Detail refers to how much shading and light filtering is used on the Sims. High detail gives you the best graphic quality, low detail gives you the best game performance.'  sha256=32fb561bead4fa6b4daae78ea0f3e940f7ca3d473cb6ce930d8d6857e73e7242
+ 34  (  7 B)  '(245;7)'  sha256=422508139e3c057efc5797b609e5ff7d2b6670820b575de1c4c899d2b1038051
+ 35  (  8 B)  '(200;20)'  sha256=9d8493f6669e45346f4927c22ef38219e6412382fdba0e76512f9c643ee0eb07
+ 36  (  7 B)  '(80;20)'  sha256=3f9c167d48edf64f8eb693d5c04f5ce8dc66adaae707bd1257b621d3176024ab
+ 37  (  8 B)  '(485;30)'  sha256=550c6504afabedeba07df4232087e27f9dd71c805373831a7bc2248510a4886f
+ 38  (  8 B)  '(200;26)'  sha256=09aa6996d15cd1205749de7538e194aca1a15519aa2f9e17b171db3476359c73
+ 39  (  3 B)  'Low'  sha256=f793de205ead5ac302c4a1627829dea41f176b1068b993a32373fc869918374b
+ 40  (  3 B)  'Med'  sha256=16b2c5623ee535ebd07bdaf50a703ff92c48dcce50b539b8523e19ec73288844
+ 41  (  4 B)  'High'  sha256=c4ebc6d4a5832cd9415f906ad03661110c705a72381c8b8b145761d02e2dd23a
+ 42  (  8 B)  '(305;13)'  sha256=b4ed48a411194151cb4e17711ce0772b7fae70bae4aa9f94e08b50fcc58ea5ef
+ 43  (  8 B)  '(200;28)'  sha256=14510b5d681e6d312bd14a0b9672584a13c146000c350f2bfcb7224a53482eff
+ 44  (  3 B)  'F/X'  sha256=4af55f53bf648a902dc9ace5ed148a91e70b2c37adf5666670694eeb8526108c
+ 45  ( 13 B)  'Sound Effects'  sha256=de7b57b57b05d02090b4091094e2117271e7df2bf17553017bb0c634ec3492c0
+ 46  ( 88 B)  'Use this volume control to set your preferred volume for all the game sounds and the TV.'  sha256=393a22e98716b0ae35a959dac2b850310d485a891681a61d337cdf8e20b62162
+ 47  (  5 B)  'Music'  sha256=6eb00b4b2614a144d41ccdf709017a675953fae2df6cfd6b397bd9e4d8708461
+ 48  (  5 B)  'Music'  sha256=6eb00b4b2614a144d41ccdf709017a675953fae2df6cfd6b397bd9e4d8708461
+ 49  (104 B)  'Use this volume control to set your preferred volume for all the music in the game including the stereo.'  sha256=ffd3d99d05e6d6a13a3397c3604025cf3511d1c2c0addfb6acc0f6a924b91a1f
+ 50  (  3 B)  'Vox'  sha256=27b2f3addd3d00794dabd18362d157491d81d80244ff982f22b6aec76c0e67eb
+ 51  (  3 B)  'Vox'  sha256=27b2f3addd3d00794dabd18362d157491d81d80244ff982f22b6aec76c0e67eb
+ 52  ( 80 B)  'Use this volume control to set your preferred volume for the voices of the Sims.'  sha256=b230073173495404fbdf2defc9ae40f0e671802ad34978d9dda88cfaae64f47e
+ 53  (  7 B)  '(130;0)'  sha256=2cc442d412b709aa1bc37ae93dc85cf5aa6fe375df53d034cfeb44d2dec5dfee
+ 54  (  7 B)  '(275;9)'  sha256=a65d43fdf5880b94c554d961acd4ab2170f11b24285c166dc7bc2ff770e06ae9
+ 55  (  8 B)  '(200;20)'  sha256=9d8493f6669e45346f4927c22ef38219e6412382fdba0e76512f9c643ee0eb07
+ 56  ( 14 B)  'Auto-Centering'  sha256=d95917ff5afc47c3accbbddf23c3b03ed4e4bc488cc650f15fb04b965574ad23
+ 57  ( 20 B)  'About Auto-centering'  sha256=11667e5e60d1ad17a854a857de7c8c500126f0213960498bd96a599117962fa8
+ 58  (133 B)  'The game automatically centers the screen on a special event when it is occurring. This option turns off that auto-centering feature.'  sha256=2da7021b61d0de36e8f5076820fa19ec5695b9a2fbc63f1753e0d71c0ebd84cb
+ 59  (  9 B)  'Free Will'  sha256=25b116dcc6308cb96548052c30b18439817d4779203211145cf158f7f70762b4
+ 60  ( 15 B)  'About Free Will'  sha256=d0307470d7c9300c8085abaf9922c0046e55cdc433f58e98281ec7a713dc781b
+ 61  (394 B)  "Free Will refers to the Sims' ability to live their lives by themselves without your help. If they have free will they will usually respond to your commands, but if you leave them alone for a while they will start to do things on their own. If you are a control freak and would like them to wait patiently for your every order, turn off this feature. By the way, visitors always have free will."  sha256=c17b4c5df8deb34ae46a3fe5cd8a011ebec54341595a5020351ad406f09cd6e1
+ 62  ( 14 B)  'Edge Scrolling'  sha256=30e9c0b5a2514241f813159ba7d75b6b430f38771258814468e0573de82da32f
+ 63  ( 20 B)  'About Edge Scrolling'  sha256=4b7bc741a9df74b5e8474d0283531c0b1c68258b8bfb1019f12b0b86171c0da4
+ 64  (129 B)  'With edge scrolling on, when your mouse hits the edge of the screen, the game screen scrolls. Turn this option off if you prefer.'  sha256=8b843047fc2f779cca840e2c46b47d8b6926f3ce93e879e30e8076af34478cb5
+ 65  ( 17 B)  'Sim In Background'  sha256=bb59a9b5753ac1feab541935baccb0b6878466fbed35f6a51f833e4b5b07315d
+ 66  ( 24 B)  ' About Sim In Background'  sha256=a7a2e78ecd2d9e5fb0997a7da925a40dc6249694be6cb77c7b5097e91b1d6dfe
+ 67  (258 B)  "You can press Alt-Tab to go to another active window while you are playing The Sims. Normally the game will simply pause when you do this. However if you want The Sims to go on living their lives while you're busy elsewhere, turn on Sim(ulate) in background."  sha256=c76b3298e9a724f1641a65e58b804c2b2ba39700eea59c8ccf043bffa5ce6920
+ 68  (  8 B)  '(521;24)'  sha256=2c74cddb0f6f2b38c59ec8ea2a8cffb1ec5014f2b147005b8fe05372d2c1a069
+ 69  ( 14 B)  'Reset Tutorial'  sha256=83cc6361672b5651e449b5d644230769b756680e469edec58134deb0da11d167
+ 70  ( 20 B)  'About Reset Tutorial'  sha256=e181d562eacb8fc5bef518a25445c410483288ea2badafc64ef50240e05cce5b
+ 71  (276 B)  'Once the tutorial has been played, in order to play it again it must be reset. This button is used for that purpose.  However, any modifications to the house and Sims living there will be lost. In addition, if another family has been moved into the house they will be evicted.'  sha256=fedafd3504c428ba5191ace30854a9b631ff878b9c3e5e9b912d802d2581f982
+ 72  ( 10 B)  'Quick Tips'  sha256=a7346ac6a9f298b2f3802f036234dd35e50ef4225fffb1c5ea8c98b6b55d8e60
+ 73  ( 16 B)  'About Quick Tips'  sha256=36926cf559852d3ac43b86a419c64046da9f842d23a2cca6b300fe279019ab04
+ 74  ( 71 B)  'Displays help popup windows without pausing or requiring a mouse click.'  sha256=106c3250dc9b5cab20eb60e5044016d3fcfa671139354f0d0ec79163b7ef454e
+ 75  ( 13 B)  'Auto Snapshot'  sha256=51cc6b3438eb4a6d36c3df10d7dba06536f0d05aeb4490422d5cef4af708e7d6
+ 76  ( 19 B)  'About Auto Snapshot'  sha256=881f0e2a8405b7098111553dbc77d9b0f4ab0d581fd861401e2c21d6f5e7ab4e
+ 77  ( 80 B)  'Automatically places a picture in the photo album when significant events occur.'  sha256=40a8bb03f730dc6ab41a2d56f9c95c072e72a7baa312cd8cef04bc46d744dba1
+ 78  (  8 B)  'Live PIP'  sha256=8fad521c748f9cf2cac01ef435ee432893ae77f373bbac8617c082c31d3cf766
+ 79  ( 14 B)  'About Live PIP'  sha256=87eb6ea5d6cc4f61df47f3f5f2aff753708a5f85cfca78df38a06817c2f24aa4
+ 80  (190 B)  'PIP means "picture in picture." When certain events occur a small active window will appear highlighting the event. For better performance on slow machines, this option should be turned off.'  sha256=715cdd7e010db638342435979af8dbee1531f325639dd70eef950bfa722edd4f
+ 81  ( 11 B)  'Export HTML'  sha256=17f681a91a2467e2829b708228e7dd8632a2e87bcae77587f125d7ee63a8f8b6
+ 82  ( 17 B)  'About Export HTML'  sha256=e66d632a5cef342395c981e10f0c90dd06f1d22c4921b0f29fa9dc23177ed76e
+ 83  (122 B)  'Turn this feature on to generate web pages about each of your families when they are saved.  Turn if off for faster saves.'  sha256=dd63a44fed2ae6316621e2937769670c19dc5ade1a03737527b95ab2598376fe
+
+################ NEIGHBORS (STR# ids 140..160) ################
+
+id    label
+140   'cammodestrs'
+141   'scrapbookstrs'
+142   'ObjDialogs'
+143   'ImportStrs'
+144   'ScrapStrs'
+145   'optionstrs'
+146   'budgetstrs'
+147   'roofpanelstrs'
+148   'Pause'
+149   'DirtToolErrs'
+150   'BuyModeCatalogSortTips'
+151   'NghbBtnTips'
+152   'DefaultDialogButtons'
+153   'AppStrings'
+154   'MiscStrings'
+155   'splashprogress'
+156   'PIPStrings'
+157   'ConfigStrings'
+158   'WebPageStrings'
+159   'ObjectTTs'
+160   'CatalogRatings'
+
+dumping full entries for labels containing 'option'/'help':
+(none)
+
+SUMMARY: STR# 145 'optionstrs' -> 84 English entries; 21 neighbors in 140..160; dumped option/help tables: (none)

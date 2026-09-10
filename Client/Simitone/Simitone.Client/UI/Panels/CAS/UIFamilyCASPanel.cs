@@ -78,7 +78,7 @@ namespace Simitone.Client.UI.Panels.CAS
             Add(NameStripe);
 
             SecondNameTitle = new UILabel();
-            SecondNameTitle.Caption = "Last Name";
+            SecondNameTitle.Caption = GameFacade.Strings.GetString("129", "12"); // R116: original DesignFamilyStrs [12]
             SecondNameTitle.CaptionStyle = SecondNameTitle.CaptionStyle.Clone();
             SecondNameTitle.CaptionStyle.Color = UIStyle.Current.SecondaryText;
             SecondNameTitle.CaptionStyle.Size = 15;
@@ -153,6 +153,28 @@ namespace Simitone.Client.UI.Panels.CAS
 
             AvatarList.InitAvatarList();
         }
+
+        // R116: last-name label twin in the caption table _10, centered across the screen.
+        public static int LastNameTwinned = 0;
+        public Simitone.Client.UI.Controls.UIOriginalText LastNameTwin;
+
+        public override void Update(FSO.Common.Rendering.Framework.Model.UpdateState state)
+        {
+            base.Update(state);
+            if (LastNameTwin == null)
+            {
+                var font = Simitone.Client.UI.Controls.OriginalGlyphFont.LoadCaption(GameFacade.GraphicsDevice);
+                if (font != null && font.Atlas != null)
+                {
+                    LastNameTwin = new Simitone.Client.UI.Controls.UIOriginalText(SecondNameTitle.Caption, font) { Color = UIStyle.Current.SecondaryText };
+                    var sw = UIScreen.Current.ScreenWidth;
+                    LastNameTwin.Position = new Microsoft.Xna.Framework.Vector2((sw - font.Measure(SecondNameTitle.Caption)) / 2f, SecondNameTitle.Y + 4);
+                    Add(LastNameTwin);
+                    SecondNameTitle.Visible = false;
+                    LastNameTwinned++;
+                }
+            }
+        }
     }
 
     public class UIAvatarListPanel : UIContainer
@@ -213,7 +235,9 @@ namespace Simitone.Client.UI.Panels.CAS
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             base.Draw(batch);
         }
     }
+
 }

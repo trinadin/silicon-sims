@@ -1,0 +1,45 @@
+== STR# 169 ('Downtown Screen Tooltips') entries=85 chunkBytes=8115
+   sha256(chunk) = 48848c00865443b3f541bb8480eab31303f9cad4eb5ef97f670832ca0ef43927
+   [0] 'Return to Neighborhood View'
+   [1] 'Goto Downtown Exchange'
+   [2] 'Credits'
+   [3] 'Import Downtown Lot'
+   [4] 'Bulldoze Lot'
+== STR# 173 ('Studio Town Screen Tooltips') entries=100 chunkBytes=7644
+   sha256(chunk) = da488d896679b50f21adb65efcb337d58d7f6c915831d1005b5c2481e9cfa447
+   [0] 'Return to Neighborhood View'
+   [1] 'Goto Studio Town Exchange'
+   [2] 'Credits'
+   [3] 'Import Studio Town Lot'
+   [4] 'Bulldoze Lot'
+== STR# 170 ('Vacation Island Screen Tooltips') entries=100 chunkBytes=7103
+   sha256(chunk) = 5a6e84c64f335fffdac04aad7c51769517cfb8807c67f37a6159f2a66b999368
+   [0] 'Return to Neighborhood View'
+   [1] 'Go to Vacation Island Exchange'
+   [2] 'Credits'
+   [3] 'Import Vacation Island Lot'
+   [4] 'Bulldoze Lot'
+== STR# 151 ('NghbBtnTips') entries=280 chunkBytes=26294
+   sha256(chunk) = 4ff9445991562586f25cdff60072a2712dd4e48c0b51f54d0f5734030f69daf9
+   [0] 'Select or Create Family'
+   [1] 'Evict or Bulldoze'
+   [2] 'Quit'
+   [3] 'View Web Pages'
+   [4] 'Switch To Previous Neighborhood'
+   [5] 'Switch To Next Neighborhood'
+   [6] 'Import Family'
+   [7] 'Switch to Downtown View'
+   [8] 'Credits'
+   [9] 'Switch to Vacation Island View'
+   [10] 'Evict or Rezone'
+   [11] 'Switch to Studio Town View'
+   [12] 'Switch to Magic Town View'
+   [13] ''
+== STR# 174 ('Magic land Screen Tooltips') entries=120 chunkBytes=8031
+   sha256(chunk) = ff59206edff77a2ce5b58fd46b9c9e974351c0323d44b95247effef94878cc77
+   [0] 'Return to Neighborhood View'
+   [1] 'Go to Magic Town Exchange'
+   [2] 'Credits'
+   [3] 'Import Magic Town Lot'
+   [4] 'Evict or Bulldoze'
+   [5] 'Select or Create Family'

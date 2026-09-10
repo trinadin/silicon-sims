@@ -1,0 +1,20 @@
+00232c50: 80630000  lwz      r3, 0(r3)
+00232c54: 38ff0018  addi     r7, r31, 0x18
+00232c58: 391f0010  addi     r8, r31, 0x10
+00232c5c: 80630024  lwz      r3, 0x24(r3)
+00232c60: 393f0020  addi     r9, r31, 0x20
+00232c64: 395f0040  addi     r10, r31, 0x40
+00232c68: 4be7ddd9  bl       0xb0a40   ; .GetHouseFileInfo__12NeighborhoodFP8iResFilePiPiPiPiPiPl
+00232c6c: 80010068  lwz      r0, 0x68(r1)
+00232c70: 38210060  addi     r1, r1, 0x60
+00232c74: bb21ffe4  lmw      r25, -0x1c(r1)
+00232c78: 7c0803a6  mtlr     r0
+00232c7c: 4e800020  blr      
+00232c80: 00000000  .long    0x00000000
+00232c84: 00092041  .long    0x00092041
+00232c88: 80070000  lwz      r0, 0(r7)
+00232c8c: 000007d0  .long    0x000007d0
+00232c90: 00282e47  .long    0x00282e47
+00232c94: 6574486f  oris     r20, r11, 0x486f
+00232c98: 75736549  andis.   r19, r11, 0x6549
+00232c9c: 6e666f5f  xoris    r6, r19, 0x6f5f

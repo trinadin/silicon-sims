@@ -17,7 +17,7 @@ namespace Simitone.Windows.UI
 
             var infoLabel = new Label
             {
-                Text = "Simitone has been configured with the following settings:",
+                Text = "The Sims has been configured with the following settings:",
                 Font = SystemFonts.Bold()
             };
 
@@ -38,13 +38,13 @@ namespace Simitone.Windows.UI
 
             var simitoneSavesLabel = new Label
             {
-                Text = $"Simitone Saves (New):\n{simitoneSavesPath}\n",
+                Text = $"Saves (macOS port):\n{simitoneSavesPath}\n",
                 Font = SystemFonts.Bold()
             };
 
             var noteLabel = new Label
             {
-                Text = "Note: Simitone uses separate save files from The Sims 1.\n" +
+                Text = "Note: this port uses separate save files from The Sims 1.\n" +
                        "Your original saves will not be modified.",
                 TextColor = Colors.DarkBlue
             };

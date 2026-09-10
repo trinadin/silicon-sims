@@ -1,4 +1,5 @@
-﻿using FSO.Client.UI.Framework;
+﻿using FSO.Client;
+using FSO.Client.UI.Framework;
 using FSO.Content;
 using FSO.LotView.Model;
 using FSO.SimAntics;
@@ -28,12 +29,22 @@ namespace Simitone.Client.UI.Panels.LotControls
 
         public UICallNeighborAlert(short callerNID, VM vm)
         {
+            // R115 provenance note: this heading has NO verbatim original (the nearest is
+            // UIText.iff 180 'Phonebook Dialog' whose [0] is 'Call' - used for the CALL
+            // button below); the port's heading stays, disclosed as port-authored.
             Caption = "Call Neighbour";
             SetHeight(490);
             NPanel = new UICallNeighborPanel(callerNID, vm);
             NPanel.Position = new Microsoft.Xna.Framework.Vector2((Width - 1030) / 2, 110);
             NPanel.OnResult += (res) => { OnResult?.Invoke(res); Close(); };
             Add(NPanel);
+        }
+
+        public override void GameResized()
+        {
+            base.GameResized();
+            if (NPanel != null)
+                NPanel.Position = new Microsoft.Xna.Framework.Vector2((Width - 1030) / 2, 110);
         }
     }
 
@@ -90,14 +101,14 @@ namespace Simitone.Client.UI.Panels.LotControls
             Add(NeighbourList);
 
             var cancelButton = new UIBigButton(false);
-            cancelButton.Caption = "Cancel";
+            cancelButton.Caption = GameFacade.Strings.GetString("142", "1"); // R115: original ObjDialogs [1]
             cancelButton.Position = new Microsoft.Xna.Framework.Vector2(370 + 385, 135);
             cancelButton.OnButtonClick += (btn) => { OnResult?.Invoke(-1); };
             cancelButton.Width = 275;
             Add(cancelButton);
 
             CallButton = new UIBigButton(true);
-            CallButton.Caption = "Call";
+            CallButton.Caption = GameFacade.Strings.GetString("180", "0"); // R115: original Phonebook Dialog [0]
             CallButton.Position = new Microsoft.Xna.Framework.Vector2(370 + 385, 255);
             CallButton.OnButtonClick += (btn) => { OnResult?.Invoke(SelectedNeighbour); };
             CallButton.Width = 275;

@@ -1,0 +1,273 @@
+                ; ==== range 0x109450..0x109540 ====
+                ; ==== .UpdateCurrentRoom__8cXPersonFv ====
+00109450: bf61ffec  stmw     r27, -0x14(r1)
+00109454: 7c0802a6  mflr     r0
+00109458: 7c7f1b78  mr       r31, r3
+0010945c: 90010008  stw      r0, 8(r1)
+00109460: 9421ffa0  stwu     r1, -0x60(r1)
+00109464: a8030084  lha      r0, 0x84(r3)
+00109468: a0830aac  lhz      r4, 0xaac(r3)
+0010946c: 541d043e  clrlwi   r29, r0, 0x10
+00109470: 7c1d2040  cmplw    r29, r4
+00109474: 418200c4  beq      0x109538
+00109478: 80628cd8  lwz      r3, -0x7328(r2)
+0010947c: 2804fffb  cmplwi   r4, 0xfffb
+00109480: 3b600000  li       r27, 0
+00109484: 83c30000  lwz      r30, 0(r3)
+00109488: 3b800000  li       r28, 0
+0010948c: 40800010  bge      0x10949c
+00109490: 7fc3f378  mr       r3, r30
+00109494: 4801f47d  bl       0x128910   ; .GetRoom__11RoomManagerFUs
+00109498: 7c7b1b78  mr       r27, r3
+0010949c: 281dfffb  cmplwi   r29, 0xfffb
+001094a0: 40800014  bge      0x1094b4
+001094a4: 387e0000  addi     r3, r30, 0
+001094a8: 389d0000  addi     r4, r29, 0
+001094ac: 4801f465  bl       0x128910   ; .GetRoom__11RoomManagerFUs
+001094b0: 7c7c1b78  mr       r28, r3
+001094b4: b3bf0aac  sth      r29, 0xaac(r31)
+001094b8: 38000001  li       r0, 1
+001094bc: a89f060e  lha      r4, 0x60e(r31)
+001094c0: 7c800278  xor      r0, r4, r0
+001094c4: 7c030e70  srawi    r3, r0, 1
+001094c8: 7c002038  and      r0, r0, r4
+001094cc: 7c001850  subf     r0, r0, r3
+001094d0: 54000fff  rlwinm.  r0, r0, 1, 0x1f, 0x1f
+001094d4: 4082003c  bne      0x109510
+001094d8: 281b0000  cmplwi   r27, 0
+001094dc: 41820020  beq      0x1094fc
+001094e0: 7f63db78  mr       r3, r27
+001094e4: 4801b4fd  bl       0x1249e0   ; .GetPeopleCount__4RoomFv
+001094e8: 2c030000  cmpwi    r3, 0
+001094ec: 40820010  bne      0x1094fc
+001094f0: 387b0000  addi     r3, r27, 0
+001094f4: 38800000  li       r4, 0
+001094f8: 4801b5a9  bl       0x124aa0   ; .SetOverheadLights__4RoomFb
+001094fc: 281c0000  cmplwi   r28, 0
+00109500: 41820010  beq      0x109510
+00109504: 387c0000  addi     r3, r28, 0
+00109508: 38800001  li       r4, 1
+0010950c: 4801b595  bl       0x124aa0   ; .SetOverheadLights__4RoomFb
+00109510: 801f0114  lwz      r0, 0x114(r31)
+00109514: 540007bd  rlwinm.  r0, r0, 0, 0x1e, 0x1e
+00109518: 40820014  bne      0x10952c
+0010951c: 80628f48  lwz      r3, -0x70b8(r2)
+00109520: 80030000  lwz      r0, 0(r3)
+00109524: 7c1f0040  cmplw    r31, r0
+00109528: 40820010  bne      0x109538
+0010952c: 386000f7  li       r3, 0xf7
+00109530: 38800000  li       r4, 0
+00109534: 4bf5776d  bl       0x60ca0   ; .GlobalDispatch__Fsl
+00109538: 80010068  lwz      r0, 0x68(r1)
+0010953c: 38210060  addi     r1, r1, 0x60
+                ; ==== range 0x10c128..0x10c1a8 ====
+0010c128: 80410014  lwz      r2, 0x14(r1)
+0010c12c: 7f23cb78  mr       r3, r25
+0010c130: 4bffd321  bl       0x109450   ; .UpdateCurrentRoom__8cXPersonFv
+0010c134: a0990aac  lhz      r4, 0xaac(r25)
+0010c138: 2804fffb  cmplwi   r4, 0xfffb
+0010c13c: 41820084  beq      0x10c1c0
+0010c140: 807f0000  lwz      r3, 0(r31)
+0010c144: 80630000  lwz      r3, 0(r3)
+0010c148: 83030024  lwz      r24, 0x24(r3)
+0010c14c: 7f03c378  mr       r3, r24
+0010c150: 4801c7c1  bl       0x128910   ; .GetRoom__11RoomManagerFUs
+0010c154: 7c7d1b79  or.      r29, r3, r3
+0010c158: 41820020  beq      0x10c178
+0010c15c: 48018e85  bl       0x124fe0   ; .IsOutside__4RoomFv
+0010c160: 5460063f  clrlwi.  r0, r3, 0x18
+0010c164: 4182000c  beq      0x10c170
+0010c168: c3f80048  lfs      f31, 0x48(r24)
+0010c16c: 48000010  b        0x10c17c
+0010c170: c3fd0068  lfs      f31, 0x68(r29)
+0010c174: 48000008  b        0x10c17c
+0010c178: c3fe0004  lfs      f31, 4(r30)
+0010c17c: a0190aac  lhz      r0, 0xaac(r25)
+0010c180: 28000000  cmplwi   r0, 0
+0010c184: 40820038  bne      0x10c1bc
+0010c188: 807f0000  lwz      r3, 0(r31)
+0010c18c: 8083001c  lwz      r4, 0x1c(r3)
+0010c190: 80630024  lwz      r3, 0x24(r3)
+0010c194: a8840024  lha      r4, 0x24(r4)
+0010c198: 4bf9e889  bl       0xaaa20   ; .GetZoningType__12NeighborhoodFi
+0010c19c: 20030001  subfic   r0, r3, 1
+0010c1a0: 7c000034  cntlzw   r0, r0
+0010c1a4: 5400de3f  rlwinm.  r0, r0, 0x1b, 0x18, 0x1f
+                ; ==== range 0xc49e0..0xc4ae4 ====
+000c49e0: 2c000002  cmpwi    r0, 2
+000c49e4: 408200e4  bne      0xc4ac8
+000c49e8: 837a0110  lwz      r27, 0x110(r26)
+000c49ec: 480fb035  bl       0x1bfa20   ; .GetLevel__7GViewerFv
+000c49f0: 7c1b1800  cmpw     r27, r3
+000c49f4: 408200d4  bne      0xc4ac8
+000c49f8: 38bb0000  addi     r5, r27, 0
+000c49fc: 38610044  addi     r3, r1, 0x44
+000c4a00: 38810048  addi     r4, r1, 0x48
+000c4a04: 480faa1d  bl       0x1bf420   ; .TileToPoint__7GViewerFRC7FTilePti
+000c4a08: 8062a54c  lwz      r3, -0x5ab4(r2)
+000c4a0c: 881e0000  lbz      r0, 0(r30)
+000c4a10: c0230000  lfs      f1, 0(r3)
+000c4a14: c002cf90  lfs      f0, -0x3070(r2)
+000c4a18: 7c000775  extsb.   r0, r0
+000c4a1c: 80010044  lwz      r0, 0x44(r1)
+000c4a20: efe10032  fmuls    f31, f1, f0
+000c4a24: 90010040  stw      r0, 0x40(r1)
+000c4a28: 40820028  bne      0xc4a50
+000c4a2c: c83c0008  lfd      f1, 8(r28)
+000c4a30: 484dd149  bl       0x5a1b78
+000c4a34: 80410014  lwz      r2, 0x14(r1)
+000c4a38: c81c0000  lfd      f0, 0(r28)
+000c4a3c: 38000001  li       r0, 1
+000c4a40: 981e0000  stb      r0, 0(r30)
+000c4a44: fc000072  fmul     f0, f0, f1
+000c4a48: fc000018  frsp     f0, f0
+000c4a4c: d01d0000  stfs     f0, 0(r29)
+000c4a50: c01d0000  lfs      f0, 0(r29)
+000c4a54: efff0032  fmuls    f31, f31, f0
+000c4a58: 480fb0c9  bl       0x1bfb20   ; .GetScale__7GViewerFv
+000c4a5c: 38830001  addi     r4, r3, 1
+000c4a60: c83c0010  lfd      f1, 0x10(r28)
+000c4a64: 38600001  li       r3, 1
+000c4a68: a8010040  lha      r0, 0x40(r1)
+000c4a6c: 7c642030  slw      r4, r3, r4
+000c4a70: a8610042  lha      r3, 0x42(r1)
+000c4a74: 6c858000  xoris    r5, r4, 0x8000
+000c4a78: 3c804330  lis      r4, 0x4330
+000c4a7c: 90a10054  stw      r5, 0x54(r1)
+000c4a80: 7fe5fb78  mr       r5, r31
+000c4a84: 90810050  stw      r4, 0x50(r1)
+000c4a88: c8010050  lfd      f0, 0x50(r1)
+000c4a8c: ec000828  fsubs    f0, f0, f1
+000c4a90: ec1f0032  fmuls    f0, f31, f0
+000c4a94: fc00001e  fctiwz   f0, f0
+000c4a98: d8010058  stfd     f0, 0x58(r1)
+000c4a9c: 80c1005c  lwz      r6, 0x5c(r1)
+000c4aa0: 54c40ffe  srwi     r4, r6, 0x1f
+000c4aa4: 7c843214  add      r4, r4, r6
+000c4aa8: 7c840e70  srawi    r4, r4, 1
+000c4aac: 7c040050  subf     r0, r4, r0
+000c4ab0: b0010040  sth      r0, 0x40(r1)
+000c4ab4: 7c040734  extsh    r4, r0
+000c4ab8: 480fa589  bl       0x1bf040   ; .ScrollToCenter__7GViewerFiib
+000c4abc: 38600000  li       r3, 0
+000c4ac0: 480fa521  bl       0x1befe0   ; .SetDrawRoof__7GViewerFb
+000c4ac4: 4800002c  b        0xc4af0
+000c4ac8: 57e0063e  clrlwi   r0, r31, 0x18
+000c4acc: 80610048  lwz      r3, 0x48(r1)
+000c4ad0: 7c000034  cntlzw   r0, r0
+000c4ad4: 8081004c  lwz      r4, 0x4c(r1)
+000c4ad8: 80ba0110  lwz      r5, 0x110(r26)
+000c4adc: 5407d97e  srwi     r7, r0, 5
+000c4ae0: 38c00001  li       r6, 1
+                ; ==== range 0x1cf604..0x1cf7c0 ====
+001cf604: 28140000  cmplwi   r20, 0
+001cf608: 4182045c  beq      0x1cfa64
+001cf60c: 807e0018  lwz      r3, 0x18(r30)
+001cf610: 80140110  lwz      r0, 0x110(r20)
+001cf614: 7c030000  cmpw     r3, r0
+001cf618: 4082044c  bne      0x1cfa64
+001cf61c: a0940aac  lhz      r4, 0xaac(r20)
+001cf620: 2804fffb  cmplwi   r4, 0xfffb
+001cf624: 40800440  bge      0x1cfa64
+001cf628: 7ea3ab78  mr       r3, r21
+001cf62c: 4bf592e5  bl       0x128910   ; .GetRoom__11RoomManagerFUs
+001cf630: 38000008  li       r0, 8
+001cf634: 38a3007c  addi     r5, r3, 0x7c
+001cf638: 7c0903a6  mtctr    r0
+001cf63c: 389e0000  addi     r4, r30, 0
+001cf640: 81040208  lwz      r8, 0x208(r4)
+001cf644: 80050004  lwz      r0, 4(r5)
+001cf648: 80e40204  lwz      r7, 0x204(r4)
+001cf64c: 80c50000  lwz      r6, 0(r5)
+001cf650: 7d000378  or       r0, r8, r0
+001cf654: 90040208  stw      r0, 0x208(r4)
+001cf658: 7ce03378  or       r0, r7, r6
+001cf65c: 90040204  stw      r0, 0x204(r4)
+001cf660: 81040210  lwz      r8, 0x210(r4)
+001cf664: 8005000c  lwz      r0, 0xc(r5)
+001cf668: 80e4020c  lwz      r7, 0x20c(r4)
+001cf66c: 80c50008  lwz      r6, 8(r5)
+001cf670: 7d000378  or       r0, r8, r0
+001cf674: 90040210  stw      r0, 0x210(r4)
+001cf678: 7ce03378  or       r0, r7, r6
+001cf67c: 9004020c  stw      r0, 0x20c(r4)
+001cf680: 81040218  lwz      r8, 0x218(r4)
+001cf684: 80050014  lwz      r0, 0x14(r5)
+001cf688: 80e40214  lwz      r7, 0x214(r4)
+001cf68c: 80c50010  lwz      r6, 0x10(r5)
+001cf690: 7d000378  or       r0, r8, r0
+001cf694: 90040218  stw      r0, 0x218(r4)
+001cf698: 7ce03378  or       r0, r7, r6
+001cf69c: 90040214  stw      r0, 0x214(r4)
+001cf6a0: 81040220  lwz      r8, 0x220(r4)
+001cf6a4: 8005001c  lwz      r0, 0x1c(r5)
+001cf6a8: 80e4021c  lwz      r7, 0x21c(r4)
+001cf6ac: 80c50018  lwz      r6, 0x18(r5)
+001cf6b0: 7d000378  or       r0, r8, r0
+001cf6b4: 90040220  stw      r0, 0x220(r4)
+001cf6b8: 7ce03378  or       r0, r7, r6
+001cf6bc: 9004021c  stw      r0, 0x21c(r4)
+001cf6c0: 81040228  lwz      r8, 0x228(r4)
+001cf6c4: 80050024  lwz      r0, 0x24(r5)
+001cf6c8: 80e40224  lwz      r7, 0x224(r4)
+001cf6cc: 80c50020  lwz      r6, 0x20(r5)
+001cf6d0: 7d000378  or       r0, r8, r0
+001cf6d4: 90040228  stw      r0, 0x228(r4)
+001cf6d8: 7ce03378  or       r0, r7, r6
+001cf6dc: 90040224  stw      r0, 0x224(r4)
+001cf6e0: 81040230  lwz      r8, 0x230(r4)
+001cf6e4: 8005002c  lwz      r0, 0x2c(r5)
+001cf6e8: 80e4022c  lwz      r7, 0x22c(r4)
+001cf6ec: 80c50028  lwz      r6, 0x28(r5)
+001cf6f0: 7d000378  or       r0, r8, r0
+001cf6f4: 90040230  stw      r0, 0x230(r4)
+001cf6f8: 7ce03378  or       r0, r7, r6
+001cf6fc: 9004022c  stw      r0, 0x22c(r4)
+001cf700: 81040238  lwz      r8, 0x238(r4)
+001cf704: 80050034  lwz      r0, 0x34(r5)
+001cf708: 80e40234  lwz      r7, 0x234(r4)
+001cf70c: 80c50030  lwz      r6, 0x30(r5)
+001cf710: 7d000378  or       r0, r8, r0
+001cf714: 90040238  stw      r0, 0x238(r4)
+001cf718: 7ce03378  or       r0, r7, r6
+001cf71c: 90040234  stw      r0, 0x234(r4)
+001cf720: 81040240  lwz      r8, 0x240(r4)
+001cf724: 8005003c  lwz      r0, 0x3c(r5)
+001cf728: 80c50038  lwz      r6, 0x38(r5)
+001cf72c: 38a50040  addi     r5, r5, 0x40
+001cf730: 80e4023c  lwz      r7, 0x23c(r4)
+001cf734: 7d000378  or       r0, r8, r0
+001cf738: 90040240  stw      r0, 0x240(r4)
+001cf73c: 7ce03378  or       r0, r7, r6
+001cf740: 9004023c  stw      r0, 0x23c(r4)
+001cf744: 38840040  addi     r4, r4, 0x40
+001cf748: 4200fef8  bdnz     0x1cf640
+001cf74c: 4bf55895  bl       0x124fe0   ; .IsOutside__4RoomFv
+001cf750: 5460063f  clrlwi.  r0, r3, 0x18
+001cf754: 41820310  beq      0x1cfa64
+001cf758: 889400fc  lbz      r4, 0xfc(r20)
+001cf75c: 3b400001  li       r26, 1
+001cf760: 887400fd  lbz      r3, 0xfd(r20)
+001cf764: 881400fe  lbz      r0, 0xfe(r20)
+001cf768: 7c850774  extsb    r5, r4
+001cf76c: 2c050001  cmpwi    r5, 1
+001cf770: 98810040  stb      r4, 0x40(r1)
+001cf774: 80d80000  lwz      r6, 0(r24)
+001cf778: 98610041  stb      r3, 0x41(r1)
+001cf77c: 7c640774  extsb    r4, r3
+001cf780: 98010042  stb      r0, 0x42(r1)
+001cf784: 41800024  blt      0x1cf7a8
+001cf788: 80660010  lwz      r3, 0x10(r6)
+001cf78c: 3803ffff  addi     r0, r3, -1
+001cf790: 7c050000  cmpw     r5, r0
+001cf794: 40800014  bge      0x1cf7a8
+001cf798: 2c040001  cmpwi    r4, 1
+001cf79c: 4180000c  blt      0x1cf7a8
+001cf7a0: 7c040000  cmpw     r4, r0
+001cf7a4: 4180000c  blt      0x1cf7b0
+001cf7a8: 38000001  li       r0, 1
+001cf7ac: 48000008  b        0x1cf7b4
+001cf7b0: 38000000  li       r0, 0
+001cf7b4: 5400063f  clrlwi.  r0, r0, 0x18
+001cf7b8: 408202ac  bne      0x1cfa64
+001cf7bc: 807c0000  lwz      r3, 0(r28)

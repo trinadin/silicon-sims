@@ -1,0 +1,200 @@
+                ; ==== .Sim__7MotivesFv ====
+0009eab0: 7c0802a6  mflr     r0
+0009eab4: 8082a4bc  lwz      r4, -0x5b44(r2)
+0009eab8: 90010008  stw      r0, 8(r1)
+0009eabc: 38c00000  li       r6, 0
+0009eac0: 9421ffb0  stwu     r1, -0x50(r1)
+0009eac4: 80a30080  lwz      r5, 0x80(r3)
+0009eac8: a8a5060e  lha      r5, 0x60e(r5)
+0009eacc: 54a007bd  rlwinm.  r0, r5, 0, 0x1e, 0x1e
+0009ead0: 4182000c  beq      0x9eadc
+0009ead4: 38c00001  li       r6, 1
+0009ead8: 48000010  b        0x9eae8
+0009eadc: 54a0077b  rlwinm.  r0, r5, 0, 0x1d, 0x1d
+0009eae0: 41820008  beq      0x9eae8
+0009eae4: 38c00002  li       r6, 2
+0009eae8: c023002c  lfs      f1, 0x2c(r3)
+0009eaec: c0040000  lfs      f0, 0(r4)
+0009eaf0: fc010040  .long    0xfc010040
+0009eaf4: 4c411382  cror     cr0eq, cr0gt, cr0eq
+0009eaf8: 40820020  bne      0x9eb18
+0009eafc: 80a2a4b8  lwz      r5, -0x5b48(r2)
+0009eb00: 54c0103a  slwi     r0, r6, 2
+0009eb04: c0230014  lfs      f1, 0x14(r3)
+0009eb08: 7c05042e  lfsx     f0, r5, r0
+0009eb0c: ec01002a  fadds    f0, f1, f0
+0009eb10: d0030014  stfs     f0, 0x14(r3)
+0009eb14: 48000060  b        0x9eb74
+0009eb18: 80a2a4b4  lwz      r5, -0x5b4c(r2)
+0009eb1c: 54c0103a  slwi     r0, r6, 2
+0009eb20: c0230014  lfs      f1, 0x14(r3)
+0009eb24: 7c05042e  lfsx     f0, r5, r0
+0009eb28: 80c28874  lwz      r6, -0x778c(r2)
+0009eb2c: ec01002a  fadds    f0, f1, f0
+0009eb30: 80a2a4b0  lwz      r5, -0x5b50(r2)
+0009eb34: d0030014  stfs     f0, 0x14(r3)
+0009eb38: 80c60000  lwz      r6, 0(r6)
+0009eb3c: 7ca5002e  lwzx     r5, r5, r0
+0009eb40: 80c6001c  lwz      r6, 0x1c(r6)
+0009eb44: a8c60010  lha      r6, 0x10(r6)
+0009eb48: 7c062800  cmpw     r6, r5
+0009eb4c: 40810028  ble      0x9eb74
+0009eb50: 80a2a4ac  lwz      r5, -0x5b54(r2)
+0009eb54: 7ca5002e  lwzx     r5, r5, r0
+0009eb58: 7c062800  cmpw     r6, r5
+0009eb5c: 40800018  bge      0x9eb74
+0009eb60: 80a2a4a8  lwz      r5, -0x5b58(r2)
+0009eb64: c0230014  lfs      f1, 0x14(r3)
+0009eb68: 7c05042e  lfsx     f0, r5, r0
+0009eb6c: ec010028  fsubs    f0, f1, f0
+0009eb70: d0030014  stfs     f0, 0x14(r3)
+0009eb74: c043001c  lfs      f2, 0x1c(r3)
+0009eb78: c023005c  lfs      f1, 0x5c(r3)
+0009eb7c: c0040000  lfs      f0, 0(r4)
+0009eb80: ec420828  fsubs    f2, f2, f1
+0009eb84: fc020040  .long    0xfc020040
+0009eb88: 40810018  ble      0x9eba0
+0009eb8c: 80a2a4a4  lwz      r5, -0x5b5c(r2)
+0009eb90: c0030024  lfs      f0, 0x24(r3)
+0009eb94: 7c25042e  lfsx     f1, r5, r0
+0009eb98: ec02007c  fnmsubs  f0, f2, f1, f0
+0009eb9c: d0030024  stfs     f0, 0x24(r3)
+0009eba0: 80a30080  lwz      r5, 0x80(r3)
+0009eba4: 3ce04330  lis      r7, 0x4330
+0009eba8: 8102a474  lwz      r8, -0x5b8c(r2)
+0009ebac: a8a50592  lha      r5, 0x592(r5)
+0009ebb0: 8122a49c  lwz      r9, -0x5b64(r2)
+0009ebb4: 6ca68000  xoris    r6, r5, 0x8000
+0009ebb8: 80a2a4a0  lwz      r5, -0x5b60(r2)
+0009ebbc: 90c10044  stw      r6, 0x44(r1)
+0009ebc0: c8880000  lfd      f4, 0(r8)
+0009ebc4: 90e10040  stw      r7, 0x40(r1)
+0009ebc8: 7c69042e  lfsx     f3, r9, r0
+0009ebcc: c8210040  lfd      f1, 0x40(r1)
+0009ebd0: 7c05042e  lfsx     f0, r5, r0
+0009ebd4: ec212028  fsubs    f1, f1, f4
+0009ebd8: c0a30018  lfs      f5, 0x18(r3)
+0009ebdc: c0440004  lfs      f2, 4(r4)
+0009ebe0: 80c2a498  lwz      r6, -0x5b68(r2)
+0009ebe4: ec23007a  fmadds   f1, f3, f1, f0
+0009ebe8: 90e10048  stw      r7, 0x48(r1)
+0009ebec: c0040000  lfs      f0, 0(r4)
+0009ebf0: ec250828  fsubs    f1, f5, f1
+0009ebf4: 80e2a490  lwz      r7, -0x5b70(r2)
+0009ebf8: 80a2a494  lwz      r5, -0x5b6c(r2)
+0009ebfc: d0230018  stfs     f1, 0x18(r3)
+0009ec00: c063001c  lfs      f3, 0x1c(r3)
+0009ec04: 7c26042e  lfsx     f1, r6, r0
+0009ec08: ec42182a  fadds    f2, f2, f3
+0009ec0c: ec220072  fmuls    f1, f2, f1
+0009ec10: ec230828  fsubs    f1, f3, f1
+0009ec14: d023001c  stfs     f1, 0x1c(r3)
+0009ec18: 80c30080  lwz      r6, 0x80(r3)
+0009ec1c: c023002c  lfs      f1, 0x2c(r3)
+0009ec20: a8c60598  lha      r6, 0x598(r6)
+0009ec24: fc010040  .long    0xfc010040
+0009ec28: 7c47042e  lfsx     f2, r7, r0
+0009ec2c: 6cc68000  xoris    r6, r6, 0x8000
+0009ec30: 7c05042e  lfsx     f0, r5, r0
+0009ec34: 90c1004c  stw      r6, 0x4c(r1)
+0009ec38: c8210048  lfd      f1, 0x48(r1)
+0009ec3c: 4c411382  cror     cr0eq, cr0gt, cr0eq
+0009ec40: ec212028  fsubs    f1, f1, f4
+0009ec44: ec22007a  fmadds   f1, f2, f1, f0
+0009ec48: 40820010  bne      0x9ec58
+0009ec4c: c0030038  lfs      f0, 0x38(r3)
+0009ec50: ec000828  fsubs    f0, f0, f1
+0009ec54: d0030038  stfs     f0, 0x38(r3)
+0009ec58: c023002c  lfs      f1, 0x2c(r3)
+0009ec5c: c0040000  lfs      f0, 0(r4)
+0009ec60: fc010040  .long    0xfc010040
+0009ec64: 4c411382  cror     cr0eq, cr0gt, cr0eq
+0009ec68: 40820044  bne      0x9ecac
+0009ec6c: 80a2a48c  lwz      r5, -0x5b74(r2)
+0009ec70: c023003c  lfs      f1, 0x3c(r3)
+0009ec74: 7c05042e  lfsx     f0, r5, r0
+0009ec78: 80c2a488  lwz      r6, -0x5b78(r2)
+0009ec7c: ec010028  fsubs    f0, f1, f0
+0009ec80: 80a2a484  lwz      r5, -0x5b7c(r2)
+0009ec84: d003003c  stfs     f0, 0x3c(r3)
+0009ec88: c0230020  lfs      f1, 0x20(r3)
+0009ec8c: 7c06042e  lfsx     f0, r6, r0
+0009ec90: ec010028  fsubs    f0, f1, f0
+0009ec94: d0030020  stfs     f0, 0x20(r3)
+0009ec98: c0230024  lfs      f1, 0x24(r3)
+0009ec9c: 7c05042e  lfsx     f0, r5, r0
+0009eca0: ec010028  fsubs    f0, f1, f0
+0009eca4: d0030024  stfs     f0, 0x24(r3)
+0009eca8: 48000040  b        0x9ece8
+0009ecac: 80a2a480  lwz      r5, -0x5b80(r2)
+0009ecb0: c023003c  lfs      f1, 0x3c(r3)
+0009ecb4: 7c05042e  lfsx     f0, r5, r0
+0009ecb8: 80c2a47c  lwz      r6, -0x5b84(r2)
+0009ecbc: ec010032  fmuls    f0, f1, f0
+0009ecc0: 80a2a478  lwz      r5, -0x5b88(r2)
+0009ecc4: d003003c  stfs     f0, 0x3c(r3)
+0009ecc8: c0230020  lfs      f1, 0x20(r3)
+0009eccc: 7c06042e  lfsx     f0, r6, r0
+0009ecd0: ec010028  fsubs    f0, f1, f0
+0009ecd4: d0030020  stfs     f0, 0x20(r3)
+0009ecd8: c0230024  lfs      f1, 0x24(r3)
+0009ecdc: 7c05042e  lfsx     f0, r5, r0
+0009ece0: ec010028  fsubs    f0, f1, f0
+0009ece4: d0030024  stfs     f0, 0x24(r3)
+0009ece8: 38000004  li       r0, 4
+0009ecec: 7c0903a6  mtctr    r0
+0009ecf0: 38a30000  addi     r5, r3, 0
+0009ecf4: 38c00000  li       r6, 0
+0009ecf8: c0050000  lfs      f0, 0(r5)
+0009ecfc: c0240004  lfs      f1, 4(r4)
+0009ed00: fc000840  .long    0xfc000840
+0009ed04: 40810008  ble      0x9ed0c
+0009ed08: d0250000  stfs     f1, 0(r5)
+0009ed0c: c0250000  lfs      f1, 0(r5)
+0009ed10: c0040008  lfs      f0, 8(r4)
+0009ed14: fc010040  .long    0xfc010040
+0009ed18: 40800008  bge      0x9ed20
+0009ed1c: d0050000  stfs     f0, 0(r5)
+0009ed20: c0050000  lfs      f0, 0(r5)
+0009ed24: c0240004  lfs      f1, 4(r4)
+0009ed28: d0050040  stfs     f0, 0x40(r5)
+0009ed2c: c0050004  lfs      f0, 4(r5)
+0009ed30: fc000840  .long    0xfc000840
+0009ed34: 40810008  ble      0x9ed3c
+0009ed38: d0250004  stfs     f1, 4(r5)
+0009ed3c: c0250004  lfs      f1, 4(r5)
+0009ed40: c0040008  lfs      f0, 8(r4)
+0009ed44: fc010040  .long    0xfc010040
+0009ed48: 40800008  bge      0x9ed50
+0009ed4c: d0050004  stfs     f0, 4(r5)
+0009ed50: c0050004  lfs      f0, 4(r5)
+0009ed54: c0240004  lfs      f1, 4(r4)
+0009ed58: d0050044  stfs     f0, 0x44(r5)
+0009ed5c: c0050008  lfs      f0, 8(r5)
+0009ed60: fc000840  .long    0xfc000840
+0009ed64: 40810008  ble      0x9ed6c
+0009ed68: d0250008  stfs     f1, 8(r5)
+0009ed6c: c0250008  lfs      f1, 8(r5)
+0009ed70: c0040008  lfs      f0, 8(r4)
+0009ed74: fc010040  .long    0xfc010040
+0009ed78: 40800008  bge      0x9ed80
+0009ed7c: d0050008  stfs     f0, 8(r5)
+0009ed80: c0050008  lfs      f0, 8(r5)
+0009ed84: c0240004  lfs      f1, 4(r4)
+0009ed88: d0050048  stfs     f0, 0x48(r5)
+0009ed8c: c005000c  lfs      f0, 0xc(r5)
+0009ed90: fc000840  .long    0xfc000840
+0009ed94: 40810008  ble      0x9ed9c
+0009ed98: d025000c  stfs     f1, 0xc(r5)
+0009ed9c: c025000c  lfs      f1, 0xc(r5)
+0009eda0: c0040008  lfs      f0, 8(r4)
+0009eda4: fc010040  .long    0xfc010040
+0009eda8: 40800008  bge      0x9edb0
+0009edac: d005000c  stfs     f0, 0xc(r5)
+0009edb0: c005000c  lfs      f0, 0xc(r5)
+0009edb4: 38c60003  addi     r6, r6, 3
+0009edb8: d005004c  stfs     f0, 0x4c(r5)
+0009edbc: 38a50010  addi     r5, r5, 0x10
+0009edc0: 4200ff38  bdnz     0x9ecf8
+0009edc4: 80630080  lwz      r3, 0x80(r3)
+0009edc8: 4806cbf9  bl       0x10b9c0   ; .CalcHappy__8cXPersonFv

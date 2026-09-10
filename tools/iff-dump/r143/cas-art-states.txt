@@ -1,0 +1,227 @@
+R143 — cas-art-states.txt
+Programmatic state-count analysis of every CAS / neighborhood button sheet in
+tools/iff-dump/r142/art/ (Res_Nbhd far members, all 8bpp BI_RLE8 unless noted).
+
+METHOD (no eyes; pure pixel statistics, PIL decodes RLE8 BMPs natively)
+  1. BMP headers parsed raw (bfSize / BITMAPINFOHEADER compression code).
+  2. Each file decoded to RGBA; key color detected (pure-magenta corner test).
+  3. Mask = pixel is ink (non-key). Candidate decompositions H k=2..8, V k=2..8,
+     grid 2..4 x 2..4, keeping only even-divisions whose every interior boundary
+     sits between two >=90%-key columns (magenta seam law).
+  4. Disambiguation: per-state mask cross-correlation (all pairs) + ink balance
+     (min/max ink) + per-state ink bbox. A true N-state sheet has all cells
+     similar AND each cell holding a complete centered glyph; over-subdivision
+     shows asymmetric bboxes / low adjacent correlation.
+  5. OPAQUE sheets (no magenta key; Done/Cancel/PAF plates) get the same test
+     with a column-mean RGB profile correlation instead of the key seam.
+  6. ENGINE LAW cross-check against the r143 PPC disasms (cTSWinBtn::SetImage
+     = vtable+0x1a4 with cols in r5, rows in r6): cols=4 rows=1 is used by
+     cawindesigncharacter-init (2 sites), cawindesignfamily-init, nbhd
+     createbutton helper, and the personality-widget button builder; the ONE
+     exception found is kPickFamilyItemBkg = SetImage(art, cols=1, rows=3).
+
+KEY COLOR LAW
+  Every magenta-keyed sheet has (255,0,255) at bottom-left, top-left AND
+  bottom-right corners — pure magenta is the engine key. The port's loader
+  already masks this family (ImageLoader.ManualTextureMaskData, R>=248 &&
+  B>=248 && G<=4 -> alpha 0, FreeSO/TSOClient/tso.files/ImageLoader.cs:405-419).
+  Opaque plates (Done/Cancel/PAF, backgrounds) carry no key — bottom-left is a
+  content color.
+
+LEGEND  states layout: H=side-by-side, V=stacked, G=grid. conf: HIGH/MED/LOW.
+
+================================================================================
+A. CREATE-A-SIM (DesignChar) BUTTON SHEETS — all magenta-keyed, all 4-state H
+================================================================================
+Nbhd_DesignCharAdultBtn.bmp    228x100  13178B  key=magenta
+    H4 = 4 states of 57x100   (conf HIGH; mincorr .97, bal .94; bboxes all
+    ~(2,1)-(54,97) — complete centered glyph per cell; H2 also divides but
+    each 114-wide cell would hold TWO glyphs)
+    RT id 5028 kDesignCharAdultBtn; engine: cols=4 (cawindesigncharacter-init)
+
+Nbhd_DesignCharChildBtn.bmp    368x90   10970B  key=magenta
+    H4 = 4 states of 92x90    (conf HIGH; mincorr .97, bal .93)
+
+Nbhd_DesignCharFemaleBtn.bmp   228x121  14140B  key=magenta
+    H4 = 4 states of 57x121   (conf HIGH; mincorr .97, bal .95)
+
+Nbhd_DesignCharMaleBtn.bmp     392x111  14790B  key=magenta
+    H4 = 4 states of 98x111   (conf HIGH; mincorr .98, bal .96)
+
+Nbhd_DesignCharDarkBtn.bmp     228x71   10004B  key=magenta
+    H4 = 4 states of 57x71    (conf HIGH; mincorr .97, bal .93)
+
+Nbhd_DesignCharMediumBtn.bmp   184x71    9656B  key=magenta
+    H4 = 4 states of 46x71    (conf HIGH; mincorr .96, bal .93)
+
+Nbhd_DesignCharLightBtn.bmp    220x71    9842B  key=magenta
+    H4 = 4 states of 55x71    (conf HIGH; mincorr .97, bal .93)
+
+Nbhd_DesignCharSkinsLeftBtn.bmp  72x34   2458B  key=magenta
+    H4 = 4 states of 18x34    (conf HIGH; mincorr .82, bal .85)
+    NOTE: same art reused by Res_CPanel ids 300/301 (kClothingDialogPrevious/
+    Next) — one sheet, two resource ids.
+
+Nbhd_DesignCharSkinsRightBtn.bmp 72x34   2450B  key=magenta
+    H4 = 4 states of 18x34    (conf HIGH; identical stats to LeftBtn)
+
+--------------------------------------------------------------------------------
+A2. DesignChar wide plates — OPAQUE (no key), 3-state H (column-profile law)
+--------------------------------------------------------------------------------
+Nbhd_DesignCharDoneBtn.bmp     630x40   19486B  opaque
+    H3 = 3 states of 210x40   (conf MED-HIGH; profile corr .724 at k=3 vs .646
+    at k=2; 630 is NOT 4-divisible, so the cols=4 engine helper does NOT build
+    these; consistent k=3 win across the whole family below)
+Nbhd_DesignCharCancelBtn.bmp   822x40   24324B  opaque
+    H3 = 3 states of 274x40   (conf MED-HIGH; corr .708 k=3 vs .631 k=2)
+    Label is TEXT (STR#130 [11] 'Done' / [12] 'Cancel' — comments say
+    "Button: Label"), the art carries no caption.
+
+--------------------------------------------------------------------------------
+A3. DesignChar widgets (single-state art; engine composes states)
+--------------------------------------------------------------------------------
+Nbhd_DesignCharPersLED.bmp      59x25    2678B  opaque, single-state
+    (the personality LED digit backdrop; 149/59 both height 25 — see below)
+Nbhd_CACPointRemainingBars.bmp 149x25    4928B  opaque, single-state
+    (kPeoplePtsBuffer RT 5203; the "personality points remaining" gauge —
+    NO text string exists for remaining points anywhere in UIText.iff; the
+    engine draws the count over this plate)
+Nbhd_PersonInfoPersBkg.bmp      40x14    1694B  opaque, repeating 8px tile
+    (NOT in the RT template — extra far member; profile corr .999 at k=2 and
+    k=5 => periodic pattern, treat as tile, not states)
+
+================================================================================
+B. CREATE-A-FAMILY (DesignFamily) SHEETS
+================================================================================
+Nbhd_AddPersonBtn.bmp          556x103  16068B  key=magenta
+    H4 = 4 states of 139x103  (conf HIGH; mincorr .98, bal .97; bbox per cell
+    (4,3)-(135,99) — complete glyph per cell)
+Nbhd_DeletePersonBtn.bmp       596x99   20132B  key=magenta
+    H4 = 4 states of 149x99   (conf HIGH; mincorr .98, bal .96)
+Nbhd_EditPersonBtn.bmp         548x99   17510B  key=magenta
+    H4 = 4 states of 137x99   (conf HIGH; mincorr .98, bal .95)
+    (engine: cawindesignfamily-init SetImage cols=4 rows=1)
+
+Nbhd_DesignFamDone.bmp         660x52   27154B  opaque
+    H3 = 3 states of 220x52   (conf MED-HIGH; corr .727 k=3 vs .658 k=2;
+    660 not 4-divisible)
+Nbhd_DesignFamCancel.bmp       894x52   35208B  opaque
+    H3 = 3 states of 298x52   (conf MED-HIGH; corr .724 k=3 vs .653 k=2)
+    Labels are TEXT: STR#129 [3] 'Done' / [4] 'Cancel' ("Button: Label").
+
+================================================================================
+C. PICK-A-FAMILY (PAF) SHEETS
+================================================================================
+Nbhd_PAFAddFamily.bmp          368x62   16256B  opaque
+    H2 = 2 states of 184x62  (conf MED-HIGH; profile corr .94 at k=2 vs .74
+    at k=4 — UNLIKE DesignChar, the PAF family is 2-state; normal + hilite)
+Nbhd_PAFDeleteFamily.bmp       368x62   15196B  opaque
+    H2 = 2 states of 184x62  (conf MED-HIGH; corr .92 vs .67)
+Nbhd_PAFMoveIn.bmp             656x62   21246B  opaque
+    H2 = 2 states of 328x62  (conf MED-HIGH; corr .93 vs .76)
+Nbhd_PAFCancel.bmp             744x49   28374B  opaque
+    H3 = 3 states of 248x49  (conf LOW-MED; corr .81 k=3 vs .75 k=2 — weakest
+    read of the set; 744 divides both; verify against engine before pinning)
+    All captions are engine TEXT/tooltips, not baked: STR#128 [2] 'Create New
+    Family' / [3] 'Move In Family' / [4] 'Delete Family' (comments: Button:
+    Tooltip) and [5] 'Cancel' (Button: Cancel: Label).
+
+Nbhd_FamilyPickItemBkg.bmp     690x204  36512B  opaque
+    V3 = 3 states of 690x68   (conf HIGH — ENGINE LAW: nbhd-disasm-
+    pickfamilyitem-init.txt:69 SetImage(art, cols=1, rows=3) on RT 5019;
+    pixel row-profile agrees, the three 68px bands are the family-slot item
+    backgrounds)
+Nbhd_SpellPickItemBkg.bmp      240x204   7294B  opaque, single-state
+Nbhd_Smiley.bmp                 20x23    1582B  key=magenta, single-state
+    (kPickFamilySmiley RT 5021 — the small smiley icon)
+
+================================================================================
+D. BACKGROUNDS (800x600, single-state, opaque)
+================================================================================
+Nbhd_PickBkg.bmp               800x600  164260B  RT 5041 kPickFamilyBkg
+Nbhd_PickBkgMagic.bmp          800x600  164040B  RT 5043 (Makin Magic variant)
+Nbhd_DsgnFamBkg.bmp            800x600  317552B  RT 5022 kDesignFamilyBkg
+Nbhd_CreateACharBack.BMP       800x600  310012B  RT 5042 kDesignCharBkg
+    All single-state; bottom-left corners are content colors (deep green/blue),
+    no key. These are the four full-screen CAS planes.
+
+================================================================================
+E. NEIGHBORHOOD-SCREEN SHARED SHEETS
+================================================================================
+Nbhd_ScrollBar.BMP             300x30    9592B  key=magenta
+    H2 = 2 states of 150x30  (conf HIGH; corr .997; the pick-list prev/next
+    page arrow pair — one sheet, two arrow buttons, not button states)
+Nbhd_NbhdTileBtn.BMP           364x62    9842B  key=magenta
+    H4 = 4 states of 91x62   (conf HIGH; H4 corr .983 vs H2 .991 — both pass;
+    4 picked on the engine's nbhd-button helper convention cols=4 rows=1)
+Nbhd_MustPickFam.BMP           133x103   3422B  single-state icon
+Nbhd_Current.bmp                29x46    2244B  single-state icon
+    NOTE: file is 29x46 but RT 5206 kNghCurrent lists NghUI/Current.bmp 23x30
+    — the extracted member is a DIFFERENT (proto/unused) far entry, not the
+    RT-listed one.
+Nbhd_ngh.bmp                   119x80   10730B  single-state icon (Community/ngh)
+Nbhd_ness01/02/03.bmp          106x75  1628/1838/2338B  single-state, keyed
+Nbhd_CreditBtn.bmp             196x58    8422B  keyed, single-state
+Nbhd_CreditBtn{De,En,Fr,Sp}.bmp 232x58 ~9.4KB   keyed, single-state (loc twins)
+Nbhd_CreditBtnJp.bmp           168x35    4518B  keyed, single-state
+Nbhd_InetDialogIcon.bmp         53x53    2652B  single-state
+Nbhd_NeighborhoodPhone.bmp      70x135   7220B  single-state, opaque
+Nbhd_PersonInfoBkg.bmp          36x36    1968B  single-state, opaque
+    (kPickFamilyPersonInfoBkg RT 5300 — backdrop of the 'Personality for %s'
+    popup, STR#128 [12])
+Nbhd_Import.bmp                372x61   14040B  keyed
+    H3 = 3 states of 124x61 (conf MED; corr .88) — NOT the RT-listed
+    NghUI/Import.bmp (212x52); extra far member.
+Nbhd_MoveIn.bmp                372x122  27266B  keyed
+    V2: top/bottom 372x61 halves have IDENTICAL masks (corr 1.00) — the same
+    372x61 plate stacked twice (proto of the RT 5200 NghUI/MoveIn 212x52);
+    extra far member.
+
+================================================================================
+F. HEADER CENSUS (all Nbhd_* CAS/nbhd members, dims from BMP headers)
+================================================================================
+file                              WxH      BPP COMP  states-read
+AddPersonBtn                     556x103   8  RLE8  4x139x103 H
+DeletePersonBtn                  596x99    8  RLE8  4x149x99 H
+EditPersonBtn                    548x99    8  RLE8  4x137x99 H
+DesignCharAdultBtn               228x100   8  RLE8  4x57x100 H
+DesignCharChildBtn               368x90    8  RLE8  4x92x90 H
+DesignCharFemaleBtn              228x121   8  RLE8  4x57x121 H
+DesignCharMaleBtn                392x111   8  RLE8  4x98x111 H
+DesignCharDarkBtn                228x71    8  RLE8  4x57x71 H
+DesignCharMediumBtn              184x71    8  RLE8  4x46x71 H
+DesignCharLightBtn               220x71    8  RLE8  4x55x71 H
+DesignCharSkinsLeftBtn            72x34    8  RLE8  4x18x34 H
+DesignCharSkinsRightBtn           72x34    8  RLE8  4x18x34 H
+DesignCharPersLED                 59x25    8  RLE8  1
+CACPointRemainingBars            149x25    8  RLE8  1
+DesignCharDoneBtn                630x40    8  RLE8  3x210x40 H (opaque)
+DesignCharCancelBtn              822x40    8  RLE8  3x274x40 H (opaque)
+DesignFamDone                    660x52    8  RLE8  3x220x52 H (opaque)
+DesignFamCancel                  894x52    8  RLE8  3x298x52 H (opaque)
+PAFAddFamily                     368x62    8  RLE8  2x184x62 H (opaque)
+PAFDeleteFamily                  368x62    8  RLE8  2x184x62 H (opaque)
+PAFMoveIn                        656x62    8  RLE8  2x328x62 H (opaque)
+PAFCancel                        744x49    8  RLE8  3x248x49 H (opaque, LOW-MED)
+FamilyPickItemBkg                690x204   8  RLE8  3x690x68 V (ENGINE cols=1 rows=3)
+SpellPickItemBkg                 240x204   8  RLE8  1
+Smiley                            20x23    8  RLE8  1
+ScrollBar                        300x30    8  RLE8  2x150x30 H (pair, not states)
+NbhdTileBtn                      364x62    8  RLE8  4x91x62 H
+PickBkg / PickBkgMagic /
+DsgnFamBkg / CreateACharBack    800x600   8  RLE8  1 (backgrounds)
+PersonInfoBkg                     36x36    8  RLE8  1
+PersonInfoPersBkg (no RT id)      40x14    8  RLE8  tile (8px period)
+MustPickFam                      133x103   8  RLE8  1
+Current (proto, not RT's)         29x46    8  RLE8  1
+Import (proto, not RT's)         372x61    8  RLE8  3x124x61 H
+MoveIn (proto, not RT's)         372x122   8  RLE8  2x372x61 V (duplicate rows)
+ngh / ness01-03                  icons     8  RLE8  1
+CreditBtn family                 196-232x58 8 RLE8 1
+
+STATE-ORDER DISCLOSURE: frame order for the 4-state sheets is presumed the
+UIButton convention 0 up / 1 down / 2 hover / 3 disabled (the port's own
+disclosure in UIOriginal.Frame, UIOriginal.cs:54-59); the engine's actual
+per-state mapping lives in cTSWinBtn state code not yet decoded. The 3-state
+opaque plates' order (up/down/disabled vs up/down/hilite) is likewise
+undischarged until the r143 disasm of their constructor runs.

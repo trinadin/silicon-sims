@@ -71,6 +71,7 @@ namespace Simitone.Client.UI.Panels.CAS
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             DrawLocalTexture(batch, PxWhite, null, new Vector2((MaxWidth - TitleWidth) / 2, 0), new Vector2(TitleWidth, 40), UIStyle.Current.Bg);
             Background.Visible = true;
             Background.Draw(batch);

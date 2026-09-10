@@ -1,0 +1,94 @@
+{
+  "sha256": "33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f",
+  "pin_count": 230,
+  "data_pin_count": 23,
+  "record_pin_count": 16,
+  "fixtures": {
+    "addnewchar_template_selector": {
+      "law": "type dispatch re-executed from the pinned words at 0xb3780..0xb37f4: 0->0x7fd96b54 (human), 1->0x4a70df92 (dog), 2->0x7bea0977 (cat), everything else -> human",
+      "derived": {
+        "-1": "0x7fd96b54",
+        "0": "0x7fd96b54",
+        "1": "0x4a70df92",
+        "2": "0x7bea0977",
+        "3": "0x7fd96b54",
+        "5": "0x7fd96b54"
+      }
+    },
+    "uchr_type_dispatch": {
+      "law": "uChr string 13 decoded from 0xae170 (=13); 'dog' @strtable+0xec -> AddNewCharacter type 1, cat @+0xf0 -> type 2, else 0; the pets gate extracts (s16)app+0x66 bit value 0x20 (rlwinm 0x1a,0x1a decoded from 0xae19c/0xae204)",
+      "dispatch": {
+        "dog": 1,
+        "cat": 2,
+        "<other>": 0
+      },
+      "gate_mask": "0x20"
+    },
+    "relmatrix_law": {
+      "law": "C1: GetArraySize/GetValue read the FAM record matrix (r20 = NBRS[id-1]->+0xc) with the OLD FAM id (r21 = lha 4(efi.ids)); RemoveArray/SetArraySize/SetValue target the live neighbor matrix (r22 = chars[new-1]->+0xc) with the NEW id (r23 = lha 0(newIds)); n==0 falls through to RemoveArray(live, new); the pair loop resets to the array bases each outer iteration, so EVERY member receives every imported relationship row",
+      "fam_side_regs": [
+        20,
+        21
+      ],
+      "live_side_regs": [
+        22,
+        23
+      ]
+    },
+    "guard_order_leak": {
+      "law": "C3: character deletion (0xae0f4), eviction (0xae094) and member creation (0xae1d4/0xae23c/0xae258) all precede the lot-table / house-claimed / id-0 guards (0xae8f0, 0xae998); both guard failures converge at 0xae9c4 and return -1 via 0xaea14 -> 0xaee18 BEFORE the single Save site (0xaecbc, the only bl to 0xb5420 in the function): the in-memory model stays mutated, only the file move has a .tmp rollback",
+      "fail_convergence": "0xae9c4",
+      "save_site": "0xaecbc"
+    },
+    "scan_and_timer_gate": {
+      "law": "C5: the *.FAM presence scan is one-arg on the path string with the wildcard appended (no r4 write between the append bl 0x46f4d0 and the scan bl 0x46f4d8); the callee takes only r3 (0x4aa018) and is FindFirstFileA + INVALID_HANDLE(-1) + FindClose. C4: TSOnTimerMsg tests win+0x16c (0x472ce8); the nonzero branch (DoInternetUpdate at 0x472cf8) exits at 0x472e98, past the CheckForNewImports call (0x472e74) and the 1000 ms re-arm (0x472e8c)",
+      "scan_arg_registers": [
+        "r3"
+      ],
+      "timer_gate_offset": "0x16c"
+    },
+    "refresh_fields": {
+      "law": "DoNbhdScreen(true) after a successful auto-import iff ImportInfo+0x110 (has-house) and +0x150 (house number) are both nonzero; offsets re-derived from the caller stack displacements (0x270/0x2b0 minus base 0x160) and cross-bound to the ctor/filler stores",
+      "fields": [
+        "0x110",
+        "0x150"
+      ]
+    },
+    "iff_files": {
+      "law": "Tutorial.FAM chunk walk (sizes include the 8-byte header); every common chunk byte-identical with pristine House07.iff; EXPi = LE s16 famId + s16[8] ids after the iPXE echo; FAMI = LE u32s after the IMAF echo (house first, funds, count, GUIDs)",
+      "fam_chunks": 37,
+      "house07_chunks": 25,
+      "fam_id": 1,
+      "member_ids": [
+        48,
+        47,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "house": 7,
+      "funds": 665,
+      "members": 2,
+      "guids": [
+        "0x5620aa32",
+        "0x5c685132"
+      ],
+      "tutorial_fam_sha256": "dc6eb8f660ea5ce50f2764df29ec792d400a9660b278ae891b13782ae91d42fb",
+      "house07_iff_sha256": "5b162c81135612acfa65628438df2246cd25ad8cb15e2646a28bb32e38de5133"
+    }
+  },
+  "skeptic_corrections_applied": [
+    "C1 relmatrix old->new row law (fixture c + pins)",
+    "C2 simi g26 not pinned as a file fact (nothing asserts a g26 value; only the read site 0xadeb0 is pinned)",
+    "C3 guard ordering/leak (fixture d)",
+    "C4 timer +0x16c gate (fixture e)",
+    "C5 one-arg wildcard-in-path scan (fixture e)",
+    "C6 ctor +0x188 seed and id-assign-before-null-check (pins)",
+    "C7 evicted-export guard documented in decode.md section 2.3",
+    "C8 fixtures re-bound to pinned binary words",
+    "F1 (self-caught during C8): the pets gate extracts app+0x66 bit value 0x20 (rlwinm 0x1a,0x1a = MSB-index 26), not 0x40; decode.md corrected"
+  ]
+}

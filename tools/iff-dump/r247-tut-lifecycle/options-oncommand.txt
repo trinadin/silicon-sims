@@ -1,0 +1,201 @@
+002828e0: 387f0000  addi     r3, r31, 0
+002828e4: 38800000  li       r4, 0
+002828e8: 4bfd2889  bl       0x255170   ; .DoMagiclandScreen__8cSimsAppFb
+002828ec: 480002a0  b        0x282b8c
+002828f0: 387f0000  addi     r3, r31, 0
+002828f4: 38800000  li       r4, 0
+002828f8: 4bfd2cb9  bl       0x2555b0   ; .DoNbhdScreen__8cSimsAppFb
+002828fc: 48000290  b        0x282b8c
+00282900: 387f0000  addi     r3, r31, 0
+00282904: 38800000  li       r4, 0
+00282908: 4bfd2ca9  bl       0x2555b0   ; .DoNbhdScreen__8cSimsAppFb
+0028290c: 48000280  b        0x282b8c
+00282910: 387f0000  addi     r3, r31, 0
+00282914: 38800000  li       r4, 0
+00282918: 4bfd2c99  bl       0x2555b0   ; .DoNbhdScreen__8cSimsAppFb
+0028291c: 48000270  b        0x282b8c
+00282920: 387e0000  addi     r3, r30, 0
+00282924: 38800000  li       r4, 0
+00282928: 4bffd589  bl       0x27feb0   ; .SaveDowntownDescription__11cWinOptionsFb
+0028292c: 7fe3fb78  mr       r3, r31
+00282930: 4bfd5571  bl       0x257ea0   ; .SaveGame__8cSimsAppFv
+00282934: 48000258  b        0x282b8c
+00282938: 881f00bf  lbz      r0, 0xbf(r31)
+0028293c: 28000000  cmplwi   r0, 0
+00282940: 41820090  beq      0x2829d0
+00282944: 387e0000  addi     r3, r30, 0
+00282948: 38800001  li       r4, 1
+0028294c: 4bffd565  bl       0x27feb0   ; .SaveDowntownDescription__11cWinOptionsFb
+00282950: 2c030001  cmpwi    r3, 1
+00282954: 40820024  bne      0x282978
+00282958: 7fe3fb78  mr       r3, r31
+0028295c: 4bfd5545  bl       0x257ea0   ; .SaveGame__8cSimsAppFv
+00282960: 7fe3fb78  mr       r3, r31
+00282964: 819f0000  lwz      r12, 0(r31)
+00282968: 818c00e4  lwz      r12, 0xe4(r12)
+0028296c: 48320075  bl       0x5a29e0
+00282970: 80410014  lwz      r2, 0x14(r1)
+00282974: 48000218  b        0x282b8c
+00282978: 2c030000  cmpwi    r3, 0
+0028297c: 4082004c  bne      0x2829c8
+00282980: 8b1f00bf  lbz      r24, 0xbf(r31)
+00282984: 38000000  li       r0, 0
+00282988: 387f0000  addi     r3, r31, 0
+0028298c: 981f00bf  stb      r0, 0xbf(r31)
+00282990: 819f0000  lwz      r12, 0(r31)
+00282994: 818c00e4  lwz      r12, 0xe4(r12)
+00282998: 48320049  bl       0x5a29e0
+0028299c: 80410014  lwz      r2, 0x14(r1)
+002829a0: 5460063f  clrlwi.  r0, r3, 0x18
+002829a4: 408201e8  bne      0x282b8c
+002829a8: 28180001  cmplwi   r24, 1
+002829ac: 40820010  bne      0x2829bc
+002829b0: 38000001  li       r0, 1
+002829b4: 981f00bf  stb      r0, 0xbf(r31)
+002829b8: 480001d4  b        0x282b8c
+002829bc: 38000000  li       r0, 0
+002829c0: 981f00bf  stb      r0, 0xbf(r31)
+002829c4: 480001c8  b        0x282b8c
+002829c8: 2c03ffff  cmpwi    r3, -1
+002829cc: 418201c0  beq      0x282b8c
+002829d0: 7fe3fb78  mr       r3, r31
+002829d4: 819f0000  lwz      r12, 0(r31)
+002829d8: 818c00e4  lwz      r12, 0xe4(r12)
+002829dc: 48320005  bl       0x5a29e0
+002829e0: 80410014  lwz      r2, 0x14(r1)
+002829e4: 480001a8  b        0x282b8c
+002829e8: 801e00d4  lwz      r0, 0xd4(r30)
+002829ec: 2c000001  cmpwi    r0, 1
+002829f0: 40820014  bne      0x282a04
+002829f4: 387e0000  addi     r3, r30, 0
+002829f8: 38800000  li       r4, 0
+002829fc: 4bffdef5  bl       0x2808f0   ; .SetMode__11cWinOptionsFQ211cWinOptions4Mode
+00282a00: 4800018c  b        0x282b8c
+00282a04: 387e0000  addi     r3, r30, 0
+00282a08: 38800001  li       r4, 1
+00282a0c: 4bffdee5  bl       0x2808f0   ; .SetMode__11cWinOptionsFQ211cWinOptions4Mode
+00282a10: 4800017c  b        0x282b8c
+00282a14: 801e00d4  lwz      r0, 0xd4(r30)
+00282a18: 2c000002  cmpwi    r0, 2
+00282a1c: 40820014  bne      0x282a30
+00282a20: 387e0000  addi     r3, r30, 0
+00282a24: 38800000  li       r4, 0
+00282a28: 4bffdec9  bl       0x2808f0   ; .SetMode__11cWinOptionsFQ211cWinOptions4Mode
+00282a2c: 48000160  b        0x282b8c
+00282a30: 387e0000  addi     r3, r30, 0
+00282a34: 38800002  li       r4, 2
+00282a38: 4bffdeb9  bl       0x2808f0   ; .SetMode__11cWinOptionsFQ211cWinOptions4Mode
+00282a3c: 48000150  b        0x282b8c
+00282a40: 801e00d4  lwz      r0, 0xd4(r30)
+00282a44: 2c000003  cmpwi    r0, 3
+00282a48: 40820014  bne      0x282a5c
+00282a4c: 387e0000  addi     r3, r30, 0
+00282a50: 38800000  li       r4, 0
+00282a54: 4bffde9d  bl       0x2808f0   ; .SetMode__11cWinOptionsFQ211cWinOptions4Mode
+00282a58: 48000134  b        0x282b8c
+00282a5c: 387e0000  addi     r3, r30, 0
+00282a60: 38800003  li       r4, 3
+00282a64: 4bffde8d  bl       0x2808f0   ; .SetMode__11cWinOptionsFQ211cWinOptions4Mode
+00282a68: 48000124  b        0x282b8c
+00282a6c: 7fe3fb78  mr       r3, r31
+00282a70: 4bfd58e1  bl       0x258350   ; .ResetTutorial__8cSimsAppFv
+00282a74: 48000118  b        0x282b8c
+00282a78: 389e00d8  addi     r4, r30, 0xd8
+00282a7c: 387e0180  addi     r3, r30, 0x180
+00282a80: 48000008  b        0x282a88
+00282a84: 38840004  addi     r4, r4, 4
+00282a88: 7c041840  cmplw    r4, r3
+00282a8c: 41820010  beq      0x282a9c
+00282a90: 80040000  lwz      r0, 0(r4)
+00282a94: 7c00c040  cmplw    r0, r24
+00282a98: 4082ffec  bne      0x282a84
+00282a9c: 381e0180  addi     r0, r30, 0x180
+00282aa0: 7c040040  cmplw    r4, r0
+00282aa4: 418200e8  beq      0x282b8c
+00282aa8: 381e00d8  addi     r0, r30, 0xd8
+00282aac: 7c002050  subf     r0, r0, r4
+00282ab0: 7c001670  srawi    r0, r0, 2
+00282ab4: 7c000194  addze    r0, r0
+00282ab8: 2c000019  cmpwi    r0, 0x19
+00282abc: 4080002c  bge      0x282ae8
+00282ac0: 2c000013  cmpwi    r0, 0x13
+00282ac4: 40800018  bge      0x282adc
+00282ac8: 2c00000c  cmpwi    r0, 0xc
+00282acc: 408000c0  bge      0x282b8c
+00282ad0: 2c000006  cmpwi    r0, 6
+00282ad4: 40800030  bge      0x282b04
+00282ad8: 480000b4  b        0x282b8c
+00282adc: 2c000016  cmpwi    r0, 0x16
+00282ae0: 408000ac  bge      0x282b8c
+00282ae4: 48000020  b        0x282b04
+00282ae8: 2c000021  cmpwi    r0, 0x21
+00282aec: 40800010  bge      0x282afc
+00282af0: 2c00001d  cmpwi    r0, 0x1d
+00282af4: 40800098  bge      0x282b8c
+00282af8: 4800000c  b        0x282b04
+00282afc: 2c000026  cmpwi    r0, 0x26
+00282b00: 4080008c  bge      0x282b8c
+00282b04: 807e018c  lwz      r3, 0x18c(r30)
+00282b08: 880300d8  lbz      r0, 0xd8(r3)
+00282b0c: 28000000  cmplwi   r0, 0
+00282b10: 41820020  beq      0x282b30
+00282b14: 809e0190  lwz      r4, 0x190(r30)
+00282b18: 80040014  lwz      r0, 0x14(r4)
+00282b1c: 7c180040  cmplw    r24, r0
+00282b20: 40820010  bne      0x282b30
+00282b24: 38800001  li       r4, 1
+00282b28: 4bff62e9  bl       0x278e10   ; .DisablePopup__13cWinLivePopupFb
+00282b2c: 48000060  b        0x282b8c
+00282b30: 807e0190  lwz      r3, 0x190(r30)
+00282b34: 80630014  lwz      r3, 0x14(r3)
+00282b38: 28030000  cmplwi   r3, 0
+00282b3c: 4182000c  beq      0x282b48
+00282b40: 38800000  li       r4, 0
+00282b44: 4828880d  bl       0x50b350   ; .SetState__9cTSWinBtnFi
+00282b48: 833800a4  lwz      r25, 0xa4(r24)
+00282b4c: 807e0190  lwz      r3, 0x190(r30)
+00282b50: 80990000  lwz      r4, 0(r25)
+00282b54: 4bff6f0d  bl       0x279a60   ; .SetName__19cWinLivePopupClientFPCc
+00282b58: 807e0190  lwz      r3, 0x190(r30)
+00282b5c: 80990004  lwz      r4, 4(r25)
+00282b60: 4bff6e61  bl       0x2799c0   ; .SetDesc__19cWinLivePopupClientFPCc
+00282b64: 807e0190  lwz      r3, 0x190(r30)
+00282b68: 38800000  li       r4, 0
+00282b6c: 80b90008  lwz      r5, 8(r25)
+00282b70: 4bff7661  bl       0x27a1d0   ; .SetBitmap__19cWinLivePopupClientFiP9cTSBuffer
+00282b74: 807e0190  lwz      r3, 0x190(r30)
+00282b78: 7fc5f378  mr       r5, r30
+00282b7c: 93030014  stw      r24, 0x14(r3)
+00282b80: 807e018c  lwz      r3, 0x18c(r30)
+00282b84: 809e0190  lwz      r4, 0x190(r30)
+00282b88: 4bff6359  bl       0x278ee0   ; .EnablePopup__13cWinLivePopupFP19cWinLivePopupClientP6cTSWin
+00282b8c: 38600001  li       r3, 1
+00282b90: 800102d8  lwz      r0, 0x2d8(r1)
+00282b94: 382102d0  addi     r1, r1, 0x2d0
+00282b98: bae1ffdc  lmw      r23, -0x24(r1)
+00282b9c: 7c0803a6  mtlr     r0
+00282ba0: 4e800020  blr      
+00282ba4: 00000000  .long    0x00000000
+00282ba8: 00092041  .long    0x00092041
+00282bac: 80090000  lwz      r0, 0(r9)
+00282bb0: 00001454  .long    0x00001454
+00282bb4: 00202e54  .long    0x00202e54
+00282bb8: 534f6e43  rlwimi.  r15, r26, 0xd, 0x19, 1
+00282bbc: 6f6d6d61  xoris    r13, r27, 0x6d61
+00282bc0: 6e645f5f  xoris    r4, r19, 0x5f5f
+00282bc4: 31316357  addic    r9, r17, 0x6357
+00282bc8: 696e4f70  xori     r14, r11, 0x4f70
+00282bcc: 74696f6e  andis.   r9, r3, 0x6f6e
+00282bd0: 7346556c  andi.    r6, r26, 0x556c
+00282bd4: 556c0000  rlwinm   r12, r11, 0, 0, 0
+00282bd8: 00000000  .long    0x00000000
+00282bdc: 00000000  .long    0x00000000
+                ; ==== .TSPaint__11cWinOptionsFb ====
+00282be0: 93e1fffc  stw      r31, -4(r1)
+00282be4: 7c0802a6  mflr     r0
+00282be8: 7c7f1b78  mr       r31, r3
+00282bec: 93c1fff8  stw      r30, -8(r1)
+00282bf0: 38800010  li       r4, 0x10
+00282bf4: 93a1fff4  stw      r29, -0xc(r1)
+00282bf8: 90010008  stw      r0, 8(r1)
+00282bfc: 9421ff40  stwu     r1, -0xc0(r1)

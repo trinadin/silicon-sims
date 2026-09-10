@@ -1,0 +1,1632 @@
+AUTOTEST enabled houses=5 checks=(default)
+08:06:06.937 autotest: AUTOTEST START houses=[5] checks=[corpus,lot,motive,mood,load,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,career,freewill,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uicasorig] timeout=1800000ms
+08:06:06.951 autotest: AUTOTEST hook-registered
+08:06:07.266 exit-probe: before Run
+08:06:07.277 exit-probe: Game.Run(Sync) enter
+08:06:07.600 exit-probe: Initialize enter
+Warning: Failed to set window icon: Unable to load shared library 'libSDL2.dylib' or one of its dependencies. In order to help diagnose loading problems, consider setting the DYLD_PRINT_LIBRARIES environment variable: 
+dlopen(/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib, 0x0001): tried: '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib' (no such file), '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib' (no such file)
+dlopen(libSDL2.dylib, 0x0001): tried: 'libSDL2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibSDL2.dylib' (no such file), '/usr/lib/libSDL2.dylib' (no such file, not in dyld cache), 'libSDL2.dylib' (no such file)
+dlopen(/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib, 0x0001): tried: '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib' (no such file), '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib' (no such file)
+dlopen(liblibSDL2.dylib, 0x0001): tried: 'liblibSDL2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OSliblibSDL2.dylib' (no such file), '/usr/lib/liblibSDL2.dylib' (no such file, not in dyld cache), 'liblibSDL2.dylib' (no such file)
+dlopen(/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib.dylib, 0x0001): tried: '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib.dylib' (no such file), '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/libSDL2.dylib.dylib' (no such file)
+dlopen(libSDL2.dylib.dylib, 0x0001): tried: 'libSDL2.dylib.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibSDL2.dylib.dylib' (no such file), '/usr/lib/libSDL2.dylib.dylib' (no such file, not in dyld cache), 'libSDL2.dylib.dylib' (no such file)
+dlopen(/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib.dylib, 0x0001): tried: '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib.dylib' (no such file), '/Users/nathannoom/Developer/Games/The Sims/simitone-fork/dist/Simitone-arm64.app/Contents/MacOS/liblibSDL2.dylib.dylib' (no such file)
+dlopen(liblibSDL2.dylib.dylib, 0x0001): tried: 'liblibSDL2.dylib.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OSliblibSDL2.dylib.dylib' (no such file), '/usr/lib/liblibSDL2.dylib.dylib' (no such file, not in dyld cache), 'liblibSDL2.dylib.dylib' (no such file)
+
+08:06:07.783 exit-probe: Initialize exit
+08:06:07.797 screen: EnterLoading
+08:06:07.831 loadscreen: DIRECT FAR mount original kSimsLogo boot screen 800x600 len=1440056 sha=8ecf9500 (from frame one; Simitone loader chrome deleted R118)
+08:06:07.832 content-init: begin
+08:06:07.841 loadscreen: splashprogress mount EXC (logs once) NullReferenceException Object reference not set to an instance of an object.
+08:06:07.924 loadscreen: IFF-mount original splashprogress strings (17) in variablesans_10 over the boot screen
+08:06:09.790 loading-screen: update frame=120 complete=False progress=InitObjects
+Unexpected TrailingZero: 617176985
+Unexpected TrailingZero: -666831736
+Unexpected TrailingZero: 1995593413
+08:06:10.543 content-init: done
+08:06:10.570 cursor-init: IFF resolve liveperson.cur -> Shared\cursors\LivePerson.cur 326 bytes
+08:06:10.572 cursor-init: IFF-first original cursors mounted livePersonLen=326
+08:06:10.583 loadscreen: IFF-mount original Community\Bus_loadscreen_1024x768.bmp
+08:06:10.588 loadscreen: IFF-mount texture 1024x768
+08:06:10.588 EnterGameMode lot= external=False
+08:06:11.136 global-context: global.iff BHAVs=251
+08:06:11.147 module: PersonGlobals BHAVs=473
+08:06:11.148 module: SocialGlobals BHAVs=101
+08:06:11.148 module: CatGlobals BHAVs=179
+08:06:11.148 module: DogGlobals BHAVs=177
+08:06:11.150 module: PetSitGlobals BHAVs=22
+08:06:11.151 module: PhoneGlobals BHAVs=149
+08:06:11.151 module: VacationDirectorGlobals BHAVs=85
+08:06:11.152 autotest: AUTOTEST neighborhood-screen ready; attempting houses
+08:06:11.153 autotest: AUTOTEST LOT-TRY house=5 path='/Users/nathannoom/Documents/Simitone/UserData/Houses/House05.iff'
+08:06:11.368 uioriginal: IFF-mount original cpanel\Backgrounds\UniversalBack.TGA
+08:06:11.387 uioriginal: IFF-mount original cpanel\Backgrounds\LivePatch.bmp
+08:06:11.388 uioriginal: IFF-mount original cpanel\Backgrounds\BuyPatch.bmp
+08:06:11.388 uioriginal: IFF-mount original cpanel\Backgrounds\BuildPatch.bmp
+08:06:11.388 uioriginal: IFF-mount original cpanel\Backgrounds\OptionsPatch.bmp
+08:06:11.388 uioriginal: IFF-mount original cpanel\Buttons\people.bmp
+08:06:11.389 uioriginal: IFF-mount original cpanel\Buttons\objects.bmp
+08:06:11.389 uioriginal: IFF-mount original cpanel\Buttons\arch.bmp
+08:06:11.389 uioriginal: IFF-mount original cpanel\Buttons\options.bmp
+08:06:11.390 uioriginal: IFF-mount original cpanel\Buttons\zoomin.bmp
+08:06:11.390 uioriginal: IFF-mount original cpanel\Buttons\zoomout.bmp
+08:06:11.390 uioriginal: IFF-mount original cpanel\Buttons\rotleft.bmp
+08:06:11.390 uioriginal: IFF-mount original cpanel\Buttons\rotright.bmp
+08:06:11.393 uioriginal: IFF-mount original cpanel\Buttons\LevRoof.bmp
+08:06:11.393 uioriginal: IFF-mount original cpanel\Buttons\nocut.bmp
+08:06:11.393 uioriginal: IFF-mount original cpanel\Buttons\dynacut.bmp
+08:06:11.393 uioriginal: IFF-mount original cpanel\Buttons\nowall.bmp
+08:06:11.394 uioriginal: IFF-mount original cpanel\Buttons\Lev2.bmp
+08:06:11.394 uioriginal: IFF-mount original cpanel\Buttons\Lev1.bmp
+08:06:11.394 uioriginal: IFF-mount original cpanel\Buttons\pause.bmp
+08:06:11.394 uioriginal: IFF-mount original cpanel\Buttons\Speed1.bmp
+08:06:11.394 uioriginal: IFF-mount original cpanel\Buttons\Speed2.bmp
+08:06:11.394 uioriginal: IFF-mount original cpanel\Buttons\Speed3.bmp
+08:06:11.398 panel-ctor: original toolbar backdrop mounted 804x100
+08:06:11.398 uioriginal: IFF-mount original cpanel\Backgrounds\BackPatch.bmp
+08:06:11.399 uioriginal: IFF-mount original cpanel\People\PeopleTemplate.bmp
+08:06:11.399 uioriginal: IFF-mount original cpanel\Buttons\UnknownFace.bmp
+08:06:11.399 uioriginal: IFF-mount original cpanel\Backgrounds\LiveGadget.bmp
+08:06:11.400 uioriginal: IFF-mount original cpanel\Greenbars.BMP
+08:06:11.400 uioriginal: IFF-mount original cpanel\Redbars.bmp
+08:06:11.401 uioriginal: IFF-mount original cpanel\Buttons\Undo.bmp
+08:06:11.402 uioriginal: IFF-mount original cpanel\Buttons\Redo.bmp
+08:06:11.402 uioriginal: IFF-mount original cpanel\Buttons\toolBtnTerrain.bmp
+08:06:11.402 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWater.bmp
+08:06:11.402 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWall.bmp
+08:06:11.402 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWallpaper.bmp
+08:06:11.402 uioriginal: IFF-mount original cpanel\Buttons\toolBtnStairs.bmp
+08:06:11.402 uioriginal: IFF-mount original cpanel\Buttons\toolBtnFireplace.bmp
+08:06:11.402 uioriginal: IFF-mount original cpanel\Buttons\toolBtnTree.bmp
+08:06:11.402 uioriginal: IFF-mount original cpanel\Buttons\toolBtnFloor.bmp
+08:06:11.402 uioriginal: IFF-mount original cpanel\Buttons\toolBtnDoor.bmp
+08:06:11.402 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWindow.bmp
+08:06:11.403 uioriginal: IFF-mount original cpanel\Buttons\toolBtnRoof.bmp
+08:06:11.403 uioriginal: IFF-mount original cpanel\Buttons\toolBtnHand.bmp
+08:06:11.403 uioriginal: IFF-mount original cpanel\Build\roofsteep.bmp
+08:06:11.403 uioriginal: IFF-mount original cpanel\Build\roofmedium.bmp
+08:06:11.403 uioriginal: IFF-mount original cpanel\Build\roofshallow.bmp
+08:06:11.403 uioriginal: IFF-mount original cpanel\Build\roofflat.bmp
+08:06:11.403 uioriginal: IFF-mount original cpanel\Buttons\ScrollLeft.bmp
+08:06:11.406 uioriginal: IFF-mount original cpanel\Buttons\ScrollRight.bmp
+08:06:11.406 uioriginal: IFF-mount original cpanel\Catalog\ThumbTemplate1Frame.BMP
+08:06:11.406 uioriginal: IFF-mount original cpanel\Catalog\ThumbTemplate.BMP
+08:06:11.407 uioriginal: IFF-mount original cpanel\Build\RoofPatternTemplate.bmp
+08:06:11.413 uioriginal: IFF-mount original cpanel\Backgrounds\BuildToothpkLeft.bmp
+08:06:11.413 uioriginal: IFF-mount original cpanel\Backgrounds\BuildToothpkRight.bmp
+08:06:11.414 uioriginal: IFF-mount original cpanel\Catalog\BuyRLiving.bmp
+08:06:11.414 uioriginal: IFF-mount original cpanel\Catalog\BuyRDining.bmp
+08:06:11.420 uioriginal: IFF-mount original cpanel\Catalog\BuyRBedroom.bmp
+08:06:11.420 uioriginal: IFF-mount original cpanel\Catalog\BuyRStudy.bmp
+08:06:11.420 uioriginal: IFF-mount original cpanel\Catalog\BuyRKitchen.bmp
+08:06:11.420 uioriginal: IFF-mount original cpanel\Catalog\BuyRBathroom.bmp
+08:06:11.420 uioriginal: IFF-mount original cpanel\Catalog\BuyROutside.bmp
+08:06:11.420 uioriginal: IFF-mount original cpanel\Catalog\BuyRMisc.bmp
+08:06:11.420 uioriginal: IFF-mount original cpanel\Catalog\BackButtons\BackRLiving.bmp
+08:06:11.421 panel-ctor: desktop speed cluster is on the UCP plate (R142 engine anchors)
+08:06:11.422 uioriginal: IFF-mount original cpanel\Buttons\Mood.bmp
+08:06:11.422 uioriginal: IFF-mount original cpanel\Buttons\Job.bmp
+08:06:11.422 uioriginal: IFF-mount original cpanel\Buttons\Personality.bmp
+08:06:11.422 uioriginal: IFF-mount original cpanel\Buttons\Relationship.BMP
+08:06:11.423 uioriginal: IFF-mount original cpanel\Buttons\House.bmp
+08:06:11.423 uioriginal: IFF-mount original cpanel\Buttons\ScrollLeft.BMP
+08:06:11.423 uioriginal: IFF-mount original cpanel\Buttons\ScrollRight.BMP
+08:06:11.424 autotest: AUTOTEST LOT-ACTION house=5 inlot=True vm=True
+08:06:11.425 autotest: AUTOTEST LOT-READY house=5 entities=303 avatars=3 loadErrors=0 speed=1 minute=30
+08:06:11.425 autotest: AUTOTEST load: PASS
+08:06:11.425 autotest: AUTOTEST lot: PASS
+08:06:11.427 autotest: AUTOTEST corpus global expected=251 actual=251
+08:06:11.427 autotest: AUTOTEST corpus PersonGlobals expected=473 actual=473
+08:06:11.427 autotest: AUTOTEST corpus SocialGlobals expected=101 actual=101
+08:06:11.427 autotest: AUTOTEST corpus CatGlobals expected=179 actual=179
+08:06:11.427 autotest: AUTOTEST corpus DogGlobals expected=177 actual=177
+08:06:11.428 autotest: AUTOTEST corpus PetSitGlobals expected=22 actual=22
+08:06:11.428 autotest: AUTOTEST corpus PhoneGlobals expected=149 actual=149
+08:06:11.428 autotest: AUTOTEST corpus VacationDirectorGlobals expected=85 actual=85
+08:06:11.428 autotest: AUTOTEST corpus: PASS
+08:06:11.429 autotest: AUTOTEST glob-fix probes=2 named=2 vdg=2
+08:06:11.429 autotest: AUTOTEST glob-fix: PASS
+08:06:11.429 autotest: AUTOTEST famnames id=1 length=1 s0=Newbie
+08:06:11.429 autotest: AUTOTEST famnames id=2 length=1 s0=Bachelor
+08:06:11.429 autotest: AUTOTEST famnames id=3 length=1 s0=Roomies
+08:06:11.430 autotest: AUTOTEST famnames id=4 length=1 s0=Pleasant
+08:06:11.430 autotest: AUTOTEST famnames id=5 length=1 s0=Goth
+08:06:11.430 autotest: AUTOTEST famnames id=6 NULL
+08:06:11.430 autotest: AUTOTEST famnames id=7 NULL
+08:06:11.430 autotest: AUTOTEST famnames: PASS
+08:06:11.437 autotest: AUTOTEST callgraph ops=92124 global+private-unresolved=0 semi-global-opcodes=134 semi-unknown-module=48 samples=CCPhonePlugin.iff op=65535 | CCPhonePlugin.iff op=65535 | CCPhonePlugin.iff op=32767 | CCPhonePlugin.iff op=65535
+08:06:11.437 autotest: AUTOTEST callgraph-notes: 48 semi-global ops have no resolvable module (e.g. NPCCatererPP with no GLOB) — verified 86/134
+08:06:11.437 autotest: AUTOTEST callgraph: PASS
+08:06:11.438 autotest: AUTOTEST chunk-reg posi=2 xxxx=0 nonEmpty=3
+08:06:11.438 autotest: AUTOTEST chunk-reg: PASS
+08:06:11.440 autotest: AUTOTEST relation pairs=22 vars=27 out-of-bounds=0 sample=19->31=0 | 31->19=0 | 32->34=50 | 32->33=50,0 | 33->34=100,1 | 33->32=85 | 34->33=100,1 | 34->32=75 | 35->36=20 | 35->37=20 | 35->43=20 | 36->35=20 | 36->37=20 | 36->43=20 | 37->35=20 | 37->36=20 | 37->43=55 | 
+08:06:11.440 autotest: AUTOTEST relation: PASS
+08:06:11.441 autotest: AUTOTEST relation-write roundtrip=True clamp+=True clamp-=True record=19->31
+08:06:11.441 autotest: AUTOTEST rel-key storedPairs=6 foundByObjectID=0 missByObjectID=6 foundByResolvedNID=6 samples=32->33 stored=[50,0] objKey=18 (objectID!=33) | 32->34 stored=[50] objKey=21 (objectID!=34) | 33->32 stored=[85] objKey=16 (objectID!=32) | 33->34 stored=[100,1] objKey=21 (objectID!=34) | 34->32 stored=[75] objKey=16 (objectID!=32) | 34->33 stored=[100,1] objKey=18 (objectID!=33)
+08:06:11.442 autotest: AUTOTEST rel-key: PASS
+08:06:11.443 autotest: AUTOTEST rel-mode stored=6 mode1Found=6 mode2Found=6 mode3Found=6 rawObjectIDMiss=6 samples=
+08:06:11.443 autotest: AUTOTEST rel-mode: PASS
+08:06:11.444 autotest: AUTOTEST jobs NumJobs=20 resolved=1 unresolved=0 lines=obj=16 nid=32 jtype=-1 jlevel=4 jperf=0 track=(none/>0?) | obj=18 nid=33 jtype=0 jlevel=0 jperf=0 track=(none/>0?) | obj=21 nid=34 jtype=9 jlevel=0 jperf=0 track=Test Subject
+08:06:11.444 autotest: AUTOTEST jobs: PASS
+08:06:11.447 autotest: AUTOTEST career IFF-literal data path: matched=20 bad=0 incoherent=0 NumJobs=20 (all 20 tracks level-0 salary/hours/car/req[0..6] == raw IFF canon); IFF progression BHAVs live in CarPortal.iff At-Work/Get-paid/At-School/test-promotion/Chance-Cards
+08:06:11.450 autotest: AUTOTEST career-iff control-flow closure: 41 private call targets all resolve inside engine-mounted CarPortal.iff (IFF-literal self-contained loop)
+08:06:11.450 autotest: AUTOTEST career-iff work-censorship triggers IFF-literal: 'At Work' ins19/ins23 + 'At School' ins10/ins14 write MyPersonData[30] (original work-clothes censorship sites)
+08:06:11.451 autotest: AUTOTEST career-iff 'test promotion' live-exec: avatar jobType=9 level=0 served levels=10 salary=155 gate-temp0-after=9 (ORIGINAL promotion gate ran on avatar thread)
+08:06:11.455 autotest: AUTOTEST career-iff live-exec step=start motives delta completed 0ms served salary=155 (ORIGINAL career-loop step ran on avatar thread)
+08:06:11.455 autotest: AUTOTEST career-iff live-exec step=get paid completed 0ms served salary=155 (ORIGINAL career-loop step ran on avatar thread)
+08:06:11.456 autotest: AUTOTEST career-iff IFF-mount loop=[set car type,test promotion,start motives delta,Chance Cards 3,Chance Cards,process,Chance Cards 2,get paid,send to work,At Work,At School] jobdata-indices=[0,1,2,3,4,5,6,7,8,12,13,14,15,16,17,18,19,20,21] reach(loop code mounted + IFF-literal served)=3 reachBad=0
+08:06:11.456 autotest: AUTOTEST career: PASS
+08:06:11.457 autotest: AUTOTEST freewill 'process mood' live-exec: completed (ORIGINAL periodic personality/motive brain ran on avatar thread; engine served every scope it reads)
+08:06:11.457 autotest: AUTOTEST freewill IFF-mount chain=[do idle and mood->do idle core ; do idle->do idle core ; brain process mood check hunger ; ids=8303,8301,8229,8275,8219] reach(original brain mounted + IFF-literal entry chain)=1 reachBad=0
+08:06:11.458 autotest: AUTOTEST freewill: PASS
+08:06:11.461 autotest: AUTOTEST deathchain 'check motive failure'(8299) live-exec serve-proof: completed (ORIGINAL failure-decision chain ran on avatar thread at low motives)
+08:06:11.461 autotest: AUTOTEST deathchain 'PC - Check Motive Failures'(8340) live-exec serve-proof: completed (ORIGINAL death-decision chain ran on avatar thread; engine served every scope it reads)
+08:06:11.461 autotest: AUTOTEST deathchain ghost serve-proof 8305: completed (ORIGINAL ghost code ran on avatar thread)
+08:06:11.463 autotest: AUTOTEST deathchain ghost serve-proof 8306: completed (ORIGINAL ghost code ran on avatar thread)
+08:06:11.465 autotest: AUTOTEST deathchain ghost serve-proof 8641: completed (ORIGINAL ghost code ran on avatar thread)
+08:06:11.467 autotest: AUTOTEST deathchain IFF-literal=20/20 drift=0 bad= live-reach(soak)= natural-death-reach(soak+collapse)= (Personglobals death-chain ids seen in live frames); closure: targets=47 unresolved= wiring=[8283.ins4=8327 ins5=8299 ok; 8327.ins1=8305 ok; 8342.ins9=8340 ok] entry=[8342-IFF-callers=0 8340-IFF-callers=1 8342.ins9->8340 ok] dispatch=[8193(person main) ins4=8283 ins10=8305 ins38=8641 ok; IFF-callers 8193=0 8641=1 ok] person-type=[8305.ins21 PersonType-write ok] shipped-save-death=[total-IsGhost=10 shipped-8-present=8 ids:9genie2 19user00023 20user00022 26user00021 27user00020 28user00017 29user00015 30user00014 31user00013 268campfireghost] serve-proof(8340)=completed on avatar obj=16 serve-proof(8299)=completed on avatar obj=16 ghost(8306/8641)=n/a 8305=completed(obj=16) 8306=completed(obj=16) 8641=completed(obj=16)
+08:06:11.467 autotest: AUTOTEST deathchain: PASS
+08:06:11.468 autotest: AUTOTEST savesim shipped-save career(JobLvl>0)=7/7 ids:19user00023 25papercarrierf1 29user00015 32user00011 35user00008 36user00007 43user00005 | user00000 cooking=300 mech=200 ok | rel=dirRows=22 ok (IFF-factual NBRS.cs mount; motives runtime-only)
+08:06:11.468 autotest: AUTOTEST savesim: PASS
+08:06:11.469 autotest: AUTOTEST personality iff-gates=1 desc= 2vs600@t20
+08:06:11.470 autotest: AUTOTEST personality playable pd2..7 = 400,500,0,700,200,700 | 700,500,0,300,300,700 | 400,400,0,700,600,400
+08:06:11.470 autotest: AUTOTEST personality IFF-literal index map + engine personality->decay coupling + IFF-reach pd2-vs-600 node: verified=4/4 notes=
+08:06:11.470 autotest: AUTOTEST personality: PASS
+08:06:11.472 autotest: AUTOTEST motiveinit IFF-literal 'init motives'(8325) motive-set=5,6,7,8,9,14,15 bcon8195=50,1,1,1,50,1,15,20,99,99,99,99,50,99,20 verified=2/2 notes=
+08:06:11.472 autotest: AUTOTEST motiveinit: PASS
+08:06:11.473 autotest: AUTOTEST skills IFF-literal skill-gain sites: verified=4/4 notes=
+08:06:11.473 autotest: AUTOTEST skills: PASS
+08:06:11.477 autotest: AUTOTEST motiveact IFF-literal activity->need sites: verified=4/4 notes=
+08:06:11.477 autotest: AUTOTEST motiveact: PASS
+08:06:11.479 autotest: AUTOTEST relact IFF-literal relationship-write sites: verified=3/3 notes=
+08:06:11.479 autotest: AUTOTEST relact: PASS
+08:06:11.480 autotest: AUTOTEST money IFF-literal money/fame write sites: verified=4/4 notes=
+08:06:11.480 autotest: AUTOTEST money: PASS
+08:06:11.481 autotest: AUTOTEST ttab IFF-literal pie-dispatch sites: verified=3/3 notes=
+08:06:11.481 autotest: AUTOTEST ttab: PASS
+08:06:11.482 autotest: AUTOTEST ttas IFF-literal pie-label sites: verified=3/3 notes=
+08:06:11.482 autotest: AUTOTEST ttas: PASS
+08:06:11.484 autotest: AUTOTEST opcodes whole-brain fingerprint: total=6124 op2=3562 op8=73 op3=3 op13=304 op44=375 op42=159 op28=176 op26=80 op31=73 op41=63 ok=True
+08:06:11.484 autotest: AUTOTEST opcodes: PASS
+08:06:11.489 autotest: AUTOTEST callgraph object-surface histogram: mounted=20/20 total=7767 op2=4035 op44=475 op23=433 op32=157 op31=152 op8=88 op48=81 op29=77 op13=21 ok=True
+08:06:11.489 autotest: AUTOTEST callgraph: PASS
+08:06:11.493 autotest: AUTOTEST globalcalls global-dispatch surface: mounted=20/20 total=1053 distinct=98 resolved=98 named=98 unresolved=0 checksum=338605 top=[Wait For Notify(281)x149,idle(280)x75,Is either person a child?(365)x73] ok=True
+08:06:11.493 autotest: AUTOTEST globalcalls: PASS
+08:06:11.555 autotest: AUTOTEST catalog IFF-literal: fixture-verified=20/20 notes= served=1114 eligible=1114 served-match=1114 served-missing=0 partB=True sort-match=1114 sort-missing=0 partC=True sortNotes= name-match=1114 name-missing=0 partD=True nameNotes= bhav-match=1114 partE=True bhavNotes= def-count=1114 partG=True defNotes= order-match=1114 partH=True orderNotes= srvNotes=
+08:06:11.576 autotest: AUTOTEST catalog: PASS
+08:06:11.577 autotest: AUTOTEST censor live-flags nonzero=0/3
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 0 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+08:06:11.866 autotest: AUTOTEST censor RENDER pair saved: off=/Users/nathannoom/Documents/Simitone/r36-censor-off.png on=/Users/nathannoom/Documents/Simitone/r36-censor-on.png (pixel diff = censored-mosaic pixels)
+08:06:11.878 autotest: AUTOTEST censor force-set roundtrip=True renderer=CensorshipFlags=0 render-pair=on+off
+08:06:11.879 autotest: AUTOTEST censor: PASS
+08:06:11.880 autotest: AUTOTEST censor-iff censor writes-var30=
+08:06:11.880 autotest: AUTOTEST censor-iff dress naked writes-var30=128,0,3,1
+08:06:11.880 autotest: AUTOTEST censor-iff dress normal writes-var30=128,0,0
+08:06:11.880 autotest: AUTOTEST censor-iff dress for bed writes-var30=128,3,3,0
+08:06:11.881 autotest: AUTOTEST censor-iff dress swimsuit writes-var30=128,3,3,0
+08:06:11.882 autotest: AUTOTEST censor-iff trigger-values=0,1,3,128 bhavs=censor,dress for bed,dress naked,dress normal,dress swimsuit ok=True
+08:06:11.884 autotest: AUTOTEST censor-live-exec dress naked=0->3 dress normal=3->0 RendererFlags=0 (ORIGINAL Global.iff dressing BHAVs executed through live avatar thread)
+08:06:11.884 autotest: AUTOTEST orig-bhavs avatar-resource=User00011.iff
+08:06:11.885 autotest: AUTOTEST orig-bhavs init-motives needs-before=0,0,0,0,0,0,0 after=99,99,99,62,100,23,99 (ORIGINAL IFF spawn-init BHAV ran, tuning+random boost in-process)
+08:06:11.885 autotest: AUTOTEST orig-bhavs init-NPC canon needs[h,c,hg,b,e,f,s]=0,0,0,0,0,0,0 -> 99,99,99,65,100,24,99 (ORIGINAL full new-sim init chain live-exec; IFF BCON 8195 canon; engine starts at 100)
+08:06:11.885 autotest: AUTOTEST orig-bhavs init-NPC canon pd[2,3,4,5,6,7,9,10,11,12,15,17,18,29,32,33,36,56,57,63] before=400,500,0,700,200,700,0,0,0,0,0,0,0,0,0,0,50,-1,4,0 -> after=1000,1000,1000,1000,1000,1000,0,0,0,0,0,0,0,1,2,25,50,-1,4,0 (IFF 8298/8192 write-set; engine MakePersonData=500/no-job/no-autonomy)
+08:06:11.886 autotest: AUTOTEST orig-bhavs do-idle-and-mood present (cid=8303, semi=True, scheduler-oriented, not sync-drivable)
+08:06:11.888 autotest: AUTOTEST npcinfo pd[2..7]=0,0,0,0,0,0 pd[33](Priority)=25 pd[36](Autonomy)=50 pd[56](JobType)=-1 pd[57](JobLevel)=4 pd[63](JobPerf)=0 pd[29](Cheats)=1 pd[32](PersonType)=2 skills[9..12,15,17,18]={794,815,722,664,126,183,534} (IFF 8298/8192 canon 25/50/-1,4,0 + 1,2 + skills [0,1000); InheritNeighbor ships record PersonData to runtime avatar)
+08:06:11.888 autotest: AUTOTEST npcinfo: PASS
+08:06:11.888 autotest: AUTOTEST names obj=16 nid=32 gender=1 name=Cassandra multiname=Cassandra tostring=Cassandra pet=False
+08:06:11.889 autotest: AUTOTEST names obj=18 nid=33 gender=1 name=Bella multiname=Bella tostring=Bella pet=False
+08:06:11.889 autotest: AUTOTEST names obj=21 nid=34 gender=0 name=Mortimer multiname=Mortimer tostring=Mortimer pet=False
+08:06:11.889 autotest: AUTOTEST names: PASS
+08:06:11.890 autotest: AUTOTEST chunks IFF-literal inventory types=28/28 eng=BCON=3663,BHAV=27852,BMP_=6174,CARR=21,CATS=1,CTSS=1895,DGRP=20522,FCNS=6,FWAV=15921,glob=2,GLOB=476,OBJD=5120,OBJf=3906,PALT=5238,pers=2,POSI=41,rsmp=1200,SLOT=1472,SPR#=758,SPR2=17140,STR#=5430,TMPL=4,TPRP=206,TRCN=9,TREE=213,TTAB=1804,TTAs=1568,XXXX=135 canon=BCON=3663,BHAV=27852,BMP_=6174,CARR=21,CATS=1,CTSS=1895,DGRP=20522,FCNS=6,FWAV=15921,GLOB=476,OBJD=5120,OBJf=3906,PALT=5238,POSI=41,SLOT=1472,SPR#=758,SPR2=17140,STR#=5430,TMPL=4,TPRP=206,TRCN=9,TREE=213,TTAB=1804,TTAs=1568,XXXX=135,glob=2,pers=2,rsmp=1200
+08:06:11.890 autotest: chunks FAILEDCOUNT 0
+08:06:11.890 autotest: AUTOTEST chunks: PASS
+08:06:11.890 autotest: AUTOTEST operand IFF-literal bytes=3108024 (256-bucket)
+08:06:11.890 autotest: AUTOTEST operand: PASS
+08:06:11.892 autotest: AUTOTEST opmx IFF-literal opcodes=713 pairs=4571 bytes=3108024
+08:06:11.892 autotest: AUTOTEST opmx: PASS
+08:06:11.892 autotest: AUTOTEST slot IFF-literal SLOT=1472/1472 entries=6969/6969 SPR#=758/758 frames=3120/3120 SPR2=17140/17140 frames=138948/138948
+08:06:11.892 autotest: AUTOTEST slot: PASS
+08:06:11.893 autotest: AUTOTEST dgrp IFF-literal DGRP refs=514716/514716 chunks=20522/20522 PALT entries=1340928/1340928 chunks=5238/5238
+08:06:11.893 autotest: AUTOTEST dgrp: PASS
+08:06:11.893 autotest: AUTOTEST bhop IFF-literal opcodes: distinct=713/713
+08:06:11.893 autotest: AUTOTEST bhop: PASS
+08:06:11.893 autotest: AUTOTEST bhvi IFF-literal BHAV instructions: 388503/388503
+08:06:11.893 autotest: AUTOTEST bhvi: PASS
+08:06:11.894 autotest: AUTOTEST consts IFF-literal constants: BCON=3663/3663 29952/29952 TPRP=206/206 434/434 GLOB=478/478
+08:06:11.894 autotest: AUTOTEST consts: PASS
+08:06:11.895 autotest: AUTOTEST strs IFF-literal STR-family: STR#=5430/5430 155482/155482 TTAs=1568/1568 11286/11286
+08:06:11.895 autotest: AUTOTEST strs: PASS
+08:06:11.895 autotest: AUTOTEST ctss IFF-literal STR corpus: blocks=3769/3769 chunks=1895/1895
+08:06:11.896 autotest: AUTOTEST ctss: PASS
+08:06:11.896 autotest: AUTOTEST objd IFF-literal OBJD corpus: mounted=5120 canon=5120
+08:06:11.896 autotest: AUTOTEST objd: PASS
+08:06:11.896 autotest: AUTOTEST iff IFF-literal resource census: ok=True 
+08:06:11.897 autotest: AUTOTEST iff: PASS
+08:06:11.900 autotest: AUTOTEST snd xa-mounted=17438 first=Beach\gulls1.XA
+08:06:11.900 autotest: AUTOTEST snd IFF-literal corpus: ok=True 
+08:06:11.900 autotest: AUTOTEST snd: PASS
+08:06:11.901 autotest: AUTOTEST audio hitvm=ok disableSound=False events=4479 lot_enter=False soundEntities=3 sample=[3,acta_fight_confa,acta_fight_confb,acta_fight_confc,acta_fight_furya,acta_fight_furyb,acta_fight_furyc,acta_fight_pasa,acta_fight_pasb,acta_fight_pasc]
+08:06:11.902 autotest: AUTOTEST audio PlaySoundEvent(stereo_zydeco)=HITTVOn: dead=False
+08:06:11.902 autotest: AUTOTEST audio: PASS
+08:06:11.903 autotest: AUTOTEST uichrome IFF-literal live-toolbar chrome mount: ok=True 
+08:06:11.903 autotest: AUTOTEST uichrome: PASS
+08:06:11.905 autotest: AUTOTEST uitoolbar IFF-literal live-toolbar chrome mount: ok=True 
+08:06:11.905 autotest: AUTOTEST uitoolbar: PASS
+08:06:11.906 autotest: AUTOTEST uicur IFF-literal cursor mount: ok=True livePersonMounted=True mountedLen=326 
+08:06:11.906 autotest: AUTOTEST uicur: PASS
+08:06:11.924 autotest: AUTOTEST uiglyph IFF-literal glyph-table mount + ORIGINAL TEXT RENDER (title + caption + bold money + small toolbar + dialog tables): ok=True render=True fontsParsed=11 textsMounted=5 hoverCaptions=0 moneyUpdates=1 toolbarReadouts=1 cheatMessages=0 dialogTitles=0  
+08:06:11.924 autotest: AUTOTEST uiglyph: PASS
+08:06:11.945 autotest: AUTOTEST uiboot IFF-literal kSimsLogo boot screen: ok=True mounted=True dims=800x600 simitoneChromeHidden=True engineBar=True barFill=1 directFrameOne=True (len=1440056 sha=8ecf950019fb86bed4be7d02e1e72ff2217e8ea1d5b44da6c6a0deec2d934ae6) 
+08:06:11.946 autotest: AUTOTEST uiboot: PASS
+08:06:11.947 autotest: AUTOTEST uisplash IFF-literal splashprogress corpus + ORIGINAL text mount: canon=True found=True chunkID=155 entries=340 english=17 chunkSha=39fdf8af203d mounted=True liveEqualsDisk=True font=True
+08:06:11.948 autotest: AUTOTEST uisplash: PASS
+08:06:11.949 uioriginal: IFF-mount original shared\dlg\GenDlg.bmp
+08:06:11.950 uioriginal: IFF-mount original shared\sys\WinBtn.bmp
+08:06:11.955 autotest: AUTOTEST uidialog IFF-literal ObjDialogs + dialog twins: canon=True label=ObjDialogs entries=90 chunkSha=fa35753e3a5a titleTwinned=True bodyTwinned=True bodyLines=3 captions=OK/Cancel captionsCanon=True glyphPathArmed=True
+08:06:11.956 autotest: AUTOTEST uidialog: PASS
+08:06:11.967 autotest: AUTOTEST uilotq IFF-literal NghRollover+MoveInModeStrs + lot-query twins: canon=True m132=MoveInModeStrs/480 r134=NghRollover/780 mounted=True synced=True wrapped=True street=1 Sim Lane
+08:06:11.967 autotest: AUTOTEST uilotq: PASS
+08:06:11.968 autotest: AUTOTEST uilogo IFF-literal logo-stamp mount: ok=True 
+08:06:11.968 autotest: AUTOTEST uilogo: PASS
+08:06:11.979 autotest: AUTOTEST uianim IFF-literal animation-frame mount: ok=True bmpRows=4911 tgaRows=16 
+08:06:11.980 autotest: AUTOTEST uianim: PASS
+08:06:12.014 autotest: AUTOTEST uinbhd IFF-literal neighborhood screens + LIVE cycling + ENGINE-derived positions + ENGINE car lanes + ENGINE clouds/balloon + ENGINE nessie cheat: pinned=True families=8/8 cyc=True lanes=True cars=54/54 clouds=True wrapped=21/21 balloon=True nessie=True fsWater=True  flowLanes=6 flowClouds=1 flowBalloons=1 flowNessie=2 flowLayers=11 flowAdvances=8      
+08:06:12.014 autotest: AUTOTEST uinbhd: PASS
+08:06:12.017 uioriginal: IFF-mount original cpanel\People\TrackingTarget.bmp
+08:06:12.026 uioriginal: IFF-mount original cpanel\Buttons\Interest.bmp
+08:06:12.026 uioriginal: IFF-mount original cpanel\Buttons\Gift.bmp
+08:06:12.267 autotest: AUTOTEST uidump screen=TS1GameScreen size=1024x768 nonBg=786250 bbox=0,0..1023,767 top=#1050B0,#1070D0,#1070B0,#101050 -> /Users/nathannoom/Documents/Simitone/uidump-lot.png
+08:06:12.267 autotest: AUTOTEST uiback panel=True backdrop=True size=804x100 vis=True band=226,668..488,724 steelIFF=0 navyteal=0 pin=PASS
+08:06:12.268 autotest: AUTOTEST uidump-tree TS1GameScreen pos=0,0 size=0x0 vis=True
+08:06:12.268 autotest: AUTOTEST uidump-tree   UILotControl pos=0,0 size=0x0 vis=True
+08:06:12.268 autotest: AUTOTEST uidump-tree     UIInteractionQueue pos=0,0 size=0x0 vis=True
+08:06:12.268 autotest: AUTOTEST uidump-tree     UILotControlTouchHelper pos=0,0 size=0x0 vis=True
+08:06:12.268 autotest: AUTOTEST uidump-tree     UIArchTouchHelper pos=0,0 size=0x0 vis=True
+08:06:12.268 autotest: AUTOTEST uidump-tree       UITwoStateButton pos=25,25 size=75x75 vis=True
+08:06:12.268 autotest: AUTOTEST uidump-tree       UITwoStateButton pos=25,513 size=75x75 vis=True
+08:06:12.269 autotest: AUTOTEST uidump-tree       UITwoStateButton pos=924,513 size=75x75 vis=True
+08:06:12.269 autotest: AUTOTEST uidump-tree       UITwoStateButton pos=25,513 size=75x75 vis=True
+08:06:12.269 autotest: AUTOTEST uidump-tree       UITwoStateButton pos=924,513 size=75x75 vis=True
+08:06:12.269 autotest: AUTOTEST uidump-tree   UISimitoneBg pos=512,384 size=0x0 vis=False
+08:06:12.269 autotest: AUTOTEST uidump-tree   UIContainer pos=0,0 size=0x0 vis=True
+08:06:12.269 autotest: AUTOTEST uidump-tree   UISimitoneBg pos=512,384 size=0x0 vis=True
+08:06:12.269 autotest: AUTOTEST uidump-tree   UISimitoneFrontend pos=0,0 size=0x0 vis=True
+08:06:12.269 autotest: AUTOTEST uidump-tree     UICheatTextbox pos=10,10 size=0x0 vis=False
+08:06:12.269 autotest: AUTOTEST uidump-tree       UITextBox pos=0,0 size=200x23 vis=False
+08:06:12.270 autotest: AUTOTEST uidump-tree     UIDesktopUCP pos=0,585 size=220x183 vis=True
+08:06:12.270 autotest: AUTOTEST uidump-tree       UIContainer pos=0,0 size=0x0 vis=True
+08:06:12.270 autotest: AUTOTEST uidump-tree       UIImage pos=0,0 size=220x183 vis=True
+08:06:12.270 autotest: AUTOTEST uidump-tree       UIImage pos=0,0 size=213x153 vis=False
+08:06:12.270 autotest: AUTOTEST uidump-tree       UIImage pos=0,0 size=156x148 vis=False
+08:06:12.270 autotest: AUTOTEST uidump-tree       UIImage pos=0,0 size=107x132 vis=False
+08:06:12.270 autotest: AUTOTEST uidump-tree       UIImage pos=0,0 size=37x100 vis=False
+08:06:12.270 autotest: AUTOTEST uidump-tree       UIButton pos=10,6 size=50x50 vis=True
+08:06:12.270 autotest: AUTOTEST uidump-tree       UIButton pos=69,20 size=45x47 vis=True
+08:06:12.270 autotest: AUTOTEST uidump-tree       UIButton pos=117,45 size=39x39 vis=True
+08:06:12.271 autotest: AUTOTEST uidump-tree       UIButton pos=193,125 size=23x23 vis=True
+08:06:12.271 autotest: AUTOTEST uidump-tree       UIStencilButton pos=26,105 size=27x27 vis=True
+08:06:12.271 autotest: AUTOTEST uidump-tree       UIStencilButton pos=26,149 size=27x27 vis=True
+08:06:12.271 autotest: AUTOTEST uidump-tree       UIStencilButton pos=9,127 size=27x27 vis=True
+08:06:12.271 autotest: AUTOTEST uidump-tree       UIStencilButton pos=43,127 size=27x27 vis=True
+08:06:12.271 autotest: AUTOTEST uidump-tree       UIStencilButton pos=32,78 size=22x19 vis=True
+08:06:12.271 autotest: AUTOTEST uidump-tree       UIStencilButton pos=56,80 size=21x21 vis=True
+08:06:12.272 autotest: AUTOTEST uidump-tree       UIStencilButton pos=80,85 size=21x21 vis=True
+08:06:12.272 autotest: AUTOTEST uidump-tree       UIStencilButton pos=103,95 size=22x15 vis=True
+08:06:12.272 autotest: AUTOTEST uidump-tree       UIStencilButton pos=5,92 size=22x15 vis=True
+08:06:12.272 autotest: AUTOTEST uidump-tree       UIStencilButton pos=5,77 size=21x11 vis=True
+08:06:12.272 autotest: AUTOTEST uidump-tree       UIStencilButton pos=85,135 size=15x15 vis=True
+08:06:12.272 autotest: AUTOTEST uidump-tree       UIStencilButton pos=105,135 size=11x15 vis=True
+08:06:12.272 autotest: AUTOTEST uidump-tree       UIStencilButton pos=120,135 size=20x15 vis=True
+08:06:12.273 autotest: AUTOTEST uidump-tree       UIStencilButton pos=141,135 size=32x15 vis=True
+08:06:12.273 autotest: AUTOTEST uidump-tree       UIOriginalText pos=162,158 size=0x0 vis=True
+08:06:12.273 autotest: AUTOTEST uidump-tree       UIOriginalText pos=97,118 size=0x0 vis=True
+08:06:12.273 autotest: AUTOTEST uidump-tree       UILabel pos=32,94 size=34x15 vis=False
+08:06:12.273 autotest: AUTOTEST uidump-tree       UILabel pos=32,92 size=34x15 vis=False
+08:06:12.273 autotest: AUTOTEST uidump-tree       UIOriginalText pos=32,95 size=0x0 vis=True
+08:06:12.273 autotest: AUTOTEST uidump-tree     UIMainPanel pos=220,668 size=0x0 vis=True
+08:06:12.273 autotest: AUTOTEST uidump-tree       UIImage pos=0,0 size=804x100 vis=True
+08:06:12.273 autotest: AUTOTEST uidump-tree       UIImage pos=-52,0 size=52x100 vis=True
+08:06:12.274 autotest: AUTOTEST uidump-tree       UIOriginalPeopleChrome pos=0,0 size=0x0 vis=True
+08:06:12.274 autotest: AUTOTEST uidump-tree       UIOriginalArchChrome pos=0,0 size=0x0 vis=False
+08:06:12.274 autotest: AUTOTEST uidump-tree       UIOriginalBuyChrome pos=0,0 size=0x0 vis=False
+08:06:12.274 autotest: AUTOTEST uidump-tree       UICategorySwitcher pos=148,0 size=0x0 vis=True
+08:06:12.274 autotest: AUTOTEST uidump-tree       UIStencilButton pos=236,15 size=36x49 vis=False
+08:06:12.274 autotest: AUTOTEST uidump-tree       UIStencilButton pos=236,66 size=36x49 vis=False
+08:06:12.274 autotest: AUTOTEST uidump-tree       UIQueryPanel pos=78,-5 size=559x45 vis=True op=0.00
+08:06:12.274 autotest: AUTOTEST uidump-tree       UIPickupPanel pos=0,0 size=0x0 vis=True op=0.00
+08:06:12.274 autotest: AUTOTEST uidump-tree       UIMotiveSubpanel pos=300,0 size=504x100 vis=True
+08:06:12.275 autotest: AUTOTEST uichrome tree: btn=True (128x39) bar=True (27x25)
+08:06:12.275 autotest: AUTOTEST uidump: PASS
+08:06:12.275 autotest: AUTOTEST uitoolbar tree: live=True (200x50) gauge=True (108x100)
+08:06:12.276 autotest: AUTOTEST uimpanel desktop bottom-bar composition: ok=True ucp=0,585 220x183 panel=220,668 ucpRight=220 screen=1024x768 viewport=1024x768 dpi=1
+08:06:12.276 autotest: AUTOTEST uimpanel: PASS
+08:06:12.279 autotest: AUTOTEST uilive IFF-literal Live.iff Motives+Personality + subpanel twins: motiveCanon=True (Motives/289) traitCanon=True (Personality/714) motiveTwinned=True motiveTextCanon=True traitTwinned=True traitTextCanon=True
+08:06:12.279 autotest: AUTOTEST uilive: PASS
+08:06:12.282 uioriginal: IFF-mount original cpanel\Backgrounds\JobSubBarsOff.bmp
+08:06:12.282 uioriginal: IFF-mount original cpanel\JobSubBars.bmp
+08:06:12.284 autotest: AUTOTEST uijob IFF-literal JobSubpanelLabels+PopupText + twins: labelCanon=True (JobSubpanelLabels/187) popupCanon=True (JobSubpanelPopupText/544) twinned=True textCanon=True valuesWired=True floaterTwinned=True
+08:06:12.284 autotest: AUTOTEST uijob: PASS
+08:06:12.295 autotest: AUTOTEST uicas IFF-literal PickFamily+DesignFamily+DesignChar + CAS twins: c128=True c129=True c130=True simTwinned=True simText=True famsTwinned=True famTwinned=True dialogWired=True
+08:06:12.296 autotest: AUTOTEST uicas: PASS
+08:06:12.297 autotest: AUTOTEST uidtips IFF-literal VCtlTips + UCP tooltips: canon=True (VCtlTips/432) wired=True speedWired=True live='Live Mode - F1' zoomIn='Zoom In  +'
+08:06:12.297 autotest: AUTOTEST uidtips: PASS
+08:06:12.298 autotest: AUTOTEST uivfont original .ffn default renderer: ok=True tablesMounted=17/10 draws=12 glyphs=42 lastTable=10@1
+08:06:12.298 autotest: AUTOTEST uivfont: PASS
+08:06:12.311 uioriginal: IFF-mount original cpanel\Buttons\OptSave.BMP
+08:06:12.312 uioriginal: IFF-mount original cpanel\Buttons\OptNbhd.bmp
+08:06:12.312 uioriginal: IFF-mount original cpanel\Buttons\OptExit.bmp
+08:06:12.312 uioriginal: IFF-mount original cpanel\Buttons\optgraphics.bmp
+08:06:12.312 uioriginal: IFF-mount original cpanel\Buttons\optsound.bmp
+08:06:12.312 uioriginal: IFF-mount original cpanel\Buttons\optplay.bmp
+08:06:12.312 uioriginal: IFF-mount original cpanel\Buttons\optcheckbox.bmp
+08:06:12.312 uioriginal: IFF-mount original cpanel\Buttons\optradio.bmp
+08:06:12.312 uioriginal: IFF-mount original cpanel\Buttons\optslideron.bmp
+08:06:12.312 uioriginal: IFF-mount original cpanel\Buttons\optslideroff.bmp
+08:06:12.312 uioriginal: IFF-mount original cpanel\Buttons\opttutreset.BMP
+08:06:12.318 uioriginal: IFF-mount original cpanel\PopupOptFreeWill.bmp
+08:06:12.318 autotest: AUTOTEST uiopts original options screen: canon=True (optionstrs/84 sha=b4f0ecd7) art=True live=True directivesParsed=7
+08:06:12.318 autotest: AUTOTEST uiopts: PASS
+08:06:12.324 uioriginal: IFF-mount original cpanel\Catalog\BuyFSeating.BMP
+08:06:12.324 uioriginal: IFF-mount original cpanel\Catalog\BuyFSurfaces.bmp
+08:06:12.324 uioriginal: IFF-mount original cpanel\Catalog\BuyFDecorative.bmp
+08:06:12.324 uioriginal: IFF-mount original cpanel\Catalog\BuyFElectronics.bmp
+08:06:12.324 uioriginal: IFF-mount original cpanel\Catalog\BuyFAppliances.bmp
+08:06:12.324 uioriginal: IFF-mount original cpanel\Catalog\BuyFPlumbing.bmp
+08:06:12.324 uioriginal: IFF-mount original cpanel\Catalog\BuyFLighting.bmp
+08:06:12.324 uioriginal: IFF-mount original cpanel\Catalog\BuyFMisc.bmp
+08:06:12.378 uioriginal: IFF-mount original cpanel\Buttons\ScrollLeftBuy.bmp
+08:06:12.416 uioriginal: IFF-mount original cpanel\Catalog\BuyFSeating.bmp
+08:06:12.418 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\Seating\BuySubSortOne.BMP
+08:06:12.418 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\Seating\BuySubSortTwo.bmp
+08:06:12.418 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\Seating\BuySubSortThree.BMP
+08:06:12.418 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\Seating\BuySubSortFour.BMP
+08:06:12.418 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\BuySubSortOther.bmp
+08:06:12.418 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\BuySubSortAll.bmp
+08:06:12.418 uioriginal: IFF-mount original cpanel\Catalog\BackButtons\BackFSeating.bmp
+08:06:12.842 autotest: AUTOTEST uibuy original buy catalog: canon=True (BuyModeCatalogSortTips/48+) art=True (80 pins) live=True
+08:06:12.842 autotest: AUTOTEST uibuy: PASS
+08:06:12.845 autotest: AUTOTEST uiexpband art-gen cpanel\catalog\buycfour.bmp len=3560 80x33 sha=3edfdfa774c1f3fade88e13292a04299a337d882e427c9f8cffe3f8cba19416c;cpanel\catalog\buycmisc.bmp len=3306 124x29 sha=2a345953b696cad2afeef2d20675a96c0102318c62dacc7b39ba6ad9f65ec8e7;cpanel\catalog\buycone.bmp len=5064 128x42 sha=0b00cdaf031e3e500ac80d219eff08abce775ca643cd11a39b88c475c74e77f7;cpanel\catalog\buyddining.bmp len=5064 128x42 sha=0b00cdaf031e3e500ac80d219eff08abce775ca643cd11a39b88c475c74e77f7;cpanel\catalog\buydmisc.bmp len=3306 124x29 sha=2a345953b696cad2afeef2d20675a96c0102318c62dacc7b39ba6ad9f65ec8e7;cpanel\catalog\buydoutdoor.bmp len=6360 144x36 sha=494a884419d5f024d491f642e0692fcb879539d056dba5ba5d2bd92d6279daf7;cpanel\catalog\buymoutdoor.bmp len=6360 144x36 sha=6add01047a241123de1e9f2d07a189351184ab673a55bd2e033684aab12eacea;cpanel\catalog\buymtmagic.bmp len=5980 144x36 sha=59accc4991481d8d619a33e3f82924ca7d5f4e47e9670591a235778454dff55e;cpanel\catalog\buystspa.bmp len=6272 144x36 sha=472b79337c9af4b811fbe6084aadaef58f84a7c79e5ea34418dd6ae6c82239d2;cpanel\catalog\buyststudio.bmp len=6384 144x36 sha=f1fe39930c70eb037301a94afd7fd520dc2750794e9d3cb262c484f065a45b7e;cpanel\catalog\buyvmisc.bmp len=3306 124x29 sha=2a345953b696cad2afeef2d20675a96c0102318c62dacc7b39ba6ad9f65ec8e7;cpanel\catalog\buyvone.bmp len=6624 128x42 sha=5a6fc23912efaa3d12d2c1a5e8e352259d591f13aebbe205be7a8a28c170ffe9;cpanel\catalog\backbuttons\backcmisc.bmp len=4026 132x26 sha=711c9a7a39c0eee31de748f3a1de5fc38c0a870b8d04bc040b5112393efe39d2;cpanel\catalog\backbuttons\backcone.bmp len=4034 132x26 sha=eb98551dff1a11b203bd4758d16c06b66e404ac52127b9b8b204b9f9f9f056aa;cpanel\catalog\backbuttons\backdmisc.bmp len=4026 132x26 sha=711c9a7a39c0eee31de748f3a1de5fc38c0a870b8d04bc040b5112393efe39d2;cpanel\catalog\subsorticons\communitysubsort\buysubsortcommunitymisc.bmp len=6100 144x36 sha=c7f8936d1f78cab17734ac8026dd3d442d70db207aadb24db80fe6b319c68854;cpanel\catalog\subsorticons\communitysubsort\buysubsortcommunityseating.bmp len=6316 144x36 sha=2cbd2d260deb6ab59760d55b96d797dd3473ca84e9b7944b4751847cbd26e5b1;cpanel\catalog\subsorticons\downtownsubsort\buysubsortdowntownseating.bmp len=6316 144x36 sha=2cbd2d260deb6ab59760d55b96d797dd3473ca84e9b7944b4751847cbd26e5b1;cpanel\catalog\subsorticons\vacationsubsort\buysubsortvacationseating.bmp len=6316 144x36 sha=2cbd2d260deb6ab59760d55b96d797dd3473ca84e9b7944b4751847cbd26e5b1;
+08:06:12.846 uioriginal: IFF-mount original cpanel\Catalog\BuyDDining.bmp
+08:06:12.846 uioriginal: IFF-mount original cpanel\Catalog\BuyDShops.bmp
+08:06:12.849 uioriginal: IFF-mount original cpanel\Catalog\BuyDOutdoor.bmp
+08:06:12.849 uioriginal: IFF-mount original cpanel\Catalog\BuyDStreet.bmp
+08:06:12.849 uioriginal: IFF-mount original cpanel\Catalog\BuyDMisc.bmp
+08:06:12.850 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\DowntownSubsort\BuySubSortDowntownSeating.bmp
+08:06:12.850 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\DowntownSubsort\BuySubSortDowntownSurfaces.bmp
+08:06:12.850 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\DowntownSubsort\BuySubSortDowntownDecorative.bmp
+08:06:12.850 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\DowntownSubsort\BuySubSortDowntownElectronics.bmp
+08:06:12.850 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\DowntownSubsort\BuySubSortDowntownAppliances.bmp
+08:06:12.850 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\DowntownSubsort\BuySubSortDowntownPlumbing.bmp
+08:06:12.850 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\DowntownSubsort\BuySubSortDowntownLighting.bmp
+08:06:12.850 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\DowntownSubsort\BuySubSortDowntownMisc.bmp
+08:06:12.850 uioriginal: IFF-mount original cpanel\Catalog\BackButtons\BackDDining.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\BuyCOne.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\BuyCTwo.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\BuyCThree.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\BuyCFour.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\BuyCMisc.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\CommunitySubsort\BuySubSortCommunitySeating.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\CommunitySubsort\BuySubSortCommunitySurfaces.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\CommunitySubsort\BuySubSortCommunityDecorative.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\CommunitySubsort\BuySubSortCommunityElectronics.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\CommunitySubsort\BuySubSortCommunityAppliances.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\CommunitySubsort\BuySubSortCommunityPlumbing.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\CommunitySubsort\BuySubSortCommunityLighting.bmp
+08:06:12.851 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\CommunitySubsort\BuySubSortCommunityMisc.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\BackButtons\BackCOne.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\BuyVOne.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\BuyVTwo.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\BuyVThree.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\BuyVFour.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\BuyVMisc.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\VacationSubsort\BuySubSortVacationSeating.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\VacationSubsort\BuySubSortVacationSurfaces.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\VacationSubsort\BuySubSortVacationDecorative.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\VacationSubsort\BuySubSortVacationElectronics.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\VacationSubsort\BuySubSortVacationAppliances.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\VacationSubsort\BuySubSortVacationPlumbing.bmp
+08:06:12.852 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\VacationSubsort\BuySubSortVacationLighting.bmp
+08:06:12.853 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\VacationSubsort\BuySubSortVacationMisc.bmp
+08:06:12.853 uioriginal: IFF-mount original cpanel\Catalog\BackButtons\BackVOne.bmp
+08:06:12.853 uioriginal: IFF-mount original cpanel\Catalog\BuySTSpa.bmp
+08:06:12.853 uioriginal: IFF-mount original cpanel\Catalog\BuySTStudio.bmp
+08:06:12.853 uioriginal: IFF-mount original cpanel\Catalog\BuyMOutdoor.bmp
+08:06:12.853 uioriginal: IFF-mount original cpanel\Catalog\BuyMTmagic.bmp
+08:06:12.862 autotest: AUTOTEST uiexpband live: community main0=364 misc=428 sub3=17 downtown0=386 fullMode=659
+08:06:12.863 autotest: AUTOTEST uiexpband expansion buy bands: art=True (19 pins) chrome=True live=True
+08:06:12.863 autotest: AUTOTEST uiexpband: PASS
+08:06:12.867 autotest: AUTOTEST uibandlaw: fit=True frames=True toggle=True regions=True(11) hover=True popup=True anchor=True detach=True
+08:06:12.867 autotest: AUTOTEST uibandlaw: PASS
+08:06:12.874 autotest: AUTOTEST uienamat matrix roomFunc enabled-cells=39/64
+08:06:12.874 autotest: AUTOTEST uienamat matrix downtown enabled-cells=34/64
+08:06:12.875 autotest: AUTOTEST uienamat matrix vacation enabled-cells=37/64
+08:06:12.875 autotest: AUTOTEST uienamat matrix community enabled-cells=37/64
+08:06:12.875 autotest: AUTOTEST uienamat matrix studio enabled-cells=35/64
+08:06:12.876 autotest: AUTOTEST uienamat matrix magic enabled-cells=37/64
+08:06:12.876 autotest: AUTOTEST uienamat matrix funcSub enabled-cells=27/64
+08:06:12.877 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomSeating.BMP
+08:06:12.877 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomSurfaces.BMP
+08:06:12.877 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomDecorative.BMP
+08:06:12.878 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomElectronics.bmp
+08:06:12.878 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomAppliances.BMP
+08:06:12.878 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomPlumbing.BMP
+08:06:12.878 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomLighting.BMP
+08:06:12.878 uioriginal: IFF-mount original cpanel\Catalog\SubSortIcons\RoomSubsort\BuySubSortRoomMisc.bmp
+08:06:12.878 uioriginal: IFF-mount original cpanel\Catalog\BackButtons\BackRKitchen.bmp
+08:06:12.879 autotest: AUTOTEST uienamat click-noop victim plaque=2 exercised=true
+08:06:12.879 autotest: AUTOTEST uienamat: cells=True anchor(stove)=True wiring=True noop=True reset=True
+08:06:12.879 autotest: AUTOTEST uienamat: PASS
+08:06:12.886 uioriginal: IFF-mount original cpanel\Backgrounds\PopupInfo.BMP
+08:06:12.886 uioriginal: IFF-mount original cpanel\Backgrounds\PopupInfoTiles.bmp
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=33,nid=0,avatar=False] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=34,nid=0,avatar=False] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=1 stack[obj=1,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=2 stack[obj=2,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=3 stack[obj=3,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=4 stack[obj=4,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=5 stack[obj=5,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=6 stack[obj=6,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=7 stack[obj=7,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=8 stack[obj=8,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=9 stack[obj=9,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=10 stack[obj=10,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=11 stack[obj=11,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=12 stack[obj=12,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=13 stack[obj=13,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=14 stack[obj=14,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=15 stack[obj=15,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=32 stack[obj=16,nid=32,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=17 stack[obj=17,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=1 myNID=33 caller[obj=16,nid=32] targNID=32 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=1 myNID=33 caller[obj=16,nid=32] targNID=32 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=1 myNID=34 caller[obj=16,nid=32] targNID=32 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=1 myNID=34 caller[obj=16,nid=32] targNID=32 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=1 myNID=34 caller[obj=18,nid=33] targNID=33 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=1 myNID=34 caller[obj=18,nid=33] targNID=33 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=34 stack[obj=21,nid=34,avatar=True] exists=False bucketMismatch=False
+08:06:12.949 autotest: AUTOTEST uidesc original description panel: canon=True (160/20) art=True (2 pins) live=True mounts=0 strLoads=2
+08:06:12.950 autotest: AUTOTEST uidesc: PASS
+08:06:12.990 autotest: AUTOTEST uitt original object hover tooltips: canon=True (159/9) live=True strLoads=6
+08:06:12.991 autotest: AUTOTEST uitt: PASS
+08:06:13.015 autotest: AUTOTEST uibuild original build catalog: canon=True (BldTips/16 ) art=True (11 pins) live=True
+08:06:13.016 autotest: AUTOTEST uibuild: PASS
+08:06:13.018 uioriginal: IFF-mount original cpanel\Build\TerrainUpIcon.BMP
+08:06:13.018 uioriginal: IFF-mount original cpanel\Build\PopupTerrainUp.bmp
+08:06:13.018 uioriginal: IFF-mount original cpanel\Build\TerrainDownIcon.BMP
+08:06:13.018 uioriginal: IFF-mount original cpanel\Build\PopupTerrainDown.bmp
+08:06:13.018 uioriginal: IFF-mount original cpanel\Build\TerrainLevelIcon.BMP
+08:06:13.019 uioriginal: IFF-mount original cpanel\Build\PopupTerrainLevel.bmp
+08:06:13.019 uioriginal: IFF-mount original cpanel\HDBuild\TerrainGrassIcon.BMP
+08:06:13.019 uioriginal: IFF-mount original cpanel\HDBuild\popupGrass.bmp
+08:06:13.019 autotest: AUTOTEST uibldt original terrain tools: art=True (8 pins) live=True
+08:06:13.020 autotest: AUTOTEST uibldt: PASS
+08:06:13.023 uioriginal: IFF-mount original cpanel\Buttons\InventoryGiftSort.bmp
+08:06:13.023 uioriginal: IFF-mount original cpanel\Buttons\InventoryMagicSort.bmp
+08:06:13.023 uioriginal: IFF-mount original cpanel\Buttons\InventoryOtherSort.bmp
+08:06:13.024 autotest: AUTOTEST uiinterest interest/gift panels: canon=True art=True (24 pins) live=True
+08:06:13.024 autotest: AUTOTEST uiinterest: PASS
+08:06:13.027 uioriginal: IFF-mount original cpanel\Build\RoofSteep.bmp
+08:06:13.027 uioriginal: IFF-mount original cpanel\Build\popuproofpitch.bmp
+08:06:13.027 uioriginal: IFF-mount original cpanel\Build\RoofMedium.bmp
+08:06:13.027 uioriginal: IFF-mount original cpanel\Build\RoofShallow.bmp
+08:06:13.027 uioriginal: IFF-mount original cpanel\Build\RoofFlat.bmp
+08:06:13.027 uioriginal: IFF-mount original cpanel\Build\popuproofpattern.bmp
+08:06:13.028 autotest: AUTOTEST uiroof original roof panel: str=True art=True (7 pins) live=True
+08:06:13.028 autotest: AUTOTEST uiroof: PASS
+08:06:13.030 autotest: AUTOTEST uigauge original live mood gauge: str=True art=True (9 pins) live=True
+08:06:13.030 autotest: AUTOTEST uigauge: PASS
+08:06:13.032 autotest: AUTOTEST uirate ratings family: art=True (9 pins) math=True live=True
+08:06:13.032 autotest: AUTOTEST uirate: PASS
+08:06:13.035 uioriginal: IFF-mount original cpanel\Backgrounds\HouseSubBarsOff.BMP
+08:06:13.035 uioriginal: IFF-mount original cpanel\HouseSubBars.bmp
+08:06:13.036 autotest: AUTOTEST uihouse original house tab: str=True math=True live=True
+08:06:13.037 autotest: AUTOTEST uihouse: PASS
+08:06:13.041 autotest: AUTOTEST uivalue live house value: str=True live=True
+08:06:13.041 autotest: AUTOTEST uivalue: PASS
+08:06:13.044 autotest: AUTOTEST uitext direct: ink=1008 solid=304 mid=704 saturated=304 eq=15360 bbox=157x21
+08:06:13.046 autotest: AUTOTEST uitext uilabel: ink=1052 solid=266 mid=786 saturated=266 eq=15360 bbox=202x18
+08:06:13.047 autotest: AUTOTEST uitext bg-composite: between=411 saturated=214 solid=15360
+08:06:13.048 autotest: AUTOTEST uitext bold-ceiling: maxAlpha=221 (13*17=221, nibble-as-is law)
+08:06:13.048 autotest: AUTOTEST uitext cp1252: unicode-ink=378 bytes-ink=378 bbox 62/62
+08:06:13.049 autotest: AUTOTEST uitext probe7: ink=231 bboxW=60 measure=61
+08:06:13.050 autotest: AUTOTEST uitext probe8: ink=296 bboxW=62 measure=62
+08:06:13.050 autotest: AUTOTEST uitext probe9: ink=331 bboxW=69 measure=69
+08:06:13.051 autotest: AUTOTEST uitext probe10: ink=382 bboxW=72 measure=72
+08:06:13.051 autotest: AUTOTEST uitext probe11: ink=457 bboxW=83 measure=83
+08:06:13.052 autotest: AUTOTEST uitext probe12: ink=534 bboxW=88 measure=89
+08:06:13.052 autotest: AUTOTEST uitext probe14: ink=702 bboxW=108 measure=109
+08:06:13.053 autotest: AUTOTEST uitext probe16: ink=822 bboxW=109 measure=110
+08:06:13.055 autotest: AUTOTEST uitext probe18: ink=1031 bboxW=126 measure=127
+08:06:13.055 autotest: AUTOTEST uitext probe20: ink=1272 bboxW=139 measure=140
+08:06:13.055 autotest: AUTOTEST uitext rendered-pixel law: OK
+08:06:13.056 autotest: AUTOTEST uitext: PASS
+08:06:13.056 autotest: AUTOTEST uitext nbr house=1 name=
+08:06:13.056 autotest: AUTOTEST uitext nbr house=2 name=
+08:06:13.056 autotest: AUTOTEST uitext nbr house=3 name=
+08:06:13.056 autotest: AUTOTEST uitext nbr house=4 name=
+08:06:13.056 autotest: AUTOTEST uitext nbr house=5 name=
+08:06:13.056 autotest: AUTOTEST uitext nbr house=6 name=
+08:06:13.056 autotest: AUTOTEST uitext nbr house=7 name=
+08:06:13.057 autotest: AUTOTEST uitext nbr house=8 name=
+08:06:13.268 autotest: AUTOTEST uisurvey dump live 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-live.png
+08:06:13.473 autotest: AUTOTEST uisurvey dump ucp 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-ucp.png
+08:06:13.667 autotest: AUTOTEST uisurvey dump buy 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-buy.png
+08:06:13.871 autotest: AUTOTEST uisurvey dump build 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-build.png
+08:06:14.093 autotest: AUTOTEST uisurvey dump roof 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-roof.png
+08:06:14.094 uioriginal: IFF-mount original cpanel\Buttons\InterestTravel.bmp
+08:06:14.096 uioriginal: IFF-mount original cpanel\Backgrounds\InterestBarsBackground.bmp
+08:06:14.097 uioriginal: IFF-mount original cpanel\InterestBars.bmp
+08:06:14.097 uioriginal: IFF-mount original cpanel\Buttons\InterestViolence.bmp
+08:06:14.097 uioriginal: IFF-mount original cpanel\Buttons\InterestPolitics.bmp
+08:06:14.097 uioriginal: IFF-mount original cpanel\Buttons\InterestThe60s.bmp
+08:06:14.099 uioriginal: IFF-mount original cpanel\Buttons\InterestWeather.bmp
+08:06:14.099 uioriginal: IFF-mount original cpanel\Buttons\InterestSports.bmp
+08:06:14.099 uioriginal: IFF-mount original cpanel\Buttons\InterestMusic.bmp
+08:06:14.099 uioriginal: IFF-mount original cpanel\Buttons\InterestOutdoors.bmp
+08:06:14.101 uioriginal: IFF-mount original cpanel\Buttons\InterestToys.bmp
+08:06:14.302 autotest: AUTOTEST uisurvey dump interest 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-interest.png
+08:06:14.501 autotest: AUTOTEST uisurvey dump expband 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-expband.png
+08:06:14.501 autotest: AUTOTEST uisurvey terrain-extent meshTiles=2704 lot=52x52 center=0,0
+08:06:14.502 autotest: AUTOTEST uisurvey zoom-diag useBackbuffer=True visible=True zoom=Near pzoom=1 bbscale=1
+08:06:14.502 autotest: AUTOTEST uisurvey zoom-diag ppxBB=1024x768
+08:06:14.502 autotest: AUTOTEST uisurvey zoom-diag ppxBB dark-sampled=8108/8108
+08:06:14.503 autotest: AUTOTEST uisurvey-tree == state A: live panel open ==
+08:06:14.503 autotest: AUTOTEST uisurvey-tree TS1GameScreen ABS=0,0 size=0x0
+08:06:14.503 autotest: AUTOTEST uisurvey-tree   UILotControl ABS=0,0 size=0x0
+08:06:14.503 autotest: AUTOTEST uisurvey-tree     UIInteractionQueue ABS=0,0 size=0x0
+08:06:14.503 autotest: AUTOTEST uisurvey-tree     UILotControlTouchHelper ABS=0,0 size=0x0
+08:06:14.503 autotest: AUTOTEST uisurvey-tree     UIArchTouchHelper ABS=0,0 size=0x0
+08:06:14.503 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,25 size=75x75 tex=150x75
+08:06:14.503 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,513 size=75x75 tex=150x75
+08:06:14.504 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=924,513 size=75x75 tex=150x75
+08:06:14.504 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,513 size=75x75 tex=150x75
+08:06:14.504 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=924,513 size=75x75 tex=150x75
+08:06:14.504 autotest: AUTOTEST uisurvey-tree   UIContainer ABS=0,0 size=0x0
+08:06:14.504 autotest: AUTOTEST uisurvey-tree   UISimitoneBg ABS=512,384 size=0x0
+08:06:14.504 autotest: AUTOTEST uisurvey-tree   UISimitoneFrontend ABS=0,0 size=0x0
+08:06:14.504 autotest: AUTOTEST uisurvey-tree     UIDesktopUCP ABS=0,585 size=220x183
+08:06:14.504 autotest: AUTOTEST uisurvey-tree       UIContainer ABS=0,585 size=0x0
+08:06:14.505 autotest: AUTOTEST uisurvey-tree       UIImage ABS=0,585 size=220x183 tex=220x183
+08:06:14.505 autotest: AUTOTEST uisurvey-tree       UIImage ABS=0,585 size=213x153 tex=213x153
+08:06:14.505 autotest: AUTOTEST uisurvey-tree       UIButton ABS=10,591 size=50x50 tex=200x50
+08:06:14.505 autotest: AUTOTEST uisurvey-tree       UIButton ABS=69,605 size=45x47 tex=180x47
+08:06:14.505 autotest: AUTOTEST uisurvey-tree       UIButton ABS=117,630 size=39x39 tex=156x39
+08:06:14.505 autotest: AUTOTEST uisurvey-tree       UIButton ABS=193,710 size=23x23 tex=92x23
+08:06:14.505 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=26,690 size=27x27 tex=27x27
+08:06:14.505 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=26,734 size=27x27 tex=27x27
+08:06:14.505 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=9,712 size=27x27 tex=27x27
+08:06:14.505 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=43,712 size=27x27 tex=27x27
+08:06:14.506 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=32,663 size=22x19 tex=22x19
+08:06:14.506 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=56,665 size=21x21 tex=21x21
+08:06:14.506 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=80,670 size=21x21 tex=21x21
+08:06:14.506 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=103,680 size=22x15 tex=22x15
+08:06:14.506 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=5,677 size=22x15 tex=22x15
+08:06:14.506 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=5,662 size=21x11 tex=21x11
+08:06:14.506 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=85,720 size=15x15 tex=15x15
+08:06:14.506 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=105,720 size=11x15 tex=11x15
+08:06:14.506 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=120,720 size=20x15 tex=20x15
+08:06:14.506 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=141,720 size=32x15 tex=32x15
+08:06:14.507 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=162,743 size=0x0
+08:06:14.507 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=97,703 size=0x0
+08:06:14.507 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=32,680 size=0x0
+08:06:14.507 autotest: AUTOTEST uisurvey-tree     UIMainPanel ABS=220,668 size=0x0
+08:06:14.507 autotest: AUTOTEST uisurvey-tree       UIImage ABS=220,668 size=804x100 tex=804x100
+08:06:14.507 autotest: AUTOTEST uisurvey-tree       UIImage ABS=168,668 size=52x100 tex=52x100
+08:06:14.507 autotest: AUTOTEST uisurvey-tree       UIOriginalPeopleChrome ABS=220,668 size=0x0
+08:06:14.507 autotest: AUTOTEST uisurvey-tree         UIOriginalWebcamButton ABS=229,673 size=45x1 tex=1x1
+08:06:14.507 autotest: AUTOTEST uisurvey-tree         UIOriginalWebcamButton ABS=274,673 size=45x1 tex=1x1
+08:06:14.507 autotest: AUTOTEST uisurvey-tree         UIOriginalWebcamButton ABS=319,673 size=45x1 tex=1x1
+08:06:14.508 autotest: AUTOTEST uisurvey-tree         UIOriginalWebcamButton ABS=364,673 size=45x1 tex=1x1
+08:06:14.508 autotest: AUTOTEST uisurvey-tree         UIOriginalWebcamButton ABS=229,718 size=45x1 tex=1x1
+08:06:14.508 autotest: AUTOTEST uisurvey-tree         UIOriginalWebcamButton ABS=274,718 size=45x1 tex=1x1
+08:06:14.508 autotest: AUTOTEST uisurvey-tree         UIOriginalWebcamButton ABS=319,718 size=45x1 tex=1x1
+08:06:14.508 autotest: AUTOTEST uisurvey-tree         UIOriginalWebcamButton ABS=364,718 size=45x1 tex=1x1
+08:06:14.508 autotest: AUTOTEST uisurvey-tree         UIImage ABS=413,668 size=108x100 tex=108x100
+08:06:14.508 autotest: AUTOTEST uisurvey-tree         UIOriginalTabButton ABS=422,699 size=32x1 tex=1x1
+08:06:14.508 autotest: AUTOTEST uisurvey-tree         UIOriginalTabButton ABS=489,672 size=27x1 tex=1x1
+08:06:14.508 autotest: AUTOTEST uisurvey-tree         UIOriginalTabButton ABS=489,703 size=27x1 tex=1x1
+08:06:14.508 autotest: AUTOTEST uisurvey-tree         UIOriginalTabButton ABS=489,734 size=27x1 tex=1x1
+08:06:14.509 autotest: AUTOTEST uisurvey-tree         UIOriginalTabButton ABS=457,703 size=27x1 tex=1x1
+08:06:14.509 autotest: AUTOTEST uisurvey-tree         UIOriginalTabButton ABS=457,672 size=27x1 tex=1x1
+08:06:14.509 autotest: AUTOTEST uisurvey-tree         UIOriginalTabButton ABS=457,734 size=27x1 tex=1x1
+08:06:14.509 autotest: AUTOTEST uisurvey-tree       UICategorySwitcher ABS=368,668 size=0x0
+08:06:14.509 autotest: AUTOTEST uisurvey-tree       UIMotiveSubpanel ABS=520,668 size=504x100
+08:06:14.509 autotest: AUTOTEST uisurvey-tree         UIContainer ABS=520,668 size=0x0
+08:06:14.509 autotest: AUTOTEST uisurvey-tree         UIOriginalText ABS=525,668 size=0x0
+08:06:14.509 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=520,689 size=100x20
+08:06:14.509 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=620,689 size=100x20
+08:06:14.510 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=520,708 size=100x20
+08:06:14.510 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=620,708 size=100x20
+08:06:14.510 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=520,727 size=100x20
+08:06:14.510 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=620,727 size=100x20
+08:06:14.510 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=520,746 size=100x20
+08:06:14.510 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=620,746 size=100x20
+08:06:14.510 autotest: AUTOTEST uisurvey-tree       UIMotiveSubpanel ABS=520,668 size=504x100
+08:06:14.510 autotest: AUTOTEST uisurvey-tree         UIContainer ABS=520,668 size=0x0
+08:06:14.510 autotest: AUTOTEST uisurvey-tree         UIOriginalText ABS=525,668 size=0x0
+08:06:14.510 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=520,689 size=100x20
+08:06:14.511 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=620,689 size=100x20
+08:06:14.511 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=520,708 size=100x20
+08:06:14.511 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=620,708 size=100x20
+08:06:14.511 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=520,727 size=100x20
+08:06:14.511 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=620,727 size=100x20
+08:06:14.511 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=520,746 size=100x20
+08:06:14.511 autotest: AUTOTEST uisurvey-tree         UIOriginalMotiveGauge ABS=620,746 size=100x20
+08:06:14.511 autotest: AUTOTEST uisurvey-tree   UIBlocker ABS=0,0 size=0x0
+08:06:14.511 autotest: AUTOTEST uisurvey-tree == state B: ucp island ==
+08:06:14.512 autotest: AUTOTEST uisurvey-tree TS1GameScreen ABS=0,0 size=0x0
+08:06:14.512 autotest: AUTOTEST uisurvey-tree   UILotControl ABS=0,0 size=0x0
+08:06:14.512 autotest: AUTOTEST uisurvey-tree     UIInteractionQueue ABS=0,0 size=0x0
+08:06:14.512 autotest: AUTOTEST uisurvey-tree     UILotControlTouchHelper ABS=0,0 size=0x0
+08:06:14.512 autotest: AUTOTEST uisurvey-tree     UIArchTouchHelper ABS=0,0 size=0x0
+08:06:14.512 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,25 size=75x75 tex=150x75
+08:06:14.512 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,513 size=75x75 tex=150x75
+08:06:14.512 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=924,513 size=75x75 tex=150x75
+08:06:14.513 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,513 size=75x75 tex=150x75
+08:06:14.513 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=924,513 size=75x75 tex=150x75
+08:06:14.513 autotest: AUTOTEST uisurvey-tree   UIContainer ABS=0,0 size=0x0
+08:06:14.513 autotest: AUTOTEST uisurvey-tree   UISimitoneBg ABS=512,384 size=0x0
+08:06:14.513 autotest: AUTOTEST uisurvey-tree   UISimitoneFrontend ABS=0,0 size=0x0
+08:06:14.514 autotest: AUTOTEST uisurvey-tree     UIDesktopUCP ABS=0,585 size=220x183
+08:06:14.514 autotest: AUTOTEST uisurvey-tree       UIContainer ABS=0,585 size=0x0
+08:06:14.514 autotest: AUTOTEST uisurvey-tree       UIImage ABS=0,585 size=220x183 tex=220x183
+08:06:14.514 autotest: AUTOTEST uisurvey-tree       UIImage ABS=0,585 size=213x153 tex=213x153
+08:06:14.514 autotest: AUTOTEST uisurvey-tree       UIButton ABS=10,591 size=50x50 tex=200x50
+08:06:14.514 autotest: AUTOTEST uisurvey-tree       UIButton ABS=69,605 size=45x47 tex=180x47
+08:06:14.514 autotest: AUTOTEST uisurvey-tree       UIButton ABS=117,630 size=39x39 tex=156x39
+08:06:14.514 autotest: AUTOTEST uisurvey-tree       UIButton ABS=193,710 size=23x23 tex=92x23
+08:06:14.514 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=26,690 size=27x27 tex=27x27
+08:06:14.515 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=26,734 size=27x27 tex=27x27
+08:06:14.515 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=9,712 size=27x27 tex=27x27
+08:06:14.515 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=43,712 size=27x27 tex=27x27
+08:06:14.515 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=32,663 size=22x19 tex=22x19
+08:06:14.515 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=56,665 size=21x21 tex=21x21
+08:06:14.515 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=80,670 size=21x21 tex=21x21
+08:06:14.515 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=103,680 size=22x15 tex=22x15
+08:06:14.515 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=5,677 size=22x15 tex=22x15
+08:06:14.515 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=5,662 size=21x11 tex=21x11
+08:06:14.516 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=85,720 size=15x15 tex=15x15
+08:06:14.516 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=105,720 size=11x15 tex=11x15
+08:06:14.516 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=120,720 size=20x15 tex=20x15
+08:06:14.516 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=141,720 size=32x15 tex=32x15
+08:06:14.516 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=162,743 size=0x0
+08:06:14.516 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=97,703 size=0x0
+08:06:14.516 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=32,680 size=0x0
+08:06:14.516 autotest: AUTOTEST uisurvey-tree   UIBlocker ABS=0,0 size=0x0
+08:06:14.517 autotest: AUTOTEST uisurvey-tree == state C: buy catalog ==
+08:06:14.517 autotest: AUTOTEST uisurvey-tree TS1GameScreen ABS=0,0 size=0x0
+08:06:14.517 autotest: AUTOTEST uisurvey-tree   UILotControl ABS=0,0 size=0x0
+08:06:14.517 autotest: AUTOTEST uisurvey-tree     UIInteractionQueue ABS=0,0 size=0x0
+08:06:14.517 autotest: AUTOTEST uisurvey-tree     UILotControlTouchHelper ABS=0,0 size=0x0
+08:06:14.517 autotest: AUTOTEST uisurvey-tree     UIArchTouchHelper ABS=0,0 size=0x0
+08:06:14.517 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,25 size=75x75 tex=150x75
+08:06:14.518 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,513 size=75x75 tex=150x75
+08:06:14.518 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=924,513 size=75x75 tex=150x75
+08:06:14.518 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,513 size=75x75 tex=150x75
+08:06:14.519 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=924,513 size=75x75 tex=150x75
+08:06:14.519 autotest: AUTOTEST uisurvey-tree   UIContainer ABS=0,0 size=0x0
+08:06:14.519 autotest: AUTOTEST uisurvey-tree   UISimitoneBg ABS=512,384 size=0x0
+08:06:14.519 autotest: AUTOTEST uisurvey-tree   UISimitoneFrontend ABS=0,0 size=0x0
+08:06:14.519 autotest: AUTOTEST uisurvey-tree     UIDesktopUCP ABS=0,585 size=220x183
+08:06:14.519 autotest: AUTOTEST uisurvey-tree       UIContainer ABS=0,585 size=0x0
+08:06:14.520 autotest: AUTOTEST uisurvey-tree       UIImage ABS=0,585 size=220x183 tex=220x183
+08:06:14.520 autotest: AUTOTEST uisurvey-tree       UIImage ABS=0,585 size=156x148 tex=156x148
+08:06:14.520 autotest: AUTOTEST uisurvey-tree       UIButton ABS=10,591 size=50x50 tex=200x50
+08:06:14.520 autotest: AUTOTEST uisurvey-tree       UIButton ABS=69,605 size=45x47 tex=180x47
+08:06:14.520 autotest: AUTOTEST uisurvey-tree       UIButton ABS=117,630 size=39x39 tex=156x39
+08:06:14.520 autotest: AUTOTEST uisurvey-tree       UIButton ABS=193,710 size=23x23 tex=92x23
+08:06:14.520 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=26,690 size=27x27 tex=27x27
+08:06:14.521 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=26,734 size=27x27 tex=27x27
+08:06:14.521 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=9,712 size=27x27 tex=27x27
+08:06:14.521 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=43,712 size=27x27 tex=27x27
+08:06:14.521 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=32,663 size=22x19 tex=22x19
+08:06:14.521 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=56,665 size=21x21 tex=21x21
+08:06:14.521 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=80,670 size=21x21 tex=21x21
+08:06:14.521 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=103,680 size=22x15 tex=22x15
+08:06:14.522 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=5,677 size=22x15 tex=22x15
+08:06:14.522 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=5,662 size=21x11 tex=21x11
+08:06:14.522 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=85,720 size=15x15 tex=15x15
+08:06:14.522 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=105,720 size=11x15 tex=11x15
+08:06:14.522 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=120,720 size=20x15 tex=20x15
+08:06:14.522 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=141,720 size=32x15 tex=32x15
+08:06:14.523 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=162,743 size=0x0
+08:06:14.523 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=97,703 size=0x0
+08:06:14.523 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=32,680 size=0x0
+08:06:14.523 autotest: AUTOTEST uisurvey-tree     UIMainPanel ABS=220,668 size=0x0
+08:06:14.523 autotest: AUTOTEST uisurvey-tree       UIImage ABS=220,668 size=804x100 tex=804x100
+08:06:14.523 autotest: AUTOTEST uisurvey-tree       UIImage ABS=168,668 size=52x100 tex=52x100
+08:06:14.523 autotest: AUTOTEST uisurvey-tree       UIOriginalBuyChrome ABS=220,668 size=0x0
+08:06:14.523 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=242,675 size=31x39 tex=124x39
+08:06:14.524 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=281,671 size=32x42 tex=128x42
+08:06:14.524 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=323,675 size=28x38 tex=112x38
+08:06:14.524 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=361,672 size=36x41 tex=144x41
+08:06:14.524 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=239,721 size=38x43 tex=152x43
+08:06:14.524 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=284,727 size=29x36 tex=116x36
+08:06:14.524 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=322,723 size=34x40 tex=136x40
+08:06:14.524 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=364,732 size=31x29 tex=124x29
+08:06:14.524 autotest: AUTOTEST uisurvey-tree       UICategorySwitcher ABS=368,668 size=0x0
+08:06:14.524 autotest: AUTOTEST uisurvey-tree       UIBuyBrowsePanel ABS=220,668 size=804x100
+08:06:14.525 autotest: AUTOTEST uisurvey-tree         UIContainer ABS=220,668 size=0x0
+08:06:14.525 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=991,694 size=9x49 tex=36x49
+08:06:14.525 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=415,673 size=45x45 tex=45x45
+08:06:14.525 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=460,673 size=45x45 tex=45x45
+08:06:14.525 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=505,673 size=45x45 tex=45x45
+08:06:14.525 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=550,673 size=45x45 tex=45x45
+08:06:14.525 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=595,673 size=45x45 tex=45x45
+08:06:14.525 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=640,673 size=45x45 tex=45x45
+08:06:14.526 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=685,673 size=45x45 tex=45x45
+08:06:14.526 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=730,673 size=45x45 tex=45x45
+08:06:14.526 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=775,673 size=45x45 tex=45x45
+08:06:14.526 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=820,673 size=45x45 tex=45x45
+08:06:14.526 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=865,673 size=45x45 tex=45x45
+08:06:14.526 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=910,673 size=45x45 tex=45x45
+08:06:14.526 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=955,673 size=45x45 tex=45x45
+08:06:14.527 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=415,718 size=45x45 tex=45x45
+08:06:14.527 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=460,718 size=45x45 tex=45x45
+08:06:14.527 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=505,718 size=45x45 tex=45x45
+08:06:14.527 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=550,718 size=45x45 tex=45x45
+08:06:14.527 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=595,718 size=45x45 tex=45x45
+08:06:14.527 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=640,718 size=45x45 tex=45x45
+08:06:14.527 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=685,718 size=45x45 tex=45x45
+08:06:14.528 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=730,718 size=45x45 tex=45x45
+08:06:14.528 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=775,718 size=45x45 tex=45x45
+08:06:14.528 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=820,718 size=45x45 tex=45x45
+08:06:14.528 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=865,718 size=45x45 tex=45x45
+08:06:14.528 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=910,718 size=45x45 tex=45x45
+08:06:14.528 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=955,718 size=45x45 tex=45x45
+08:06:14.528 autotest: AUTOTEST uisurvey-tree   UIBlocker ABS=0,0 size=0x0
+08:06:14.528 autotest: AUTOTEST uisurvey-tree == state D: build arch band ==
+08:06:14.528 autotest: AUTOTEST uisurvey-tree TS1GameScreen ABS=0,0 size=0x0
+08:06:14.529 autotest: AUTOTEST uisurvey-tree   UILotControl ABS=0,0 size=0x0
+08:06:14.529 autotest: AUTOTEST uisurvey-tree     UIInteractionQueue ABS=0,0 size=0x0
+08:06:14.529 autotest: AUTOTEST uisurvey-tree     UILotControlTouchHelper ABS=0,0 size=0x0
+08:06:14.529 autotest: AUTOTEST uisurvey-tree     UIArchTouchHelper ABS=0,0 size=0x0
+08:06:14.529 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,25 size=75x75 tex=150x75
+08:06:14.529 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,513 size=75x75 tex=150x75
+08:06:14.529 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=924,513 size=75x75 tex=150x75
+08:06:14.530 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,513 size=75x75 tex=150x75
+08:06:14.530 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=924,513 size=75x75 tex=150x75
+08:06:14.530 autotest: AUTOTEST uisurvey-tree   UIContainer ABS=0,0 size=0x0
+08:06:14.530 autotest: AUTOTEST uisurvey-tree   UISimitoneBg ABS=512,384 size=0x0
+08:06:14.530 autotest: AUTOTEST uisurvey-tree   UISimitoneFrontend ABS=0,0 size=0x0
+08:06:14.530 autotest: AUTOTEST uisurvey-tree     UIDesktopUCP ABS=0,585 size=220x183
+08:06:14.530 autotest: AUTOTEST uisurvey-tree       UIContainer ABS=0,585 size=0x0
+08:06:14.530 autotest: AUTOTEST uisurvey-tree       UIImage ABS=0,585 size=220x183 tex=220x183
+08:06:14.530 autotest: AUTOTEST uisurvey-tree       UIImage ABS=0,585 size=107x132 tex=107x132
+08:06:14.531 autotest: AUTOTEST uisurvey-tree       UIButton ABS=10,591 size=50x50 tex=200x50
+08:06:14.531 autotest: AUTOTEST uisurvey-tree       UIButton ABS=69,605 size=45x47 tex=180x47
+08:06:14.531 autotest: AUTOTEST uisurvey-tree       UIButton ABS=117,630 size=39x39 tex=156x39
+08:06:14.531 autotest: AUTOTEST uisurvey-tree       UIButton ABS=193,710 size=23x23 tex=92x23
+08:06:14.531 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=26,690 size=27x27 tex=27x27
+08:06:14.531 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=26,734 size=27x27 tex=27x27
+08:06:14.531 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=9,712 size=27x27 tex=27x27
+08:06:14.531 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=43,712 size=27x27 tex=27x27
+08:06:14.532 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=32,663 size=22x19 tex=22x19
+08:06:14.532 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=56,665 size=21x21 tex=21x21
+08:06:14.532 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=80,670 size=21x21 tex=21x21
+08:06:14.532 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=103,680 size=22x15 tex=22x15
+08:06:14.532 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=5,677 size=22x15 tex=22x15
+08:06:14.532 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=5,662 size=21x11 tex=21x11
+08:06:14.532 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=85,720 size=15x15 tex=15x15
+08:06:14.532 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=105,720 size=11x15 tex=11x15
+08:06:14.532 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=120,720 size=20x15 tex=20x15
+08:06:14.533 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=141,720 size=32x15 tex=32x15
+08:06:14.533 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=162,743 size=0x0
+08:06:14.533 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=97,703 size=0x0
+08:06:14.533 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=32,680 size=0x0
+08:06:14.533 autotest: AUTOTEST uisurvey-tree     UIMainPanel ABS=220,668 size=0x0
+08:06:14.533 autotest: AUTOTEST uisurvey-tree       UIImage ABS=220,668 size=804x100 tex=804x100
+08:06:14.533 autotest: AUTOTEST uisurvey-tree       UIImage ABS=168,668 size=52x100 tex=52x100
+08:06:14.533 autotest: AUTOTEST uisurvey-tree       UIOriginalArchChrome ABS=220,668 size=0x0
+08:06:14.533 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=231,689 size=30x24 tex=120x24
+08:06:14.534 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=231,721 size=30x24 tex=120x24
+08:06:14.534 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=278,672 size=39x39 tex=156x39
+08:06:14.534 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=325,674 size=25x38 tex=100x38
+08:06:14.534 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=364,672 size=31x40 tex=124x40
+08:06:14.534 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=408,671 size=32x40 tex=128x40
+08:06:14.534 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=450,672 size=32x38 tex=128x38
+08:06:14.534 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=502,676 size=29x35 tex=116x35
+08:06:14.534 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=279,725 size=35x39 tex=140x39
+08:06:14.534 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=317,732 size=43x28 tex=172x28
+08:06:14.535 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=367,723 size=27x41 tex=108x41
+08:06:14.535 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=409,723 size=29x39 tex=116x39
+08:06:14.535 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=449,723 size=39x33 tex=156x33
+08:06:14.535 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=502,723 size=30x35 tex=120x35
+08:06:14.535 autotest: AUTOTEST uisurvey-tree       UIOriginalBuyChrome ABS=220,668 size=0x0
+08:06:14.535 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=242,675 size=31x39 tex=124x39
+08:06:14.535 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=281,671 size=32x42 tex=128x42
+08:06:14.535 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=323,675 size=28x38 tex=112x38
+08:06:14.535 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=361,672 size=36x41 tex=144x41
+08:06:14.536 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=239,721 size=38x43 tex=152x43
+08:06:14.536 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=284,727 size=29x36 tex=116x36
+08:06:14.536 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=322,723 size=34x40 tex=136x40
+08:06:14.536 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=364,732 size=31x29 tex=124x29
+08:06:14.536 autotest: AUTOTEST uisurvey-tree       UICategorySwitcher ABS=368,668 size=0x0
+08:06:14.536 autotest: AUTOTEST uisurvey-tree       UIBuyBrowsePanel ABS=220,668 size=804x100
+08:06:14.536 autotest: AUTOTEST uisurvey-tree         UIContainer ABS=220,668 size=0x0
+08:06:14.537 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=1010,694 size=9x49 tex=36x49
+08:06:14.537 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=558,673 size=45x45 tex=45x45
+08:06:14.537 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=603,673 size=45x45 tex=45x45
+08:06:14.537 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=648,673 size=45x45 tex=45x45
+08:06:14.537 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=693,673 size=45x45 tex=45x45
+08:06:14.537 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=738,673 size=45x45 tex=45x45
+08:06:14.537 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=783,673 size=45x45 tex=45x45
+08:06:14.537 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=828,673 size=45x45 tex=45x45
+08:06:14.538 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=873,673 size=45x45 tex=45x45
+08:06:14.538 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=918,673 size=45x45 tex=45x45
+08:06:14.538 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=963,673 size=45x45 tex=45x45
+08:06:14.538 autotest: AUTOTEST uisurvey-tree   UIBlocker ABS=0,0 size=0x0
+08:06:14.538 autotest: AUTOTEST uisurvey-tree == state D2: roof panel ==
+08:06:14.538 autotest: AUTOTEST uisurvey-tree TS1GameScreen ABS=0,0 size=0x0
+08:06:14.538 autotest: AUTOTEST uisurvey-tree   UILotControl ABS=0,0 size=0x0
+08:06:14.539 autotest: AUTOTEST uisurvey-tree     UIInteractionQueue ABS=0,0 size=0x0
+08:06:14.539 autotest: AUTOTEST uisurvey-tree     UILotControlTouchHelper ABS=0,0 size=0x0
+08:06:14.539 autotest: AUTOTEST uisurvey-tree     UIArchTouchHelper ABS=0,0 size=0x0
+08:06:14.539 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,25 size=75x75 tex=150x75
+08:06:14.539 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,513 size=75x75 tex=150x75
+08:06:14.539 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=924,513 size=75x75 tex=150x75
+08:06:14.539 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,513 size=75x75 tex=150x75
+08:06:14.539 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=924,513 size=75x75 tex=150x75
+08:06:14.539 autotest: AUTOTEST uisurvey-tree   UIContainer ABS=0,0 size=0x0
+08:06:14.540 autotest: AUTOTEST uisurvey-tree   UISimitoneBg ABS=512,384 size=0x0
+08:06:14.540 autotest: AUTOTEST uisurvey-tree   UISimitoneFrontend ABS=0,0 size=0x0
+08:06:14.540 autotest: AUTOTEST uisurvey-tree     UIDesktopUCP ABS=0,585 size=220x183
+08:06:14.540 autotest: AUTOTEST uisurvey-tree       UIContainer ABS=0,585 size=0x0
+08:06:14.540 autotest: AUTOTEST uisurvey-tree       UIImage ABS=0,585 size=220x183 tex=220x183
+08:06:14.540 autotest: AUTOTEST uisurvey-tree       UIImage ABS=0,585 size=107x132 tex=107x132
+08:06:14.540 autotest: AUTOTEST uisurvey-tree       UIButton ABS=10,591 size=50x50 tex=200x50
+08:06:14.540 autotest: AUTOTEST uisurvey-tree       UIButton ABS=69,605 size=45x47 tex=180x47
+08:06:14.540 autotest: AUTOTEST uisurvey-tree       UIButton ABS=117,630 size=39x39 tex=156x39
+08:06:14.541 autotest: AUTOTEST uisurvey-tree       UIButton ABS=193,710 size=23x23 tex=92x23
+08:06:14.541 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=26,690 size=27x27 tex=27x27
+08:06:14.541 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=26,734 size=27x27 tex=27x27
+08:06:14.541 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=9,712 size=27x27 tex=27x27
+08:06:14.541 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=43,712 size=27x27 tex=27x27
+08:06:14.541 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=32,663 size=22x19 tex=22x19
+08:06:14.541 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=56,665 size=21x21 tex=21x21
+08:06:14.542 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=80,670 size=21x21 tex=21x21
+08:06:14.542 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=103,680 size=22x15 tex=22x15
+08:06:14.542 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=5,677 size=22x15 tex=22x15
+08:06:14.542 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=5,662 size=21x11 tex=21x11
+08:06:14.542 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=85,720 size=15x15 tex=15x15
+08:06:14.542 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=105,720 size=11x15 tex=11x15
+08:06:14.542 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=120,720 size=20x15 tex=20x15
+08:06:14.542 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=141,720 size=32x15 tex=32x15
+08:06:14.542 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=162,743 size=0x0
+08:06:14.543 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=97,703 size=0x0
+08:06:14.543 autotest: AUTOTEST uisurvey-tree       UIOriginalText ABS=32,680 size=0x0
+08:06:14.543 autotest: AUTOTEST uisurvey-tree     UIMainPanel ABS=220,668 size=0x0
+08:06:14.543 autotest: AUTOTEST uisurvey-tree       UIImage ABS=220,668 size=804x100 tex=804x100
+08:06:14.543 autotest: AUTOTEST uisurvey-tree       UIImage ABS=168,668 size=52x100 tex=52x100
+08:06:14.543 autotest: AUTOTEST uisurvey-tree       UIOriginalArchChrome ABS=220,668 size=0x0
+08:06:14.543 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=231,689 size=30x24 tex=120x24
+08:06:14.543 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=231,721 size=30x24 tex=120x24
+08:06:14.543 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=278,672 size=39x39 tex=156x39
+08:06:14.544 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=325,674 size=25x38 tex=100x38
+08:06:14.544 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=364,672 size=31x40 tex=124x40
+08:06:14.544 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=408,671 size=32x40 tex=128x40
+08:06:14.544 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=450,672 size=32x38 tex=128x38
+08:06:14.544 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=502,676 size=29x35 tex=116x35
+08:06:14.544 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=279,725 size=35x39 tex=140x39
+08:06:14.544 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=317,732 size=43x28 tex=172x28
+08:06:14.544 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=367,723 size=27x41 tex=108x41
+08:06:14.545 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=409,723 size=29x39 tex=116x39
+08:06:14.545 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=449,723 size=39x33 tex=156x33
+08:06:14.545 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=502,723 size=30x35 tex=120x35
+08:06:14.545 autotest: AUTOTEST uisurvey-tree         UIOriginalRoofPanel ABS=534,673 size=0x0
+08:06:14.545 autotest: AUTOTEST uisurvey-tree       UIOriginalBuyChrome ABS=220,668 size=0x0
+08:06:14.545 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=242,675 size=31x39 tex=124x39
+08:06:14.545 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=281,671 size=32x42 tex=128x42
+08:06:14.546 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=323,675 size=28x38 tex=112x38
+08:06:14.546 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=361,672 size=36x41 tex=144x41
+08:06:14.546 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=239,721 size=38x43 tex=152x43
+08:06:14.546 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=284,727 size=29x36 tex=116x36
+08:06:14.546 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=322,723 size=34x40 tex=136x40
+08:06:14.546 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=364,732 size=31x29 tex=124x29
+08:06:14.547 autotest: AUTOTEST uisurvey-tree       UICategorySwitcher ABS=368,668 size=0x0
+08:06:14.547 autotest: AUTOTEST uisurvey-tree       UIBuyBrowsePanel ABS=220,668 size=804x100
+08:06:14.547 autotest: AUTOTEST uisurvey-tree         UIContainer ABS=220,668 size=0x0
+08:06:14.547 autotest: AUTOTEST uisurvey-tree         UIOriginalSheetButton ABS=1010,694 size=9x49 tex=36x49
+08:06:14.547 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=558,673 size=45x45 tex=45x45
+08:06:14.547 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=603,673 size=45x45 tex=45x45
+08:06:14.547 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=648,673 size=45x45 tex=45x45
+08:06:14.547 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=693,673 size=45x45 tex=45x45
+08:06:14.548 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=738,673 size=45x45 tex=45x45
+08:06:14.548 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=783,673 size=45x45 tex=45x45
+08:06:14.548 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=828,673 size=45x45 tex=45x45
+08:06:14.548 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=873,673 size=45x45 tex=45x45
+08:06:14.549 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=918,673 size=45x45 tex=45x45
+08:06:14.549 autotest: AUTOTEST uisurvey-tree         UIOriginalCatalogCell ABS=963,673 size=45x45 tex=45x45
+08:06:14.549 autotest: AUTOTEST uisurvey-tree   UIBlocker ABS=0,0 size=0x0
+08:06:14.549 autotest: AUTOTEST uisurvey-tree == state E: interest panel ==
+08:06:14.549 autotest: AUTOTEST uisurvey-tree TS1GameScreen ABS=0,0 size=0x0
+08:06:14.549 autotest: AUTOTEST uisurvey-tree   UILotControl ABS=0,0 size=0x0
+08:06:14.549 autotest: AUTOTEST uisurvey-tree     UIInteractionQueue ABS=0,0 size=0x0
+08:06:14.549 autotest: AUTOTEST uisurvey-tree     UILotControlTouchHelper ABS=0,0 size=0x0
+08:06:14.550 autotest: AUTOTEST uisurvey-tree     UIArchTouchHelper ABS=0,0 size=0x0
+08:06:14.550 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,25 size=75x75 tex=150x75
+08:06:14.550 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,513 size=75x75 tex=150x75
+08:06:14.550 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=924,513 size=75x75 tex=150x75
+08:06:14.550 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=25,513 size=75x75 tex=150x75
+08:06:14.550 autotest: AUTOTEST uisurvey-tree       UITwoStateButton ABS=924,513 size=75x75 tex=150x75
+08:06:14.550 autotest: AUTOTEST uisurvey-tree   UIContainer ABS=0,0 size=0x0
+08:06:14.550 autotest: AUTOTEST uisurvey-tree   UISimitoneBg ABS=512,384 size=0x0
+08:06:14.550 autotest: AUTOTEST uisurvey-tree   UISimitoneFrontend ABS=0,0 size=0x0
+08:06:14.551 autotest: AUTOTEST uisurvey-tree     UIDesktopUCP ABS=0,585 size=220x183
+08:06:14.551 autotest: AUTOTEST uisurvey-tree       UIContainer ABS=0,585 size=0x0
+08:06:14.551 autotest: AUTOTEST uisurvey-tree       UIImage ABS=0,585 size=220x183 tex=220x183
+08:06:14.551 autotest: AUTOTEST uisurvey-tree       UIImage ABS=0,585 size=213x153 tex=213x153
+08:06:14.551 autotest: AUTOTEST uisurvey-tree       UIButton ABS=10,591 size=50x50 tex=200x50
+08:06:14.551 autotest: AUTOTEST uisurvey-tree       UIButton ABS=69,605 size=45x47 tex=180x47
+08:06:14.551 autotest: AUTOTEST uisurvey-tree       UIButton ABS=117,630 size=39x39 tex=156x39
+08:06:14.551 autotest: AUTOTEST uisurvey-tree       UIButton ABS=193,710 size=23x23 tex=92x23
+08:06:14.552 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=26,690 size=27x27 tex=27x27
+08:06:14.552 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=26,734 size=27x27 tex=27x27
+08:06:14.552 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=9,712 size=27x27 tex=27x27
+08:06:14.552 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=43,712 size=27x27 tex=27x27
+08:06:14.552 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=32,663 size=22x19 tex=22x19
+08:06:14.552 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=56,665 size=21x21 tex=21x21
+08:06:14.552 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=80,670 size=21x21 tex=21x21
+08:06:14.552 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=103,680 size=22x15 tex=22x15
+08:06:14.552 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=5,677 size=22x15 tex=22x15
+08:06:14.552 autotest: AUTOTEST uisurvey-tree       UIStencilButton ABS=5,662 size=21x11 tex=21x11
+08:06:14.553 autotest: AUTOTEST zoomlive ARM (baseline 30 frames, then far, then medium, then scroll)
+08:06:14.553 autotest: AUTOTEST uisurvey: PASS
+08:06:14.736 autotest: AUTOTEST uizoomcage Far tileHalf=16/8 cage |u|<=20 |v|<=4 lot=52
+08:06:14.756 autotest: AUTOTEST uizoomcage Medium tileHalf=32/16 cage |u|<=36 |v|<=28 lot=52
+08:06:14.770 autotest: AUTOTEST uizoomcage Near tileHalf=64/32 cage |u|<=44 |v|<=40 lot=52
+08:06:14.779 autotest: AUTOTEST uizoomcage: PASS
+08:06:14.781 autotest: AUTOTEST uicp original-plate+patches+buttons+speed-cluster: OK 
+08:06:14.781 autotest: AUTOTEST uicp: PASS
+08:06:14.924 autotest: AUTOTEST uisurvey dump dialog 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-dialog.png
+08:06:14.925 uioriginal: IFF-mount original shared\sys\PieButt.bmp
+08:06:14.925 uioriginal: IFF-mount original cpanel\ViewMenuBackground.bmp
+08:06:14.926 autotest: AUTOTEST uidlgchrome original-dialog+pie canon: OK 
+08:06:14.926 autotest: AUTOTEST uidlgchrome: PASS
+08:06:14.926 autotest: AUTOTEST uibargeom original-bar-composition: OK panel=220,668 back=804x100 sub=504x100@r1024
+08:06:14.926 autotest: AUTOTEST uibargeom: PASS
+08:06:14.929 uioriginal: IFF-mount original nbhd\CreateACharBack.BMP
+08:06:14.931 uioriginal: IFF-mount original nbhd\DsgnFamBkg.bmp
+08:06:14.933 uioriginal: IFF-mount original nbhd\PickBkg.bmp
+08:06:14.936 uioriginal: IFF-mount original nbhd\DesignCharPersLED.bmp
+08:06:14.936 uioriginal: IFF-mount original nbhd\CACPointRemainingBars.bmp
+08:06:14.939 uioriginal: IFF-mount original nbhd\FamilyPickItemBkg.bmp
+08:06:14.940 uioriginal: IFF-mount original nbhd\PAFMoveIn.bmp
+08:06:14.940 uioriginal: IFF-mount original nbhd\NbhdTileBtn.BMP
+08:06:14.940 uioriginal: IFF-mount original nbhd\AddPersonBtn.bmp
+08:06:14.945 uioriginal: IFF-mount original nbhd\DesignCharAdultBtn.bmp
+08:06:14.946 uioriginal: IFF-mount original nbhd\DesignCharChildBtn.bmp
+08:06:14.947 uioriginal: IFF-mount original nbhd\DesignCharFemaleBtn.bmp
+08:06:14.947 uioriginal: IFF-mount original nbhd\DesignCharMaleBtn.bmp
+08:06:14.948 uioriginal: IFF-mount original nbhd\DesignCharDarkBtn.bmp
+08:06:14.948 uioriginal: IFF-mount original nbhd\DesignCharMediumBtn.bmp
+08:06:14.948 uioriginal: IFF-mount original nbhd\DesignCharLightBtn.bmp
+08:06:14.948 uioriginal: IFF-mount original nbhd\DesignCharSkinsLeftBtn.bmp
+08:06:14.949 uioriginal: IFF-mount original nbhd\DesignCharSkinsRightBtn.bmp
+08:06:15.076 autotest: AUTOTEST uisurvey dump casorig-cac 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-casorig-cac.png
+08:06:15.079 uioriginal: IFF-mount original nbhd\DeletePersonBtn.bmp
+08:06:15.080 uioriginal: IFF-mount original nbhd\EditPersonBtn.bmp
+08:06:15.207 autotest: AUTOTEST uisurvey dump casorig-fam 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-casorig-fam.png
+08:06:15.208 uioriginal: IFF-mount original nbhd\PAFAddFamily.bmp
+08:06:15.211 uioriginal: IFF-mount original nbhd\PAFDeleteFamily.bmp
+08:06:15.323 autotest: AUTOTEST uisurvey dump casorig-paf 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-casorig-paf.png
+08:06:15.323 autotest: AUTOTEST uicasorig original-cas-screens: OK
+08:06:15.323 autotest: AUTOTEST uicasorig: PASS
+08:06:15.324 autotest: AUTOTEST uipal canon=13 hex=000029,000052,00004A UIStyle bg=0,0,30 title=0,0,20 accent=0,255,255 navyBg=True navyTitle=True cyanAccent=True
+08:06:15.324 autotest: AUTOTEST uipal: PASS
+08:06:15.334 autotest: AUTOTEST loadscreen IFF-literal start/loading mount: ok=True 
+08:06:15.335 autotest: AUTOTEST loadscreen: PASS
+08:06:15.467 autotest: AUTOTEST zoomlive f=10 phase=1 zoom=Near pz=1 target=1 bbs=1 immediate=False ssDirty=False dark=96/14839 green=12/14839
+08:06:15.469 autotest: AUTOTEST zoomlive f=20 phase=1 zoom=Near pz=1 target=1 bbs=1 immediate=False ssDirty=False dark=96/14839 green=12/14839
+08:06:15.510 autotest: AUTOTEST zoomlive f=30 phase=1 zoom=Near pz=1 target=1 bbs=1 immediate=False ssDirty=False dark=33/14839 green=6/14839
+08:06:15.510 autotest: AUTOTEST zoomlive >>> target far (TargetZoom=0.25)
+08:06:15.511 autotest: AUTOTEST zoomlive f=40 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=33/14839 green=6/14839
+08:06:15.512 autotest: AUTOTEST zoomlive f=50 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=33/14839 green=6/14839
+08:06:15.563 autotest: AUTOTEST zoomlive f=60 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4705/14839 green=83/14839
+08:06:15.811 autotest: AUTOTEST zoomlive f=70 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4705/14839 green=83/14839
+08:06:15.877 autotest: AUTOTEST zoomlive f=80 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4705/14839 green=83/14839
+08:06:16.042 autotest: AUTOTEST zoomlive f=90 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4705/14839 green=83/14839
+08:06:16.209 autotest: AUTOTEST zoomlive f=100 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4705/14839 green=83/14839
+08:06:16.378 autotest: AUTOTEST zoomlive f=110 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4705/14839 green=83/14839
+08:06:16.625 autotest: AUTOTEST zoomlive f=120 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4705/14839 green=83/14839
+08:06:16.810 autotest: AUTOTEST zoomlive f=130 phase=2 zoom=Far pz=1 target=0.25 bbs=1 immediate=False ssDirty=False dark=4705/14839 green=83/14839
+08:06:16.810 autotest: AUTOTEST zoomlive >>> target medium (TargetZoom=0.5)
+08:06:16.887 autotest: AUTOTEST zoomlive f=140 phase=3 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=273/14839 green=246/14839
+08:06:17.043 autotest: AUTOTEST zoomlive f=150 phase=3 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=273/14839 green=246/14839
+08:06:17.209 autotest: AUTOTEST zoomlive f=160 phase=3 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=273/14839 green=246/14839
+08:06:17.371 autotest: AUTOTEST zoomlive f=170 phase=3 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=273/14839 green=246/14839
+08:06:17.529 autotest: AUTOTEST zoomlive f=180 phase=3 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=273/14839 green=246/14839
+08:06:17.847 autotest: AUTOTEST zoomlive f=190 phase=3 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=273/14839 green=246/14839
+08:06:17.847 autotest: AUTOTEST zoomlive >>> scroll phase (front-left corner, 0.4 tiles/frame)
+08:06:17.877 autotest: AUTOTEST zoomlive f=200 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=248/14839 green=238/14839
+08:06:18.034 autotest: AUTOTEST zoomlive f=210 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=332/14839 green=88/14839
+08:06:18.211 autotest: AUTOTEST zoomlive f=220 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=1113/14839 green=20/14839
+08:06:18.384 autotest: AUTOTEST zoomlive f=230 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=3276/14839 green=19/14839
+08:06:18.534 autotest: AUTOTEST zoomlive f=240 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6159/14839 green=9/14839
+08:06:18.791 autotest: AUTOTEST zoomlive f=250 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6159/14839 green=9/14839
+08:06:18.947 autotest: AUTOTEST zoomlive f=260 phase=4 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6159/14839 green=9/14839
+08:06:18.947 autotest: AUTOTEST zoomlive >>> scroll stop (does the wedge heal = 'pops back in'?)
+08:06:19.042 autotest: AUTOTEST zoomlive f=270 phase=5 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6159/14839 green=9/14839
+08:06:19.217 autotest: AUTOTEST zoomlive f=280 phase=5 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6159/14839 green=9/14839
+08:06:19.447 autotest: AUTOTEST zoomlive f=290 phase=5 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6159/14839 green=9/14839
+08:06:19.542 autotest: AUTOTEST zoomlive f=300 phase=5 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6159/14839 green=9/14839
+08:06:19.717 autotest: AUTOTEST zoomlive f=310 phase=5 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6159/14839 green=9/14839
+08:06:19.947 autotest: AUTOTEST zoomlive f=320 phase=5 zoom=Medium pz=1 target=0.5 bbs=1 immediate=False ssDirty=False dark=6159/14839 green=9/14839
+08:06:19.947 autotest: AUTOTEST zoomlive END
+08:06:19.970 autotest: AUTOTEST forced speed 1 (was 1)
+08:06:19.971 autotest: AUTOTEST mood load-phase av0 storedMood=73 needs=99,98,99,75,100,29,99 roomScore=-9 rowRoom=-9 s7=599 hypNoRoom=85 hypEngine=73 (original-save values; engine recomputes after first decay tick)
+08:06:19.971 autotest: AUTOTEST mood load-phase av1 storedMood=72 needs=99,98,99,71,100,22,99 roomScore=-9 rowRoom=-9 s7=588 hypNoRoom=84 hypEngine=72 (original-save values; engine recomputes after first decay tick)
+08:06:19.971 autotest: AUTOTEST mood load-phase av2 storedMood=73 needs=99,98,99,71,100,33,99 roomScore=-9 rowRoom=-9 s7=599 hypNoRoom=85 hypEngine=73 (original-save values; engine recomputes after first decay tick)
+08:06:19.972 autotest: AUTOTEST brainlive diag av0 threads=7
+08:06:19.972 autotest: AUTOTEST brainlive diag   frame0 routineID=4096 label=Main rti=Main semiGlobal=personglobals.iff
+08:06:19.972 autotest: AUTOTEST brainlive diag   frame1 routineID=8193 label=person main rti=person main semiGlobal=personglobals.iff
+08:06:19.972 autotest: AUTOTEST brainlive diag   frame2 routineID=8283 label=person main loop rti=person main loop semiGlobal=personglobals.iff
+08:06:19.972 autotest: AUTOTEST brainlive diag   frame3 routineID=8303 label=do idle and mood rti=do idle and mood semiGlobal=personglobals.iff
+08:06:19.973 autotest: AUTOTEST brainlive diag   frame4 routineID=8229 label=do idle core rti=do idle core semiGlobal=personglobals.iff
+08:06:19.973 autotest: AUTOTEST brainlive diag   frame5 routineID=8534 label=do shy child rti=do shy child semiGlobal=personglobals.iff
+08:06:19.973 autotest: AUTOTEST brainlive diag   frame6 routineID=8534 label=do shy child rti=do shy child semiGlobal=personglobals.iff
+08:06:19.973 autotest: AUTOTEST brainlive diag av1 threads=5
+08:06:19.973 autotest: AUTOTEST brainlive diag   frame0 routineID=4096 label=Main rti=Main semiGlobal=personglobals.iff
+08:06:19.973 autotest: AUTOTEST brainlive diag   frame1 routineID=8193 label=person main rti=person main semiGlobal=personglobals.iff
+08:06:19.973 autotest: AUTOTEST brainlive diag   frame2 routineID=8283 label=person main loop rti=person main loop semiGlobal=personglobals.iff
+08:06:19.973 autotest: AUTOTEST brainlive diag   frame3 routineID=8330 label=do new adult idle rti=do new adult idle semiGlobal=personglobals.iff
+08:06:19.974 autotest: AUTOTEST brainlive diag   frame4 routineID=280 label=idle rti=idle semiGlobal=personglobals.iff
+08:06:19.974 autotest: AUTOTEST brainlive diag av2 threads=5
+08:06:19.974 autotest: AUTOTEST brainlive diag   frame0 routineID=4096 label=Main rti=Main semiGlobal=personglobals.iff
+08:06:19.974 autotest: AUTOTEST brainlive diag   frame1 routineID=8193 label=person main rti=person main semiGlobal=personglobals.iff
+08:06:19.974 autotest: AUTOTEST brainlive diag   frame2 routineID=8283 label=person main loop rti=person main loop semiGlobal=personglobals.iff
+08:06:19.974 autotest: AUTOTEST brainlive diag   frame3 routineID=8330 label=do new adult idle rti=do new adult idle semiGlobal=personglobals.iff
+08:06:19.974 autotest: AUTOTEST brainlive diag   frame4 routineID=280 label=idle rti=idle semiGlobal=personglobals.iff
+[SimAnticsExc] Object reference not set to an instance of an object.VMStackFrame.cs:line 131
+[SimAnticsExc] Object reference not set to an instance of an object.VMStackFrame.cs:line 131
+08:06:20.874 autotest: AUTOTEST mood load-phase av0 storedMood=73 needs=99,97,99,75,100,29,99 roomScore=-9 rowRoom=-9 s7=598 hypNoRoom=85 hypEngine=73 (original-save values; engine recomputes after first decay tick)
+08:06:20.874 autotest: AUTOTEST mood load-phase av1 storedMood=72 needs=99,97,99,71,100,22,99 roomScore=-9 rowRoom=-9 s7=587 hypNoRoom=83 hypEngine=72 (original-save values; engine recomputes after first decay tick)
+08:06:20.875 autotest: AUTOTEST mood load-phase av2 storedMood=73 needs=99,97,99,71,100,33,99 roomScore=-9 rowRoom=-9 s7=598 hypNoRoom=85 hypEngine=73 (original-save values; engine recomputes after first decay tick)
+08:06:21.867 autotest: AUTOTEST motive sample minute=33 avatars=3 moodAllOk=True elapsed=2 speed=1 (33:6 h)
+08:06:22.870 autotest: AUTOTEST motive sample minute=34 avatars=3 moodAllOk=True elapsed=3 speed=1 (34:6 h)
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+08:06:23.875 autotest: AUTOTEST motive sample minute=35 avatars=3 moodAllOk=True elapsed=4 speed=1 (35:6 h)
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+08:06:24.877 autotest: AUTOTEST motive sample minute=36 avatars=3 moodAllOk=True elapsed=5 speed=1 (36:6 h)
+08:06:25.866 autotest: AUTOTEST motive sample minute=37 avatars=3 moodAllOk=True elapsed=6 speed=1 (37:6 h)
+08:06:25.868 autotest: AUTOTEST death-reach: motives collapsed to 3 on av0 obj=16 at minute=37 (natural death-decision reach probe)
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+08:06:26.883 autotest: AUTOTEST motive sample minute=38 avatars=3 moodAllOk=True elapsed=7 speed=1 (38:6 h)
+08:06:27.874 autotest: AUTOTEST motive sample minute=39 avatars=3 moodAllOk=True elapsed=8 speed=1 (39:6 h)
+08:06:28.882 autotest: AUTOTEST motive sample minute=40 avatars=3 moodAllOk=True elapsed=9 speed=1 (40:6 h)
+08:06:29.719 autotest: AUTOTEST mood: MISMATCH av0 storedMood=0 computed=4
+08:06:29.745 autotest: AUTOTEST mood: MISMATCH av0 storedMood=0 computed=4
+08:06:29.767 autotest: AUTOTEST mood: MISMATCH av0 storedMood=0 computed=4
+08:06:29.767 autotest: AUTOTEST mood: MISMATCH av0 storedMood=0 computed=4
+08:06:29.767 autotest: AUTOTEST mood: MISMATCH av0 storedMood=0 computed=4
+08:06:29.791 autotest: AUTOTEST mood: MISMATCH av0 storedMood=0 computed=4
+08:06:29.816 autotest: AUTOTEST mood: MISMATCH av0 storedMood=0 computed=4
+08:06:29.816 autotest: AUTOTEST mood: MISMATCH av0 storedMood=0 computed=4
+08:06:29.842 autotest: AUTOTEST mood: MISMATCH av0 storedMood=0 computed=4
+08:06:29.866 autotest: AUTOTEST mood: MISMATCH av0 storedMood=0 computed=4
+08:06:29.867 autotest: AUTOTEST mood: MISMATCH av0 storedMood=0 computed=4
+08:06:29.867 autotest: AUTOTEST motive sample minute=41 avatars=3 moodAllOk=False elapsed=10 speed=1 (41:6 h)
+08:06:29.867 autotest: AUTOTEST mood: FAIL
+08:06:29.868 autotest: AUTOTEST MOTIVE av0 deltas=[-97,-95,-97,-73,-98,-26,-96] over 10 sim-min
+08:06:29.868 autotest: AUTOTEST MOTIVE av1 deltas=[-2,-2,-1,-2,-2,-1,0] over 10 sim-min
+08:06:29.868 autotest: AUTOTEST MOTIVE av2 deltas=[-2,-2,-1,-2,-2,-1,0] over 10 sim-min
+08:06:29.868 autotest: AUTOTEST motive: PASS
+08:06:29.869 autotest: AUTOTEST brainlive pg-seen=True routine-count=9881 distinct=16 ids=280,4096,8193,8216,8219,8227,8229,8233,8283,8292,8303,8330,8331,8333,8334,8534
+08:06:29.869 autotest: AUTOTEST brainlive brain-id-hit=True (8303/8301/8229/8275/8219 = IFF-verified canonical idle/personality brain BHAVs)
+08:06:29.870 autotest: AUTOTEST brainlive: PASS
+08:06:29.870 autotest: AUTOTEST carseek: entering commute soak after pins minute=6:41 (no clock jump; natural ~1 sim-min/sec wait)
+08:06:29.872 autotest: AUTOTEST carseek discovery avatars=3 plan=[obj=16 jtype=-1 jlevel=4 jperf=0 start=- track= | obj=18 jtype=0 jlevel=0 jperf=0 start=- track= | obj=21 jtype=9 jlevel=0 jperf=0 start=9 track=Test Subject]
+08:06:29.872 autotest: AUTOTEST carseek discovery distinct-mounted-IFFs=89 car-ifffs=[CarPortal.iffx1]
+08:06:29.877 autotest: AUTOTEST carseek discovery iff=Windows.iff entities=50
+08:06:29.877 autotest: AUTOTEST carseek discovery iff=Trees.iff entities=40
+08:06:29.877 autotest: AUTOTEST carseek discovery iff=Shrubs.iff entities=25
+08:06:29.877 autotest: AUTOTEST carseek discovery iff=Destination.iff entities=14
+08:06:29.877 autotest: AUTOTEST carseek discovery iff=Doors.iff entities=12
+08:06:29.878 autotest: AUTOTEST carseek discovery iff=stair.iff entities=9
+08:06:29.878 autotest: AUTOTEST carseek discovery iff=Beds.iff entities=9
+08:06:29.878 autotest: AUTOTEST carseek discovery iff=UrnStone.iff entities=8
+08:06:29.878 autotest: AUTOTEST carseek discovery iff=FlowersOutdoor.iff entities=7
+08:06:29.878 autotest: AUTOTEST carseek discovery iff=SocialInteractions.iff entities=7
+08:06:29.878 autotest: AUTOTEST carseek discovery iff=DiningTables.iff entities=6
+08:06:29.879 autotest: AUTOTEST carseek discovery iff=piano.iff entities=4
+08:06:29.879 autotest: AUTOTEST carseek discovery iff=Counters.iff entities=4
+08:06:29.879 autotest: AUTOTEST carseek discovery iff=Plants.iff entities=4
+08:06:29.879 autotest: AUTOTEST carseek discovery iff=Sofas.iff entities=4
+08:06:29.880 autotest: AUTOTEST carseek discovery iff=DiningChairs.iff entities=4
+08:06:29.880 autotest: AUTOTEST carseek discovery iff=Lamps.iff entities=3
+08:06:29.880 autotest: AUTOTEST carseek discovery iff=Paintings.iff entities=3
+08:06:29.880 autotest: AUTOTEST carseek discovery iff=PedPortal.iff entities=2
+08:06:29.880 autotest: AUTOTEST carseek discovery iff=phones.iff entities=2
+08:06:29.880 autotest: AUTOTEST carseek discovery iff=MailBox.iff entities=2
+08:06:29.881 autotest: AUTOTEST carseek discovery iff=Sinks.iff entities=2
+08:06:29.881 autotest: AUTOTEST carseek discovery iff=TubM.iff entities=2
+08:06:29.881 autotest: AUTOTEST carseek discovery iff=TablesEnd.iff entities=2
+08:06:29.881 autotest: AUTOTEST carseek discovery iff=ToyBox.iff entities=2
+08:06:29.881 autotest: AUTOTEST carseek discovery iff=unleashedcontroller.iff entities=2
+08:06:29.881 autotest: AUTOTEST carseek discovery iff=ControllerStudioLot.iff entities=2
+08:06:29.881 autotest: AUTOTEST carseek discovery iff=AnimTester.iff entities=1
+08:06:29.882 autotest: AUTOTEST carseek discovery iff=JobFinder.iff entities=1
+08:06:29.882 autotest: AUTOTEST carseek discovery iff=NPCController.iff entities=1
+08:06:29.882 autotest: AUTOTEST carseek IFF-label-map CarPortal.iff bhavs=[4099:Clean,4108:dress for work,4118:Random A++ Bonus,4107:set car type,4111:send out of world,4109:hide the menu,4128:display bad mood help,4104:test promotion,4122:start motive deltas for school,4115:check for school bus schedule,4098:msg:show special,4130:display no study for school,4117:lower all kids grades,4127:was stack object due at work?,4132:verify stack object,4112:start motives delta,4114:CT - reset,4120:set car type from work,4121:create car from work,4135:push pet,4136:look for pets,4137:Interaction - Run to car,4119:Create School Bus,4138:call pets,4134:Chance Cards 3,4133:Chance Cards,4110:ensure stand,4106:Create Car,4141:Clone - Warning,4125:process warnings car pools,4100:process,4124:Chance Cards 2,4103:get paid,4096:main,4123:bring all children home,4129:display bad mood school,4113:return to world,4126:warn/fire people who miss work,4139:Clone - Find My Clone?,4140:Clone - Find My Owner?,4105:send to work,4142:Clone - Am I a Clone?,4131:set icon,4102:At Work,4116:At School,4097:load tree,4101:init common]
+08:06:29.882 autotest: AUTOTEST carseek: earliest CARR StartTime=540 target=615 (wait 214 sim-min ~ 3.6 real min)
+08:06:29.909 autotest: AUTOTEST carseek car-entity-change carEnt=1 present=[CarPortal.iff#id8]
+08:06:29.909 autotest: AUTOTEST carseek first-seen id=4096 label=main owner=CarPortal.iff sg=
+08:06:29.909 autotest: AUTOTEST carseek first-seen id=280 label=idle owner=CarPortal.iff sg=
+08:06:29.970 autotest: AUTOTEST carseek minute=6:41 carEnt=1 maxCarEnt=1 careerFrames=2 distinct=2 jobPerfLvlChanged=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+08:06:30.875 autotest: AUTOTEST carseek minute=6:42 carEnt=1 maxCarEnt=1 careerFrames=120 distinct=2 jobPerfLvlChanged=False
+08:06:31.883 autotest: AUTOTEST carseek minute=6:43 carEnt=1 maxCarEnt=1 careerFrames=240 distinct=2 jobPerfLvlChanged=False
+08:06:32.866 autotest: AUTOTEST carseek minute=6:44 carEnt=1 maxCarEnt=1 careerFrames=360 distinct=2 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+08:06:33.866 autotest: AUTOTEST carseek minute=6:45 carEnt=1 maxCarEnt=1 careerFrames=480 distinct=2 jobPerfLvlChanged=False
+08:06:34.883 autotest: AUTOTEST carseek minute=6:46 carEnt=1 maxCarEnt=1 careerFrames=600 distinct=2 jobPerfLvlChanged=False
+08:06:35.875 autotest: AUTOTEST carseek minute=6:47 carEnt=1 maxCarEnt=1 careerFrames=720 distinct=2 jobPerfLvlChanged=False
+08:06:37.125 autotest: AUTOTEST carseek minute=6:48 carEnt=1 maxCarEnt=1 careerFrames=840 distinct=2 jobPerfLvlChanged=False
+08:06:37.866 autotest: AUTOTEST carseek minute=6:49 carEnt=1 maxCarEnt=1 careerFrames=960 distinct=2 jobPerfLvlChanged=False
+08:06:38.883 autotest: AUTOTEST carseek minute=6:50 carEnt=1 maxCarEnt=1 careerFrames=1080 distinct=2 jobPerfLvlChanged=False
+08:06:39.874 autotest: AUTOTEST carseek minute=6:51 carEnt=1 maxCarEnt=1 careerFrames=1200 distinct=2 jobPerfLvlChanged=False
+08:06:40.885 autotest: AUTOTEST carseek minute=6:52 carEnt=1 maxCarEnt=1 careerFrames=1320 distinct=2 jobPerfLvlChanged=False
+08:06:41.883 autotest: AUTOTEST carseek minute=6:53 carEnt=1 maxCarEnt=1 careerFrames=1440 distinct=2 jobPerfLvlChanged=False
+08:06:42.868 autotest: AUTOTEST carseek minute=6:54 carEnt=1 maxCarEnt=1 careerFrames=1560 distinct=2 jobPerfLvlChanged=False
+08:06:43.883 autotest: AUTOTEST carseek minute=6:55 carEnt=1 maxCarEnt=1 careerFrames=1680 distinct=2 jobPerfLvlChanged=False
+08:06:44.874 autotest: AUTOTEST carseek minute=6:56 carEnt=1 maxCarEnt=1 careerFrames=1800 distinct=2 jobPerfLvlChanged=False
+08:06:45.867 autotest: AUTOTEST carseek minute=6:57 carEnt=1 maxCarEnt=1 careerFrames=1920 distinct=2 jobPerfLvlChanged=False
+08:06:46.883 autotest: AUTOTEST carseek minute=6:58 carEnt=1 maxCarEnt=1 careerFrames=2040 distinct=2 jobPerfLvlChanged=False
+08:06:47.875 autotest: AUTOTEST carseek minute=6:59 carEnt=1 maxCarEnt=1 careerFrames=2160 distinct=2 jobPerfLvlChanged=False
+08:06:48.870 autotest: AUTOTEST carseek first-seen id=4100 label=process owner=CarPortal.iff sg=
+08:06:48.886 autotest: AUTOTEST carseek first-seen id=4125 label=process warnings car pools owner=CarPortal.iff sg=
+08:06:48.886 autotest: AUTOTEST carseek minute=7:00 carEnt=1 maxCarEnt=1 careerFrames=2281 distinct=4 jobPerfLvlChanged=False
+08:06:49.883 autotest: AUTOTEST carseek minute=7:01 carEnt=1 maxCarEnt=1 careerFrames=2461 distinct=4 jobPerfLvlChanged=False
+08:06:50.866 autotest: AUTOTEST carseek minute=7:02 carEnt=1 maxCarEnt=1 careerFrames=2641 distinct=4 jobPerfLvlChanged=False
+08:06:51.882 autotest: AUTOTEST carseek minute=7:03 carEnt=1 maxCarEnt=1 careerFrames=2821 distinct=4 jobPerfLvlChanged=False
+08:06:52.883 autotest: AUTOTEST carseek minute=7:04 carEnt=1 maxCarEnt=1 careerFrames=3001 distinct=4 jobPerfLvlChanged=False
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+[SimAnticsExc] Object reference not set to an instance of an object.VMThread.cs:line 732
+08:06:53.867 autotest: AUTOTEST carseek minute=7:05 carEnt=1 maxCarEnt=1 careerFrames=3181 distinct=4 jobPerfLvlChanged=False
+08:06:54.891 autotest: AUTOTEST carseek minute=7:06 carEnt=1 maxCarEnt=1 careerFrames=3361 distinct=4 jobPerfLvlChanged=False
+08:06:55.867 autotest: AUTOTEST carseek minute=7:07 carEnt=1 maxCarEnt=1 careerFrames=3541 distinct=4 jobPerfLvlChanged=False
+08:06:56.869 autotest: AUTOTEST carseek minute=7:08 carEnt=1 maxCarEnt=1 careerFrames=3721 distinct=4 jobPerfLvlChanged=False
+08:06:57.866 autotest: AUTOTEST carseek minute=7:09 carEnt=1 maxCarEnt=1 careerFrames=3901 distinct=4 jobPerfLvlChanged=False
+08:06:58.883 autotest: AUTOTEST carseek minute=7:10 carEnt=1 maxCarEnt=1 careerFrames=4081 distinct=4 jobPerfLvlChanged=False
+08:06:59.866 autotest: AUTOTEST carseek minute=7:11 carEnt=1 maxCarEnt=1 careerFrames=4261 distinct=4 jobPerfLvlChanged=False
+08:07:00.862 autotest: AUTOTEST carseek minute=7:12 carEnt=1 maxCarEnt=1 careerFrames=4441 distinct=4 jobPerfLvlChanged=False
+08:07:01.867 autotest: AUTOTEST carseek minute=7:13 carEnt=1 maxCarEnt=1 careerFrames=4621 distinct=4 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+08:07:02.862 autotest: AUTOTEST carseek minute=7:14 carEnt=1 maxCarEnt=1 careerFrames=4801 distinct=4 jobPerfLvlChanged=False
+08:07:03.871 autotest: AUTOTEST carseek minute=7:15 carEnt=1 maxCarEnt=1 careerFrames=4981 distinct=4 jobPerfLvlChanged=False
+08:07:04.863 autotest: AUTOTEST carseek minute=7:16 carEnt=1 maxCarEnt=1 careerFrames=5161 distinct=4 jobPerfLvlChanged=False
+08:07:05.862 autotest: AUTOTEST carseek minute=7:17 carEnt=1 maxCarEnt=1 careerFrames=5341 distinct=4 jobPerfLvlChanged=False
+08:07:06.862 autotest: AUTOTEST carseek minute=7:18 carEnt=1 maxCarEnt=1 careerFrames=5521 distinct=4 jobPerfLvlChanged=False
+08:07:07.878 autotest: AUTOTEST carseek minute=7:19 carEnt=1 maxCarEnt=1 careerFrames=5701 distinct=4 jobPerfLvlChanged=False
+08:07:08.862 autotest: AUTOTEST carseek minute=7:20 carEnt=1 maxCarEnt=1 careerFrames=5881 distinct=4 jobPerfLvlChanged=False
+08:07:09.879 autotest: AUTOTEST carseek minute=7:21 carEnt=1 maxCarEnt=1 careerFrames=6061 distinct=4 jobPerfLvlChanged=False
+08:07:10.870 autotest: AUTOTEST carseek minute=7:22 carEnt=1 maxCarEnt=1 careerFrames=6241 distinct=4 jobPerfLvlChanged=False
+08:07:11.879 autotest: AUTOTEST carseek minute=7:23 carEnt=1 maxCarEnt=1 careerFrames=6421 distinct=4 jobPerfLvlChanged=False
+08:07:12.879 autotest: AUTOTEST carseek minute=7:24 carEnt=1 maxCarEnt=1 careerFrames=6601 distinct=4 jobPerfLvlChanged=False
+08:07:13.880 autotest: AUTOTEST carseek minute=7:25 carEnt=1 maxCarEnt=1 careerFrames=6781 distinct=4 jobPerfLvlChanged=False
+08:07:14.862 autotest: AUTOTEST carseek minute=7:26 carEnt=1 maxCarEnt=1 careerFrames=6961 distinct=4 jobPerfLvlChanged=False
+08:07:15.879 autotest: AUTOTEST carseek minute=7:27 carEnt=1 maxCarEnt=1 careerFrames=7141 distinct=4 jobPerfLvlChanged=False
+08:07:16.870 autotest: AUTOTEST carseek minute=7:28 carEnt=1 maxCarEnt=1 careerFrames=7321 distinct=4 jobPerfLvlChanged=False
+08:07:17.862 autotest: AUTOTEST carseek minute=7:29 carEnt=1 maxCarEnt=1 careerFrames=7501 distinct=4 jobPerfLvlChanged=False
+08:07:18.879 autotest: AUTOTEST carseek minute=7:30 carEnt=1 maxCarEnt=1 careerFrames=7681 distinct=4 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMThread.cs:line 709
+[SimAnticsExc] Index was outside the bounds of the array.VMThread.cs:line 709
+08:07:19.867 autotest: AUTOTEST carseek minute=7:31 carEnt=1 maxCarEnt=1 careerFrames=7861 distinct=4 jobPerfLvlChanged=False
+08:07:20.862 autotest: AUTOTEST carseek minute=7:32 carEnt=1 maxCarEnt=1 careerFrames=8041 distinct=4 jobPerfLvlChanged=False
+08:07:21.862 autotest: AUTOTEST carseek minute=7:33 carEnt=1 maxCarEnt=1 careerFrames=8221 distinct=4 jobPerfLvlChanged=False
+08:07:22.879 autotest: AUTOTEST carseek minute=7:34 carEnt=1 maxCarEnt=1 careerFrames=8401 distinct=4 jobPerfLvlChanged=False
+08:07:23.879 autotest: AUTOTEST carseek minute=7:35 carEnt=1 maxCarEnt=1 careerFrames=8581 distinct=4 jobPerfLvlChanged=False
+08:07:24.887 autotest: AUTOTEST carseek minute=7:36 carEnt=1 maxCarEnt=1 careerFrames=8761 distinct=4 jobPerfLvlChanged=False
+08:07:25.862 autotest: AUTOTEST carseek minute=7:37 carEnt=1 maxCarEnt=1 careerFrames=8941 distinct=4 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+08:07:26.863 autotest: AUTOTEST carseek minute=7:38 carEnt=1 maxCarEnt=1 careerFrames=9121 distinct=4 jobPerfLvlChanged=False
+08:07:27.862 autotest: AUTOTEST carseek minute=7:39 carEnt=1 maxCarEnt=1 careerFrames=9301 distinct=4 jobPerfLvlChanged=False
+08:07:28.873 autotest: AUTOTEST carseek minute=7:40 carEnt=1 maxCarEnt=1 careerFrames=9481 distinct=4 jobPerfLvlChanged=False
+08:07:29.862 autotest: AUTOTEST carseek minute=7:41 carEnt=1 maxCarEnt=1 careerFrames=9661 distinct=4 jobPerfLvlChanged=False
+08:07:30.878 autotest: AUTOTEST carseek minute=7:42 carEnt=1 maxCarEnt=1 careerFrames=9841 distinct=4 jobPerfLvlChanged=False
+08:07:31.879 autotest: AUTOTEST carseek minute=7:43 carEnt=1 maxCarEnt=1 careerFrames=10021 distinct=4 jobPerfLvlChanged=False
+08:07:32.870 autotest: AUTOTEST carseek minute=7:44 carEnt=1 maxCarEnt=1 careerFrames=10201 distinct=4 jobPerfLvlChanged=False
+08:07:33.879 autotest: AUTOTEST carseek minute=7:45 carEnt=1 maxCarEnt=1 careerFrames=10381 distinct=4 jobPerfLvlChanged=False
+08:07:34.862 autotest: AUTOTEST carseek minute=7:46 carEnt=1 maxCarEnt=1 careerFrames=10561 distinct=4 jobPerfLvlChanged=False
+08:07:35.870 autotest: AUTOTEST carseek minute=7:47 carEnt=1 maxCarEnt=1 careerFrames=10741 distinct=4 jobPerfLvlChanged=False
+08:07:36.879 autotest: AUTOTEST carseek minute=7:48 carEnt=1 maxCarEnt=1 careerFrames=10921 distinct=4 jobPerfLvlChanged=False
+08:07:37.862 autotest: AUTOTEST carseek minute=7:49 carEnt=1 maxCarEnt=1 careerFrames=11101 distinct=4 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+08:07:38.877 autotest: AUTOTEST carseek minute=7:50 carEnt=1 maxCarEnt=1 careerFrames=11281 distinct=4 jobPerfLvlChanged=False
+08:07:39.879 autotest: AUTOTEST carseek minute=7:51 carEnt=1 maxCarEnt=1 careerFrames=11461 distinct=4 jobPerfLvlChanged=False
+08:07:40.879 autotest: AUTOTEST carseek minute=7:52 carEnt=1 maxCarEnt=1 careerFrames=11641 distinct=4 jobPerfLvlChanged=False
+08:07:41.862 autotest: AUTOTEST carseek minute=7:53 carEnt=1 maxCarEnt=1 careerFrames=11821 distinct=4 jobPerfLvlChanged=False
+08:07:42.870 autotest: AUTOTEST carseek minute=7:54 carEnt=1 maxCarEnt=1 careerFrames=12001 distinct=4 jobPerfLvlChanged=False
+08:07:43.862 autotest: AUTOTEST carseek minute=7:55 carEnt=1 maxCarEnt=1 careerFrames=12181 distinct=4 jobPerfLvlChanged=False
+08:07:44.879 autotest: AUTOTEST carseek minute=7:56 carEnt=1 maxCarEnt=1 careerFrames=12361 distinct=4 jobPerfLvlChanged=False
+08:07:45.879 autotest: AUTOTEST carseek minute=7:57 carEnt=1 maxCarEnt=1 careerFrames=12541 distinct=4 jobPerfLvlChanged=False
+08:07:46.870 autotest: AUTOTEST carseek minute=7:58 carEnt=1 maxCarEnt=1 careerFrames=12721 distinct=4 jobPerfLvlChanged=False
+08:07:47.879 autotest: AUTOTEST carseek minute=7:59 carEnt=1 maxCarEnt=1 careerFrames=12901 distinct=4 jobPerfLvlChanged=False
+08:07:48.862 autotest: AUTOTEST carseek minute=8:00 carEnt=1 maxCarEnt=1 careerFrames=13081 distinct=4 jobPerfLvlChanged=False
+08:07:49.862 autotest: AUTOTEST carseek minute=8:01 carEnt=1 maxCarEnt=1 careerFrames=13261 distinct=4 jobPerfLvlChanged=False
+08:07:50.862 autotest: AUTOTEST carseek minute=8:02 carEnt=1 maxCarEnt=1 careerFrames=13441 distinct=4 jobPerfLvlChanged=False
+08:07:51.878 autotest: AUTOTEST carseek minute=8:03 carEnt=1 maxCarEnt=1 careerFrames=13621 distinct=4 jobPerfLvlChanged=False
+08:07:52.879 autotest: AUTOTEST carseek minute=8:04 carEnt=1 maxCarEnt=1 careerFrames=13801 distinct=4 jobPerfLvlChanged=False
+08:07:53.884 autotest: AUTOTEST carseek minute=8:05 carEnt=1 maxCarEnt=1 careerFrames=13981 distinct=4 jobPerfLvlChanged=False
+08:07:54.879 autotest: AUTOTEST carseek minute=8:06 carEnt=1 maxCarEnt=1 careerFrames=14161 distinct=4 jobPerfLvlChanged=False
+08:07:55.879 autotest: AUTOTEST carseek minute=8:07 carEnt=1 maxCarEnt=1 careerFrames=14341 distinct=4 jobPerfLvlChanged=False
+08:07:56.861 autotest: AUTOTEST carseek minute=8:08 carEnt=1 maxCarEnt=1 careerFrames=14521 distinct=4 jobPerfLvlChanged=False
+08:07:57.870 autotest: AUTOTEST carseek minute=8:09 carEnt=1 maxCarEnt=1 careerFrames=14701 distinct=4 jobPerfLvlChanged=False
+08:07:58.870 autotest: AUTOTEST carseek minute=8:10 carEnt=1 maxCarEnt=1 careerFrames=14881 distinct=4 jobPerfLvlChanged=False
+08:07:59.862 autotest: AUTOTEST carseek minute=8:11 carEnt=1 maxCarEnt=1 careerFrames=15061 distinct=4 jobPerfLvlChanged=False
+08:08:00.871 autotest: AUTOTEST carseek minute=8:12 carEnt=1 maxCarEnt=1 careerFrames=15241 distinct=4 jobPerfLvlChanged=False
+08:08:01.862 autotest: AUTOTEST carseek minute=8:13 carEnt=1 maxCarEnt=1 careerFrames=15421 distinct=4 jobPerfLvlChanged=False
+08:08:02.878 autotest: AUTOTEST carseek minute=8:14 carEnt=1 maxCarEnt=1 careerFrames=15601 distinct=4 jobPerfLvlChanged=False
+08:08:03.870 autotest: AUTOTEST carseek minute=8:15 carEnt=1 maxCarEnt=1 careerFrames=15781 distinct=4 jobPerfLvlChanged=False
+08:08:04.871 autotest: AUTOTEST carseek minute=8:16 carEnt=1 maxCarEnt=1 careerFrames=15961 distinct=4 jobPerfLvlChanged=False
+08:08:05.871 autotest: AUTOTEST carseek minute=8:17 carEnt=1 maxCarEnt=1 careerFrames=16141 distinct=4 jobPerfLvlChanged=False
+08:08:06.863 autotest: AUTOTEST carseek minute=8:18 carEnt=1 maxCarEnt=1 careerFrames=16321 distinct=4 jobPerfLvlChanged=False
+08:08:07.862 autotest: AUTOTEST carseek minute=8:19 carEnt=1 maxCarEnt=1 careerFrames=16501 distinct=4 jobPerfLvlChanged=False
+08:08:08.862 autotest: AUTOTEST carseek minute=8:20 carEnt=1 maxCarEnt=1 careerFrames=16681 distinct=4 jobPerfLvlChanged=False
+08:08:09.880 autotest: AUTOTEST carseek minute=8:21 carEnt=1 maxCarEnt=1 careerFrames=16861 distinct=4 jobPerfLvlChanged=False
+08:08:10.862 autotest: AUTOTEST carseek minute=8:22 carEnt=1 maxCarEnt=1 careerFrames=17041 distinct=4 jobPerfLvlChanged=False
+08:08:11.862 autotest: AUTOTEST carseek minute=8:23 carEnt=1 maxCarEnt=1 careerFrames=17221 distinct=4 jobPerfLvlChanged=False
+08:08:12.863 autotest: AUTOTEST carseek minute=8:24 carEnt=1 maxCarEnt=1 careerFrames=17401 distinct=4 jobPerfLvlChanged=False
+08:08:13.878 autotest: AUTOTEST carseek minute=8:25 carEnt=1 maxCarEnt=1 careerFrames=17581 distinct=4 jobPerfLvlChanged=False
+08:08:14.862 autotest: AUTOTEST carseek minute=8:26 carEnt=1 maxCarEnt=1 careerFrames=17761 distinct=4 jobPerfLvlChanged=False
+08:08:15.883 autotest: AUTOTEST carseek minute=8:27 carEnt=1 maxCarEnt=1 careerFrames=17941 distinct=4 jobPerfLvlChanged=False
+08:08:16.870 autotest: AUTOTEST carseek minute=8:28 carEnt=1 maxCarEnt=1 careerFrames=18121 distinct=4 jobPerfLvlChanged=False
+08:08:17.878 autotest: AUTOTEST carseek minute=8:29 carEnt=1 maxCarEnt=1 careerFrames=18301 distinct=4 jobPerfLvlChanged=False
+08:08:18.871 autotest: AUTOTEST carseek minute=8:30 carEnt=1 maxCarEnt=1 careerFrames=18481 distinct=4 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMThread.cs:line 709
+[SimAnticsExc] Index was outside the bounds of the array.VMThread.cs:line 709
+08:08:19.865 autotest: AUTOTEST carseek minute=8:31 carEnt=1 maxCarEnt=1 careerFrames=18661 distinct=4 jobPerfLvlChanged=False
+08:08:20.878 autotest: AUTOTEST carseek minute=8:32 carEnt=1 maxCarEnt=1 careerFrames=18841 distinct=4 jobPerfLvlChanged=False
+08:08:21.870 autotest: AUTOTEST carseek minute=8:33 carEnt=1 maxCarEnt=1 careerFrames=19021 distinct=4 jobPerfLvlChanged=False
+08:08:22.862 autotest: AUTOTEST carseek minute=8:34 carEnt=1 maxCarEnt=1 careerFrames=19201 distinct=4 jobPerfLvlChanged=False
+08:08:23.870 autotest: AUTOTEST carseek minute=8:35 carEnt=1 maxCarEnt=1 careerFrames=19381 distinct=4 jobPerfLvlChanged=False
+08:08:24.870 autotest: AUTOTEST carseek minute=8:36 carEnt=1 maxCarEnt=1 careerFrames=19561 distinct=4 jobPerfLvlChanged=False
+08:08:25.879 autotest: AUTOTEST carseek minute=8:37 carEnt=1 maxCarEnt=1 careerFrames=19741 distinct=4 jobPerfLvlChanged=False
+08:08:26.862 autotest: AUTOTEST carseek minute=8:38 carEnt=1 maxCarEnt=1 careerFrames=19921 distinct=4 jobPerfLvlChanged=False
+08:08:27.870 autotest: AUTOTEST carseek minute=8:39 carEnt=1 maxCarEnt=1 careerFrames=20101 distinct=4 jobPerfLvlChanged=False
+08:08:28.879 autotest: AUTOTEST carseek minute=8:40 carEnt=1 maxCarEnt=1 careerFrames=20281 distinct=4 jobPerfLvlChanged=False
+08:08:29.870 autotest: AUTOTEST carseek minute=8:41 carEnt=1 maxCarEnt=1 careerFrames=20461 distinct=4 jobPerfLvlChanged=False
+08:08:30.878 autotest: AUTOTEST carseek minute=8:42 carEnt=1 maxCarEnt=1 careerFrames=20641 distinct=4 jobPerfLvlChanged=False
+08:08:31.890 autotest: AUTOTEST carseek minute=8:43 carEnt=1 maxCarEnt=1 careerFrames=20821 distinct=4 jobPerfLvlChanged=False
+08:08:32.879 autotest: AUTOTEST carseek minute=8:44 carEnt=1 maxCarEnt=1 careerFrames=21001 distinct=4 jobPerfLvlChanged=False
+08:08:33.870 autotest: AUTOTEST carseek minute=8:45 carEnt=1 maxCarEnt=1 careerFrames=21181 distinct=4 jobPerfLvlChanged=False
+08:08:34.864 autotest: AUTOTEST carseek minute=8:46 carEnt=1 maxCarEnt=1 careerFrames=21361 distinct=4 jobPerfLvlChanged=False
+08:08:35.862 autotest: AUTOTEST carseek minute=8:47 carEnt=1 maxCarEnt=1 careerFrames=21541 distinct=4 jobPerfLvlChanged=False
+08:08:36.870 autotest: AUTOTEST carseek minute=8:48 carEnt=1 maxCarEnt=1 careerFrames=21721 distinct=4 jobPerfLvlChanged=False
+08:08:37.875 autotest: AUTOTEST carseek minute=8:49 carEnt=1 maxCarEnt=1 careerFrames=21901 distinct=4 jobPerfLvlChanged=False
+08:08:38.871 autotest: AUTOTEST carseek minute=8:50 carEnt=1 maxCarEnt=1 careerFrames=22081 distinct=4 jobPerfLvlChanged=False
+08:08:39.871 autotest: AUTOTEST carseek minute=8:51 carEnt=1 maxCarEnt=1 careerFrames=22261 distinct=4 jobPerfLvlChanged=False
+08:08:40.879 autotest: AUTOTEST carseek minute=8:52 carEnt=1 maxCarEnt=1 careerFrames=22441 distinct=4 jobPerfLvlChanged=False
+08:08:41.872 autotest: AUTOTEST carseek minute=8:53 carEnt=1 maxCarEnt=1 careerFrames=22621 distinct=4 jobPerfLvlChanged=False
+08:08:42.870 autotest: AUTOTEST carseek minute=8:54 carEnt=1 maxCarEnt=1 careerFrames=22801 distinct=4 jobPerfLvlChanged=False
+08:08:43.866 autotest: AUTOTEST carseek minute=8:55 carEnt=1 maxCarEnt=1 careerFrames=22981 distinct=4 jobPerfLvlChanged=False
+08:08:44.870 autotest: AUTOTEST carseek minute=8:56 carEnt=1 maxCarEnt=1 careerFrames=23161 distinct=4 jobPerfLvlChanged=False
+08:08:45.879 autotest: AUTOTEST carseek minute=8:57 carEnt=1 maxCarEnt=1 careerFrames=23341 distinct=4 jobPerfLvlChanged=False
+08:08:46.878 autotest: AUTOTEST carseek minute=8:58 carEnt=1 maxCarEnt=1 careerFrames=23521 distinct=4 jobPerfLvlChanged=False
+08:08:47.862 autotest: AUTOTEST carseek minute=8:59 carEnt=1 maxCarEnt=1 careerFrames=23701 distinct=4 jobPerfLvlChanged=False
+08:08:48.879 autotest: AUTOTEST carseek minute=9:00 carEnt=1 maxCarEnt=1 careerFrames=23881 distinct=4 jobPerfLvlChanged=False
+08:08:49.862 autotest: AUTOTEST carseek minute=9:01 carEnt=1 maxCarEnt=1 careerFrames=24061 distinct=4 jobPerfLvlChanged=False
+08:08:50.870 autotest: AUTOTEST carseek minute=9:02 carEnt=1 maxCarEnt=1 careerFrames=24241 distinct=4 jobPerfLvlChanged=False
+08:08:51.878 autotest: AUTOTEST carseek minute=9:03 carEnt=1 maxCarEnt=1 careerFrames=24421 distinct=4 jobPerfLvlChanged=False
+08:08:52.879 autotest: AUTOTEST carseek minute=9:04 carEnt=1 maxCarEnt=1 careerFrames=24601 distinct=4 jobPerfLvlChanged=False
+08:08:53.862 autotest: AUTOTEST carseek minute=9:05 carEnt=1 maxCarEnt=1 careerFrames=24781 distinct=4 jobPerfLvlChanged=False
+08:08:54.870 autotest: AUTOTEST carseek minute=9:06 carEnt=1 maxCarEnt=1 careerFrames=24961 distinct=4 jobPerfLvlChanged=False
+08:08:54.916 autotest: AUTOTEST carseek car-entity-change carEnt=2 present=[CarPortal.iff#id8,People\PaperCarrierF1.iff#id24]
+08:08:55.879 autotest: AUTOTEST carseek minute=9:07 carEnt=2 maxCarEnt=2 careerFrames=25257 distinct=4 jobPerfLvlChanged=False
+08:08:56.887 autotest: AUTOTEST carseek minute=9:08 carEnt=2 maxCarEnt=2 careerFrames=25557 distinct=4 jobPerfLvlChanged=False
+08:08:57.879 autotest: AUTOTEST carseek minute=9:09 carEnt=2 maxCarEnt=2 careerFrames=25857 distinct=4 jobPerfLvlChanged=False
+08:08:58.862 autotest: AUTOTEST carseek minute=9:10 carEnt=2 maxCarEnt=2 careerFrames=26157 distinct=4 jobPerfLvlChanged=False
+08:08:59.871 autotest: AUTOTEST carseek minute=9:11 carEnt=2 maxCarEnt=2 careerFrames=26457 distinct=4 jobPerfLvlChanged=False
+08:09:00.863 autotest: AUTOTEST carseek minute=9:12 carEnt=2 maxCarEnt=2 careerFrames=26757 distinct=4 jobPerfLvlChanged=False
+08:09:01.879 autotest: AUTOTEST carseek minute=9:13 carEnt=2 maxCarEnt=2 careerFrames=27057 distinct=4 jobPerfLvlChanged=False
+08:09:02.870 autotest: AUTOTEST carseek minute=9:14 carEnt=2 maxCarEnt=2 careerFrames=27357 distinct=4 jobPerfLvlChanged=False
+08:09:03.878 autotest: AUTOTEST carseek minute=9:15 carEnt=2 maxCarEnt=2 careerFrames=27657 distinct=4 jobPerfLvlChanged=False
+08:09:04.861 autotest: AUTOTEST carseek minute=9:16 carEnt=2 maxCarEnt=2 careerFrames=27957 distinct=4 jobPerfLvlChanged=False
+08:09:05.870 autotest: AUTOTEST carseek minute=9:17 carEnt=2 maxCarEnt=2 careerFrames=28257 distinct=4 jobPerfLvlChanged=False
+08:09:06.861 autotest: AUTOTEST carseek minute=9:18 carEnt=2 maxCarEnt=2 careerFrames=28557 distinct=4 jobPerfLvlChanged=False
+08:09:07.870 autotest: AUTOTEST carseek minute=9:19 carEnt=2 maxCarEnt=2 careerFrames=28857 distinct=4 jobPerfLvlChanged=False
+08:09:08.879 autotest: AUTOTEST carseek minute=9:20 carEnt=2 maxCarEnt=2 careerFrames=29157 distinct=4 jobPerfLvlChanged=False
+08:09:09.870 autotest: AUTOTEST carseek minute=9:21 carEnt=2 maxCarEnt=2 careerFrames=29457 distinct=4 jobPerfLvlChanged=False
+08:09:10.870 autotest: AUTOTEST carseek minute=9:22 carEnt=2 maxCarEnt=2 careerFrames=29757 distinct=4 jobPerfLvlChanged=False
+08:09:11.862 autotest: AUTOTEST carseek minute=9:23 carEnt=2 maxCarEnt=2 careerFrames=30057 distinct=4 jobPerfLvlChanged=False
+08:09:12.612 autotest: AUTOTEST carseek first-seen id=4099 label=drop paper owner=People\PaperCarrierF1.iff sg=personglobals.iff
+08:09:12.625 autotest: AUTOTEST carseek first-seen id=4102 label=special drop function owner=People\PaperCarrierF1.iff sg=personglobals.iff
+08:09:12.871 autotest: AUTOTEST carseek minute=9:24 carEnt=2 maxCarEnt=2 careerFrames=30391 distinct=6 jobPerfLvlChanged=False
+08:09:13.862 autotest: AUTOTEST carseek minute=9:25 carEnt=2 maxCarEnt=2 careerFrames=30811 distinct=6 jobPerfLvlChanged=False
+08:09:14.896 autotest: AUTOTEST carseek minute=9:26 carEnt=2 maxCarEnt=2 careerFrames=31230 distinct=6 jobPerfLvlChanged=False
+08:09:15.738 autotest: AUTOTEST carseek first-seen id=4106 label=special drop tabloid function owner=People\PaperCarrierF1.iff sg=personglobals.iff
+08:09:15.881 autotest: AUTOTEST carseek minute=9:27 carEnt=2 maxCarEnt=2 careerFrames=31599 distinct=7 jobPerfLvlChanged=False
+08:09:16.878 autotest: AUTOTEST carseek minute=9:28 carEnt=2 maxCarEnt=2 careerFrames=32019 distinct=7 jobPerfLvlChanged=False
+08:09:17.878 autotest: AUTOTEST carseek minute=9:29 carEnt=2 maxCarEnt=2 careerFrames=32439 distinct=7 jobPerfLvlChanged=False
+08:09:18.871 autotest: AUTOTEST carseek first-seen id=368 label=Leave owner=People\PaperCarrierF1.iff sg=personglobals.iff
+08:09:18.889 autotest: AUTOTEST carseek first-seen id=281 label=Wait For Notify owner=People\PaperCarrierF1.iff sg=personglobals.iff
+08:09:18.890 autotest: AUTOTEST carseek minute=9:30 carEnt=2 maxCarEnt=2 careerFrames=32806 distinct=9 jobPerfLvlChanged=False
+08:09:19.879 autotest: AUTOTEST carseek minute=9:31 carEnt=2 maxCarEnt=2 careerFrames=33166 distinct=9 jobPerfLvlChanged=False
+08:09:20.879 autotest: AUTOTEST carseek minute=9:32 carEnt=2 maxCarEnt=2 careerFrames=33526 distinct=9 jobPerfLvlChanged=False
+08:09:21.879 autotest: AUTOTEST carseek minute=9:33 carEnt=2 maxCarEnt=2 careerFrames=33886 distinct=9 jobPerfLvlChanged=False
+08:09:22.870 autotest: AUTOTEST carseek minute=9:34 carEnt=2 maxCarEnt=2 careerFrames=34246 distinct=9 jobPerfLvlChanged=False
+08:09:23.878 autotest: AUTOTEST carseek minute=9:35 carEnt=2 maxCarEnt=2 careerFrames=34606 distinct=9 jobPerfLvlChanged=False
+08:09:24.878 autotest: AUTOTEST carseek minute=9:36 carEnt=2 maxCarEnt=2 careerFrames=34966 distinct=9 jobPerfLvlChanged=False
+08:09:25.870 autotest: AUTOTEST carseek minute=9:37 carEnt=2 maxCarEnt=2 careerFrames=35326 distinct=9 jobPerfLvlChanged=False
+08:09:26.871 autotest: AUTOTEST carseek minute=9:38 carEnt=2 maxCarEnt=2 careerFrames=35686 distinct=9 jobPerfLvlChanged=False
+08:09:27.878 autotest: AUTOTEST carseek minute=9:39 carEnt=2 maxCarEnt=2 careerFrames=36046 distinct=9 jobPerfLvlChanged=False
+08:09:28.870 autotest: AUTOTEST carseek minute=9:40 carEnt=2 maxCarEnt=2 careerFrames=36406 distinct=9 jobPerfLvlChanged=False
+08:09:29.879 autotest: AUTOTEST carseek minute=9:41 carEnt=2 maxCarEnt=2 careerFrames=36766 distinct=9 jobPerfLvlChanged=False
+08:09:30.879 autotest: AUTOTEST carseek minute=9:42 carEnt=2 maxCarEnt=2 careerFrames=37126 distinct=9 jobPerfLvlChanged=False
+08:09:31.870 autotest: AUTOTEST carseek minute=9:43 carEnt=2 maxCarEnt=2 careerFrames=37486 distinct=9 jobPerfLvlChanged=False
+08:09:32.870 autotest: AUTOTEST carseek minute=9:44 carEnt=2 maxCarEnt=2 careerFrames=37846 distinct=9 jobPerfLvlChanged=False
+08:09:33.878 autotest: AUTOTEST carseek minute=9:45 carEnt=2 maxCarEnt=2 careerFrames=38206 distinct=9 jobPerfLvlChanged=False
+08:09:34.879 autotest: AUTOTEST carseek minute=9:46 carEnt=2 maxCarEnt=2 careerFrames=38566 distinct=9 jobPerfLvlChanged=False
+08:09:35.412 autotest: AUTOTEST carseek car-entity-change carEnt=1 present=[CarPortal.iff#id8]
+08:09:35.878 autotest: AUTOTEST carseek minute=9:47 carEnt=1 maxCarEnt=2 careerFrames=38839 distinct=9 jobPerfLvlChanged=False
+08:09:36.861 autotest: AUTOTEST carseek minute=9:48 carEnt=1 maxCarEnt=2 careerFrames=39019 distinct=9 jobPerfLvlChanged=False
+08:09:37.882 autotest: AUTOTEST carseek minute=9:49 carEnt=1 maxCarEnt=2 careerFrames=39199 distinct=9 jobPerfLvlChanged=False
+08:09:38.878 autotest: AUTOTEST carseek minute=9:50 carEnt=1 maxCarEnt=2 careerFrames=39379 distinct=9 jobPerfLvlChanged=False
+08:09:39.862 autotest: AUTOTEST carseek minute=9:51 carEnt=1 maxCarEnt=2 careerFrames=39559 distinct=9 jobPerfLvlChanged=False
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+[SimAnticsExc] Index was outside the bounds of the array.VMAvatar.cs:line 785
+08:09:40.881 autotest: AUTOTEST carseek minute=9:52 carEnt=1 maxCarEnt=2 careerFrames=39739 distinct=9 jobPerfLvlChanged=False
+08:09:41.862 autotest: AUTOTEST carseek minute=9:53 carEnt=1 maxCarEnt=2 careerFrames=39919 distinct=9 jobPerfLvlChanged=False
+08:09:42.880 autotest: AUTOTEST carseek minute=9:54 carEnt=1 maxCarEnt=2 careerFrames=40099 distinct=9 jobPerfLvlChanged=False
+08:09:43.874 autotest: AUTOTEST carseek minute=9:55 carEnt=1 maxCarEnt=2 careerFrames=40279 distinct=9 jobPerfLvlChanged=False
+08:09:44.871 autotest: AUTOTEST carseek minute=9:56 carEnt=1 maxCarEnt=2 careerFrames=40459 distinct=9 jobPerfLvlChanged=False
+08:09:45.872 autotest: AUTOTEST carseek minute=9:57 carEnt=1 maxCarEnt=2 careerFrames=40639 distinct=9 jobPerfLvlChanged=False
+08:09:46.866 autotest: AUTOTEST carseek minute=9:58 carEnt=1 maxCarEnt=2 careerFrames=40819 distinct=9 jobPerfLvlChanged=False
+08:09:47.879 autotest: AUTOTEST carseek minute=9:59 carEnt=1 maxCarEnt=2 careerFrames=40999 distinct=9 jobPerfLvlChanged=False
+08:09:48.873 autotest: AUTOTEST carseek minute=10:00 carEnt=1 maxCarEnt=2 careerFrames=41179 distinct=9 jobPerfLvlChanged=False
+08:09:49.865 autotest: AUTOTEST carseek minute=10:01 carEnt=1 maxCarEnt=2 careerFrames=41359 distinct=9 jobPerfLvlChanged=False
+08:09:50.878 autotest: AUTOTEST carseek minute=10:02 carEnt=1 maxCarEnt=2 careerFrames=41539 distinct=9 jobPerfLvlChanged=False
+08:09:51.871 autotest: AUTOTEST carseek minute=10:03 carEnt=1 maxCarEnt=2 careerFrames=41719 distinct=9 jobPerfLvlChanged=False
+08:09:52.863 autotest: AUTOTEST carseek minute=10:04 carEnt=1 maxCarEnt=2 careerFrames=41899 distinct=9 jobPerfLvlChanged=False
+08:09:53.867 autotest: AUTOTEST carseek minute=10:05 carEnt=1 maxCarEnt=2 careerFrames=42079 distinct=9 jobPerfLvlChanged=False
+08:09:54.879 autotest: AUTOTEST carseek minute=10:06 carEnt=1 maxCarEnt=2 careerFrames=42259 distinct=9 jobPerfLvlChanged=False
+08:09:55.879 autotest: AUTOTEST carseek minute=10:07 carEnt=1 maxCarEnt=2 careerFrames=42439 distinct=9 jobPerfLvlChanged=False
+08:09:56.879 autotest: AUTOTEST carseek minute=10:08 carEnt=1 maxCarEnt=2 careerFrames=42619 distinct=9 jobPerfLvlChanged=False
+08:09:57.859 autotest: AUTOTEST carseek minute=10:09 carEnt=1 maxCarEnt=2 careerFrames=42799 distinct=9 jobPerfLvlChanged=False
+08:09:58.859 autotest: AUTOTEST carseek minute=10:10 carEnt=1 maxCarEnt=2 careerFrames=42979 distinct=9 jobPerfLvlChanged=False
+08:09:59.859 autotest: AUTOTEST carseek minute=10:11 carEnt=1 maxCarEnt=2 careerFrames=43159 distinct=9 jobPerfLvlChanged=False
+08:10:00.863 autotest: AUTOTEST carseek minute=10:12 carEnt=1 maxCarEnt=2 careerFrames=43339 distinct=9 jobPerfLvlChanged=False
+08:10:01.871 autotest: AUTOTEST carseek minute=10:13 carEnt=1 maxCarEnt=2 careerFrames=43519 distinct=9 jobPerfLvlChanged=False
+08:10:02.864 autotest: AUTOTEST carseek minute=10:14 carEnt=1 maxCarEnt=2 careerFrames=43699 distinct=9 jobPerfLvlChanged=False
+08:10:03.871 autotest: AUTOTEST carseek minute=10:15 carEnt=1 maxCarEnt=2 careerFrames=43879 distinct=9 jobPerfLvlChanged=False
+08:10:03.893 autotest: AUTOTEST carseek RESULT minute=615 car-entity-max=2 career-frames=43879 ids=[280,281,368,4096,4099,4100,4102,4106,4125] jobPerfLvlChanged=False iff4100process=True
+08:10:03.893 autotest: AUTOTEST carseek: PASS
+RELPROBE SUMMARY calls=1713 misses=1026 objectbucket=22 avatarStack=889
+08:10:03.894 autotest: AUTOTEST audio end thread=HITTVOn: dead=False
+08:10:03.894 autotest: AUTOTEST SUMMARY passed=89 failed=1 skipped=0
+08:10:03.894 autotest: AUTOTEST RESULT FAIL
+AUTOTEST RESULT FAIL passed=89 failed=1
+08:10:03.922 exit-probe: OnExiting cancel=True screen=TS1GameScreen
+08:10:03.943 exit-probe: OnExiting cancel=False screen=TS1GameScreen
+08:10:03.970 exit-probe: after Run
+08:10:04.000 exit-probe: after Dispose
+AUTOTEST_WRAPPER_EXIT=0

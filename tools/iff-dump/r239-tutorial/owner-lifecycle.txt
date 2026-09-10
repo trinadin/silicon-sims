@@ -1,0 +1,17 @@
+000e2bf0: 7c0802a6  mflr     r0
+000e2bf4: 90010008  stw      r0, 8(r1)
+000e2bf8: 9421ffc0  stwu     r1, -0x40(r1)
+000e2bfc: 806300ac  lwz      r3, 0xac(r3)
+000e2c00: 28030000  cmplwi   r3, 0
+000e2c04: 41820020  beq      0xe2c24
+000e2c08: 8083011c  lwz      r4, 0x11c(r3)
+000e2c0c: 38a00000  li       r5, 0
+000e2c10: 80c2a5d0  lwz      r6, -0x5a30(r2)
+000e2c14: 38e00000  li       r7, 0
+000e2c18: 8084000c  lwz      r4, 0xc(r4)
+000e2c1c: 38c60072  addi     r6, r6, 0x72
+000e2c20: 4800d111  bl       0xefd30   ; .RunTree__8cXObjectFP8BehaviorsPCcPs
+000e2c24: 80010048  lwz      r0, 0x48(r1)
+000e2c28: 38210040  addi     r1, r1, 0x40
+000e2c2c: 7c0803a6  mtlr     r0
+000e2c30: 4e800020  blr

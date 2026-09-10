@@ -1,0 +1,22 @@
+R89 position analysis - data-informed (PROVISIONAL) sprite placements.
+Placements derive from the original background art bytes; the original
+engine-code positions are not in the IFF corpus.
+
+NESSIE river (Community\NScreen_unleashed.bmp blue band): 2 candidate band(s)
+  y=463..498 h=36 px/row~161 centroid-x=386
+  y=525..599 h=75 px/row~203 centroid-x=175
+  -> nessie (106x75) place ~(121, 505)  [tallest band, centroid x, head above waterline]
+CAR road (Studiotown\DScreen.bmp gray band): 0 candidate band(s)
+BALLOON sky (Magicland\DScreen.bmp): most-uniform band y=20 (score 22.6; next ['y=10:23', 'y=30:23'])
+  -> balloon (64x64) place ~(140, 30)  [left sky, clear of centre art]
+MIST water: no dominant blue band; default (210, 210)
+
+DECISIONS (provisional constants used in UINeighbourhoodSelectionPanel):
+  car     -> no distinct road band exists; the Studiotown screen is uniformly concrete
+             (152,152,136). Frames 0-13 are a blue-grey car, 14-19 a yellow taxi
+             (magenta 255,0,255 key). Place mid-lot on the concrete: (390, 440).
+  balloon -> left sky over the most-uniform band: (140, 30).
+  mist    -> the water region is the waves rect (0,62)-(647,424) (not blue - swamp).
+             Centre the fog inside it: (210, 210).
+  nessie  -> tallest blue band (river) bottom-left: (121, 505).
+All four are layout traces; positions are NOT gate-pinned.

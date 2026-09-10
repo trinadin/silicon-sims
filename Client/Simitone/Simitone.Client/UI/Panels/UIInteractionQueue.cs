@@ -27,6 +27,11 @@ namespace Simitone.Client.UI.Panels
     /// </summary>
     public class UIInteractionQueue : UIContainer
     {
+        public const float OriginalQueueOriginX = 32f;
+        public const float OriginalQueueOriginY = 32f;
+        public const float OriginalQueuePitch = 50f;
+        public const float OriginalRepositionSeconds = 0.5f;
+        public const float OriginalPieSourceInset = 16f;
 
         private List<UIIQTrackEntry> QueueItems;
         public VMEntity QueueOwner;
@@ -38,6 +43,11 @@ namespace Simitone.Client.UI.Panels
             this.vm = vm;
             this.QueueOwner = QueueOwner;
             QueueItems = new List<UIIQTrackEntry>();
+        }
+
+        public static Vector2 GetOriginalQueuePosition(int position)
+        {
+            return new Vector2(OriginalQueueOriginX + position * OriginalQueuePitch, OriginalQueueOriginY);
         }
 
         public short GetElemPriority(VMQueuedAction elem, int i)
@@ -118,9 +128,10 @@ namespace Simitone.Client.UI.Panels
             //now detect if there are any interactions we're not displaying and add them.
 
             skipParentIdle = false;
+            var originalPosition = 0;
             for (int i = 0; i < queue.Count; i++)
             {
-                int position = 0;
+                int position = UIInteraction.OriginalStyle ? originalPosition : 0;
                 var elem = queue[i];
 
                 if (elem.Mode != VMQueueMode.Idle && (i == 0 || elem.Mode != VMQueueMode.ParentExit) && (!skipParentIdle || elem.Mode != VMQueueMode.ParentIdle))
@@ -138,11 +149,17 @@ namespace Simitone.Client.UI.Panels
                     }
                     if (!found) //new interaction!!!
                     {
+                        var pieSource = PieMenuClickPos.X >= 0;
+                        var sourcePos = UIInteraction.OriginalStyle
+                            ? (pieSource
+                                ? PieMenuClickPos - new Vector2(OriginalPieSourceInset, OriginalPieSourceInset)
+                                : GetOriginalQueuePosition(position))
+                            : (pieSource ? PieMenuClickPos : new Vector2(30 + position * 50, 30));
                         var itemui = new UIIQTrackEntry()
                         {
                             Interaction = elem,
                             IconOwner = elem.IconOwner,
-                            SourcePos = (PieMenuClickPos.X < 0) ? (new Vector2(30 + position * 50, 30)) : PieMenuClickPos,
+                            SourcePos = sourcePos,
                             TweenProgress = 0,
                             UI = new UIInteraction(i == 0),
                             Active = (i == 0)
@@ -162,6 +179,7 @@ namespace Simitone.Client.UI.Panels
                         PieMenuClickPos = new Vector2(-1, -1);
                     }
                     position++;
+                    if (UIInteraction.OriginalStyle) originalPosition++;
                 }
                 if (elem.Mode == VMQueueMode.ParentIdle) skipParentIdle = true;
             }
@@ -240,10 +258,22 @@ namespace Simitone.Client.UI.Panels
         public void TweenToPosition(int pos)
         {
             Vector2 realPos;
-            if (pos == 0) realPos = new Vector2(73, 73);
+            if (UIInteraction.OriginalStyle)
+            {
+                realPos = UIInteractionQueue.GetOriginalQueuePosition(pos);
+            }
+            else if (pos == 0) realPos = new Vector2(73, 73);
             else realPos = new Vector2(37 + 68 + pos*60, 41.5f);
 
-            GameFacade.Screens.Tween.To(UI, 0.5f, new Dictionary<string, float>() { { "X", realPos.X }, { "Y", realPos.Y } }, TweenQuad.EaseOut);
+            if (!UIInteraction.OriginalStyle || UI.X != realPos.X || UI.Y != realPos.Y)
+            {
+                // Original StartAnimating uses 500ms. Its RampGenerator curve is
+                // not decoded yet; EaseOut remains the port's disclosed easing.
+                GameFacade.Screens.Tween.To(UI,
+                    UIInteraction.OriginalStyle ? UIInteractionQueue.OriginalRepositionSeconds : 0.5f,
+                    new Dictionary<string, float>() { { "X", realPos.X }, { "Y", realPos.Y } },
+                    TweenQuad.EaseOut);
+            }
             QueuePosition = pos;
             /*
             SourcePos = GetTweenPosition();
@@ -258,6 +288,7 @@ namespace Simitone.Client.UI.Panels
 
         public void Update()
         {
+            if (UIInteraction.OriginalStyle) return;
             if (TweenProgress < 1)
             {
                 TweenProgress = Math.Min(TweenProgress + MotionPerFrame * (60.0 / FSOEnvironment.RefreshRate), 1);

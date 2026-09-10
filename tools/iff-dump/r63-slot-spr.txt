@@ -1,0 +1,1 @@
+SLOT chunks=1472 entries=6969 SPR chunks=758 frames=3120 SPR2 chunks=17140 frames=138948

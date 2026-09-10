@@ -1,0 +1,65 @@
+0x2c2f90: bf41ffe8  stmw r26, -24(r1)                          |.A..|
+0x2c2f94: 7c0802a6  mfxer r0                                   ||...|
+0x2c2f98: 2c050000  cmpwi r0, r5, 0                            |,...|
+0x2c2f9c: 3b840000  addi r28, r4, 0                            |;...|
+0x2c2fa0: 90010008  stw r0, 8(r1)                              |....|
+0x2c2fa4: 9421ffa0  stwu r1, -96(r1)                           |.!..|
+0x2c2fa8: 40820010  beq(2) 0x2c2fb8                            |@...|
+0x2c2fac: 38800000  addi r4, r0, 0                             |8...|
+0x2c2fb0: 3ba00002  addi r29, r0, 2                            |;...|
+0x2c2fb4: 4800000c  b 0x2c2fc0                                  ; -> 2c2fc0 |H...|
+0x2c2fb8: 3885ffff  addi r4, r5, -1                            |8...|
+0x2c2fbc: 3ba40001  addi r29, r4, 1                            |;...|
+0x2c2fc0: 5480103a  rlwinm r0, r4 <<2                          |T..:|
+0x2c2fc4: 3bc40000  addi r30, r4, 0                            |;...|
+0x2c2fc8: 7fe30214  add r31, r3, r0                            |....|
+0x2c2fcc: 480000ac  b 0x2c3078                                  ; -> 2c3078 |H...|
+0x2c2fd0: 807f0010  lwz r3, 16(r31)                            |....|
+0x2c2fd4: 83430008  lwz r26, 8(r3)                             |.C..|
+0x2c2fd8: 48000018  b 0x2c2ff0                                  ; -> 2c2ff0 |H...|
+0x2c2fdc: 60000000  ori r0, r0, 0                              |`...|
+0x2c2fe0: 807a0000  lwz r3, 0(r26)                             |.z..|
+0x2c2fe4: 7f84e378  or r28, r4, r28                            |...x|
+0x2c2fe8: 4bffdce9  bl 0x2c0cd0                                 ; .SetCutaway__4WallFb |K...|
+0x2c2fec: 3b5a0004  addi r26, r26, 4                           |;Z..|
+0x2c2ff0: 807f0010  lwz r3, 16(r31)                            |....|
+0x2c2ff4: 80030004  lwz r0, 4(r3)                              |....|
+0x2c2ff8: 80630008  lwz r3, 8(r3)                              |.c..|
+0x2c2ffc: 5400103a  rlwinm r0, r0 <<2                          |T..:|
+0x2c3000: 7c030214  add r0, r3, r0                             ||...|
+0x2c3004: 7c1a0040  cmpl cr0, r26, r0                          ||..@|
+0x2c3008: 4082ffd8  beq(2) 0x2c2fe0                            |@...|
+0x2c300c: 807f0008  lwz r3, 8(r31)                             |....|
+0x2c3010: 83430008  lwz r26, 8(r3)                             |.C..|
+0x2c3014: 48000014  b 0x2c3028                                  ; -> 2c3028 |H...|
+0x2c3018: 60000000  ori r0, r0, 0                              |`...|
+0x2c301c: 807a0000  lwz r3, 0(r26)                             |.z..|
+0x2c3020: 4bff77a1  bl 0x2ba7c0                                 ; .sub_2ba7c0 |K.w.|
+0x2c3024: 3b5a0004  addi r26, r26, 4                           |;Z..|
+0x2c3028: 807f0008  lwz r3, 8(r31)                             |....|
+0x2c302c: 80030004  lwz r0, 4(r3)                              |....|
+0x2c3030: 83630008  lwz r27, 8(r3)                             |.c..|
+0x2c3034: 5400103a  rlwinm r0, r0 <<2                          |T..:|
+0x2c3038: 7c1b0214  add r0, r27, r0                            ||...|
+0x2c303c: 7c1a0040  cmpl cr0, r26, r0                          ||..@|
+0x2c3040: 4082ffdc  beq(2) 0x2c301c                            |@...|
+0x2c3044: 48000010  b 0x2c3054                                  ; -> 2c3054 |H...|
+0x2c3048: 807b0000  lwz r3, 0(r27)                             |.{..|
+0x2c304c: 4bff7465  bl 0x2ba4b0                                 ; .ComputeCutawaySecondPass__6VertexFv |K.te|
+0x2c3050: 3b7b0004  addi r27, r27, 4                           |;{..|
+0x2c3054: 807f0008  lwz r3, 8(r31)                             |....|
+0x2c3058: 80030004  lwz r0, 4(r3)                              |....|
+0x2c305c: 80630008  lwz r3, 8(r3)                              |.c..|
+0x2c3060: 5400103a  rlwinm r0, r0 <<2                          |T..:|
+0x2c3064: 7c030214  add r0, r3, r0                             ||...|
+0x2c3068: 7c1b0040  cmpl cr0, r27, r0                          ||..@|
+0x2c306c: 4082ffdc  beq(2) 0x2c3048                            |@...|
+0x2c3070: 3bff0004  addi r31, r31, 4                           |;...|
+0x2c3074: 3bde0001  addi r30, r30, 1                           |;...|
+0x2c3078: 7c1ee800  cmp cr0, r30, r29                          ||...|
+0x2c307c: 4180ff54  bne(0) 0x2c2fd0                            |A..T|
+0x2c3080: 80010068  lwz r0, 104(r1)                            |...h|
+0x2c3084: 38210060  addi r1, r1, 96                            |8!.`|
+0x2c3088: bb41ffe8  lmw r26, -24(r1)                           |.A..|
+0x2c308c: 7c0803a6  mtxer r0                                   ||...|
+0x2c3090: 4e800020  bclr                                       |N.. |

@@ -1,0 +1,131 @@
+0x1270a0: lwz r11, 0x64(r1)
+0x1270a4: ble 0x1272a8
+0x1270a8: cmpwi r10, 8
+0x1270ac: addi r3, r10, -8
+0x1270b0: ble 0x127258
+0x1270b4: addi r0, r3, 7
+0x1270b8: cmpwi r3, 0
+0x1270bc: srwi r0, r0, 3
+0x1270c0: slwi r3, r12, 2
+0x1270c4: mtctr r0
+0x1270c8: addi r0, r3, 0x50
+0x1270cc: ble 0x127258
+0x1270d0: lwz r4, 0xc(r31)
+0x1270d4: addi r25, r30, 3
+0x1270d8: lwzx r8, r28, r0
+0x1270dc: addi r3, r30, 6
+0x1270e0: add r5, r4, r30
+0x1270e4: lbz r7, 0(r5)
+0x1270e8: addi r4, r30, 9
+0x1270ec: lbz r6, 1(r5)
+0x1270f0: addi r5, r30, 0xc
+0x1270f4: extsb r7, r7
+0x1270f8: lwz r8, 0xc(r8)
+0x1270fc: slwi r7, r7, 2
+0x127100: extsb r26, r6
+0x127104: addi r6, r30, 0xf
+0x127108: lwzx r27, r8, r7
+0x12710c: addi r7, r30, 0x12
+0x127110: addi r8, r30, 0x15
+0x127114: stbx r11, r27, r26
+0x127118: addi r9, r9, 8
+0x12711c: addi r30, r30, 0x18
+0x127120: lwz r27, 0xc(r31)
+0x127124: lwzx r26, r28, r0
+0x127128: add r25, r27, r25
+0x12712c: lbz r27, 0(r25)
+0x127130: lwz r26, 0xc(r26)
+0x127134: extsb r29, r27
+0x127138: lbz r27, 1(r25)
+0x12713c: slwi r29, r29, 2
+0x127140: lwzx r29, r26, r29
+0x127144: extsb r27, r27
+0x127148: stbx r11, r29, r27
+0x12714c: lwz r27, 0xc(r31)
+0x127150: lwzx r29, r28, r0
+0x127154: add r3, r27, r3
+0x127158: lbz r27, 0(r3)
+0x12715c: lwz r29, 0xc(r29)
+0x127160: extsb r27, r27
+0x127164: lbz r3, 1(r3)
+0x127168: slwi r27, r27, 2
+0x12716c: lwzx r27, r29, r27
+0x127170: extsb r3, r3
+0x127174: stbx r11, r27, r3
+0x127178: lwz r3, 0xc(r31)
+0x12717c: lwzx r27, r28, r0
+0x127180: add r4, r3, r4
+0x127184: lbz r3, 0(r4)
+0x127188: lwz r27, 0xc(r27)
+0x12718c: extsb r29, r3
+0x127190: lbz r3, 1(r4)
+0x127194: slwi r4, r29, 2
+0x127198: lwzx r4, r27, r4
+0x12719c: extsb r3, r3
+0x1271a0: stbx r11, r4, r3
+0x1271a4: lwz r3, 0xc(r31)
+0x1271a8: lwzx r4, r28, r0
+0x1271ac: add r5, r3, r5
+0x1271b0: lbz r3, 0(r5)
+0x1271b4: lwz r29, 0xc(r4)
+0x1271b8: extsb r4, r3
+0x1271bc: lbz r3, 1(r5)
+0x1271c0: slwi r4, r4, 2
+0x1271c4: lwzx r4, r29, r4
+0x1271c8: extsb r3, r3
+0x1271cc: stbx r11, r4, r3
+0x1271d0: lwz r3, 0xc(r31)
+0x1271d4: lwzx r4, r28, r0
+0x1271d8: add r6, r3, r6
+0x1271dc: lbz r3, 0(r6)
+0x1271e0: lwz r5, 0xc(r4)
+0x1271e4: extsb r4, r3
+0x1271e8: lbz r3, 1(r6)
+0x1271ec: slwi r4, r4, 2
+0x1271f0: lwzx r4, r5, r4
+0x1271f4: extsb r3, r3
+0x1271f8: stbx r11, r4, r3
+0x1271fc: lwz r3, 0xc(r31)
+0x127200: lwzx r4, r28, r0
+0x127204: add r7, r3, r7
+0x127208: lbz r3, 0(r7)
+0x12720c: lwz r5, 0xc(r4)
+0x127210: extsb r4, r3
+0x127214: lbz r3, 1(r7)
+0x127218: slwi r4, r4, 2
+0x12721c: lwzx r4, r5, r4
+0x127220: extsb r3, r3
+0x127224: stbx r11, r4, r3
+0x127228: lwz r3, 0xc(r31)
+0x12722c: lwzx r4, r28, r0
+0x127230: add r8, r3, r8
+0x127234: lbz r3, 0(r8)
+0x127238: lwz r5, 0xc(r4)
+0x12723c: extsb r4, r3
+0x127240: lbz r3, 1(r8)
+0x127244: slwi r4, r4, 2
+0x127248: lwzx r4, r5, r4
+0x12724c: extsb r3, r3
+0x127250: stbx r11, r4, r3
+0x127254: bdnz 0x1270d0
+0x127258: subf r0, r9, r10
+0x12725c: cmpw r9, r10
+0x127260: slwi r4, r12, 2
+0x127264: mtctr r0
+0x127268: mulli r3, r9, 3
+0x12726c: addi r7, r4, 0x50
+0x127270: bge 0x1272a8
+0x127274: lwz r0, 0xc(r31)
+0x127278: lwzx r5, r28, r7
+0x12727c: add r6, r0, r3
+0x127280: addi r3, r3, 3
+0x127284: lbz r4, 0(r6)
+0x127288: lbz r0, 1(r6)
+0x12728c: extsb r4, r4
+0x127290: lwz r5, 0xc(r5)
+0x127294: slwi r4, r4, 2
+0x127298: lwzx r4, r5, r4
+0x12729c: extsb r0, r0
+0x1272a0: stbx r11, r4, r0
+0x1272a4: bdnz 0x127274
+0x1272a8: lwz r0, 0x98(r1)

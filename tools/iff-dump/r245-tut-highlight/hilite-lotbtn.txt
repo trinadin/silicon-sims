@@ -1,0 +1,37 @@
+                ; ==== .HiliteForTutorial__10cWinLotBtnFb ====
+002d2ae0: 93e1fffc  stw      r31, -4(r1)
+002d2ae4: 7c0802a6  mflr     r0
+002d2ae8: 83e28e04  lwz      r31, -0x71fc(r2)
+002d2aec: 93c1fff8  stw      r30, -8(r1)
+002d2af0: 7c9e2378  mr       r30, r4
+002d2af4: 90010008  stw      r0, 8(r1)
+002d2af8: 9421ffb0  stwu     r1, -0x50(r1)
+002d2afc: 482309c5  bl       0x5034c0   ; .HiliteForTutorial__6cTSWinFb
+002d2b00: 57c0063f  clrlwi.  r0, r30, 0x18
+002d2b04: 41820054  beq      0x2d2b58
+002d2b08: 807f0000  lwz      r3, 0(r31)
+002d2b0c: 83c3020c  lwz      r30, 0x20c(r3)
+002d2b10: 7fc3f378  mr       r3, r30
+002d2b14: 809e0078  lwz      r4, 0x78(r30)
+002d2b18: 819e0000  lwz      r12, 0(r30)
+002d2b1c: 80fe0080  lwz      r7, 0x80(r30)
+002d2b20: 38a40032  addi     r5, r4, 0x32
+002d2b24: 809e0074  lwz      r4, 0x74(r30)
+002d2b28: 80de007c  lwz      r6, 0x7c(r30)
+002d2b2c: 38e70032  addi     r7, r7, 0x32
+002d2b30: 818c0068  lwz      r12, 0x68(r12)
+002d2b34: 482cfead  bl       0x5a29e0
+002d2b38: 80410014  lwz      r2, 0x14(r1)
+002d2b3c: 807f0000  lwz      r3, 0(r31)
+002d2b40: 38800004  li       r4, 4
+002d2b44: 80630190  lwz      r3, 0x190(r3)
+002d2b48: 481c4789  bl       0x4972d0   ; .GetStandardCursor__16cTSCursorManagerFQ29cTSCursor14StandardCursor
+002d2b4c: 38830000  addi     r4, r3, 0
+002d2b50: 387e0000  addi     r3, r30, 0
+002d2b54: 482313ad  bl       0x503f00   ; .SetCursor__6cTSWinFP9cTSCursor
+002d2b58: 80010058  lwz      r0, 0x58(r1)
+002d2b5c: 38210050  addi     r1, r1, 0x50
+002d2b60: 83e1fffc  lwz      r31, -4(r1)
+002d2b64: 7c0803a6  mtlr     r0
+002d2b68: 83c1fff8  lwz      r30, -8(r1)
+002d2b6c: 4e800020  blr      

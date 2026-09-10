@@ -1,0 +1,109 @@
+                ; ==== .TryIdle__8cXObjectFP9StackElemP10XPrimParam ====
+000f13c0: 93e1fffc  stw      r31, -4(r1)
+000f13c4: 7c0802a6  mflr     r0
+000f13c8: 3be30000  addi     r31, r3, 0
+000f13cc: 93c1fff8  stw      r30, -8(r1)
+000f13d0: 7cbe2b78  mr       r30, r5
+000f13d4: 93a1fff4  stw      r29, -0xc(r1)
+000f13d8: 3ba40000  addi     r29, r4, 0
+000f13dc: 90010008  stw      r0, 8(r1)
+000f13e0: 9421ffa0  stwu     r1, -0x60(r1)
+000f13e4: a8a50000  lha      r5, 0(r5)
+000f13e8: 7ca00735  extsh.   r0, r5
+000f13ec: 41800010  blt      0xf13fc
+000f13f0: 881d0007  lbz      r0, 7(r29)
+000f13f4: 7c050000  cmpw     r5, r0
+000f13f8: 4180001c  blt      0xf1414
+000f13fc: 38000008  li       r0, 8
+000f1400: 8062a6a8  lwz      r3, -0x5958(r2)
+000f1404: b0010040  sth      r0, 0x40(r1)
+000f1408: 38810040  addi     r4, r1, 0x40
+000f140c: 38a00000  li       r5, 0
+000f1410: 4849f311  bl       0x590720
+000f1414: 7fa3eb78  mr       r3, r29
+000f1418: 48061c29  bl       0x153040   ; .GetParams__9StackElemFv
+000f141c: 80bf00dc  lwz      r5, 0xdc(r31)
+000f1420: a89f00f0  lha      r4, 0xf0(r31)
+000f1424: 80a5002c  lwz      r5, 0x2c(r5)
+000f1428: 3804ffff  addi     r0, r4, -1
+000f142c: a89e0000  lha      r4, 0(r30)
+000f1430: 5400103a  slwi     r0, r0, 2
+000f1434: 7c05002e  lwzx     r0, r5, r0
+000f1438: 5487083c  slwi     r7, r4, 1
+000f143c: 5400043e  clrlwi   r0, r0, 0x10
+000f1440: 7c000735  extsh.   r0, r0
+000f1444: 4082003c  bne      0xf1480
+000f1448: 38000000  li       r0, 0
+000f144c: 7c033b2e  sthx     r0, r3, r7
+000f1450: 80df00dc  lwz      r6, 0xdc(r31)
+000f1454: a8bf00f0  lha      r5, 0xf0(r31)
+000f1458: 8086002c  lwz      r4, 0x2c(r6)
+000f145c: 3805ffff  addi     r0, r5, -1
+000f1460: 5405103a  slwi     r5, r0, 2
+000f1464: 7c04282e  lwzx     r0, r4, r5
+000f1468: 5400001e  rlwinm   r0, r0, 0, 0, 0xf
+000f146c: 7c04292e  stwx     r0, r4, r5
+000f1470: 8086002c  lwz      r4, 0x2c(r6)
+000f1474: 7c04282e  lwzx     r0, r4, r5
+000f1478: 6000ffff  ori      r0, r0, 0xffff
+000f147c: 7c04292e  stwx     r0, r4, r5
+000f1480: 7c033aae  lhax     r0, r3, r7
+000f1484: 2c000000  cmpwi    r0, 0
+000f1488: 4080000c  bge      0xf1494
+000f148c: 38000000  li       r0, 0
+000f1490: 7c033b2e  sthx     r0, r3, r7
+000f1494: 7ca33aae  lhax     r5, r3, r7
+000f1498: 7ca00735  extsh.   r0, r5
+000f149c: 4082000c  bne      0xf14a8
+000f14a0: 38600001  li       r3, 1
+000f14a4: 480000a0  b        0xf1544
+000f14a8: 809f0118  lwz      r4, 0x118(r31)
+000f14ac: a8040012  lha      r0, 0x12(r4)
+000f14b0: 2c000002  cmpwi    r0, 2
+000f14b4: 4182002c  beq      0xf14e0
+000f14b8: 801f014c  lwz      r0, 0x14c(r31)
+000f14bc: 28000000  cmplwi   r0, 0
+000f14c0: 41820014  beq      0xf14d4
+000f14c4: 809f0150  lwz      r4, 0x150(r31)
+000f14c8: 80040010  lwz      r0, 0x10(r4)
+000f14cc: 2c000000  cmpwi    r0, 0
+000f14d0: 40820010  bne      0xf14e0
+000f14d4: a81f007c  lha      r0, 0x7c(r31)
+000f14d8: 2c000000  cmpwi    r0, 0
+000f14dc: 4182000c  beq      0xf14e8
+000f14e0: 38000000  li       r0, 0
+000f14e4: 48000008  b        0xf14ec
+000f14e8: 38000001  li       r0, 1
+000f14ec: 5400063f  clrlwi.  r0, r0, 0x18
+000f14f0: 40820018  bne      0xf1508
+000f14f4: 7c833aae  lhax     r4, r3, r7
+000f14f8: 3804ffff  addi     r0, r4, -1
+000f14fc: 7c033b2e  sthx     r0, r3, r7
+000f1500: 38600002  li       r3, 2
+000f1504: 48000040  b        0xf1544
+000f1508: 80df00dc  lwz      r6, 0xdc(r31)
+000f150c: 3805ffff  addi     r0, r5, -1
+000f1510: a87f00f0  lha      r3, 0xf0(r31)
+000f1514: 5400043e  clrlwi   r0, r0, 0x10
+000f1518: 80a6002c  lwz      r5, 0x2c(r6)
+000f151c: 3863ffff  addi     r3, r3, -1
+000f1520: 5467103a  slwi     r7, r3, 2
+000f1524: 7c85382e  lwzx     r4, r5, r7
+000f1528: 38600002  li       r3, 2
+000f152c: 5484001e  rlwinm   r4, r4, 0, 0, 0xf
+000f1530: 7c85392e  stwx     r4, r5, r7
+000f1534: 80a6002c  lwz      r5, 0x2c(r6)
+000f1538: 7c85382e  lwzx     r4, r5, r7
+000f153c: 7c800378  or       r0, r4, r0
+000f1540: 7c05392e  stwx     r0, r5, r7
+000f1544: 80010068  lwz      r0, 0x68(r1)
+000f1548: 38210060  addi     r1, r1, 0x60
+000f154c: 83e1fffc  lwz      r31, -4(r1)
+000f1550: 83c1fff8  lwz      r30, -8(r1)
+000f1554: 7c0803a6  mtlr     r0
+000f1558: 83a1fff4  lwz      r29, -0xc(r1)
+000f155c: 4e800020  blr
+000f1560: 00000000  .long    0x00000000
+000f1564: 00092041  .long    0x00092041
+000f1568: 80030000  lwz      r0, 0(r3)
+000f156c: 000001a0  .long    0x000001a0

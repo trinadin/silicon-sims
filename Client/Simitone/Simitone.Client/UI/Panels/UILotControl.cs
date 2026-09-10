@@ -6,6 +6,7 @@ http://mozilla.org/MPL/2.0/.
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using FSO.Client.UI.Framework;
@@ -20,6 +21,7 @@ using FSO.HIT;
 
 using FSO.LotView;
 using FSO.SimAntics;
+using FSO.SimAntics.Entities;
 using FSO.LotView.Components;
 using Microsoft.Xna.Framework.Input;
 using FSO.LotView.Model;
@@ -36,13 +38,15 @@ using Simitone.Client.UI.Panels.LotControls;
 using FSO.Client.UI.Panels.LotControls;
 using FSO.UI.Panels.LotControls;
 using Simitone.Client.UI.Controls;
+using Simitone.Client.UI.Model;
+using FSO.Files.Formats.IFF.Chunks;
 
 namespace Simitone.Client.UI.Panels
 {
     /// <summary>
     /// Generates pie menus when the player clicks on objects.
     /// </summary>
-    public class UILotControl : UIContainer, ILotControl
+    public partial class UILotControl : UIContainer, ILotControl
     {
         private UIMouseEventRef MouseEvt;
         public bool MouseIsOn;
@@ -58,9 +62,14 @@ namespace Simitone.Client.UI.Panels
         public FSO.LotView.World World { get; set; }
         public VMEntity ActiveEntity { get; set; }
         public int Budget { get
-            {
-                return vm.TS1State.CurrentFamily?.Budget ?? int.MaxValue;
-            }
+        {
+            // NBR-04: on community/downtown lots the visiting family (travel
+            // context) pays — fall back to it so InsufficientFunds stays
+            // reachable instead of conceding infinite money.
+            return vm?.TS1State?.CurrentFamily?.Budget
+                ?? FSO.Content.Content.Get().Neighborhood?.GameState?.ActiveFamily?.Budget
+                ?? int.MaxValue;
+        }
         }
         public uint SelectedSimID
         {
@@ -111,14 +120,24 @@ namespace Simitone.Client.UI.Panels
         private static uint GOTO_GUID = 0x000007C4;
         public VMEntity GotoObject;
 
-        private Rectangle MouseCutRect = new Rectangle(-4, -4, 4, 4);
+        // ==== R244: native dynamic-cutaway state (tools/iff-dump/r244-cutaway-state) ====
+        // History = membership model of cCutawaySet: FIFO capacity 3, duplicate
+        // insert is a no-op that does NOT refresh recency, the oldest member is
+        // evicted. Outside rooms ARE inserted now (native inserts any room id
+        // < 0xfffb; the engine's r26 flag tracks outside-ness for the cursor gate).
         private List<uint> CutRooms = new List<uint>();
-        private HashSet<uint> LastCutRooms = new HashSet<uint>(); //final rooms, including those outside. used to detect dirty.
         public sbyte LastFloor = -1;
         public WorldRotation LastRotation = WorldRotation.TopLeft;
-        private bool[] LastCuts; //cached roomcuts, to apply rect cut to.
-        private int LastWallMode = -1; //invalidates last roomcuts
-        private bool LastRectCutNotable = false; //set if the last rect cut made a noticable change to the cuts array. If true refresh regardless of new cut effect.
+        private bool[] LastCuts; //the standing composition (also the all-true/all-false shortcut arrays)
+        private int LastWallMode = -1; //invalidates the shortcut arrays
+        private WorldZoom LastCutZoom; //zoom is part of the mask geometry; changes invalidate the mask cache
+        private sbyte LastTouchFloor = -1; //touch-path (SoftwareKeyboard) change gate
+        private WorldRotation LastTouchRot = WorldRotation.TopLeft;
+        private HashSet<uint> LastTouchRooms;
+        // R244: per-room mask cache owned here; invalidated on floor/rotation/zoom
+        // changes, lot refresh (RefreshCut) and wall/room architecture changes.
+        private FSO.LotView.Utils.CutawayMaskCache CutMasks = new FSO.LotView.Utils.CutawayMaskCache();
+        private bool CutWallsWired;
 
         public UIObjectHolder ObjectHolder;
         public UICustomLotControl CustomControl;
@@ -191,13 +210,50 @@ namespace Simitone.Client.UI.Panels
         }
 
         public static bool ShowSimanticsExceptions = true;
+
+        internal static int OriginalDialogIconMode(FSO.SimAntics.Primitives.VMDialogOperand operand)
+        {
+            return operand == null ? -1 : (int)operand.IconMode;
+        }
+
+        internal static bool IsOriginalObjectDialog(FSO.SimAntics.Model.VMDialogInfo info)
+        {
+            return info != null && info.Operand != null && info.DialogID != 0;
+        }
+
+        internal static bool UsesAutomaticObjectDialogIcon(FSO.SimAntics.Model.VMDialogInfo info)
+        {
+            return IsOriginalObjectDialog(info)
+                && info.Operand.IconMode == VMDialogIconMode.Automatic;
+        }
+
+        internal static bool TryParseOriginalNamedIcon(string value, out string command, out int argument)
+        {
+            command = null;
+            argument = 0;
+            if (string.IsNullOrEmpty(value)) return false;
+
+            int split = value.IndexOf(' ');
+            if (split < 0)
+            {
+                command = value.ToLowerInvariant();
+                return command == "rel";
+            }
+            if (split == 0 || split == value.Length - 1) return false;
+            command = value.Substring(0, split).ToLowerInvariant();
+            return int.TryParse(value.Substring(split + 1), NumberStyles.Integer,
+                CultureInfo.InvariantCulture, out argument);
+        }
+
         void vm_OnDialog(FSO.SimAntics.Model.VMDialogInfo info)
         {
+            BindTutorialContext();
             if (info != null && ((info.DialogID == LastDialogID && info.DialogID != 0 && info.Block))) return;
             //return if same dialog as before, or not ours
             if ((info == null || info.Block) && BlockingDialog != null)
             {
                 //cancel current dialog because it's no longer valid
+                if (BlockingDialog is UIMobileAlert oldTutorial) TutorialPresenter?.Forget(oldTutorial);
                 UIScreen.RemoveDialog(BlockingDialog);
                 LastDialogID = 0;
                 BlockingDialog = null;
@@ -261,20 +317,35 @@ namespace Simitone.Client.UI.Panels
                     TS1NeighSelector.OnHouseSelect += HouseSelected;
                     return;
                 case VMDialogType.TS1PhoneBook:
-                    var phone = new UICallNeighborAlert(((VMAvatar)info.Caller).GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.NeighborId), vm);
-                    BlockingDialog = phone;
-                    UIScreen.GlobalShowDialog(phone, true);
-                    phone.OnResult += (result) =>
+                {
+                    // R192: desktop uses the original CWinPhoneBook law
+                    // (kPhoneBookBkg 620x356 + phoneicon + STR# 180 + the
+                    // decoded list anchors); touch keeps the mobile alert.
+                    Action<int> respond = (res) =>
                     {
                         vm.SendCommand(new VMNetDialogResponseCmd
                         {
                             ActorUID = info.Caller.PersistID,
-                            ResponseCode = (byte)((result > 0) ? 1 : 0),
-                            ResponseText = result.ToString()
+                            ResponseCode = (byte)((res > 0) ? 1 : 0),
+                            ResponseText = res.ToString()
                         });
                         BlockingDialog = null;
                     };
+                    if (Parent is Simitone.Client.UI.Screens.TS1GameScreen tgs && tgs.Desktop)
+                    {
+                        var orig = new Simitone.Client.UI.Panels.UIOriginalPhoneBookDialog(
+                            ((VMAvatar)info.Caller).GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.NeighborId), vm);
+                        UIScreen.GlobalShowDialog(orig, true);
+                        orig.OnResult += (r) => { orig.Close(); respond(r); };
+                    }
+                    else
+                    {
+                        var phone = new UICallNeighborAlert(((VMAvatar)info.Caller).GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.NeighborId), vm);
+                        UIScreen.GlobalShowDialog(phone, true);
+                        phone.OnResult += (r) => respond(r);
+                    }
                     return;
+                }
 
                 case VMDialogType.TS1PetChoice:
                 case VMDialogType.TS1Clothes:
@@ -298,28 +369,287 @@ namespace Simitone.Client.UI.Panels
                     return;
             }
 
-            var alert = new UIMobileAlert(options);
+            // TS1's real ObjectDialog primitive always creates
+            // cWinPictureDialog, including the common no-icon case. A nonzero
+            // DialogID plus an operand distinguishes that path from the debug,
+            // missing-object and generic-command messages which share this sink.
+            bool originalPictureDialogKind = IsOriginalObjectDialog(info);
+            bool tutorialOwner = originalPictureDialogKind && info.Caller != null &&
+                info.Caller == vm.Context.TutorialObject && !FSOEnvironment.SoftwareKeyboard;
+            bool tutorialGuid = originalPictureDialogKind && info.Caller?.Object.OBJ.GUID == 0xc3249a1d &&
+                !FSOEnvironment.SoftwareKeyboard;
+            bool tutorialCloseBox = !FSOEnvironment.SoftwareKeyboard && IsNonmodalTutorial(info);
+            if (tutorialGuid) options.Title = "";
+            // Nonmodal ObjectDialog replaces its primary bottom button with
+            // the closebox. Continue and nonmodal are independent flag bits.
+            if (tutorialCloseBox) options.Buttons = options.Buttons.Skip(1).ToArray();
+            var alert = new UIMobileAlert(options, originalPictureDialogKind,
+                tutorialOwner || tutorialCloseBox ? (((byte)info.Operand.Type & 0x80) != 0 ? 1.2 : 2.0) : (double?)null);
+            try
+            {
+                ApplyOriginalDialogIcon(alert, info);
+            }
+            // Icon generation is decorative. A corrupt/missing thumbnail must
+            // never strand a blocking VM primitive without an answerable dialog.
+            catch { }
 
-            UIScreen.GlobalShowDialog(alert, true);
+            // SetImage is part of ObjectDialog::SetupDialog. Finish it before
+            // mounting/centering the window so the first visible frame does not
+            // jump from the no-image geometry to the picture geometry.
+            TrackTutorialDialog(alert, info);
+            UIScreen.GlobalShowDialog(alert, !IsNonmodalTutorial(info));
+            if (tutorialGuid)
+            {
+                alert.OriginalOpacityMultiplier = 200f / 255f;
+                alert.InterpolatedAnimation = alert.InterpolatedAnimation;
+            }
+            if (tutorialOwner || tutorialCloseBox)
+            {
+                alert.TutorialEscapeResponse = type == VMDialogType.YesNoCancel ? (byte)2 :
+                    type == VMDialogType.YesNo ? (byte)1 : (byte)0;
+                alert.TutorialSpacePrimary = type != VMDialogType.YesNo && type != VMDialogType.YesNoCancel;
+                alert.TutorialKeyResponse = code => { if (info.Block) DialogResponse(code); else alert.Close(); };
+            }
+            if (tutorialCloseBox) alert.AddTutorialCloseBox(tutorialOwner,
+                () => { if (info.Block) DialogResponse(0); else alert.Close(); });
+            if (tutorialOwner && alert.OriginalChrome)
+            {
+                alert.TutorialOpacity = tutorialGuid ? 200f / 255f : 1;
+                TutorialPresenter?.Open(alert);
+            }
 
             if (info.Block)
             {
                 BlockingDialog = alert;
                 LastDialogID = info.DialogID;
             }
+        }
 
-            var entity = info.Icon;
+        private void ApplyOriginalDialogIcon(UIMobileAlert alert,
+            FSO.SimAntics.Model.VMDialogInfo info)
+        {
+            if (!IsOriginalObjectDialog(info)) return;
+            switch (info.Operand.IconMode)
+            {
+                case VMDialogIconMode.Automatic:
+                    // ParseUIString may have selected a neighbor even when no
+                    // live entity exists. Its selector takes precedence over
+                    // the signed Stack Object fallback captured by SimAntics.
+                    if (info.IconNeighborID >= 0) ApplyNeighborDialogIcon(alert, info.IconNeighborID);
+                    else ApplyAutomaticEntityDialogIcon(alert, info.Icon);
+                    break;
+                case VMDialogIconMode.None:
+                    break;
+                case VMDialogIconMode.Neighbor:
+                    ApplyNeighborDialogIcon(alert, info.IconNeighborID);
+                    break;
+                case VMDialogIconMode.Indexed:
+                    ApplyPrivateDialogBitmap(alert, info.IconResource,
+                        5000 + info.Operand.IconNameStringID);
+                    break;
+                case VMDialogIconMode.Named:
+                    ApplyNamedDialogIcon(alert, info);
+                    break;
+                // The original dispatch has no branches for 5..7.
+                default:
+                    break;
+            }
+        }
+
+        internal void ApplyOriginalDialogIconForProbe(UIMobileAlert alert,
+            FSO.SimAntics.Model.VMDialogInfo info)
+        {
+            ApplyOriginalDialogIcon(alert, info);
+        }
+
+        private void ApplyAutomaticEntityDialogIcon(UIMobileAlert alert, VMEntity entity)
+        {
             if (entity is VMGameObject)
             {
                 var objects = entity.MultitileGroup.Objects;
                 ObjectComponent[] objComps = new ObjectComponent[objects.Count];
                 for (int i = 0; i < objects.Count; i++)
-                {
                     objComps[i] = (ObjectComponent)objects[i].WorldUI;
-                }
-                var thumb = World.GetObjectThumb(objComps, entity.MultitileGroup.GetBasePositions(), GameFacade.GraphicsDevice);
-                alert.SetIcon(thumb, 256, 256);
+                var thumb = World.GetObjectThumb(objComps,
+                    entity.MultitileGroup.GetBasePositions(), GameFacade.GraphicsDevice);
+                // Product::DrawIcon's destination is exactly 120x120.
+                alert.SetOwnedIcon(thumb, alert.OriginalChrome ? 120 : 256,
+                    alert.OriginalChrome ? 120 : 256);
             }
+            else if (entity is VMAvatar)
+            {
+                // PersonFinder returns a 45x45 selector picture. UIIconCache's
+                // larger head source is shared, so ownership stays with it.
+                var portrait = UIIconCache.GetObject(entity);
+                alert.SetIcon(portrait, alert.OriginalChrome ? 45 : 256,
+                    alert.OriginalChrome ? 45 : 256);
+            }
+        }
+
+        private void ApplyNeighborDialogIcon(UIMobileAlert alert, short neighborID)
+        {
+            if (neighborID < 0) return;
+            VMAvatar avatar = null;
+            VMMultitileGroup temporary = null;
+            try
+            {
+                avatar = vm.Context.ObjectQueries.Avatars
+                    .OfType<VMAvatar>()
+                    .FirstOrDefault(x => x.GetPersonData(
+                        FSO.SimAntics.Model.VMPersonDataVariable.NeighborId) == neighborID);
+                if (avatar == null)
+                {
+                    var neighbor = Content.Get().Neighborhood.GetNeighborByID(neighborID);
+                    if (neighbor == null) return;
+                    temporary = vm.Context.CreateObjectInstance(neighbor.GUID,
+                        LotTilePos.OUT_OF_WORLD, Direction.NORTH, true);
+                    avatar = temporary?.BaseObject as VMAvatar;
+                }
+                var portrait = avatar == null ? null : UIIconCache.GetObject(avatar);
+                alert.SetIcon(portrait, alert.OriginalChrome ? 45 : 256,
+                    alert.OriginalChrome ? 45 : 256);
+            }
+            finally
+            {
+                temporary?.Delete(vm.Context);
+            }
+        }
+
+        private static void ApplyPrivateDialogBitmap(UIMobileAlert alert,
+            GameIffResource resource, int resourceID)
+        {
+            if (resourceID < 0 || resourceID > ushort.MaxValue) return;
+            var bmp = resource?.Get<BMP>((ushort)resourceID);
+            var texture = bmp?.GetTexture(GameFacade.GraphicsDevice);
+            if (texture != null)
+            {
+                // R210: the dialog's private BMP is the object's OWN original
+                // data — register for the ui-total provenance walk.
+                Simitone.Client.UI.Model.UIArtProvenance.NoteOriginal(texture, "dialog-private-bmp");
+                alert.SetOwnedIcon(texture, texture.Width, texture.Height);
+            }
+        }
+
+        private void ApplyNamedDialogIcon(UIMobileAlert alert,
+            FSO.SimAntics.Model.VMDialogInfo info)
+        {
+            string command;
+            int argument;
+            if (!TryParseOriginalNamedIcon(info.IconName, out command, out argument)) return;
+            switch (command)
+            {
+                case "gz":
+                case "gzi":
+                    var reference = UIOriginal.EnsureResolvedByID(argument);
+                    var global = reference?.Get(GameFacade.GraphicsDevice);
+                    if (global == null) return;
+                    if (command == "gz")
+                    {
+                        var member = UIOriginal.ResourceNameForIDForProbe(argument);
+                        if (member == null || global.Width < 4) return;
+                        // "gz" alone selects the first horizontal quarter;
+                        // the three-letter "gzi" command retains full bounds.
+                        global = UIOriginal.Rect(member, 0, 0,
+                            Math.Max(1, global.Width / 4), global.Height);
+                    }
+                    if (global != null)
+                        alert.SetIcon(global, global.Width, global.Height);
+                    break;
+                case "my":
+                    ApplyPrivateDialogBitmap(alert, info.IconResource, argument);
+                    break;
+                case "guid":
+                    ApplyGuidDialogIcon(alert, unchecked((uint)argument));
+                    break;
+                case "rel":
+                    ApplyRelationshipDialogIcon(alert);
+                    break;
+                case "job":
+                    ApplyJobDialogIcon(alert, argument);
+                    break;
+            }
+        }
+
+        private void ApplyGuidDialogIcon(UIMobileAlert alert, uint guid)
+        {
+            VMMultitileGroup temporary = null;
+            Texture2D texture = null;
+            bool ownsTexture = false;
+            try
+            {
+                temporary = vm.Context.CreateObjectInstance(guid,
+                    LotTilePos.OUT_OF_WORLD, Direction.NORTH, true);
+                var entity = temporary?.BaseObject;
+                if (entity == null) return;
+                texture = UIIconCache.GetObject(entity);
+                // UIIconCache returns a newly decoded private BMP for ordinary
+                // products, but GUID 0x7c4 is the process-wide Go Here CustomUI
+                // texture. Never dispose that shared singleton.
+                ownsTexture = entity is VMGameObject
+                    && entity.Object.OBJ.GUID != 0x000007C4;
+                // Product::ComposeBtnImage hands ObjectDialog an explicit 45px
+                // rectangle. Product BMPs are two horizontal states: select
+                // the first cell before composing, never squeeze both into it.
+                if (entity is VMGameObject && texture != null)
+                {
+                    var source = LiveSubpanels.Catalog.UICatalogItem.ProductIconSource(
+                        texture.Width, texture.Height, true, false);
+                    var cell = FSO.Common.Utils.TextureUtils.Clip(
+                        GameFacade.GraphicsDevice, texture, source);
+                    if (cell != null)
+                        alert.SetOwnedIcon(cell, alert.OriginalChrome ? 45 : 256,
+                            alert.OriginalChrome ? 45 : 256);
+                }
+                else
+                {
+                    // Avatar heads are shared by UIIconCache.
+                    alert.SetIcon(texture, alert.OriginalChrome ? 45 : 256,
+                        alert.OriginalChrome ? 45 : 256);
+                }
+            }
+            finally
+            {
+                if (ownsTexture) texture?.Dispose();
+                temporary?.Delete(vm.Context);
+            }
+        }
+
+        private void ApplyRelationshipDialogIcon(UIMobileAlert alert)
+        {
+            // The only shipped `rel` command selects the center fifth of the
+            // active character's BMP_2003 relationship strip (200x40, five
+            // 40x40 states). This is not a neighbor portrait or SimStub image.
+            var selected = ActiveEntity as VMAvatar;
+            if (selected == null) return;
+            var bitmap = selected.Object.Resource.Get<BMP>(2003);
+            Texture2D strip = null;
+            try
+            {
+                strip = bitmap?.GetTexture(GameFacade.GraphicsDevice);
+                if (strip == null || strip.Width < 5 || strip.Height < 1) return;
+                int frameWidth = strip.Width / 5;
+                var center = FSO.Common.Utils.TextureUtils.Clip(GameFacade.GraphicsDevice,
+                    strip, new Rectangle(frameWidth * 2, 0, frameWidth, strip.Height));
+                if (center != null)
+                    alert.SetOwnedIcon(center, center.Width, center.Height);
+            }
+            finally
+            {
+                strip?.Dispose();
+            }
+        }
+
+        private static void ApplyJobDialogIcon(UIMobileAlert alert, int jobID)
+        {
+            const int rowWidth = 84;
+            const int rowHeight = 63;
+            const int rowCount = 22;
+            if (jobID == -1) jobID = 11;
+            if (jobID < 0 || jobID >= rowCount) return;
+            var texture = UIOriginal.Rect("cpanel\\Backgrounds\\JobIconMultiPopup.bmp",
+                0, jobID * rowHeight, rowWidth, rowHeight);
+            if (texture != null)
+                alert.SetIcon(texture, texture.Width, texture.Height);
         }
 
         private void HouseSelected(int house)
@@ -479,23 +809,16 @@ namespace Simitone.Client.UI.Panels
                         obj = obj.MultitileGroup.GetInteractionGroupLeader(obj);
                         if (obj is VMGameObject && ((VMGameObject)obj).Disabled > 0)
                         {
-                            var flags = ((VMGameObject)obj).Disabled;
-
-                            if ((flags & VMGameObjectDisableFlags.ForSale) > 0)
-                            {
-                                //for sale
-                                var retailPrice = obj.MultitileGroup.Price; //wrong... should get this from catalog
-                                var salePrice = obj.MultitileGroup.SalePrice;
-                                ShowErrorTooltip(state, 22, true, "$" + retailPrice.ToString("##,#0"), "$" + salePrice.ToString("##,#0"));
-                            }
-                            else if ((flags & VMGameObjectDisableFlags.LotCategoryWrong) > 0)
-                                ShowErrorTooltip(state, 21, true); //category wrong
-                            else if ((flags & VMGameObjectDisableFlags.TransactionIncomplete) > 0)
-                                ShowErrorTooltip(state, 27, true); //transaction not yet complete
-                            else if ((flags & VMGameObjectDisableFlags.ObjectLimitExceeded) > 0)
-                                ShowErrorTooltip(state, 24, true); //object is temporarily disabled... todo: something more helpful
-                            else if ((flags & VMGameObjectDisableFlags.PendingRoommateDeletion) > 0)
-                                ShowErrorTooltip(state, 16, true); //pending roommate deletion
+                            // R198: the five TSO disable branches used STR# 159
+                            // ids 16/21/22/24/27 — ids that DO NOT EXIST in the
+                            // TS1 table (9 English entries; the flags are only
+                            // ever set by TSO netplay commands, dead on this
+                            // port). The engine's TS1 answer to a zero-action
+                            // object is the R129 reason ladder, so a disabled
+                            // object routes there like any other empty pie.
+                            var reason = DisabledObjectTooltipText(vm, obj, ActiveEntity);
+                            ReasonsShown++;
+                            ShowReasonTooltip(state, reason);
                         }
                         else
                         {
@@ -508,6 +831,14 @@ namespace Simitone.Client.UI.Panels
                                 PieMenu.X = state.MouseState.X / FSOEnvironment.DPIScaleFactor;
                                 PieMenu.Y = state.MouseState.Y / FSOEnvironment.DPIScaleFactor;
                                 PieMenu.UpdateHeadPosition(state.MouseState.X, state.MouseState.Y);
+                            }
+                            else
+                            {
+                                // R125: the original's zero-interaction feedback — the
+                                // classified STR# 159 reason replaces the dead click
+                                var reason = ObjectTooltipReason(vm, obj, ActiveEntity);
+                                ReasonsShown++;
+                                ShowReasonTooltip(state, reason);
                             }
                         }
                     }
@@ -526,15 +857,136 @@ namespace Simitone.Client.UI.Panels
             }
         }
 
+        // ==== R198: the cDefaultTTWindow COLOR LAW (decoded this round,
+        // tools/iff-dump/r198/r198-tooltip-law.md) ====
+        // The engine owns ONE shared tooltip window (cTSWinMgrW95::
+        // GetDefaultTTWindow @0x51c7d4 is the ONLY ctor caller), font face 1
+        // size 7, white box. It carries two color slots: the normal slot
+        // (cDefaultTTWindow::Init 0x3b9828 stores 0 = the default black pen)
+        // and the error slot (0x3b9844-0x3b9860 = the palette lookup
+        // (0xFF,0,0) = RED). SetColor @0x3b9770 ({0=normal, 1=error}) has
+        // exactly ONE consumer: ProductButton::GetToolTipsWindow @0x20b8d4 —
+        // RED when the player cannot afford the catalog product, normal
+        // otherwise. The buy catalog additionally overrides its normal slot
+        // with RGB(31,124,31) (cWinCatalog::Init 0x26b458, the R145 green).
+        // cTool::SetToolTip @0x191c30 (the live-mode path these tooltips ride)
+        // never recolors — the default pen is the law here. The error-red is
+        // unreachable in this port (the catalog product tooltip was replaced
+        // by the R124 description panel); the constant pins the law.
+        public static readonly Color TooltipDefaultColor = Color.Black;
+        public static readonly Color TooltipErrorColor = new Color(255, 0, 0);
+
         private void ShowErrorTooltip(UpdateState state, uint id, bool playSound, params string[] args)
         {
             if (playSound) HITVM.Get().PlaySoundEvent(UISounds.Error);
             state.UIState.TooltipProperties.Show = true;
-            state.UIState.TooltipProperties.Color = Color.Black;
+            state.UIState.TooltipProperties.Color = TooltipDefaultColor;
             state.UIState.TooltipProperties.Opacity = 1;
             state.UIState.TooltipProperties.Position = new Vector2(state.MouseState.X,
                 state.MouseState.Y);
             state.UIState.Tooltip = GameFacade.Strings.GetString("159", id.ToString(), args);
+            state.UIState.TooltipProperties.UpdateDead = false;
+            ShowTooltip = true;
+            TipIsError = true;
+        }
+
+        // ==== R125: the ORIGINAL live-mode object hover tooltips (STR# 159) ====
+        // Gate instrumentation.
+        public static int CanonStringsLoaded = 0;
+        public static int NamesShown = 0;
+        public static int ReasonsShown = 0;
+
+        /// The hover text for an entity whose interactions ARE available: its
+        /// NAME. VMEntity.ToString already resolves it the original's way
+        /// (MultitileGroup.Name -> CTSS[0] -> OBJD label) — the same string the
+        /// avatar hover showed before R125, now shown for objects too.
+        public static string ObjectHoverName(VMEntity obj)
+        {
+            NamesShown++;
+            return obj.ToString();
+        }
+
+        /// R129: the ORIGINAL unavailability reason for a hovered entity, from
+        /// UIText.iff STR# 159 'ObjectTTs' — the ENGINE ladder, decoded
+        /// instruction-literally from the original PPC binary
+        /// (cObjPickerTool::Release 0x1850c4 + the ObjSelector audience
+        /// predicates 0x103870-0x104578; tools/iff-dump/r129/). Fixed priority
+        /// over audience aggregates of the object's OWN TTAB (the engine's
+        /// predicates never merge the global tree), Debug-flagged (0x80)
+        /// entries skipped, and every aggregate requires >= 1 live entry.
+        /// Engine-derived viewer map: selected person +1550 bit0 = cat,
+        /// bit1 = dog; +1536 type in (0,18) = human. [3] is the pet-click
+        /// self-hover; [8] is pet-only (pets take no user direction) — a
+        /// human viewer's terminal default is [0]. The engine's game-level
+        /// pet gate and its debug pet-control flag are constant on Complete
+        /// data (disclosed in r129-objpicker-engine.md).
+        /// R198: the disabled-object routing target. The TSO flags never fire on
+        /// this port (netplay-only setters), and their old STR# 159 ids
+        /// (16/21/22/24/27) do not exist in the 9-entry TS1 table — a disabled
+        /// object is a zero-action object, and the engine answer is the R129
+        /// reason ladder this delegates to (null viewer -> no tooltip, the
+        /// engine's own behavior).
+        public static int DisabledRouted = 0;
+        public static string DisabledObjectTooltipText(VM vm, VMEntity obj, VMEntity viewerEntity)
+        {
+            DisabledRouted++;
+            return ObjectTooltipReason(vm, obj, viewerEntity);
+        }
+
+        public static string ObjectTooltipReason(VM vm, VMEntity obj, VMEntity viewerEntity)
+        {
+            var viewer = viewerEntity as VMAvatar;
+            Func<int, string> S = i => { CanonStringsLoaded++; return GameFacade.Strings.GetString("159", i.ToString()); };
+            if (viewer == null) return null;                      // engine: no selected person -> no tooltip
+            if (obj == viewerEntity && viewer.IsPet) return S(3); // engine modes 29/42: the pet hovering itself
+
+            bool isCat = viewer.IsCat;      // person+1550 bit0
+            bool isDog = viewer.IsDog;      // person+1550 bit1
+            bool isHuman = !viewer.IsPet;   // r17: a human person is selected
+
+            bool hasTable = obj.TreeTable != null;                // engine: hovered+284 != 0
+            bool any = false, allNoChild = true, allNoAdult = true, anyAllowCats = false, anyAllowDogs = false;
+            if (hasTable)
+            {
+                foreach (var e in obj.TreeTable.Interactions)
+                {
+                    if ((e.Flags & TTABFlags.Debug) > 0) continue; // the engine skips the 0x80 entry flag
+                    any = true;
+                    if ((e.Flags & TTABFlags.TS1NoChild) == 0) allNoChild = false;
+                    if ((e.Flags & TTABFlags.TS1NoAdult) == 0) allNoAdult = false;
+                    if ((e.Flags & TTABFlags.TS1AllowCats) > 0) anyAllowCats = true;
+                    if ((e.Flags & TTABFlags.TS1AllowDogs) > 0) anyAllowDogs = true;
+                }
+            }
+            // ObjSelector::AdultsOnly / ChildrenOnly / PetsOnly / DogsOnly / CatsOnly / PeopleOnly
+            bool adultsOnly = any && allNoChild && !anyAllowCats && !anyAllowDogs;
+            bool childrenOnly = any && allNoAdult && !anyAllowCats && !anyAllowDogs;
+            bool petsOnly = any && allNoChild && allNoAdult;
+            bool dogsOnly = petsOnly && !anyAllowCats;
+            bool catsOnly = petsOnly && !anyAllowDogs;
+            bool peopleOnly = any && !anyAllowCats && !anyAllowDogs;
+
+            if (hasTable && (isHuman || isCat || isDog) && adultsOnly) return S(1); // rung 1 'adults'
+            if (hasTable && !isHuman && childrenOnly) return S(2);                  // rung 2 'kids'
+            if (hasTable && !isCat && dogsOnly) return S(4);                        // rung 3 'dogs'
+            if (hasTable && !isDog && catsOnly) return S(5);                        // rung 4 'cats'
+            if (hasTable && !isCat && !isDog && petsOnly) return S(6);              // rung 5 'pets'
+            if (hasTable && (isCat || isDog) && peopleOnly) return S(7);            // rung 6 'people'
+            if (isCat || isDog) return S(8);                                        // rung 7 'no user-directed'
+            return S(0);                                                            // terminal default 'no actions'
+        }
+
+        /// R125: shows an already-classified STR# 159 reason (the shared channel
+        /// and error sound of ShowErrorTooltip, with the exact string).
+        private void ShowReasonTooltip(UpdateState state, string reason)
+        {
+            HITVM.Get().PlaySoundEvent(UISounds.Error);
+            state.UIState.TooltipProperties.Show = true;
+            state.UIState.TooltipProperties.Color = TooltipDefaultColor;
+            state.UIState.TooltipProperties.Opacity = 1;
+            state.UIState.TooltipProperties.Position = new Vector2(state.MouseState.X,
+                state.MouseState.Y);
+            state.UIState.Tooltip = reason;
             state.UIState.TooltipProperties.UpdateDead = false;
             ShowTooltip = true;
             TipIsError = true;
@@ -577,6 +1029,9 @@ namespace Simitone.Client.UI.Panels
                             var obj = vm.GetObjectById(ObjectHover);
                             if (obj != null)
                             {
+                                // R125: leader-ize exactly like the pie path so the
+                                // availability flag matches what a click would build
+                                obj = obj.MultitileGroup.GetInteractionGroupLeader(obj);
                                 var menu = obj.GetPieMenu(vm, ActiveEntity, false, true);
                                 InteractionsAvailable = (menu.Count > 0);
                             }
@@ -589,24 +1044,17 @@ namespace Simitone.Client.UI.Panels
                         var obj = vm.GetObjectById(ObjectHover);
                         if (!TipIsError && obj != null)
                         {
-                            if (obj is VMAvatar)
-                            {
-                                state.UIState.TooltipProperties.Show = true;
-                                state.UIState.TooltipProperties.Color = Color.Black;
-                                state.UIState.TooltipProperties.Opacity = 1;
-                                state.UIState.TooltipProperties.Position = new Vector2(state.MouseState.X,
-                                    state.MouseState.Y);
-                                state.UIState.Tooltip = GetAvatarString(obj as VMAvatar);
-                                state.UIState.TooltipProperties.UpdateDead = false;
-                                ShowTooltip = true;
-                            }
-                            else if (((VMGameObject)obj).Disabled > 0)
+                            // R125: the ORIGINAL hover tooltip — the entity's NAME when
+                            // interactions are available, else the unavailability REASON
+                            // from UIText.iff STR# 159 'ObjectTTs' (classified from the
+                            // object's own TTAB flags — see ObjectTooltipReason).
+                            obj = obj.MultitileGroup.GetInteractionGroupLeader(obj);
+                            if (obj is VMGameObject && ((VMGameObject)obj).Disabled > 0)
                             {
                                 var flags = ((VMGameObject)obj).Disabled;
                                 if ((flags & VMGameObjectDisableFlags.ForSale) > 0)
                                 {
-                                    //for sale
-                                    //try to get catalog price
+                                    //for sale (TSO-era residual; TS1 lots never set it)
                                     var guid = obj.MasterDefinition?.GUID ?? obj.Object.OBJ.GUID;
                                     var item = Content.Get().WorldCatalog.GetItemByGUID(guid);
 
@@ -616,7 +1064,20 @@ namespace Simitone.Client.UI.Panels
                                     TipIsError = false;
                                 }
                             }
-
+                            else
+                            {
+                                string tip;
+                                if (InteractionsAvailable) tip = ObjectHoverName(obj);
+                                else { tip = ObjectTooltipReason(vm, obj, ActiveEntity); ReasonsShown++; }
+                                state.UIState.TooltipProperties.Show = true;
+                                state.UIState.TooltipProperties.Color = TooltipDefaultColor;
+                                state.UIState.TooltipProperties.Opacity = 1;
+                                state.UIState.TooltipProperties.Position = new Vector2(state.MouseState.X,
+                                    state.MouseState.Y);
+                                state.UIState.Tooltip = tip;
+                                state.UIState.TooltipProperties.UpdateDead = false;
+                                ShowTooltip = true;
+                            }
                         }
                     }
                     if (!ShowTooltip)
@@ -665,15 +1126,17 @@ namespace Simitone.Client.UI.Panels
 
         }
 
-        private string GetAvatarString(VMAvatar ava)
-        {
-            return ava.ToString();
-        }
-
         public void RefreshCut()
         {
             LastFloor = -1;
             LastWallMode = -1;
+            LastTouchFloor = -1;
+            //R244: a lot refresh rebuilds rooms — every cached mask is stale AND
+            //the history's room ids are re-partitioned by the rebuild, so stale
+            //ids must not survive (native clears the set on the same shape of
+            //event: terrain-rebuild command 0x105, decode.md §1.2B).
+            CutRooms.Clear();
+            CutMasks.Invalidate();
 
             if (vm.Context.Blueprint != null && LastCuts != null)
             {
@@ -700,6 +1163,7 @@ namespace Simitone.Client.UI.Panels
 
         public override void Draw(UISpriteBatch batch)
         {
+            if (!Visible) return;
             //DrawLocalTexture(batch, World.State.Light.LightMap, new Rectangle(0,0, World.State.Light.LightMap.Width/3, World.State.Light.LightMap.Height/2), new Vector2());
             if (RMBScroll)
             {
@@ -711,6 +1175,8 @@ namespace Simitone.Client.UI.Panels
         private WorldZoom LastZoom;
         public override void Update(UpdateState state)
         {
+            BindTutorialContext();
+            TickTutorialPoller(state);
             base.Update(state);
 
             if (!vm.Ready || vm.Context.Architecture == null) return;
@@ -817,25 +1283,20 @@ namespace Simitone.Client.UI.Panels
             if (GotoObject == null) GotoObject = vm.Context.CreateObjectInstance(GOTO_GUID, LotTilePos.OUT_OF_WORLD, Direction.NORTH, true).Objects[0];
 
 
-            //update plumbbob
-            var plumb = Content.Get().RCMeshes.Get("arrow.fsom");
+            // Original TS1 marker: one selected Sim, a shared real-time spin phase,
+            // native mood color and native assets. Selection does not accelerate it.
             foreach (VMAvatar avatar in vm.Context.ObjectQueries.Avatars)
             {
                 if (avatar.Avatar == null) continue;
                 var isActive = (avatar == ActiveEntity);
-                if ((avatar.Avatar.HeadObject == plumb) != isActive)
-                {
-                    avatar.Avatar.HeadObject = (avatar == ActiveEntity) ? plumb : null;
-                    avatar.Avatar.HeadObjectSpeedyVel = 0.2f;
-                }
-                avatar.Avatar.HeadObjectRotation += 3f / FSOEnvironment.RefreshRate;
-                if (isActive)
-                {
-                    avatar.Avatar.HeadObjectRotation += avatar.Avatar.HeadObjectSpeedyVel;
-                    avatar.Avatar.HeadObjectSpeedyVel *= 0.98f;
-                } else if (avatar.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.Category) == 87)
+                avatar.Avatar.TS1PlumbBobVisible = isActive;
+                avatar.Avatar.TS1PlumbBobMood = avatar.GetMotiveData(FSO.SimAntics.Model.VMMotive.Mood);
+                avatar.Avatar.TS1PlumbBobSeconds = state.Time.TotalGameTime.TotalSeconds;
+                avatar.Avatar.HeadObject = null;
+                if (!isActive && avatar.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.Category) == 87)
                 {
                     avatar.Avatar.HeadObject = Content.Get().RCMeshes.Get("star.fsom");
+                    avatar.Avatar.HeadObjectRotation += 3f / FSOEnvironment.RefreshRate;
                 }
             }
             /*
@@ -991,11 +1452,17 @@ namespace Simitone.Client.UI.Panels
                         Title = "Debug Lot Thumbnail",
                         Message = "Arch Value: "+VMArchitectureStats.GetArchValue(vm.Context.Architecture),
                         Buttons = UIAlertButton.Ok((btn) => UIScreen.RemoveDialog(alert))
-                    });
-                    Texture2D roofless = null;
-                    var thumb = World.GetLotThumb(GameFacade.GraphicsDevice, (tex) => roofless = FSO.Common.Utils.TextureUtils.Decimate(tex, GameFacade.GraphicsDevice, 2, false));
+                    }, true);
+                    // The roofless callback is optional. This debug dialog only
+                    // displays the normal thumbnail, so requesting and then
+                    // abandoning a second decimated texture leaked it.
+                    var thumb = World.GetLotThumb(GameFacade.GraphicsDevice, null);
                     thumb = FSO.Common.Utils.TextureUtils.Decimate(thumb, GameFacade.GraphicsDevice, 2, false);
-                    alert.SetIcon(thumb, thumb.Width, thumb.Height);
+                    // Keep the port-only debug thumbnail inside the same desktop
+                    // picture-dialog canvas; touch retains its established size.
+                    int debugIconWidth = alert.OriginalChrome ? 120 : thumb.Width;
+                    int debugIconHeight = alert.OriginalChrome ? 120 : thumb.Height;
+                    alert.SetOwnedIcon(thumb, debugIconWidth, debugIconHeight);
                     UIScreen.GlobalShowDialog(alert, true);
                 }
                 if (LiveMode) LiveModeUpdate(state, scrolled);
@@ -1043,89 +1510,306 @@ namespace Simitone.Client.UI.Panels
 
         private void UpdateCutaway(UpdateState state)
         {
-            if (vm.Context.Blueprint != null)
+            if (vm.Context.Blueprint == null) return;
+            WireCutMaskInvalidation();
+            World.State.DynamicCutaway = (WallsMode == 1);
+
+            // WallsMode 0 (walls down: everything cut) and 2/3 (walls up, roof:
+            // nothing cut) keep their byte-identical shortcut arrays — assigned
+            // once per wall-mode change, never recomposed.
+            if (LastWallMode != WallsMode)
             {
-                World.State.DynamicCutaway = (WallsMode == 1);
-                //first we need to cycle the rooms that are being cutaway. Keep this up even if we're in all-cut mode.
-                var mouseTilePos = World.EstTileAtPosWithScroll(new Vector2(state.MouseState.X, state.MouseState.Y) / FSOEnvironment.DPIScaleFactor);
-                var roomHover = vm.Context.GetRoomAt(LotTilePos.FromBigTile((short)(mouseTilePos.X), (short)(mouseTilePos.Y), World.State.Level));
-                var outside = (vm.Context.RoomInfo[roomHover].Room.IsOutside);
-                if (!outside && !CutRooms.Contains(roomHover))
-                    CutRooms.Add(roomHover); //outside hover should not persist like with other rooms.
-                while (CutRooms.Count > 3) CutRooms.Remove(CutRooms.ElementAt(0));
-
-                if (LastWallMode != WallsMode)
+                if (WallsMode == 0) //walls down
                 {
-                    if (WallsMode == 0) //walls down
-                    {
-                        LastCuts = new bool[vm.Context.Architecture.Width * vm.Context.Architecture.Height];
-                        vm.Context.Blueprint.Cutaway = LastCuts;
-                        vm.Context.Blueprint.Changes.SetFlag(BlueprintGlobalChanges.WALL_CUT_CHANGED);
-                        for (int i = 0; i < LastCuts.Length; i++) LastCuts[i] = true;
-                    }
-                    else if (WallsMode == 1)
-                    {
-                        MouseCutRect = new Rectangle();
-                        LastCutRooms = new HashSet<uint>() { uint.MaxValue }; //must regenerate cuts
-                    }
-                    else //walls up or roof
-                    {
-                        LastCuts = new bool[vm.Context.Architecture.Width * vm.Context.Architecture.Height];
-                        vm.Context.Blueprint.Cutaway = LastCuts;
-                        vm.Context.Blueprint.Changes.SetFlag(BlueprintGlobalChanges.WALL_CUT_CHANGED);
-                    }
-                    LastWallMode = WallsMode;
+                    LastCuts = new bool[vm.Context.Architecture.Width * vm.Context.Architecture.Height];
+                    vm.Context.Blueprint.Cutaway = LastCuts;
+                    vm.Context.Blueprint.Changes.SetFlag(BlueprintGlobalChanges.WALL_CUT_CHANGED);
+                    for (int i = 0; i < LastCuts.Length; i++) LastCuts[i] = true;
                 }
-
-                if (WallsMode == 1)
+                else if (WallsMode == 1)
                 {
-                    HashSet<uint> finalRooms;
-                    int recut = 0;
-                    if (FSOEnvironment.SoftwareKeyboard)
-                    {
-                        finalRooms = new HashSet<uint>();
-                        foreach (var room in vm.Context.RoomInfo)
-                        {
-                            if (!room.Room.IsOutside && room.Room.Floor == World.State.Level-1) finalRooms.Add(room.Room.RoomID);
-                        }
-                    }
-                    else
-                    {
-                        if (RMBScroll || !MouseIsOn) return;
-                        finalRooms = new HashSet<uint>(CutRooms);
-                        var newCut = new Rectangle((int)(mouseTilePos.X - 2.5), (int)(mouseTilePos.Y - 2.5), 5, 5);
-                        newCut.X -= VMArchitectureTools.CutCheckDir[(int)World.State.CutRotation][0] * 2;
-                        newCut.Y -= VMArchitectureTools.CutCheckDir[(int)World.State.CutRotation][1] * 2;
-                        if (newCut != MouseCutRect)
-                        {
-                            MouseCutRect = newCut;
-                            recut = 1;
-                        }
-                    }
-
-                    if (LastFloor != World.State.Level || LastRotation != World.State.CutRotation || !finalRooms.SetEquals(LastCutRooms))
-                    {
-                        LastCuts = VMArchitectureTools.GenerateRoomCut(vm.Context.Architecture, World.State.Level, World.State.CutRotation, finalRooms);
-                        recut = 2;
-                        LastFloor = World.State.Level;
-                        LastRotation = World.State.CutRotation;
-                    }
-                    LastCutRooms = finalRooms;
-
-                    if (recut > 0)
-                    {
-                        var finalCut = new bool[LastCuts.Length];
-                        Array.Copy(LastCuts, finalCut, LastCuts.Length);
-                        var notableChange = VMArchitectureTools.ApplyCutRectangle(vm.Context.Architecture, World.State.Level, finalCut, MouseCutRect);
-                        if (recut > 1 || notableChange || LastRectCutNotable)
-                        {
-                            vm.Context.Blueprint.Cutaway = finalCut;
-                            vm.Context.Blueprint.Changes.SetFlag(BlueprintGlobalChanges.WALL_CUT_CHANGED);
-                        }
-                        LastRectCutNotable = notableChange;
-                    }
+                    // native SetDynamicCutaway clears the room history on any
+                    // toggle of the dynamic flag (decode.md §1.2B).
+                    CutRooms.Clear();
+                    CutMasks.Invalidate();
                 }
+                else //walls up or roof
+                {
+                    LastCuts = new bool[vm.Context.Architecture.Width * vm.Context.Architecture.Height];
+                    vm.Context.Blueprint.Cutaway = LastCuts;
+                    vm.Context.Blueprint.Changes.SetFlag(BlueprintGlobalChanges.WALL_CUT_CHANGED);
+                }
+                LastWallMode = WallsMode;
             }
+
+            if (WallsMode != 1) return;
+
+            //view changes invalidate the cached per-room masks; a floor change
+            //also clears the history (native SetLevel idiom, decode.md §1.2A)
+            NoteCutawayViewChange();
+
+            // R244 touch residual: the SoftwareKeyboard path keeps its existing
+            // all-indoor-rooms-on-view-floor behavior (GenerateRoomCut mask law)
+            // UNCHANGED this round; the native composition below is desktop-only.
+            if (FSOEnvironment.SoftwareKeyboard)
+            {
+                var finalRooms = new HashSet<uint>();
+                foreach (var room in vm.Context.RoomInfo)
+                {
+                    if (!room.Room.IsOutside && room.Room.Floor == World.State.Level-1) finalRooms.Add(room.Room.RoomID);
+                }
+                if (LastTouchFloor != World.State.Level || LastTouchRot != World.State.CutRotation
+                    || LastTouchRooms == null || !finalRooms.SetEquals(LastTouchRooms))
+                {
+                    LastTouchFloor = World.State.Level;
+                    LastTouchRot = World.State.CutRotation;
+                    LastTouchRooms = finalRooms;
+                    LastCuts = VMArchitectureTools.GenerateRoomCut(vm.Context.Architecture, World.State.Level, World.State.CutRotation, finalRooms);
+                    vm.Context.Blueprint.Cutaway = LastCuts;
+                    vm.Context.Blueprint.Changes.SetFlag(BlueprintGlobalChanges.WALL_CUT_CHANGED);
+                }
+                return;
+            }
+
+            // suppression = the port's freeze conditions: the RMB camera scroll
+            // is active (the native EdgeDetectScroller waiting-for-click state)
+            // or the mouse is off the lot control (the native MouseTrack
+            // viewport gate). Inserts stop; the compose stays live so the
+            // person/standing-history inputs keep driving the mask.
+            var mousePhysical = (new Vector2(state.MouseState.X, state.MouseState.Y) / FSOEnvironment.DPIScaleFactor).ToPoint();
+            bool suppressed = RMBScroll || !MouseIsOn;
+            UpdateCutawayDynamic(mousePhysical, suppressed);
         }
+
+        /// <summary>
+        /// R244: the whole desktop dynamic-mode pipeline — view-change
+        /// lifecycle, the native MouseTrack(phase 0) history insert plus the
+        /// DoDynamicCutaway compose — in one entry point shared with the
+        /// uicutaway autotest, so the check drives exactly the production path.
+        /// </summary>
+        internal void UpdateCutawayDynamic(Point cursorScreen, bool suppressed)
+        {
+            if (vm?.Context?.Blueprint == null || vm.Context.Architecture == null) return;
+            if (WallsMode != 1 || FSOEnvironment.SoftwareKeyboard) return;
+            NoteCutawayViewChange();
+            if (!suppressed)
+            {
+                // native MouseTrack: an off-lot cursor runs ResetDynamicCutaway
+                // and RETURNS — the reset is the whole update (decode.md §1.1
+                // step 5); recomposing the standing history afterwards would
+                // immediately defeat the reset
+                var bp = vm.Context.Blueprint;
+                var tile = World.EstTileAtPosWithScroll(new Vector2(cursorScreen.X, cursorScreen.Y));
+                int tx = (int)tile.X, ty = (int)tile.Y;
+                if (tx < 1 || ty < 1 || tx > bp.Width - 2 || ty > bp.Height - 2)
+                {
+                    ResetCutawayMatrix();
+                    return;
+                }
+                DriveCutawayHistory(cursorScreen);
+            }
+            CommitCutaway(BuildCutawayInputs(cursorScreen, suppressed));
+        }
+
+        /// <summary>
+        /// R244 view-change lifecycle: any floor/rotation/zoom change
+        /// invalidates the cached per-room masks, and a FLOOR change
+        /// additionally clears the room history — the native SetLevel/
+        /// ScrollToTile idiom (decode.md §1.2A: disable the old floor's
+        /// cutaway, clear, reset, swap floor, recompute). A rotation change
+        /// alone does NOT clear (native DoCommand 0xe4 keeps the set). Runs
+        /// inside the shared production entry point so the uicutaway battery
+        /// drives the exact same lifecycle.
+        /// </summary>
+        internal void NoteCutawayViewChange()
+        {
+            if (LastFloor == World.State.Level && LastRotation == World.State.CutRotation && LastCutZoom == World.State.Zoom) return;
+            bool floorChanged = LastFloor != World.State.Level;
+            LastFloor = World.State.Level;
+            LastRotation = World.State.CutRotation;
+            LastCutZoom = World.State.Zoom;
+            CutMasks.Invalidate();
+            if (floorChanged) CutRooms.Clear(); //the old floor's room ids must not survive the swap
+        }
+
+        private FSO.LotView.Utils.CutawayViewInputs BuildCutawayInputs(Point cursorScreen, bool suppressed)
+        {
+            var viewport = GameFacade.GraphicsDevice.Viewport;
+            // the native main-animation-buffer bounds test: the lot viewport in
+            // LOGICAL pixels — the same units as CursorScreenPos
+            // (MouseState/DPIScaleFactor) — so the cursor-in-buffer gate is
+            // DPI-independent (identical to the physical viewport at DPI 1)
+            float dpi = FSOEnvironment.DPIScaleFactor;
+            var view = new FSO.LotView.Utils.CutawayViewInputs
+            {
+                Floor = World.State.Level,
+                Rotation = World.State.CutRotation,
+                Zoom = World.State.Zoom,
+                // effective on-screen sprite scale: the engine only uses it for the
+                // cursor Y adjustment and the cache key; the mask algebra cancels it
+                PreciseZoom = World.State.PreciseZoom * World.BackbufferScale,
+                BufferBounds = new Rectangle(0, 0, (int)(viewport.Width / dpi), (int)(viewport.Height / dpi)),
+                CursorScreenPos = cursorScreen,
+                CursorSuppressed = suppressed,
+                // the port's own mouse->tile projection (the same path the old
+                // cursor math used), in BufferBounds pixels
+                ScreenToTile = pos => World.EstTileAtPosWithScroll(new Vector2(pos.X, pos.Y)),
+                HistoryRooms = CutRooms,
+                DynamicEnabled = true,
+            };
+            AppendPersonInputs(view);
+            return view;
+        }
+
+        /// <summary>
+        /// R244: commit only on a real difference (CutawayMatrix.Differs) —
+        /// replaces the old recut/notableChange heuristics.
+        /// </summary>
+        private void CommitCutaway(FSO.LotView.Utils.CutawayViewInputs view)
+        {
+            var composed = FSO.LotView.Utils.CutawayMatrix.ComposeDynamic(vm.Context.Blueprint, view, CutMasks);
+            if (!FSO.LotView.Utils.CutawayMatrix.Differs(composed, vm.Context.Blueprint.Cutaway)) return;
+            LastCuts = composed;
+            vm.Context.Blueprint.Cutaway = composed;
+            vm.Context.Blueprint.Changes.SetFlag(BlueprintGlobalChanges.WALL_CUT_CHANGED);
+        }
+
+        /// <summary>
+        /// Native DoDynamicCutaway mode-2 (LIVE) person branch inputs: live mode
+        /// only; the tracked person first, else the selected person. The port's
+        /// honest equivalents are the follow-Sim camera anchor
+        /// (World.State.ScrollAnchor — set by the tracking crosshair, cleared by
+        /// manual camera input) for the native Animator tracked-object global,
+        /// and ActiveEntity (the plumbob sim, vm.MyUID) for
+        /// ObjectModule::GetSelectedPerson. Floor gating, the &lt;0xfffb room
+        /// validity gate and the outside-person rectangle are the engine's job
+        /// (CutawayMatrix.ComposeDynamic); only real on-lot positions pass.
+        /// </summary>
+        private void AppendPersonInputs(FSO.LotView.Utils.CutawayViewInputs view)
+        {
+            if (!LiveMode) return; //native GetMode()==2 gate: LIVE mode only
+            var person = ResolvePerson();
+            if (person == null || person.Position == LotTilePos.OUT_OF_WORLD) return;
+            var room = vm.Context.GetRoomAt(LotTilePos.FromBigTile(person.Position.TileX, person.Position.TileY, person.Position.Level));
+            view.PersonRoomId = room;
+            view.PersonFloor = person.Position.Level;
+            view.PersonOutside = vm.Context.RoomInfo[room].Room.IsOutside;
+            //native person+0xfc/+0xfd: the avatar's tile — the source of the
+            //decoded outside-person k-probe rectangle (decode.md §4)
+            view.PersonTile = new Point(person.Position.TileX, person.Position.TileY);
+        }
+
+        internal FSO.SimAntics.VMEntity ResolvePerson()
+        {
+            var anchor = World.State.ScrollAnchor; //tracked: the follow-Sim camera anchor
+            if (anchor != null)
+            {
+                var tracked = vm.Entities.FirstOrDefault(x => x.WorldUI == anchor);
+                if (tracked != null) return tracked;
+            }
+            return ActiveEntity; //selected person
+        }
+
+        /// <summary>
+        /// R244 MouseTrack(phase 0) equivalent — decode.md §1.1: insert the room
+        /// under the cursor AND the room found screen-v "behind" it (probe walk
+        /// in half-wall-height pixel steps bounded by half the story pixel
+        /// height; out-of-world probes are skipped). An off-lot cursor runs the
+        /// ResetDynamicCutaway path instead (matrix cleared, history survives).
+        /// Returns true if the history membership changed.
+        /// </summary>
+        internal bool DriveCutawayHistory(Point cursorScreen)
+        {
+            var bp = vm.Context.Blueprint;
+            var tile = World.EstTileAtPosWithScroll(new Vector2(cursorScreen.X, cursorScreen.Y));
+            int tx = (int)tile.X, ty = (int)tile.Y;
+            //off-lot = world bounds inset by 1 (native [x0+1..x1-1]x[y0+1..y1-1])
+            if (tx < 1 || ty < 1 || tx > bp.Width - 2 || ty > bp.Height - 2)
+            {
+                ResetCutawayMatrix();
+                return false;
+            }
+            var level = World.State.Level;
+            var front = vm.Context.GetRoomAt(LotTilePos.FromBigTile((short)tx, (short)ty, level));
+            var behind = front;
+            //probe walk: screen-down (toward the camera) in native dv =
+            //viewer+0x60/2 = (8 << zoom)/2 = 4 << zoom px steps (docommand.txt
+            //0x1d689c pins +0x60 = 8<<zoom; the port zoom bucket 1=Far/2=Medium/
+            //3=Near is the native zoom index), while the probed room equals the
+            //cursor room, bounded by half the story pixel height
+            //((58<<(zoom-1))/2 native); the port renders world pixels at
+            //PreciseZoom*BackbufferScale screen px per world px.
+            var zoom = (int)World.State.Zoom; //1=Far, 2=Medium, 3=Near (≡ native zoom index)
+            float scale = World.State.PreciseZoom * World.BackbufferScale;
+            float step = (4 << zoom) * scale;
+            float bound = (29 << (zoom - 1)) * scale;
+            for (float off = step; off < bound; off += step)
+            {
+                var probe = World.EstTileAtPosWithScroll(new Vector2(cursorScreen.X, cursorScreen.Y + off));
+                int px = (int)probe.X, py = (int)probe.Y;
+                if (px < 0 || py < 0 || px >= bp.Width || py >= bp.Height) continue; //out-of-world probe: skipped
+                var probed = vm.Context.GetRoomAt(LotTilePos.FromBigTile((short)px, (short)py, level));
+                if (probed != front) { behind = probed; break; }
+            }
+            bool changed = CutHistoryInsert((uint)front);
+            if (behind != front) changed |= CutHistoryInsert((uint)behind);
+            return changed;
+        }
+
+        /// <summary>
+        /// cCutawaySet::insert: a duplicate leaves membership untouched (no
+        /// recency refresh — skeptic-corrections.md #1); otherwise the room is
+        /// appended and the list trimmed to 3 by evicting the oldest member.
+        /// Only valid room ids (&lt;0xfffb) are stored.
+        /// </summary>
+        private bool CutHistoryInsert(uint room)
+        {
+            if (room >= 0xfffb) return false; //native validity gate
+            if (CutRooms.Contains(room)) return false;
+            CutRooms.Add(room);
+            while (CutRooms.Count > 3) CutRooms.RemoveAt(0);
+            return true;
+        }
+
+        /// <summary>
+        /// ResetDynamicCutaway: clears the standing matrix only — the history
+        /// set survives (native callers clear it explicitly).
+        /// </summary>
+        internal void ResetCutawayMatrix()
+        {
+            CommitCutaway(new FSO.LotView.Utils.CutawayViewInputs
+            {
+                Floor = World.State.Level,
+                Rotation = World.State.CutRotation,
+                Zoom = World.State.Zoom,
+                PreciseZoom = World.State.PreciseZoom,
+                HistoryRooms = new uint[0], //empty composition; CutRooms intentionally untouched
+                DynamicEnabled = false,
+            });
+        }
+
+        /// <summary>
+        /// Wall/room architecture changes rebuild the room partition, so the
+        /// cached per-room masks are stale (revision bump) and the history's ids
+        /// are re-derived (the port cannot observe native's stable room ids
+        /// across edits; the native terrain-rebuild command 0x105 clears the set
+        /// the same way).
+        /// </summary>
+        private void WireCutMaskInvalidation()
+        {
+            if (CutWallsWired || vm.Context.Architecture == null) return;
+            CutWallsWired = true;
+            vm.Context.Architecture.WallsChanged += (caller) =>
+            {
+                CutMasks.Invalidate();
+                CutMasks.Revision++;
+                CutRooms.Clear();
+            };
+        }
+
+        //uicutaway autotest hooks (the battery drives the production path)
+        internal IReadOnlyList<uint> CutawayHistory => CutRooms;
+        internal void CutawayHistoryReset() { CutRooms.Clear(); }
+        internal FSO.LotView.Utils.CutawayMaskCache CutMaskCache => CutMasks;
     }
 }

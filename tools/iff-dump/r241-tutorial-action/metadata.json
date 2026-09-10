@@ -1,0 +1,85 @@
+{
+  "engine_sha256": "33c76da298841dcaf8402eff8814700bb20e36bb22878d00ea16fcc874c06a5f",
+  "tutorial_sha256": "9d619b137b2c1e3353b7ea3732800efa98203961fb957866b596f48467f1edcd",
+  "name_data_address": "0x47e4a",
+  "named_tree": "show situation info",
+  "opcode49_jump_table": "0x48438",
+  "opcode49_file_address": "0xf0634",
+  "pinned_words": {
+    "0xe2bfc": "0x806300ac",
+    "0xe2c08": "0x8083011c",
+    "0xe2c18": "0x8084000c",
+    "0xf0670": "0x38000015",
+    "0xf06d0": "0xb3a30000",
+    "0xf06ec": "0x5400001e",
+    "0xf06fc": "0x2c000011",
+    "0xf0710": "0xb3a30000",
+    "0xf144c": "0x7c033b2e",
+    "0xf14a0": "0x38600001"
+  },
+  "instructions": [
+    {
+      "bhav": 4099,
+      "label": "show situation info",
+      "index": 0,
+      "opcode": 2,
+      "true": 2,
+      "false": 253,
+      "operand": "0100010000050007"
+    },
+    {
+      "bhav": 4099,
+      "label": "show situation info",
+      "index": 1,
+      "opcode": 49,
+      "true": 254,
+      "false": 253,
+      "operand": "0000000000000000"
+    },
+    {
+      "bhav": 4099,
+      "label": "show situation info",
+      "index": 2,
+      "opcode": 2,
+      "true": 1,
+      "false": 253,
+      "operand": "00000b0000050a03"
+    },
+    {
+      "bhav": 4146,
+      "label": "pause ticks",
+      "index": 0,
+      "opcode": 0,
+      "true": 1,
+      "false": 253,
+      "operand": "0000000000000000"
+    },
+    {
+      "bhav": 4146,
+      "label": "pause ticks",
+      "index": 1,
+      "opcode": 2,
+      "true": 2,
+      "false": 3,
+      "operand": "0100010000020007"
+    },
+    {
+      "bhav": 4146,
+      "label": "pause ticks",
+      "index": 2,
+      "opcode": 2,
+      "true": 255,
+      "false": 253,
+      "operand": "0100000000050007"
+    },
+    {
+      "bhav": 4146,
+      "label": "pause ticks",
+      "index": 3,
+      "opcode": 2,
+      "true": 254,
+      "false": 0,
+      "operand": "0000000000020907"
+    }
+  ]
+}

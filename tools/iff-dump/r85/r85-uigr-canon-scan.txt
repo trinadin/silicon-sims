@@ -1,0 +1,449 @@
+R85 uichrome canon - engine-independent raw IFF scan (game-data/The Sims/UIGraphics/UIGraphics.far)
+member header: index DataLength filename [BMP WxH]
+------------------------------------------------------------------------------------------
+30 4400 'cpanel\\CatalogUnknown.bmp' BMP 90x45
+31 5096 'cpanel\\DialogEditBioDisplay.bmp' BMP 337x164
+32 774 'cpanel\\ExploreAnchor.bmp' BMP 15x15
+33 1608 'cpanel\\FameSubBars.bmp' BMP 80x16
+34 3382 'cpanel\\FilterDogCat.bmp' BMP 150x50
+35 3442 'cpanel\\FilterFood.bmp' BMP 150x50
+36 3334 'cpanel\\FilterGardening.bmp' BMP 150x50
+37 3440 'cpanel\\FilterLodging.bmp' BMP 150x50
+38 3222 'cpanel\\FilterMagic.bmp' BMP 150x50
+39 3404 'cpanel\\FilterModel.bmp' BMP 150x50
+40 3360 'cpanel\\FilterMovie.bmp' BMP 150x50
+41 3300 'cpanel\\FilterMusic.bmp' BMP 150x50
+42 3414 'cpanel\\FilterPark.bmp' BMP 150x50
+43 3280 'cpanel\\FilterRides.bmp' BMP 150x50
+44 3162 'cpanel\\FilterShopping.bmp' BMP 150x50
+45 3358 'cpanel\\FilterSmallAnimal.bmp' BMP 150x50
+46 3432 'cpanel\\FilterSpa.bmp' BMP 150x50
+47 2156 'cpanel\\Greenbars.BMP' BMP 27x25
+48 1976 'cpanel\\HouseSubBars.BMP' BMP 40x16
+49 1702 'cpanel\\InterestBars.BMP' BMP 40x16
+50 1376 'cpanel\\JobSubBars.bmp' BMP 40x11
+51 5208 'cpanel\\LotDescription.bmp' BMP 337x164
+52 6402 'cpanel\\Personality.bmp' BMP 92x23
+53 121460 'cpanel\\pieFace1.bmp' BMP 201x201
+54 5232 'cpanel\\PopupExportHTML.bmp' BMP 133x103
+55 4726 'cpanel\\PopupOptAntiAlias.bmp' BMP 133x103
+56 7786 'cpanel\\PopupOptAutoCenter.bmp' BMP 133x103
+57 6498 'cpanel\\PopupOptAutoSnap.bmp' BMP 133x103
+58 6724 'cpanel\\PopupOptCharDetail.bmp' BMP 133x103
+59 9724 'cpanel\\PopupOptEdgeScroll.bmp' BMP 131x102
+60 6254 'cpanel\\PopupOptFreeWill.bmp' BMP 133x103
+61 6720 'cpanel\\PopupOptLighting.bmp' BMP 133x103
+62 6780 'cpanel\\PopupOptLivePIP.bmp' BMP 133x103
+63 6500 'cpanel\\PopupOptMusic.bmp' BMP 133x103
+64 5926 'cpanel\\PopupOptQuickTips.BMP' BMP 133x103
+65 6910 'cpanel\\PopupOptSFX.bmp' BMP 133x103
+66 5430 'cpanel\\PopupOptShadows.bmp' BMP 133x103
+67 6118 'cpanel\\PopupOptSimInBack.bmp' BMP 133x103
+68 8216 'cpanel\\PopupOptTerrainDetail.bmp' BMP 133x103
+69 4876 'cpanel\\PopupOptTransUI.bmp' BMP 133x103
+70 6288 'cpanel\\PopupOptVox.bmp' BMP 133x103
+71 5100 'cpanel\\PopupResetTutorial.bmp' BMP 133x103
+72 2156 'cpanel\\Redbars.bmp' BMP 27x25
+73 31808 'cpanel\\RotateLeft.bmp' BMP 252x42
+74 31808 'cpanel\\RotateRight.bmp' BMP 252x42
+75 1170 'cpanel\\SimPeopleLogo.BMP' BMP 80x23
+76 1250 'cpanel\\SimsLogo.BMP' BMP 75x43
+77 1250 'cpanel\\SimsLogoDe.bmp' BMP 75x43
+78 1250 'cpanel\\SimsLogoFr.bmp' BMP 75x43
+79 1250 'cpanel\\SimsLogoSp.bmp' BMP 75x43
+80 6838 'cpanel\\SimStub.BMP' BMP 133x103
+81 188 'cpanel\\SkillsHilite.bmp' BMP 4x11
+82 22656 'cpanel\\TutHigh.bmp' BMP 150x50
+83 940 'cpanel\\ViewMenuBackground.bmp' BMP 17x17
+84 52976 'cpanel\\ViewMenuRotateLeft.bmp' BMP 420x42
+85 52976 'cpanel\\ViewMenuRotateRight.bmp' BMP 420x42
+86 95480 'cpanel\\ViewMenuZoomIn.bmp' BMP 378x84
+87 95480 'cpanel\\ViewMenuZoomOut.bmp' BMP 378x84
+88 31808 'cpanel\\ZoomIn.bmp' BMP 252x42
+89 31808 'cpanel\\ZoomOut.bmp' BMP 252x42
+90 2918 'cpanel\\SimPeopleLogoAlpha.bmp' BMP 80x23
+91 4346 'cpanel\\SimsLogoAlpha.bmp' BMP 75x43
+92 4346 'cpanel\\SimsLogoDeAlpha.bmp' BMP 75x43
+93 4346 'cpanel\\SimsLogoFrAlpha.bmp' BMP 75x43
+94 4346 'cpanel\\SimsLogoSpAlpha.bmp' BMP 75x43
+95 15654 'cpanel\\Backgrounds\\BackPatch.bmp' BMP 52x100
+96 483842 'cpanel\\Backgrounds\\budgetback.bmp' BMP 800x600
+97 3342 'cpanel\\Backgrounds\\BuildPatch.bmp' BMP 107x132
+98 1434 'cpanel\\Backgrounds\\BuildToothpkLeft.bmp' BMP 2x89
+99 1434 'cpanel\\Backgrounds\\BuildToothpkRight.bmp' BMP 2x89
+100 3708 'cpanel\\Backgrounds\\BuyPatch.bmp' BMP 156x148
+101 2636 'cpanel\\Backgrounds\\CameraPatch.bmp' BMP 55x100
+102 1434 'cpanel\\Backgrounds\\CameraToothpkLeft.bmp' BMP 2x89
+103 1434 'cpanel\\Backgrounds\\CameraToothpkRight.bmp' BMP 2x89
+104 2584 'cpanel\\Backgrounds\\campopupdetail.bmp' BMP 100x100
+105 3318 'cpanel\\Backgrounds\\CamPopupQualDetail.bmp' BMP 100x100
+106 312210 'cpanel\\Backgrounds\\CreateACharBack.BMP' BMP 800x600
+107 4706 'cpanel\\Backgrounds\\FameIconMultiPopup.bmp' BMP 84x63
+108 2040 'cpanel\\Backgrounds\\FameSubBarsOff.bmp' BMP 80x16
+109 1718 'cpanel\\Backgrounds\\HouseSubBarsOff.BMP' BMP 40x16
+110 1702 'cpanel\\Backgrounds\\InterestBarsBackground.BMP' BMP 40x16
+111 117502 'cpanel\\Backgrounds\\JobIconMultiPopup.bmp' BMP 84x1386
+112 1518 'cpanel\\Backgrounds\\JobSubBarsOff.bmp' BMP 40x11
+113 6612 'cpanel\\Backgrounds\\LiveGadget.bmp' BMP 108x100
+114 3936 'cpanel\\Backgrounds\\LivePatch.bmp' BMP 213x153
+115 11144 'cpanel\\Backgrounds\\magicbookbkg.bmp' BMP 620x400
+116 2328 'cpanel\\Backgrounds\\OptionsPatch.bmp' BMP 37x100
+117 1486 'cpanel\\Backgrounds\\OptionsToothpkHoriz.bmp' BMP 201x2
+118 1434 'cpanel\\Backgrounds\\OptionsToothpkVert.bmp' BMP 2x89
+119 25122 'cpanel\\Backgrounds\\PanelBack.bmp' BMP 804x100
+120 1694 'cpanel\\Backgrounds\\PersBkg.bmp' BMP 40x14
+121 22476 'cpanel\\Backgrounds\\phonebookbkg.bmp' BMP 620x356
+122 1732 'cpanel\\Backgrounds\\phoneicon.bmp' BMP 33x23
+123 4210 'cpanel\\Backgrounds\\PopupInfo.BMP' BMP 559x127
+124 1968 'cpanel\\Backgrounds\\PopupInfoTiles.bmp' BMP 36x36
+125 384746 'cpanel\\Backgrounds\\scrapback.bmp' BMP 700x560
+126 10416 'cpanel\\Backgrounds\\SocialInfoPopup.BMP' BMP 133x103
+127 9808 'cpanel\\Backgrounds\\SPELLBOOK_BakersOven.bmp' BMP 130x90
+128 9692 'cpanel\\Backgrounds\\SPELLBOOK_CharmMakerAdult.bmp' BMP 130x90
+129 9360 'cpanel\\Backgrounds\\SPELLBOOK_CharmMakerKid.bmp' BMP 130x90
+130 9640 'cpanel\\Backgrounds\\SPELLBOOK_NectarPress.bmp' BMP 130x90
+131 9844 'cpanel\\Backgrounds\\SPELLBOOK_WandCharger.bmp' BMP 130x90
+132 360044 'cpanel\\Backgrounds\\TallSubPanel.TGA' hdr=00000200
+133 161084 'cpanel\\Backgrounds\\UniversalBack.TGA' hdr=00000200
+134 3186 'cpanel\\Build\\HandIcon.bmp' BMP 120x35
+135 5312 'cpanel\\Build\\PoolToolIcon.bmp' BMP 180x45
+136 3528 'cpanel\\Build\\PopupHand.bmp' BMP 145x103
+137 6424 'cpanel\\Build\\PopupPool.BMP' BMP 145x103
+138 5618 'cpanel\\Build\\popuproofpattern.bmp' BMP 145x103
+139 4122 'cpanel\\Build\\popuproofpitch.bmp' BMP 133x103
+140 3700 'cpanel\\Build\\PopupTerrainDown.bmp' BMP 145x103
+141 3302 'cpanel\\Build\\PopupTerrainLevel.bmp' BMP 145x103
+142 3540 'cpanel\\Build\\PopupTerrainUp.BMP' BMP 145x103
+143 2178 'cpanel\\Build\\roofflat.bmp' BMP 100x16
+144 2372 'cpanel\\Build\\roofmedium.bmp' BMP 104x17
+145 2874 'cpanel\\Build\\roofpatterntemplate.bmp' BMP 180x45
+146 2336 'cpanel\\Build\\roofshallow.bmp' BMP 104x16
+147 2752 'cpanel\\Build\\roofsteep.bmp' BMP 104x23
+148 3336 'cpanel\\Build\\TerrainDownIcon.BMP' BMP 144x34
+149 3098 'cpanel\\Build\\TerrainLevelIcon.BMP' BMP 156x33
+150 3584 'cpanel\\Build\\TerrainUpIcon.BMP' BMP 144x33
+151 1288 'cpanel\\Buttons\\AMPM.BMP' BMP 36x7
+152 5146 'cpanel\\Buttons\\arch.bmp' BMP 156x39
+153 42470 'cpanel\\Buttons\\budgetok.bmp' BMP 868x52
+154 4948 'cpanel\\Buttons\\ButtonTileDialog.BMP' BMP 260x33
+155 3718 'cpanel\\Buttons\\Camera.bmp' BMP 116x29
+156 14924 'cpanel\\Buttons\\camframecust.bmp' BMP 240x58
+157 3316 'cpanel\\Buttons\\camframelarge.bmp' BMP 128x28
+158 3226 'cpanel\\Buttons\\camframemed.bmp' BMP 128x29
+159 3228 'cpanel\\Buttons\\camframesmall.bmp' BMP 128x27
+160 3858 'cpanel\\Buttons\\camqualhigh.bmp' BMP 128x28
+161 4286 'cpanel\\Buttons\\camquallow.bmp' BMP 128x28
+162 4216 'cpanel\\Buttons\\camqualmed.bmp' BMP 128x29
+163 7056 'cpanel\\Buttons\\camviewalbum.bmp' BMP 244x35
+164 2392 'cpanel\\Buttons\\dynacut.bmp' BMP 84x21
+165 2366 'cpanel\\Buttons\\FameFriendSmiley.bmp' BMP 88x20
+166 3298 'cpanel\\Buttons\\FameIconMultiButton.BMP' BMP 112x22
+167 3704 'cpanel\\Buttons\\Gift.bmp' BMP 108x30
+168 1202 'cpanel\\Buttons\\Heart.bmp' BMP 9x9
+169 1202 'cpanel\\Buttons\\HeartDeep.bmp' BMP 9x9
+170 1712 'cpanel\\Buttons\\HelpButton.bmp' BMP 40x15
+171 3900 'cpanel\\Buttons\\House.bmp' BMP 108x30
+172 2776 'cpanel\\Buttons\\Housebars.bmp' BMP 63x26
+173 1998 'cpanel\\Buttons\\IconFrame.bmp' BMP 90x45
+174 3116 'cpanel\\Buttons\\Interest.bmp' BMP 108x30
+175 2048 'cpanel\\Buttons\\InterestAliens.bmp' BMP 75x25
+176 1828 'cpanel\\Buttons\\InterestCharisma.bmp' BMP 75x26
+177 1556 'cpanel\\Buttons\\InterestExercise.bmp' BMP 75x25
+178 1812 'cpanel\\Buttons\\InterestFood.bmp' BMP 75x25
+179 1360 'cpanel\\Buttons\\InterestHealth.bmp' BMP 75x26
+180 1922 'cpanel\\Buttons\\InterestMusic.bmp' BMP 75x25
+181 1860 'cpanel\\Buttons\\InterestOutdoors.bmp' BMP 75x25
+182 1424 'cpanel\\Buttons\\InterestParties.bmp' BMP 75x25
+183 1958 'cpanel\\Buttons\\InterestPets.bmp' BMP 75x25
+184 2080 'cpanel\\Buttons\\InterestPolitics.bmp' BMP 75x25
+185 1148 'cpanel\\Buttons\\InterestRomance.bmp' BMP 75x26
+186 1954 'cpanel\\Buttons\\InterestSchool.bmp' BMP 75x25
+187 1974 'cpanel\\Buttons\\InterestsExcercise.bmp' BMP 75x25
+188 1898 'cpanel\\Buttons\\InterestSports.bmp' BMP 75x25
+189 1400 'cpanel\\Buttons\\InterestStyle.bmp' BMP 75x25
+190 2278 'cpanel\\Buttons\\InterestThe60s.bmp' BMP 75x25
+191 2006 'cpanel\\Buttons\\InterestToys.bmp' BMP 75x25
+192 1846 'cpanel\\Buttons\\InterestTravel.bmp' BMP 75x25
+193 1834 'cpanel\\Buttons\\InterestViolence.bmp' BMP 75x25
+194 2050 'cpanel\\Buttons\\InterestWeather.bmp' BMP 75x25
+195 2028 'cpanel\\Buttons\\InventoryGiftSort.bmp' BMP 80x20
+196 2376 'cpanel\\Buttons\\InventoryMagicSort.bmp' BMP 80x20
+197 2132 'cpanel\\Buttons\\InventoryOtherSort.bmp' BMP 80x20
+198 3648 'cpanel\\Buttons\\Job.bmp' BMP 108x30
+199 2764 'cpanel\\Buttons\\Jobbars.bmp' BMP 63x26
+200 1554 'cpanel\\Buttons\\JobFriendSmiley.bmp' BMP 40x11
+201 36354 'cpanel\\Buttons\\JobIconMultiButton.BMP' BMP 112x484
+202 1814 'cpanel\\Buttons\\Lev1.BMP' BMP 84x11
+203 1954 'cpanel\\Buttons\\Lev2.BMP' BMP 88x15
+204 2030 'cpanel\\Buttons\\LevRoof.bmp' BMP 88x19
+205 1190 'cpanel\\Buttons\\littleStar.bmp' BMP 9x9
+206 5846 'cpanel\\Buttons\\Mood.bmp' BMP 128x39
+207 2218 'cpanel\\Buttons\\NewRadio.bmp' BMP 80x20
+208 2330 'cpanel\\Buttons\\NewRadioSelected.bmp' BMP 80x20
+209 2188 'cpanel\\Buttons\\nocut.bmp' BMP 84x21
+210 1946 'cpanel\\Buttons\\nowall.bmp' BMP 88x15
+211 6008 'cpanel\\Buttons\\objects.bmp' BMP 180x47
+212 2720 'cpanel\\Buttons\\optcheckbox.bmp' BMP 120x21
+213 3162 'cpanel\\Buttons\\OptExit.bmp' BMP 200x40
+214 3760 'cpanel\\Buttons\\optgraphics.bmp' BMP 152x40
+215 2632 'cpanel\\Buttons\\options.bmp' BMP 92x23
+216 5650 'cpanel\\Buttons\\OptNbhd.bmp' BMP 196x37
+217 5606 'cpanel\\Buttons\\optplay.bmp' BMP 220x40
+218 2752 'cpanel\\Buttons\\optradio.bmp' BMP 120x20
+219 4810 'cpanel\\Buttons\\OptSave.BMP' BMP 156x39
+220 1382 'cpanel\\Buttons\\optslideroff.bmp' BMP 44x14
+221 1382 'cpanel\\Buttons\\optslideron.bmp' BMP 44x14
+222 6182 'cpanel\\Buttons\\optsound.bmp' BMP 188x40
+223 3156 'cpanel\\Buttons\\opttutreset.BMP' BMP 88x30
+224 2438 'cpanel\\Buttons\\pause.bmp' BMP 60x30
+225 7478 'cpanel\\Buttons\\people.bmp' BMP 200x50
+226 1598 'cpanel\\Buttons\\PerformanceButton.bmp' BMP 52x12
+227 3862 'cpanel\\Buttons\\Personality.bmp' BMP 108x30
+228 2596 'cpanel\\Buttons\\Redo.bmp' BMP 120x24
+229 2594 'cpanel\\Buttons\\RelAllSort.bmp' BMP 80x20
+230 4290 'cpanel\\Buttons\\Relationship.BMP' BMP 108x30
+231 2740 'cpanel\\Buttons\\RelBars.bmp' BMP 63x26
+232 2634 'cpanel\\Buttons\\RelFamilySort.bmp' BMP 80x20
+233 2628 'cpanel\\Buttons\\RelFriendSort.bmp' BMP 80x20
+234 2324 'cpanel\\Buttons\\RelStarSort.bmp' BMP 80x20
+235 3472 'cpanel\\Buttons\\rotleft.bmp' BMP 108x27
+236 3462 'cpanel\\Buttons\\rotright.bmp' BMP 108x27
+237 1644 'cpanel\\Buttons\\SalaryButton.bmp' BMP 52x11
+238 3970 'cpanel\\Buttons\\scrapdelete.bmp' BMP 520x41
+239 4360 'cpanel\\Buttons\\scrapdone.bmp' BMP 520x41
+240 6214 'cpanel\\Buttons\\scrapend.bmp' BMP 148x46
+241 6304 'cpanel\\Buttons\\scraphome.bmp' BMP 152x47
+242 5430 'cpanel\\Buttons\\scrapleft.bmp' BMP 116x47
+243 5340 'cpanel\\Buttons\\scrapright.bmp' BMP 112x46
+244 2828 'cpanel\\Buttons\\ScrollLeft.BMP' BMP 36x49
+245 2828 'cpanel\\Buttons\\ScrollLeftBuy.BMP' BMP 36x49
+246 2810 'cpanel\\Buttons\\ScrollRight.BMP' BMP 36x49
+247 1196 'cpanel\\Buttons\\Smiley.bmp' BMP 9x9
+248 1528 'cpanel\\Buttons\\Speed1.bmp' BMP 44x15
+249 1724 'cpanel\\Buttons\\Speed2.bmp' BMP 80x15
+250 2038 'cpanel\\Buttons\\Speed3.bmp' BMP 128x15
+251 4242 'cpanel\\Buttons\\toolBtnDoor.bmp' BMP 108x41
+252 3476 'cpanel\\Buttons\\toolBtnFireplace.bmp' BMP 116x35
+253 3230 'cpanel\\Buttons\\toolBtnFloor.bmp' BMP 172x28
+254 3186 'cpanel\\Buttons\\toolBtnHand.bmp' BMP 120x35
+255 3686 'cpanel\\Buttons\\toolBtnRoof.bmp' BMP 156x33
+256 3932 'cpanel\\Buttons\\toolBtnStairs.bmp' BMP 128x38
+257 3734 'cpanel\\Buttons\\toolBtnTerrain.bmp' BMP 156x39
+258 3846 'cpanel\\Buttons\\toolBtnTree.bmp' BMP 140x39
+259 4480 'cpanel\\Buttons\\toolBtnWall.bmp' BMP 124x40
+260 3606 'cpanel\\Buttons\\toolBtnWallpaper.bmp' BMP 128x40
+261 2824 'cpanel\\Buttons\\toolBtnWater.bmp' BMP 100x38
+262 4560 'cpanel\\Buttons\\toolBtnWindow.bmp' BMP 116x39
+263 2570 'cpanel\\Buttons\\Undo.BMP' BMP 120x24
+264 20290 'cpanel\\Buttons\\UnknownFace.bmp' BMP 180x135
+265 3516 'cpanel\\Buttons\\zoomin.bmp' BMP 108x27
+266 3210 'cpanel\\Buttons\\zoomout.bmp' BMP 108x27
+267 2184 'cpanel\\Buttons\\FrogIconMultiButton.BMP' BMP 43x43
+268 3560 'cpanel\\Catalog\\BuyCFour.bmp' BMP 80x33
+269 3306 'cpanel\\Catalog\\BuyCMisc.bmp' BMP 124x29
+270 5064 'cpanel\\Catalog\\BuyCOne.BMP' BMP 128x42
+271 6360 'cpanel\\Catalog\\BuyCThree.bmp' BMP 144x36
+272 3500 'cpanel\\Catalog\\BuyCTwo.bmp' BMP 96x35
+273 5064 'cpanel\\Catalog\\BuyDDining.BMP' BMP 128x42
+274 3306 'cpanel\\Catalog\\BuyDMisc.bmp' BMP 124x29
+275 6360 'cpanel\\Catalog\\BuyDOutdoor.bmp' BMP 144x36
+276 3500 'cpanel\\Catalog\\BuyDShops.bmp' BMP 96x35
+277 3560 'cpanel\\Catalog\\BuyDStreet.bmp' BMP 80x33
+278 4208 'cpanel\\Catalog\\BuyFAppliances.bmp' BMP 136x34
+279 4568 'cpanel\\Catalog\\BuyFDecorative.bmp' BMP 128x36
+280 3738 'cpanel\\Catalog\\BuyFElectronics.bmp' BMP 84x40
+281 4536 'cpanel\\Catalog\\BuyFLighting.bmp' BMP 136x40
+282 3306 'cpanel\\Catalog\\BuyFMisc.bmp' BMP 124x29
+283 3134 'cpanel\\Catalog\\BuyFPlumbing.bmp' BMP 112x36
+284 3178 'cpanel\\Catalog\\BuyFSeating.BMP' BMP 120x38
+285 2978 'cpanel\\Catalog\\BuyFSurfaces.bmp' BMP 148x29
+286 6360 'cpanel\\Catalog\\BuyMOutdoor.bmp' BMP 144x36
+287 5980 'cpanel\\Catalog\\BuyMTmagic.bmp' BMP 144x36
+288 3014 'cpanel\\Catalog\\BuyRBathroom.bmp' BMP 116x36
+289 3336 'cpanel\\Catalog\\BuyRBedroom.bmp' BMP 112x38
+290 5064 'cpanel\\Catalog\\BuyRDining.bmp' BMP 128x42
+291 3466 'cpanel\\Catalog\\BuyRKitchen.bmp' BMP 152x43
+292 3924 'cpanel\\Catalog\\BuyRLiving.BMP' BMP 124x39
+293 2682 'cpanel\\Catalog\\BuyRMisc.bmp' BMP 124x29
+294 3428 'cpanel\\Catalog\\BuyROutside.bmp' BMP 136x40
+295 4300 'cpanel\\Catalog\\BuyRStudy.bmp' BMP 144x41
+296 6408 'cpanel\\Catalog\\BuySTDining.bmp' BMP 144x36
+297 6404 'cpanel\\Catalog\\BuySTMisc.bmp' BMP 144x36
+298 5740 'cpanel\\Catalog\\BuySTShops.bmp' BMP 144x36
+299 6272 'cpanel\\Catalog\\BuySTSpa.bmp' BMP 144x36
+300 6384 'cpanel\\Catalog\\BuySTStudio.bmp' BMP 144x36
+301 4526 'cpanel\\Catalog\\BuyVFour.bmp' BMP 112x34
+302 3306 'cpanel\\Catalog\\BuyVMisc.bmp' BMP 124x29
+303 6624 'cpanel\\Catalog\\BuyVOne.BMP' BMP 128x42
+304 6336 'cpanel\\Catalog\\BuyVThree.bmp' BMP 144x36
+305 3500 'cpanel\\Catalog\\BuyVTwo.bmp' BMP 96x35
+306 6506 'cpanel\\Catalog\\SSFashionRunwayThumb.bmp' BMP 128x110
+307 5830 'cpanel\\Catalog\\SSMovieSetThumb.bmp' BMP 128x110
+308 5442 'cpanel\\Catalog\\SSMusicVideoThumb.bmp' BMP 128x110
+309 3782 'cpanel\\Catalog\\ThumbTemplate.BMP' BMP 180x45
+310 6176 'cpanel\\Catalog\\ThumbTemplate1Frame.BMP' BMP 45x45
+311 4030 'cpanel\\Catalog\\BackButtons\\BackCFour.bmp' BMP 132x26
+312 4026 'cpanel\\Catalog\\BackButtons\\BackCMisc.bmp' BMP 132x26
+313 4034 'cpanel\\Catalog\\BackButtons\\BackCOne.bmp' BMP 132x26
+314 4010 'cpanel\\Catalog\\BackButtons\\BackCThree.bmp' BMP 132x26
+315 3822 'cpanel\\Catalog\\BackButtons\\BackCTwo.bmp' BMP 132x26
+316 4034 'cpanel\\Catalog\\BackButtons\\BackDDining.bmp' BMP 132x26
+317 4026 'cpanel\\Catalog\\BackButtons\\BackDMisc.bmp' BMP 132x26
+318 4010 'cpanel\\Catalog\\BackButtons\\BackDOutdoor.bmp' BMP 132x26
+319 3822 'cpanel\\Catalog\\BackButtons\\BackDShops.bmp' BMP 132x26
+320 4030 'cpanel\\Catalog\\BackButtons\\BackDStreet.bmp' BMP 132x26
+321 3964 'cpanel\\Catalog\\BackButtons\\BackFAppliances.bmp' BMP 132x26
+322 4000 'cpanel\\Catalog\\BackButtons\\BackFDecorative.bmp' BMP 132x26
+323 4076 'cpanel\\Catalog\\BackButtons\\BackFElectronics.bmp' BMP 132x26
+324 4028 'cpanel\\Catalog\\BackButtons\\BackFLighting.bmp' BMP 132x26
+325 4026 'cpanel\\Catalog\\BackButtons\\BackFMisc.bmp' BMP 132x26
+326 3996 'cpanel\\Catalog\\BackButtons\\BackFPlumbing.bmp' BMP 132x26
+327 3916 'cpanel\\Catalog\\BackButtons\\BackFSeating.bmp' BMP 132x26
+328 3724 'cpanel\\Catalog\\BackButtons\\BackFSurfaces.bmp' BMP 132x26
+329 3988 'cpanel\\Catalog\\BackButtons\\BackMMagic.bmp' BMP 132x26
+330 3922 'cpanel\\Catalog\\BackButtons\\BackRBathroom.bmp' BMP 132x26
+331 4010 'cpanel\\Catalog\\BackButtons\\BackRBedroom.bmp' BMP 132x26
+332 4034 'cpanel\\Catalog\\BackButtons\\BackRDining.bmp' BMP 132x26
+333 3960 'cpanel\\Catalog\\BackButtons\\BackRKitchen.bmp' BMP 132x26
+334 3992 'cpanel\\Catalog\\BackButtons\\BackRLiving.bmp' BMP 132x26
+335 3968 'cpanel\\Catalog\\BackButtons\\BackRMisc.bmp' BMP 132x26
+336 3940 'cpanel\\Catalog\\BackButtons\\BackROutside.bmp' BMP 132x26
+337 3994 'cpanel\\Catalog\\BackButtons\\BackRStudy.bmp' BMP 132x26
+338 4036 'cpanel\\Catalog\\BackButtons\\BackSSpa.bmp' BMP 132x26
+339 4032 'cpanel\\Catalog\\BackButtons\\BackSStudio.bmp' BMP 132x26
+340 4556 'cpanel\\Catalog\\BackButtons\\BackVFour.bmp' BMP 132x26
+341 4026 'cpanel\\Catalog\\BackButtons\\BackVMisc.bmp' BMP 132x26
+342 4484 'cpanel\\Catalog\\BackButtons\\BackVOne.bmp' BMP 132x26
+343 4596 'cpanel\\Catalog\\BackButtons\\BackVThree.bmp' BMP 132x26
+344 3822 'cpanel\\Catalog\\BackButtons\\BackVTwo.bmp' BMP 132x26
+345 4756 'cpanel\\Catalog\\SubSortIcons\\BuySubSortAll.bmp' BMP 124x29
+346 4424 'cpanel\\Catalog\\SubSortIcons\\BuySubSortOther.bmp' BMP 124x29
+347 5304 'cpanel\\Catalog\\SubSortIcons\\Appliances\\BuySubSortFour.BMP' BMP 144x36
+348 5804 'cpanel\\Catalog\\SubSortIcons\\Appliances\\BuySubSortOne.BMP' BMP 144x36
+349 5584 'cpanel\\Catalog\\SubSortIcons\\Appliances\\BuySubSortThree.BMP' BMP 144x36
+350 4892 'cpanel\\Catalog\\SubSortIcons\\Appliances\\BuySubSortTwo.bmp' BMP 144x36
+351 5404 'cpanel\\Catalog\\SubSortIcons\\CommunitySubsort\\BuySubSortCommunityAppliances.BMP' BMP 144x36
+352 5852 'cpanel\\Catalog\\SubSortIcons\\CommunitySubsort\\BuySubSortCommunityDecorative.BMP' BMP 144x36
+353 6288 'cpanel\\Catalog\\SubSortIcons\\CommunitySubsort\\BuySubSortCommunityElectronics.bmp' BMP 144x36
+354 6384 'cpanel\\Catalog\\SubSortIcons\\CommunitySubsort\\BuySubSortCommunityLighting.BMP' BMP 144x36
+355 6100 'cpanel\\Catalog\\SubSortIcons\\CommunitySubsort\\BuySubSortCommunityMisc.bmp' BMP 144x36
+356 6268 'cpanel\\Catalog\\SubSortIcons\\CommunitySubsort\\BuySubSortCommunityPlumbing.BMP' BMP 144x36
+357 6316 'cpanel\\Catalog\\SubSortIcons\\CommunitySubsort\\BuySubSortCommunitySeating.BMP' BMP 144x36
+358 6100 'cpanel\\Catalog\\SubSortIcons\\CommunitySubsort\\BuySubSortCommunitySurfaces.BMP' BMP 144x36
+359 6236 'cpanel\\Catalog\\SubSortIcons\\Decorative\\BuySubSortFour.BMP' BMP 144x36
+360 6068 'cpanel\\Catalog\\SubSortIcons\\Decorative\\BuySubSortOne.BMP' BMP 144x36
+361 6408 'cpanel\\Catalog\\SubSortIcons\\Decorative\\BuySubSortThree.BMP' BMP 144x36
+362 6004 'cpanel\\Catalog\\SubSortIcons\\Decorative\\BuySubSortTwo.bmp' BMP 144x36
+363 5404 'cpanel\\Catalog\\SubSortIcons\\DowntownSubsort\\BuySubSortDowntownAppliances.BMP' BMP 144x36
+364 5852 'cpanel\\Catalog\\SubSortIcons\\DowntownSubsort\\BuySubSortDowntownDecorative.BMP' BMP 144x36
+365 6288 'cpanel\\Catalog\\SubSortIcons\\DowntownSubsort\\BuySubSortDowntownElectronics.bmp' BMP 144x36
+366 6384 'cpanel\\Catalog\\SubSortIcons\\DowntownSubsort\\BuySubSortDowntownLighting.BMP' BMP 144x36
+367 6100 'cpanel\\Catalog\\SubSortIcons\\DowntownSubsort\\BuySubSortDowntownMisc.bmp' BMP 144x36
+368 6268 'cpanel\\Catalog\\SubSortIcons\\DowntownSubsort\\BuySubSortDowntownPlumbing.BMP' BMP 144x36
+369 6316 'cpanel\\Catalog\\SubSortIcons\\DowntownSubsort\\BuySubSortDowntownSeating.BMP' BMP 144x36
+370 6100 'cpanel\\Catalog\\SubSortIcons\\DowntownSubsort\\BuySubSortDowntownSurfaces.BMP' BMP 144x36
+371 6020 'cpanel\\Catalog\\SubSortIcons\\Electronics\\BuySubSortFour.BMP' BMP 144x36
+372 6408 'cpanel\\Catalog\\SubSortIcons\\Electronics\\BuySubSortOne.BMP' BMP 144x36
+373 6164 'cpanel\\Catalog\\SubSortIcons\\Electronics\\BuySubSortThree.BMP' BMP 144x36
+374 6168 'cpanel\\Catalog\\SubSortIcons\\Electronics\\BuySubSortTwo.bmp' BMP 144x36
+375 6172 'cpanel\\Catalog\\SubSortIcons\\Lighting\\BuySubSortFour.BMP' BMP 144x36
+376 6168 'cpanel\\Catalog\\SubSortIcons\\Lighting\\BuySubSortOne.BMP' BMP 144x36
+377 6352 'cpanel\\Catalog\\SubSortIcons\\Lighting\\BuySubSortThree.BMP' BMP 144x36
+378 6208 'cpanel\\Catalog\\SubSortIcons\\Lighting\\BuySubSortTwo.bmp' BMP 144x36
+379 6180 'cpanel\\Catalog\\SubSortIcons\\Miscellaneous\\BuySubSortFour.BMP' BMP 144x36
+380 5976 'cpanel\\Catalog\\SubSortIcons\\Miscellaneous\\BuySubSortMagic.BMP' BMP 144x36
+381 6276 'cpanel\\Catalog\\SubSortIcons\\Miscellaneous\\BuySubSortOne.BMP' BMP 144x36
+382 5792 'cpanel\\Catalog\\SubSortIcons\\Miscellaneous\\BuySubSortPets.BMP' BMP 144x36
+383 6104 'cpanel\\Catalog\\SubSortIcons\\Miscellaneous\\BuySubSortThree.BMP' BMP 144x36
+384 6156 'cpanel\\Catalog\\SubSortIcons\\Miscellaneous\\BuySubSortTwo.bmp' BMP 144x36
+385 5616 'cpanel\\Catalog\\SubSortIcons\\Plumbing\\BuySubSortFour.BMP' BMP 144x36
+386 6148 'cpanel\\Catalog\\SubSortIcons\\Plumbing\\BuySubSortOne.BMP' BMP 144x36
+387 6232 'cpanel\\Catalog\\SubSortIcons\\Plumbing\\BuySubSortThree.BMP' BMP 144x36
+388 6200 'cpanel\\Catalog\\SubSortIcons\\Plumbing\\BuySubSortTwo.bmp' BMP 144x36
+389 5936 'cpanel\\Catalog\\SubSortIcons\\RoomSubsort\\BuySubSortRoomAppliances.BMP' BMP 144x36
+390 6308 'cpanel\\Catalog\\SubSortIcons\\RoomSubsort\\BuySubSortRoomDecorative.BMP' BMP 144x36
+391 6208 'cpanel\\Catalog\\SubSortIcons\\RoomSubsort\\BuySubSortRoomElectronics.bmp' BMP 144x36
+392 6192 'cpanel\\Catalog\\SubSortIcons\\RoomSubsort\\BuySubSortRoomLighting.BMP' BMP 144x36
+393 6092 'cpanel\\Catalog\\SubSortIcons\\RoomSubsort\\BuySubSortRoomMisc.bmp' BMP 144x36
+394 5900 'cpanel\\Catalog\\SubSortIcons\\RoomSubsort\\BuySubSortRoomPlumbing.BMP' BMP 144x36
+395 6340 'cpanel\\Catalog\\SubSortIcons\\RoomSubsort\\BuySubSortRoomSeating.BMP' BMP 144x36
+396 6072 'cpanel\\Catalog\\SubSortIcons\\RoomSubsort\\BuySubSortRoomSurfaces.BMP' BMP 144x36
+397 6072 'cpanel\\Catalog\\SubSortIcons\\Seating\\BuySubSortFour.BMP' BMP 144x36
+398 6244 'cpanel\\Catalog\\SubSortIcons\\Seating\\BuySubSortOne.BMP' BMP 144x36
+399 5744 'cpanel\\Catalog\\SubSortIcons\\Seating\\BuySubSortThree.BMP' BMP 144x36
+400 5856 'cpanel\\Catalog\\SubSortIcons\\Seating\\BuySubSortTwo.bmp' BMP 144x36
+401 6316 'cpanel\\Catalog\\SubSortIcons\\Surfaces\\BuySubSortFour.BMP' BMP 144x36
+402 5628 'cpanel\\Catalog\\SubSortIcons\\Surfaces\\BuySubSortOne.BMP' BMP 144x36
+403 6092 'cpanel\\Catalog\\SubSortIcons\\Surfaces\\BuySubSortThree.BMP' BMP 144x36
+404 6136 'cpanel\\Catalog\\SubSortIcons\\Surfaces\\BuySubSortTwo.bmp' BMP 144x36
+405 5404 'cpanel\\Catalog\\SubSortIcons\\VacationSubsort\\BuySubSortVacationAppliances.BMP' BMP 144x36
+406 5852 'cpanel\\Catalog\\SubSortIcons\\VacationSubsort\\BuySubSortVacationDecorative.BMP' BMP 144x36
+407 6288 'cpanel\\Catalog\\SubSortIcons\\VacationSubsort\\BuySubSortVacationElectronics.bmp' BMP 144x36
+408 6384 'cpanel\\Catalog\\SubSortIcons\\VacationSubsort\\BuySubSortVacationLighting.BMP' BMP 144x36
+409 6100 'cpanel\\Catalog\\SubSortIcons\\VacationSubsort\\BuySubSortVacationMisc.bmp' BMP 144x36
+410 6268 'cpanel\\Catalog\\SubSortIcons\\VacationSubsort\\BuySubSortVacationPlumbing.BMP' BMP 144x36
+411 6316 'cpanel\\Catalog\\SubSortIcons\\VacationSubsort\\BuySubSortVacationSeating.BMP' BMP 144x36
+412 6100 'cpanel\\Catalog\\SubSortIcons\\VacationSubsort\\BuySubSortVacationSurfaces.BMP' BMP 144x36
+413 9064 'cpanel\\HDBuild\\popupGrass.bmp' BMP 145x103
+414 3990 'cpanel\\HDBuild\\PopupWaterTool.bmp' BMP 145x103
+415 3062 'cpanel\\HDBuild\\TerrainGrassIcon.BMP' BMP 144x32
+416 6256 'cpanel\\HDBuild\\WaterToolIcon.bmp' BMP 180x45
+417 2874 'cpanel\\People\\PeopleTemplate.bmp' BMP 180x45
+418 1270 'cpanel\\People\\ThumbBack.bmp' BMP 25x25
+419 1354 'cpanel\\People\\TrackingTarget.bmp' BMP 45x45
+420 7340 'cpanel\\People\\UnknownRel.bmp' BMP 200x40
+421 1760 'cpanel\\People\\UnknownThumbnail.bmp' BMP 25x25
+422 1266 'cpanel\\People\\WebPeopleTemplate.bmp' BMP 45x45
+450 13136 'Fonts\\variablesans_07.ffn' hdr=464e5446
+451 16208 'Fonts\\variablesans_08.ffn' hdr=464e5446
+452 17232 'Fonts\\variablesans_09.ffn' hdr=464e5446
+453 18000 'Fonts\\variablesans_10.ffn' hdr=464e5446
+454 21968 'Fonts\\variablesans_11.ffn' hdr=464e5446
+455 27088 'Fonts\\variablesans_11_bs.ffn' hdr=464e5446
+456 24784 'Fonts\\variablesans_11_s.ffn' hdr=464e5446
+457 25552 'Fonts\\variablesans_12.ffn' hdr=464e5446
+458 28624 'Fonts\\variablesans_12_bs.ffn' hdr=464e5446
+459 31184 'Fonts\\variablesans_14.ffn' hdr=464e5446
+460 42448 'Fonts\\variablesans_14_bs.ffn' hdr=464e5446
+461 42960 'Fonts\\variablesans_16.ffn' hdr=464e5446
+462 44112 'Fonts\\variablesans_18.ffn' hdr=464e5446
+463 57168 'Fonts\\variablesans_20.ffn' hdr=464e5446
+464 18328 'Fonts\\variablesans_48.ffn' hdr=464e5446
+465 13264 'Fonts\\Polish\\variablesans_07.ffn' hdr=464e5446
+466 14672 'Fonts\\Polish\\variablesans_08.ffn' hdr=464e5446
+467 17104 'Fonts\\Polish\\variablesans_09.ffn' hdr=464e5446
+468 17744 'Fonts\\Polish\\variablesans_10.ffn' hdr=464e5446
+469 22352 'Fonts\\Polish\\variablesans_11.ffn' hdr=464e5446
+470 27472 'Fonts\\Polish\\variablesans_11_bs.ffn' hdr=464e5446
+471 25040 'Fonts\\Polish\\variablesans_11_s.ffn' hdr=464e5446
+472 25424 'Fonts\\Polish\\variablesans_12.ffn' hdr=464e5446
+473 28496 'Fonts\\Polish\\variablesans_12_bs.ffn' hdr=464e5446
+474 31184 'Fonts\\Polish\\variablesans_14.ffn' hdr=464e5446
+475 42448 'Fonts\\Polish\\variablesans_14_bs.ffn' hdr=464e5446
+476 42960 'Fonts\\Polish\\variablesans_16.ffn' hdr=464e5446
+477 44112 'Fonts\\Polish\\variablesans_18.ffn' hdr=464e5446
+478 57168 'Fonts\\Polish\\variablesans_20.ffn' hdr=464e5446
+479 18328 'Fonts\\Polish\\variablesans_48.ffn' hdr=464e5446
+480 12624 'Fonts\\Russian\\variablesans_07.ffn' hdr=464e5446
+481 6096 'Fonts\\Russian\\variablesans_08.ffn' hdr=464e5446
+482 6288 'Fonts\\Russian\\variablesans_09.ffn' hdr=464e5446
+483 6480 'Fonts\\Russian\\variablesans_10.ffn' hdr=464e5446
+484 8336 'Fonts\\Russian\\variablesans_11.ffn' hdr=464e5446
+485 11088 'Fonts\\Russian\\variablesans_11_bs.ffn' hdr=464e5446
+486 8400 'Fonts\\Russian\\variablesans_11_s.ffn' hdr=464e5446
+487 8400 'Fonts\\Russian\\variablesans_12.ffn' hdr=464e5446
+488 11600 'Fonts\\Russian\\variablesans_12_bs.ffn' hdr=464e5446
+489 12240 'Fonts\\Russian\\variablesans_14.ffn' hdr=464e5446
+490 12752 'Fonts\\Russian\\variablesans_14_bs.ffn' hdr=464e5446
+491 13136 'Fonts\\Russian\\variablesans_16.ffn' hdr=464e5446
+492 17744 'Fonts\\Russian\\variablesans_18.ffn' hdr=464e5446
+493 19024 'Fonts\\Russian\\variablesans_20.ffn' hdr=464e5446
+494 90320 'Fonts\\Russian\\variablesans_48.ffn' hdr=464e5446
+678 326 'Shared\\cursors\\LiveNothing.cur' hdr=00000200
+679 326 'Shared\\cursors\\LiveNothingPet.cur' hdr=00000200
+680 326 'Shared\\cursors\\LiveObjectAvail.cur' hdr=00000200
+681 326 'Shared\\cursors\\LiveObjectUnavail.cur' hdr=00000200
+682 326 'Shared\\cursors\\LivePerson.cur' hdr=00000200
+683 326 'Shared\\cursors\\LivePet.cur' hdr=00000200
+------------------------------------------------------------------------------------------
+total manifest members: 794

@@ -1,0 +1,85 @@
+# ids parsed from Res_Nbhd.h: 209 (range 5000..6338)
+  0x4755a0: 46696969  .long
+  0x4755a4: 69000000  xori r8, r0, 0
+  0x4755a8: 00000000  .long
+  0x4755ac: 00000000  .long
+  0x4755b0: 93e1fffc  stw r31, -4(r1)
+  0x4755b4: 7c0802a6  .long
+  0x4755b8: 54bf103a  .long
+  0x4755bc: 2c050000  cmpwi r0, r5, 0
+  0x4755c0: 93c1fff8  stw r30, -8(r1)
+  0x4755c4: 93a1fff4  stw r29, -12(r1)
+  0x4755c8: 3ba40000  addi r29, r4, 0
+  0x4755cc: 9381fff0  stw r28, -16(r1)
+  0x4755d0: 3b830000  addi r28, r3, 0
+  0x4755d4: 90010008  stw r0, 8(r1)
+  0x4755d8: 9421ffb0  .long
+  0x4755dc: 80840044  lwz r4, 68(r4)
+  0x4755e0: 83dd005c  lwz r30, 92(r29)
+  0x4755e4: 7c04f82e  .long
+  0x4755e8: 809d0058  lwz r4, 88(r29)
+  0x4755ec: 5400103a  .long
+  0x4755f0: 7c7c0214  add r3, r0, 28
+  0x4755f4: 8063035c  lwz r3, 860(r3)
+  0x4755f8: 8063001c  lwz r3, 28(r3)
+  0x4755fc: 38c30004  addi r6, r3, 4
+  0x475600: 40810140  .long
+  0x475604: 807d0038  lwz r3, 56(r29)
+  0x475608: 7c03f82e  .long
+  0x47560c: 2c000001  cmpwi r0, r0, 1
+  0x475610: 408200a8  .long
+  0x475614: 4bba4abd  bl +76528
+  0x475618: 3c806666  addis r4, r0, 1717960704
+  0x47561c: 38046667  addi r0, r4, 26215
+  0x475620: 7c001896  .long
+  0x475624: 7c001670  .long
+  0x475628: 54040ffe  .long
+  0x47562c: 7c002214  add r0, r4, 0
+  0x475630: 1c00000a  mulli r0, r0, 10
+  0x475634: 7c001850  .long
+  0x475638: 2c000001  cmpwi r0, r0, 1
+  0x47563c: 40820030  .long
+  0x475640: 807d002c  lwz r3, 44(r29)
+  0x475644: 7c03f82e  .long
+  0x475648: 7c00f000  .long
+  0x47564c: 40810020  .long
+  0x475650: 809d0020  lwz r4, 32(r29)
+  0x475654: 7c64f82e  .long
+  0x475658: 2c030000  cmpwi r0, r3, 0
+  0x47565c: 408101c8  .long
+  0x475660: 3803ffff  addi r0, r3, -1
+  0x475664: 7c04f92e  .long
+  0x475668: 480001bc  b +1776
+  0x47566c: 4bba4a65  bl +76176
+  0x475670: 3c806666  addis r4, r0, 1717960704
+  0x475674: 38046667  addi r0, r4, 26215
+  0x475678: 7c001896  .long
+  0x47567c: 7c002670  .long
+  0x475680: 54040ffe  .long
+  0x475684: 7c002214  add r0, r4, 0
+  0x475688: 1c000028  mulli r0, r0, 40
+  0x47568c: 7c001850  .long
+  0x475690: 2c000001  cmpwi r0, r0, 1
+  0x475694: 40820190  .long
+  0x475698: 809d0020  lwz r4, 32(r29)
+  0x47569c: 801c0354  lwz r0, 852(r28)
+  0x4756a0: 7c64f82e  .long
+  0x4756a4: 7c030000  .long
+  0x4756a8: 4080017c  .long
+  0x4756ac: 38030001  addi r0, r3, 1
+  0x4756b0: 7c04f92e  .long
+  0x4756b4: 48000170  b +1472
+  0x4756b8: 3805ffff  addi r0, r5, -1
+  0x4756bc: 809d0008  lwz r4, 8(r29)
+  0x4756c0: 5400103a  .long
+  0x4756c4: 7c64002e  .long
+  0x4756c8: 7c04f82e  .long
+  0x4756cc: 7c661850  .long
+  0x4756d0: 7c030000  .long
+  0x4756d4: 40800020  .long
+  0x4756d8: 809d0020  lwz r4, 32(r29)
+  0x4756dc: 7c64f82e  .long
+  0x4756e0: 2c030000  cmpwi r0, r3, 0
+  0x4756e4: 40810140  .long
+  0x4756e8: 3803ffff  addi r0, r3, -1
+  0x4756ec: 7c04f92e  .long

@@ -1,0 +1,277 @@
+=== cTSWinSlider::SetImage @0x52bbf0 (the 4-piece metric: w/4, area keeps width, height snaps to art) ===
+0052bbf0: 93e1fffc  stw      r31, -4(r1)
+0052bbf4: 7c0802a6  mflr     r0
+0052bbf8: 28040000  cmplwi   r4, 0
+0052bbfc: 3be30000  addi     r31, r3, 0
+0052bc00: 93c1fff8  stw      r30, -8(r1)
+0052bc04: 3bc00000  li       r30, 0
+0052bc08: 90010008  stw      r0, 8(r1)
+0052bc0c: 38000000  li       r0, 0
+0052bc10: 9421ffb0  stwu     r1, -0x50(r1)
+0052bc14: 90030100  stw      r0, 0x100(r3)
+0052bc18: 418200f8  beq      0x52bd10
+0052bc1c: 54a0063f  clrlwi.  r0, r5, 0x18
+0052bc20: 909f0100  stw      r4, 0x100(r31)
+0052bc24: 4182002c  beq      0x52bc50
+0052bc28: 388000ff  li       r4, 0xff
+0052bc2c: 38a00000  li       r5, 0
+0052bc30: 38c000ff  li       r6, 0xff
+0052bc34: 4bfd9b4d  bl       0x505780
+0052bc38: 7c641b78  mr       r4, r3
+0052bc3c: 807f0100  lwz      r3, 0x100(r31)
+0052bc40: 81830000  lwz      r12, 0(r3)
+0052bc44: 818c0070  lwz      r12, 0x70(r12)
+0052bc48: 48076d99  bl       0x5a29e0
+0052bc4c: 80410014  lwz      r2, 0x14(r1)
+0052bc50: 801f00cc  lwz      r0, 0xcc(r31)
+0052bc54: 2c000002  cmpwi    r0, 2
+0052bc58: 41820068  beq      0x52bcc0
+0052bc5c: 408000b4  bge      0x52bd10
+0052bc60: 2c000001  cmpwi    r0, 1
+0052bc64: 40800008  bge      0x52bc6c
+0052bc68: 480000a8  b        0x52bd10
+0052bc6c: 80bf0100  lwz      r5, 0x100(r31)
+0052bc70: 38800000  li       r4, 0
+0052bc74: 387f0000  addi     r3, r31, 0
+0052bc78: 8005001c  lwz      r0, 0x1c(r5)
+0052bc7c: 80e50020  lwz      r7, 0x20(r5)
+0052bc80: 7c001670  srawi    r0, r0, 2
+0052bc84: 909f0104  stw      r4, 0x104(r31)
+0052bc88: 7c000194  addze    r0, r0
+0052bc8c: 909f0108  stw      r4, 0x108(r31)
+0052bc90: 901f010c  stw      r0, 0x10c(r31)
+0052bc94: 90ff0110  stw      r7, 0x110(r31)
+0052bc98: 819f0000  lwz      r12, 0(r31)
+0052bc9c: 80bf0078  lwz      r5, 0x78(r31)
+0052bca0: 809f0074  lwz      r4, 0x74(r31)
+0052bca4: 80df007c  lwz      r6, 0x7c(r31)
+0052bca8: 7ce72a14  add      r7, r7, r5
+0052bcac: 818c0068  lwz      r12, 0x68(r12)
+0052bcb0: 48076d31  bl       0x5a29e0
+0052bcb4: 80410014  lwz      r2, 0x14(r1)
+0052bcb8: 3bc00001  li       r30, 1
+0052bcbc: 48000054  b        0x52bd10
+0052bcc0: 80bf0100  lwz      r5, 0x100(r31)
+0052bcc4: 38800000  li       r4, 0
+0052bcc8: 387f0000  addi     r3, r31, 0
+0052bccc: 80050020  lwz      r0, 0x20(r5)
+0052bcd0: 80c5001c  lwz      r6, 0x1c(r5)
+0052bcd4: 7c001670  srawi    r0, r0, 2
+0052bcd8: 909f0104  stw      r4, 0x104(r31)
+0052bcdc: 7c000194  addze    r0, r0
+0052bce0: 909f0108  stw      r4, 0x108(r31)
+0052bce4: 90df010c  stw      r6, 0x10c(r31)
+0052bce8: 901f0110  stw      r0, 0x110(r31)
+0052bcec: 819f0000  lwz      r12, 0(r31)
+0052bcf0: 809f0074  lwz      r4, 0x74(r31)
+0052bcf4: 80bf0078  lwz      r5, 0x78(r31)
+0052bcf8: 80ff0080  lwz      r7, 0x80(r31)
+0052bcfc: 7cc62214  add      r6, r6, r4
+0052bd00: 818c0068  lwz      r12, 0x68(r12)
+0052bd04: 48076cdd  bl       0x5a29e0
+0052bd08: 80410014  lwz      r2, 0x14(r1)
+0052bd0c: 3bc00001  li       r30, 1
+0052bd10: 7fc3f378  mr       r3, r30
+0052bd14: 80010058  lwz      r0, 0x58(r1)
+0052bd18: 38210050  addi     r1, r1, 0x50
+0052bd1c: 7c0803a6  mtlr     r0
+0052bd20: 83e1fffc  lwz      r31, -4(r1)
+0052bd24: 83c1fff8  lwz      r30, -8(r1)
+0052bd28: 4e800020  blr      
+
+=== cTSWinSlider::TSPaint @0x52c7c0 (head through the horizontal branch: thumb draw, cap/middle/cap law) ===
+0052c7c0: 93e1fffc  stw      r31, -4(r1)
+0052c7c4: 7c0802a6  mflr     r0
+0052c7c8: 7c7f1b78  mr       r31, r3
+0052c7cc: 93c1fff8  stw      r30, -8(r1)
+0052c7d0: 93a1fff4  stw      r29, -0xc(r1)
+0052c7d4: 9381fff0  stw      r28, -0x10(r1)
+0052c7d8: 90010008  stw      r0, 8(r1)
+0052c7dc: 9421ff40  stwu     r1, -0xc0(r1)
+0052c7e0: 88030115  lbz      r0, 0x115(r3)
+0052c7e4: 28000000  cmplwi   r0, 0
+0052c7e8: 418200e4  beq      0x52c8cc
+0052c7ec: 801f0118  lwz      r0, 0x118(r31)
+0052c7f0: 28000000  cmplwi   r0, 0
+0052c7f4: 40820018  bne      0x52c80c
+0052c7f8: 81830000  lwz      r12, 0(r3)
+0052c7fc: 818c00cc  lwz      r12, 0xcc(r12)
+0052c800: 480761e1  bl       0x5a29e0
+0052c804: 80410014  lwz      r2, 0x14(r1)
+0052c808: 907f0118  stw      r3, 0x118(r31)
+0052c80c: 801f0118  lwz      r0, 0x118(r31)
+0052c810: 28000000  cmplwi   r0, 0
+0052c814: 418200b8  beq      0x52c8cc
+0052c818: 807f005c  lwz      r3, 0x5c(r31)
+0052c81c: 38800010  li       r4, 0x10
+0052c820: 81830000  lwz      r12, 0(r3)
+0052c824: 818c0028  lwz      r12, 0x28(r12)
+0052c828: 480761b9  bl       0x5a29e0
+0052c82c: 80410014  lwz      r2, 0x14(r1)
+0052c830: 5460063f  clrlwi.  r0, r3, 0x18
+0052c834: 41820098  beq      0x52c8cc
+0052c838: 809f0118  lwz      r4, 0x118(r31)
+0052c83c: 38a10040  addi     r5, r1, 0x40
+0052c840: 38c10050  addi     r6, r1, 0x50
+0052c844: 81240014  lwz      r9, 0x14(r4)
+0052c848: 38e00000  li       r7, 0
+0052c84c: 91210040  stw      r9, 0x40(r1)
+0052c850: 80640018  lwz      r3, 0x18(r4)
+0052c854: 90610044  stw      r3, 0x44(r1)
+0052c858: 8104001c  lwz      r8, 0x1c(r4)
+0052c85c: 91010048  stw      r8, 0x48(r1)
+0052c860: 80040020  lwz      r0, 0x20(r4)
+0052c864: 9001004c  stw      r0, 0x4c(r1)
+0052c868: 91210050  stw      r9, 0x50(r1)
+0052c86c: 90610054  stw      r3, 0x54(r1)
+0052c870: 91010058  stw      r8, 0x58(r1)
+0052c874: 9001005c  stw      r0, 0x5c(r1)
+0052c878: 815f0020  lwz      r10, 0x20(r31)
+0052c87c: 817f001c  lwz      r11, 0x1c(r31)
+0052c880: 7c635214  add      r3, r3, r10
+0052c884: 7c005214  add      r0, r0, r10
+0052c888: 7d295a14  add      r9, r9, r11
+0052c88c: 7d085a14  add      r8, r8, r11
+0052c890: 91210050  stw      r9, 0x50(r1)
+0052c894: 91010058  stw      r8, 0x58(r1)
+0052c898: 90610054  stw      r3, 0x54(r1)
+0052c89c: 9001005c  stw      r0, 0x5c(r1)
+0052c8a0: 807f005c  lwz      r3, 0x5c(r31)
+0052c8a4: 81830000  lwz      r12, 0(r3)
+0052c8a8: 818c00a0  lwz      r12, 0xa0(r12)
+0052c8ac: 48076135  bl       0x5a29e0
+0052c8b0: 80410014  lwz      r2, 0x14(r1)
+0052c8b4: 807f005c  lwz      r3, 0x5c(r31)
+0052c8b8: 38800010  li       r4, 0x10
+0052c8bc: 81830000  lwz      r12, 0(r3)
+0052c8c0: 818c002c  lwz      r12, 0x2c(r12)
+0052c8c4: 4807611d  bl       0x5a29e0
+0052c8c8: 80410014  lwz      r2, 0x14(r1)
+0052c8cc: 801f0100  lwz      r0, 0x100(r31)
+0052c8d0: 28000000  cmplwi   r0, 0
+0052c8d4: 418202bc  beq      0x52cb90
+0052c8d8: 807f005c  lwz      r3, 0x5c(r31)
+0052c8dc: 38800010  li       r4, 0x10
+0052c8e0: 81830000  lwz      r12, 0(r3)
+0052c8e4: 818c0028  lwz      r12, 0x28(r12)
+0052c8e8: 480760f9  bl       0x5a29e0
+0052c8ec: 80410014  lwz      r2, 0x14(r1)
+0052c8f0: 5460063f  clrlwi.  r0, r3, 0x18
+0052c8f4: 418204d8  beq      0x52cdcc
+0052c8f8: 38610060  addi     r3, r1, 0x60
+0052c8fc: 389f0104  addi     r4, r31, 0x104
+0052c900: 4bd42f21  bl       0x26f820
+0052c904: 387f001c  addi     r3, r31, 0x1c
+0052c908: 4bd45ae9  bl       0x2723f0
+0052c90c: 38a30000  addi     r5, r3, 0
+0052c910: 38610070  addi     r3, r1, 0x70
+0052c914: 389f0104  addi     r4, r31, 0x104
+0052c918: 4bda5699  bl       0x2d1fb0
+0052c91c: 807f005c  lwz      r3, 0x5c(r31)
+0052c920: 38a10060  addi     r5, r1, 0x60
+0052c924: 809f0100  lwz      r4, 0x100(r31)
+0052c928: 38c10070  addi     r6, r1, 0x70
+0052c92c: 81830000  lwz      r12, 0(r3)
+0052c930: 38e00000  li       r7, 0
+0052c934: 818c00a0  lwz      r12, 0xa0(r12)
+0052c938: 480760a9  bl       0x5a29e0
+0052c93c: 80410014  lwz      r2, 0x14(r1)
+0052c940: 801f00cc  lwz      r0, 0xcc(r31)
+0052c944: 2c000002  cmpwi    r0, 2
+0052c948: 41820124  beq      0x52ca6c
+0052c94c: 40800228  bge      0x52cb74
+0052c950: 2c000001  cmpwi    r0, 1
+0052c954: 40800008  bge      0x52c95c
+0052c958: 4800021c  b        0x52cb74
+0052c95c: 387f0104  addi     r3, r31, 0x104
+0052c960: 4bd35321  bl       0x261c80
+0052c964: 3b830000  addi     r28, r3, 0
+0052c968: 38610060  addi     r3, r1, 0x60
+0052c96c: 389c0000  addi     r4, r28, 0
+0052c970: 38a00000  li       r5, 0
+0052c974: 4bd42e4d  bl       0x26f7c0
+0052c978: 80010070  lwz      r0, 0x70(r1)
+0052c97c: 38a10060  addi     r5, r1, 0x60
+0052c980: 38c10070  addi     r6, r1, 0x70
+0052c984: 7c00e214  add      r0, r0, r28
+0052c988: 90010070  stw      r0, 0x70(r1)
+0052c98c: 38e00000  li       r7, 0
+0052c990: 39000000  li       r8, 0
+0052c994: 801f0024  lwz      r0, 0x24(r31)
+0052c998: 7c1c0050  subf     r0, r28, r0
+0052c99c: 90010078  stw      r0, 0x78(r1)
+0052c9a0: 807f005c  lwz      r3, 0x5c(r31)
+0052c9a4: 809f0100  lwz      r4, 0x100(r31)
+0052c9a8: 81830000  lwz      r12, 0(r3)
+0052c9ac: 818c00c4  lwz      r12, 0xc4(r12)
+0052c9b0: 48076031  bl       0x5a29e0
+0052c9b4: 80410014  lwz      r2, 0x14(r1)
+0052c9b8: 389c0000  addi     r4, r28, 0
+0052c9bc: 38610060  addi     r3, r1, 0x60
+0052c9c0: 38a00000  li       r5, 0
+0052c9c4: 4bd42dfd  bl       0x26f7c0
+0052c9c8: 80010078  lwz      r0, 0x78(r1)
+0052c9cc: 38a10060  addi     r5, r1, 0x60
+0052c9d0: 38c10070  addi     r6, r1, 0x70
+0052c9d4: 90010070  stw      r0, 0x70(r1)
+0052c9d8: 38e00000  li       r7, 0
+0052c9dc: 801f0024  lwz      r0, 0x24(r31)
+0052c9e0: 90010078  stw      r0, 0x78(r1)
+0052c9e4: 807f005c  lwz      r3, 0x5c(r31)
+0052c9e8: 809f0100  lwz      r4, 0x100(r31)
+0052c9ec: 81830000  lwz      r12, 0(r3)
+0052c9f0: 818c00a0  lwz      r12, 0xa0(r12)
+0052c9f4: 48075fed  bl       0x5a29e0
+0052c9f8: 80410014  lwz      r2, 0x14(r1)
+0052c9fc: 389c0000  addi     r4, r28, 0
+0052ca00: 38610060  addi     r3, r1, 0x60
+0052ca04: 38a00000  li       r5, 0
+0052ca08: 4bd42db9  bl       0x26f7c0
+0052ca0c: 387f001c  addi     r3, r31, 0x1c
+0052ca10: 4bd459e1  bl       0x2723f0
+0052ca14: 38a30000  addi     r5, r3, 0
+0052ca18: 38610080  addi     r3, r1, 0x80
+0052ca1c: 389f0104  addi     r4, r31, 0x104
+0052ca20: 4bda5591  bl       0x2d1fb0
+0052ca24: 38610070  addi     r3, r1, 0x70
+0052ca28: 38810080  addi     r4, r1, 0x80
+0052ca2c: 4bd45b75  bl       0x2725a0
+0052ca30: 387f00ec  addi     r3, r31, 0xec
+0052ca34: 4bd459bd  bl       0x2723f0
+0052ca38: 38830000  addi     r4, r3, 0
+0052ca3c: 38610070  addi     r3, r1, 0x70
+0052ca40: 480003e1  bl       0x52ce20
+0052ca44: 807f005c  lwz      r3, 0x5c(r31)
+0052ca48: 38a10060  addi     r5, r1, 0x60
+0052ca4c: 809f0100  lwz      r4, 0x100(r31)
+0052ca50: 38c10070  addi     r6, r1, 0x70
+0052ca54: 81830000  lwz      r12, 0(r3)
+0052ca58: 38e00000  li       r7, 0
+0052ca5c: 818c00a0  lwz      r12, 0xa0(r12)
+0052ca60: 48075f81  bl       0x5a29e0
+0052ca64: 80410014  lwz      r2, 0x14(r1)
+0052ca68: 4800010c  b        0x52cb74
+0052ca6c: 387f0104  addi     r3, r31, 0x104
+0052ca70: 4bd39cb1  bl       0x266720
+0052ca74: 3b830000  addi     r28, r3, 0
+0052ca78: 38610060  addi     r3, r1, 0x60
+0052ca7c: 38bc0000  addi     r5, r28, 0
+
+=== rect helpers: OffsetRect 0x26f7c0 / CopyRect 0x26f820 / RectWidth 0x261c80 ===
+0026f7c0: 80030000  lwz      r0, 0(r3)
+0026f7c4: 7c002214  add      r0, r0, r4
+0026f7c8: 90030000  stw      r0, 0(r3)
+0026f7cc: 80030008  lwz      r0, 8(r3)
+0026f7d0: 7c002214  add      r0, r0, r4
+0026f7d4: 90030008  stw      r0, 8(r3)
+0026f7d8: 80030004  lwz      r0, 4(r3)
+0026f7dc: 7c002a14  add      r0, r0, r5
+0026f7e0: 90030004  stw      r0, 4(r3)
+0026f7e4: 8003000c  lwz      r0, 0xc(r3)
+0026f7e8: 7c002a14  add      r0, r0, r5
+0026f7ec: 9003000c  stw      r0, 0xc(r3)
+0026f7f0: 4e800020  blr      
+00261c80: 80830000  lwz      r4, 0(r3)
+00261c84: 80030008  lwz      r0, 8(r3)
+00261c88: 7c640050  subf     r3, r4, r0
+00261c8c: 4e800020  blr      

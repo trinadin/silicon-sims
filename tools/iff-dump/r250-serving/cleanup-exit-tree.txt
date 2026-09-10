@@ -1,0 +1,60 @@
+001085d0: 4bffab51  bl       0x103120   ; .GetFnTable__11ObjSelectorFv
+001085d4: 38800001  li       r4, 1
+001085d8: 4bff46c9  bl       0xfcca0   ; .GetTreeID__10ObjFnTableF13ObjEntryPoint
+001085dc: 809e011c  lwz      r4, 0x11c(r30)
+001085e0: 7c651b78  mr       r5, r3
+001085e4: 7fc3f378  mr       r3, r30
+001085e8: 8084000c  lwz      r4, 0xc(r4)
+001085ec: 4804bd35  bl       0x154320   ; .Reset__7TreeSimFP8Behaviors
+001085f0: 807e011c  lwz      r3, 0x11c(r30)
+001085f4: 4bffab2d  bl       0x103120   ; .GetFnTable__11ObjSelectorFv
+001085f8: 38800003  li       r4, 3
+001085fc: 4bff46a5  bl       0xfcca0   ; .GetTreeID__10ObjFnTableF13ObjEntryPoint
+00108600: 38c30000  addi     r6, r3, 0
+00108604: 7cc00735  extsh.   r0, r6
+00108608: 4182001c  beq      0x108624
+0010860c: 809e011c  lwz      r4, 0x11c(r30)
+00108610: 7fc3f378  mr       r3, r30
+00108614: 38a00000  li       r5, 0
+00108618: 8084000c  lwz      r4, 0xc(r4)
+0010861c: 38e00000  li       r7, 0
+00108620: 4804b8a1  bl       0x153ec0
+00108624: 38000000  li       r0, 0
+00108628: 38610110  addi     r3, r1, 0x110
+0010862c: b01e058c  sth      r0, 0x58c(r30)
+00108630: b01e05dc  sth      r0, 0x5dc(r30)
+00108634: b01e0602  sth      r0, 0x602(r30)
+00108638: b01e008e  sth      r0, 0x8e(r30)
+0010863c: b01e005c  sth      r0, 0x5c(r30)
+00108640: 4bf94b41  bl       0x9d180   ; .__ct__11InteractionFv
+00108644: 387e0000  addi     r3, r30, 0
+00108648: 38810110  addi     r4, r1, 0x110
+0010864c: 48000815  bl       0x108e60   ; .SetCurrentAction__8cXPersonFRC11Interaction
+00108650: 38610138  addi     r3, r1, 0x138
+00108654: 3880ffff  li       r4, -1
+00108658: 48468f49  bl       0x5715a0   ; .__dt__9CTGStringFv
+0010865c: 281f0000  cmplwi   r31, 0
+00108660: 41820718  beq      0x108d78
+00108664: 807e0a00  lwz      r3, 0xa00(r30)
+00108668: 38c00000  li       r6, 0
+0010866c: 801e0a04  lwz      r0, 0xa04(r30)
+00108670: 38a00000  li       r5, 0
+00108674: 7c030050  subf     r0, r3, r0
+00108678: 28000000  cmplwi   r0, 0
+0010867c: 7c0903a6  mtctr    r0
+00108680: 4081003c  ble      0x1086bc
+00108684: 60000000  nop      
+00108688: 7c032a14  add      r0, r3, r5
+0010868c: 5400077e  clrlwi   r0, r0, 0x1d
+00108690: 1c00003c  mulli    r0, r0, 0x3c
+00108694: 7c9e0214  add      r4, r30, r0
+00108698: 80040828  lwz      r0, 0x828(r4)
+0010869c: 7c00f840  cmplw    r0, r31
+001086a0: 41820010  beq      0x1086b0
+001086a4: 8004082c  lwz      r0, 0x82c(r4)
+001086a8: 7c00f840  cmplw    r0, r31
+001086ac: 40820008  bne      0x1086b4
+001086b0: 38c00001  li       r6, 1
+001086b4: 38a50001  addi     r5, r5, 1
+001086b8: 4200ffd0  bdnz     0x108688
+001086bc: 54c0063f  clrlwi.  r0, r6, 0x18

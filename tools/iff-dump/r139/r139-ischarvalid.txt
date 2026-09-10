@@ -1,0 +1,28 @@
+0x4acf10: 80a30024  lwz r5, 36(r3)                             |...$|
+0x4acf14: 5484063e  rlwinm r4, r4, 0, 24, 31                   |T..>|
+0x4acf18: 38c00000  addi r6, r0, 0                             |8...|
+0x4acf1c: 7c042840  cmpl cr0, r4, r5                           ||.(@|
+0x4acf20: 40810018  beq(1) 0x4acf38                            |@...|
+0x4acf24: 80030028  lwz r0, 40(r3)                             |...(|
+0x4acf28: 7c050214  add r0, r5, r0                             ||...|
+0x4acf2c: 7c040040  cmpl cr0, r4, r0                           ||..@|
+0x4acf30: 40800008  beq(0) 0x4acf38                            |@...|
+0x4acf34: 38c00001  addi r6, r0, 1                             |8...|
+0x4acf38: 7cc33378  or r6, r3, r6                              ||.3x|
+0x4acf3c: 4e800020  bclr                                       |N.. |
+0x4acf40: 00000000  .long                                      |....|
+0x4acf44: 00092040  .long                                      |.. @|
+0x4acf48: 00000000  .long                                      |....|
+0x4acf4c: 00000030  .long                                      |...0|
+0x4acff0: 5480063e  rlwinm r0, r4, 0, 24, 31                   |T..>|
+0x4acff4: 80630010  lwz r3, 16(r3)                             |.c..|
+0x4acff8: 1c00001c  mulli r0, r0, 28                           |....|
+0x4acffc: 7c830214  add r4, r3, r0                             ||...|
+0x4ad000: 80640000  lwz r3, 0(r4)                              |.d..|
+0x4ad004: 80040008  lwz r0, 8(r4)                              |....|
+0x4ad008: 7c630050  subf r3, r3, r0                            ||c.P|
+0x4ad00c: 4e800020  bclr                                       |N.. |
+0x4ad010: 00000000  .long                                      |....|
+0x4ad014: 00092040  .long                                      |.. @|
+0x4ad018: 00000000  .long                                      |....|
+0x4ad01c: 00000020  .long                                      |... |

@@ -1,0 +1,77 @@
+                ; ==== .TSOnPaste__15cTSWinTextEdit2Fv ====
+0052f920: 93e1fffc  stw      r31, -4(r1)
+0052f924: 7c0802a6  mflr     r0
+0052f928: 93c1fff8  stw      r30, -8(r1)
+0052f92c: 7c7e1b78  mr       r30, r3
+0052f930: 90010008  stw      r0, 8(r1)
+0052f934: 9421ffa0  stwu     r1, -0x60(r1)
+0052f938: 80630104  lwz      r3, 0x104(r3)
+0052f93c: 81830000  lwz      r12, 0(r3)
+0052f940: 818c0050  lwz      r12, 0x50(r12)
+0052f944: 4807309d  bl       0x5a29e0
+0052f948: 80410014  lwz      r2, 0x14(r1)
+0052f94c: 5460063f  clrlwi.  r0, r3, 0x18
+0052f950: 4182000c  beq      0x52f95c
+0052f954: 38600000  li       r3, 0
+0052f958: 480000ac  b        0x52fa04
+0052f95c: 80628e04  lwz      r3, -0x71fc(r2)
+0052f960: 80630000  lwz      r3, 0(r3)
+0052f964: 4bfec56d  bl       0x51bed0   ; .GetClipboard__12cTSWinMgrW95Fv
+0052f968: 38830000  addi     r4, r3, 0
+0052f96c: 38610040  addi     r3, r1, 0x40
+0052f970: 4bfc5401  bl       0x4f4d70
+0052f974: 801e0120  lwz      r0, 0x120(r30)
+0052f978: 2c000001  cmpwi    r0, 1
+0052f97c: 40820050  bne      0x52f9cc
+0052f980: 3be00000  li       r31, 0
+0052f984: 48000038  b        0x52f9bc
+0052f988: 389f0000  addi     r4, r31, 0
+0052f98c: 38610040  addi     r3, r1, 0x40
+0052f990: 4bb20041  bl       0x4f9d0
+0052f994: 88030000  lbz      r0, 0(r3)
+0052f998: 28000020  cmplwi   r0, 0x20
+0052f99c: 4080001c  bge      0x52f9b8
+0052f9a0: 389f0000  addi     r4, r31, 0
+0052f9a4: 38610040  addi     r3, r1, 0x40
+0052f9a8: 38a00001  li       r5, 1
+0052f9ac: 38c00000  li       r6, 0
+0052f9b0: 38e00000  li       r7, 0
+0052f9b4: 4bb2390d  bl       0x532c0
+0052f9b8: 3bff0001  addi     r31, r31, 1
+0052f9bc: 80610040  lwz      r3, 0x40(r1)
+0052f9c0: 80030000  lwz      r0, 0(r3)
+0052f9c4: 7c1f0000  cmpw     r31, r0
+0052f9c8: 4180ffc0  blt      0x52f988
+0052f9cc: 38610040  addi     r3, r1, 0x40
+0052f9d0: 4bb056b1  bl       0x35080
+0052f9d4: 38830000  addi     r4, r3, 0
+0052f9d8: 387e0000  addi     r3, r30, 0
+0052f9dc: 48002ac5  bl       0x5324a0   ; .InsertText__15cTSWinTextEdit2FPCc
+0052f9e0: 5460063f  clrlwi.  r0, r3, 0x18
+0052f9e4: 40820010  bne      0x52f9f4
+0052f9e8: 387e018c  addi     r3, r30, 0x18c
+0052f9ec: 4bb05695  bl       0x35080
+0052f9f0: 4bdda8a1  bl       0x30a290   ; .PlaySoundA__FPCc
+0052f9f4: 38610040  addi     r3, r1, 0x40
+0052f9f8: 3880ffff  li       r4, -1
+0052f9fc: 4bfc4f85  bl       0x4f4980   ; .__dt__9cTSStringFv
+0052fa00: 38600001  li       r3, 1
+0052fa04: 80010068  lwz      r0, 0x68(r1)
+0052fa08: 38210060  addi     r1, r1, 0x60
+0052fa0c: 83e1fffc  lwz      r31, -4(r1)
+0052fa10: 7c0803a6  mtlr     r0
+0052fa14: 83c1fff8  lwz      r30, -8(r1)
+0052fa18: 4e800020  blr
+0052fa1c: 00000000  .long    0x00000000
+0052fa20: 00092041  .long    0x00092041
+0052fa24: 80020000  lwz      r0, 0(r2)
+0052fa28: 000000fc  .long    0x000000fc
+0052fa2c: 001f2e54  .long    0x001f2e54
+0052fa30: 534f6e50  rlwimi   r15, r26, 0xd, 0x19, 8
+0052fa34: 61737465  ori      r19, r11, 0x7465
+0052fa38: 5f5f3135  rlwnm.   r31, r26, r6, 4, 0x1a
+0052fa3c: 63545357  ori      r20, r26, 0x5357
+0052fa40: 696e5465  xori     r14, r11, 0x5465
+0052fa44: 78744564  rldicr   r20, r3, 8, 0x35
+0052fa48: 69743246  xori     r20, r11, 0x3246
+0052fa4c: 76000000  andis.   r0, r16, 0

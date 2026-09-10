@@ -1,0 +1,45 @@
+                ; ==== .GosubObjectTree__8cXPersonFP8cXObjectPssb ====
+00109180: 93e1fffc  stw      r31, -4(r1)
+00109184: 7c0802a6  mflr     r0
+00109188: 3be70000  addi     r31, r7, 0
+0010918c: 93c1fff8  stw      r30, -8(r1)
+00109190: 3bc40000  addi     r30, r4, 0
+00109194: 93a1fff4  stw      r29, -0xc(r1)
+00109198: 3ba30000  addi     r29, r3, 0
+0010919c: 90010008  stw      r0, 8(r1)
+001091a0: 9421ffa0  stwu     r1, -0x60(r1)
+001091a4: 4bfe6c5d  bl       0xefe00
+001091a8: 5460063f  clrlwi.  r0, r3, 0x18
+001091ac: 4182005c  beq      0x109208
+001091b0: 93c10040  stw      r30, 0x40(r1)
+001091b4: 7fa3eb78  mr       r3, r29
+001091b8: 4804a2f9  bl       0x1534b0   ; .GetStackSize__7TreeSimFv
+001091bc: 7c630734  extsh    r3, r3
+001091c0: 9be10048  stb      r31, 0x48(r1)
+001091c4: 57e0063f  clrlwi.  r0, r31, 0x18
+001091c8: 90610044  stw      r3, 0x44(r1)
+001091cc: 41820008  beq      0x1091d4
+001091d0: 93dd0a14  stw      r30, 0xa14(r29)
+001091d4: 801d0ab4  lwz      r0, 0xab4(r29)
+001091d8: 387d0ab0  addi     r3, r29, 0xab0
+001091dc: 809d0ab8  lwz      r4, 0xab8(r29)
+001091e0: 38c10040  addi     r6, r1, 0x40
+001091e4: 1c00000c  mulli    r0, r0, 0xc
+001091e8: 7c840214  add      r4, r4, r0
+001091ec: 38a00001  li       r5, 1
+001091f0: 4800c891  bl       0x115a80
+001091f4: a89e00c6  lha      r4, 0xc6(r30)
+001091f8: 38600001  li       r3, 1
+001091fc: 38040001  addi     r0, r4, 1
+00109200: b01e00c6  sth      r0, 0xc6(r30)
+00109204: 48000008  b        0x10920c
+00109208: 38600000  li       r3, 0
+0010920c: 80010068  lwz      r0, 0x68(r1)
+00109210: 38210060  addi     r1, r1, 0x60
+00109214: 83e1fffc  lwz      r31, -4(r1)
+00109218: 83c1fff8  lwz      r30, -8(r1)
+0010921c: 7c0803a6  mtlr     r0
+00109220: 83a1fff4  lwz      r29, -0xc(r1)
+00109224: 4e800020  blr      
+00109228: 00000000  .long    0x00000000
+0010922c: 00092041  .long    0x00092041

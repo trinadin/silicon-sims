@@ -1,0 +1,25 @@
+[
+  {
+    "source": "ExpansionPack5/ExpansionPack5.FAR!petcatlitterbox.iff",
+    "objd": [
+      [
+        42817,
+        "Pet - Cat - Litter Box"
+      ]
+    ],
+    "routines": [
+      {
+        "label": "Interaction - Cat - Use",
+        "node1": [
+          27,
+          29,
+          26,
+          0,
+          -512,
+          0,
+          0
+        ]
+      }
+    ]
+  }
+]

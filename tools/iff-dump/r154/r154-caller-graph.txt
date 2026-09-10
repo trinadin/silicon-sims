@@ -1,0 +1,108 @@
+containers=1378  total call instructions corpus-wide=60267  distinct targets=664
+
+=== 1. references to targets (opcode form) ===
+  9761 'Convert Interests to 0-1000': 0 references
+  39200 'Add Hot Date Interests': 0 references
+
+  (caller-of-caller recursion: depth 0 is empty -> no graph to walk)
+
+=== 2. live semiglobal-id usage near the targets ===
+  range 9700..9799: 0 distinct ids called, 0 call sites
+  range 39100..39299: 0 distinct ids called, 0 call sites
+
+=== 3. potential invoker set (objects whose GLOB targets a defining globals file) ===
+  GLOB -> personglobals.iff          : 255 object file(s)
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\BikerFemale\HDT_Biker_FD.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\BikerFemale\HDT_Biker_FL.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\BikerFemale\HDT_Biker_FM.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\BikerMale\HDT_Biker_MD.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\BikerMale\HDT_Biker_ML.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\BikerMale\HDT_Biker_MM.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\ConstructionFemale\HDT_Construction_FM.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\ConstructionMale\HDT_Construction_MD.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\ConstructionMale\HDT_Construction_ML.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\ConstructionMale\HDT_Construction_MM.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\CopFemale\HDT_Police_FD.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\FirefighterMale\HDT_Firefighter_MD.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\FirefighterMale\HDT_Firefighter_ML.iff
+     Downloads/BabbagesHDTs/BabbagesHDTs.far!C:\WINDOWS\Desktop\Sims\BabbagesHDTs\FirefighterMale\HDT_Firefighter_MM.iff
+     Downloads/CCPlugIn/CCPlugin.far!CCFemale.iff
+     Downloads/CCPlugIn/CCPlugin.far!CCMale.iff
+     Downloads/Christmas2000/Christmas2000.far!SantaClaus.iff
+     Downloads/JackOLantern/JackOLantern.far!GrimReaperDBD.iff
+     Downloads/ShrimpCartReal/ShrimpCartReal.far!NPC_CajunVendor_drk.iff
+     ExpansionPack/ExpansionPack.far!Genie.iff
+     ExpansionPack/ExpansionPack.far!Genie2.iff
+     ExpansionPack/ExpansionPack.far!GrimReaper.iff
+     ExpansionPack/ExpansionPack.far!MonsterFemale.iff
+     ExpansionPack/ExpansionPack.far!MonsterMale.iff
+     ExpansionPack/ExpansionPack.far!Officer2.iff
+     ... (+230 more)
+  GLOB -> rentalclerkglobals.iff     : 2 object file(s)
+     ExpansionPack3/ExpansionPack3.far!NPC_RentalClerk.iff
+     ExpansionPack4/ExpansionPack4.far!NPC_Vacation_RentalClerk.iff
+  GLOB -> salesclerkglobals.iff      : 24 object file(s)
+     ExpansionPack3/ExpansionPack3.far!NPC_Clerk_CFD.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Clerk_CFL.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Clerk_CFM.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Clerk_CMD.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Clerk_CML.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Clerk_CMM.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Clerk_FL.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Clerk_FL_Drk.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Clerk_FL_Med.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Clerk_MD.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Clerk_Med.iff
+     ExpansionPack3/ExpansionPack3.far!npc_clerk.iff
+     ExpansionPack4/ExpansionPack4.far!NPC_Vacation_ClerkFD.iff
+     ExpansionPack4/ExpansionPack4.far!NPC_Vacation_ClerkFL.iff
+     ExpansionPack4/ExpansionPack4.far!NPC_Vacation_ClerkFM.iff
+     ExpansionPack4/ExpansionPack4.far!NPC_Vacation_ClerkMD.iff
+     ExpansionPack4/ExpansionPack4.far!NPC_Vacation_ClerkML.iff
+     ExpansionPack4/ExpansionPack4.far!NPC_Vacation_ClerkMM.iff
+     ExpansionPack6/ExpansionPack6.far!NPC_Clerk_SS_MD.iff
+     ExpansionPack6/ExpansionPack6.far!NPC_Clerk_SS_ML.iff
+     ExpansionPack6/ExpansionPack6.far!NPC_Clerk_SS_MM.iff
+     ExpansionPack6/ExpansionPack6.far!NPC_Clerk_SS_fl.iff
+     ExpansionPack6/ExpansionPack6.far!NPC_Clerk_ss_fm.iff
+     ExpansionPack6/ExpansionPack6.far!npc_clerk_ss_fd.iff
+  GLOB -> vacationcarnieglobals.iff  : 1 object file(s)
+     ExpansionPack4/ExpansionPack4.far!NPC_Vacation_Carnie.iff
+  GLOB -> vacationdirectorglobals.iff : 1 object file(s)
+     ExpansionPack6/ExpansionPack6.far!NPC_Superstar_PA.iff
+  GLOB -> vacationmascotglobals.iff  : 3 object file(s)
+     ExpansionPack4/ExpansionPack4.far!NPC_Mascot_RobinHood.iff
+     ExpansionPack4/ExpansionPack4.far!NPC_Mascot_Shark.iff
+     ExpansionPack4/ExpansionPack4.far!NPC_Mascot_Yeti.iff
+  GLOB -> waiterglobals.iff          : 12 object file(s)
+     ExpansionPack3/ExpansionPack3.far!NPC_Waiter.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_WaiterDiner.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_WaiterDiner_Drk.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_WaiterDiner_Med.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Waiter_Drk.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Waiter_Med.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Waitress.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_WaitressDiner.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_WaitressDiner_Drk.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_WaitressDiner_Med.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Waitress_Drk.iff
+     ExpansionPack3/ExpansionPack3.far!NPC_Waitress_Med.iff
+  GLOB -> catglobals.iff             : 2 object file(s)
+     ExpansionPack5/ExpansionPack5.FAR!templatecat.iff
+     ExpansionPack7/ExpansionPack7.far!NPC_GardenGnome.iff
+  GLOB -> dogglobals.iff             : 11 object file(s)
+     ExpansionPack5/ExpansionPack5.FAR!npc_pen_catfour.iff
+     ExpansionPack5/ExpansionPack5.FAR!npc_pen_catthree.iff
+     ExpansionPack5/ExpansionPack5.FAR!npc_pen_cattwo.iff
+     ExpansionPack5/ExpansionPack5.FAR!npc_pen_dogfour.iff
+     ExpansionPack5/ExpansionPack5.FAR!npc_pen_dogthree.iff
+     ExpansionPack5/ExpansionPack5.FAR!npc_pen_dogtwo.iff
+     ExpansionPack5/ExpansionPack5.FAR!npc_pen_labrador.iff
+     ExpansionPack5/ExpansionPack5.FAR!npc_pen_tabby.iff
+     ExpansionPack5/ExpansionPack5.FAR!npc_unleashed_raccoon.iff
+     ExpansionPack5/ExpansionPack5.FAR!npc_unleashed_skunk.iff
+     ExpansionPack5/ExpansionPack5.FAR!templatedog.iff
+
+=== 4. conclusion inputs ===
+  9761: defined in 7 files, referenced by 0 call instructions, 0 TTAB entries, 0 run_tree_by_name sites (see r154-callers-dump.txt)
+  39200: defined in 9 files, referenced by 0 call instructions, 0 TTAB entries, 0 run_tree_by_name sites (see r154-callers-dump.txt)

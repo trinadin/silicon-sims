@@ -1,0 +1,7778 @@
+{
+  "iff_files": 3575,
+  "opcode10_sites": [
+    {
+      "file": "ExpansionShared/ExpansionShared.far!HDHelpSystem.iff",
+      "bhav": 4115,
+      "label": "reset lot",
+      "index": 0,
+      "opcode": 10,
+      "true": 1,
+      "false": 254,
+      "operand": "0100000000000000"
+    },
+    {
+      "file": "ExpansionShared/ExpansionShared.far!HDHelpSystem.iff",
+      "bhav": 4103,
+      "label": "process - commands",
+      "index": 4,
+      "opcode": 10,
+      "true": 12,
+      "false": 5,
+      "operand": "0000000000000000"
+    },
+    {
+      "file": "ExpansionShared/ExpansionShared.far!HDHelpSystem.iff",
+      "bhav": 4103,
+      "label": "process - commands",
+      "index": 8,
+      "opcode": 10,
+      "true": 22,
+      "false": 22,
+      "operand": "0100000000000000"
+    },
+    {
+      "file": "ExpansionShared/ExpansionShared.far!HDHelpSystem.iff",
+      "bhav": 4119,
+      "label": "main",
+      "index": 19,
+      "opcode": 10,
+      "true": 8,
+      "false": 8,
+      "operand": "0100000000000000"
+    },
+    {
+      "file": "GameData/Global/Global.far!Global.iff",
+      "bhav": 274,
+      "label": "Move forward n tiles (n)",
+      "index": 3,
+      "opcode": 10,
+      "true": 1,
+      "false": 1,
+      "operand": "0100000000000000"
+    },
+    {
+      "file": "GameData/Global/Global.far!Global.iff",
+      "bhav": 274,
+      "label": "Move forward n tiles (n)",
+      "index": 4,
+      "opcode": 10,
+      "true": 254,
+      "false": 255,
+      "operand": "0000000000000000"
+    },
+    {
+      "file": "GameData/Objects/Objects.far!HelpSystem.iff",
+      "bhav": 4115,
+      "label": "reset lot",
+      "index": 0,
+      "opcode": 10,
+      "true": 1,
+      "false": 254,
+      "operand": "0100000000000000"
+    },
+    {
+      "file": "GameData/Objects/Objects.far!HelpSystem.iff",
+      "bhav": 4157,
+      "label": "load tree",
+      "index": 2,
+      "opcode": 10,
+      "true": 254,
+      "false": 254,
+      "operand": "0100000000000000"
+    },
+    {
+      "file": "GameData/Objects/Objects.far!HelpSystem.iff",
+      "bhav": 4103,
+      "label": "process - commands",
+      "index": 4,
+      "opcode": 10,
+      "true": 12,
+      "false": 5,
+      "operand": "0000000000000000"
+    },
+    {
+      "file": "GameData/Objects/Objects.far!HelpSystem.iff",
+      "bhav": 4103,
+      "label": "process - commands",
+      "index": 8,
+      "opcode": 10,
+      "true": 20,
+      "false": 20,
+      "operand": "0100000000000000"
+    },
+    {
+      "file": "GameData/Objects/Objects.far!HelpSystem.iff",
+      "bhav": 4119,
+      "label": "main",
+      "index": 23,
+      "opcode": 10,
+      "true": 9,
+      "false": 9,
+      "operand": "0100000000000000"
+    },
+    {
+      "file": "GameData/Objects/Objects.far!Tutorial.iff",
+      "bhav": 4096,
+      "label": "main",
+      "index": 2,
+      "opcode": 10,
+      "true": 6,
+      "false": 3,
+      "operand": "0000000000000000"
+    },
+    {
+      "file": "GameData/Objects/Objects.far!Tutorial.iff",
+      "bhav": 4096,
+      "label": "main",
+      "index": 4,
+      "opcode": 10,
+      "true": 5,
+      "false": 5,
+      "operand": "0100000000000000"
+    }
+  ],
+  "objm_trailers": [
+    {
+      "file": "TemplateCommunity/House50.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7229,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House51.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 126,
+      "trailer_offset": 8349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House52.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7417,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House53.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 374,
+      "trailer_offset": 29992,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House54.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 333,
+      "trailer_offset": 26409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House55.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 488,
+      "trailer_offset": 38494,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House56.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 435,
+      "trailer_offset": 39319,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House57.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 340,
+      "trailer_offset": 26215,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House58.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 477,
+      "trailer_offset": 37744,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House59.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 261,
+      "trailer_offset": 19553,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House60.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 324,
+      "trailer_offset": 24284,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House61.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 383,
+      "trailer_offset": 30547,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House62.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 220,
+      "trailer_offset": 16903,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House63.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 402,
+      "trailer_offset": 37628,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House64.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 202,
+      "trailer_offset": 15452,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House65.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7064,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House66.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 257,
+      "trailer_offset": 20083,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House67.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 120,
+      "trailer_offset": 8825,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House68.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 199,
+      "trailer_offset": 15070,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House69.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 299,
+      "trailer_offset": 25329,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House70.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 917,
+      "trailer_offset": 71461,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House71.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 1079,
+      "trailer_offset": 88261,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House72.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 90,
+      "trailer_offset": 6458,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House73.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 777,
+      "trailer_offset": 63031,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House74.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 520,
+      "trailer_offset": 41349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House75.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 633,
+      "trailer_offset": 50907,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House76.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 262,
+      "trailer_offset": 23548,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House77.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 847,
+      "trailer_offset": 91306,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House78.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 540,
+      "trailer_offset": 43350,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House79.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7059,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateCommunity/House80.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 353,
+      "trailer_offset": 27407,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateDowntown/House21.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 708,
+      "trailer_offset": 58383,
+      "trailer_prefix": "c0d40000a3",
+      "owner": 212
+    },
+    {
+      "file": "TemplateDowntown/House22.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 330,
+      "trailer_offset": 26503,
+      "trailer_prefix": "a48000",
+      "owner": 36
+    },
+    {
+      "file": "TemplateDowntown/House23.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 106,
+      "trailer_offset": 8119,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "TemplateDowntown/House24.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 858,
+      "trailer_offset": 70403,
+      "trailer_prefix": "af8000",
+      "owner": 124
+    },
+    {
+      "file": "TemplateDowntown/House25.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 557,
+      "trailer_offset": 44939,
+      "trailer_prefix": "a46000",
+      "owner": 35
+    },
+    {
+      "file": "TemplateDowntown/House26.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 632,
+      "trailer_offset": 52728,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateDowntown/House27.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 721,
+      "trailer_offset": 60576,
+      "trailer_prefix": "c1c40000",
+      "owner": 452
+    },
+    {
+      "file": "TemplateDowntown/House28.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 701,
+      "trailer_offset": 57800,
+      "trailer_prefix": "a72000a3",
+      "owner": 57
+    },
+    {
+      "file": "TemplateDowntown/House29.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 529,
+      "trailer_offset": 41942,
+      "trailer_prefix": "c0820000",
+      "owner": 130
+    },
+    {
+      "file": "TemplateDowntown/House30.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 449,
+      "trailer_offset": 36539,
+      "trailer_prefix": "c1af0000a3",
+      "owner": 431
+    },
+    {
+      "file": "TemplateFamilyUnleashed/Burb_11.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 377,
+      "trailer_offset": 35512,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateFamilyUnleashed/Charming_13.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 292,
+      "trailer_offset": 24853,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateFamilyUnleashed/Goth Sr_12.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 838,
+      "trailer_offset": 90651,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateFamilyUnleashed/Hick_10.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 253,
+      "trailer_offset": 22873,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateFamilyUnleashed/Kat_6.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 415,
+      "trailer_offset": 37327,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateMagictown/House90.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 395,
+      "trailer_offset": 31495,
+      "trailer_prefix": "000019",
+      "owner": 0
+    },
+    {
+      "file": "TemplateMagictown/House91.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 205,
+      "trailer_offset": 15725,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateMagictown/House92.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 216,
+      "trailer_offset": 16796,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateMagictown/House93.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 752,
+      "trailer_offset": 54819,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateMagictown/House94.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 1061,
+      "trailer_offset": 84285,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateMagictown/House95.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 848,
+      "trailer_offset": 60740,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateMagictown/House96.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 995,
+      "trailer_offset": 81141,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateMagictown/House97.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 850,
+      "trailer_offset": 59409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateMagictown/House98.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 674,
+      "trailer_offset": 50145,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateMagictown/House99.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 346,
+      "trailer_offset": 24880,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateStudiotown/House81.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 327,
+      "trailer_offset": 25966,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateStudiotown/House82.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 913,
+      "trailer_offset": 76053,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateStudiotown/House83.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 590,
+      "trailer_offset": 43865,
+      "trailer_prefix": "000095",
+      "owner": 0
+    },
+    {
+      "file": "TemplateStudiotown/House84.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 610,
+      "trailer_offset": 49535,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateStudiotown/House85.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 1006,
+      "trailer_offset": 83440,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateStudiotown/House86.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 445,
+      "trailer_offset": 36196,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateStudiotown/House87.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 745,
+      "trailer_offset": 58960,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateStudiotown/House88.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 550,
+      "trailer_offset": 42054,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateStudiotown/House89.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 941,
+      "trailer_offset": 77200,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House00.iff",
+      "chunk": 1,
+      "version": 51,
+      "objects": 0,
+      "trailer_offset": 18,
+      "trailer_prefix": "00",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House01.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 60,
+      "trailer_offset": 4755,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House02.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 36,
+      "trailer_offset": 2973,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House03.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 95,
+      "trailer_offset": 7981,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House04.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 24,
+      "trailer_offset": 1855,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House05.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 7,
+      "trailer_offset": 539,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House06.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 9,
+      "trailer_offset": 672,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House07.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 24,
+      "trailer_offset": 1863,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House08.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 57,
+      "trailer_offset": 4498,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House09.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 27,
+      "trailer_offset": 2103,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House10.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 27,
+      "trailer_offset": 2185,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House11.iff",
+      "chunk": 1,
+      "version": 56,
+      "objects": 16,
+      "trailer_offset": 1132,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House21.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 714,
+      "trailer_offset": 58849,
+      "trailer_prefix": "c0d40000a3",
+      "owner": 212
+    },
+    {
+      "file": "TemplateUserData/Houses/House22.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 336,
+      "trailer_offset": 26934,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House23.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 112,
+      "trailer_offset": 8528,
+      "trailer_prefix": "a4a000a3",
+      "owner": 37
+    },
+    {
+      "file": "TemplateUserData/Houses/House24.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 909,
+      "trailer_offset": 74709,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House25.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 557,
+      "trailer_offset": 44930,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House26.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 643,
+      "trailer_offset": 53532,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House27.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 861,
+      "trailer_offset": 71392,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House28.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 549,
+      "trailer_offset": 45149,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House29.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 563,
+      "trailer_offset": 44693,
+      "trailer_prefix": "c0820000a3",
+      "owner": 130
+    },
+    {
+      "file": "TemplateUserData/Houses/House30.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 455,
+      "trailer_offset": 36971,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House40.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 431,
+      "trailer_offset": 35185,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House41.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 645,
+      "trailer_offset": 53876,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House42.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 789,
+      "trailer_offset": 65755,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House43.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 663,
+      "trailer_offset": 53292,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House44.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 379,
+      "trailer_offset": 30096,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House45.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 189,
+      "trailer_offset": 14539,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House46.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 404,
+      "trailer_offset": 31745,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House47.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 420,
+      "trailer_offset": 33579,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House48.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 984,
+      "trailer_offset": 85792,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House50.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7229,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House51.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 126,
+      "trailer_offset": 8349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House52.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7417,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House53.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 374,
+      "trailer_offset": 29992,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House54.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 333,
+      "trailer_offset": 26409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House55.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 488,
+      "trailer_offset": 38494,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House56.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 435,
+      "trailer_offset": 39319,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House57.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 340,
+      "trailer_offset": 26215,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House58.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 477,
+      "trailer_offset": 37744,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House59.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 261,
+      "trailer_offset": 19553,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House60.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 324,
+      "trailer_offset": 24284,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House61.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 383,
+      "trailer_offset": 30547,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House62.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 220,
+      "trailer_offset": 16903,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House63.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 402,
+      "trailer_offset": 37628,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House64.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 202,
+      "trailer_offset": 15452,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House65.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7064,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House66.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 257,
+      "trailer_offset": 20083,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House67.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 120,
+      "trailer_offset": 8825,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House68.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 199,
+      "trailer_offset": 15070,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House69.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 299,
+      "trailer_offset": 25329,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House70.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 917,
+      "trailer_offset": 71461,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House71.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 1079,
+      "trailer_offset": 88261,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House72.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 90,
+      "trailer_offset": 6458,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House73.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 777,
+      "trailer_offset": 63031,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House74.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 520,
+      "trailer_offset": 41349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House75.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 633,
+      "trailer_offset": 50907,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House76.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 262,
+      "trailer_offset": 23548,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House77.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 847,
+      "trailer_offset": 91306,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House78.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 540,
+      "trailer_offset": 43350,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House79.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7059,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House80.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 353,
+      "trailer_offset": 27407,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House81.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 327,
+      "trailer_offset": 25966,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House82.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 913,
+      "trailer_offset": 76053,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House83.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 590,
+      "trailer_offset": 43865,
+      "trailer_prefix": "000095",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House84.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 610,
+      "trailer_offset": 49535,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House85.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 1006,
+      "trailer_offset": 83440,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House86.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 445,
+      "trailer_offset": 36196,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House87.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 745,
+      "trailer_offset": 58960,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House88.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 550,
+      "trailer_offset": 42054,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House89.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 941,
+      "trailer_offset": 77200,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House90.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 395,
+      "trailer_offset": 31495,
+      "trailer_prefix": "000019",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House91.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 205,
+      "trailer_offset": 15725,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House92.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 216,
+      "trailer_offset": 16796,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House93.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 752,
+      "trailer_offset": 54819,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House94.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 1061,
+      "trailer_offset": 84285,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House95.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 848,
+      "trailer_offset": 60740,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House96.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 995,
+      "trailer_offset": 81141,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House97.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 850,
+      "trailer_offset": 59409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House98.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 674,
+      "trailer_offset": 50145,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Houses/House99.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 346,
+      "trailer_offset": 24880,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Patch/Burb_11.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 377,
+      "trailer_offset": 35512,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Patch/Charming_13.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 292,
+      "trailer_offset": 24853,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Patch/Goth Sr_12.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 838,
+      "trailer_offset": 90651,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Patch/Hick_10.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 253,
+      "trailer_offset": 22873,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateUserData/Patch/Kat_6.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 415,
+      "trailer_offset": 37327,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateVacation/House40.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 431,
+      "trailer_offset": 35185,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateVacation/House41.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 645,
+      "trailer_offset": 53876,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateVacation/House42.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 789,
+      "trailer_offset": 65755,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateVacation/House43.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 663,
+      "trailer_offset": 53292,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateVacation/House44.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 379,
+      "trailer_offset": 30096,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateVacation/House45.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 189,
+      "trailer_offset": 14539,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateVacation/House46.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 404,
+      "trailer_offset": 31745,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateVacation/House47.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 420,
+      "trailer_offset": 33579,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "TemplateVacation/House48.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 984,
+      "trailer_offset": 85792,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House00.iff",
+      "chunk": 1,
+      "version": 51,
+      "objects": 0,
+      "trailer_offset": 18,
+      "trailer_prefix": "00",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House01.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 60,
+      "trailer_offset": 4755,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House02.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 388,
+      "trailer_offset": 31736,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House03.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 267,
+      "trailer_offset": 21897,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House04.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 24,
+      "trailer_offset": 1855,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House05.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 245,
+      "trailer_offset": 21934,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House06.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 100,
+      "trailer_offset": 7985,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House07.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 182,
+      "trailer_offset": 16365,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House08.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 57,
+      "trailer_offset": 4498,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House09.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 27,
+      "trailer_offset": 2103,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House10.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 159,
+      "trailer_offset": 12943,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House11.iff",
+      "chunk": 1,
+      "version": 56,
+      "objects": 16,
+      "trailer_offset": 1132,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House21.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 714,
+      "trailer_offset": 58849,
+      "trailer_prefix": "c0d40000a3",
+      "owner": 212
+    },
+    {
+      "file": "UserData/Houses/House22.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 336,
+      "trailer_offset": 26934,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House23.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 112,
+      "trailer_offset": 8528,
+      "trailer_prefix": "a4a000a3",
+      "owner": 37
+    },
+    {
+      "file": "UserData/Houses/House24.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 909,
+      "trailer_offset": 74709,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House25.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 557,
+      "trailer_offset": 44930,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House26.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 643,
+      "trailer_offset": 53532,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House27.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 861,
+      "trailer_offset": 71392,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House28.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 549,
+      "trailer_offset": 45149,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House29.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 563,
+      "trailer_offset": 44693,
+      "trailer_prefix": "c0820000a3",
+      "owner": 130
+    },
+    {
+      "file": "UserData/Houses/House30.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 455,
+      "trailer_offset": 36971,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House40.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 431,
+      "trailer_offset": 35185,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House41.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 645,
+      "trailer_offset": 53876,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House42.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 789,
+      "trailer_offset": 65755,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House43.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 663,
+      "trailer_offset": 53292,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House44.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 379,
+      "trailer_offset": 30096,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House45.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 189,
+      "trailer_offset": 14539,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House46.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 404,
+      "trailer_offset": 31745,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House47.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 420,
+      "trailer_offset": 33579,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House48.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 984,
+      "trailer_offset": 85792,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House50.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7229,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House51.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 126,
+      "trailer_offset": 8349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House52.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7417,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House53.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 374,
+      "trailer_offset": 29992,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House54.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 333,
+      "trailer_offset": 26409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House55.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 488,
+      "trailer_offset": 38494,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House56.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 435,
+      "trailer_offset": 39319,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House57.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 340,
+      "trailer_offset": 26215,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House58.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 477,
+      "trailer_offset": 37744,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House59.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 261,
+      "trailer_offset": 19553,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House60.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 324,
+      "trailer_offset": 24284,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House61.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 383,
+      "trailer_offset": 30547,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House62.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 220,
+      "trailer_offset": 16903,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House63.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 402,
+      "trailer_offset": 37628,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House64.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 202,
+      "trailer_offset": 15452,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House65.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7064,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House66.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 257,
+      "trailer_offset": 20083,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House67.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 120,
+      "trailer_offset": 8825,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House68.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 199,
+      "trailer_offset": 15070,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House69.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 299,
+      "trailer_offset": 25329,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House70.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 917,
+      "trailer_offset": 71461,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House71.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 1079,
+      "trailer_offset": 88261,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House72.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 90,
+      "trailer_offset": 6458,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House73.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 777,
+      "trailer_offset": 63031,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House74.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 520,
+      "trailer_offset": 41349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House75.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 633,
+      "trailer_offset": 50907,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House76.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 262,
+      "trailer_offset": 23548,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House77.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 847,
+      "trailer_offset": 91306,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House78.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 540,
+      "trailer_offset": 43350,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House79.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7059,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House80.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 353,
+      "trailer_offset": 27407,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House81.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 327,
+      "trailer_offset": 25966,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House82.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 913,
+      "trailer_offset": 76053,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House83.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 590,
+      "trailer_offset": 43865,
+      "trailer_prefix": "000095",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House84.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 610,
+      "trailer_offset": 49535,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House85.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 1006,
+      "trailer_offset": 83440,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House86.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 445,
+      "trailer_offset": 36196,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House87.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 745,
+      "trailer_offset": 58960,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House88.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 550,
+      "trailer_offset": 42054,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House89.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 941,
+      "trailer_offset": 77200,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House90.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 395,
+      "trailer_offset": 31495,
+      "trailer_prefix": "000019",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House91.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 205,
+      "trailer_offset": 15725,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House92.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 216,
+      "trailer_offset": 16796,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House93.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 752,
+      "trailer_offset": 54819,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House94.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 1061,
+      "trailer_offset": 84285,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House95.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 848,
+      "trailer_offset": 60740,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House96.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 995,
+      "trailer_offset": 81141,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House97.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 850,
+      "trailer_offset": 59409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House98.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 674,
+      "trailer_offset": 50145,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Houses/House99.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 346,
+      "trailer_offset": 24880,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Patch/Burb_11.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 377,
+      "trailer_offset": 35512,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Patch/Charming_13.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 292,
+      "trailer_offset": 24853,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Patch/Goth Sr_12.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 838,
+      "trailer_offset": 90651,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Patch/Hick_10.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 253,
+      "trailer_offset": 22873,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Patch/Kat_6.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 415,
+      "trailer_offset": 37327,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData/Tutorial.FAM",
+      "chunk": 1,
+      "version": 62,
+      "objects": 182,
+      "trailer_offset": 16365,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House00.iff",
+      "chunk": 1,
+      "version": 51,
+      "objects": 0,
+      "trailer_offset": 18,
+      "trailer_prefix": "00",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House01.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 595,
+      "trailer_offset": 50370,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House02.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 170,
+      "trailer_offset": 13728,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House03.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 203,
+      "trailer_offset": 16853,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House04.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 72,
+      "trailer_offset": 5789,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House05.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 75,
+      "trailer_offset": 6082,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House06.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 60,
+      "trailer_offset": 4801,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House07.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 218,
+      "trailer_offset": 18452,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House08.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 61,
+      "trailer_offset": 4883,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House09.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 205,
+      "trailer_offset": 19290,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House10.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 85,
+      "trailer_offset": 6940,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House11.iff",
+      "chunk": 1,
+      "version": 56,
+      "objects": 16,
+      "trailer_offset": 1132,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House21.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 714,
+      "trailer_offset": 58849,
+      "trailer_prefix": "c0d40000a3",
+      "owner": 212
+    },
+    {
+      "file": "UserData2/Houses/House22.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 336,
+      "trailer_offset": 26934,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House23.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 112,
+      "trailer_offset": 8528,
+      "trailer_prefix": "a4a000a3",
+      "owner": 37
+    },
+    {
+      "file": "UserData2/Houses/House24.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 909,
+      "trailer_offset": 74709,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House25.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 557,
+      "trailer_offset": 44930,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House26.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 643,
+      "trailer_offset": 53532,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House27.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 861,
+      "trailer_offset": 71392,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House28.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 549,
+      "trailer_offset": 45149,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House29.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 563,
+      "trailer_offset": 44693,
+      "trailer_prefix": "c0820000a3",
+      "owner": 130
+    },
+    {
+      "file": "UserData2/Houses/House30.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 455,
+      "trailer_offset": 36971,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House40.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 431,
+      "trailer_offset": 35185,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House41.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 645,
+      "trailer_offset": 53876,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House42.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 789,
+      "trailer_offset": 65755,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House43.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 663,
+      "trailer_offset": 53292,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House44.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 379,
+      "trailer_offset": 30096,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House45.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 189,
+      "trailer_offset": 14539,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House46.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 404,
+      "trailer_offset": 31745,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House47.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 420,
+      "trailer_offset": 33579,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House48.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 984,
+      "trailer_offset": 85792,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House50.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7229,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House51.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 126,
+      "trailer_offset": 8349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House52.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7417,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House53.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 374,
+      "trailer_offset": 29992,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House54.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 333,
+      "trailer_offset": 26409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House55.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 488,
+      "trailer_offset": 38494,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House56.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 435,
+      "trailer_offset": 39319,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House57.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 340,
+      "trailer_offset": 26215,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House58.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 477,
+      "trailer_offset": 37744,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House59.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 261,
+      "trailer_offset": 19553,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House60.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 324,
+      "trailer_offset": 24284,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House61.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 383,
+      "trailer_offset": 30547,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House62.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 220,
+      "trailer_offset": 16903,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House63.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 402,
+      "trailer_offset": 37628,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House64.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 202,
+      "trailer_offset": 15452,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House65.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7064,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House66.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 257,
+      "trailer_offset": 20083,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House67.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 120,
+      "trailer_offset": 8825,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House68.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 199,
+      "trailer_offset": 15070,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House69.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 299,
+      "trailer_offset": 25329,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House70.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 917,
+      "trailer_offset": 71461,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House71.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 1079,
+      "trailer_offset": 88261,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House72.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 90,
+      "trailer_offset": 6458,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House73.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 777,
+      "trailer_offset": 63031,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House74.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 520,
+      "trailer_offset": 41349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House75.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 633,
+      "trailer_offset": 50907,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House76.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 262,
+      "trailer_offset": 23548,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House77.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 847,
+      "trailer_offset": 91306,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House78.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 540,
+      "trailer_offset": 43350,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House79.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7059,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House80.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 353,
+      "trailer_offset": 27407,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House81.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 327,
+      "trailer_offset": 25966,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House82.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 913,
+      "trailer_offset": 76053,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House83.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 590,
+      "trailer_offset": 43865,
+      "trailer_prefix": "000095",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House84.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 610,
+      "trailer_offset": 49535,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House85.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 1006,
+      "trailer_offset": 83440,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House86.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 445,
+      "trailer_offset": 36196,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House87.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 745,
+      "trailer_offset": 58960,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House88.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 550,
+      "trailer_offset": 42054,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House89.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 941,
+      "trailer_offset": 77200,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House90.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 395,
+      "trailer_offset": 31495,
+      "trailer_prefix": "000019",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House91.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 205,
+      "trailer_offset": 15725,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House92.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 216,
+      "trailer_offset": 16796,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House93.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 752,
+      "trailer_offset": 54819,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House94.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 1061,
+      "trailer_offset": 84285,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House95.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 848,
+      "trailer_offset": 60740,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House96.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 995,
+      "trailer_offset": 81141,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House97.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 850,
+      "trailer_offset": 59409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House98.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 674,
+      "trailer_offset": 50145,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Houses/House99.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 346,
+      "trailer_offset": 24880,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Patch/Burb_11.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 377,
+      "trailer_offset": 35512,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Patch/Charming_13.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 292,
+      "trailer_offset": 24853,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Patch/Goth Sr_12.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 838,
+      "trailer_offset": 90651,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Patch/Hick_10.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 253,
+      "trailer_offset": 22873,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData2/Patch/Kat_6.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 415,
+      "trailer_offset": 37327,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House00.iff",
+      "chunk": 1,
+      "version": 51,
+      "objects": 0,
+      "trailer_offset": 18,
+      "trailer_prefix": "00",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House01.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 60,
+      "trailer_offset": 4755,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House02.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 36,
+      "trailer_offset": 2973,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House03.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 95,
+      "trailer_offset": 7981,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House04.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 24,
+      "trailer_offset": 1855,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House05.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 7,
+      "trailer_offset": 539,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House06.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 9,
+      "trailer_offset": 672,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House07.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 24,
+      "trailer_offset": 1863,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House08.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 57,
+      "trailer_offset": 4498,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House09.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 27,
+      "trailer_offset": 2103,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House10.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 27,
+      "trailer_offset": 2185,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House11.iff",
+      "chunk": 1,
+      "version": 56,
+      "objects": 16,
+      "trailer_offset": 1132,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House21.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 714,
+      "trailer_offset": 58849,
+      "trailer_prefix": "c0d40000a3",
+      "owner": 212
+    },
+    {
+      "file": "UserData3/Houses/House22.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 336,
+      "trailer_offset": 26934,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House23.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 112,
+      "trailer_offset": 8528,
+      "trailer_prefix": "a4a000a3",
+      "owner": 37
+    },
+    {
+      "file": "UserData3/Houses/House24.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 909,
+      "trailer_offset": 74709,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House25.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 557,
+      "trailer_offset": 44930,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House26.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 643,
+      "trailer_offset": 53532,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House27.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 861,
+      "trailer_offset": 71392,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House28.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 549,
+      "trailer_offset": 45149,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House29.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 563,
+      "trailer_offset": 44693,
+      "trailer_prefix": "c0820000a3",
+      "owner": 130
+    },
+    {
+      "file": "UserData3/Houses/House30.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 455,
+      "trailer_offset": 36971,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House40.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 431,
+      "trailer_offset": 35185,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House41.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 645,
+      "trailer_offset": 53876,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House42.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 789,
+      "trailer_offset": 65755,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House43.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 663,
+      "trailer_offset": 53292,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House44.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 379,
+      "trailer_offset": 30096,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House45.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 189,
+      "trailer_offset": 14539,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House46.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 404,
+      "trailer_offset": 31745,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House47.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 420,
+      "trailer_offset": 33579,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House48.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 984,
+      "trailer_offset": 85792,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House50.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7229,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House51.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 126,
+      "trailer_offset": 8349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House52.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7417,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House53.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 374,
+      "trailer_offset": 29992,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House54.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 333,
+      "trailer_offset": 26409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House55.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 488,
+      "trailer_offset": 38494,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House56.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 435,
+      "trailer_offset": 39319,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House57.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 340,
+      "trailer_offset": 26215,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House58.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 477,
+      "trailer_offset": 37744,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House59.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 261,
+      "trailer_offset": 19553,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House60.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 324,
+      "trailer_offset": 24284,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House61.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 383,
+      "trailer_offset": 30547,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House62.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 220,
+      "trailer_offset": 16903,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House63.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 402,
+      "trailer_offset": 37628,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House64.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 202,
+      "trailer_offset": 15452,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House65.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7064,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House66.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 257,
+      "trailer_offset": 20083,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House67.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 120,
+      "trailer_offset": 8825,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House68.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 199,
+      "trailer_offset": 15070,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House69.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 299,
+      "trailer_offset": 25329,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House70.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 917,
+      "trailer_offset": 71461,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House71.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 1079,
+      "trailer_offset": 88261,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House72.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 90,
+      "trailer_offset": 6458,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House73.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 777,
+      "trailer_offset": 63031,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House74.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 520,
+      "trailer_offset": 41349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House75.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 633,
+      "trailer_offset": 50907,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House76.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 262,
+      "trailer_offset": 23548,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House77.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 847,
+      "trailer_offset": 91306,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House78.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 540,
+      "trailer_offset": 43350,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House79.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7059,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House80.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 353,
+      "trailer_offset": 27407,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House81.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 327,
+      "trailer_offset": 25966,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House82.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 913,
+      "trailer_offset": 76053,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House83.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 590,
+      "trailer_offset": 43865,
+      "trailer_prefix": "000095",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House84.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 610,
+      "trailer_offset": 49535,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House85.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 1006,
+      "trailer_offset": 83440,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House86.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 445,
+      "trailer_offset": 36196,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House87.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 745,
+      "trailer_offset": 58960,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House88.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 550,
+      "trailer_offset": 42054,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House89.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 941,
+      "trailer_offset": 77200,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House90.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 395,
+      "trailer_offset": 31495,
+      "trailer_prefix": "000019",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House91.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 205,
+      "trailer_offset": 15725,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House92.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 216,
+      "trailer_offset": 16796,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House93.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 752,
+      "trailer_offset": 54819,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House94.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 1061,
+      "trailer_offset": 84285,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House95.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 848,
+      "trailer_offset": 60740,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House96.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 995,
+      "trailer_offset": 81141,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House97.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 850,
+      "trailer_offset": 59409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House98.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 674,
+      "trailer_offset": 50145,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Houses/House99.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 346,
+      "trailer_offset": 24880,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Patch/Burb_11.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 377,
+      "trailer_offset": 35512,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Patch/Charming_13.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 292,
+      "trailer_offset": 24853,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Patch/Goth Sr_12.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 838,
+      "trailer_offset": 90651,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Patch/Hick_10.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 253,
+      "trailer_offset": 22873,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData3/Patch/Kat_6.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 415,
+      "trailer_offset": 37327,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House00.iff",
+      "chunk": 1,
+      "version": 51,
+      "objects": 0,
+      "trailer_offset": 18,
+      "trailer_prefix": "00",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House01.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 60,
+      "trailer_offset": 4755,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House02.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 36,
+      "trailer_offset": 2973,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House03.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 95,
+      "trailer_offset": 7981,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House04.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 24,
+      "trailer_offset": 1855,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House05.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 7,
+      "trailer_offset": 539,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House06.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 9,
+      "trailer_offset": 672,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House07.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 24,
+      "trailer_offset": 1863,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House08.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 57,
+      "trailer_offset": 4498,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House09.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 27,
+      "trailer_offset": 2103,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House10.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 27,
+      "trailer_offset": 2185,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House11.iff",
+      "chunk": 1,
+      "version": 56,
+      "objects": 16,
+      "trailer_offset": 1132,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House21.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 714,
+      "trailer_offset": 58849,
+      "trailer_prefix": "c0d40000a3",
+      "owner": 212
+    },
+    {
+      "file": "UserData4/Houses/House22.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 336,
+      "trailer_offset": 26934,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House23.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 112,
+      "trailer_offset": 8528,
+      "trailer_prefix": "a4a000a3",
+      "owner": 37
+    },
+    {
+      "file": "UserData4/Houses/House24.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 909,
+      "trailer_offset": 74709,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House25.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 557,
+      "trailer_offset": 44930,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House26.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 643,
+      "trailer_offset": 53532,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House27.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 861,
+      "trailer_offset": 71392,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House28.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 549,
+      "trailer_offset": 45149,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House29.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 563,
+      "trailer_offset": 44693,
+      "trailer_prefix": "c0820000a3",
+      "owner": 130
+    },
+    {
+      "file": "UserData4/Houses/House30.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 455,
+      "trailer_offset": 36971,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House40.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 431,
+      "trailer_offset": 35185,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House41.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 645,
+      "trailer_offset": 53876,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House42.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 789,
+      "trailer_offset": 65755,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House43.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 663,
+      "trailer_offset": 53292,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House44.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 379,
+      "trailer_offset": 30096,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House45.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 189,
+      "trailer_offset": 14539,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House46.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 404,
+      "trailer_offset": 31745,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House47.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 420,
+      "trailer_offset": 33579,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House48.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 984,
+      "trailer_offset": 85792,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House50.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7229,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House51.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 126,
+      "trailer_offset": 8349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House52.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7417,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House53.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 374,
+      "trailer_offset": 29992,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House54.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 333,
+      "trailer_offset": 26409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House55.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 488,
+      "trailer_offset": 38494,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House56.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 435,
+      "trailer_offset": 39319,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House57.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 340,
+      "trailer_offset": 26215,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House58.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 477,
+      "trailer_offset": 37744,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House59.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 261,
+      "trailer_offset": 19553,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House60.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 324,
+      "trailer_offset": 24284,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House61.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 383,
+      "trailer_offset": 30547,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House62.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 220,
+      "trailer_offset": 16903,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House63.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 402,
+      "trailer_offset": 37628,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House64.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 202,
+      "trailer_offset": 15452,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House65.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7064,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House66.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 257,
+      "trailer_offset": 20083,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House67.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 120,
+      "trailer_offset": 8825,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House68.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 199,
+      "trailer_offset": 15070,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House69.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 299,
+      "trailer_offset": 25329,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House70.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 917,
+      "trailer_offset": 71461,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House71.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 1079,
+      "trailer_offset": 88261,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House72.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 90,
+      "trailer_offset": 6458,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House73.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 777,
+      "trailer_offset": 63031,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House74.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 520,
+      "trailer_offset": 41349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House75.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 633,
+      "trailer_offset": 50907,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House76.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 262,
+      "trailer_offset": 23548,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House77.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 847,
+      "trailer_offset": 91306,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House78.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 540,
+      "trailer_offset": 43350,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House79.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7059,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House80.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 353,
+      "trailer_offset": 27407,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House81.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 327,
+      "trailer_offset": 25966,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House82.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 913,
+      "trailer_offset": 76053,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House83.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 590,
+      "trailer_offset": 43865,
+      "trailer_prefix": "000095",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House84.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 610,
+      "trailer_offset": 49535,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House85.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 1006,
+      "trailer_offset": 83440,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House86.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 445,
+      "trailer_offset": 36196,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House87.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 745,
+      "trailer_offset": 58960,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House88.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 550,
+      "trailer_offset": 42054,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House89.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 941,
+      "trailer_offset": 77200,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House90.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 395,
+      "trailer_offset": 31495,
+      "trailer_prefix": "000019",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House91.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 205,
+      "trailer_offset": 15725,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House92.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 216,
+      "trailer_offset": 16796,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House93.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 752,
+      "trailer_offset": 54819,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House94.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 1061,
+      "trailer_offset": 84285,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House95.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 848,
+      "trailer_offset": 60740,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House96.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 995,
+      "trailer_offset": 81141,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House97.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 850,
+      "trailer_offset": 59409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House98.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 674,
+      "trailer_offset": 50145,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Houses/House99.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 346,
+      "trailer_offset": 24880,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Patch/Burb_11.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 377,
+      "trailer_offset": 35512,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Patch/Charming_13.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 292,
+      "trailer_offset": 24853,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Patch/Goth Sr_12.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 838,
+      "trailer_offset": 90651,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Patch/Hick_10.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 253,
+      "trailer_offset": 22873,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData4/Patch/Kat_6.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 415,
+      "trailer_offset": 37327,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House00.iff",
+      "chunk": 1,
+      "version": 51,
+      "objects": 0,
+      "trailer_offset": 18,
+      "trailer_prefix": "00",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House01.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 60,
+      "trailer_offset": 4755,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House02.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 36,
+      "trailer_offset": 2973,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House03.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 95,
+      "trailer_offset": 7981,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House04.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 24,
+      "trailer_offset": 1855,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House05.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 7,
+      "trailer_offset": 539,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House06.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 9,
+      "trailer_offset": 672,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House07.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 24,
+      "trailer_offset": 1863,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House08.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 57,
+      "trailer_offset": 4498,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House09.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 27,
+      "trailer_offset": 2103,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House10.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 27,
+      "trailer_offset": 2185,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House11.iff",
+      "chunk": 1,
+      "version": 56,
+      "objects": 16,
+      "trailer_offset": 1132,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House21.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 714,
+      "trailer_offset": 58849,
+      "trailer_prefix": "c0d40000a3",
+      "owner": 212
+    },
+    {
+      "file": "UserData5/Houses/House22.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 336,
+      "trailer_offset": 26934,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House23.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 112,
+      "trailer_offset": 8528,
+      "trailer_prefix": "a4a000a3",
+      "owner": 37
+    },
+    {
+      "file": "UserData5/Houses/House24.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 909,
+      "trailer_offset": 74709,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House25.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 557,
+      "trailer_offset": 44930,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House26.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 643,
+      "trailer_offset": 53532,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House27.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 861,
+      "trailer_offset": 71392,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House28.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 549,
+      "trailer_offset": 45149,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House29.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 563,
+      "trailer_offset": 44693,
+      "trailer_prefix": "c0820000a3",
+      "owner": 130
+    },
+    {
+      "file": "UserData5/Houses/House30.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 455,
+      "trailer_offset": 36971,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House40.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 431,
+      "trailer_offset": 35185,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House41.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 645,
+      "trailer_offset": 53876,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House42.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 789,
+      "trailer_offset": 65755,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House43.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 663,
+      "trailer_offset": 53292,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House44.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 379,
+      "trailer_offset": 30096,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House45.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 189,
+      "trailer_offset": 14539,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House46.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 404,
+      "trailer_offset": 31745,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House47.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 420,
+      "trailer_offset": 33579,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House48.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 984,
+      "trailer_offset": 85792,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House50.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7229,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House51.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 126,
+      "trailer_offset": 8349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House52.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7417,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House53.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 374,
+      "trailer_offset": 29992,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House54.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 333,
+      "trailer_offset": 26409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House55.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 488,
+      "trailer_offset": 38494,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House56.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 435,
+      "trailer_offset": 39319,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House57.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 340,
+      "trailer_offset": 26215,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House58.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 477,
+      "trailer_offset": 37744,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House59.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 261,
+      "trailer_offset": 19553,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House60.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 324,
+      "trailer_offset": 24284,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House61.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 383,
+      "trailer_offset": 30547,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House62.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 220,
+      "trailer_offset": 16903,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House63.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 402,
+      "trailer_offset": 37628,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House64.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 202,
+      "trailer_offset": 15452,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House65.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7064,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House66.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 257,
+      "trailer_offset": 20083,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House67.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 120,
+      "trailer_offset": 8825,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House68.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 199,
+      "trailer_offset": 15070,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House69.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 299,
+      "trailer_offset": 25329,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House70.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 917,
+      "trailer_offset": 71461,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House71.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 1079,
+      "trailer_offset": 88261,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House72.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 90,
+      "trailer_offset": 6458,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House73.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 777,
+      "trailer_offset": 63031,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House74.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 520,
+      "trailer_offset": 41349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House75.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 633,
+      "trailer_offset": 50907,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House76.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 262,
+      "trailer_offset": 23548,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House77.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 847,
+      "trailer_offset": 91306,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House78.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 540,
+      "trailer_offset": 43350,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House79.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7059,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House80.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 353,
+      "trailer_offset": 27407,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House81.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 327,
+      "trailer_offset": 25966,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House82.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 913,
+      "trailer_offset": 76053,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House83.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 590,
+      "trailer_offset": 43865,
+      "trailer_prefix": "000095",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House84.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 610,
+      "trailer_offset": 49535,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House85.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 1006,
+      "trailer_offset": 83440,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House86.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 445,
+      "trailer_offset": 36196,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House87.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 745,
+      "trailer_offset": 58960,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House88.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 550,
+      "trailer_offset": 42054,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House89.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 941,
+      "trailer_offset": 77200,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House90.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 395,
+      "trailer_offset": 31495,
+      "trailer_prefix": "000019",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House91.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 205,
+      "trailer_offset": 15725,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House92.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 216,
+      "trailer_offset": 16796,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House93.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 752,
+      "trailer_offset": 54819,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House94.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 1061,
+      "trailer_offset": 84285,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House95.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 848,
+      "trailer_offset": 60740,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House96.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 995,
+      "trailer_offset": 81141,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House97.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 850,
+      "trailer_offset": 59409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House98.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 674,
+      "trailer_offset": 50145,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Houses/House99.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 346,
+      "trailer_offset": 24880,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Patch/Burb_11.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 377,
+      "trailer_offset": 35512,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Patch/Charming_13.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 292,
+      "trailer_offset": 24853,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Patch/Goth Sr_12.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 838,
+      "trailer_offset": 90651,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Patch/Hick_10.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 253,
+      "trailer_offset": 22873,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData5/Patch/Kat_6.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 415,
+      "trailer_offset": 37327,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House00.iff",
+      "chunk": 1,
+      "version": 51,
+      "objects": 0,
+      "trailer_offset": 18,
+      "trailer_prefix": "00",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House01.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 60,
+      "trailer_offset": 4755,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House02.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 36,
+      "trailer_offset": 2973,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House03.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 95,
+      "trailer_offset": 7981,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House04.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 24,
+      "trailer_offset": 1855,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House05.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 7,
+      "trailer_offset": 539,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House06.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 9,
+      "trailer_offset": 672,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House07.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 24,
+      "trailer_offset": 1863,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House08.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 57,
+      "trailer_offset": 4498,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House09.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 27,
+      "trailer_offset": 2103,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House10.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 27,
+      "trailer_offset": 2185,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House11.iff",
+      "chunk": 1,
+      "version": 56,
+      "objects": 16,
+      "trailer_offset": 1132,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House21.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 714,
+      "trailer_offset": 58849,
+      "trailer_prefix": "c0d40000a3",
+      "owner": 212
+    },
+    {
+      "file": "UserData6/Houses/House22.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 336,
+      "trailer_offset": 26934,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House23.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 112,
+      "trailer_offset": 8528,
+      "trailer_prefix": "a4a000a3",
+      "owner": 37
+    },
+    {
+      "file": "UserData6/Houses/House24.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 909,
+      "trailer_offset": 74709,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House25.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 557,
+      "trailer_offset": 44930,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House26.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 643,
+      "trailer_offset": 53532,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House27.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 861,
+      "trailer_offset": 71392,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House28.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 549,
+      "trailer_offset": 45149,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House29.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 563,
+      "trailer_offset": 44693,
+      "trailer_prefix": "c0820000a3",
+      "owner": 130
+    },
+    {
+      "file": "UserData6/Houses/House30.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 455,
+      "trailer_offset": 36971,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House40.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 431,
+      "trailer_offset": 35185,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House41.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 645,
+      "trailer_offset": 53876,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House42.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 789,
+      "trailer_offset": 65755,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House43.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 663,
+      "trailer_offset": 53292,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House44.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 379,
+      "trailer_offset": 30096,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House45.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 189,
+      "trailer_offset": 14539,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House46.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 404,
+      "trailer_offset": 31745,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House47.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 420,
+      "trailer_offset": 33579,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House48.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 984,
+      "trailer_offset": 85792,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House50.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7229,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House51.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 126,
+      "trailer_offset": 8349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House52.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7417,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House53.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 374,
+      "trailer_offset": 29992,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House54.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 333,
+      "trailer_offset": 26409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House55.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 488,
+      "trailer_offset": 38494,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House56.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 435,
+      "trailer_offset": 39319,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House57.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 340,
+      "trailer_offset": 26215,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House58.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 477,
+      "trailer_offset": 37744,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House59.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 261,
+      "trailer_offset": 19553,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House60.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 324,
+      "trailer_offset": 24284,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House61.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 383,
+      "trailer_offset": 30547,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House62.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 220,
+      "trailer_offset": 16903,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House63.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 402,
+      "trailer_offset": 37628,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House64.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 202,
+      "trailer_offset": 15452,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House65.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7064,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House66.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 257,
+      "trailer_offset": 20083,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House67.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 120,
+      "trailer_offset": 8825,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House68.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 199,
+      "trailer_offset": 15070,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House69.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 299,
+      "trailer_offset": 25329,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House70.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 917,
+      "trailer_offset": 71461,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House71.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 1079,
+      "trailer_offset": 88261,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House72.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 90,
+      "trailer_offset": 6458,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House73.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 777,
+      "trailer_offset": 63031,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House74.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 520,
+      "trailer_offset": 41349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House75.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 633,
+      "trailer_offset": 50907,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House76.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 262,
+      "trailer_offset": 23548,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House77.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 847,
+      "trailer_offset": 91306,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House78.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 540,
+      "trailer_offset": 43350,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House79.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7059,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House80.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 353,
+      "trailer_offset": 27407,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House81.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 327,
+      "trailer_offset": 25966,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House82.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 913,
+      "trailer_offset": 76053,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House83.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 590,
+      "trailer_offset": 43865,
+      "trailer_prefix": "000095",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House84.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 610,
+      "trailer_offset": 49535,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House85.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 1006,
+      "trailer_offset": 83440,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House86.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 445,
+      "trailer_offset": 36196,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House87.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 745,
+      "trailer_offset": 58960,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House88.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 550,
+      "trailer_offset": 42054,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House89.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 941,
+      "trailer_offset": 77200,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House90.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 395,
+      "trailer_offset": 31495,
+      "trailer_prefix": "000019",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House91.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 205,
+      "trailer_offset": 15725,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House92.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 216,
+      "trailer_offset": 16796,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House93.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 752,
+      "trailer_offset": 54819,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House94.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 1061,
+      "trailer_offset": 84285,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House95.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 848,
+      "trailer_offset": 60740,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House96.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 995,
+      "trailer_offset": 81141,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House97.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 850,
+      "trailer_offset": 59409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House98.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 674,
+      "trailer_offset": 50145,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Houses/House99.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 346,
+      "trailer_offset": 24880,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Patch/Burb_11.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 377,
+      "trailer_offset": 35512,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Patch/Charming_13.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 292,
+      "trailer_offset": 24853,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Patch/Goth Sr_12.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 838,
+      "trailer_offset": 90651,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Patch/Hick_10.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 253,
+      "trailer_offset": 22873,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData6/Patch/Kat_6.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 415,
+      "trailer_offset": 37327,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House00.iff",
+      "chunk": 1,
+      "version": 51,
+      "objects": 0,
+      "trailer_offset": 18,
+      "trailer_prefix": "00",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House01.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 60,
+      "trailer_offset": 4755,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House02.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 36,
+      "trailer_offset": 2973,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House03.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 95,
+      "trailer_offset": 7981,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House04.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 24,
+      "trailer_offset": 1855,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House05.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 7,
+      "trailer_offset": 539,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House06.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 9,
+      "trailer_offset": 672,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House07.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 24,
+      "trailer_offset": 1863,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House08.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 57,
+      "trailer_offset": 4498,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House09.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 27,
+      "trailer_offset": 2103,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House10.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 27,
+      "trailer_offset": 2185,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House11.iff",
+      "chunk": 1,
+      "version": 56,
+      "objects": 16,
+      "trailer_offset": 1132,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House21.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 714,
+      "trailer_offset": 58849,
+      "trailer_prefix": "c0d40000a3",
+      "owner": 212
+    },
+    {
+      "file": "UserData7/Houses/House22.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 336,
+      "trailer_offset": 26934,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House23.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 112,
+      "trailer_offset": 8528,
+      "trailer_prefix": "a4a000a3",
+      "owner": 37
+    },
+    {
+      "file": "UserData7/Houses/House24.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 909,
+      "trailer_offset": 74709,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House25.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 557,
+      "trailer_offset": 44930,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House26.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 643,
+      "trailer_offset": 53532,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House27.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 861,
+      "trailer_offset": 71392,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House28.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 549,
+      "trailer_offset": 45149,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House29.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 563,
+      "trailer_offset": 44693,
+      "trailer_prefix": "c0820000a3",
+      "owner": 130
+    },
+    {
+      "file": "UserData7/Houses/House30.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 455,
+      "trailer_offset": 36971,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House40.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 431,
+      "trailer_offset": 35185,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House41.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 645,
+      "trailer_offset": 53876,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House42.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 789,
+      "trailer_offset": 65755,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House43.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 663,
+      "trailer_offset": 53292,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House44.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 379,
+      "trailer_offset": 30096,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House45.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 189,
+      "trailer_offset": 14539,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House46.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 404,
+      "trailer_offset": 31745,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House47.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 420,
+      "trailer_offset": 33579,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House48.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 984,
+      "trailer_offset": 85792,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House50.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7229,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House51.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 126,
+      "trailer_offset": 8349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House52.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7417,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House53.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 374,
+      "trailer_offset": 29992,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House54.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 333,
+      "trailer_offset": 26409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House55.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 488,
+      "trailer_offset": 38494,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House56.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 435,
+      "trailer_offset": 39319,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House57.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 340,
+      "trailer_offset": 26215,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House58.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 477,
+      "trailer_offset": 37744,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House59.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 261,
+      "trailer_offset": 19553,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House60.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 324,
+      "trailer_offset": 24284,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House61.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 383,
+      "trailer_offset": 30547,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House62.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 220,
+      "trailer_offset": 16903,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House63.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 402,
+      "trailer_offset": 37628,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House64.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 202,
+      "trailer_offset": 15452,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House65.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7064,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House66.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 257,
+      "trailer_offset": 20083,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House67.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 120,
+      "trailer_offset": 8825,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House68.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 199,
+      "trailer_offset": 15070,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House69.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 299,
+      "trailer_offset": 25329,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House70.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 917,
+      "trailer_offset": 71461,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House71.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 1079,
+      "trailer_offset": 88261,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House72.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 90,
+      "trailer_offset": 6458,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House73.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 777,
+      "trailer_offset": 63031,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House74.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 520,
+      "trailer_offset": 41349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House75.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 633,
+      "trailer_offset": 50907,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House76.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 262,
+      "trailer_offset": 23548,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House77.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 847,
+      "trailer_offset": 91306,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House78.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 540,
+      "trailer_offset": 43350,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House79.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7059,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House80.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 353,
+      "trailer_offset": 27407,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House81.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 327,
+      "trailer_offset": 25966,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House82.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 913,
+      "trailer_offset": 76053,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House83.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 590,
+      "trailer_offset": 43865,
+      "trailer_prefix": "000095",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House84.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 610,
+      "trailer_offset": 49535,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House85.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 1006,
+      "trailer_offset": 83440,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House86.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 445,
+      "trailer_offset": 36196,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House87.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 745,
+      "trailer_offset": 58960,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House88.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 550,
+      "trailer_offset": 42054,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House89.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 941,
+      "trailer_offset": 77200,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House90.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 395,
+      "trailer_offset": 31495,
+      "trailer_prefix": "000019",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House91.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 205,
+      "trailer_offset": 15725,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House92.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 216,
+      "trailer_offset": 16796,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House93.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 752,
+      "trailer_offset": 54819,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House94.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 1061,
+      "trailer_offset": 84285,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House95.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 848,
+      "trailer_offset": 60740,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House96.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 995,
+      "trailer_offset": 81141,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House97.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 850,
+      "trailer_offset": 59409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House98.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 674,
+      "trailer_offset": 50145,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Houses/House99.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 346,
+      "trailer_offset": 24880,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Patch/Burb_11.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 377,
+      "trailer_offset": 35512,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Patch/Charming_13.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 292,
+      "trailer_offset": 24853,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Patch/Goth Sr_12.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 838,
+      "trailer_offset": 90651,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Patch/Hick_10.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 253,
+      "trailer_offset": 22873,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData7/Patch/Kat_6.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 415,
+      "trailer_offset": 37327,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House00.iff",
+      "chunk": 1,
+      "version": 51,
+      "objects": 0,
+      "trailer_offset": 18,
+      "trailer_prefix": "00",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House01.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 60,
+      "trailer_offset": 4755,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House02.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 36,
+      "trailer_offset": 2973,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House03.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 95,
+      "trailer_offset": 7981,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House04.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 24,
+      "trailer_offset": 1855,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House05.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 7,
+      "trailer_offset": 539,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House06.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 9,
+      "trailer_offset": 672,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House07.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 24,
+      "trailer_offset": 1863,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House08.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 57,
+      "trailer_offset": 4498,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House09.iff",
+      "chunk": 1,
+      "version": 62,
+      "objects": 27,
+      "trailer_offset": 2103,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House10.iff",
+      "chunk": 1,
+      "version": 63,
+      "objects": 27,
+      "trailer_offset": 2185,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House11.iff",
+      "chunk": 1,
+      "version": 56,
+      "objects": 16,
+      "trailer_offset": 1132,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House21.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 714,
+      "trailer_offset": 58849,
+      "trailer_prefix": "c0d40000a3",
+      "owner": 212
+    },
+    {
+      "file": "UserData8/Houses/House22.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 336,
+      "trailer_offset": 26934,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House23.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 112,
+      "trailer_offset": 8528,
+      "trailer_prefix": "a4a000a3",
+      "owner": 37
+    },
+    {
+      "file": "UserData8/Houses/House24.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 909,
+      "trailer_offset": 74709,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House25.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 557,
+      "trailer_offset": 44930,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House26.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 643,
+      "trailer_offset": 53532,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House27.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 861,
+      "trailer_offset": 71392,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House28.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 549,
+      "trailer_offset": 45149,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House29.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 563,
+      "trailer_offset": 44693,
+      "trailer_prefix": "c0820000a3",
+      "owner": 130
+    },
+    {
+      "file": "UserData8/Houses/House30.iff",
+      "chunk": 1,
+      "version": 66,
+      "objects": 455,
+      "trailer_offset": 36971,
+      "trailer_prefix": "0000a3",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House40.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 431,
+      "trailer_offset": 35185,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House41.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 645,
+      "trailer_offset": 53876,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House42.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 789,
+      "trailer_offset": 65755,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House43.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 663,
+      "trailer_offset": 53292,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House44.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 379,
+      "trailer_offset": 30096,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House45.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 189,
+      "trailer_offset": 14539,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House46.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 404,
+      "trailer_offset": 31745,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House47.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 420,
+      "trailer_offset": 33579,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House48.iff",
+      "chunk": 1,
+      "version": 68,
+      "objects": 984,
+      "trailer_offset": 85792,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House50.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7229,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House51.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 126,
+      "trailer_offset": 8349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House52.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 102,
+      "trailer_offset": 7417,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House53.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 374,
+      "trailer_offset": 29992,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House54.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 333,
+      "trailer_offset": 26409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House55.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 488,
+      "trailer_offset": 38494,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House56.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 435,
+      "trailer_offset": 39319,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House57.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 340,
+      "trailer_offset": 26215,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House58.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 477,
+      "trailer_offset": 37744,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House59.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 261,
+      "trailer_offset": 19553,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House60.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 324,
+      "trailer_offset": 24284,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House61.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 383,
+      "trailer_offset": 30547,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House62.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 220,
+      "trailer_offset": 16903,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House63.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 402,
+      "trailer_offset": 37628,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House64.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 202,
+      "trailer_offset": 15452,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House65.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7064,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House66.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 257,
+      "trailer_offset": 20083,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House67.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 120,
+      "trailer_offset": 8825,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House68.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 199,
+      "trailer_offset": 15070,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House69.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 299,
+      "trailer_offset": 25329,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House70.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 917,
+      "trailer_offset": 71461,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House71.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 1079,
+      "trailer_offset": 88261,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House72.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 90,
+      "trailer_offset": 6458,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House73.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 777,
+      "trailer_offset": 63031,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House74.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 520,
+      "trailer_offset": 41349,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House75.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 633,
+      "trailer_offset": 50907,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House76.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 262,
+      "trailer_offset": 23548,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House77.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 847,
+      "trailer_offset": 91306,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House78.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 540,
+      "trailer_offset": 43350,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House79.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 99,
+      "trailer_offset": 7059,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House80.iff",
+      "chunk": 1,
+      "version": 69,
+      "objects": 353,
+      "trailer_offset": 27407,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House81.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 327,
+      "trailer_offset": 25966,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House82.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 913,
+      "trailer_offset": 76053,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House83.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 590,
+      "trailer_offset": 43865,
+      "trailer_prefix": "000095",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House84.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 610,
+      "trailer_offset": 49535,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House85.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 1006,
+      "trailer_offset": 83440,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House86.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 445,
+      "trailer_offset": 36196,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House87.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 745,
+      "trailer_offset": 58960,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House88.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 550,
+      "trailer_offset": 42054,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House89.iff",
+      "chunk": 1,
+      "version": 72,
+      "objects": 941,
+      "trailer_offset": 77200,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House90.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 395,
+      "trailer_offset": 31495,
+      "trailer_prefix": "000019",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House91.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 205,
+      "trailer_offset": 15725,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House92.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 216,
+      "trailer_offset": 16796,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House93.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 752,
+      "trailer_offset": 54819,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House94.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 1061,
+      "trailer_offset": 84285,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House95.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 848,
+      "trailer_offset": 60740,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House96.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 995,
+      "trailer_offset": 81141,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House97.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 850,
+      "trailer_offset": 59409,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House98.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 674,
+      "trailer_offset": 50145,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Houses/House99.iff",
+      "chunk": 1,
+      "version": 73,
+      "objects": 346,
+      "trailer_offset": 24880,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Patch/Burb_11.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 377,
+      "trailer_offset": 35512,
+      "trailer_prefix": "0000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Patch/Charming_13.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 292,
+      "trailer_offset": 24853,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Patch/Goth Sr_12.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 838,
+      "trailer_offset": 90651,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Patch/Hick_10.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 253,
+      "trailer_offset": 22873,
+      "trailer_prefix": "000000",
+      "owner": 0
+    },
+    {
+      "file": "UserData8/Patch/Kat_6.FAM",
+      "chunk": 1,
+      "version": 69,
+      "objects": 415,
+      "trailer_offset": 37327,
+      "trailer_prefix": "000000",
+      "owner": 0
+    }
+  ]
+}

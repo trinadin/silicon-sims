@@ -1,0 +1,206 @@
+                ; ==== .CamGetQualityValue__7CPStateFv ====
+0020ca20: 80030214  lwz      r0, 0x214(r3)
+0020ca24: 2c000001  cmpwi    r0, 1
+0020ca28: 4182002c  beq      0x20ca54
+0020ca2c: 40800010  bge      0x20ca3c
+0020ca30: 2c000000  cmpwi    r0, 0
+0020ca34: 40800018  bge      0x20ca4c
+0020ca38: 4800001c  b        0x20ca54
+0020ca3c: 2c000003  cmpwi    r0, 3
+0020ca40: 40800014  bge      0x20ca54
+0020ca44: 3860005a  li       r3, 0x5a
+0020ca48: 4e800020  blr
+0020ca4c: 38600014  li       r3, 0x14
+0020ca50: 4e800020  blr
+0020ca54: 38600032  li       r3, 0x32
+0020ca58: 4e800020  blr
+0020ca5c: 00000000  .long    0x00000000
+0020ca60: 00092040  .long    0x00092040
+0020ca64: 00000000  .long    0x00000000
+0020ca68: 0000003c  .long    0x0000003c
+0020ca6c: 001f2e43  .long    0x001f2e43
+0020ca70: 616d4765  ori      r13, r11, 0x4765
+0020ca74: 74517561  andis.   r17, r2, 0x7561
+0020ca78: 6c697479  xoris    r9, r3, 0x7479
+0020ca7c: 56616c75  rlwinm.  r1, r19, 0xd, 0x11, 0x1a
+0020ca80: 655f5f37  oris     r31, r10, 0x5f37
+0020ca84: 43505374  bdz-     0x211df8
+0020ca88: 61746546  ori      r20, r11, 0x6546
+0020ca8c: 76000000  andis.   r0, r16, 0
+0020ca90: 80630214  lwz      r3, 0x214(r3)
+0020ca94: 4e800020  blr
+0020ca98: 00000000  .long    0x00000000
+0020ca9c: 00092040  .long    0x00092040
+0020caa0: 00000000  .long    0x00000000
+0020caa4: 00000008  .long    0x00000008
+0020caa8: 001a2e43  .long    0x001a2e43
+0020caac: 616d4765  ori      r13, r11, 0x4765
+0020cab0: 74517561  andis.   r17, r2, 0x7561
+0020cab4: 6c697479  xoris    r9, r3, 0x7479
+0020cab8: 5f5f3743  rlwnm.   r31, r26, r6, 0x1d, 1
+0020cabc: 50537461  rlwimi.  r19, r2, 0xe, 0x11, 0x10
+0020cac0: 74654676  andis.   r5, r3, 0x4676
+0020cac4: 00000000  .long    0x00000000
+0020cac8: 00000000  .long    0x00000000
+0020cacc: 00000000  .long    0x00000000
+                ; ==== .CamGetHeight__7CPStateFv ====
+0020cad0: 8063021c  lwz      r3, 0x21c(r3)
+0020cad4: 4e800020  blr
+0020cad8: 00000000  .long    0x00000000
+0020cadc: 00092040  .long    0x00092040
+0020cae0: 00000000  .long    0x00000000
+0020cae4: 00000008  .long    0x00000008
+0020cae8: 00192e43  .long    0x00192e43
+0020caec: 616d4765  ori      r13, r11, 0x4765
+0020caf0: 74486569  andis.   r8, r2, 0x6569
+0020caf4: 6768745f  oris     r8, r27, 0x745f
+0020caf8: 5f374350  rlwnm    r23, r25, r8, 0xd, 8
+0020cafc: 53746174  rlwimi   r20, r27, 0xc, 5, 0x1a
+0020cb00: 65467600  oris     r6, r10, 0x7600
+0020cb04: 00000000  .long    0x00000000
+0020cb08: 00000000  .long    0x00000000
+0020cb0c: 00000000  .long    0x00000000
+                ; ==== .CamGetWidth__7CPStateFv ====
+0020cb10: 80630218  lwz      r3, 0x218(r3)
+0020cb14: 4e800020  blr
+0020cb18: 00000000  .long    0x00000000
+0020cb1c: 00092040  .long    0x00092040
+0020cb20: 00000000  .long    0x00000000
+0020cb24: 00000008  .long    0x00000008
+0020cb28: 00182e43  .long    0x00182e43
+0020cb2c: 616d4765  ori      r13, r11, 0x4765
+0020cb30: 74576964  andis.   r23, r2, 0x6964
+0020cb34: 74685f5f  andis.   r8, r3, 0x5f5f
+0020cb38: 37435053  addic.   r26, r3, 0x5053
+0020cb3c: 74617465  andis.   r1, r3, 0x7465
+0020cb40: 46760000  .long    0x46760000
+0020cb44: 00000000  .long    0x00000000
+0020cb48: 00000000  .long    0x00000000
+0020cb4c: 00000000  .long    0x00000000
+                ; ==== .CamGetSize__7CPStateFv ====
+0020cb50: 80630210  lwz      r3, 0x210(r3)
+0020cb54: 4e800020  blr
+0020cb58: 00000000  .long    0x00000000
+0020cb5c: 00092040  .long    0x00092040
+0020cb60: 00000000  .long    0x00000000
+0020cb64: 00000008  .long    0x00000008
+0020cb68: 00172e43  .long    0x00172e43
+0020cb6c: 616d4765  ori      r13, r11, 0x4765
+0020cb70: 7453697a  andis.   r19, r2, 0x697a
+0020cb74: 655f5f37  oris     r31, r10, 0x5f37
+0020cb78: 43505374  bdz-     0x211eec
+0020cb7c: 61746546  ori      r20, r11, 0x6546
+0020cb80: 76000000  andis.   r0, r16, 0
+0020cb84: 00000000  .long    0x00000000
+0020cb88: 00000000  .long    0x00000000
+0020cb8c: 00000000  .long    0x00000000
+                ; ==== .CamSetQuality__7CPStateFQ27CPState13CameraQuality ====
+0020cb90: 90830214  stw      r4, 0x214(r3)
+0020cb94: 4e800020  blr
+0020cb98: 00000000  .long    0x00000000
+0020cb9c: 00092040  .long    0x00092040
+0020cba0: 00000000  .long    0x00000000
+0020cba4: 00000008  .long    0x00000008
+0020cba8: 00322e43  .long    0x00322e43
+0020cbac: 616d5365  ori      r13, r11, 0x5365
+0020cbb0: 74517561  andis.   r17, r2, 0x7561
+0020cbb4: 6c697479  xoris    r9, r3, 0x7479
+0020cbb8: 5f5f3743  rlwnm.   r31, r26, r6, 0x1d, 1
+0020cbbc: 50537461  rlwimi.  r19, r2, 0xe, 0x11, 0x10
+0020cbc0: 74654651  andis.   r5, r3, 0x4651
+0020cbc4: 32374350  addic    r17, r23, 0x4350
+0020cbc8: 53746174  rlwimi   r20, r27, 0xc, 5, 0x1a
+0020cbcc: 65313343  oris     r17, r9, 0x3343
+0020cbd0: 616d6572  ori      r13, r11, 0x6572
+0020cbd4: 61517561  ori      r17, r10, 0x7561
+0020cbd8: 6c697479  xoris    r9, r3, 0x7479
+0020cbdc: 00000000  .long    0x00000000
+                ; ==== .CamSetSize__7CPStateFii ====
+0020cbe0: 80e29350  lwz      r7, -0x6cb0(r2)
+0020cbe4: 38c1001c  addi     r6, r1, 0x1c
+0020cbe8: 9081001c  stw      r4, 0x1c(r1)
+0020cbec: 80070000  lwz      r0, 0(r7)
+0020cbf0: 90a10020  stw      r5, 0x20(r1)
+0020cbf4: 7c040000  cmpw     r4, r0
+0020cbf8: 81229348  lwz      r9, -0x6cb8(r2)
+0020cbfc: 9001fff0  stw      r0, -0x10(r1)
+0020cc00: 8102934c  lwz      r8, -0x6cb4(r2)
+0020cc04: 81670000  lwz      r11, 0(r7)
+0020cc08: 40800008  bge      0x20cc10
+0020cc0c: 38c1fff0  addi     r6, r1, -0x10
+0020cc10: 80860000  lwz      r4, 0(r6)
+0020cc14: 38a1001c  addi     r5, r1, 0x1c
+0020cc18: 80080000  lwz      r0, 0(r8)
+0020cc1c: 9081001c  stw      r4, 0x1c(r1)
+0020cc20: 7c002000  cmpw     r0, r4
+0020cc24: 81480000  lwz      r10, 0(r8)
+0020cc28: 9001fff4  stw      r0, -0xc(r1)
+0020cc2c: 40800008  bge      0x20cc34
+0020cc30: 38a1fff4  addi     r5, r1, -0xc
+0020cc34: 80e70004  lwz      r7, 4(r7)
+0020cc38: 38810020  addi     r4, r1, 0x20
+0020cc3c: 80a50000  lwz      r5, 0(r5)
+0020cc40: 80010020  lwz      r0, 0x20(r1)
+0020cc44: 90a1001c  stw      r5, 0x1c(r1)
+0020cc48: 7c003800  cmpw     r0, r7
+0020cc4c: 90e1fff8  stw      r7, -8(r1)
+0020cc50: 40800008  bge      0x20cc58
+0020cc54: 3881fff8  addi     r4, r1, -8
+0020cc58: 80040000  lwz      r0, 0(r4)
+0020cc5c: 38810020  addi     r4, r1, 0x20
+0020cc60: 80c80004  lwz      r6, 4(r8)
+0020cc64: 90010020  stw      r0, 0x20(r1)
+0020cc68: 7c060000  cmpw     r6, r0
+0020cc6c: 90c1fffc  stw      r6, -4(r1)
+0020cc70: 40800008  bge      0x20cc78
+0020cc74: 3881fffc  addi     r4, r1, -4
+0020cc78: 8101001c  lwz      r8, 0x1c(r1)
+0020cc7c: 38000000  li       r0, 0
+0020cc80: 80a40000  lwz      r5, 0(r4)
+0020cc84: 7c085800  cmpw     r8, r11
+0020cc88: 90a10020  stw      r5, 0x20(r1)
+0020cc8c: 40820010  bne      0x20cc9c
+0020cc90: 7c053800  cmpw     r5, r7
+0020cc94: 40820008  bne      0x20cc9c
+0020cc98: 38000001  li       r0, 1
+0020cc9c: 5400063f  clrlwi.  r0, r0, 0x18
+0020cca0: 41820010  beq      0x20ccb0
+0020cca4: 38000000  li       r0, 0
+0020cca8: 90030210  stw      r0, 0x210(r3)
+0020ccac: 4800006c  b        0x20cd18
+0020ccb0: 80090000  lwz      r0, 0(r9)
+0020ccb4: 38800000  li       r4, 0
+0020ccb8: 7c080000  cmpw     r8, r0
+0020ccbc: 40820014  bne      0x20ccd0
+0020ccc0: 80090004  lwz      r0, 4(r9)
+0020ccc4: 7c050000  cmpw     r5, r0
+0020ccc8: 40820008  bne      0x20ccd0
+0020cccc: 38800001  li       r4, 1
+0020ccd0: 5480063f  clrlwi.  r0, r4, 0x18
+0020ccd4: 41820010  beq      0x20cce4
+0020ccd8: 38000001  li       r0, 1
+0020ccdc: 90030210  stw      r0, 0x210(r3)
+0020cce0: 48000038  b        0x20cd18
+0020cce4: 7c085000  cmpw     r8, r10
+0020cce8: 38000000  li       r0, 0
+0020ccec: 40820010  bne      0x20ccfc
+0020ccf0: 7c053000  cmpw     r5, r6
+0020ccf4: 40820008  bne      0x20ccfc
+0020ccf8: 38000001  li       r0, 1
+0020ccfc: 5400063f  clrlwi.  r0, r0, 0x18
+0020cd00: 41820010  beq      0x20cd10
+0020cd04: 38000002  li       r0, 2
+0020cd08: 90030210  stw      r0, 0x210(r3)
+0020cd0c: 4800000c  b        0x20cd18
+0020cd10: 38000003  li       r0, 3
+0020cd14: 90030210  stw      r0, 0x210(r3)
+0020cd18: 91030218  stw      r8, 0x218(r3)
+0020cd1c: 90a3021c  stw      r5, 0x21c(r3)
+0020cd20: 8003000c  lwz      r0, 0xc(r3)
+0020cd24: 64000020  oris     r0, r0, 0x20
+0020cd28: 9003000c  stw      r0, 0xc(r3)
+0020cd2c: 4e800020  blr
+0020cd30: 00000000  .long    0x00000000
+0020cd34: 00092040  .long    0x00092040
+0020cd38: 00000000  .long    0x00000000
+0020cd3c: 00000150  .long    0x00000150

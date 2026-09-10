@@ -1,0 +1,36 @@
+001bef00: bf41ffe8  stmw     r26, -0x18(r1)
+001bef04: 7c0802a6  mflr     r0
+001bef08: 81628870  lwz      r11, -0x7790(r2)
+001bef0c: 7c7a1b78  mr       r26, r3
+001bef10: 7c9b2378  mr       r27, r4
+001bef14: 3b850000  addi     r28, r5, 0
+001bef18: 3ba60000  addi     r29, r6, 0
+001bef1c: 3bc70000  addi     r30, r7, 0
+001bef20: 3be80000  addi     r31, r8, 0
+001bef24: 90010008  stw      r0, 8(r1)
+001bef28: 9421ff90  stwu     r1, -0x70(r1)
+001bef2c: 806b0000  lwz      r3, 0(r11)
+001bef30: 39690000  addi     r11, r9, 0
+001bef34: 898100ab  lbz      r12, 0xab(r1)
+001bef38: 28030000  cmplwi   r3, 0
+001bef3c: 800100ac  lwz      r0, 0xac(r1)
+001bef40: 4182003c  beq      0x1bef7c
+001bef44: 80630080  lwz      r3, 0x80(r3)
+001bef48: 28030000  cmplwi   r3, 0
+001bef4c: 41820030  beq      0x1bef7c
+001bef50: 91410038  stw      r10, 0x38(r1)
+001bef54: 7f44d378  mr       r4, r26
+001bef58: 38bb0000  addi     r5, r27, 0
+001bef5c: 38dc0000  addi     r6, r28, 0
+001bef60: 9181003c  stw      r12, 0x3c(r1)
+001bef64: 38fd0000  addi     r7, r29, 0
+001bef68: 391e0000  addi     r8, r30, 0
+001bef6c: 90010040  stw      r0, 0x40(r1)
+001bef70: 393f0000  addi     r9, r31, 0
+001bef74: 394b0000  addi     r10, r11, 0
+001bef78: 48054149  bl       0x2130c0   ; .DoPictureInPicture__12cDDDSimsViewFbP8cXObjectbiiibbbPCc
+001bef7c: 80010078  lwz      r0, 0x78(r1)
+001bef80: 38210070  addi     r1, r1, 0x70
+001bef84: bb41ffe8  lmw      r26, -0x18(r1)
+001bef88: 7c0803a6  mtlr     r0
+001bef8c: 4e800020  blr

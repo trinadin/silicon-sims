@@ -1,0 +1,286 @@
+AUTOTEST enabled houses=5 checks=lot,corpus,uicasorig,uiscrap
+20:03:06.902 autotest: AUTOTEST START houses=[5] checks=[lot,corpus,uicasorig,uiscrap] timeout=1800000ms
+20:03:07.146 autotest: AUTOTEST hook-registered
+2026-09-06 20:03:07.585 TheSims[72392:36028128] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/sg/3fjlktk972j1zkbssc8dfcrw0000gn/T/com.thesims.macos.savedState
+20:03:07.674 exit-probe: before Run
+20:03:07.697 exit-probe: Game.Run(Sync) enter
+20:03:08.034 exit-probe: Initialize enter
+20:03:08.233 exit-probe: Initialize exit
+20:03:08.254 screen: EnterLoading
+20:03:08.316 loadscreen: DIRECT FAR mount original kSimsLogo boot screen 800x600 len=1440056 sha=8ecf9500 (from frame one; Simitone loader chrome deleted R118)
+20:03:08.316 content-init: begin
+20:03:08.472 loadscreen: IFF-mount original splashprogress strings (17) in variablesans_10 over the boot screen
+20:03:10.239 loading-screen: update frame=120 complete=False progress=InitObjects
+Unexpected TrailingZero: 617176985
+Unexpected TrailingZero: -666831736
+Unexpected TrailingZero: 1995593413
+20:03:11.157 content-init: done
+20:03:11.198 cursor-init: IFF resolve liveperson.cur -> Shared\cursors\LivePerson.cur 326 bytes
+20:03:11.200 cursor-init: IFF-first original cursors mounted livePersonLen=326
+20:03:11.204 loadscreen: IFF-mount original Community\Bus_loadscreen_1024x768.bmp
+20:03:11.209 loadscreen: IFF-mount texture 1024x768
+20:03:11.209 EnterGameMode lot= external=False
+20:03:11.340 uioriginal: IFF-mount original Downtown\LargeBack.bmp
+20:03:11.369 uinav: IFF-mount neighborhood surround 1024x768
+20:03:11.459 uioriginal: IFF-mount original Nbhd\HotspotPopupTiler.TGA
+20:03:11.489 uioriginal: IFF-mount original NghUI\banner_neighborhood.bmp
+20:03:11.490 uioriginal: IFF-mount original NghUI\Current.bmp
+20:03:11.491 uioriginal: IFF-mount original NghUI\MoveIn.bmp
+20:03:11.491 uioriginal: IFF-mount original NghUI\Bulldoze.bmp
+20:03:11.492 uioriginal: IFF-mount original NghUI\Exit.bmp
+20:03:11.492 uioriginal: IFF-mount original NghUI\InetBtn.bmp
+20:03:11.492 uioriginal: IFF-mount original Nbhd\CreditBtnEn.bmp
+20:03:11.492 uioriginal: IFF-mount original NghUI\Previous.bmp
+20:03:11.493 uioriginal: IFF-mount original NghUI\Next.bmp
+20:03:11.493 uioriginal: IFF-mount original NghUI\Import.bmp
+20:03:11.495 uioriginal: IFF-mount original NghUI\Downtown.bmp
+20:03:11.495 uioriginal: IFF-mount original NghUI\TheSimsLogo.bmp
+20:03:11.495 uioriginal: IFF-mount original NghUI\Vacation.bmp
+20:03:11.495 uioriginal: IFF-mount original NghUI\Rezone.bmp
+20:03:11.495 uioriginal: IFF-mount original NghUI\Studiotown.bmp
+20:03:11.495 uioriginal: IFF-mount original NghUI\MagicLand.bmp
+20:03:11.498 global-context: global.iff BHAVs=251
+20:03:11.500 module: PersonGlobals BHAVs=473
+20:03:11.501 module: SocialGlobals BHAVs=101
+20:03:11.502 module: CatGlobals BHAVs=179
+20:03:11.509 module: DogGlobals BHAVs=177
+20:03:11.509 module: PetSitGlobals BHAVs=22
+20:03:11.510 module: PhoneGlobals BHAVs=149
+20:03:11.510 module: VacationDirectorGlobals BHAVs=85
+20:03:11.511 autotest: AUTOTEST LOT-TRY house=5 path='/Users/nathannoom/Documents/Simitone/UserData/Houses/House05.iff'
+20:03:11.559 uioriginal: IFF-mount original shared\sys\CloseBox.bmp
+[TS1StackRepair] object=10 guid=6b264238 invalid=4096:1@6b264238(len=missing),4113:0@6b264238(len=missing) recovery=reset
+[TS1StackRepair] object=114 guid=91767a36 invalid=4096:3@91767a36(len=2) recovery=reset
+[TS1StackRepair] object=115 guid=91767a36 invalid=4096:3@91767a36(len=2) recovery=reset
+[TS1StackRepair] object=116 guid=91767a36 invalid=4096:3@91767a36(len=2) recovery=reset
+[TS1StackRepair] object=117 guid=91767a36 invalid=4096:3@91767a36(len=2) recovery=reset
+[TS1StackRepair] object=123 guid=28975923 invalid=4109:0@28975923(len=missing) recovery=reset
+[TS1StackRepair] object=131 guid=df77ee12 invalid=4109:0@df77ee12(len=missing) recovery=reset
+[TS1StackRepair] object=133 guid=d1cf9596 invalid=4096:0@d1cf9596(len=missing) recovery=reset
+[TS1StackRepair] object=134 guid=fbe586b7 invalid=4096:2@fbe586b7(len=missing) recovery=reset
+[TS1StackRepair] object=173 guid=d5ca2d74 invalid=4096:1@d5ca2d74(len=missing) recovery=reset
+[TS1StackRepair] object=174 guid=24e26386 invalid=4096:1@24e26386(len=missing) recovery=reset
+[TS1StackRepair] object=191 guid=c59350c6 invalid=4096:1@c59350c6(len=missing) recovery=reset
+[TS1StackRepair] object=192 guid=23a15547 invalid=4096:1@23a15547(len=missing) recovery=reset
+[TS1StackRepair] object=194 guid=fd746ad2 invalid=4109:0@fd746ad2(len=missing) recovery=reset
+[TS1StackRepair] object=226 guid=7d2089b6 invalid=4096:0@7d2089b6(len=missing) recovery=reset
+[TS1StackRepair] total=15
+20:03:11.802 uioriginal: IFF-mount original cpanel\Backgrounds\UniversalBack.TGA
+20:03:11.821 uioriginal: IFF-mount original cpanel\Backgrounds\LivePatch.bmp
+20:03:11.821 uioriginal: IFF-mount original cpanel\Backgrounds\BuyPatch.bmp
+20:03:11.821 uioriginal: IFF-mount original cpanel\Backgrounds\BuildPatch.bmp
+20:03:11.822 uioriginal: IFF-mount original cpanel\Backgrounds\OptionsPatch.bmp
+20:03:11.822 uioriginal: IFF-mount original cpanel\Backgrounds\CameraPatch.bmp
+20:03:11.822 uioriginal: IFF-mount original cpanel\Buttons\people.bmp
+20:03:11.822 uioriginal: IFF-mount original cpanel\Buttons\objects.bmp
+20:03:11.823 uioriginal: IFF-mount original cpanel\Buttons\arch.bmp
+20:03:11.823 uioriginal: IFF-mount original cpanel\Buttons\options.bmp
+20:03:11.824 uioriginal: IFF-mount original cpanel\Buttons\camera.bmp
+20:03:11.824 uioriginal: IFF-mount original cpanel\Buttons\zoomin.bmp
+20:03:11.825 uioriginal: IFF-mount original cpanel\Buttons\zoomout.bmp
+20:03:11.825 uioriginal: IFF-mount original cpanel\Buttons\rotleft.bmp
+20:03:11.825 uioriginal: IFF-mount original cpanel\Buttons\rotright.bmp
+20:03:11.825 uioriginal: IFF-mount original cpanel\Buttons\LevRoof.bmp
+20:03:11.825 uioriginal: IFF-mount original cpanel\Buttons\nocut.bmp
+20:03:11.825 uioriginal: IFF-mount original cpanel\Buttons\dynacut.bmp
+20:03:11.825 uioriginal: IFF-mount original cpanel\Buttons\nowall.bmp
+20:03:11.825 uioriginal: IFF-mount original cpanel\Buttons\Lev2.bmp
+20:03:11.826 uioriginal: IFF-mount original cpanel\Buttons\Lev1.bmp
+20:03:11.826 uioriginal: IFF-mount original cpanel\Buttons\pause.bmp
+20:03:11.826 uioriginal: IFF-mount original cpanel\Buttons\Speed1.bmp
+20:03:11.827 uioriginal: IFF-mount original cpanel\Buttons\Speed2.bmp
+20:03:11.827 uioriginal: IFF-mount original cpanel\Buttons\Speed3.bmp
+20:03:11.827 uioriginal: IFF-mount original cpanel\buttons\helpbutton.bmp
+20:03:11.833 uioriginal: IFF-mount original cpanel\Backgrounds\PanelBack.bmp
+20:03:11.833 panel-ctor: original toolbar backdrop mounted 804x100
+20:03:11.834 uioriginal: IFF-mount original cpanel\Backgrounds\BackPatch.bmp
+20:03:11.835 uioriginal: IFF-mount original cpanel\People\TrackingTarget.bmp
+20:03:11.835 uioriginal: IFF-mount original cpanel\People\PeopleTemplate.bmp
+20:03:11.836 uioriginal: IFF-mount original cpanel\Backgrounds\LiveGadget.bmp
+20:03:11.842 uioriginal: IFF-mount original cpanel\Greenbars.BMP
+20:03:11.842 uioriginal: IFF-mount original cpanel\Redbars.bmp
+20:03:11.843 uioriginal: IFF-mount original cpanel\Buttons\Undo.bmp
+20:03:11.843 uioriginal: IFF-mount original cpanel\Buttons\Redo.bmp
+20:03:11.844 uioriginal: IFF-mount original cpanel\Buttons\toolBtnTerrain.bmp
+20:03:11.844 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWater.bmp
+20:03:11.844 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWall.bmp
+20:03:11.844 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWallpaper.bmp
+20:03:11.844 uioriginal: IFF-mount original cpanel\Buttons\toolBtnStairs.bmp
+20:03:11.844 uioriginal: IFF-mount original cpanel\Buttons\toolBtnFireplace.bmp
+20:03:11.844 uioriginal: IFF-mount original cpanel\Buttons\toolBtnTree.bmp
+20:03:11.844 uioriginal: IFF-mount original cpanel\Buttons\toolBtnFloor.bmp
+20:03:11.844 uioriginal: IFF-mount original cpanel\Buttons\toolBtnDoor.bmp
+20:03:11.844 uioriginal: IFF-mount original cpanel\Buttons\toolBtnWindow.bmp
+20:03:11.845 uioriginal: IFF-mount original cpanel\Buttons\toolBtnRoof.bmp
+20:03:11.845 uioriginal: IFF-mount original cpanel\Buttons\toolBtnHand.bmp
+20:03:11.845 uioriginal: IFF-mount original cpanel\Build\roofsteep.bmp
+20:03:11.845 uioriginal: IFF-mount original cpanel\Build\roofmedium.bmp
+20:03:11.846 uioriginal: IFF-mount original cpanel\Build\roofshallow.bmp
+20:03:11.846 uioriginal: IFF-mount original cpanel\Build\roofflat.bmp
+20:03:11.846 uioriginal: IFF-mount original cpanel\Buttons\ScrollLeft.bmp
+20:03:11.852 uioriginal: IFF-mount original cpanel\Buttons\ScrollRight.bmp
+20:03:11.853 uioriginal: IFF-mount original cpanel\Catalog\ThumbTemplate1Frame.BMP
+20:03:11.853 uioriginal: IFF-mount original cpanel\Catalog\ThumbTemplate.BMP
+20:03:11.853 uioriginal: IFF-mount original cpanel\Build\RoofPatternTemplate.bmp
+20:03:11.860 uioriginal: IFF-mount original cpanel\Backgrounds\BuildToothpkLeft.bmp
+20:03:11.861 uioriginal: IFF-mount original cpanel\Backgrounds\BuildToothpkRight.bmp
+20:03:11.862 uioriginal: IFF-mount original cpanel\Catalog\BuyRLiving.bmp
+20:03:11.862 uioriginal: IFF-mount original cpanel\Catalog\BuyRDining.bmp
+20:03:11.862 uioriginal: IFF-mount original cpanel\Catalog\BuyRBedroom.bmp
+20:03:11.862 uioriginal: IFF-mount original cpanel\Catalog\BuyRStudy.bmp
+20:03:11.862 uioriginal: IFF-mount original cpanel\Catalog\BuyRKitchen.bmp
+20:03:11.862 uioriginal: IFF-mount original cpanel\Catalog\BuyRBathroom.bmp
+20:03:11.862 uioriginal: IFF-mount original cpanel\Catalog\BuyROutside.bmp
+20:03:11.863 uioriginal: IFF-mount original cpanel\Catalog\BuyRMisc.bmp
+20:03:11.863 uioriginal: IFF-mount original cpanel\Catalog\BackButtons\BackRLiving.bmp
+20:03:11.863 uioriginal: IFF-mount original cpanel\Buttons\CamFrameSmall.bmp
+20:03:11.863 uioriginal: IFF-mount original cpanel\Buttons\CamFrameMed.bmp
+20:03:11.864 uioriginal: IFF-mount original cpanel\Buttons\CamFrameLarge.bmp
+20:03:11.864 uioriginal: IFF-mount original cpanel\Buttons\CamFrameCust.bmp
+20:03:11.864 uioriginal: IFF-mount original cpanel\Buttons\CamViewAlbum.bmp
+20:03:11.864 uioriginal: IFF-mount original cpanel\Buttons\CamQualLow.bmp
+20:03:11.864 uioriginal: IFF-mount original cpanel\Buttons\CamQualMed.bmp
+20:03:11.864 uioriginal: IFF-mount original cpanel\Buttons\CamQualHigh.bmp
+20:03:11.864 uioriginal: IFF-mount original cpanel\Backgrounds\CameraToothpkLeft.bmp
+20:03:11.864 uioriginal: IFF-mount original cpanel\Backgrounds\CameraToothpkRight.bmp
+20:03:11.865 panel-ctor: desktop speed cluster is on the UCP plate (R142 engine anchors)
+20:03:11.865 uioriginal: IFF-mount original cpanel\Buttons\Mood.bmp
+20:03:11.866 uioriginal: IFF-mount original cpanel\Buttons\Relationship.BMP
+20:03:11.866 uioriginal: IFF-mount original cpanel\Buttons\Job.bmp
+20:03:11.866 uioriginal: IFF-mount original cpanel\Buttons\House.bmp
+20:03:11.866 uioriginal: IFF-mount original cpanel\Buttons\Personality.bmp
+20:03:11.866 uioriginal: IFF-mount original cpanel\Buttons\Interest.bmp
+20:03:11.866 uioriginal: IFF-mount original cpanel\Buttons\Gift.bmp
+20:03:11.866 uioriginal: IFF-mount original cpanel\Buttons\ScrollLeft.BMP
+20:03:11.866 uioriginal: IFF-mount original cpanel\Buttons\ScrollRight.BMP
+20:03:11.868 autotest: AUTOTEST LOT-ACTION house=5 inlot=True vm=True
+20:03:11.873 autotest: AUTOTEST LOT-READY house=5 entities=303 avatars=3 loadErrors=0 speed=1 minute=30
+20:03:11.873 autotest: AUTOTEST lot: PASS
+20:03:11.875 autotest: AUTOTEST corpus global expected=251 actual=251
+20:03:11.875 autotest: AUTOTEST corpus PersonGlobals expected=473 actual=473
+20:03:11.875 autotest: AUTOTEST corpus SocialGlobals expected=101 actual=101
+20:03:11.875 autotest: AUTOTEST corpus CatGlobals expected=179 actual=179
+20:03:11.875 autotest: AUTOTEST corpus DogGlobals expected=177 actual=177
+20:03:11.875 autotest: AUTOTEST corpus PetSitGlobals expected=22 actual=22
+20:03:11.876 autotest: AUTOTEST corpus PhoneGlobals expected=149 actual=149
+20:03:11.876 autotest: AUTOTEST corpus VacationDirectorGlobals expected=85 actual=85
+20:03:11.876 autotest: AUTOTEST corpus: PASS
+20:03:11.877 autotest: AUTOTEST glob-fix probes=2 named=2 vdg=2
+20:03:11.877 autotest: AUTOTEST glob-fix: PASS
+20:03:11.877 autotest: AUTOTEST famnames id=1 length=1 s0=Newbie
+20:03:11.877 autotest: AUTOTEST famnames id=2 length=1 s0=Bachelor
+20:03:11.877 autotest: AUTOTEST famnames id=3 length=1 s0=Roomies
+20:03:11.877 autotest: AUTOTEST famnames id=4 length=1 s0=Pleasant
+20:03:11.877 autotest: AUTOTEST famnames id=5 length=1 s0=Goth
+20:03:11.877 autotest: AUTOTEST famnames id=6 NULL
+20:03:11.877 autotest: AUTOTEST famnames id=7 NULL
+20:03:11.878 autotest: AUTOTEST famnames: PASS
+20:03:11.886 autotest: AUTOTEST callgraph ops=92124 global+private-unresolved=0 semi-global-opcodes=134 semi-unknown-module=48 samples=CCPhonePlugin.iff op=65535 | CCPhonePlugin.iff op=65535 | CCPhonePlugin.iff op=32767 | CCPhonePlugin.iff op=65535
+20:03:11.886 autotest: AUTOTEST callgraph-notes: 48 semi-global ops have no resolvable module (e.g. NPCCatererPP with no GLOB) — verified 86/134
+20:03:11.886 autotest: AUTOTEST callgraph: PASS
+20:03:11.887 autotest: AUTOTEST chunk-reg posi=2 xxxx=0 nonEmpty=3
+20:03:11.887 autotest: AUTOTEST chunk-reg: PASS
+20:03:11.888 autotest: AUTOTEST orig-bhavs avatar-resource=User00011.iff
+20:03:11.890 autotest: AUTOTEST orig-bhavs init-motives needs-before=0,0,0,0,0,0,0 after=99,99,99,75,100,30,99 (ORIGINAL IFF spawn-init BHAV ran, tuning+random boost in-process)
+20:03:11.890 autotest: AUTOTEST orig-bhavs init-NPC canon needs[h,c,hg,b,e,f,s]=0,0,0,0,0,0,0 -> 99,99,99,98,100,31,99 (ORIGINAL full new-sim init chain live-exec; IFF BCON 8195 canon; engine starts at 100)
+20:03:11.893 autotest: AUTOTEST orig-bhavs init-NPC canon pd[2,3,4,5,6,7,9,10,11,12,15,17,18,29,32,33,36,56,57,63] before=400,500,0,700,200,700,0,0,0,0,0,0,0,0,0,0,50,-1,4,0 -> after=1000,1000,1000,1000,1000,1000,0,0,0,0,0,0,0,1,2,25,50,-1,4,0 (IFF 8298/8192 write-set; engine MakePersonData=500/no-job/no-autonomy)
+20:03:11.895 autotest: AUTOTEST orig-bhavs do-idle-and-mood present (cid=8303, semi=True, scheduler-oriented, not sync-drivable)
+20:03:11.898 uioriginal: IFF-mount original cpanel\backgrounds\scrapback.bmp
+20:03:11.900 uioriginal: IFF-mount original cpanel\buttons\scrapdone.bmp
+20:03:11.901 uioriginal: IFF-mount original cpanel\buttons\scrapdelete.bmp
+20:03:11.901 uioriginal: IFF-mount original cpanel\buttons\scraphome.bmp
+20:03:11.901 uioriginal: IFF-mount original cpanel\buttons\scrapleft.bmp
+20:03:11.901 uioriginal: IFF-mount original cpanel\buttons\scrapright.bmp
+20:03:11.901 uioriginal: IFF-mount original cpanel\buttons\scrapend.bmp
+20:03:11.940 uioriginal: IFF-mount original shared\dlg\GenDlg.bmp
+20:03:11.941 uioriginal: IFF-mount original shared\sys\WinBtn.bmp
+20:03:11.947 autotest: AUTOTEST uiscrap modal-input-and-original-cancel=True
+20:03:11.948 autotest: AUTOTEST uiscrap editor=True saved-navigation=True persistence=True
+20:03:11.949 autotest: AUTOTEST uiscrap live dialog anchors/cells/tooltips=OK nav=OK album=OK overlay=OK
+20:03:12.012 autotest: AUTOTEST uiscrap camera239=True native-frame/input/dpi/jpeg/family/legacy OK
+20:03:12.103 autotest: AUTOTEST uiscrap editor239=True native keyboard/mouse/wrap-edge contracts passed
+20:03:12.103 autotest: AUTOTEST uiscrap canon=True canon141=True art=True law=True inset=True live=True nav=True album=True overlay=True
+20:03:12.103 autotest: AUTOTEST uiscrap: PASS
+20:03:12.106 uioriginal: IFF-mount original nbhd\CreateACharBack.BMP
+20:03:12.109 uioriginal: IFF-mount original nbhd\DsgnFamBkg.bmp
+20:03:12.112 uioriginal: IFF-mount original nbhd\PickBkg.bmp
+20:03:12.114 uioriginal: IFF-mount original nbhd\DesignCharPersLED.bmp
+20:03:12.115 uioriginal: IFF-mount original nbhd\CACPointRemainingBars.bmp
+20:03:12.116 uioriginal: IFF-mount original nbhd\FamilyPickItemBkg.bmp
+20:03:12.117 uioriginal: IFF-mount original nbhd\PAFMoveIn.bmp
+20:03:12.118 uioriginal: IFF-mount original nbhd\NbhdTileBtn.BMP
+20:03:12.118 uioriginal: IFF-mount original nbhd\AddPersonBtn.bmp
+20:03:12.121 uioriginal: IFF-mount original nbhd\DesignCharAdultBtn.bmp
+20:03:12.122 uioriginal: IFF-mount original nbhd\DesignCharChildBtn.bmp
+20:03:12.122 uioriginal: IFF-mount original nbhd\DesignCharFemaleBtn.bmp
+20:03:12.122 uioriginal: IFF-mount original nbhd\DesignCharMaleBtn.bmp
+20:03:12.123 uioriginal: IFF-mount original nbhd\DesignCharDarkBtn.bmp
+20:03:12.123 uioriginal: IFF-mount original nbhd\DesignCharMediumBtn.bmp
+20:03:12.123 uioriginal: IFF-mount original nbhd\DesignCharLightBtn.bmp
+20:03:12.123 uioriginal: IFF-mount original nbhd\DesignCharSkinsLeftBtn.bmp
+20:03:12.124 uioriginal: IFF-mount original nbhd\DesignCharSkinsRightBtn.bmp
+20:03:12.137 uioriginal: IFF-mount original nbhd\DeletePersonBtn.bmp
+20:03:12.137 uioriginal: IFF-mount original nbhd\EditPersonBtn.bmp
+20:03:12.138 uioriginal: IFF-mount original nbhd\PAFAddFamily.bmp
+20:03:12.138 uioriginal: IFF-mount original nbhd\PAFDeleteFamily.bmp
+UNSUPPORTED (log once): POSSIBLE ISSUE: unit 0 GLD_TEXTURE_INDEX_2D is unloadable and bound to sampler type (Float) - using zero texture because texture unloadable
+20:03:12.520 autotest: AUTOTEST uisurvey dump casorig-cac 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-casorig-cac.png
+20:03:12.722 autotest: AUTOTEST uisurvey dump casorig-fam 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-casorig-fam.png
+20:03:12.864 autotest: AUTOTEST uisurvey dump casorig-paf 1024x768 -> /Users/nathannoom/Documents/Simitone/uisurvey-casorig-paf.png
+20:03:12.875 uioriginal: IFF-mount original nbhd\Smiley.bmp
+20:03:12.876 autotest: AUTOTEST uicasorig workflow239=True nativeBounds=15 cornerClicks=60 prompts=3 isolatedDeletes=1 censusReads=2 PASS
+20:03:12.881 autotest: AUTOTEST uicasorig workflow240=True catalogLoads=17 buttonClicks=37 PASS
+20:03:12.962 autotest: AUTOTEST uicasorig composite242=True production CAS background over varied underlay: 0/22000 changed preview pixels
+20:03:12.963 autotest: AUTOTEST uicasorig original-cas-screens: OK
+20:03:12.963 autotest: AUTOTEST uicasorig: PASS
+RELPROBE SUMMARY calls=0 misses=0 objectbucket=0 avatarStack=0
+20:03:12.964 autotest: AUTOTEST SUMMARY passed=8 failed=0 skipped=0
+20:03:12.964 autotest: AUTOTEST RESULT PASS
+AUTOTEST RESULT PASS passed=8 failed=0
+20:03:12.968 uioriginal: IFF-mount original CPanel\TutHigh.bmp
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=33,nid=0,avatar=False] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=34,nid=0,avatar=False] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=1 stack[obj=1,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=2 stack[obj=2,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=3 stack[obj=3,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=4 stack[obj=4,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=5 stack[obj=5,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=6 stack[obj=6,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=7 stack[obj=7,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=8 stack[obj=8,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=9 stack[obj=9,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=10 stack[obj=10,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=11 stack[obj=11,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=12 stack[obj=12,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=13 stack[obj=13,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=14 stack[obj=14,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=15 stack[obj=15,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=32 stack[obj=16,nid=32,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=17 stack[obj=17,nid=0,avatar=False] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=1 myNID=33 caller[obj=16,nid=32] targNID=32 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=1 myNID=33 caller[obj=16,nid=32] targNID=32 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=32 caller[obj=16,nid=32] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=1 myNID=34 caller[obj=16,nid=32] targNID=32 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=1 myNID=34 caller[obj=16,nid=32] targNID=32 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=33 stack[obj=18,nid=33,avatar=True] exists=False bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=33 caller[obj=18,nid=33] targNID=34 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=1 myNID=34 caller[obj=18,nid=33] targNID=33 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=1 myNID=34 caller[obj=18,nid=33] targNID=33 stack[obj=21,nid=34,avatar=True] exists=True bucketMismatch=True
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=32 stack[obj=16,nid=32,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=33 stack[obj=18,nid=33,avatar=True] exists=True bucketMismatch=False
+RELPROBE mode=0 myNID=34 caller[obj=21,nid=34] targNID=34 stack[obj=21,nid=34,avatar=True] exists=False bucketMismatch=False
+20:03:13.020 exit-probe: OnExiting cancel=True screen=TS1GameScreen
+20:03:13.062 exit-probe: OnExiting cancel=False screen=TS1GameScreen
+20:03:13.063 exit-probe: after Run
+20:03:13.077 exit-probe: after Dispose

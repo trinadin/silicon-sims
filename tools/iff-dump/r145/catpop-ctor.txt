@@ -1,0 +1,49 @@
+                ; ==== .__ct__16cWinCatalogPopupFP7CPState ====
+0026e620: bf61ffec  stmw     r27, -0x14(r1)
+0026e624: 7c0802a6  mflr     r0
+0026e628: 83a290b0  lwz      r29, -0x6f50(r2)
+0026e62c: 7c7b1b78  mr       r27, r3
+0026e630: 83c290ac  lwz      r30, -0x6f54(r2)
+0026e634: 83e2af5c  lwz      r31, -0x50a4(r2)
+0026e638: 7c9c2378  mr       r28, r4
+0026e63c: 90010008  stw      r0, 8(r1)
+0026e640: 9421ffa0  stwu     r1, -0x60(r1)
+0026e644: 4829afcd  bl       0x509610   ; .__ct__6cTSWinFv
+0026e648: 800295e0  lwz      r0, -0x6a20(r2)
+0026e64c: 387b00dc  addi     r3, r27, 0xdc
+0026e650: 901b0000  stw      r0, 0(r27)
+0026e654: 4828681d  bl       0x4f4e70   ; .__ct__9cTSStringFv
+0026e658: c03f0004  lfs      f1, 4(r31)
+0026e65c: 387b00e4  addi     r3, r27, 0xe4
+0026e660: fc400890  fmr      f2, f1
+0026e664: 4bee034d  bl       0x14e9b0   ; .__ct__13RampGeneratorFff
+0026e668: 389d0000  addi     r4, r29, 0
+0026e66c: 387b0110  addi     r3, r27, 0x110
+0026e670: 38be0000  addi     r5, r30, 0
+0026e674: 38c00004  li       r6, 4
+0026e678: 38e0000e  li       r7, 0xe
+0026e67c: 48322965  bl       0x590fe0
+0026e680: 389d0000  addi     r4, r29, 0
+0026e684: 387b0148  addi     r3, r27, 0x148
+0026e688: 38be0000  addi     r5, r30, 0
+0026e68c: 38c00004  li       r6, 4
+0026e690: 38e00005  li       r7, 5
+0026e694: 4832294d  bl       0x590fe0
+0026e698: 387b015c  addi     r3, r27, 0x15c
+0026e69c: 482867d5  bl       0x4f4e70   ; .__ct__9cTSStringFv
+0026e6a0: 939b00cc  stw      r28, 0xcc(r27)
+0026e6a4: 38000000  li       r0, 0
+0026e6a8: 387b0000  addi     r3, r27, 0
+0026e6ac: 901b0104  stw      r0, 0x104(r27)
+0026e6b0: 901b0108  stw      r0, 0x108(r27)
+0026e6b4: 981b00e0  stb      r0, 0xe0(r27)
+0026e6b8: 901b010c  stw      r0, 0x10c(r27)
+0026e6bc: 80010068  lwz      r0, 0x68(r1)
+0026e6c0: 38210060  addi     r1, r1, 0x60
+0026e6c4: 7c0803a6  mtlr     r0
+0026e6c8: bb61ffec  lmw      r27, -0x14(r1)
+0026e6cc: 4e800020  blr      
+0026e6d0: 00000000  .long    0x00000000
+0026e6d4: 00092041  .long    0x00092041
+0026e6d8: 80050000  lwz      r0, 0(r5)
+0026e6dc: 000000b0  .long    0x000000b0

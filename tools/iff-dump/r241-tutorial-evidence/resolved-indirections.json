@@ -1,0 +1,59 @@
+[
+  {
+    "toc": -25504,
+    "vtable": "0x6e388",
+    "slot": "0x58",
+    "descriptor": "0x12220",
+    "file": "0x488c20"
+  },
+  {
+    "toc": -25504,
+    "vtable": "0x6e388",
+    "slot": "0x70",
+    "descriptor": "0x12250",
+    "file": "0x48ec10"
+  },
+  {
+    "toc": -25504,
+    "vtable": "0x6e388",
+    "slot": "0xa0",
+    "descriptor": "0x120d8",
+    "file": "0x485ea0"
+  },
+  {
+    "toc": -29176,
+    "vtable": "0x46180",
+    "slot": "0x64",
+    "descriptor": "0x14218",
+    "file": "0x506060"
+  },
+  {
+    "toc": -29176,
+    "vtable": "0x46180",
+    "slot": "0x68",
+    "descriptor": "0x14220",
+    "file": "0x504860"
+  },
+  {
+    "toc": -29176,
+    "vtable": "0x46180",
+    "slot": "0x9c",
+    "descriptor": "0x14250",
+    "file": "0x5029d0"
+  },
+  {
+    "toc": -29176,
+    "vtable": "0x46180",
+    "slot": "0xa0",
+    "descriptor": "0x14258",
+    "file": "0x5028a0"
+  },
+  {
+    "toc": -20328,
+    "float": 2.0
+  },
+  {
+    "toc": -23212,
+    "float": 1.2000000476837158
+  }
+]

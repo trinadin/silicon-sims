@@ -21,6 +21,9 @@ namespace Simitone.Client.UI.Panels
         public int LastMoney = 0;
         private TS1GameScreen Game;
         private UILabel MoneyLabel;
+        // R98: the ORIGINAL-styled money readout (bold .ffn table) — replaces
+        // the modern label's drawing; the modern label stays for style fallback.
+        private Simitone.Client.UI.Controls.UIOriginalText MoneyOriginal;
         private Texture2D Bg;
 
         public UIMoneyPanel(TS1GameScreen game) : base()
@@ -34,6 +37,14 @@ namespace Simitone.Client.UI.Panels
             MoneyLabel.CaptionStyle.Color = UIStyle.Current.Text;
             MoneyLabel.Alignment = FSO.Client.UI.Framework.TextAlignment.Center | FSO.Client.UI.Framework.TextAlignment.Middle;
             MoneyLabel.Size = new Microsoft.Xna.Framework.Vector2(128, 24);
+            MoneyLabel.Visible = false;   // R98: drawn by the original glyph text below
+            var boldFont = Simitone.Client.UI.Controls.OriginalGlyphFont.LoadBold(GameFacade.GraphicsDevice);
+            if (boldFont != null)
+            {
+                MoneyOriginal = new Simitone.Client.UI.Controls.UIOriginalText("", boldFont);
+                MoneyOriginal.Y = 4;
+                Add(MoneyOriginal);
+            }
             Add(MoneyLabel);
 
             Bg = Content.Get().CustomUI.Get("money_bg.png").Get(GameFacade.GraphicsDevice);
@@ -41,8 +52,28 @@ namespace Simitone.Client.UI.Panels
             UpdateMoneyDisplay();
         }
 
+        // R115: money-change FLOATERS in original glyphs (the most-flashed modern text left;
+        // the "+/-§n" composition is port-side — the original corpus has no '§' string — but
+        // the GLYPHS are the original bold money table _12_bs, same as the readout twin).
+        public static int FloatersTwinned = 0;
+
         public void DisplayChange(int change)
         {
+            var text = ((change > 0) ? "+" : "-") + "§" + Math.Abs(change);
+            if (MoneyOriginal != null && MoneyOriginal.Font != null && MoneyOriginal.Font.Atlas != null)
+            {
+                var twin = new Simitone.Client.UI.Controls.UIOriginalText(text, MoneyOriginal.Font)
+                {
+                    Color = (change > 0) ? UIStyle.Current.PosMoney : UIStyle.Current.NegMoney
+                };
+                twin.Y = -20f;
+                twin.X = System.Math.Max(0, 128 - twin.Font.Measure(text)); // right-align in the 128px panel
+                Add(twin);
+                GameFacade.Screens.Tween.To(twin, 1.5f, new Dictionary<string, float>() { { "Y", -50 }, { "Opacity", 0 } });
+                GameThread.SetTimeout(() => { Remove(twin); }, 1500);
+                FloatersTwinned++;
+                return;
+            }
             var newLabel = new UILabel();
             newLabel.Y = -20f;
             newLabel.CaptionStyle = MoneyLabel.CaptionStyle.Clone();
@@ -51,7 +82,7 @@ namespace Simitone.Client.UI.Panels
             newLabel.Alignment = FSO.Client.UI.Framework.TextAlignment.Right | FSO.Client.UI.Framework.TextAlignment.Middle;
             newLabel.Size = new Microsoft.Xna.Framework.Vector2(128, 24);
 
-            newLabel.Caption = ((change > 0) ? "+" : "-") + "§" + Math.Abs(change);
+            newLabel.Caption = text;
             Add(newLabel);
 
             GameFacade.Screens.Tween.To(newLabel, 1.5f, new Dictionary<string, float>() { { "Y", -50 }, { "Opacity", 0 } });
@@ -60,7 +91,15 @@ namespace Simitone.Client.UI.Panels
 
         private void UpdateMoneyDisplay()
         {
-            MoneyLabel.Caption = "§" + LastMoney.ToString("##,#0");
+            var text = "§" + LastMoney.ToString("##,#0");
+            MoneyLabel.Caption = text;
+            if (MoneyOriginal != null)
+            {
+                MoneyOriginal.Text = text;
+                // center inside the 128px panel like the old label was
+                MoneyOriginal.X = System.Math.Max(0, (128 - MoneyOriginal.Font.Measure(text)) / 2);
+                Simitone.Client.UI.Controls.UIOriginalText.MoneyUpdatesDrawn++;
+            }
         }
 
         private int GetMoney()

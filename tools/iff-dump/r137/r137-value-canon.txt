@@ -1,0 +1,14 @@
+// ==== R137 REGENERATED CANON (tools/iff-dump/r137/make_r137_value_canon.py)
+//      — the value-display corpus; NEVER hand-edit ====
+private const string R137BLabel = "budgetstrs";
+private const string R137BSha = "48abf0be8228434ac7818e03ead7e7499249627f89a49e1bc31188a9cf54ab61";
+private const string R137B30 = "Household Account Total: %s";
+private const string R137B34 = "Household Net Worth: %s";
+private const string R137B35 = "Value of house and belongings";
+private const string R137NLabel = "NghRollover";
+private const string R137NSha = "70a5d2a201722be18c7566b7c6286360bc75e99b0431a8deb6c519971ca1a4af";
+private const string R137N0 = "The %s Family\r\nNet Worth: %s\r\nFriends: %d";
+private const string R137ELabel = "EvictModeStrs";
+private const string R137ESha = "c52417bd20a734baf89946c34ca00352fdd432a5ff4f8c7a0b9aece3a93296d1";
+private const string R137E3 = "The %s family has net worth of %s.  Do you want to evict them?";
+// ==== END R137 REGENERATED CANON ====

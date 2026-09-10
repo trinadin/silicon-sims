@@ -1,0 +1,105 @@
+                ; ==== .Shutdown__8cWinArchFv ====
+00261da0: 93e1fffc  stw      r31, -4(r1)
+00261da4: 7c0802a6  mflr     r0
+00261da8: 93c1fff8  stw      r30, -8(r1)
+00261dac: 93a1fff4  stw      r29, -0xc(r1)
+00261db0: 7c7d1b78  mr       r29, r3
+00261db4: 90010008  stw      r0, 8(r1)
+00261db8: 9421ffb0  stwu     r1, -0x50(r1)
+00261dbc: 81830000  lwz      r12, 0(r3)
+00261dc0: 818c00d0  lwz      r12, 0xd0(r12)
+00261dc4: 48340c1d  bl       0x5a29e0
+00261dc8: 80410014  lwz      r2, 0x14(r1)
+00261dcc: 5460063f  clrlwi.  r0, r3, 0x18
+00261dd0: 4182011c  beq      0x261eec
+00261dd4: 7fa3eb78  mr       r3, r29
+00261dd8: 819d0000  lwz      r12, 0(r29)
+00261ddc: 38800001  li       r4, 1
+00261de0: 38a00000  li       r5, 0
+00261de4: 818c0098  lwz      r12, 0x98(r12)
+00261de8: 48340bf9  bl       0x5a29e0
+00261dec: 80410014  lwz      r2, 0x14(r1)
+00261df0: 807d0154  lwz      r3, 0x154(r29)
+00261df4: 28030000  cmplwi   r3, 0
+00261df8: 41820020  beq      0x261e18
+00261dfc: 4800c145  bl       0x26df40   ; .DisablePopup__16cWinCatalogPopupFv
+00261e00: 80628e04  lwz      r3, -0x71fc(r2)
+00261e04: 809d0154  lwz      r4, 0x154(r29)
+00261e08: 80630000  lwz      r3, 0(r3)
+00261e0c: 482bc195  bl       0x51dfa0   ; .DestroyWindow__12cTSWinMgrW95FP6cTSWin
+00261e10: 38000000  li       r0, 0
+00261e14: 901d0154  stw      r0, 0x154(r29)
+00261e18: 38000000  li       r0, 0
+00261e1c: 387d011c  addi     r3, r29, 0x11c
+00261e20: 901d00dc  stw      r0, 0xdc(r29)
+00261e24: 901d00e0  stw      r0, 0xe0(r29)
+00261e28: 901d00ec  stw      r0, 0xec(r29)
+00261e2c: 901d00f0  stw      r0, 0xf0(r29)
+00261e30: 901d00f4  stw      r0, 0xf4(r29)
+00261e34: 901d00f8  stw      r0, 0xf8(r29)
+00261e38: 901d00fc  stw      r0, 0xfc(r29)
+00261e3c: 901d0100  stw      r0, 0x100(r29)
+00261e40: 901d0104  stw      r0, 0x104(r29)
+00261e44: 901d0108  stw      r0, 0x108(r29)
+00261e48: 901d010c  stw      r0, 0x10c(r29)
+00261e4c: 901d0110  stw      r0, 0x110(r29)
+00261e50: 901d0114  stw      r0, 0x114(r29)
+00261e54: 901d0118  stw      r0, 0x118(r29)
+00261e58: 4bffd7f9  bl       0x25f650
+00261e5c: 28030000  cmplwi   r3, 0
+00261e60: 41820034  beq      0x261e94
+00261e64: 3bc00000  li       r30, 0
+00261e68: 3be00000  li       r31, 0
+00261e6c: 48000018  b        0x261e84
+00261e70: 389e0000  addi     r4, r30, 0
+00261e74: 387d011c  addi     r3, r29, 0x11c
+00261e78: 4bffd849  bl       0x25f6c0
+00261e7c: 93e30000  stw      r31, 0(r3)
+00261e80: 3bde0001  addi     r30, r30, 1
+00261e84: 387d011c  addi     r3, r29, 0x11c
+00261e88: 4bffd7c9  bl       0x25f650
+00261e8c: 7c1e1840  cmplw    r30, r3
+00261e90: 4180ffe0  blt      0x261e70
+00261e94: 807d0174  lwz      r3, 0x174(r29)
+00261e98: 28030000  cmplwi   r3, 0
+00261e9c: 41820018  beq      0x261eb4
+00261ea0: 81830000  lwz      r12, 0(r3)
+00261ea4: 38800001  li       r4, 1
+00261ea8: 818c0008  lwz      r12, 8(r12)
+00261eac: 48340b35  bl       0x5a29e0
+00261eb0: 80410014  lwz      r2, 0x14(r1)
+00261eb4: 38000000  li       r0, 0
+00261eb8: 901d0174  stw      r0, 0x174(r29)
+00261ebc: 807d0178  lwz      r3, 0x178(r29)
+00261ec0: 28030000  cmplwi   r3, 0
+00261ec4: 41820018  beq      0x261edc
+00261ec8: 81830000  lwz      r12, 0(r3)
+00261ecc: 38800001  li       r4, 1
+00261ed0: 818c0008  lwz      r12, 8(r12)
+00261ed4: 48340b0d  bl       0x5a29e0
+00261ed8: 80410014  lwz      r2, 0x14(r1)
+00261edc: 38000000  li       r0, 0
+00261ee0: 901d0178  stw      r0, 0x178(r29)
+00261ee4: 7fa3eb78  mr       r3, r29
+00261ee8: 482a7449  bl       0x509330   ; .Shutdown__6cTSWinFv
+00261eec: 38600001  li       r3, 1
+00261ef0: 80010058  lwz      r0, 0x58(r1)
+00261ef4: 38210050  addi     r1, r1, 0x50
+00261ef8: 7c0803a6  mtlr     r0
+00261efc: 83e1fffc  lwz      r31, -4(r1)
+00261f00: 83c1fff8  lwz      r30, -8(r1)
+00261f04: 83a1fff4  lwz      r29, -0xc(r1)
+00261f08: 4e800020  blr      
+00261f0c: 00000000  .long    0x00000000
+00261f10: 00092041  .long    0x00092041
+00261f14: 80030000  lwz      r0, 0(r3)
+00261f18: 0000016c  .long    0x0000016c
+00261f1c: 00162e53  .long    0x00162e53
+00261f20: 68757464  xori     r21, r3, 0x7464
+00261f24: 6f776e5f  xoris    r23, r27, 0x6e5f
+00261f28: 5f386357  rlwnm.   r24, r25, r12, 0xd, 0xb
+00261f2c: 696e4172  xori     r14, r11, 0x4172
+00261f30: 63684676  ori      r8, r27, 0x4676
+00261f34: 00000000  .long    0x00000000
+00261f38: 00000000  .long    0x00000000
+00261f3c: 00000000  .long    0x00000000

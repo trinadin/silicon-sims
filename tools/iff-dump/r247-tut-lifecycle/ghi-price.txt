@@ -1,0 +1,24 @@
+000b0b10: 900101fc  stw      r0, 0x1fc(r1)
+000b0b14: c0470000  lfs      f2, 0(r7)
+000b0b18: c80101f8  lfd      f0, 0x1f8(r1)
+000b0b1c: 80a100dc  lwz      r5, 0xdc(r1)
+000b0b20: ec000828  fsubs    f0, f0, f1
+000b0b24: 800100e0  lwz      r0, 0xe0(r1)
+000b0b28: 7c050214  add      r0, r5, r0
+000b0b2c: ec020032  fmuls    f0, f2, f0
+000b0b30: fc00001e  fctiwz   f0, f0
+000b0b34: d8010200  stfd     f0, 0x200(r1)
+000b0b38: 80a10204  lwz      r5, 0x204(r1)
+000b0b3c: 7c050214  add      r0, r5, r0
+000b0b40: 901f0000  stw      r0, 0(r31)
+000b0b44: 480895cd  bl       0x13a110   ; .__dt__10cSimulatorFv
+000b0b48: 38600001  li       r3, 1
+000b0b4c: 80010238  lwz      r0, 0x238(r1)
+000b0b50: 38210230  addi     r1, r1, 0x230
+000b0b54: bb21ffe4  lmw      r25, -0x1c(r1)
+000b0b58: 7c0803a6  mtlr     r0
+000b0b5c: 4e800020  blr      
+000b0b60: 00000000  .long    0x00000000
+000b0b64: 00092041  .long    0x00092041
+000b0b68: 80070000  lwz      r0, 0(r7)
+000b0b6c: 00000120  .long    0x00000120

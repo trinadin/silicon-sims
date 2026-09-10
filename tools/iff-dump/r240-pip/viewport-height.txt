@@ -1,0 +1,87 @@
+001c52f0: bf61ffec  stmw     r27, -0x14(r1)
+001c52f4: 7c0802a6  mflr     r0
+001c52f8: 7c9e2378  mr       r30, r4
+001c52fc: 83e28874  lwz      r31, -0x778c(r2)
+001c5300: 83828fb8  lwz      r28, -0x7048(r2)
+001c5304: 7c7d1b78  mr       r29, r3
+001c5308: 90010008  stw      r0, 8(r1)
+001c530c: 9421ffa0  stwu     r1, -0x60(r1)
+001c5310: 80a30068  lwz      r5, 0x68(r3)
+001c5314: 81830004  lwz      r12, 4(r3)
+001c5318: 80850074  lwz      r4, 0x74(r5)
+001c531c: 8005007c  lwz      r0, 0x7c(r5)
+001c5320: 818c0018  lwz      r12, 0x18(r12)
+001c5324: 7f640050  subf     r27, r4, r0
+001c5328: 483dd6b9  bl       0x5a29e0
+001c532c: 80410014  lwz      r2, 0x14(r1)
+001c5330: 7fc4f378  mr       r4, r30
+001c5334: 4bfddf3d  bl       0x1a3270   ; .SetViewportHeight__14cAnimDeviceSubFi
+001c5338: 80dd0068  lwz      r6, 0x68(r29)
+001c533c: 387d0028  addi     r3, r29, 0x28
+001c5340: 80060070  lwz      r0, 0x70(r6)
+001c5344: 901d0028  stw      r0, 0x28(r29)
+001c5348: 7c8000d0  neg      r4, r0
+001c534c: 80060074  lwz      r0, 0x74(r6)
+001c5350: 901d002c  stw      r0, 0x2c(r29)
+001c5354: 7ca000d0  neg      r5, r0
+001c5358: 80060078  lwz      r0, 0x78(r6)
+001c535c: 901d0030  stw      r0, 0x30(r29)
+001c5360: 8006007c  lwz      r0, 0x7c(r6)
+001c5364: 901d0034  stw      r0, 0x34(r29)
+001c5368: 4be72909  bl       0x37c70
+001c536c: 807d0054  lwz      r3, 0x54(r29)
+001c5370: 4bfddeb1  bl       0x1a3220   ; .Exists__14cAnimDeviceSubFv
+001c5374: 5460063f  clrlwi.  r0, r3, 0x18
+001c5378: 41820024  beq      0x1c539c
+001c537c: 80828cb0  lwz      r4, -0x7350(r2)
+001c5380: 807d0054  lwz      r3, 0x54(r29)
+001c5384: 80e40000  lwz      r7, 0(r4)
+001c5388: 809c0008  lwz      r4, 8(r28)
+001c538c: 80bc0000  lwz      r5, 0(r28)
+001c5390: 80dc0004  lwz      r6, 4(r28)
+001c5394: 80e70084  lwz      r7, 0x84(r7)
+001c5398: 4bfdc019  bl       0x1a13b0   ; .SetCameraPosition__14cAnimDeviceSubFiiii
+001c539c: 807d006c  lwz      r3, 0x6c(r29)
+001c53a0: 481f75c1  bl       0x3bc960   ; .GetBuffDims__10AnimDeviceCFv
+001c53a4: 80030004  lwz      r0, 4(r3)
+001c53a8: 7c1e0000  cmpw     r30, r0
+001c53ac: 40820038  bne      0x1c53e4
+001c53b0: 38000000  li       r0, 0
+001c53b4: 901d04c8  stw      r0, 0x4c8(r29)
+001c53b8: 807d006c  lwz      r3, 0x6c(r29)
+001c53bc: 481f75a5  bl       0x3bc960   ; .GetBuffDims__10AnimDeviceCFv
+001c53c0: 80030000  lwz      r0, 0(r3)
+001c53c4: 901d04d0  stw      r0, 0x4d0(r29)
+001c53c8: 807d006c  lwz      r3, 0x6c(r29)
+001c53cc: 481f7595  bl       0x3bc960   ; .GetBuffDims__10AnimDeviceCFv
+001c53d0: 80030004  lwz      r0, 4(r3)
+001c53d4: 901d04d4  stw      r0, 0x4d4(r29)
+001c53d8: 7c1b0050  subf     r0, r27, r0
+001c53dc: 901d04cc  stw      r0, 0x4cc(r29)
+001c53e0: 48000018  b        0x1c53f8
+001c53e4: 38000000  li       r0, 0
+001c53e8: 901d04c8  stw      r0, 0x4c8(r29)
+001c53ec: 901d04cc  stw      r0, 0x4cc(r29)
+001c53f0: 901d04d0  stw      r0, 0x4d0(r29)
+001c53f4: 901d04d4  stw      r0, 0x4d4(r29)
+001c53f8: 807f0000  lwz      r3, 0(r31)
+001c53fc: 38800000  li       r4, 0
+001c5400: 80bd0030  lwz      r5, 0x30(r29)
+001c5404: 7c1ef214  add      r0, r30, r30
+001c5408: 8063004c  lwz      r3, 0x4c(r3)
+001c540c: 90830294  stw      r4, 0x294(r3)
+001c5410: 90830298  stw      r4, 0x298(r3)
+001c5414: 90a3029c  stw      r5, 0x29c(r3)
+001c5418: 93c302a0  stw      r30, 0x2a0(r3)
+001c541c: 807f0000  lwz      r3, 0(r31)
+001c5420: 80bd0030  lwz      r5, 0x30(r29)
+001c5424: 8063004c  lwz      r3, 0x4c(r3)
+001c5428: 908302a4  stw      r4, 0x2a4(r3)
+001c542c: 93c302a8  stw      r30, 0x2a8(r3)
+001c5430: 90a302ac  stw      r5, 0x2ac(r3)
+001c5434: 900302b0  stw      r0, 0x2b0(r3)
+001c5438: 80010068  lwz      r0, 0x68(r1)
+001c543c: 38210060  addi     r1, r1, 0x60
+001c5440: 7c0803a6  mtlr     r0
+001c5444: bb61ffec  lmw      r27, -0x14(r1)
+001c5448: 4e800020  blr

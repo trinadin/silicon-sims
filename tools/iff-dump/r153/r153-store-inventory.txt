@@ -1,0 +1,2770 @@
+# R153 task 2: store inventory touching cXPerson +0x5e8..+0x5f6
+
+## (a) D-form stores, disp in [0x5d0,0x610] (rA likely person base)
+0x05941c: 924105d0  stw r18, 0x5d0(r1)   in LoadCareers__Fv+0x11c
+0x06c0c0: 900105d8  stw r0, 0x5d8(r1)   in SetupChildHDSkins__10EditPersonFv+0x1c0
+0x06c0dc: 928105e4  stw r20, 0x5e4(r1)   in SetupChildHDSkins__10EditPersonFv+0x1dc
+0x06c4f0: 900105d8  stw r0, 0x5d8(r1)   in SetupChildHDSkins__10EditPersonFv+0x5f0
+0x09e7b8: 938105e8  stw r28, 0x5e8(r1)   in Construct__8MenuWrapFP8iResFileUlsPCc+0x607
+0x0b3bfc: b0030606  sth r0, 0x606(r3)   in RemoveFromFamily__12NeighborhoodFP8Neighbor+0xdc
+0x0b3d6c: b0830606  sth r4, 0x606(r3)   in AddToFamily__12NeighborhoodFP8NeighborP6Family+0xbc
+0x0b4cac: b01e0606  sth r0, 0x606(r30)   in LoadPersistentData__12NeighborhoodFP8cXPersonRCQ23std48vector<P8cXPerson,Q23std21allocator<P8cXPerson>>+0xec
+0x0d4504: 93410600  stw r26, 0x600(r1)   in ImportConstants__12ObjectFolderFR9CTGString+0x44
+0x0d6000: 932105d0  stw r25, 0x5d0(r1)   in ImportConstants__12ObjectFolderFR9CTGString+0x1b40
+0x0fb15c: 93c105dc  stw r30, 0x5dc(r1)   in LogSoundHeader__FP9StackElem+0x12c
+0x108630: b01e05dc  sth r0, 0x5dc(r30)   in Cleanup__8cXPersonFP8cXObject+0x460
+0x108634: b01e0602  sth r0, 0x602(r30)   in Cleanup__8cXPersonFP8cXObject+0x464
+0x108f9c: b01e05d8  sth r0, 0x5d8(r30)   in SetCurrentAction__8cXPersonFRC11Interaction+0x13c
+0x108fa0: b01e05da  sth r0, 0x5da(r30)   in SetCurrentAction__8cXPersonFRC11Interaction+0x140
+0x1092a4: b0ff060c  sth r7, 0x60c(r31)   in ForceLocation__8cXPersonFv+0x34
+0x10933c: b01f060c  sth r0, 0x60c(r31)   in ForceLocation__8cXPersonFv+0xcc
+0x10cea0: b01a05d6  sth r0, 0x5d6(r26)   in InitRoute__8cXPersonFP6XRoute+0xd0
+0x10ebc8: b01f0608  sth r0, 0x608(r31)   in TryGotoRoutingSlot__8cXPersonFP9StackElemP11RoutingSlot+0x4c8
+0x10ebe8: b01f05da  sth r0, 0x5da(r31)   in TryGotoRoutingSlot__8cXPersonFP9StackElemP11RoutingSlot+0x4e8
+0x10ed00: b01f0608  sth r0, 0x608(r31)   in TryGotoRoutingSlot__8cXPersonFP9StackElemP11RoutingSlot+0x600
+0x10edb8: b01f0608  sth r0, 0x608(r31)   in TryGotoRoutingSlot__8cXPersonFP9StackElemP11RoutingSlot+0x6b8
+0x10f170: b07f05d6  sth r3, 0x5d6(r31)   in TryGotoRoutingSlot__8cXPersonFP9StackElemP11RoutingSlot+0xa70
+0x111760: b01e05e8  sth r0, 0x5e8(r30)   in RandomizeAllInterests__8cXPersonFv+0x110
+0x1119d8: b0fc05d0  sth r7, 0x5d0(r28)   in Reset__8cXPersonFUc+0xc8
+0x1119e0: b0bc05d2  sth r5, 0x5d2(r28)   in Reset__8cXPersonFUc+0xd0
+0x21f7c0: 93a10610  stw r29, 0x610(r1)   in ExportHTMLHomelessFamilies__FRC16StackString<260>RC16StackString<260>P6Family+0x420
+0x222700: 92e105f0  stw r23, 0x5f0(r1)   in MakePublishingInfo__F16StackString<260>16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6Family+0x570
+0x24b4b0: 93e105d8  stw r31, 0x5d8(r1)   in ExportUnoccupiedLot__8cSimsAppFv+0x340
+0x24eee4: b36305d4  sth r27, 0x5d4(r3)   in AppCheatCallback__FP17cCheatCommandLineUl+0xa74
+0x24f0f4: b20305d4  sth r16, 0x5d4(r3)   in AppCheatCallback__FP17cCheatCommandLineUl+0xc84
+0x356a88: b06405e6  sth r3, 0x5e6(r4)   in AdjustHead__9SAnimatorFv+0x48
+0x356a98: b00305e0  sth r0, 0x5e0(r3)   in AdjustHead__9SAnimatorFv+0x58
+0x356b7c: b00305e0  sth r0, 0x5e0(r3)   in AdjustHead__9SAnimatorFv+0x13c
+0x356b88: b00305e0  sth r0, 0x5e0(r3)   in AdjustHead__9SAnimatorFv+0x148
+0x356fdc: b00405de  sth r0, 0x5de(r4)   in UpdateHeadDirection__9SAnimatorFv+0x9c
+0x356fe8: b00305e0  sth r0, 0x5e0(r3)   in UpdateHeadDirection__9SAnimatorFv+0xa8
+0x357114: b00405de  sth r0, 0x5de(r4)   in UpdateHeadDirection__9SAnimatorFv+0x1d4
+0x357120: b00305e0  sth r0, 0x5e0(r3)   in UpdateHeadDirection__9SAnimatorFv+0x1e0
+0x35bea4: 933f05fc  stw r25, 0x5fc(r31)   in UpdateOutfitAndHands__9SAnimatorFb+0xf94
+0x35f29c: b08505de  sth r4, 0x5de(r5)   in LookTowards__9SAnimatorFi+0xb
+0x35f2b0: b08605e0  sth r4, 0x5e0(r6)   in LookTowards__9SAnimatorFi+0x1f
+0x35f2b8: b0a405e2  sth r5, 0x5e2(r4)   in LookTowards__9SAnimatorFi+0x27
+0x35f2c0: b00405e4  sth r0, 0x5e4(r4)   in LookTowards__9SAnimatorFi+0x2f
+0x35f2c8: b0a305e6  sth r5, 0x5e6(r3)   in LookTowards__9SAnimatorFi+0x37
+0x361528: b003060e  sth r0, 0x60e(r3)   in ResetSuits__9SAnimatorFv+0xf8
+0x361574: b003060e  sth r0, 0x60e(r3)   in ResetSuits__9SAnimatorFv+0x144
+0x361590: 93e105f0  stw r31, 0x5f0(r1)   in ResetSuits__9SAnimatorFv+0x160
+0x3615c0: b003060e  sth r0, 0x60e(r3)   in ResetSuits__9SAnimatorFv+0x190
+0x36160c: b003060e  sth r0, 0x60e(r3)   in ResetSuits__9SAnimatorFv+0x1dc
+0x361658: b003060e  sth r0, 0x60e(r3)   in ResetSuits__9SAnimatorFv+0x228
+0x3616a4: b003060e  sth r0, 0x60e(r3)   in ResetSuits__9SAnimatorFv+0x274
+0x3616c8: b0640600  sth r3, 0x600(r4)   in ResetSuits__9SAnimatorFv+0x298
+0x36172c: b0050604  sth r0, 0x604(r5)   in ResetSuits__9SAnimatorFv+0x2fc
+0x3617b8: b0030604  sth r0, 0x604(r3)   in ResetSuits__9SAnimatorFv+0x388
+
+## (b) all X-form indexed stores (grouped by function)
+
+== AddDeck__9cPoolToolFP10cPoolLayer (3 indexed stores)
+  0x188798: 7c8301ae  stbx r4, r3, r0
+  0x1887a0: 7c18c9ae  stbx r0, r24, r25
+  0x1887b4: 7c8301ae  stbx r4, r3, r0
+
+== AddFARToMapping__14CTGFileManagerF9CTGString (1 indexed stores)
+  0x5488a8: 7cb301ae  stbx r5, r19, r0
+
+== AddNewNeighbor__12NeighborhoodFP11ObjSelectors (1 indexed stores)
+  0x0b4ea4: 7f43012e  stwx r26, r3, r0
+
+== AddObject__12ObjectModuleFP8cXObjectsb (2 indexed stores)
+  0x0e4adc: 7ce5312e  stwx r7, r5, r6
+  0x0e4ae8: 7c83312e  stwx r4, r3, r6
+
+== AddPointsFromText__11PiecewiseFnFPCc (1 indexed stores)
+  0x117a74: 7c04f1ae  stbx r0, r4, r30
+
+== AddPool__10cPoolLayerFRC7CTilePt (3 indexed stores)
+  0x11914c: 7c1ef9ae  stbx r0, r30, r31
+  0x1191f8: 7c8629ae  stbx r4, r6, r5
+  0x119204: 7c1ef9ae  stbx r0, r30, r31
+
+== AddWater__11cWaterLayerFRC7CTilePt (3 indexed stores)
+  0x15930c: 7c1ef9ae  stbx r0, r30, r31
+  0x1593b8: 7c8629ae  stbx r4, r6, r5
+  0x1593c4: 7c1ef9ae  stbx r0, r30, r31
+
+== Allocate__15ShearedLightMapFv (1 indexed stores)
+  0x1eb6d0: 7c64d92e  stwx r3, r4, r27
+
+== AlphaZSpriteBlit555__FiiiiP12DecompressorPCUsP12DecompressorP12DecompressorPUsiPUsiP7tagRECTP11RenderParam (1 indexed stores)
+  0x1a0798: 7c0729ae  stbx r0, r7, r5
+
+== AlphaZSpriteBlit565__FiiiiP12DecompressorPCUsP12DecompressorP12DecompressorPUsiPUsiP7tagRECTP11RenderParam (1 indexed stores)
+  0x1a0b18: 7c0449ae  stbx r0, r4, r9
+
+== AlphaZSpriteBlitFlip555__FiiiiP12DecompressorPCUsP12DecompressorP12DecompressorPUsiPUsiP7tagRECTP11RenderParam (1 indexed stores)
+  0x1a0068: 7c0839ae  stbx r0, r8, r7
+
+== AlphaZSpriteBlitFlip565__FiiiiP12DecompressorPCUsP12DecompressorP12DecompressorPUsiPUsiP7tagRECTP11RenderParam (1 indexed stores)
+  0x1a03f8: 7c0429ae  stbx r0, r4, r5
+
+== AnimateCarLane__14cWinStudiotownFP11carLaneInfo (7 indexed stores)
+  0x475ca8: 7c83012e  stwx r4, r3, r0
+  0x475cb4: 7c03f12e  stwx r0, r3, r30
+  0x475cbc: 7c03f12e  stwx r0, r3, r30
+  0x475cc4: 7f43f12e  stwx r26, r3, r30
+  0x475ccc: 7f23f12e  stwx r25, r3, r30
+  0x475cd8: 7c03f12e  stwx r0, r3, r30
+  0x475ce0: 7cc3f12e  stwx r6, r3, r30
+
+== AnimateCarNE__14cWinStudiotownFP11carLaneInfoi (7 indexed stores)
+  0x475664: 7c04f92e  stwx r0, r4, r31
+  0x4756b0: 7c04f92e  stwx r0, r4, r31
+  0x4756ec: 7c04f92e  stwx r0, r4, r31
+  0x475738: 7c04f92e  stwx r0, r4, r31
+  0x4757d4: 7c04f92e  stwx r0, r4, r31
+  0x47583c: 7c04f92e  stwx r0, r4, r31
+  0x475854: 7c03f92e  stwx r0, r3, r31
+
+== AnimateCarSW__14cWinStudiotownFP11carLaneInfoi (7 indexed stores)
+  0x475974: 7c04f92e  stwx r0, r4, r31
+  0x4759c0: 7c04f92e  stwx r0, r4, r31
+  0x4759fc: 7c04f92e  stwx r0, r4, r31
+  0x475a48: 7c04f92e  stwx r0, r4, r31
+  0x475ae4: 7c04f92e  stwx r0, r4, r31
+  0x475b4c: 7c03f92e  stwx r0, r3, r31
+  0x475b64: 7c05f92e  stwx r0, r5, r31
+
+== BuildFromVertex__4WallFP6VertexQ27CTilePt3Dir (12 indexed stores)
+  0x2bd0b4: 7c9e032e  sthx r4, r30, r0
+  0x2bd164: 7cbe232e  sthx r5, r30, r4
+  0x2bd21c: 7c72012e  stwx r3, r18, r0
+  0x2bd27c: 7c92012e  stwx r4, r18, r0
+  0x2bd294: 7c92012e  stwx r4, r18, r0
+  0x2bd2ac: 7c92012e  stwx r4, r18, r0
+  0x2bd2c4: 7c92012e  stwx r4, r18, r0
+  0x2bd2f0: 7c92012e  stwx r4, r18, r0
+  0x2bd308: 7c92012e  stwx r4, r18, r0
+  0x2bd320: 7c92012e  stwx r4, r18, r0
+  0x2bd338: 7c92012e  stwx r4, r18, r0
+  0x2bd368: 7c72012e  stwx r3, r18, r0
+
+== BuildMaxAltsTable__11HouseViewerFv (16 indexed stores)
+  0x1c6ba8: 7d8419ae  stbx r12, r4, r3
+  0x1c6bc4: 7d6419ae  stbx r11, r4, r3
+  0x1c6bd4: 7d8451ae  stbx r12, r4, r10
+  0x1c6bdc: 7d6451ae  stbx r11, r4, r10
+  0x1c6be4: 7d8449ae  stbx r12, r4, r9
+  0x1c6bec: 7d6449ae  stbx r11, r4, r9
+  0x1c6bf4: 7d8441ae  stbx r12, r4, r8
+  0x1c6bfc: 7d6441ae  stbx r11, r4, r8
+  0x1c6c04: 7d8439ae  stbx r12, r4, r7
+  0x1c6c0c: 7d6439ae  stbx r11, r4, r7
+  0x1c6c14: 7d8431ae  stbx r12, r4, r6
+  0x1c6c1c: 7d6431ae  stbx r11, r4, r6
+  0x1c6c24: 7d8429ae  stbx r12, r4, r5
+  0x1c6c2c: 7d6429ae  stbx r11, r4, r5
+  0x1c6c34: 7d8401ae  stbx r12, r4, r0
+  0x1c6c3c: 7d6401ae  stbx r11, r4, r0
+
+== BuildRelationships__10cWinPeopleFv (2 indexed stores)
+  0x2899c4: 7f44c92e  stwx r26, r4, r25
+  0x289a7c: 7f44c92e  stwx r26, r4, r25
+
+== BuildSections__13CachedIniFileFPcl (2 indexed stores)
+  0x58d360: 7c04d1ae  stbx r0, r4, r26
+  0x58d3f8: 7c04d1ae  stbx r0, r4, r26
+
+== Callback__FP17cCheatCommandLineUl (1 indexed stores)
+  0x1bd4f8: 7d4541ae  stbx r10, r5, r8
+
+== CaptionDraw__15cPerformanceBtnFv (2 indexed stores)
+  0x2a5960: 7cbcd92e  stwx r5, r28, r27
+  0x2a5980: 7c7dd92e  stwx r3, r29, r27
+
+== Censor__11HouseViewerFPC4RectiiiiP11RenderParam (1 indexed stores)
+  0x1ced6c: 7ef51b2e  sthx r23, r21, r3
+
+== ChangeFloor__13cNewFloorToolFRC7FTilePti12FloorPatternbb (1 indexed stores)
+  0x17afcc: 7cc301ae  stbx r6, r3, r0
+
+== ChangeReturnsToBrTags__FPc (6 indexed stores)
+  0x224bdc: 7c0539ae  stbx r0, r5, r7
+  0x224be8: 7c0539ae  stbx r0, r5, r7
+  0x224bf4: 7c0539ae  stbx r0, r5, r7
+  0x224c00: 7c0539ae  stbx r0, r5, r7
+  0x224c10: 7cc539ae  stbx r6, r5, r7
+  0x224c3c: 7c0439ae  stbx r0, r4, r7
+
+== ChangeSimBaseType__12NeighborhoodFP8NeighborQ221MakeNewCharacterParam15eCharacterTypesi (4 indexed stores)
+  0x0a641c: 7c8d032e  sthx r4, r13, r0
+  0x0a69dc: 7c04192e  stwx r0, r4, r3
+  0x0a6a84: 7de4192e  stwx r15, r4, r3
+  0x0a6e0c: 7caf032e  sthx r5, r15, r0
+
+== ChangeSlashesToBackslashes__FR16StackString<260> (1 indexed stores)
+  0x4718ec: 7ffd01ae  stbx r31, r29, r0
+
+== ChangeWallPattern__4WallF11WallPattern11WallPattern (4 indexed stores)
+  0x2c0bb0: 7ca8032e  sthx r5, r8, r0
+  0x2c0bc4: 7ca8032e  sthx r5, r8, r0
+  0x2c0be4: 7ca8032e  sthx r5, r8, r0
+  0x2c0bf4: 7ca8032e  sthx r5, r8, r0
+
+== CheckIntegrity__12ObjectModuleFv (2 indexed stores)
+  0x0e3f90: 7c83032e  sthx r4, r3, r0
+  0x0e409c: 7c83032e  sthx r4, r3, r0
+
+== ChooseProxy__10EditPersonFiP11SuitTexListi (2 indexed stores)
+  0x066bb0: 7c0429ae  stbx r0, r4, r5
+  0x066c60: 7c0321ae  stbx r0, r3, r4
+
+== Cleanup__8cXObjectFP8cXObject (2 indexed stores)
+  0x0ca244: 7c04312e  stwx r0, r4, r6
+  0x0ca254: 7c04312e  stwx r0, r4, r6
+
+== ClearAccessories__8AnimatorFv (1 indexed stores)
+  0x481084: 7c03f92e  stwx r0, r3, r31
+
+== ClearAccessories__9SAnimatorFv (1 indexed stores)
+  0x3613a8: 7fc3f92e  stwx r30, r3, r31
+
+== ClearDeck__10cPoolLayerFv (1 indexed stores)
+  0x118948: 7ca301ae  stbx r5, r3, r0
+
+== ClearIdleStatus__12ObjectModuleFi (2 indexed stores)
+  0x0e1ff4: 7c03212e  stwx r0, r3, r4
+  0x0e2004: 7c03212e  stwx r0, r3, r4
+
+== Clear__10cPoolLayerFv (1 indexed stores)
+  0x118af4: 7ca301ae  stbx r5, r3, r0
+
+== Clear__11cWaterLayerFv (1 indexed stores)
+  0x158da0: 7c03f1ae  stbx r0, r3, r30
+
+== Clear__13ZBufferLookupFv (1 indexed stores)
+  0x204168: 7c8301ae  stbx r4, r3, r0
+
+== Clear__19ObjectTypeAttrBlockFv (1 indexed stores)
+  0x0fc478: 7ca4332e  sthx r5, r4, r6
+
+== Clone__10cArray<Sc>Fv (9 indexed stores)
+  0x15c6c4: 7d6921ae  stbx r11, r9, r4
+  0x15c6f0: 7d0321ae  stbx r8, r3, r4
+  0x15c730: 7d0321ae  stbx r8, r3, r4
+  0x15c788: 7f6b21ae  stbx r27, r11, r4
+  0x15c7c4: 7f6c21ae  stbx r27, r12, r4
+  0x15c7ec: 7d6821ae  stbx r11, r8, r4
+  0x15c808: 7d6821ae  stbx r11, r8, r4
+  0x15c84c: 7c0321ae  stbx r0, r3, r4
+  0x15c8ac: 7c0321ae  stbx r0, r3, r4
+
+== Clone__10cArray<Uc>Fv (9 indexed stores)
+  0x15cb84: 7d6921ae  stbx r11, r9, r4
+  0x15cbb0: 7d0321ae  stbx r8, r3, r4
+  0x15cbf0: 7d0321ae  stbx r8, r3, r4
+  0x15cc48: 7f6b21ae  stbx r27, r11, r4
+  0x15cc84: 7f6c21ae  stbx r27, r12, r4
+  0x15ccac: 7d6821ae  stbx r11, r8, r4
+  0x15ccc8: 7d6821ae  stbx r11, r8, r4
+  0x15cd0c: 7c0321ae  stbx r0, r3, r4
+  0x15cd6c: 7c0321ae  stbx r0, r3, r4
+
+== Clone__10cArray<Us>Fv (9 indexed stores)
+  0x15c208: 7d281b2e  sthx r9, r8, r3
+  0x15c234: 7c071b2e  sthx r0, r7, r3
+  0x15c274: 7c071b2e  sthx r0, r7, r3
+  0x15c2c4: 7f8c1b2e  sthx r28, r12, r3
+  0x15c300: 7f8b1b2e  sthx r28, r11, r3
+  0x15c324: 7d071b2e  sthx r8, r7, r3
+  0x15c340: 7d071b2e  sthx r8, r7, r3
+  0x15c384: 7c071b2e  sthx r0, r7, r3
+  0x15c3e8: 7c03232e  sthx r0, r3, r4
+
+== Clone__10cPoolLayerCFv (1 indexed stores)
+  0x1185c4: 7ca301ae  stbx r5, r3, r0
+
+== Clone__11cWaterLayerCFv (1 indexed stores)
+  0x158bd8: 7c03e9ae  stbx r0, r3, r29
+
+== Clone__22cArray<12VertexConfig>Fv (3 indexed stores)
+  0x15b5b8: 7c0429ae  stbx r0, r4, r5
+  0x15b608: 7c0429ae  stbx r0, r4, r5
+  0x15b658: 7c0429ae  stbx r0, r4, r5
+
+== Clone__9cArray<s>Fv (9 indexed stores)
+  0x15bd48: 7d281b2e  sthx r9, r8, r3
+  0x15bd74: 7c071b2e  sthx r0, r7, r3
+  0x15bdb4: 7c071b2e  sthx r0, r7, r3
+  0x15be04: 7f8c1b2e  sthx r28, r12, r3
+  0x15be40: 7f8b1b2e  sthx r28, r11, r3
+  0x15be64: 7d071b2e  sthx r8, r7, r3
+  0x15be80: 7d071b2e  sthx r8, r7, r3
+  0x15bec4: 7c071b2e  sthx r0, r7, r3
+  0x15bf28: 7c03232e  sthx r0, r3, r4
+
+== ComputeEaves__10cRoofLayerFP10cRoofLayer (2 indexed stores)
+  0x2de404: 7c06f1ae  stbx r0, r6, r30
+  0x2de418: 7c03f1ae  stbx r0, r3, r30
+
+== ComputeRoom__4RoomFP5House (27 indexed stores)
+  0x126c54: 7d7bd1ae  stbx r11, r27, r26
+  0x126c88: 7d7bd1ae  stbx r11, r27, r26
+  0x126cb4: 7d7a19ae  stbx r11, r26, r3
+  0x126ce0: 7d6419ae  stbx r11, r4, r3
+  0x126d0c: 7d6419ae  stbx r11, r4, r3
+  0x126d38: 7d6419ae  stbx r11, r4, r3
+  0x126d64: 7d6419ae  stbx r11, r4, r3
+  0x126d90: 7d6419ae  stbx r11, r4, r3
+  0x126de0: 7d6401ae  stbx r11, r4, r0
+  0x126ec0: 7c1a41ae  stbx r0, r26, r8
+  0x126ef8: 7c1bd1ae  stbx r0, r27, r26
+  0x126f24: 7c1a19ae  stbx r0, r26, r3
+  0x126f50: 7c0419ae  stbx r0, r4, r3
+  0x126f7c: 7c0419ae  stbx r0, r4, r3
+  0x126fa8: 7c0419ae  stbx r0, r4, r3
+  0x126fd4: 7c0419ae  stbx r0, r4, r3
+  0x127000: 7c0419ae  stbx r0, r4, r3
+  0x127054: 7cc401ae  stbx r6, r4, r0
+  0x127114: 7d7bd1ae  stbx r11, r27, r26
+  0x127148: 7d7dd9ae  stbx r11, r29, r27
+  0x127174: 7d7b19ae  stbx r11, r27, r3
+  0x1271a0: 7d6419ae  stbx r11, r4, r3
+  0x1271cc: 7d6419ae  stbx r11, r4, r3
+  0x1271f8: 7d6419ae  stbx r11, r4, r3
+  0x127224: 7d6419ae  stbx r11, r4, r3
+  0x127250: 7d6419ae  stbx r11, r4, r3
+  0x1272a0: 7d6401ae  stbx r11, r4, r0
+
+== ComputeRooms__11cFixedWorldFi (18 indexed stores)
+  0x15f458: 7de62b2e  sthx r15, r6, r5
+  0x15f48c: 7c062b2e  sthx r0, r6, r5
+  0x15f4b4: 7c062b2e  sthx r0, r6, r5
+  0x15f4c4: 7c062b2e  sthx r0, r6, r5
+  0x15f56c: 7de3032e  sthx r15, r3, r0
+  0x15f59c: 7ca3032e  sthx r5, r3, r0
+  0x15f5f8: 7de3032e  sthx r15, r3, r0
+  0x15f628: 7ca3032e  sthx r5, r3, r0
+  0x15f690: 7de3032e  sthx r15, r3, r0
+  0x15f6c0: 7ca3032e  sthx r5, r3, r0
+  0x15f710: 7de3032e  sthx r15, r3, r0
+  0x15f740: 7ca3032e  sthx r5, r3, r0
+  0x15f848: 7de3032e  sthx r15, r3, r0
+  0x15f878: 7ca3032e  sthx r5, r3, r0
+  0x16050c: 7c03a1ae  stbx r0, r3, r20
+  0x1605cc: 7c0399ae  stbx r0, r3, r19
+  0x16063c: 7c0399ae  stbx r0, r3, r19
+  0x1607d0: 7c0399ae  stbx r0, r3, r19
+
+== CopyString__FPCcb (1 indexed stores)
+  0x3743a8: 7c1ef9ae  stbx r0, r30, r31
+
+== CreateSoundBuffer__16IDirectSound_MacFPC13_DSBUFFERDESCPP18IDirectSoundBufferP8IUnknown (1 indexed stores)
+  0x02b95c: 7f9f012e  stwx r28, r31, r0
+
+== CutawayWallThickBlit__FiiiiP12DecompressorPCUsP12DecompressorPUsiPUsiP7tagRECTPCUsP11RenderParam (1 indexed stores)
+  0x1aab1c: 7ce831ae  stbx r7, r8, r6
+
+== DiscoverTilesToRoof__10cRoofLayerFi (4 indexed stores)
+  0x2de72c: 7c03c9ae  stbx r0, r3, r25
+  0x2de73c: 7c03c9ae  stbx r0, r3, r25
+  0x2de764: 7c03c9ae  stbx r0, r3, r25
+  0x2de774: 7c03c9ae  stbx r0, r3, r25
+
+== DoMenu__14cObjPickerToolFP9AnimTableP8cXPersonii (3 indexed stores)
+  0x184138: 7ff9b9ae  stbx r31, r25, r23
+  0x1841b8: 7c17e9ae  stbx r0, r23, r29
+  0x184260: 7c17b1ae  stbx r0, r23, r22
+
+== DoRoom__17cNewWallpaperToolFRC7FTilePtiQ29TileWalls7Segment5PointQ217cNewWallpaperTool4Mode (16 indexed stores)
+  0x17dbb8: 7ca4012e  stwx r5, r4, r0
+  0x17dbd8: 7ca4012e  stwx r5, r4, r0
+  0x17dbf8: 7ca4012e  stwx r5, r4, r0
+  0x17dc18: 7ca4012e  stwx r5, r4, r0
+  0x17dc38: 7cc5212e  stwx r6, r5, r4
+  0x17dc48: 7c85012e  stwx r4, r5, r0
+  0x17dc60: 7cc5212e  stwx r6, r5, r4
+  0x17dc70: 7c85012e  stwx r4, r5, r0
+  0x17dcb4: 7c83012e  stwx r4, r3, r0
+  0x17dcd4: 7c83012e  stwx r4, r3, r0
+  0x17dcf4: 7c83012e  stwx r4, r3, r0
+  0x17dd14: 7c83012e  stwx r4, r3, r0
+  0x17dd34: 7ca4192e  stwx r5, r4, r3
+  0x17dd44: 7c64012e  stwx r3, r4, r0
+  0x17dd5c: 7ca4192e  stwx r5, r4, r3
+  0x17dd6c: 7c64012e  stwx r3, r4, r0
+
+== DoStream__10cSimulatorFP11ReconBufferl (2 indexed stores)
+  0x139eb0: 7c79012e  stwx r3, r25, r0
+  0x139f28: 7c7d012e  stwx r3, r29, r0
+
+== DoStream__12ObjectModuleFP11ReconBufferl (4 indexed stores)
+  0x0e7f3c: 7c04192e  stwx r0, r4, r3
+  0x0e7f84: 7c04192e  stwx r0, r4, r3
+  0x0e7fa0: 7c04192e  stwx r0, r4, r3
+  0x0e80f8: 7c9bd12e  stwx r4, r27, r26
+
+== DoStream__9TreeTableFP11ReconBufferPs (1 indexed stores)
+  0x155840: 7f03f12e  stwx r24, r3, r30
+
+== DrawArrow__14cWinDeltaMeterFRC7cTSRectbUl (1 indexed stores)
+  0x274a50: 7fc3032e  sthx r30, r3, r0
+
+== DrawChar2__15cTSDBFontKoreanFP9cTSBufferllUibPC7cTSRect (4 indexed stores)
+  0x49aedc: 7ca4032e  sthx r5, r4, r0
+  0x49af28: 7ca4032e  sthx r5, r4, r0
+  0x49af50: 7ca4032e  sthx r5, r4, r0
+  0x49b04c: 7c83032e  sthx r4, r3, r0
+
+== DrawCharThai__13cTSDBFontThaiFP9cTSBufferllP11_t_tcharsetb (2 indexed stores)
+  0x49d98c: 7c83032e  sthx r4, r3, r0
+  0x49da38: 7c83032e  sthx r4, r3, r0
+
+== DrawCircleNoClip__9cTSBufferFllllUlUl (4 indexed stores)
+  0x48a0f0: 7fc71b2e  sthx r30, r7, r3
+  0x48a100: 7fcf8b2e  sthx r30, r15, r17
+  0x48a104: 7fd91b2e  sthx r30, r25, r3
+  0x48a10c: 7fcb8b2e  sthx r30, r11, r17
+
+== DrawCircle__9cTSBufferFllllUlUl (6 indexed stores)
+  0x48ac64: 7f67532e  sthx r27, r7, r10
+  0x48ace4: 7f67232e  sthx r27, r7, r4
+  0x48adc0: 7f6e532e  sthx r27, r14, r10
+  0x48ae0c: 7f68332e  sthx r27, r8, r6
+  0x48ae30: 7f65532e  sthx r27, r5, r10
+  0x48ae80: 7f6e332e  sthx r27, r14, r6
+
+== DrawClipped__13cLineRender16FiiP9PackedAlti (2 indexed stores)
+  0x1f499c: 7f77e32e  sthx r27, r23, r28
+  0x1f4a54: 7c97032e  sthx r4, r23, r0
+
+== DrawLineNoClip__9cTSBufferFlllllUl (1 indexed stores)
+  0x48803c: 7f83032e  sthx r28, r3, r0
+
+== DrawLine__9cTSBufferFlllllUl (1 indexed stores)
+  0x48862c: 7faa4b2e  sthx r29, r10, r9
+
+== Draw__13cLineRender16FiiP9PackedAlti (2 indexed stores)
+  0x1f4b50: 7f77eb2e  sthx r27, r23, r29
+  0x1f4bd8: 7cb7032e  sthx r5, r23, r0
+
+== DropGrid__9cTileToolFv (1 indexed stores)
+  0x1907b8: 7c8519ae  stbx r4, r5, r3
+
+== ExpandRect__14SpacePartitionFP11PenaltyRect (5 indexed stores)
+  0x130e7c: 7c16f12e  stwx r0, r22, r30
+  0x130ed0: 7c76f12e  stwx r3, r22, r30
+  0x130ed4: 7c1ff12e  stwx r0, r31, r30
+  0x131014: 7c76f12e  stwx r3, r22, r30
+  0x131018: 7c1ff12e  stwx r0, r31, r30
+
+== ExportHTMLHomelessFamilies__FRC16StackString<260>RC16StackString<260>P6Family (1 indexed stores)
+  0x21f670: 7f3701ae  stbx r25, r23, r0
+
+== ExportHTML__FRC16StackString<260>RC16StackString<260>P6FamilyP7CPState (1 indexed stores)
+  0x2211e8: 7ed401ae  stbx r22, r20, r0
+
+== ExtractBaseNum__10cScrapbookFPCc (10 indexed stores)
+  0x2485f4: 7ce501ae  stbx r7, r5, r0
+  0x248604: 7ce501ae  stbx r7, r5, r0
+  0x248614: 7ce501ae  stbx r7, r5, r0
+  0x248624: 7ce501ae  stbx r7, r5, r0
+  0x248634: 7ce501ae  stbx r7, r5, r0
+  0x248644: 7ce501ae  stbx r7, r5, r0
+  0x248654: 7ce501ae  stbx r7, r5, r0
+  0x248668: 7ce501ae  stbx r7, r5, r0
+  0x24868c: 7ce501ae  stbx r7, r5, r0
+  0x2486a4: 7c8301ae  stbx r4, r3, r0
+
+== FSpLocationFromFullPath__FsPCvP6FSSpec (1 indexed stores)
+  0x0155fc: 7c7f01ae  stbx r3, r31, r0
+
+== FillCircleNoClip__9cTSBufferFllllUl (1 indexed stores)
+  0x489348: 7f57332e  sthx r26, r23, r6
+
+== FillCircle__9cTSBufferFllllUl (2 indexed stores)
+  0x489750: 7f31332e  sthx r25, r17, r6
+  0x4897d0: 7f312b2e  sthx r25, r17, r5
+
+== FilterOutCommonPages__FPvPv (1 indexed stores)
+  0x22fb24: 7c7f012e  stwx r3, r31, r0
+
+== FinalizeChanges__9cDirtToolFP18cArray<9PackedAlt> (4 indexed stores)
+  0x18f71c: 7ce601ae  stbx r7, r6, r0
+  0x18f7a8: 7c8301ae  stbx r4, r3, r0
+  0x18f840: 7c8301ae  stbx r4, r3, r0
+  0x18f8d8: 7c8301ae  stbx r4, r3, r0
+
+== FindPath__6XRouteFR8TileList (3 indexed stores)
+  0x16d2bc: 7c64012e  stwx r3, r4, r0
+  0x16d318: 7c64012e  stwx r3, r4, r0
+  0x16ded0: 7c64012e  stwx r3, r4, r0
+
+== FixFences__4WallFv (2 indexed stores)
+  0x2c0b20: 7ca6032e  sthx r5, r6, r0
+  0x2c0b40: 7ca6032e  sthx r5, r6, r0
+
+== FloorBlit__FiiiiP12DecompressorPCUsP12DecompressorPUsiPUsiP7tagRECTiP11RenderParam (1 indexed stores)
+  0x1acc10: 7ca419ae  stbx r5, r4, r3
+
+== ForceGrade__9cDirtToolFiiii (11 indexed stores)
+  0x18e048: 7c9631ae  stbx r4, r22, r6
+  0x18e094: 7ea431ae  stbx r21, r4, r6
+  0x18e0c8: 7e9631ae  stbx r20, r22, r6
+  0x18e0e8: 7c7531ae  stbx r3, r21, r6
+  0x18e108: 7c7331ae  stbx r3, r19, r6
+  0x18e12c: 7c0431ae  stbx r0, r4, r6
+  0x18e178: 7c1331ae  stbx r0, r19, r6
+  0x18e198: 7c0431ae  stbx r0, r4, r6
+  0x18e1ec: 7c0521ae  stbx r0, r5, r4
+  0x18e280: 7c03a1ae  stbx r0, r3, r20
+  0x18e394: 7c0419ae  stbx r0, r4, r3
+
+== FormatCStringWithGameName__FPc (1 indexed stores)
+  0x0194e4: 7c7c01ae  stbx r3, r28, r0
+
+== FractalInitializeGrid__FP10cArray<Sc>lScUc (1 indexed stores)
+  0x15d738: 7c83d1ae  stbx r4, r3, r26
+
+== FractallyInterpolateGrid__FP10cArray<Sc>ll (1 indexed stores)
+  0x15d64c: 7f23b1ae  stbx r25, r3, r22
+
+== FrameRect__11HouseViewerFRC7tagRECTUlP11RenderParamPC7tagRECT (2 indexed stores)
+  0x1c70e4: 7c05432e  sthx r0, r5, r8
+  0x1c70f0: 7c05332e  sthx r0, r5, r6
+
+== GenerateAltitudeLookup__13ZBufferLookupFP14cAnimDeviceSubi (1 indexed stores)
+  0x202d94: 7c03d32e  sthx r0, r3, r26
+
+== GenerateFloorLookup__13ZBufferLookupFP14cAnimDeviceSubi (1 indexed stores)
+  0x202fb8: 7c03312e  stwx r0, r3, r6
+
+== GenerateOrthoWallLookup__13ZBufferLookupFP14cAnimDeviceSubi (19 indexed stores)
+  0x203718: 7f1d632e  sthx r24, r29, r12
+  0x203738: 7f1dbb2e  sthx r24, r29, r23
+  0x203744: 7d9d5b2e  sthx r12, r29, r11
+  0x20374c: 7d9d532e  sthx r12, r29, r10
+  0x203750: 7cfd4b2e  sthx r7, r29, r9
+  0x203754: 7cfd432e  sthx r7, r29, r8
+  0x203768: 7cfd332e  sthx r7, r29, r6
+  0x20376c: 7cfd2b2e  sthx r7, r29, r5
+  0x20386c: 7efdc32e  sthx r23, r29, r24
+  0x203884: 7efdcb2e  sthx r23, r29, r25
+  0x203890: 7d5d632e  sthx r10, r29, r12
+  0x20389c: 7d5d5b2e  sthx r10, r29, r11
+  0x2038a4: 7cfd4b2e  sthx r7, r29, r9
+  0x2038a8: 7cfd432e  sthx r7, r29, r8
+  0x2038bc: 7cfd332e  sthx r7, r29, r6
+  0x2038c0: 7cfd2b2e  sthx r7, r29, r5
+  0x203934: 7cbd1b2e  sthx r5, r29, r3
+  0x203938: 7cbd032e  sthx r5, r29, r0
+  0x203960: 7c1d232e  sthx r0, r29, r4
+
+== GeneratePalette__17cTSBufferBMPProxyFPC19tagBITMAPFILEHEADERPPUlP7cTSRect (2 indexed stores)
+  0x4838b4: 7c03312e  stwx r0, r3, r6
+  0x483924: 7c03312e  stwx r0, r3, r6
+
+== GenerateRoof__10cRoofLayerFiP10cRoofLayer (1 indexed stores)
+  0x2dd870: 7c03f1ae  stbx r0, r3, r30
+
+== GenerateRotationLookups__9TileWallsFv (5 indexed stores)
+  0x2b96cc: 7c7e012e  stwx r3, r30, r0
+  0x2b96d8: 7cbe012e  stwx r5, r30, r0
+  0x2b96f8: 7c7e012e  stwx r3, r30, r0
+  0x2b9704: 7cbe012e  stwx r5, r30, r0
+  0x2b9734: 7c7e012e  stwx r3, r30, r0
+
+== GenerateVerticalLookup__13ZBufferLookupFP14cAnimDeviceSubi (9 indexed stores)
+  0x203284: 7d98332e  sthx r12, r24, r6
+  0x203298: 7d8abb2e  sthx r12, r10, r23
+  0x2032c8: 7d8a5b2e  sthx r12, r10, r11
+  0x2032e0: 7d6a4b2e  sthx r11, r10, r9
+  0x2033d8: 7d97c32e  sthx r12, r23, r24
+  0x2033ec: 7d8ad32e  sthx r12, r10, r26
+  0x203410: 7d8a5b2e  sthx r12, r10, r11
+  0x203428: 7d6a4b2e  sthx r11, r10, r9
+  0x2034a4: 7c034b2e  sthx r0, r3, r9
+
+== Generate__14FloorShadowMgrFRC8ShadowID (2 indexed stores)
+  0x1b80c0: 7c7901ae  stbx r3, r25, r0
+  0x1b8280: 7c7901ae  stbx r3, r25, r0
+
+== GetCacheFile__FPCc (2 indexed stores)
+  0x58c678: 7c1ef92e  stwx r0, r30, r31
+  0x58c694: 7fbef92e  stwx r29, r30, r31
+
+== GetExpensesHistory__10cSimulatorFP13ExpenseReport (4 indexed stores)
+  0x1388f4: 7d04192e  stwx r8, r4, r3
+  0x138910: 7d04192e  stwx r8, r4, r3
+  0x13892c: 7d04192e  stwx r8, r4, r3
+  0x138948: 7d04192e  stwx r8, r4, r3
+
+== GetRsrcNameFromFileName__7RsrcMgrCFR9CTGString (1 indexed stores)
+  0x3eeb44: 7c04f1ae  stbx r0, r4, r30
+
+== GetTruncatedScrapbookCaption__FPc (10 indexed stores)
+  0x2249f4: 7c05f9ae  stbx r0, r5, r31
+  0x224a14: 7c05f9ae  stbx r0, r5, r31
+  0x224a30: 7c05f9ae  stbx r0, r5, r31
+  0x224a3c: 7c05f9ae  stbx r0, r5, r31
+  0x224a48: 7c05f9ae  stbx r0, r5, r31
+  0x224a54: 7c05f9ae  stbx r0, r5, r31
+  0x224a60: 7c05f9ae  stbx r0, r5, r31
+  0x224a6c: 7c05f9ae  stbx r0, r5, r31
+  0x224a7c: 7cc5f9ae  stbx r6, r5, r31
+  0x224aa8: 7c04f9ae  stbx r0, r4, r31
+
+== GrowGrass__11cFixedWorldFi (1 indexed stores)
+  0x15e4e8: 7f6301ae  stbx r27, r3, r0
+
+== HierSetSite__8cXObjectFPC13HierarchySite (2 indexed stores)
+  0x0c922c: 7ce3032e  sthx r7, r3, r0
+  0x0c9264: 7ca4032e  sthx r5, r4, r0
+
+== HierSever__8cXObjectFv (2 indexed stores)
+  0x0c8fc8: 7c85032e  sthx r4, r5, r0
+  0x0c907c: 7ca4032e  sthx r5, r4, r0
+
+== ImportConstants__12ObjectFolderFR9CTGString (1 indexed stores)
+  0x0d6110: 7c70032e  sthx r3, r16, r0
+
+== ImportFamily__12NeighborhoodFRC16StackString<260>PP6FamilyPP6Family (1 indexed stores)
+  0x0ae7c4: 7c13232e  sthx r0, r19, r4
+
+== InitAlphaZSpriteBlit__Fv (1 indexed stores)
+  0x1a114c: 7c6b01ae  stbx r3, r11, r0
+
+== InitBitmapped__7cTSFontFb (9 indexed stores)
+  0x4b4148: 7ca3012e  stwx r5, r3, r0
+  0x4b468c: 7c07312e  stwx r0, r7, r6
+  0x4b46b4: 7c16612e  stwx r0, r22, r12
+  0x4b46c8: 7c0c592e  stwx r0, r12, r11
+  0x4b46dc: 7c0b512e  stwx r0, r11, r10
+  0x4b46f0: 7c0a492e  stwx r0, r10, r9
+  0x4b4704: 7c09412e  stwx r0, r9, r8
+  0x4b4718: 7c08392e  stwx r0, r8, r7
+  0x4b472c: 7c07312e  stwx r0, r7, r6
+
+== InitCars__14cWinStudiotownFv (4 indexed stores)
+  0x47602c: 7c03b92e  stwx r0, r3, r23
+  0x476040: 7c04b92e  stwx r0, r4, r23
+  0x47605c: 7c04b92e  stwx r0, r4, r23
+  0x476070: 7c03b92e  stwx r0, r3, r23
+
+== InitData__12cWinLotPopupFv (11 indexed stores)
+  0x2d7b54: 7d23512e  stwx r9, r3, r10
+  0x2d7b70: 7d28392e  stwx r9, r8, r7
+  0x2d7b78: 7d27312e  stwx r9, r7, r6
+  0x2d7b80: 7d26292e  stwx r9, r6, r5
+  0x2d7b88: 7d25212e  stwx r9, r5, r4
+  0x2d7b90: 7d24192e  stwx r9, r4, r3
+  0x2d7b98: 7d23012e  stwx r9, r3, r0
+  0x2d7bb0: 7d25312e  stwx r9, r5, r6
+  0x2d7bbc: 7d25212e  stwx r9, r5, r4
+  0x2d7bc4: 7d24192e  stwx r9, r4, r3
+  0x2d7bcc: 7d23012e  stwx r9, r3, r0
+
+== InitGame__FP6HWND__iiPCcPCcPCc (8 indexed stores)
+  0x088d90: 7c1461ae  stbx r0, r20, r12
+  0x088da8: 7c0c59ae  stbx r0, r12, r11
+  0x088dc0: 7c0b51ae  stbx r0, r11, r10
+  0x088dd8: 7c0a49ae  stbx r0, r10, r9
+  0x088df0: 7c0941ae  stbx r0, r9, r8
+  0x088e08: 7c0839ae  stbx r0, r8, r7
+  0x088e20: 7c0731ae  stbx r0, r7, r6
+  0x088e38: 7c0629ae  stbx r0, r6, r5
+
+== Init__10cWinPeopleFv (4 indexed stores)
+  0x28f298: 7e23792e  stwx r17, r3, r15
+  0x2902cc: 7e63912e  stwx r19, r3, r18
+  0x2904a4: 7e43712e  stwx r18, r3, r14
+  0x2904e0: 7e43712e  stwx r18, r3, r14
+
+== Init__11cWinCatalogFv (27 indexed stores)
+  0x26bd7c: 7e7201ae  stbx r19, r18, r0
+  0x26bdec: 7e5319ae  stbx r18, r19, r3
+  0x26be14: 7e5319ae  stbx r18, r19, r3
+  0x26be3c: 7e5319ae  stbx r18, r19, r3
+  0x26be64: 7e5319ae  stbx r18, r19, r3
+  0x26be8c: 7e5319ae  stbx r18, r19, r3
+  0x26bf0c: 7e5319ae  stbx r18, r19, r3
+  0x26bf34: 7e5319ae  stbx r18, r19, r3
+  0x26bf5c: 7e5319ae  stbx r18, r19, r3
+  0x26bf84: 7e5319ae  stbx r18, r19, r3
+  0x26bfac: 7e5319ae  stbx r18, r19, r3
+  0x26c02c: 7e5319ae  stbx r18, r19, r3
+  0x26c054: 7e5319ae  stbx r18, r19, r3
+  0x26c07c: 7e5319ae  stbx r18, r19, r3
+  0x26c0a4: 7e5319ae  stbx r18, r19, r3
+  0x26c0cc: 7e5319ae  stbx r18, r19, r3
+  0x26c14c: 7e5319ae  stbx r18, r19, r3
+  0x26c174: 7e5319ae  stbx r18, r19, r3
+  0x26c19c: 7e5319ae  stbx r18, r19, r3
+  0x26c1c4: 7e5319ae  stbx r18, r19, r3
+  0x26c1ec: 7e5319ae  stbx r18, r19, r3
+  0x26c26c: 7e5319ae  stbx r18, r19, r3
+  0x26c294: 7e5319ae  stbx r18, r19, r3
+  0x26c2bc: 7e5319ae  stbx r18, r19, r3
+  0x26c2e4: 7e5319ae  stbx r18, r19, r3
+  0x26c30c: 7e5319ae  stbx r18, r19, r3
+  0x26c364: 7e7201ae  stbx r19, r18, r0
+
+== Init__12ObjectFolderFPCcb (15 indexed stores)
+  0x0d90fc: 7c0521ae  stbx r0, r5, r4
+  0x0d9190: 7c0521ae  stbx r0, r5, r4
+  0x0d9224: 7c0521ae  stbx r0, r5, r4
+  0x0d92b8: 7c0521ae  stbx r0, r5, r4
+  0x0d934c: 7c0521ae  stbx r0, r5, r4
+  0x0d93f0: 7c0521ae  stbx r0, r5, r4
+  0x0d9494: 7c0521ae  stbx r0, r5, r4
+  0x0d9538: 7c0521ae  stbx r0, r5, r4
+  0x0d95dc: 7c0521ae  stbx r0, r5, r4
+  0x0d9680: 7c0521ae  stbx r0, r5, r4
+  0x0d9724: 7c0521ae  stbx r0, r5, r4
+  0x0d97c8: 7c0521ae  stbx r0, r5, r4
+  0x0d986c: 7c0521ae  stbx r0, r5, r4
+  0x0d9910: 7c0521ae  stbx r0, r5, r4
+  0x0d99a4: 7c0521ae  stbx r0, r5, r4
+
+== Init__12cSamplePatchFv (1 indexed stores)
+  0x30f110: 7ca4312e  stwx r5, r4, r6
+
+== Init__12cTrackPlayerFv (3 indexed stores)
+  0x314898: 7c83292e  stwx r4, r3, r5
+  0x314900: 7c83292e  stwx r4, r3, r5
+  0x314964: 7c83292e  stwx r4, r3, r5
+
+== Init__12cWinLotPopupFv (1 indexed stores)
+  0x2d7680: 7c64f12e  stwx r3, r4, r30
+
+== Init__21cSndobAttrRegisterSetFll (1 indexed stores)
+  0x30d808: 7ca4312e  stwx r5, r4, r6
+
+== Init__6cTrackFv (3 indexed stores)
+  0x314ea8: 7c83292e  stwx r4, r3, r5
+  0x314f10: 7c83292e  stwx r4, r3, r5
+  0x314f74: 7c83292e  stwx r4, r3, r5
+
+== Init__7cHitManFv (6 indexed stores)
+  0x31b13c: 7c83292e  stwx r4, r3, r5
+  0x31b1a0: 7c83292e  stwx r4, r3, r5
+  0x31b200: 7c83292e  stwx r4, r3, r5
+  0x31b268: 7c83292e  stwx r4, r3, r5
+  0x31b2c8: 7c83292e  stwx r4, r3, r5
+  0x31b420: 7c03612e  stwx r0, r3, r12
+
+== Initialize__8cXObjectFv (1 indexed stores)
+  0x0caadc: 7c832b2e  sthx r4, r3, r5
+
+== Initialize__8cXPersonFv (2 indexed stores)
+  0x111eb4: 7c83012e  stwx r4, r3, r0
+  0x111f18: 7c83012e  stwx r4, r3, r0
+
+== LiftGrid__9cTileToolFv (9 indexed stores)
+  0x1909a0: 7d7739ae  stbx r11, r23, r7
+  0x1909d4: 7ee901ae  stbx r23, r9, r0
+  0x1909fc: 7d69c1ae  stbx r11, r9, r24
+  0x190a50: 7d4961ae  stbx r10, r9, r12
+  0x190a98: 7f4ab9ae  stbx r26, r10, r23
+  0x190ac0: 7f8a01ae  stbx r28, r10, r0
+  0x190ae8: 7c0ad9ae  stbx r0, r10, r27
+  0x190b20: 7c0459ae  stbx r0, r4, r11
+  0x190b80: 7c0339ae  stbx r0, r3, r7
+
+== LitWallAddBlit__FiiiiP12DecompressorPC7PalWrapP12DecompressorP12DecompressorP12DecompressorPUsiPUsiP7tagRECTPCUsP11RenderParam (1 indexed stores)
+  0x1e16a8: 7c0349ae  stbx r0, r3, r9
+
+== LitWallBlitFB__FiiiiP12DecompressorPC7PalWrapP12DecompressorP12DecompressorPUsiPUsiP7tagRECTPCUsP11RenderParam (1 indexed stores)
+  0x1e1b60: 7c0349ae  stbx r0, r3, r9
+
+== LitWallBlit__FiiiiP12DecompressorPC7PalWrapP12DecompressorP12DecompressorPUsiPUsiP7tagRECTPCUsP11RenderParam (1 indexed stores)
+  0x1e1f60: 7c0349ae  stbx r0, r3, r9
+
+== LoadByCompleteSpec__7RsrcMgrFP7RsrcPktRC8RsrcTypePCcPCcl (1 indexed stores)
+  0x3ef460: 7c0331ae  stbx r0, r3, r6
+
+== LoadCareersFromText__FRC16StackString<260> (1 indexed stores)
+  0x059fc0: 7e8501ae  stbx r20, r5, r0
+
+== LoadInterestData__12NeighborhoodFP8cXPerson (1 indexed stores)
+  0x0b4b48: 7c9e032e  sthx r4, r30, r0
+
+== LoadPersistentData__12NeighborhoodFP8cXPersonRCQ23std48vector<P8cXPerson,Q23std21allocator<P8cXPerson>> (1 indexed stores)
+  0x0b4c88: 7c9e032e  sthx r4, r30, r0
+
+== LoadScore__11cFreshScoreF9cTSString (1 indexed stores)
+  0x305e84: 7c0f81ae  stbx r0, r15, r16
+
+== LoadUsageMapAndUpdate__15WallGraphicsMgrFP8iResFileP11cFixedWorldl (3 indexed stores)
+  0x1f614c: 7c7f032e  sthx r3, r31, r0
+  0x1f61f0: 7ebf032e  sthx r21, r31, r0
+  0x1f620c: 7c1f1b2e  sthx r0, r31, r3
+
+== LoadUsageMapAndUpdate__16FloorGraphicsMgrFP8iResFileP11cFixedWorldl (4 indexed stores)
+  0x1add5c: 7c79032e  sthx r3, r25, r0
+  0x1add94: 7c79032e  sthx r3, r25, r0
+  0x1addb0: 7c191b2e  sthx r0, r25, r3
+  0x1adea0: 7c05f32e  sthx r0, r5, r30
+
+== Load__11cFixedWorldFP8iResFilel (1 indexed stores)
+  0x1633f0: 7c76032e  sthx r3, r22, r0
+
+== Load__13StringSetBaseFbb (2 indexed stores)
+  0x1459a8: 7c15b9ae  stbx r0, r21, r23
+  0x145a40: 7c1bd1ae  stbx r0, r27, r26
+
+== Load__14StringSetMultiFbb (2 indexed stores)
+  0x1438b8: 7c16c1ae  stbx r0, r22, r24
+  0x143974: 7c19a9ae  stbx r0, r25, r21
+
+== M3D_GetZValueAtPoint__F5Point (1 indexed stores)
+  0x013c58: 7ca41b2e  sthx r5, r4, r3
+
+== MakeNewOutOfWorldObject__12ObjectModuleFP11ObjSelector (4 indexed stores)
+  0x0e7224: 7c03212e  stwx r0, r3, r4
+  0x0e7234: 7c03212e  stwx r0, r3, r4
+  0x0e735c: 7c03212e  stwx r0, r3, r4
+  0x0e736c: 7c03212e  stwx r0, r3, r4
+
+== MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood (1 indexed stores)
+  0x224438: 7e3201ae  stbx r17, r18, r0
+
+== Mid__9CTGStringCFUlUl (1 indexed stores)
+  0x571048: 7c1ff1ae  stbx r0, r31, r30
+
+== Mid__9cTSStringCFUlUl (1 indexed stores)
+  0x4f4194: 7c1ff1ae  stbx r0, r31, r30
+
+== MoveOut__12NeighborhoodFii (1 indexed stores)
+  0x0b1b78: 7ce6032e  sthx r7, r6, r0
+
+== MungeDEString__FPc (30 indexed stores)
+  0x00da20: 7c7e01ae  stbx r3, r30, r0
+  0x00dad0: 7c7e01ae  stbx r3, r30, r0
+  0x00dad8: 7c7e01ae  stbx r3, r30, r0
+  0x00dae0: 7c7e01ae  stbx r3, r30, r0
+  0x00dae8: 7c7e01ae  stbx r3, r30, r0
+  0x00dbb8: 7c7e01ae  stbx r3, r30, r0
+  0x00dbc0: 7c7e01ae  stbx r3, r30, r0
+  0x00dbc8: 7c7e01ae  stbx r3, r30, r0
+  0x00dbd0: 7c7e01ae  stbx r3, r30, r0
+  0x00dbd8: 7c7e01ae  stbx r3, r30, r0
+  0x00dc5c: 7c7e01ae  stbx r3, r30, r0
+  0x00dc64: 7c7e01ae  stbx r3, r30, r0
+  0x00dc6c: 7c7e01ae  stbx r3, r30, r0
+  0x00dc74: 7c7e01ae  stbx r3, r30, r0
+  0x00dc7c: 7c7e01ae  stbx r3, r30, r0
+  0x00dd28: 7c7e01ae  stbx r3, r30, r0
+  0x00dde8: 7c7e01ae  stbx r3, r30, r0
+  0x00ddf0: 7c7e01ae  stbx r3, r30, r0
+  0x00de8c: 7c7e01ae  stbx r3, r30, r0
+  0x00de94: 7c7e01ae  stbx r3, r30, r0
+  0x00de9c: 7c7e01ae  stbx r3, r30, r0
+  0x00dea4: 7c7e01ae  stbx r3, r30, r0
+  0x00deac: 7c7e01ae  stbx r3, r30, r0
+  0x00df30: 7c7e01ae  stbx r3, r30, r0
+  0x00df38: 7c7e01ae  stbx r3, r30, r0
+  0x00df40: 7c7e01ae  stbx r3, r30, r0
+  0x00df48: 7c7e01ae  stbx r3, r30, r0
+  0x00e014: 7c7e01ae  stbx r3, r30, r0
+  0x00e01c: 7c7e21ae  stbx r3, r30, r4
+  0x00e020: 7c7e01ae  stbx r3, r30, r0
+
+== MungeFRString__FPc (27 indexed stores)
+  0x00d390: 7c7e01ae  stbx r3, r30, r0
+  0x00d3fc: 7c7e01ae  stbx r3, r30, r0
+  0x00d404: 7c7e01ae  stbx r3, r30, r0
+  0x00d40c: 7c7e01ae  stbx r3, r30, r0
+  0x00d414: 7c7ed1ae  stbx r3, r30, r26
+  0x00d418: 7c7e01ae  stbx r3, r30, r0
+  0x00d420: 7c7e01ae  stbx r3, r30, r0
+  0x00d428: 7c7e01ae  stbx r3, r30, r0
+  0x00d494: 7c7e01ae  stbx r3, r30, r0
+  0x00d49c: 7c7e01ae  stbx r3, r30, r0
+  0x00d4a4: 7c7e01ae  stbx r3, r30, r0
+  0x00d4ac: 7c7ed1ae  stbx r3, r30, r26
+  0x00d4b0: 7c7e01ae  stbx r3, r30, r0
+  0x00d4b8: 7c7e01ae  stbx r3, r30, r0
+  0x00d4c0: 7c7e01ae  stbx r3, r30, r0
+  0x00d558: 7c7e01ae  stbx r3, r30, r0
+  0x00d5f0: 7c7e01ae  stbx r3, r30, r0
+  0x00d728: 7c7e01ae  stbx r3, r30, r0
+  0x00d734: 7c7e01ae  stbx r3, r30, r0
+  0x00d740: 7c7e01ae  stbx r3, r30, r0
+  0x00d74c: 7c7e01ae  stbx r3, r30, r0
+  0x00d758: 7c7e01ae  stbx r3, r30, r0
+  0x00d764: 7c7e01ae  stbx r3, r30, r0
+  0x00d770: 7c7e01ae  stbx r3, r30, r0
+  0x00d77c: 7c7e01ae  stbx r3, r30, r0
+  0x00d890: 7c7e01ae  stbx r3, r30, r0
+  0x00d940: 7c7e01ae  stbx r3, r30, r0
+
+== MungeUSString__FPc (22 indexed stores)
+  0x00e140: 7c7e01ae  stbx r3, r30, r0
+  0x00e298: 7c7e01ae  stbx r3, r30, r0
+  0x00e3ac: 7c9e01ae  stbx r4, r30, r0
+  0x00e3f0: 7c9e01ae  stbx r4, r30, r0
+  0x00e4e8: 7c7e01ae  stbx r3, r30, r0
+  0x00e4f0: 7c7e01ae  stbx r3, r30, r0
+  0x00e4f8: 7c7e01ae  stbx r3, r30, r0
+  0x00e500: 7c7e01ae  stbx r3, r30, r0
+  0x00e508: 7c7e01ae  stbx r3, r30, r0
+  0x00e510: 7c7e01ae  stbx r3, r30, r0
+  0x00e518: 7c7e01ae  stbx r3, r30, r0
+  0x00e520: 7c7e01ae  stbx r3, r30, r0
+  0x00e528: 7c7e01ae  stbx r3, r30, r0
+  0x00e66c: 7c7ee1ae  stbx r3, r30, r28
+  0x00e674: 7c7e01ae  stbx r3, r30, r0
+  0x00e67c: 7c7e01ae  stbx r3, r30, r0
+  0x00e684: 7c7e01ae  stbx r3, r30, r0
+  0x00e68c: 7c7e01ae  stbx r3, r30, r0
+  0x00e80c: 7c7e01ae  stbx r3, r30, r0
+  0x00e814: 7c7ee1ae  stbx r3, r30, r28
+  0x00e818: 7c7e01ae  stbx r3, r30, r0
+  0x00e820: 7c7e01ae  stbx r3, r30, r0
+
+== NewFileAdded__12ObjectFolderFR16StackString<260> (2 indexed stores)
+  0x0d6edc: 7c0521ae  stbx r0, r5, r4
+  0x0d71d8: 7c0521ae  stbx r0, r5, r4
+
+== OffsetWorld__11cFixedWorldFRC7CTilePt (4 indexed stores)
+  0x15b180: 7ca731ae  stbx r5, r7, r6
+  0x15b1dc: 7ca731ae  stbx r5, r7, r6
+  0x15b234: 7ca731ae  stbx r5, r7, r6
+  0x15b28c: 7ca731ae  stbx r5, r7, r6
+
+== OpenMovie__16CQuickTimePlayerFP6FSSpec (1 indexed stores)
+  0x012d68: 7fbe012e  stwx r29, r30, r0
+
+== PathNameFromDirID__FslPUccUc (1 indexed stores)
+  0x015530: 7f8401ae  stbx r28, r4, r0
+
+== Pickup__8cXObjectFb (1 indexed stores)
+  0x0c822c: 7c0419ae  stbx r0, r4, r3
+
+== Place__8cXObjectFRC7FTilePtiP8cXObjectib (2 indexed stores)
+  0x0c795c: 7c0419ae  stbx r0, r4, r3
+  0x0c7d20: 7c0419ae  stbx r0, r4, r3
+
+== PlayPause__12cTrackPlayerFlll (2 indexed stores)
+  0x313fe8: 7c03312e  stwx r0, r3, r6
+  0x314020: 7c03312e  stwx r0, r3, r6
+
+== PreCompute__12cColorSwatchFv (1 indexed stores)
+  0x1a8150: 7c04832e  sthx r0, r4, r16
+
+== PrepareButtons__19cWinDesignCharacterFv (1 indexed stores)
+  0x2ccfac: 7fc3032e  sthx r30, r3, r0
+
+== PrepareForModuleLoad__12ObjectFolderFP8iResFile (1 indexed stores)
+  0x0d3a94: 7c7df92e  stwx r3, r29, r31
+
+== ProcessCheat__19cTSCheatCodeManagerFPCc (1 indexed stores)
+  0x49e8fc: 7f6519ae  stbx r27, r5, r3
+
+== RandomSmooth__FP10cArray<Uc>UcUcUcUc (3 indexed stores)
+  0x15df70: 7fc401ae  stbx r30, r4, r0
+  0x15e020: 7c0451ae  stbx r0, r4, r10
+  0x15e088: 7fa429ae  stbx r29, r4, r5
+
+== RandomizeAllInterests__8cXPersonFv (2 indexed stores)
+  0x1116c8: 7c1d212e  stwx r0, r29, r4
+  0x1117c0: 7c1d212e  stwx r0, r29, r4
+
+== ReadString__7CTGFileFPci (1 indexed stores)
+  0x54f514: 7c9e01ae  stbx r4, r30, r0
+
+== RebuildColorTable__7cTSFontFv (6 indexed stores)
+  0x4b32d0: 7c05192e  stwx r0, r5, r3
+  0x4b32e0: 7c05192e  stwx r0, r5, r3
+  0x4b3304: 7c06192e  stwx r0, r6, r3
+  0x4b3380: 7c05192e  stwx r0, r5, r3
+  0x4b3390: 7c05192e  stwx r0, r5, r3
+  0x4b33b4: 7c06192e  stwx r0, r6, r3
+
+== ReconMark__11ReconBufferFv (1 indexed stores)
+  0x11e5dc: 7ca4012e  stwx r5, r4, r0
+
+== ReconSlots__8cXObjectFP11ReconBufferl (1 indexed stores)
+  0x0c5934: 7c83032e  sthx r4, r3, r0
+
+== RedoSelf__12WallUndoableFv (1 indexed stores)
+  0x19c8f0: 7ca301ae  stbx r5, r3, r0
+
+== RefreshBreakpoints__8BehaviorFs (1 indexed stores)
+  0x03f1ec: 7c1f1b2e  sthx r0, r31, r3
+
+== RefreshFromMap__4WallFv (2 indexed stores)
+  0x2bd87c: 7c99032e  sthx r4, r25, r0
+  0x2bd92c: 7cd9032e  sthx r6, r25, r0
+
+== Release__22IDirectSoundBuffer_MacFv (1 indexed stores)
+  0x02aafc: 7c64012e  stwx r3, r4, r0
+
+== RemoveCarrotTokens__FPc (1 indexed stores)
+  0x224b6c: 7c0439ae  stbx r0, r4, r7
+
+== RemoveFromVacation__12NeighborhoodFii (1 indexed stores)
+  0x0b1604: 7ce6032e  sthx r7, r6, r0
+
+== RemoveNeighbor__12NeighborhoodFP8Neighbor (1 indexed stores)
+  0x0b49cc: 7c83012e  stwx r4, r3, r0
+
+== RemoveObject__12ObjectModuleFP8cXObject (1 indexed stores)
+  0x0e470c: 7c04192e  stwx r0, r4, r3
+
+== RemovePool__10cPoolLayerFRC7CTilePt (2 indexed stores)
+  0x118dec: 7c0519ae  stbx r0, r5, r3
+  0x118e88: 7c0419ae  stbx r0, r4, r3
+
+== RemoveWater__11cWaterLayerFRC7CTilePt (2 indexed stores)
+  0x15906c: 7c0519ae  stbx r0, r5, r3
+  0x159108: 7c0419ae  stbx r0, r4, r3
+
+== Reset__8cXObjectFUc (2 indexed stores)
+  0x0ca8c0: 7c03212e  stwx r0, r3, r4
+  0x0ca8d0: 7c03212e  stwx r0, r3, r4
+
+== SaveAllPersistentDataForMatterTransferance__12NeighborhoodFv (1 indexed stores)
+  0x0b4774: 7c9b032e  sthx r4, r27, r0
+
+== SavePersistentData__12NeighborhoodFP8cXPerson (1 indexed stores)
+  0x0b4880: 7c9f032e  sthx r4, r31, r0
+
+== SaveUsageMap__15WallGraphicsMgrFP8iResFileP11cFixedWorld (1 indexed stores)
+  0x1f5b88: 7c1f19ae  stbx r0, r31, r3
+
+== SaveUsageMap__16FloorGraphicsMgrFP8iResFileP11cFixedWorld (9 indexed stores)
+  0x1ad3d0: 7c1f91ae  stbx r0, r31, r18
+  0x1ad418: 7c1f59ae  stbx r0, r31, r11
+  0x1ad45c: 7c1f51ae  stbx r0, r31, r10
+  0x1ad478: 7c1f39ae  stbx r0, r31, r7
+  0x1ad4e0: 7c1f61ae  stbx r0, r31, r12
+  0x1ad524: 7c1f59ae  stbx r0, r31, r11
+  0x1ad548: 7c1f41ae  stbx r0, r31, r8
+  0x1ad55c: 7c1f39ae  stbx r0, r31, r7
+  0x1ad5c0: 7c1f39ae  stbx r0, r31, r7
+
+== Save__11cFixedWorldFP8iResFilel (1 indexed stores)
+  0x163a6c: 7c7101ae  stbx r3, r17, r0
+
+== ScaleBitmap__FffP9cTSBufferPC7cTSRectb (4 indexed stores)
+  0x1ea18c: 7ca3212e  stwx r5, r3, r4
+  0x1ea7e8: 7c83292e  stwx r4, r3, r5
+  0x1eaa48: 7c1cc1ae  stbx r0, r28, r24
+  0x1eab04: 7c1cc1ae  stbx r0, r28, r24
+
+== SetColor16__10ColorChunkFiUs (1 indexed stores)
+  0x1bcc24: 7ca3032e  sthx r5, r3, r0
+
+== SetColor16__14WideColorChunkFiUs (1 indexed stores)
+  0x1a8938: 7ca3332e  sthx r5, r3, r6
+
+== SetColor__10cTSPaletteFlRCUl (3 indexed stores)
+  0x495fb4: 7ca4032e  sthx r5, r4, r0
+  0x495fcc: 7c0439ae  stbx r0, r4, r7
+  0x49600c: 7ca3012e  stwx r5, r3, r0
+
+== SetFlags__15cRotatableWorldF7CTilePtUc (1 indexed stores)
+  0x1917cc: 7ca301ae  stbx r5, r3, r0
+
+== SetFloor__15cRotatableWorldF7CTilePt12FloorPattern (1 indexed stores)
+  0x175e70: 7ca3032e  sthx r5, r3, r0
+
+== SetGrass__15cRotatableWorldF7CTilePtSc (1 indexed stores)
+  0x1911fc: 7ca301ae  stbx r5, r3, r0
+
+== SetHiliteArea__9cDirtToolFRC7CTilePtRC7CTilePtb (1 indexed stores)
+  0x18e8b8: 7f6301ae  stbx r27, r3, r0
+
+== SetLotBorders__Fiiii (1 indexed stores)
+  0x159d10: 7ce419ae  stbx r7, r4, r3
+
+== SetMultiObjectData__10cXMTObjectFii (1 indexed stores)
+  0x0a2734: 7ca4032e  sthx r5, r4, r0
+
+== SetName__14RsrcDescriptorFPCc (1 indexed stores)
+  0x3ee430: 7c0329ae  stbx r0, r3, r5
+
+== SetOverheadLights__4RoomFb (18 indexed stores)
+  0x124bb0: 7c1a41ae  stbx r0, r26, r8
+  0x124be8: 7c1bd1ae  stbx r0, r27, r26
+  0x124c14: 7c1a19ae  stbx r0, r26, r3
+  0x124c40: 7c0419ae  stbx r0, r4, r3
+  0x124c6c: 7c0419ae  stbx r0, r4, r3
+  0x124c98: 7c0419ae  stbx r0, r4, r3
+  0x124cc4: 7c0419ae  stbx r0, r4, r3
+  0x124cf0: 7c0419ae  stbx r0, r4, r3
+  0x124d44: 7cc401ae  stbx r6, r4, r0
+  0x124e08: 7d7bd1ae  stbx r11, r27, r26
+  0x124e3c: 7d7cd9ae  stbx r11, r28, r27
+  0x124e68: 7d7b19ae  stbx r11, r27, r3
+  0x124e94: 7d6419ae  stbx r11, r4, r3
+  0x124ec0: 7d6419ae  stbx r11, r4, r3
+  0x124eec: 7d6419ae  stbx r11, r4, r3
+  0x124f18: 7d6419ae  stbx r11, r4, r3
+  0x124f44: 7d6419ae  stbx r11, r4, r3
+  0x124f94: 7d6401ae  stbx r11, r4, r0
+
+== SetPackedAlt__15cRotatableWorldFRC7CTilePt9PackedAlt (12 indexed stores)
+  0x162060: 7cc501ae  stbx r6, r5, r0
+  0x16208c: 7cc501ae  stbx r6, r5, r0
+  0x1620b4: 7ca401ae  stbx r5, r4, r0
+  0x1620e0: 7cc501ae  stbx r6, r5, r0
+  0x16210c: 7cc501ae  stbx r6, r5, r0
+  0x162134: 7ca401ae  stbx r5, r4, r0
+  0x162160: 7cc501ae  stbx r6, r5, r0
+  0x16218c: 7cc501ae  stbx r6, r5, r0
+  0x1621b8: 7ca401ae  stbx r5, r4, r0
+  0x1621e8: 7cc501ae  stbx r6, r5, r0
+  0x162218: 7cc501ae  stbx r6, r5, r0
+  0x162244: 7ca401ae  stbx r5, r4, r0
+
+== SetPalette__7PalWrapFP15PaletteResource (3 indexed stores)
+  0x1e62c4: 7ca439ae  stbx r5, r4, r7
+  0x1e62d0: 7ca419ae  stbx r5, r4, r3
+  0x1e62e0: 7c8301ae  stbx r4, r3, r0
+
+== SetPalette__7PalWrapFP15tagPALETTEENTRYb (10 indexed stores)
+  0x1e6a34: 7c8301ae  stbx r4, r3, r0
+  0x1e6a48: 7c8301ae  stbx r4, r3, r0
+  0x1e6ab4: 7c0321ae  stbx r0, r3, r4
+  0x1e6b30: 7c03a9ae  stbx r0, r3, r21
+  0x1e6b5c: 7c03c1ae  stbx r0, r3, r24
+  0x1e6b88: 7c03c9ae  stbx r0, r3, r25
+  0x1e6bb4: 7c03d9ae  stbx r0, r3, r27
+  0x1e6be0: 7c0359ae  stbx r0, r3, r11
+  0x1e6c34: 7c0339ae  stbx r0, r3, r7
+  0x1e6c60: 7c0331ae  stbx r0, r3, r6
+
+== SetRegister__12cRegisterSetFll (3 indexed stores)
+  0x30d8ec: 7ca3012e  stwx r5, r3, r0
+  0x30d904: 7ca3012e  stwx r5, r3, r0
+  0x30d91c: 7ca3012e  stwx r5, r3, r0
+
+== SetRotation__11HouseViewerFibb (1 indexed stores)
+  0x1d7710: 7c03432e  sthx r0, r3, r8
+
+== SetSimFlag__12ObjectModuleFiQ212ObjectModule7SimFlagb (2 indexed stores)
+  0x0e1ecc: 7c87412e  stwx r4, r7, r8
+  0x0e1ee0: 7c03412e  stwx r0, r3, r8
+
+== SetSize__11cFixedWorldFi (14 indexed stores)
+  0x1644c0: 7c04b9ae  stbx r0, r4, r23
+  0x1644e4: 7c83b9ae  stbx r4, r3, r23
+  0x164570: 7c03c9ae  stbx r0, r3, r25
+  0x1645e4: 7c04e1ae  stbx r0, r4, r28
+  0x1645fc: 7c03e1ae  stbx r0, r3, r28
+  0x164634: 7c9a032e  sthx r4, r26, r0
+  0x164650: 7c9a032e  sthx r4, r26, r0
+  0x164690: 7c9a032e  sthx r4, r26, r0
+  0x1646b0: 7c83e1ae  stbx r4, r3, r28
+  0x1646fc: 7c03d1ae  stbx r0, r3, r26
+  0x1647b0: 7c9a032e  sthx r4, r26, r0
+  0x1647cc: 7c9a032e  sthx r4, r26, r0
+  0x16480c: 7c9a032e  sthx r4, r26, r0
+  0x16487c: 7c03d1ae  stbx r0, r3, r26
+
+== SetString__13StringSetBaseFiPCcc (1 indexed stores)
+  0x144fb8: 7c1ff1ae  stbx r0, r31, r30
+
+== SetString__14StringSetMultiFiPCcc (1 indexed stores)
+  0x142d78: 7c1ff1ae  stbx r0, r31, r30
+
+== SetTargetGrass__15cRotatableWorldF7CTilePtSc (1 indexed stores)
+  0x1912bc: 7ca301ae  stbx r5, r3, r0
+
+== SetTileObjectID__15cRotatableWorldF7CTilePts (1 indexed stores)
+  0x1cc6b0: 7ca3032e  sthx r5, r3, r0
+
+== SetUserPath__12ObjectFolderFRC16StackString<260> (1 indexed stores)
+  0x0d7384: 7c0521ae  stbx r0, r5, r4
+
+== SetWall__11cFixedWorldFRC7CTilePt9TileWalls (6 indexed stores)
+  0x1613a8: 7c03f9ae  stbx r0, r3, r31
+  0x1614f8: 7c0419ae  stbx r0, r4, r3
+  0x161878: 7d2731ae  stbx r9, r7, r6
+  0x1618d0: 7d2731ae  stbx r9, r7, r6
+  0x16192c: 7d4839ae  stbx r10, r8, r7
+  0x161974: 7ca301ae  stbx r5, r3, r0
+
+== SetWindowLongA__8HWND_MacFil (1 indexed stores)
+  0x02e534: 7fc4f92e  stwx r30, r4, r31
+
+== SetZodiacSign__FPss (5 indexed stores)
+  0x1720c0: 7c83032e  sthx r4, r3, r0
+  0x1720e0: 7c83032e  sthx r4, r3, r0
+  0x172100: 7c83032e  sthx r4, r3, r0
+  0x172120: 7c83032e  sthx r4, r3, r0
+  0x172140: 7c83032e  sthx r4, r3, r0
+
+== Set__5PropsFPCcPCc (1 indexed stores)
+  0x374650: 7c1de1ae  stbx r0, r29, r28
+
+== SetupPickMonitorPane__FP16OpaqueControlRefUl (1 indexed stores)
+  0x57ae68: 7c9d012e  stwx r4, r29, r0
+
+== SetupShadowMgrs__9cRendererFPP14FloorShadowMgr (1 indexed stores)
+  0x1faf1c: 7f5df92e  stwx r26, r29, r31
+
+== Shutdown__11cWinCatalogFv (1 indexed stores)
+  0x26b390: 7c03d92e  stwx r0, r3, r27
+
+== Spr2DecoderFlip555__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCs (3 indexed stores)
+  0x1ece70: 7d2bbb2e  sthx r9, r11, r23
+  0x1ece80: 7cacbb2e  sthx r5, r12, r23
+  0x1ecf34: 7f8c4b2e  sthx r28, r12, r9
+
+== Spr2DecoderFlip565__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCs (3 indexed stores)
+  0x1edeb0: 7d3e532e  sthx r9, r30, r10
+  0x1edec0: 7c1d532e  sthx r0, r29, r10
+  0x1edf8c: 7c1d532e  sthx r0, r29, r10
+
+== Spr2DecoderFlipClip555__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (3 indexed stores)
+  0x1eca6c: 7e178b2e  sthx r16, r23, r17
+  0x1eca7c: 7df68b2e  sthx r15, r22, r17
+  0x1ecbe4: 7c16632e  sthx r0, r22, r12
+
+== Spr2DecoderFlipClip565__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (3 indexed stores)
+  0x1eda8c: 7e178b2e  sthx r16, r23, r17
+  0x1eda9c: 7df68b2e  sthx r15, r22, r17
+  0x1edc1c: 7c16632e  sthx r0, r22, r12
+
+== Spr2DecoderNoAlphaFlipClip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (2 indexed stores)
+  0x1ebe4c: 7ebba32e  sthx r21, r27, r20
+  0x1ebe5c: 7edaa32e  sthx r22, r26, r20
+
+== Spr2DecoderNoAlphaFlip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCs (2 indexed stores)
+  0x1ec0f0: 7fa9e32e  sthx r29, r9, r28
+  0x1ec100: 7fcae32e  sthx r30, r10, r28
+
+== TSDrawChar__7cTSFontFP9cTSBufferllUlRC7cTSRectb (9 indexed stores)
+  0x4b39c4: 7dfa732e  sthx r15, r26, r14
+  0x4b39e0: 7c1a732e  sthx r0, r26, r14
+  0x4b39fc: 7c1a8b2e  sthx r0, r26, r17
+  0x4b3a14: 7dfa732e  sthx r15, r26, r14
+  0x4b3a20: 7dfa032e  sthx r15, r26, r0
+  0x4b3a28: 7c1a8b2e  sthx r0, r26, r17
+  0x4b3a30: 7c1a932e  sthx r0, r26, r18
+  0x4b3a38: 7c1a732e  sthx r0, r26, r14
+  0x4b3a64: 7dda032e  sthx r14, r26, r0
+
+== TSOnCommand__16cTSMainWindowW95FUlUl (1 indexed stores)
+  0x4d5a44: 7c04f9ae  stbx r0, r4, r31
+
+== TSOnCommand__19cWinDesignCharacterFUlUl (3 indexed stores)
+  0x2cd4ac: 7c03c1ae  stbx r0, r3, r24
+  0x2cd50c: 7c03c9ae  stbx r0, r3, r25
+  0x2cd580: 7f23032e  sthx r25, r3, r0
+
+== TSPaint__11cWinMemViewFb (1 indexed stores)
+  0x27c3cc: 7ca3032e  sthx r5, r3, r0
+
+== TSPaint__14cWinStudiotownFb (3 indexed stores)
+  0x47a818: 7c05192e  stwx r0, r5, r3
+  0x47a848: 7c05192e  stwx r0, r5, r3
+  0x47a878: 7c05192e  stwx r0, r5, r3
+
+== TickAllObjects__10cSimulatorFv (2 indexed stores)
+  0x139528: 7c65312e  stwx r3, r5, r6
+  0x139538: 7c04312e  stwx r0, r4, r6
+
+== TruncPString (1 indexed stores)
+  0x410b3c: 7c1d19ae  stbx r0, r29, r3
+
+== TryAnimate__8AnimatorFP9StackElemPC15AnimateNewParam (2 indexed stores)
+  0x480408: 7f23032e  sthx r25, r3, r0
+  0x480590: 7f23032e  sthx r25, r3, r0
+
+== TryAnimate__9SAnimatorFP9StackElemPC15AnimateNewParam (2 indexed stores)
+  0x36023c: 7ee3032e  sthx r23, r3, r0
+  0x3603d4: 7ee3032e  sthx r23, r3, r0
+
+== TryElement__8cXObjectFP9StackElemP12BehaviorNode (1 indexed stores)
+  0x0f06f0: 7c04192e  stwx r0, r4, r3
+
+== TryGenericSimCall__8cXObjectFP9StackElemP10XPrimParam (1 indexed stores)
+  0x0f3f74: 7cdf032e  sthx r6, r31, r0
+
+== TryIdleForInput__8cXPersonFP9StackElemP10XPrimParam (2 indexed stores)
+  0x10a158: 7c1efb2e  sthx r0, r30, r31
+  0x10a430: 7c1efb2e  sthx r0, r30, r31
+
+== TryIdle__8cXObjectFP9StackElemP10XPrimParam (7 indexed stores)
+  0x0f144c: 7c033b2e  sthx r0, r3, r7
+  0x0f146c: 7c04292e  stwx r0, r4, r5
+  0x0f147c: 7c04292e  stwx r0, r4, r5
+  0x0f1490: 7c033b2e  sthx r0, r3, r7
+  0x0f14fc: 7c033b2e  sthx r0, r3, r7
+  0x0f1530: 7c85392e  stwx r4, r5, r7
+  0x0f1540: 7c05392e  stwx r0, r5, r7
+
+== TryRelationship__8cXObjectFP9StackElemP10XPrimParam (1 indexed stores)
+  0x0f76c4: 7c76ab2e  sthx r3, r22, r21
+
+== UndoOne__13FloorUndoableFR11FloorChange (2 indexed stores)
+  0x17ca20: 7ca3032e  sthx r5, r3, r0
+  0x17ca84: 7cc301ae  stbx r6, r3, r0
+
+== UndoRedo__15TerrainUndoableFv (1 indexed stores)
+  0x1902d0: 7ca301ae  stbx r5, r3, r0
+
+== UndoSelf__12WallUndoableFv (1 indexed stores)
+  0x19cc70: 7ca301ae  stbx r5, r3, r0
+
+== Undress__8AnimatorFRC9CTGString (1 indexed stores)
+  0x47f584: 7ca4e12e  stwx r5, r4, r28
+
+== Undress__9SAnimatorFRC9CTGString (1 indexed stores)
+  0x35ada8: 7ca4e92e  stwx r5, r4, r29
+
+== UpdatePlayerInfo__12cFreshPlayerFv (1 indexed stores)
+  0x300dd8: 7c0639ae  stbx r0, r6, r7
+
+== UpdateViewFromCPState__11cWinCatalogFP7CPState (4 indexed stores)
+  0x267ca4: 7c03912e  stwx r0, r3, r18
+  0x268204: 7ea3c92e  stwx r21, r3, r25
+  0x2682a8: 7ca4192e  stwx r5, r4, r3
+  0x268304: 7c72992e  stwx r3, r18, r19
+
+== WallBlitFB__FiiiiP12DecompressorP12DecompressorPUsiPUsiP7tagRECTPCUsP11RenderParami (1 indexed stores)
+  0x1f5298: 7d4939ae  stbx r10, r9, r7
+
+== WallBlit__FiiiiP12DecompressorP12DecompressorPUsiPUsiP7tagRECTPCUsP11RenderParami (1 indexed stores)
+  0x1f5558: 7d4939ae  stbx r10, r9, r7
+
+== ZSpriteBlitFlip__FiiiiP12DecompressorPCUsP12DecompressorPUsiPUsiP7tagRECTP11RenderParam (1 indexed stores)
+  0x204528: 7ce849ae  stbx r7, r8, r9
+
+== ZSpriteBlit__FiiiiP12DecompressorPCUsP12DecompressorPUsiPUsiP7tagRECTP11RenderParam (1 indexed stores)
+  0x2047e0: 7cc521ae  stbx r6, r5, r4
+
+== __as__10cPoolLayerFRC10cPoolLayer (1 indexed stores)
+  0x1193b4: 7c03f9ae  stbx r0, r3, r31
+
+== __as__11cWaterLayerFRC11cWaterLayer (1 indexed stores)
+  0x159574: 7c03f9ae  stbx r0, r3, r31
+
+== __ct__10IniFileKeyFPcl (3 indexed stores)
+  0x58d820: 7c03d9ae  stbx r0, r3, r27
+  0x58d8ec: 7c03e1ae  stbx r0, r3, r28
+  0x58d92c: 7c04f9ae  stbx r0, r4, r31
+
+== __ct__11LightingRigFR13U3DLightGroup (1 indexed stores)
+  0x1dcec0: 7f63e92e  stwx r27, r3, r29
+
+== __ct__12cSoundObjectFl (1 indexed stores)
+  0x30e988: 7ca4312e  stwx r5, r4, r6
+
+== __ct__13MotiveEffectsFP8cXPerson (1 indexed stores)
+  0x09fe10: 7ca3012e  stwx r5, r3, r0
+
+== __ct__14SpriteListInfoFP14PaletteManagerP10HandleNodei10SpriteTypePb (8 indexed stores)
+  0x1efb9c: 7c03212e  stwx r0, r3, r4
+  0x1efbb8: 7c03212e  stwx r0, r3, r4
+  0x1efc60: 7c06192e  stwx r0, r6, r3
+  0x1efc78: 7c06192e  stwx r0, r6, r3
+  0x1efc94: 7c06192e  stwx r0, r6, r3
+  0x1efcb0: 7c06192e  stwx r0, r6, r3
+  0x1efcd0: 7c06192e  stwx r0, r6, r3
+  0x1efd1c: 7c03212e  stwx r0, r3, r4
+
+== __ct__19ObjectTypeAttrBlockFli (1 indexed stores)
+  0x0fc5c4: 7c832b2e  sthx r4, r3, r5
+
+== __ct__6cTrackFlR9cTSStringlllllll (2 indexed stores)
+  0x315088: 7c83292e  stwx r4, r3, r5
+  0x3150f0: 7c83292e  stwx r4, r3, r5
+
+== __ct__8FileIterFRC16StackString<260>PCc (1 indexed stores)
+  0x22a10c: 7c0521ae  stbx r0, r5, r4
+
+== __ct__8HWND_MacFP13OpaqueGrafPtrbP12tagWNDCLASSA (3 indexed stores)
+  0x02e6c8: 7f84d92e  stwx r28, r4, r27
+  0x02e6ec: 7f84d92e  stwx r28, r4, r27
+  0x02e70c: 7f63e12e  stwx r27, r3, r28
+
+== __ct__8RsrcSiteFPCc (2 indexed stores)
+  0x3f74c4: 7c1ae9ae  stbx r0, r26, r29
+  0x3f74f0: 7c04e9ae  stbx r0, r4, r29
+
+== __dt__11RoomManagerFv (1 indexed stores)
+  0x129538: 7f63f92e  stwx r27, r3, r31
+
+== __dt__8AnimatorFv (1 indexed stores)
+  0x4816a4: 7c03e92e  stwx r0, r3, r29
+
+== __dt__9SAnimatorFv (2 indexed stores)
+  0x36227c: 7f83e92e  stwx r28, r3, r29
+  0x3622b8: 7f83e92e  stwx r28, r3, r29
+
+== __pp__8FileIterFv (1 indexed stores)
+  0x229f40: 7c0521ae  stbx r0, r5, r4
+
+== __sinit_:Win32INI_cp (35 indexed stores)
+  0x58e590: 7c0431ae  stbx r0, r4, r6
+  0x591e60: 7c7d012e  stwx r3, r29, r0
+  0x591e8c: 7cdd012e  stwx r6, r29, r0
+  0x591f6c: 7cde012e  stwx r6, r30, r0
+  0x592088: 7c04292e  stwx r0, r4, r5
+  0x5920a8: 7c03292e  stwx r0, r3, r5
+  0x5920bc: 7c03292e  stwx r0, r3, r5
+  0x59212c: 7c03212e  stwx r0, r3, r4
+  0x592138: 7c83012e  stwx r4, r3, r0
+  0x592234: 7ca6012e  stwx r5, r6, r0
+  0x5922a8: 7cc3012e  stwx r6, r3, r0
+  0x5922c0: 7c03312e  stwx r0, r3, r6
+  0x5922d0: 7c03312e  stwx r0, r3, r6
+  0x594a9c: 7c1f39ae  stbx r0, r31, r7
+  0x594aa8: 7c1f39ae  stbx r0, r31, r7
+  0x596124: 7f57c1ae  stbx r26, r23, r24
+  0x596768: 7c1be9ae  stbx r0, r27, r29
+  0x59a294: 7c9e01ae  stbx r4, r30, r0
+  0x59aa8c: 7c6729ae  stbx r3, r7, r5
+  0x59aac8: 7c0521ae  stbx r0, r5, r4
+  0x59b1f0: 7e83c9ae  stbx r20, r3, r25
+  0x59b1fc: 7e83db2e  sthx r20, r3, r27
+  0x59b208: 7e83712e  stwx r20, r3, r14
+  0x59b744: 7ea3c9ae  stbx r21, r3, r25
+  0x59b750: 7ea3db2e  sthx r21, r3, r27
+  0x59b75c: 7ea3712e  stwx r21, r3, r14
+  0x59cfa4: 7c0531ae  stbx r0, r5, r6
+  0x59d5cc: 7c0389ae  stbx r0, r3, r17
+  0x59d790: 7c8301ae  stbx r4, r3, r0
+  0x59d860: 7c8301ae  stbx r4, r3, r0
+  0x59dc24: 7c7c01ae  stbx r3, r28, r0
+  0x59dd28: 7c7c01ae  stbx r3, r28, r0
+  0x59e038: 7c0321ae  stbx r0, r3, r4
+  0x59f4e4: 7c7a01ae  stbx r3, r26, r0
+  0x59f764: 7c1a29ae  stbx r0, r26, r5
+
+== _findfirst (1 indexed stores)
+  0x02dd88: 7c8301ae  stbx r4, r3, r0
+
+== _splitpath (4 indexed stores)
+  0x016b24: 7c1ad9ae  stbx r0, r26, r27
+  0x016b80: 7c1ed9ae  stbx r0, r30, r27
+  0x016bb0: 7c1fe1ae  stbx r0, r31, r28
+  0x016be4: 7c1ee9ae  stbx r0, r30, r29
+
+== append__12StringBufferFPCci (1 indexed stores)
+  0x1422fc: 7c7e01ae  stbx r3, r30, r0
+
+== bpt_Spr2Decoder555__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCs (40 indexed stores)
+  0x44eb40: 7d0e4b2e  sthx r8, r14, r9
+  0x44eb50: 7c174b2e  sthx r0, r23, r9
+  0x44eb8c: 7d0e4b2e  sthx r8, r14, r9
+  0x44eba0: 7c174b2e  sthx r0, r23, r9
+  0x44ec0c: 7cee332e  sthx r7, r14, r6
+  0x44ec20: 7cb7332e  sthx r5, r23, r6
+  0x44ec44: 7ce5012e  stwx r7, r5, r0
+  0x44f748: 7c1dab2e  sthx r0, r29, r21
+  0x44f760: 7c7cab2e  sthx r3, r28, r21
+  0x44f964: 7cdd232e  sthx r6, r29, r4
+  0x44f980: 7d1d3b2e  sthx r8, r29, r7
+  0x44f99c: 7d3d332e  sthx r9, r29, r6
+  0x44f9b8: 7d3d432e  sthx r9, r29, r8
+  0x44f9d0: 7d1d3b2e  sthx r8, r29, r7
+  0x44f9e0: 7cfd332e  sthx r7, r29, r6
+  0x44f9e8: 7cdd232e  sthx r6, r29, r4
+  0x44f9f4: 7c9d032e  sthx r4, r29, r0
+  0x44fa30: 7c7c032e  sthx r3, r28, r0
+  0x44fa8c: 7c1d1b2e  sthx r0, r29, r3
+  0x44fa9c: 7c1c1b2e  sthx r0, r28, r3
+  0x44fadc: 7cdd2b2e  sthx r6, r29, r5
+  0x44faf8: 7d1d3b2e  sthx r8, r29, r7
+  0x44fb14: 7d3d332e  sthx r9, r29, r6
+  0x44fb30: 7d3d432e  sthx r9, r29, r8
+  0x44fb48: 7d1d3b2e  sthx r8, r29, r7
+  0x44fb58: 7cfd332e  sthx r7, r29, r6
+  0x44fb60: 7cdd2b2e  sthx r6, r29, r5
+  0x44fb6c: 7cbd032e  sthx r5, r29, r0
+  0x44fba8: 7d1c3b2e  sthx r8, r28, r7
+  0x44fbd8: 7d7c532e  sthx r11, r28, r10
+  0x44fc04: 7d5c4b2e  sthx r10, r28, r9
+  0x44fc20: 7d3c432e  sthx r9, r28, r8
+  0x44fc30: 7d1c3b2e  sthx r8, r28, r7
+  0x44fc40: 7cfc332e  sthx r7, r28, r6
+  0x44fc50: 7cdc2b2e  sthx r6, r28, r5
+  0x44fc64: 7cbc032e  sthx r5, r28, r0
+  0x44ffe0: 7c1dab2e  sthx r0, r29, r21
+  0x44fff8: 7c7cab2e  sthx r3, r28, r21
+  0x450054: 7c1d1b2e  sthx r0, r29, r3
+  0x450064: 7c1c1b2e  sthx r0, r28, r3
+
+== bpt_Spr2Decoder565__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCs (40 indexed stores)
+  0x4554b0: 7d0e4b2e  sthx r8, r14, r9
+  0x4554c0: 7c174b2e  sthx r0, r23, r9
+  0x4554fc: 7d0e4b2e  sthx r8, r14, r9
+  0x455510: 7c174b2e  sthx r0, r23, r9
+  0x45557c: 7cee332e  sthx r7, r14, r6
+  0x455590: 7cb7332e  sthx r5, r23, r6
+  0x4555b4: 7ce5012e  stwx r7, r5, r0
+  0x4560b8: 7c1dab2e  sthx r0, r29, r21
+  0x4560d0: 7c7cab2e  sthx r3, r28, r21
+  0x4562d4: 7cdd232e  sthx r6, r29, r4
+  0x4562f0: 7d1d3b2e  sthx r8, r29, r7
+  0x45630c: 7d3d332e  sthx r9, r29, r6
+  0x456328: 7d3d432e  sthx r9, r29, r8
+  0x456340: 7d1d3b2e  sthx r8, r29, r7
+  0x456350: 7cfd332e  sthx r7, r29, r6
+  0x456358: 7cdd232e  sthx r6, r29, r4
+  0x456364: 7c9d032e  sthx r4, r29, r0
+  0x4563a0: 7c7c032e  sthx r3, r28, r0
+  0x4563fc: 7c1d1b2e  sthx r0, r29, r3
+  0x45640c: 7c1c1b2e  sthx r0, r28, r3
+  0x45644c: 7cdd2b2e  sthx r6, r29, r5
+  0x456468: 7d1d3b2e  sthx r8, r29, r7
+  0x456484: 7d3d332e  sthx r9, r29, r6
+  0x4564a0: 7d3d432e  sthx r9, r29, r8
+  0x4564b8: 7d1d3b2e  sthx r8, r29, r7
+  0x4564c8: 7cfd332e  sthx r7, r29, r6
+  0x4564d0: 7cdd2b2e  sthx r6, r29, r5
+  0x4564dc: 7cbd032e  sthx r5, r29, r0
+  0x456518: 7d1c3b2e  sthx r8, r28, r7
+  0x456548: 7d7c532e  sthx r11, r28, r10
+  0x456574: 7d5c4b2e  sthx r10, r28, r9
+  0x456590: 7d3c432e  sthx r9, r28, r8
+  0x4565a0: 7d1c3b2e  sthx r8, r28, r7
+  0x4565b0: 7cfc332e  sthx r7, r28, r6
+  0x4565c0: 7cdc2b2e  sthx r6, r28, r5
+  0x4565d4: 7cbc032e  sthx r5, r28, r0
+  0x456950: 7c1dab2e  sthx r0, r29, r21
+  0x456968: 7c7cab2e  sthx r3, r28, r21
+  0x4569c4: 7c1d1b2e  sthx r0, r29, r3
+  0x4569d4: 7c1c1b2e  sthx r0, r28, r3
+
+== bpt_Spr2DecoderAlphaChannelClip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (7 indexed stores)
+  0x44752c: 7d1e4b2e  sthx r8, r30, r9
+  0x447540: 7c1d4b2e  sthx r0, r29, r9
+  0x44757c: 7d1e4b2e  sthx r8, r30, r9
+  0x447590: 7c1d4b2e  sthx r0, r29, r9
+  0x4475fc: 7d1e2b2e  sthx r8, r30, r5
+  0x447610: 7cdd2b2e  sthx r6, r29, r5
+  0x44762c: 7cda012e  stwx r6, r26, r0
+
+== bpt_Spr2DecoderAlphaChannelFlipClip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (3 indexed stores)
+  0x446608: 7c73232e  sthx r3, r19, r4
+  0x446618: 7c12232e  sthx r0, r18, r4
+  0x4466dc: 7d3a012e  stwx r9, r26, r0
+
+== bpt_Spr2DecoderAlphaChannelFlip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCs (3 indexed stores)
+  0x446cd4: 7c72232e  sthx r3, r18, r4
+  0x446ce4: 7c11232e  sthx r0, r17, r4
+  0x446da0: 7d39012e  stwx r9, r25, r0
+
+== bpt_Spr2DecoderClip555__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (40 indexed stores)
+  0x44d1e8: 7d0e4b2e  sthx r8, r14, r9
+  0x44d1f8: 7c174b2e  sthx r0, r23, r9
+  0x44d234: 7d0e4b2e  sthx r8, r14, r9
+  0x44d248: 7c174b2e  sthx r0, r23, r9
+  0x44d2b4: 7cee332e  sthx r7, r14, r6
+  0x44d2c8: 7cb7332e  sthx r5, r23, r6
+  0x44d2ec: 7ce5012e  stwx r7, r5, r0
+  0x44def0: 7c1dab2e  sthx r0, r29, r21
+  0x44df08: 7c7cab2e  sthx r3, r28, r21
+  0x44e10c: 7cdd232e  sthx r6, r29, r4
+  0x44e128: 7d1d3b2e  sthx r8, r29, r7
+  0x44e144: 7d3d332e  sthx r9, r29, r6
+  0x44e160: 7d3d432e  sthx r9, r29, r8
+  0x44e178: 7d1d3b2e  sthx r8, r29, r7
+  0x44e188: 7cfd332e  sthx r7, r29, r6
+  0x44e190: 7cdd232e  sthx r6, r29, r4
+  0x44e19c: 7c9d032e  sthx r4, r29, r0
+  0x44e1d8: 7c7c032e  sthx r3, r28, r0
+  0x44e234: 7c1d1b2e  sthx r0, r29, r3
+  0x44e244: 7c1c1b2e  sthx r0, r28, r3
+  0x44e284: 7cdd2b2e  sthx r6, r29, r5
+  0x44e2a0: 7d1d3b2e  sthx r8, r29, r7
+  0x44e2bc: 7d3d332e  sthx r9, r29, r6
+  0x44e2d8: 7d3d432e  sthx r9, r29, r8
+  0x44e2f0: 7d1d3b2e  sthx r8, r29, r7
+  0x44e300: 7cfd332e  sthx r7, r29, r6
+  0x44e308: 7cdd2b2e  sthx r6, r29, r5
+  0x44e314: 7cbd032e  sthx r5, r29, r0
+  0x44e350: 7d1c3b2e  sthx r8, r28, r7
+  0x44e380: 7d7c532e  sthx r11, r28, r10
+  0x44e3ac: 7d5c4b2e  sthx r10, r28, r9
+  0x44e3c8: 7d3c432e  sthx r9, r28, r8
+  0x44e3d8: 7d1c3b2e  sthx r8, r28, r7
+  0x44e3e8: 7cfc332e  sthx r7, r28, r6
+  0x44e3f8: 7cdc2b2e  sthx r6, r28, r5
+  0x44e40c: 7cbc032e  sthx r5, r28, r0
+  0x44e788: 7c1dab2e  sthx r0, r29, r21
+  0x44e7a0: 7c7cab2e  sthx r3, r28, r21
+  0x44e7fc: 7c1d1b2e  sthx r0, r29, r3
+  0x44e80c: 7c1c1b2e  sthx r0, r28, r3
+
+== bpt_Spr2DecoderClip565__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (40 indexed stores)
+  0x453b58: 7d0e4b2e  sthx r8, r14, r9
+  0x453b68: 7c174b2e  sthx r0, r23, r9
+  0x453ba4: 7d0e4b2e  sthx r8, r14, r9
+  0x453bb8: 7c174b2e  sthx r0, r23, r9
+  0x453c24: 7cee332e  sthx r7, r14, r6
+  0x453c38: 7cb7332e  sthx r5, r23, r6
+  0x453c5c: 7ce5012e  stwx r7, r5, r0
+  0x454860: 7c1dab2e  sthx r0, r29, r21
+  0x454878: 7c7cab2e  sthx r3, r28, r21
+  0x454a7c: 7cdd232e  sthx r6, r29, r4
+  0x454a98: 7d1d3b2e  sthx r8, r29, r7
+  0x454ab4: 7d3d332e  sthx r9, r29, r6
+  0x454ad0: 7d3d432e  sthx r9, r29, r8
+  0x454ae8: 7d1d3b2e  sthx r8, r29, r7
+  0x454af8: 7cfd332e  sthx r7, r29, r6
+  0x454b00: 7cdd232e  sthx r6, r29, r4
+  0x454b0c: 7c9d032e  sthx r4, r29, r0
+  0x454b48: 7c7c032e  sthx r3, r28, r0
+  0x454ba4: 7c1d1b2e  sthx r0, r29, r3
+  0x454bb4: 7c1c1b2e  sthx r0, r28, r3
+  0x454bf4: 7cdd2b2e  sthx r6, r29, r5
+  0x454c10: 7d1d3b2e  sthx r8, r29, r7
+  0x454c2c: 7d3d332e  sthx r9, r29, r6
+  0x454c48: 7d3d432e  sthx r9, r29, r8
+  0x454c60: 7d1d3b2e  sthx r8, r29, r7
+  0x454c70: 7cfd332e  sthx r7, r29, r6
+  0x454c78: 7cdd2b2e  sthx r6, r29, r5
+  0x454c84: 7cbd032e  sthx r5, r29, r0
+  0x454cc0: 7d1c3b2e  sthx r8, r28, r7
+  0x454cf0: 7d7c532e  sthx r11, r28, r10
+  0x454d1c: 7d5c4b2e  sthx r10, r28, r9
+  0x454d38: 7d3c432e  sthx r9, r28, r8
+  0x454d48: 7d1c3b2e  sthx r8, r28, r7
+  0x454d58: 7cfc332e  sthx r7, r28, r6
+  0x454d68: 7cdc2b2e  sthx r6, r28, r5
+  0x454d7c: 7cbc032e  sthx r5, r28, r0
+  0x4550f8: 7c1dab2e  sthx r0, r29, r21
+  0x455110: 7c7cab2e  sthx r3, r28, r21
+  0x45516c: 7c1d1b2e  sthx r0, r29, r3
+  0x45517c: 7c1c1b2e  sthx r0, r28, r3
+
+== bpt_Spr2DecoderDepthChannelClip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (7 indexed stores)
+  0x445c5c: 7d1e4b2e  sthx r8, r30, r9
+  0x445c70: 7c1d4b2e  sthx r0, r29, r9
+  0x445cac: 7d1e4b2e  sthx r8, r30, r9
+  0x445cc0: 7c1d4b2e  sthx r0, r29, r9
+  0x445d2c: 7d1e2b2e  sthx r8, r30, r5
+  0x445d40: 7cdd2b2e  sthx r6, r29, r5
+  0x445d5c: 7cda012e  stwx r6, r26, r0
+
+== bpt_Spr2DecoderDepthChannelFlipClip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (3 indexed stores)
+  0x444d38: 7c73232e  sthx r3, r19, r4
+  0x444d48: 7c12232e  sthx r0, r18, r4
+  0x444e0c: 7d3a012e  stwx r9, r26, r0
+
+== bpt_Spr2DecoderDepthChannelFlip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCs (3 indexed stores)
+  0x445404: 7c72232e  sthx r3, r18, r4
+  0x445414: 7c11232e  sthx r0, r17, r4
+  0x4454d0: 7d39012e  stwx r9, r25, r0
+
+== bpt_Spr2DecoderFlip555__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCs (40 indexed stores)
+  0x44b658: 7c7d232e  sthx r3, r29, r4
+  0x44b668: 7c1c232e  sthx r0, r28, r4
+  0x44b734: 7d49012e  stwx r10, r9, r0
+  0x44bd54: 7cfd032e  sthx r7, r29, r0
+  0x44bdb0: 7cdc032e  sthx r6, r28, r0
+  0x44bdc0: 7cfd032e  sthx r7, r29, r0
+  0x44bdd0: 7cdc032e  sthx r6, r28, r0
+  0x44c39c: 7c1db32e  sthx r0, r29, r22
+  0x44c3b4: 7c7cb32e  sthx r3, r28, r22
+  0x44c5e0: 7cdd2b2e  sthx r6, r29, r5
+  0x44c5fc: 7cfd332e  sthx r7, r29, r6
+  0x44c618: 7cfd332e  sthx r7, r29, r6
+  0x44c634: 7cdd2b2e  sthx r6, r29, r5
+  0x44c650: 7d1d3b2e  sthx r8, r29, r7
+  0x44c668: 7cfd332e  sthx r7, r29, r6
+  0x44c67c: 7cdd2b2e  sthx r6, r29, r5
+  0x44c688: 7cbd032e  sthx r5, r29, r0
+  0x44c6d0: 7c7c032e  sthx r3, r28, r0
+  0x44c728: 7c1d1b2e  sthx r0, r29, r3
+  0x44c738: 7c1c1b2e  sthx r0, r28, r3
+  0x44c780: 7cdd2b2e  sthx r6, r29, r5
+  0x44c79c: 7cfd332e  sthx r7, r29, r6
+  0x44c7b8: 7cfd332e  sthx r7, r29, r6
+  0x44c7d4: 7cdd2b2e  sthx r6, r29, r5
+  0x44c7f0: 7d1d3b2e  sthx r8, r29, r7
+  0x44c808: 7cfd332e  sthx r7, r29, r6
+  0x44c81c: 7cdd2b2e  sthx r6, r29, r5
+  0x44c828: 7cbd032e  sthx r5, r29, r0
+  0x44c864: 7cfc332e  sthx r7, r28, r6
+  0x44c894: 7d1c3b2e  sthx r8, r28, r7
+  0x44c8c8: 7d5c4b2e  sthx r10, r28, r9
+  0x44c8f0: 7d3c432e  sthx r9, r28, r8
+  0x44c90c: 7d1c3b2e  sthx r8, r28, r7
+  0x44c91c: 7cfc332e  sthx r7, r28, r6
+  0x44c92c: 7cdc2b2e  sthx r6, r28, r5
+  0x44c940: 7cbc032e  sthx r5, r28, r0
+  0x44cce4: 7c1db32e  sthx r0, r29, r22
+  0x44ccfc: 7c7cb32e  sthx r3, r28, r22
+  0x44cd60: 7c1d1b2e  sthx r0, r29, r3
+  0x44cd70: 7c1c1b2e  sthx r0, r28, r3
+
+== bpt_Spr2DecoderFlip565__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCs (40 indexed stores)
+  0x451fa4: 7c7d232e  sthx r3, r29, r4
+  0x451fb4: 7c1c232e  sthx r0, r28, r4
+  0x45208c: 7d49012e  stwx r10, r9, r0
+  0x4526c4: 7cfd032e  sthx r7, r29, r0
+  0x452720: 7cdc032e  sthx r6, r28, r0
+  0x452730: 7cfd032e  sthx r7, r29, r0
+  0x452740: 7cdc032e  sthx r6, r28, r0
+  0x452d0c: 7c1db32e  sthx r0, r29, r22
+  0x452d24: 7c7cb32e  sthx r3, r28, r22
+  0x452f50: 7cdd232e  sthx r6, r29, r4
+  0x452f6c: 7cfd332e  sthx r7, r29, r6
+  0x452f88: 7cfd332e  sthx r7, r29, r6
+  0x452fa4: 7cdd232e  sthx r6, r29, r4
+  0x452fc0: 7d1d3b2e  sthx r8, r29, r7
+  0x452fd8: 7cfd332e  sthx r7, r29, r6
+  0x452fec: 7cdd232e  sthx r6, r29, r4
+  0x452ff8: 7c9d032e  sthx r4, r29, r0
+  0x453040: 7c7c032e  sthx r3, r28, r0
+  0x453098: 7c1d1b2e  sthx r0, r29, r3
+  0x4530a8: 7c1c1b2e  sthx r0, r28, r3
+  0x4530f0: 7cdd2b2e  sthx r6, r29, r5
+  0x45310c: 7cfd332e  sthx r7, r29, r6
+  0x453128: 7cfd332e  sthx r7, r29, r6
+  0x453144: 7cdd2b2e  sthx r6, r29, r5
+  0x453160: 7d1d3b2e  sthx r8, r29, r7
+  0x453178: 7cfd332e  sthx r7, r29, r6
+  0x45318c: 7cdd2b2e  sthx r6, r29, r5
+  0x453198: 7cbd032e  sthx r5, r29, r0
+  0x4531d4: 7cfc332e  sthx r7, r28, r6
+  0x453204: 7d1c3b2e  sthx r8, r28, r7
+  0x453238: 7d5c4b2e  sthx r10, r28, r9
+  0x453260: 7d3c432e  sthx r9, r28, r8
+  0x45327c: 7d1c3b2e  sthx r8, r28, r7
+  0x45328c: 7cfc332e  sthx r7, r28, r6
+  0x45329c: 7cdc2b2e  sthx r6, r28, r5
+  0x4532b0: 7cbc032e  sthx r5, r28, r0
+  0x45364c: 7c1db32e  sthx r0, r29, r22
+  0x453664: 7c7cb32e  sthx r3, r28, r22
+  0x4536c8: 7c1d1b2e  sthx r0, r29, r3
+  0x4536d8: 7c1c1b2e  sthx r0, r28, r3
+
+== bpt_Spr2DecoderFlipClip555__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (40 indexed stores)
+  0x449b5c: 7c7d232e  sthx r3, r29, r4
+  0x449b6c: 7c1c232e  sthx r0, r28, r4
+  0x449c38: 7d49012e  stwx r10, r9, r0
+  0x44a32c: 7cfd032e  sthx r7, r29, r0
+  0x44a388: 7cdc032e  sthx r6, r28, r0
+  0x44a398: 7cfd032e  sthx r7, r29, r0
+  0x44a3a8: 7cdc032e  sthx r6, r28, r0
+  0x44a974: 7c1dab2e  sthx r0, r29, r21
+  0x44a98c: 7c7cab2e  sthx r3, r28, r21
+  0x44abb8: 7cdd2b2e  sthx r6, r29, r5
+  0x44abd4: 7cfd332e  sthx r7, r29, r6
+  0x44abf0: 7cfd332e  sthx r7, r29, r6
+  0x44ac0c: 7cdd2b2e  sthx r6, r29, r5
+  0x44ac28: 7d1d3b2e  sthx r8, r29, r7
+  0x44ac40: 7cfd332e  sthx r7, r29, r6
+  0x44ac54: 7cdd2b2e  sthx r6, r29, r5
+  0x44ac60: 7cbd032e  sthx r5, r29, r0
+  0x44aca8: 7c7c032e  sthx r3, r28, r0
+  0x44ad00: 7c1d1b2e  sthx r0, r29, r3
+  0x44ad10: 7c1c1b2e  sthx r0, r28, r3
+  0x44ad58: 7cdd2b2e  sthx r6, r29, r5
+  0x44ad74: 7cfd332e  sthx r7, r29, r6
+  0x44ad90: 7cfd332e  sthx r7, r29, r6
+  0x44adac: 7cdd2b2e  sthx r6, r29, r5
+  0x44adc8: 7d1d3b2e  sthx r8, r29, r7
+  0x44ade0: 7cfd332e  sthx r7, r29, r6
+  0x44adf4: 7cdd2b2e  sthx r6, r29, r5
+  0x44ae00: 7cbd032e  sthx r5, r29, r0
+  0x44ae3c: 7cfc332e  sthx r7, r28, r6
+  0x44ae6c: 7d1c3b2e  sthx r8, r28, r7
+  0x44aea0: 7d5c4b2e  sthx r10, r28, r9
+  0x44aec8: 7d3c432e  sthx r9, r28, r8
+  0x44aee4: 7d1c3b2e  sthx r8, r28, r7
+  0x44aef4: 7cfc332e  sthx r7, r28, r6
+  0x44af04: 7cdc2b2e  sthx r6, r28, r5
+  0x44af18: 7cbc032e  sthx r5, r28, r0
+  0x44b2bc: 7c1dab2e  sthx r0, r29, r21
+  0x44b2d4: 7c7cab2e  sthx r3, r28, r21
+  0x44b338: 7c1d1b2e  sthx r0, r29, r3
+  0x44b348: 7c1c1b2e  sthx r0, r28, r3
+
+== bpt_Spr2DecoderFlipClip565__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (40 indexed stores)
+  0x45045c: 7c7d232e  sthx r3, r29, r4
+  0x45046c: 7c1c232e  sthx r0, r28, r4
+  0x450544: 7d49012e  stwx r10, r9, r0
+  0x450c6c: 7cfd032e  sthx r7, r29, r0
+  0x450cc8: 7cdc032e  sthx r6, r28, r0
+  0x450cd8: 7cfd032e  sthx r7, r29, r0
+  0x450ce8: 7cdc032e  sthx r6, r28, r0
+  0x4512b4: 7c1dab2e  sthx r0, r29, r21
+  0x4512cc: 7c7cab2e  sthx r3, r28, r21
+  0x4514f8: 7cdd232e  sthx r6, r29, r4
+  0x451514: 7cfd332e  sthx r7, r29, r6
+  0x451530: 7cfd332e  sthx r7, r29, r6
+  0x45154c: 7cdd232e  sthx r6, r29, r4
+  0x451568: 7d1d3b2e  sthx r8, r29, r7
+  0x451580: 7cfd332e  sthx r7, r29, r6
+  0x451594: 7cdd232e  sthx r6, r29, r4
+  0x4515a0: 7c9d032e  sthx r4, r29, r0
+  0x4515e8: 7c7c032e  sthx r3, r28, r0
+  0x451640: 7c1d1b2e  sthx r0, r29, r3
+  0x451650: 7c1c1b2e  sthx r0, r28, r3
+  0x451698: 7cdd2b2e  sthx r6, r29, r5
+  0x4516b4: 7cfd332e  sthx r7, r29, r6
+  0x4516d0: 7cfd332e  sthx r7, r29, r6
+  0x4516ec: 7cdd2b2e  sthx r6, r29, r5
+  0x451708: 7d1d3b2e  sthx r8, r29, r7
+  0x451720: 7cfd332e  sthx r7, r29, r6
+  0x451734: 7cdd2b2e  sthx r6, r29, r5
+  0x451740: 7cbd032e  sthx r5, r29, r0
+  0x45177c: 7cfc332e  sthx r7, r28, r6
+  0x4517ac: 7d1c3b2e  sthx r8, r28, r7
+  0x4517e0: 7d5c4b2e  sthx r10, r28, r9
+  0x451808: 7d3c432e  sthx r9, r28, r8
+  0x451824: 7d1c3b2e  sthx r8, r28, r7
+  0x451834: 7cfc332e  sthx r7, r28, r6
+  0x451844: 7cdc2b2e  sthx r6, r28, r5
+  0x451858: 7cbc032e  sthx r5, r28, r0
+  0x451bf4: 7c1dab2e  sthx r0, r29, r21
+  0x451c0c: 7c7cab2e  sthx r3, r28, r21
+  0x451c70: 7c1d1b2e  sthx r0, r29, r3
+  0x451c80: 7c1c1b2e  sthx r0, r28, r3
+
+== bpt_Spr2DecoderIndexChannelClip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (7 indexed stores)
+  0x44438c: 7d1e4b2e  sthx r8, r30, r9
+  0x4443a0: 7c1d4b2e  sthx r0, r29, r9
+  0x4443dc: 7d1e4b2e  sthx r8, r30, r9
+  0x4443f0: 7c1d4b2e  sthx r0, r29, r9
+  0x44445c: 7d1e2b2e  sthx r8, r30, r5
+  0x444470: 7cdd2b2e  sthx r6, r29, r5
+  0x44448c: 7cda012e  stwx r6, r26, r0
+
+== bpt_Spr2DecoderIndexChannelFlipClip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (3 indexed stores)
+  0x443428: 7c73232e  sthx r3, r19, r4
+  0x443438: 7c12232e  sthx r0, r18, r4
+  0x4434fc: 7d3a012e  stwx r9, r26, r0
+
+== bpt_Spr2DecoderIndexChannelFlip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCs (3 indexed stores)
+  0x443b34: 7c72232e  sthx r3, r18, r4
+  0x443b44: 7c11232e  sthx r0, r17, r4
+  0x443c00: 7d39012e  stwx r9, r25, r0
+
+== bpt_Spr2DecoderNoAlphaClip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (7 indexed stores)
+  0x448dec: 7d1e4b2e  sthx r8, r30, r9
+  0x448e00: 7c1d4b2e  sthx r0, r29, r9
+  0x448e3c: 7d1e4b2e  sthx r8, r30, r9
+  0x448e50: 7c1d4b2e  sthx r0, r29, r9
+  0x448ebc: 7d1e2b2e  sthx r8, r30, r5
+  0x448ed0: 7cdd2b2e  sthx r6, r29, r5
+  0x448eec: 7cda012e  stwx r6, r26, r0
+
+== bpt_Spr2DecoderNoAlphaFlipClip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCsPC7tagRECT (3 indexed stores)
+  0x447ed8: 7c73232e  sthx r3, r19, r4
+  0x447ee8: 7c12232e  sthx r0, r18, r4
+  0x447fac: 7d3a012e  stwx r9, r26, r0
+
+== bpt_Spr2DecoderNoAlphaFlip__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCs (3 indexed stores)
+  0x4485a4: 7c72232e  sthx r3, r18, r4
+  0x4485b4: 7c11232e  sthx r0, r17, r4
+  0x448670: 7d39012e  stwx r9, r25, r0
+
+== bpt_Spr2DecoderNoAlpha__FRC9Surface16RC9Surface16PC7Sprite2PCUsiPCs (7 indexed stores)
+  0x449434: 7d1e4b2e  sthx r8, r30, r9
+  0x449448: 7c1d4b2e  sthx r0, r29, r9
+  0x449484: 7d1e4b2e  sthx r8, r30, r9
+  0x449498: 7c1d4b2e  sthx r0, r29, r9
+  0x449504: 7d1e2b2e  sthx r8, r30, r5
+  0x449518: 7cdd2b2e  sthx r6, r29, r5
+  0x449534: 7cda012e  stwx r6, r26, r0
+
+== change_size__Q23std59basic_string<c,Q23std14char_traits<c>,Q23std12allocator<c>>FUlb (1 indexed stores)
+  0x03dc2c: 7c83e9ae  stbx r4, r3, r29
+
+== change_size__Q23std62basic_string<Us,Q23std15char_traits<Us>,Q23std13allocator<Us>>FUlb (1 indexed stores)
+  0x53f530: 7ca41b2e  sthx r5, r4, r3
+
+== do_replace__Q23std59basic_string<c,Q23std14char_traits<c>,Q23std12allocator<c>>FUlUlPCcPCcQ23std26random_access_iterator_tag (2 indexed stores)
+  0x0fb57c: 7c03d9ae  stbx r0, r3, r27
+  0x0fb664: 7c03d9ae  stbx r0, r3, r27
+
+== fullpath__FPcPCcUl (1 indexed stores)
+  0x030ee8: 7c1d19ae  stbx r0, r29, r3
+
+== init__Q23std59basic_string<c,Q23std14char_traits<c>,Q23std12allocator<c>>FPCcPCcRCQ23std12allocator<c>Q23std26random_access_iterator_tag (1 indexed stores)
+  0x036bc0: 7c03e9ae  stbx r0, r3, r29
+
+== init__Q23std59basic_string<c,Q23std14char_traits<c>,Q23std12allocator<c>>FUlcRCQ23std12allocator<c> (1 indexed stores)
+  0x4f51e0: 7c03f1ae  stbx r0, r3, r30
+
+== replace__Q23std59basic_string<c,Q23std14char_traits<c>,Q23std12allocator<c>>FUlUlUlc (2 indexed stores)
+  0x0534a8: 7c03e9ae  stbx r0, r3, r29
+  0x05358c: 7c03e9ae  stbx r0, r3, r29
+
+== strrpbrk__FPCcPCc (1 indexed stores)
+  0x01933c: 7c0639ae  stbx r0, r6, r7
+
+== toLower__12StringBufferFv (1 indexed stores)
+  0x141c88: 7c0329ae  stbx r0, r3, r5
+
+## (c) addi rD, rA, imm materializing interior pointers (imm in [0x58c,0x78c] even)
+0x01b354: 38210670  addi r1, r1, 0x670   in Load__20IDirect3DTexture_MacFP16IDirect3DTexture+0x6e3
+0x02db14: 386106d8  addi r3, r1, 0x6d8   in _findfirst+0x223
+0x02db28: 386106d8  addi r3, r1, 0x6d8   in _findfirst+0x237
+0x02ddc4: 388106d8  addi r4, r1, 0x6d8   in _findfirst+0x4d3
+0x03143c: 382106a0  addi r1, r1, 0x6a0   in ShellExecuteA+0x14c
+0x0316a8: 38210620  addi r1, r1, 0x620   in GetURLFromSpec__FPC6FSSpecPcs+0x228
+0x032fe8: 386105d8  addi r3, r1, 0x5d8   in MoveFileA+0x98
+0x033004: 386106d8  addi r3, r1, 0x6d8   in MoveFileA+0xb4
+0x033018: 38a106d8  addi r5, r1, 0x6d8   in MoveFileA+0xc8
+0x033048: 38a105d8  addi r5, r1, 0x5d8   in MoveFileA+0xf8
+0x0593c8: 386106d8  addi r3, r1, 0x6d8   in LoadCareers__Fv+0xc8
+0x0593d4: 386106d8  addi r3, r1, 0x6d8   in LoadCareers__Fv+0xd4
+0x0593f0: 386106d8  addi r3, r1, 0x6d8   in LoadCareers__Fv+0xf0
+0x059408: 386105c8  addi r3, r1, 0x5c8   in LoadCareers__Fv+0x108
+0x05940c: 388105d4  addi r4, r1, 0x5d4   in LoadCareers__Fv+0x10c
+0x059438: 386105c8  addi r3, r1, 0x5c8   in LoadCareers__Fv+0x138
+0x059450: 38a105c8  addi r5, r1, 0x5c8   in LoadCareers__Fv+0x150
+0x059458: 386105c8  addi r3, r1, 0x5c8   in LoadCareers__Fv+0x158
+0x059468: 386105c8  addi r3, r1, 0x5c8   in LoadCareers__Fv+0x168
+0x059480: 386106d8  addi r3, r1, 0x6d8   in LoadCareers__Fv+0x180
+0x0594ac: 386106d8  addi r3, r1, 0x6d8   in LoadCareers__Fv+0x1ac
+0x0594d0: 386106d8  addi r3, r1, 0x6d8   in LoadCareers__Fv+0x1d0
+0x0594f4: 386106d8  addi r3, r1, 0x6d8   in LoadCareers__Fv+0x1f4
+0x05950c: 386106d8  addi r3, r1, 0x6d8   in LoadCareers__Fv+0x20c
+0x05957c: 388106d8  addi r4, r1, 0x6d8   in LoadCareers__Fv+0x27c
+0x059598: 386106d8  addi r3, r1, 0x6d8   in LoadCareers__Fv+0x298
+0x0595ec: 388106d8  addi r4, r1, 0x6d8   in LoadCareers__Fv+0x2ec
+0x059600: 388106d8  addi r4, r1, 0x6d8   in LoadCareers__Fv+0x300
+0x059694: 388106d8  addi r4, r1, 0x6d8   in LoadCareers__Fv+0x394
+0x0596e0: 388106d8  addi r4, r1, 0x6d8   in LoadCareers__Fv+0x3e0
+0x0599f4: 386106d8  addi r3, r1, 0x6d8   in LoadCareers__Fv+0x6f4
+0x0664f0: 386105c0  addi r3, r1, 0x5c0   in ValidateTextures__10EditPersonFRQ23std62vector<15StackString<64>,Q23std28allocator<15StackString<64>>>+0x620
+0x066518: 388105c0  addi r4, r1, 0x5c0   in ValidateTextures__10EditPersonFRQ23std62vector<15StackString<64>,Q23std28allocator<15StackString<64>>>+0x648
+0x066580: 38610658  addi r3, r1, 0x658   in ValidateTextures__10EditPersonFRQ23std62vector<15StackString<64>,Q23std28allocator<15StackString<64>>>+0x6b0
+0x0665a8: 38810658  addi r4, r1, 0x658   in ValidateTextures__10EditPersonFRQ23std62vector<15StackString<64>,Q23std28allocator<15StackString<64>>>+0x6d8
+0x066670: 386106f0  addi r3, r1, 0x6f0   in ValidateTextures__10EditPersonFRQ23std62vector<15StackString<64>,Q23std28allocator<15StackString<64>>>+0x7a0
+0x066698: 388106f0  addi r4, r1, 0x6f0   in ValidateTextures__10EditPersonFRQ23std62vector<15StackString<64>,Q23std28allocator<15StackString<64>>>+0x7c8
+0x06c088: 3b0105d0  addi r24, r1, 0x5d0   in SetupChildHDSkins__10EditPersonFv+0x188
+0x06c08c: 3a0105c4  addi r16, r1, 0x5c4   in SetupChildHDSkins__10EditPersonFv+0x18c
+0x06c0ac: 3b4105dc  addi r26, r1, 0x5dc   in SetupChildHDSkins__10EditPersonFv+0x1ac
+0x06c4a4: 386105c4  addi r3, r1, 0x5c4   in SetupChildHDSkins__10EditPersonFv+0x5a4
+0x06c748: 386105c4  addi r3, r1, 0x5c4   in SetupChildHDSkins__10EditPersonFv+0x848
+0x06c77c: 386105c4  addi r3, r1, 0x5c4   in SetupChildHDSkins__10EditPersonFv+0x87c
+0x06c8e8: 388105dc  addi r4, r1, 0x5dc   in SetupChildHDSkins__10EditPersonFv+0x9e8
+0x06c910: 386105c4  addi r3, r1, 0x5c4   in SetupChildHDSkins__10EditPersonFv+0xa10
+0x06c968: 38210730  addi r1, r1, 0x730   in SetupChildHDSkins__10EditPersonFv+0xa68
+0x06d218: 3ac10660  addi r22, r1, 0x660   in SetupNewSkins__10EditPersonFv+0x178
+0x06d21c: 3a010654  addi r16, r1, 0x654   in SetupNewSkins__10EditPersonFv+0x17c
+0x06d24c: 3a41066c  addi r18, r1, 0x66c   in SetupNewSkins__10EditPersonFv+0x1ac
+0x06d274: 3aa10784  addi r21, r1, 0x784   in SetupNewSkins__10EditPersonFv+0x1d4
+0x06d278: 3a010778  addi r16, r1, 0x778   in SetupNewSkins__10EditPersonFv+0x1d8
+0x06d308: 38c10654  addi r6, r1, 0x654   in SetupNewSkins__10EditPersonFv+0x268
+0x06d30c: 38a10778  addi r5, r1, 0x778   in SetupNewSkins__10EditPersonFv+0x26c
+0x06d3e4: 38610654  addi r3, r1, 0x654   in SetupNewSkins__10EditPersonFv+0x344
+0x06d688: 38610654  addi r3, r1, 0x654   in SetupNewSkins__10EditPersonFv+0x5e8
+0x06d6bc: 38610654  addi r3, r1, 0x654   in SetupNewSkins__10EditPersonFv+0x61c
+0x06d77c: 38610778  addi r3, r1, 0x778   in SetupNewSkins__10EditPersonFv+0x6dc
+0x06da20: 38610778  addi r3, r1, 0x778   in SetupNewSkins__10EditPersonFv+0x980
+0x06da54: 38610778  addi r3, r1, 0x778   in SetupNewSkins__10EditPersonFv+0x9b4
+0x06def8: 3881066c  addi r4, r1, 0x66c   in SetupNewSkins__10EditPersonFv+0xe58
+0x06dff8: 38610778  addi r3, r1, 0x778   in SetupNewSkins__10EditPersonFv+0xf58
+0x06e010: 38610654  addi r3, r1, 0x654   in SetupNewSkins__10EditPersonFv+0xf70
+0x06e3fc: 3a01061c  addi r16, r1, 0x61c   in ForceUpdateSuits__10EditPersonFv+0x34c
+0x06e428: 38610628  addi r3, r1, 0x628   in ForceUpdateSuits__10EditPersonFv+0x378
+0x06e438: 38610634  addi r3, r1, 0x634   in ForceUpdateSuits__10EditPersonFv+0x388
+0x06e494: 39e10740  addi r15, r1, 0x740   in ForceUpdateSuits__10EditPersonFv+0x3e4
+0x06e4c0: 3861074c  addi r3, r1, 0x74c   in ForceUpdateSuits__10EditPersonFv+0x410
+0x06e4d0: 38610758  addi r3, r1, 0x758   in ForceUpdateSuits__10EditPersonFv+0x420
+0x06e824: 3861061c  addi r3, r1, 0x61c   in ForceUpdateSuits__10EditPersonFv+0x774
+0x06e8dc: 38a10740  addi r5, r1, 0x740   in ForceUpdateSuits__10EditPersonFv+0x82c
+0x06eaf8: 38810634  addi r4, r1, 0x634   in ForceUpdateSuits__10EditPersonFv+0xa48
+0x06eb2c: 38810758  addi r4, r1, 0x758   in ForceUpdateSuits__10EditPersonFv+0xa7c
+0x06ee5c: 3861074c  addi r3, r1, 0x74c   in ForceUpdateSuits__10EditPersonFv+0xdac
+0x06ee68: 38610740  addi r3, r1, 0x740   in ForceUpdateSuits__10EditPersonFv+0xdb8
+0x06ee74: 38610628  addi r3, r1, 0x628   in ForceUpdateSuits__10EditPersonFv+0xdc4
+0x06ee80: 3861061c  addi r3, r1, 0x61c   in ForceUpdateSuits__10EditPersonFv+0xdd0
+0x06f534: 38610608  addi r3, r1, 0x608   in UpdateSuits__10EditPersonFv+0x614
+0x06f55c: 38810608  addi r4, r1, 0x608   in UpdateSuits__10EditPersonFv+0x63c
+0x06f628: 386106a0  addi r3, r1, 0x6a0   in UpdateSuits__10EditPersonFv+0x708
+0x06f62c: 388106ac  addi r4, r1, 0x6ac   in UpdateSuits__10EditPersonFv+0x70c
+0x06f66c: 386106a0  addi r3, r1, 0x6a0   in UpdateSuits__10EditPersonFv+0x74c
+0x06f7c8: 386106a0  addi r3, r1, 0x6a0   in UpdateSuits__10EditPersonFv+0x8a8
+0x06f808: 386106a0  addi r3, r1, 0x6a0   in UpdateSuits__10EditPersonFv+0x8e8
+0x06f848: 386106a0  addi r3, r1, 0x6a0   in UpdateSuits__10EditPersonFv+0x928
+0x06f888: 386106a0  addi r3, r1, 0x6a0   in UpdateSuits__10EditPersonFv+0x968
+0x06f990: 386106a0  addi r3, r1, 0x6a0   in UpdateSuits__10EditPersonFv+0xa70
+0x06f9d0: 386106a0  addi r3, r1, 0x6a0   in UpdateSuits__10EditPersonFv+0xab0
+0x06fab8: 386106a0  addi r3, r1, 0x6a0   in UpdateSuits__10EditPersonFv+0xb98
+0x0881f4: 38c5058e  addi r6, r5, 0x58e   in GetStringConstant__Fi+0x294
+0x0881fc: 38c505a4  addi r6, r5, 0x5a4   in GetStringConstant__Fi+0x29c
+0x08820c: 38c505d6  addi r6, r5, 0x5d6   in GetStringConstant__Fi+0x2ac
+0x088214: 38c505e6  addi r6, r5, 0x5e6   in GetStringConstant__Fi+0x2b4
+0x088234: 38c5064e  addi r6, r5, 0x64e   in GetStringConstant__Fi+0x2d4
+0x088244: 38c5067a  addi r6, r5, 0x67a   in GetStringConstant__Fi+0x2e4
+0x08824c: 38c50688  addi r6, r5, 0x688   in GetStringConstant__Fi+0x2ec
+0x088254: 38c506a8  addi r6, r5, 0x6a8   in GetStringConstant__Fi+0x2f4
+0x088264: 38c506dc  addi r6, r5, 0x6dc   in GetStringConstant__Fi+0x304
+0x08826c: 38c506f6  addi r6, r5, 0x6f6   in GetStringConstant__Fi+0x30c
+0x08855c: 387d0744  addi r3, r29, 0x744   in InitGame__FP6HWND__iiPCcPCcPCc+0x5c
+0x088560: 389d075e  addi r4, r29, 0x75e   in InitGame__FP6HWND__iiPCcPCcPCc+0x60
+0x08857c: 389d0760  addi r4, r29, 0x760   in InitGame__FP6HWND__iiPCcPCcPCc+0x7c
+0x0885c4: 389d075e  addi r4, r29, 0x75e   in InitGame__FP6HWND__iiPCcPCcPCc+0xc4
+0x088628: 389d075e  addi r4, r29, 0x75e   in InitGame__FP6HWND__iiPCcPCcPCc+0x128
+0x08868c: 389d075e  addi r4, r29, 0x75e   in InitGame__FP6HWND__iiPCcPCcPCc+0x18c
+0x088738: 389d075e  addi r4, r29, 0x75e   in InitGame__FP6HWND__iiPCcPCcPCc+0x238
+0x089b38: 382105d0  addi r1, r1, 0x5d0   in InitGame__FP6HWND__iiPCcPCcPCc+0x1638
+0x09df1c: 382105c0  addi r1, r1, 0x5c0   in Append__8MenuWrapFPCcc+0x41c
+0x09e708: 3ac105ec  addi r22, r1, 0x5ec   in Construct__8MenuWrapFP8iResFileUlsPCc+0x557
+0x09e7a8: 386105e0  addi r3, r1, 0x5e0   in Construct__8MenuWrapFP8iResFileUlsPCc+0x5f7
+0x09e7bc: 386105e0  addi r3, r1, 0x5e0   in Construct__8MenuWrapFP8iResFileUlsPCc+0x60b
+0x09e818: 38210720  addi r1, r1, 0x720   in Construct__8MenuWrapFP8iResFileUlsPCc+0x667
+0x09fa34: 396b058c  addi r11, r11, 0x58c   in GetInteractionScore__13MotiveEffectsFP11TreeTableAd+0x64
+0x09fdd0: 381d078c  addi r0, r29, 0x78c   in __ct__13MotiveEffectsFP8cXPerson+0x50
+0x0a6410: 3885058c  addi r4, r5, 0x58c   in ChangeSimBaseType__12NeighborhoodFP8NeighborQ221MakeNewCharacterParam15eCharacterTypesi+0xd0
+0x0a6930: 38610650  addi r3, r1, 0x650   in ChangeSimBaseType__12NeighborhoodFP8NeighborQ221MakeNewCharacterParam15eCharacterTypesi+0x5f0
+0x0a6934: 3881065c  addi r4, r1, 0x65c   in ChangeSimBaseType__12NeighborhoodFP8NeighborQ221MakeNewCharacterParam15eCharacterTypesi+0x5f4
+0x0a6948: 38810650  addi r4, r1, 0x650   in ChangeSimBaseType__12NeighborhoodFP8NeighborQ221MakeNewCharacterParam15eCharacterTypesi+0x608
+0x0a69ec: 38610760  addi r3, r1, 0x760   in ChangeSimBaseType__12NeighborhoodFP8NeighborQ221MakeNewCharacterParam15eCharacterTypesi+0x6ac
+0x0a69f8: 38610760  addi r3, r1, 0x760   in ChangeSimBaseType__12NeighborhoodFP8NeighborQ221MakeNewCharacterParam15eCharacterTypesi+0x6b8
+0x0a69fc: 38810650  addi r4, r1, 0x650   in ChangeSimBaseType__12NeighborhoodFP8NeighborQ221MakeNewCharacterParam15eCharacterTypesi+0x6bc
+0x0a6a0c: 38610760  addi r3, r1, 0x760   in ChangeSimBaseType__12NeighborhoodFP8NeighborQ221MakeNewCharacterParam15eCharacterTypesi+0x6cc
+0x0a8dac: 38210640  addi r1, r1, 0x640   in AddNewNPCSim__12NeighborhoodFl9PersonAge12PersonGenderR9CTGString11PersonColoriib+0x60c
+0x0ada38: 38610620  addi r3, r1, 0x620   in TutorialCompleted__12NeighborhoodFi+0x58
+0x0ada3c: 3881062c  addi r4, r1, 0x62c   in TutorialCompleted__12NeighborhoodFi+0x5c
+0x0ada58: 38810620  addi r4, r1, 0x620   in TutorialCompleted__12NeighborhoodFi+0x78
+0x0adbfc: 38210750  addi r1, r1, 0x750   in TutorialCompleted__12NeighborhoodFi+0x21c
+0x0adf84: 3861060c  addi r3, r1, 0x60c   in ImportFamily__12NeighborhoodFRC16StackString<260>PP6FamilyPP6Family+0x334
+0x0adf88: 38810618  addi r4, r1, 0x618   in ImportFamily__12NeighborhoodFRC16StackString<260>PP6FamilyPP6Family+0x338
+0x0adfa0: 3881060c  addi r4, r1, 0x60c   in ImportFamily__12NeighborhoodFRC16StackString<260>PP6FamilyPP6Family+0x350
+0x0adfb0: 3881060c  addi r4, r1, 0x60c   in ImportFamily__12NeighborhoodFRC16StackString<260>PP6FamilyPP6Family+0x360
+0x0aeafc: 38610718  addi r3, r1, 0x718   in ImportFamily__12NeighborhoodFRC16StackString<260>PP6FamilyPP6Family+0xeac
+0x0aeb00: 38810724  addi r4, r1, 0x724   in ImportFamily__12NeighborhoodFRC16StackString<260>PP6FamilyPP6Family+0xeb0
+0x0aeb88: 38610718  addi r3, r1, 0x718   in ImportFamily__12NeighborhoodFRC16StackString<260>PP6FamilyPP6Family+0xf38
+0x0aeb98: 38810718  addi r4, r1, 0x718   in ImportFamily__12NeighborhoodFRC16StackString<260>PP6FamilyPP6Family+0xf48
+0x0af3e4: 38610678  addi r3, r1, 0x678   in ExportFamily__12NeighborhoodFRC16StackString<260>P6Family+0x244
+0x0af3e8: 38810684  addi r4, r1, 0x684   in ExportFamily__12NeighborhoodFRC16StackString<260>P6Family+0x248
+0x0af400: 38810678  addi r4, r1, 0x678   in ExportFamily__12NeighborhoodFRC16StackString<260>P6Family+0x260
+0x0af8dc: 38610788  addi r3, r1, 0x788   in ExportFamily__12NeighborhoodFRC16StackString<260>P6Family+0x73c
+0x0af90c: 38610788  addi r3, r1, 0x788   in ExportFamily__12NeighborhoodFRC16StackString<260>P6Family+0x76c
+0x0af918: 38610788  addi r3, r1, 0x788   in ExportFamily__12NeighborhoodFRC16StackString<260>P6Family+0x778
+0x0af92c: 38810788  addi r4, r1, 0x788   in ExportFamily__12NeighborhoodFRC16StackString<260>P6Family+0x78c
+0x0b0804: 382106b0  addi r1, r1, 0x6b0   in LoadHouse__12NeighborhoodFii+0x964
+0x0b0c7c: 38610590  addi r3, r1, 0x590   in SwapHouses__12NeighborhoodFiiR12StringBuffer+0xcc
+0x0b0c80: 3881059c  addi r4, r1, 0x59c   in SwapHouses__12NeighborhoodFiiR12StringBuffer+0xd0
+0x0b0c90: 386106a0  addi r3, r1, 0x6a0   in SwapHouses__12NeighborhoodFiiR12StringBuffer+0xe0
+0x0b0c94: 388106ac  addi r4, r1, 0x6ac   in SwapHouses__12NeighborhoodFiiR12StringBuffer+0xe4
+0x0b0cac: 388106a0  addi r4, r1, 0x6a0   in SwapHouses__12NeighborhoodFiiR12StringBuffer+0xfc
+0x0b0ccc: 38810590  addi r4, r1, 0x590   in SwapHouses__12NeighborhoodFiiR12StringBuffer+0x11c
+0x0b2b60: 38210640  addi r1, r1, 0x640   in AddNewTourist__12NeighborhoodFl9PersonAge12PersonGenderR9StringSet11PersonColor+0x4a0
+0x0b2d3c: 386105e0  addi r3, r1, 0x5e0   in AddNewTownie__12NeighborhoodFlR10GenNPCInfo+0x15c
+0x0b2d44: 386105e0  addi r3, r1, 0x5e0   in AddNewTownie__12NeighborhoodFlR10GenNPCInfo+0x164
+0x0b2d54: 386105e0  addi r3, r1, 0x5e0   in AddNewTownie__12NeighborhoodFlR10GenNPCInfo+0x174
+0x0b3634: 38210780  addi r1, r1, 0x780   in AddNewTownie__12NeighborhoodFlR10GenNPCInfo+0xa54
+0x0b3aa4: 38210610  addi r1, r1, 0x610   in AddNewCharacter__12NeighborhoodFPP8NeighborQ221MakeNewCharacterParam15eCharacterTypess+0x333
+0x0b4768: 3885058c  addi r4, r5, 0x58c   in SaveAllPersistentDataForMatterTransferance__12NeighborhoodFv+0xa8
+0x0b4874: 3885058c  addi r4, r5, 0x58c   in SavePersistentData__12NeighborhoodFP8cXPerson+0x74
+0x0b4b40: 3805058c  addi r0, r5, 0x58c   in LoadInterestData__12NeighborhoodFP8cXPerson+0xc0
+0x0b4c80: 3805058c  addi r0, r5, 0x58c   in LoadPersistentData__12NeighborhoodFP8cXPersonRCQ23std48vector<P8cXPerson,Q23std21allocator<P8cXPerson>>+0xc0
+0x0b6068: 38610714  addi r3, r1, 0x714   in Load__12NeighborhoodFv+0x828
+0x0b6070: 38610714  addi r3, r1, 0x714   in Load__12NeighborhoodFv+0x830
+0x0b608c: 38610714  addi r3, r1, 0x714   in Load__12NeighborhoodFv+0x84c
+0x0b60dc: 38810714  addi r4, r1, 0x714   in Load__12NeighborhoodFv+0x89c
+0x0b60f4: 38610714  addi r3, r1, 0x714   in Load__12NeighborhoodFv+0x8b4
+0x0b6144: 38610714  addi r3, r1, 0x714   in Load__12NeighborhoodFv+0x904
+0x0b64ac: 38610714  addi r3, r1, 0x714   in Load__12NeighborhoodFv+0xc6c
+0x0b98a8: 387e062c  addi r3, r30, 0x62c   in insert__Q23std54__vector_imp<8tagPOINT,Q23std20allocator<8tagPOINT>,0>FP8tagPOINTUlRC8tagPOINT+0xe8
+0x0b9cf8: 387e062c  addi r3, r30, 0x62c   in insert__Q23std60__vector_imp<10ZoningData,Q23std23allocator<10ZoningData>,0>FP10ZoningDataUlRC10ZoningData+0xe8
+0x0be288: 387e05d2  addi r3, r30, 0x5d2   in compare__Q23std59basic_string<c,Q23std14char_traits<c>,Q23std12allocator<c>>CFUlUlPCcUl+0xd8
+0x0be964: 387e062c  addi r3, r30, 0x62c   in init<PCUl>__Q23std38__vector_pod<Ul,Q23std13allocator<Ul>>FPCUlPCUlQ23std20forward_iterator_tag_v+0xe4
+0x0bf5b8: 387e062c  addi r3, r30, 0x62c   in __ct__Q23std73pair<CQ210GenNPCInfo11sGenderSkin,Q23std30vector<i,Q23std12allocator<i>>>FRCQ23std73pair<CQ210GenNPCInfo11sGenderSkin,Q23std30vector<i,Q23std12allocator<i>>>+0xd8
+0x0bfbac: 387d062c  addi r3, r29, 0x62c   in __ct__Q23std73pair<CQ210GenNPCInfo11sGenderSkin,Q23std30vector<i,Q23std12allocator<i>>>FRCQ23std73pair<CQ210GenNPCInfo11sGenderSkin,Q23std30vector<i,Q23std12allocator<i>>>+0x6cc
+0x0bfe18: 387e062c  addi r3, r30, 0x62c   in insert_node_at__Q23std73__tree<9cTSString,Q23std16less<9cTSString>,Q23std21allocator<9cTSString>>FPQ33std73__tree<9cTSString,Q23std16less<9cTSString>,Q23std21allocator<9cTSString>>4nodebbRC9cTSString+0xd8
+0x0c01c8: 387e062c  addi r3, r30, 0x62c   in insert_node_at__Q23std73__tree<9cTSString,Q23std16less<9cTSString>,Q23std21allocator<9cTSString>>FPQ33std73__tree<9cTSString,Q23std16less<9cTSString>,Q23std21allocator<9cTSString>>4nodebbRC9cTSString+0x488
+0x0ccef8: 38610610  addi r3, r1, 0x610   in SetParams__12ObjectDialogFP9StackElemPC11DialogParam+0x4a8
+0x0ccefc: 3881061c  addi r4, r1, 0x61c   in SetParams__12ObjectDialogFP9StackElemPC11DialogParam+0x4ac
+0x0ccf28: 38a10610  addi r5, r1, 0x610   in SetParams__12ObjectDialogFP9StackElemPC11DialogParam+0x4d8
+0x0ccf3c: 38810610  addi r4, r1, 0x610   in SetParams__12ObjectDialogFP9StackElemPC11DialogParam+0x4ec
+0x0ccfb4: 38610720  addi r3, r1, 0x720   in SetParams__12ObjectDialogFP9StackElemPC11DialogParam+0x564
+0x0ccfb8: 3881072c  addi r4, r1, 0x72c   in SetParams__12ObjectDialogFP9StackElemPC11DialogParam+0x568
+0x0ccfe4: 38a10720  addi r5, r1, 0x720   in SetParams__12ObjectDialogFP9StackElemPC11DialogParam+0x594
+0x0ccff8: 38810720  addi r4, r1, 0x720   in SetParams__12ObjectDialogFP9StackElemPC11DialogParam+0x5a8
+0x0d24ec: 3bdf05c4  addi r30, r31, 0x5c4   in GetErrorString__8cXObjectFR12StringBuffer+0x3bc
+0x0d250c: 3bdf064c  addi r30, r31, 0x64c   in GetErrorString__8cXObjectFR12StringBuffer+0x3dc
+0x0d251c: 3bdf06a6  addi r30, r31, 0x6a6   in GetErrorString__8cXObjectFR12StringBuffer+0x3ec
+0x0d252c: 3bdf0700  addi r30, r31, 0x700   in GetErrorString__8cXObjectFR12StringBuffer+0x3fc
+0x0d253c: 3bdf076e  addi r30, r31, 0x76e   in GetErrorString__8cXObjectFR12StringBuffer+0x40c
+0x0d2544: 3bdf0788  addi r30, r31, 0x788   in GetErrorString__8cXObjectFR12StringBuffer+0x414
+0x0d44f0: 386105f8  addi r3, r1, 0x5f8   in ImportConstants__12ObjectFolderFR9CTGString+0x30
+0x0d44f4: 38810604  addi r4, r1, 0x604   in ImportConstants__12ObjectFolderFR9CTGString+0x34
+0x0d4500: 386105f8  addi r3, r1, 0x5f8   in ImportConstants__12ObjectFolderFR9CTGString+0x40
+0x0d451c: 386105f8  addi r3, r1, 0x5f8   in ImportConstants__12ObjectFolderFR9CTGString+0x5c
+0x0d4528: 386105f8  addi r3, r1, 0x5f8   in ImportConstants__12ObjectFolderFR9CTGString+0x68
+0x0d4544: 388105f8  addi r4, r1, 0x5f8   in ImportConstants__12ObjectFolderFR9CTGString+0x84
+0x0d4634: 38610708  addi r3, r1, 0x708   in ImportConstants__12ObjectFolderFR9CTGString+0x174
+0x0d4638: 38810714  addi r4, r1, 0x714   in ImportConstants__12ObjectFolderFR9CTGString+0x178
+0x0d4650: 38610708  addi r3, r1, 0x708   in ImportConstants__12ObjectFolderFR9CTGString+0x190
+0x0d4664: 38610708  addi r3, r1, 0x708   in ImportConstants__12ObjectFolderFR9CTGString+0x1a4
+0x0d5fd4: 388105a8  addi r4, r1, 0x5a8   in ImportConstants__12ObjectFolderFR9CTGString+0x1b14
+0x0d5fd8: 3861059c  addi r3, r1, 0x59c   in ImportConstants__12ObjectFolderFR9CTGString+0x1b18
+0x0d5fec: 388105d4  addi r4, r1, 0x5d4   in ImportConstants__12ObjectFolderFR9CTGString+0x1b2c
+0x0d5ff0: 386105c8  addi r3, r1, 0x5c8   in ImportConstants__12ObjectFolderFR9CTGString+0x1b30
+0x0d6008: 3861059c  addi r3, r1, 0x59c   in ImportConstants__12ObjectFolderFR9CTGString+0x1b48
+0x0d6010: 386105c8  addi r3, r1, 0x5c8   in ImportConstants__12ObjectFolderFR9CTGString+0x1b50
+0x0d6a64: 387b0690  addi r3, r27, 0x690   in ScanForNewFiles__12ObjectFolderFv+0x174
+0x0d6a8c: 389b0690  addi r4, r27, 0x690   in ScanForNewFiles__12ObjectFolderFv+0x19c
+0x0d6f78: 389a0690  addi r4, r26, 0x690   in NewFileAdded__12ObjectFolderFR16StackString<260>+0x167
+0x0d8bbc: 387f0690  addi r3, r31, 0x690   in Init__12ObjectFolderFPCcb+0x18c
+0x0d8bdc: 387f0690  addi r3, r31, 0x690   in Init__12ObjectFolderFPCcb+0x1ac
+0x0d8bf8: 387f0690  addi r3, r31, 0x690   in Init__12ObjectFolderFPCcb+0x1c8
+0x0d9258: 386105a0  addi r3, r1, 0x5a0   in Init__12ObjectFolderFPCcb+0x828
+0x0d925c: 388105ac  addi r4, r1, 0x5ac   in Init__12ObjectFolderFPCcb+0x82c
+0x0d9274: 386105a0  addi r3, r1, 0x5a0   in Init__12ObjectFolderFPCcb+0x844
+0x0d9280: 386105a0  addi r3, r1, 0x5a0   in Init__12ObjectFolderFPCcb+0x850
+0x0d92c8: 388105a0  addi r4, r1, 0x5a0   in Init__12ObjectFolderFPCcb+0x898
+0x0d92ec: 386106b0  addi r3, r1, 0x6b0   in Init__12ObjectFolderFPCcb+0x8bc
+0x0d92f0: 388106bc  addi r4, r1, 0x6bc   in Init__12ObjectFolderFPCcb+0x8c0
+0x0d9308: 386106b0  addi r3, r1, 0x6b0   in Init__12ObjectFolderFPCcb+0x8d8
+0x0d9314: 386106b0  addi r3, r1, 0x6b0   in Init__12ObjectFolderFPCcb+0x8e4
+0x0d935c: 388106b0  addi r4, r1, 0x6b0   in Init__12ObjectFolderFPCcb+0x92c
+0x0d9374: 387f0690  addi r3, r31, 0x690   in Init__12ObjectFolderFPCcb+0x944
+0x0d93fc: 387f0690  addi r3, r31, 0x690   in Init__12ObjectFolderFPCcb+0x9cc
+0x0da534: 389c058c  addi r4, r28, 0x58c   in __ct__12ObjectFolderFv+0xe4
+0x0da548: 387c0690  addi r3, r28, 0x690   in __ct__12ObjectFolderFv+0xf8
+0x0da54c: 389c069c  addi r4, r28, 0x69c   in __ct__12ObjectFolderFv+0xfc
+0x0ddca0: 387e06c0  addi r3, r30, 0x6c0   in __dt__Q210Metrowerks62scoped_obj<Q23std42allocator<Q23std23pair<Cl,P11ObjSelector>>>Fv+0x40a
+0x0ddd18: 389e06c0  addi r4, r30, 0x6c0   in __dt__Q210Metrowerks62scoped_obj<Q23std42allocator<Q23std23pair<Cl,P11ObjSelector>>>Fv+0x482
+0x0de660: 387e06c0  addi r3, r30, 0x6c0   in bucket_count__Q210Metrowerks415hash_table<Q23std23pair<Cl,P11ObjSelector>,Q310Metrowerks120hash_map<l,P11ObjSelector,Q210Metrowerks7hash<l>,Q23std11equal_to<l>,Q23std42allocator<Q23std23pair<Cl+0x201
+0x0de6d8: 389e06c0  addi r4, r30, 0x6c0   in bucket_count__Q210Metrowerks415hash_table<Q23std23pair<Cl,P11ObjSelector>,Q310Metrowerks120hash_map<l,P11ObjSelector,Q210Metrowerks7hash<l>,Q23std11equal_to<l>,Q23std42allocator<Q23std23pair<Cl+0x279
+0x0ede30: 38a5058c  addi r5, r5, 0x58c   in InterpValue__8cXObjectFssb+0x7b0
+0x0ee034: 38a5058c  addi r5, r5, 0x58c   in InterpValue__8cXObjectFssb+0x9b4
+0x0ee284: 38a5058c  addi r5, r5, 0x58c   in InterpValue__8cXObjectFssb+0xc04
+0x0ee520: 38a5058c  addi r5, r5, 0x58c   in InterpValue__8cXObjectFssb+0xea0
+0x0f0230: 382105d0  addi r1, r1, 0x5d0   in TryPlaySound__8cXObjectFP9StackElemP14PlaySoundParam+0x35f
+0x0fb144: 386105d4  addi r3, r1, 0x5d4   in LogSoundHeader__FP9StackElem+0x114
+0x0fb14c: 388105e0  addi r4, r1, 0x5e0   in LogSoundHeader__FP9StackElem+0x11c
+0x0fb160: 386105d4  addi r3, r1, 0x5d4   in LogSoundHeader__FP9StackElem+0x130
+0x0fb174: 388105d4  addi r4, r1, 0x5d4   in LogSoundHeader__FP9StackElem+0x144
+0x0fb20c: 382106f0  addi r1, r1, 0x6f0   in LogSoundHeader__FP9StackElem+0x1dc
+0x10ba1c: 3805078c  addi r0, r5, 0x78c   in CalcHappy__8cXPersonFv+0x5c
+0x10bb98: 3864078c  addi r3, r4, 0x78c   in GetMotiveRef__8cXPersonFi+0x8
+0x10bcd4: 389b078c  addi r4, r27, 0x78c   in ReconStream__8cXPersonFP11ReconBufferlb+0x74
+0x10bd60: 389b058c  addi r4, r27, 0x58c   in ReconStream__8cXPersonFP11ReconBufferlb+0x100
+0x10bd7c: 389b058c  addi r4, r27, 0x58c   in ReconStream__8cXPersonFP11ReconBufferlb+0x11c
+0x10bd90: 389b058c  addi r4, r27, 0x58c   in ReconStream__8cXPersonFP11ReconBufferlb+0x130
+0x10c100: 3879078c  addi r3, r25, 0x78c   in Simulate__8cXPersonFl+0x110
+0x10c1ec: 3803078c  addi r0, r3, 0x78c   in Simulate__8cXPersonFl+0x1fc
+0x112228: 387e078c  addi r3, r30, 0x78c   in __ct__8cXPersonFP11ObjSelectorP12ObjectModule+0x28
+0x134d98: 389b058c  addi r4, r27, 0x58c   in SimTickCompleted__6SimLogFP8cXPerson+0xe8
+0x13f884: 3ba10690  addi r29, r1, 0x690   in ReadFromFile__11SpreadsheetFRC16StackString<260>+0xa4
+0x13f990: 38610684  addi r3, r1, 0x684   in ReadFromFile__11SpreadsheetFRC16StackString<260>+0x1b0
+0x13f9b0: 38610684  addi r3, r1, 0x684   in ReadFromFile__11SpreadsheetFRC16StackString<260>+0x1d0
+0x168b38: 389d05ac  addi r4, r29, 0x5ac   in CatDialogParam__FRC11DialogParamP11ObjSelectorR12StringBuffers+0x137
+0x168b5c: 389d05be  addi r4, r29, 0x5be   in CatDialogParam__FRC11DialogParamP11ObjSelectorR12StringBuffers+0x15b
+0x168ca0: 389d060c  addi r4, r29, 0x60c   in CatDialogParam__FRC11DialogParamP11ObjSelectorR12StringBuffers+0x29f
+0x168ff0: 389a064c  addi r4, r26, 0x64c   in CatStackParam__FRC10XPrimParamP11ObjSelectorR12StringBuffers+0x1f0
+0x1690d4: 382105a0  addi r1, r1, 0x5a0   in CatStackParam__FRC10XPrimParamP11ObjSelectorR12StringBuffers+0x2d4
+0x169264: 389f066c  addi r4, r31, 0x66c   in CatPlaySoundParam__FRC14PlaySoundParamP11ObjSelectorR12StringBuffer+0x124
+0x1692f4: 389f069a  addi r4, r31, 0x69a   in CatPlaySoundParam__FRC14PlaySoundParamP11ObjSelectorR12StringBuffer+0x1b4
+0x1694d8: 389f06be  addi r4, r31, 0x6be   in CatGotoRoutingSlotParam__FRC20GotoRoutingSlotParamP11ObjSelectorR12StringBuffers+0xd8
+0x169660: 389f070a  addi r4, r31, 0x70a   in CatReachParam__FRC10ReachParamP11ObjSelectorR12StringBuffers+0xa0
+0x1696a8: 389f074e  addi r4, r31, 0x74e   in CatReachParam__FRC10ReachParamP11ObjSelectorR12StringBuffers+0xe8
+0x1696bc: 389f0772  addi r4, r31, 0x772   in CatReachParam__FRC10ReachParamP11ObjSelectorR12StringBuffers+0xfc
+0x16983c: 389f078c  addi r4, r31, 0x78c   in CatRelationship2Param__FRC18Relationship2ParamP11ObjSelectorR12StringBuffers+0xfc
+0x169928: 389f05ac  addi r4, r31, 0x5ac   in CatRelationship2Param__FRC18Relationship2ParamP11ObjSelectorR12StringBuffers+0x1e8
+0x16996c: 389f05ac  addi r4, r31, 0x5ac   in CatRelationship2Param__FRC18Relationship2ParamP11ObjSelectorR12StringBuffers+0x22c
+0x169bb8: 389f05ac  addi r4, r31, 0x5ac   in CatRelationshipParam__FRC17RelationshipParamP11ObjSelectorR12StringBuffers+0x178
+0x169c04: 389f05ac  addi r4, r31, 0x5ac   in CatRelationshipParam__FRC17RelationshipParamP11ObjSelectorR12StringBuffers+0x1c4
+0x16b164: 38610688  addi r3, r1, 0x688   in GetFlagsID__8XObjLangFRC12StringBufferb+0x254
+0x16b168: 38810694  addi r4, r1, 0x694   in GetFlagsID__8XObjLangFRC12StringBufferb+0x258
+0x16b17c: 38610688  addi r3, r1, 0x688   in GetFlagsID__8XObjLangFRC12StringBufferb+0x26c
+0x16b194: 38610688  addi r3, r1, 0x688   in GetFlagsID__8XObjLangFRC12StringBufferb+0x284
+0x16e670: 38210600  addi r1, r1, 0x600   in FindPath__6XRouteFR8TileList+0x14e0
+0x1af544: 382105c0  addi r1, r1, 0x5c0   in Initialize__16FloorGraphicsMgrFv+0x714
+0x1bd300: 389c0594  addi r4, r28, 0x594   in Callback__FP17cCheatCommandLineUl+0x420
+0x1bd374: 389c05b8  addi r4, r28, 0x5b8   in Callback__FP17cCheatCommandLineUl+0x494
+0x1bd3d8: 389c05c8  addi r4, r28, 0x5c8   in Callback__FP17cCheatCommandLineUl+0x4f8
+0x1bd414: 389c05e0  addi r4, r28, 0x5e0   in Callback__FP17cCheatCommandLineUl+0x534
+0x1bd610: 389c0608  addi r4, r28, 0x608   in Callback__FP17cCheatCommandLineUl+0x730
+0x1bd624: 387c0630  addi r3, r28, 0x630   in Callback__FP17cCheatCommandLineUl+0x744
+0x1bd64c: 387c0634  addi r3, r28, 0x634   in Callback__FP17cCheatCommandLineUl+0x76c
+0x1bd684: 389c0608  addi r4, r28, 0x608   in Callback__FP17cCheatCommandLineUl+0x7a4
+0x1bd724: 387c0640  addi r3, r28, 0x640   in Callback__FP17cCheatCommandLineUl+0x844
+0x1bd77c: 387c0648  addi r3, r28, 0x648   in Callback__FP17cCheatCommandLineUl+0x89c
+0x1bd7b4: 389c067c  addi r4, r28, 0x67c   in Callback__FP17cCheatCommandLineUl+0x8d4
+0x1bd7c4: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0x8e4
+0x1bd7e0: 389c069a  addi r4, r28, 0x69a   in Callback__FP17cCheatCommandLineUl+0x900
+0x1bd7f4: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0x914
+0x1bd810: 389c06ac  addi r4, r28, 0x6ac   in Callback__FP17cCheatCommandLineUl+0x930
+0x1bd824: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0x944
+0x1bd854: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0x974
+0x1bd884: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0x9a4
+0x1bd8a0: 389c06e4  addi r4, r28, 0x6e4   in Callback__FP17cCheatCommandLineUl+0x9c0
+0x1bd8b4: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0x9d4
+0x1bd8d0: 389c06f6  addi r4, r28, 0x6f6   in Callback__FP17cCheatCommandLineUl+0x9f0
+0x1bd8e4: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0xa04
+0x1bd900: 389c0706  addi r4, r28, 0x706   in Callback__FP17cCheatCommandLineUl+0xa20
+0x1bd914: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0xa34
+0x1bd944: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0xa64
+0x1bd974: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0xa94
+0x1bda5c: 389c074e  addi r4, r28, 0x74e   in Callback__FP17cCheatCommandLineUl+0xb7c
+0x1bda80: 389c0754  addi r4, r28, 0x754   in Callback__FP17cCheatCommandLineUl+0xba0
+0x1bdaa4: 389c075a  addi r4, r28, 0x75a   in Callback__FP17cCheatCommandLineUl+0xbc4
+0x1bdac8: 389c0762  addi r4, r28, 0x762   in Callback__FP17cCheatCommandLineUl+0xbe8
+0x1bdb58: 389c0786  addi r4, r28, 0x786   in Callback__FP17cCheatCommandLineUl+0xc78
+0x1bdd90: 387c0640  addi r3, r28, 0x640   in Callback__FP17cCheatCommandLineUl+0xeb0
+0x1bddb8: 387c0648  addi r3, r28, 0x648   in Callback__FP17cCheatCommandLineUl+0xed8
+0x1bddfc: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0xf1c
+0x1bde28: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0xf48
+0x1bde54: 38bc0694  addi r5, r28, 0x694   in Callback__FP17cCheatCommandLineUl+0xf74
+0x1cdc14: 38210640  addi r1, r1, 0x640   in GetDefaultAmbientLight__11HouseViewerFv+0x2f4
+0x1eed40: 3ac30620  addi r22, r3, 0x620   in Render__14SpriteListInfoFiiiUsP11RenderParambi+0x330
+0x1f6ff0: 38fe0700  addi r7, r30, 0x700   in ProcessPluginFile__15WallGraphicsMgrFRC16StackString<260>+0x580
+0x1f7424: 38b40600  addi r5, r20, 0x600   in Initialize__15WallGraphicsMgrFv+0x1f4
+0x1f742c: 38740700  addi r3, r20, 0x700   in Initialize__15WallGraphicsMgrFv+0x1fc
+0x1f7b10: 382105c0  addi r1, r1, 0x5c0   in Initialize__15WallGraphicsMgrFv+0x8e0
+0x1fb958: 38030620  addi r0, r3, 0x620   in DrawThickWallCutawayPiece__9cRendererFiiiiiUsP11RenderParami+0x197
+0x1fbf00: 38030620  addi r0, r3, 0x620   in DrawThickWallPiece__9cRendererFRC7CTilePtiiiiUsP11RenderParamii+0x1a0
+0x1fcb14: 3b430620  addi r26, r3, 0x620   in DrawFloor__9cRendererFRC7CTilePtiiiiUsP11RenderParamRC10LightEntrybibi+0x2d4
+0x1fd37c: 38030620  addi r0, r3, 0x620   in DrawWall__9cRendererFP9cRendereriP9cRendereriiiiUsP11RenderParamiQ29TileWalls7SegmentRC10LightEntryi+0x1cc
+0x1fe164: 38030620  addi r0, r3, 0x620   in DrawShape__9cRendererFiiiiUsP11RenderParamb+0x224
+0x21f7ac: 38610608  addi r3, r1, 0x608   in ExportHTMLHomelessFamilies__FRC16StackString<260>RC16StackString<260>P6Family+0x40c
+0x21f7b0: 38810614  addi r4, r1, 0x614   in ExportHTMLHomelessFamilies__FRC16StackString<260>RC16StackString<260>P6Family+0x410
+0x21f7dc: 38610608  addi r3, r1, 0x608   in ExportHTMLHomelessFamilies__FRC16StackString<260>RC16StackString<260>P6Family+0x43c
+0x21f7e8: 38610718  addi r3, r1, 0x718   in ExportHTMLHomelessFamilies__FRC16StackString<260>RC16StackString<260>P6Family+0x448
+0x21f7ec: 38810724  addi r4, r1, 0x724   in ExportHTMLHomelessFamilies__FRC16StackString<260>RC16StackString<260>P6Family+0x44c
+0x21f818: 38610718  addi r3, r1, 0x718   in ExportHTMLHomelessFamilies__FRC16StackString<260>RC16StackString<260>P6Family+0x478
+0x21f824: 38610718  addi r3, r1, 0x718   in ExportHTMLHomelessFamilies__FRC16StackString<260>RC16StackString<260>P6Family+0x484
+0x21fb7c: 38610608  addi r3, r1, 0x608   in ExportHTMLHomelessFamilies__FRC16StackString<260>RC16StackString<260>P6Family+0x7dc
+0x21fb98: 38810608  addi r4, r1, 0x608   in ExportHTMLHomelessFamilies__FRC16StackString<260>RC16StackString<260>P6Family+0x7f8
+0x220378: 38610618  addi r3, r1, 0x618   in ExportHTMLNeighborhood__FRC16StackString<260>RC16StackString<260>P12NeighborhoodP7CPState+0x417
+0x22037c: 38810624  addi r4, r1, 0x624   in ExportHTMLNeighborhood__FRC16StackString<260>RC16StackString<260>P12NeighborhoodP7CPState+0x41b
+0x2203a8: 38610618  addi r3, r1, 0x618   in ExportHTMLNeighborhood__FRC16StackString<260>RC16StackString<260>P12NeighborhoodP7CPState+0x447
+0x2203d4: 38610618  addi r3, r1, 0x618   in ExportHTMLNeighborhood__FRC16StackString<260>RC16StackString<260>P12NeighborhoodP7CPState+0x473
+0x2203e4: 38610728  addi r3, r1, 0x728   in ExportHTMLNeighborhood__FRC16StackString<260>RC16StackString<260>P12NeighborhoodP7CPState+0x483
+0x2203e8: 38810734  addi r4, r1, 0x734   in ExportHTMLNeighborhood__FRC16StackString<260>RC16StackString<260>P12NeighborhoodP7CPState+0x487
+0x22041c: 38610728  addi r3, r1, 0x728   in ExportHTMLNeighborhood__FRC16StackString<260>RC16StackString<260>P12NeighborhoodP7CPState+0x4bb
+0x220428: 38610728  addi r3, r1, 0x728   in ExportHTMLNeighborhood__FRC16StackString<260>RC16StackString<260>P12NeighborhoodP7CPState+0x4c7
+0x220448: 38610728  addi r3, r1, 0x728   in ExportHTMLNeighborhood__FRC16StackString<260>RC16StackString<260>P12NeighborhoodP7CPState+0x4e7
+0x220464: 38610728  addi r3, r1, 0x728   in ExportHTMLNeighborhood__FRC16StackString<260>RC16StackString<260>P12NeighborhoodP7CPState+0x503
+0x22135c: 38610628  addi r3, r1, 0x628   in ExportHTML__FRC16StackString<260>RC16StackString<260>P6FamilyP7CPState+0x45c
+0x221360: 38810634  addi r4, r1, 0x634   in ExportHTML__FRC16StackString<260>RC16StackString<260>P6FamilyP7CPState+0x460
+0x22138c: 38610628  addi r3, r1, 0x628   in ExportHTML__FRC16StackString<260>RC16StackString<260>P6FamilyP7CPState+0x48c
+0x221398: 38610738  addi r3, r1, 0x738   in ExportHTML__FRC16StackString<260>RC16StackString<260>P6FamilyP7CPState+0x498
+0x22139c: 38810744  addi r4, r1, 0x744   in ExportHTML__FRC16StackString<260>RC16StackString<260>P6FamilyP7CPState+0x49c
+0x2213c8: 38610738  addi r3, r1, 0x738   in ExportHTML__FRC16StackString<260>RC16StackString<260>P6FamilyP7CPState+0x4c8
+0x2213d4: 38610738  addi r3, r1, 0x738   in ExportHTML__FRC16StackString<260>RC16StackString<260>P6FamilyP7CPState+0x4d4
+0x22172c: 38610628  addi r3, r1, 0x628   in ExportHTML__FRC16StackString<260>RC16StackString<260>P6FamilyP7CPState+0x82c
+0x221748: 38810628  addi r4, r1, 0x628   in ExportHTML__FRC16StackString<260>RC16StackString<260>P6FamilyP7CPState+0x848
+0x2226ec: 386105e8  addi r3, r1, 0x5e8   in MakePublishingInfo__F16StackString<260>16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6Family+0x55c
+0x2226f0: 388105f4  addi r4, r1, 0x5f4   in MakePublishingInfo__F16StackString<260>16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6Family+0x560
+0x222704: 386105e8  addi r3, r1, 0x5e8   in MakePublishingInfo__F16StackString<260>16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6Family+0x574
+0x22271c: 388105e8  addi r4, r1, 0x5e8   in MakePublishingInfo__F16StackString<260>16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6Family+0x58c
+0x22272c: 386106f4  addi r3, r1, 0x6f4   in MakePublishingInfo__F16StackString<260>16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6Family+0x59c
+0x222730: 38810700  addi r4, r1, 0x700   in MakePublishingInfo__F16StackString<260>16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6Family+0x5a0
+0x222744: 386106f4  addi r3, r1, 0x6f4   in MakePublishingInfo__F16StackString<260>16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6Family+0x5b4
+0x22275c: 388106f4  addi r4, r1, 0x6f4   in MakePublishingInfo__F16StackString<260>16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6Family+0x5cc
+0x22341c: 389e05aa  addi r4, r30, 0x5aa   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0x11c
+0x2237d8: 389e05f6  addi r4, r30, 0x5f6   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0x4d8
+0x2238b8: 38610620  addi r3, r1, 0x620   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0x5b8
+0x2238bc: 3881062c  addi r4, r1, 0x62c   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0x5bc
+0x2238e8: 38610620  addi r3, r1, 0x620   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0x5e8
+0x2239fc: 3b01073c  addi r24, r1, 0x73c   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0x6fc
+0x223a48: 389e060c  addi r4, r30, 0x60c   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0x748
+0x223b44: 389e060c  addi r4, r30, 0x60c   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0x844
+0x223c08: 389e060c  addi r4, r30, 0x60c   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0x908
+0x223cb8: 38610620  addi r3, r1, 0x620   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0x9b8
+0x223cc8: 38610620  addi r3, r1, 0x620   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0x9c8
+0x223cdc: 389e061c  addi r4, r30, 0x61c   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0x9dc
+0x223d04: 389e0626  addi r4, r30, 0x626   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0xa04
+0x223d80: 38610620  addi r3, r1, 0x620   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0xa80
+0x223e90: 38610730  addi r3, r1, 0x730   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0xb90
+0x223ebc: 38610730  addi r3, r1, 0x730   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0xbbc
+0x223ec8: 38610730  addi r3, r1, 0x730   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0xbc8
+0x223edc: 389e061c  addi r4, r30, 0x61c   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0xbdc
+0x223f80: 38610730  addi r3, r1, 0x730   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0xc80
+0x22416c: 389e0636  addi r4, r30, 0x636   in MakeWebPagesFromTemplate__FPc16StackString<260>RCQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>RQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP12Neighborhood+0xe6c
+0x226078: 389e067e  addi r4, r30, 0x67e   in GenerateHouseData__FRQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP7CPState+0x1f8
+0x226080: 389e0680  addi r4, r30, 0x680   in GenerateHouseData__FRQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>P6FamilyP7CPState+0x200
+0x226f30: 389f0682  addi r4, r31, 0x682   in GenerateLookupTagsList__FRQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>+0x10
+0x226f94: 389f06b6  addi r4, r31, 0x6b6   in GenerateLookupTagsList__FRQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>+0x74
+0x227034: 389f072e  addi r4, r31, 0x72e   in GenerateLookupTagsList__FRQ23std48vector<9CTGString,Q23std21allocator<9CTGString>>+0x114
+0x230334: 3a4106bc  addi r18, r1, 0x6bc   in FamilyTestHarness__Fi+0x94
+0x230784: 388105b0  addi r4, r1, 0x5b0   in FamilyTestHarness__Fi+0x4e4
+0x230788: 386105a4  addi r3, r1, 0x5a4   in FamilyTestHarness__Fi+0x4e8
+0x23079c: 386105a4  addi r3, r1, 0x5a4   in FamilyTestHarness__Fi+0x4fc
+0x2307b0: 388105a4  addi r4, r1, 0x5a4   in FamilyTestHarness__Fi+0x510
+0x2309b8: 386106b0  addi r3, r1, 0x6b0   in FamilyTestHarness__Fi+0x718
+0x2309cc: 386106b0  addi r3, r1, 0x6b0   in FamilyTestHarness__Fi+0x72c
+0x2309e0: 388106b0  addi r4, r1, 0x6b0   in FamilyTestHarness__Fi+0x740
+0x2312f8: 386105b4  addi r3, r1, 0x5b4   in HarnessEditPerson__Fi+0x2d7
+0x2312fc: 388105c0  addi r4, r1, 0x5c0   in HarnessEditPerson__Fi+0x2db
+0x231310: 386105b4  addi r3, r1, 0x5b4   in HarnessEditPerson__Fi+0x2ef
+0x231324: 386105b4  addi r3, r1, 0x5b4   in HarnessEditPerson__Fi+0x303
+0x23132c: 386105b4  addi r3, r1, 0x5b4   in HarnessEditPerson__Fi+0x30b
+0x2314a8: 386106c0  addi r3, r1, 0x6c0   in HarnessEditPerson__Fi+0x487
+0x2314ac: 388106cc  addi r4, r1, 0x6cc   in HarnessEditPerson__Fi+0x48b
+0x2314c0: 386106c0  addi r3, r1, 0x6c0   in HarnessEditPerson__Fi+0x49f
+0x2314d4: 386106c0  addi r3, r1, 0x6c0   in HarnessEditPerson__Fi+0x4b3
+0x2314dc: 386106c0  addi r3, r1, 0x6c0   in HarnessEditPerson__Fi+0x4bb
+0x2319f4: 38210730  addi r1, r1, 0x730   in ExportFamilyHTML__Fi+0x284
+0x232e6c: 38610690  addi r3, r1, 0x690   in GetHouseInfo__FiP9HouseInfoi+0x13c
+0x232e70: 3881069c  addi r4, r1, 0x69c   in GetHouseInfo__FiP9HouseInfoi+0x140
+0x232e88: 38810690  addi r4, r1, 0x690   in GetHouseInfo__FiP9HouseInfoi+0x158
+0x232f30: 3881058c  addi r4, r1, 0x58c   in GetHouseInfo__FiP9HouseInfoi+0x200
+0x234f08: 382105c0  addi r1, r1, 0x5c0   in ObjectDialogCheatCallback__FP17cCheatCommandLineUl+0x4e8
+0x23e410: 3863058c  addi r3, r3, 0x58c   in SetupNewHDSkins__12PersonFinderFi+0x17f
+0x23f328: 3863058c  addi r3, r3, 0x58c   in GetSpecies__12PersonFinderFi+0x148
+0x23f6b8: 3863058c  addi r3, r3, 0x58c   in GetGender__12PersonFinderFi+0x148
+0x23fb74: 3863058c  addi r3, r3, 0x58c   in GetAge__12PersonFinderFi+0xf4
+0x23fe3c: 3863058c  addi r3, r3, 0x58c   in GetJobPerformance__12PersonFinderFi+0x10c
+0x23ffa0: 3863058c  addi r3, r3, 0x58c   in GetJobPerformance__12PersonFinderFi+0x270
+0x2400ec: 3863058c  addi r3, r3, 0x58c   in GetJobPerformance__12PersonFinderFi+0x3bc
+0x240320: 3863058c  addi r3, r3, 0x58c   in GetSkillNeededToAdvance__12PersonFinderFii+0x130
+0x2404f4: 3883058c  addi r4, r3, 0x58c   in GetNextJobInTrack__12PersonFinderFi+0xb4
+0x240914: 3863058c  addi r3, r3, 0x58c   in GetJobA__12PersonFinderFi+0xb4
+0x240aa8: 3863058c  addi r3, r3, 0x58c   in GetJobA__12PersonFinderFi+0x248
+0x240cb4: 3863058c  addi r3, r3, 0x58c   in GetCareer__12PersonFinderFi+0xb4
+0x2410a4: 3863058c  addi r3, r3, 0x58c   in GetData__12PersonFinderFi+0xb4
+0x242580: 3863058c  addi r3, r3, 0x58c   in GetRelatedPeople__12PersonFinderFiRQ23std30vector<i,Q23std12allocator<i>>Q212PersonFinder14eRelationTypes+0x220
+0x2426d4: 3863058c  addi r3, r3, 0x58c   in GetRelatedPeople__12PersonFinderFiRQ23std30vector<i,Q23std12allocator<i>>Q212PersonFinder14eRelationTypes+0x374
+0x242828: 3863058c  addi r3, r3, 0x58c   in GetRelatedPeople__12PersonFinderFiRQ23std30vector<i,Q23std12allocator<i>>Q212PersonFinder14eRelationTypes+0x4c8
+0x242b38: 3863058c  addi r3, r3, 0x58c   in GetRelatedPeople__12PersonFinderFiRQ23std30vector<i,Q23std12allocator<i>>Q212PersonFinder14eRelationTypes+0x7d8
+0x242e54: 3863058c  addi r3, r3, 0x58c   in GetFullName__12PersonFinderFiR9CTGString+0x174
+0x24301c: 3863058c  addi r3, r3, 0x58c   in GetFullName__12PersonFinderFiR9CTGString+0x33c
+0x24338c: 3863058c  addi r3, r3, 0x58c   in GetName__12PersonFinderFiR9CTGString+0x12c
+0x2434d8: 3863058c  addi r3, r3, 0x58c   in GetName__12PersonFinderFiR9CTGString+0x278
+0x243624: 3863058c  addi r3, r3, 0x58c   in GetName__12PersonFinderFiR9CTGString+0x3c4
+0x2437a0: 3863058c  addi r3, r3, 0x58c   in GetName__12PersonFinderFiR9CTGString+0x540
+0x248a2c: 3861060c  addi r3, r1, 0x60c   in LoadScrapbook__10cScrapbookFRC16StackString<260>RC16StackString<260>+0x20c
+0x248a3c: 3861060c  addi r3, r1, 0x60c   in LoadScrapbook__10cScrapbookFRC16StackString<260>RC16StackString<260>+0x21c
+0x248b94: 3861060c  addi r3, r1, 0x60c   in LoadScrapbook__10cScrapbookFRC16StackString<260>RC16StackString<260>+0x374
+0x248b9c: 3861060c  addi r3, r1, 0x60c   in LoadScrapbook__10cScrapbookFRC16StackString<260>RC16StackString<260>+0x37c
+0x248bb0: 3861060c  addi r3, r1, 0x60c   in LoadScrapbook__10cScrapbookFRC16StackString<260>RC16StackString<260>+0x390
+0x24b49c: 386105d0  addi r3, r1, 0x5d0   in ExportUnoccupiedLot__8cSimsAppFv+0x32c
+0x24b4a0: 388105dc  addi r4, r1, 0x5dc   in ExportUnoccupiedLot__8cSimsAppFv+0x330
+0x24b4c8: 388105d0  addi r4, r1, 0x5d0   in ExportUnoccupiedLot__8cSimsAppFv+0x358
+0x24b504: 386105d0  addi r3, r1, 0x5d0   in ExportUnoccupiedLot__8cSimsAppFv+0x394
+0x24b538: 386105d0  addi r3, r1, 0x5d0   in ExportUnoccupiedLot__8cSimsAppFv+0x3c8
+0x24b56c: 386105d0  addi r3, r1, 0x5d0   in ExportUnoccupiedLot__8cSimsAppFv+0x3fc
+0x24b5a0: 386105d0  addi r3, r1, 0x5d0   in ExportUnoccupiedLot__8cSimsAppFv+0x430
+0x24b62c: 386105d0  addi r3, r1, 0x5d0   in ExportUnoccupiedLot__8cSimsAppFv+0x4bc
+0x24b63c: 386106e0  addi r3, r1, 0x6e0   in ExportUnoccupiedLot__8cSimsAppFv+0x4cc
+0x24b644: 386106e0  addi r3, r1, 0x6e0   in ExportUnoccupiedLot__8cSimsAppFv+0x4d4
+0x24b648: 388105d0  addi r4, r1, 0x5d0   in ExportUnoccupiedLot__8cSimsAppFv+0x4d8
+0x24b670: 388106e0  addi r4, r1, 0x6e0   in ExportUnoccupiedLot__8cSimsAppFv+0x500
+0x24b720: 386106e0  addi r3, r1, 0x6e0   in ExportUnoccupiedLot__8cSimsAppFv+0x5b0
+0x24b814: 386106e0  addi r3, r1, 0x6e0   in ExportUnoccupiedLot__8cSimsAppFv+0x6a4
+0x24c6ec: 38610598  addi r3, r1, 0x598   in SetupSoundDirectories__8cSimsAppFv+0x14c
+0x24c6f0: 388105a4  addi r4, r1, 0x5a4   in SetupSoundDirectories__8cSimsAppFv+0x150
+0x24c700: 38610598  addi r3, r1, 0x598   in SetupSoundDirectories__8cSimsAppFv+0x160
+0x24c714: 38810598  addi r4, r1, 0x598   in SetupSoundDirectories__8cSimsAppFv+0x174
+0x24c750: 386106a8  addi r3, r1, 0x6a8   in SetupSoundDirectories__8cSimsAppFv+0x1b0
+0x24c754: 388106b4  addi r4, r1, 0x6b4   in SetupSoundDirectories__8cSimsAppFv+0x1b4
+0x24c76c: 386106a8  addi r3, r1, 0x6a8   in SetupSoundDirectories__8cSimsAppFv+0x1cc
+0x24c77c: 388106a8  addi r4, r1, 0x6a8   in SetupSoundDirectories__8cSimsAppFv+0x1dc
+0x24e694: 38be05a0  addi r5, r30, 0x5a0   in AppCheatCallback__FP17cCheatCommandLineUl+0x224
+0x24e73c: 389e05a4  addi r4, r30, 0x5a4   in AppCheatCallback__FP17cCheatCommandLineUl+0x2cc
+0x24ec74: 389e0668  addi r4, r30, 0x668   in AppCheatCallback__FP17cCheatCommandLineUl+0x804
+0x24ef60: 389e06b2  addi r4, r30, 0x6b2   in AppCheatCallback__FP17cCheatCommandLineUl+0xaf0
+0x24ef64: 38be06c6  addi r5, r30, 0x6c6   in AppCheatCallback__FP17cCheatCommandLineUl+0xaf4
+0x24ef94: 389e06cc  addi r4, r30, 0x6cc   in AppCheatCallback__FP17cCheatCommandLineUl+0xb24
+0x24ef98: 38be06c6  addi r5, r30, 0x6c6   in AppCheatCallback__FP17cCheatCommandLineUl+0xb28
+0x24efcc: 38be06c6  addi r5, r30, 0x6c6   in AppCheatCallback__FP17cCheatCommandLineUl+0xb5c
+0x24f008: 38be06c6  addi r5, r30, 0x6c6   in AppCheatCallback__FP17cCheatCommandLineUl+0xb98
+0x24f450: 389e0760  addi r4, r30, 0x760   in AppCheatCallback__FP17cCheatCommandLineUl+0xfe0
+0x24f534: 387e077c  addi r3, r30, 0x77c   in AppCheatCallback__FP17cCheatCommandLineUl+0x10c4
+0x24f544: 389e077c  addi r4, r30, 0x77c   in AppCheatCallback__FP17cCheatCommandLineUl+0x10d4
+0x24f5ec: 389e077e  addi r4, r30, 0x77e   in AppCheatCallback__FP17cCheatCommandLineUl+0x117c
+0x24f718: 38610670  addi r3, r1, 0x670   in AppCheatCallback__FP17cCheatCommandLineUl+0x12a8
+0x24f71c: 3881067c  addi r4, r1, 0x67c   in AppCheatCallback__FP17cCheatCommandLineUl+0x12ac
+0x24f750: 38a10670  addi r5, r1, 0x670   in AppCheatCallback__FP17cCheatCommandLineUl+0x12e0
+0x24f768: 38810670  addi r4, r1, 0x670   in AppCheatCallback__FP17cCheatCommandLineUl+0x12f8
+0x24f81c: 38810670  addi r4, r1, 0x670   in AppCheatCallback__FP17cCheatCommandLineUl+0x13ac
+0x24fd88: 38610780  addi r3, r1, 0x780   in AppCheatCallback__FP17cCheatCommandLineUl+0x1918
+0x24fd8c: 3881078c  addi r4, r1, 0x78c   in AppCheatCallback__FP17cCheatCommandLineUl+0x191c
+0x24fda4: 38610780  addi r3, r1, 0x780   in AppCheatCallback__FP17cCheatCommandLineUl+0x1934
+0x24fde0: 38610780  addi r3, r1, 0x780   in AppCheatCallback__FP17cCheatCommandLineUl+0x1970
+0x24fe0c: 38610780  addi r3, r1, 0x780   in AppCheatCallback__FP17cCheatCommandLineUl+0x199c
+0x24fe1c: 38610780  addi r3, r1, 0x780   in AppCheatCallback__FP17cCheatCommandLineUl+0x19ac
+0x24ff04: 389e077c  addi r4, r30, 0x77c   in AppCheatCallback__FP17cCheatCommandLineUl+0x1a94
+0x2520a0: 38610594  addi r3, r1, 0x594   in RegisterCheats__8cSimsAppFv+0xae0
+0x2520bc: 38810594  addi r4, r1, 0x594   in RegisterCheats__8cSimsAppFv+0xafc
+0x2520c8: 386105a8  addi r3, r1, 0x5a8   in RegisterCheats__8cSimsAppFv+0xb08
+0x2520e4: 388105a8  addi r4, r1, 0x5a8   in RegisterCheats__8cSimsAppFv+0xb24
+0x2520f0: 386105bc  addi r3, r1, 0x5bc   in RegisterCheats__8cSimsAppFv+0xb30
+0x25210c: 388105bc  addi r4, r1, 0x5bc   in RegisterCheats__8cSimsAppFv+0xb4c
+0x252118: 386105d0  addi r3, r1, 0x5d0   in RegisterCheats__8cSimsAppFv+0xb58
+0x252134: 388105d0  addi r4, r1, 0x5d0   in RegisterCheats__8cSimsAppFv+0xb74
+0x252140: 386105e4  addi r3, r1, 0x5e4   in RegisterCheats__8cSimsAppFv+0xb80
+0x25215c: 388105e4  addi r4, r1, 0x5e4   in RegisterCheats__8cSimsAppFv+0xb9c
+0x252168: 386105f8  addi r3, r1, 0x5f8   in RegisterCheats__8cSimsAppFv+0xba8
+0x252184: 388105f8  addi r4, r1, 0x5f8   in RegisterCheats__8cSimsAppFv+0xbc4
+0x252190: 3861060c  addi r3, r1, 0x60c   in RegisterCheats__8cSimsAppFv+0xbd0
+0x2521ac: 3881060c  addi r4, r1, 0x60c   in RegisterCheats__8cSimsAppFv+0xbec
+0x2521b8: 38610620  addi r3, r1, 0x620   in RegisterCheats__8cSimsAppFv+0xbf8
+0x2521d4: 38810620  addi r4, r1, 0x620   in RegisterCheats__8cSimsAppFv+0xc14
+0x2521e0: 38610634  addi r3, r1, 0x634   in RegisterCheats__8cSimsAppFv+0xc20
+0x2521fc: 38810634  addi r4, r1, 0x634   in RegisterCheats__8cSimsAppFv+0xc3c
+0x252208: 38610648  addi r3, r1, 0x648   in RegisterCheats__8cSimsAppFv+0xc48
+0x252224: 38810648  addi r4, r1, 0x648   in RegisterCheats__8cSimsAppFv+0xc64
+0x252230: 3861065c  addi r3, r1, 0x65c   in RegisterCheats__8cSimsAppFv+0xc70
+0x25224c: 3881065c  addi r4, r1, 0x65c   in RegisterCheats__8cSimsAppFv+0xc8c
+0x252258: 38610670  addi r3, r1, 0x670   in RegisterCheats__8cSimsAppFv+0xc98
+0x252274: 38810670  addi r4, r1, 0x670   in RegisterCheats__8cSimsAppFv+0xcb4
+0x252280: 38610684  addi r3, r1, 0x684   in RegisterCheats__8cSimsAppFv+0xcc0
+0x25229c: 38810684  addi r4, r1, 0x684   in RegisterCheats__8cSimsAppFv+0xcdc
+0x2522a8: 38610698  addi r3, r1, 0x698   in RegisterCheats__8cSimsAppFv+0xce8
+0x2522c4: 38810698  addi r4, r1, 0x698   in RegisterCheats__8cSimsAppFv+0xd04
+0x2522d0: 386106ac  addi r3, r1, 0x6ac   in RegisterCheats__8cSimsAppFv+0xd10
+0x2522ec: 388106ac  addi r4, r1, 0x6ac   in RegisterCheats__8cSimsAppFv+0xd2c
+0x2522f8: 386106c0  addi r3, r1, 0x6c0   in RegisterCheats__8cSimsAppFv+0xd38
+0x252314: 388106c0  addi r4, r1, 0x6c0   in RegisterCheats__8cSimsAppFv+0xd54
+0x252320: 386106d4  addi r3, r1, 0x6d4   in RegisterCheats__8cSimsAppFv+0xd60
+0x25233c: 388106d4  addi r4, r1, 0x6d4   in RegisterCheats__8cSimsAppFv+0xd7c
+0x252348: 386106e8  addi r3, r1, 0x6e8   in RegisterCheats__8cSimsAppFv+0xd88
+0x252364: 388106e8  addi r4, r1, 0x6e8   in RegisterCheats__8cSimsAppFv+0xda4
+0x252370: 386106fc  addi r3, r1, 0x6fc   in RegisterCheats__8cSimsAppFv+0xdb0
+0x25238c: 388106fc  addi r4, r1, 0x6fc   in RegisterCheats__8cSimsAppFv+0xdcc
+0x252398: 38610710  addi r3, r1, 0x710   in RegisterCheats__8cSimsAppFv+0xdd8
+0x2523b4: 38810710  addi r4, r1, 0x710   in RegisterCheats__8cSimsAppFv+0xdf4
+0x2523c0: 38610724  addi r3, r1, 0x724   in RegisterCheats__8cSimsAppFv+0xe00
+0x2523dc: 38810724  addi r4, r1, 0x724   in RegisterCheats__8cSimsAppFv+0xe1c
+0x2523e8: 38610738  addi r3, r1, 0x738   in RegisterCheats__8cSimsAppFv+0xe28
+0x252404: 38810738  addi r4, r1, 0x738   in RegisterCheats__8cSimsAppFv+0xe44
+0x252410: 3861074c  addi r3, r1, 0x74c   in RegisterCheats__8cSimsAppFv+0xe50
+0x25242c: 3881074c  addi r4, r1, 0x74c   in RegisterCheats__8cSimsAppFv+0xe6c
+0x252438: 38610760  addi r3, r1, 0x760   in RegisterCheats__8cSimsAppFv+0xe78
+0x252454: 38810760  addi r4, r1, 0x760   in RegisterCheats__8cSimsAppFv+0xe94
+0x252460: 38610774  addi r3, r1, 0x774   in RegisterCheats__8cSimsAppFv+0xea0
+0x25247c: 38810774  addi r4, r1, 0x774   in RegisterCheats__8cSimsAppFv+0xebc
+0x252488: 38610788  addi r3, r1, 0x788   in RegisterCheats__8cSimsAppFv+0xec8
+0x2524a4: 38810788  addi r4, r1, 0x788   in RegisterCheats__8cSimsAppFv+0xee4
+0x27c700: 38210600  addi r1, r1, 0x600   in TSPaint__11cWinMemViewFb+0x91f
+0x29decc: 382105f0  addi r1, r1, 0x5f0   in TraverseRoofDirectory__13cWinRoofPanelFv+0xfc
+0x2be834: 3b6706fc  addi r27, r7, 0x6fc   in Draw__4WallFPC7tagRECTP11RenderParami+0x204
+0x2be870: 386706fe  addi r3, r7, 0x6fe   in Draw__4WallFPC7tagRECTP11RenderParami+0x240
+0x2cc34c: 38210590  addi r1, r1, 0x590   in PrintBodyStrings__19cWinDesignCharacterFv+0x18c
+0x2d5ebc: 38610650  addi r3, r1, 0x650   in SetHouseInfo__12cWinLotPopupFP9HouseInfoP13RampGeneratorb+0x3bc
+0x2d5ed4: 38810650  addi r4, r1, 0x650   in SetHouseInfo__12cWinLotPopupFP9HouseInfoP13RampGeneratorb+0x3d4
+0x2d5f0c: 38610650  addi r3, r1, 0x650   in SetHouseInfo__12cWinLotPopupFP9HouseInfoP13RampGeneratorb+0x40c
+0x2d5f24: 38810650  addi r4, r1, 0x650   in SetHouseInfo__12cWinLotPopupFP9HouseInfoP13RampGeneratorb+0x424
+0x2d60a8: 38610750  addi r3, r1, 0x750   in SetHouseInfo__12cWinLotPopupFP9HouseInfoP13RampGeneratorb+0x5a8
+0x2d60b4: 38810750  addi r4, r1, 0x750   in SetHouseInfo__12cWinLotPopupFP9HouseInfoP13RampGeneratorb+0x5b4
+0x2da8b4: 387e0628  addi r3, r30, 0x628   in BuildCatAnimationList__15cWinVitaBtnSoloFv+0x54
+0x2da8c0: 387e072c  addi r3, r30, 0x72c   in BuildCatAnimationList__15cWinVitaBtnSoloFv+0x60
+0x2e003c: 38c1058c  addi r6, r1, 0x58c   in BuildCap__16cRoofMeshFactoryFi+0x9ec
+0x2e0050: 39010598  addi r8, r1, 0x598   in BuildCap__16cRoofMeshFactoryFi+0xa00
+0x2e00bc: 388105a4  addi r4, r1, 0x5a4   in BuildCap__16cRoofMeshFactoryFi+0xa6c
+0x2e00d0: 38c105b0  addi r6, r1, 0x5b0   in BuildCap__16cRoofMeshFactoryFi+0xa80
+0x2e00e4: 390105bc  addi r8, r1, 0x5bc   in BuildCap__16cRoofMeshFactoryFi+0xa94
+0x2e0150: 388105c8  addi r4, r1, 0x5c8   in BuildCap__16cRoofMeshFactoryFi+0xb00
+0x2e0164: 38c105d4  addi r6, r1, 0x5d4   in BuildCap__16cRoofMeshFactoryFi+0xb14
+0x2e0178: 390105e0  addi r8, r1, 0x5e0   in BuildCap__16cRoofMeshFactoryFi+0xb28
+0x2e01e0: 388105ec  addi r4, r1, 0x5ec   in BuildCap__16cRoofMeshFactoryFi+0xb90
+0x2e01f4: 38c105f8  addi r6, r1, 0x5f8   in BuildCap__16cRoofMeshFactoryFi+0xba4
+0x2e0208: 39010604  addi r8, r1, 0x604   in BuildCap__16cRoofMeshFactoryFi+0xbb8
+0x2e026c: 38810610  addi r4, r1, 0x610   in BuildCap__16cRoofMeshFactoryFi+0xc1c
+0x2e0280: 38c1061c  addi r6, r1, 0x61c   in BuildCap__16cRoofMeshFactoryFi+0xc30
+0x2e0294: 39010628  addi r8, r1, 0x628   in BuildCap__16cRoofMeshFactoryFi+0xc44
+0x2e0308: 38810634  addi r4, r1, 0x634   in BuildCap__16cRoofMeshFactoryFi+0xcb8
+0x2e031c: 38c10640  addi r6, r1, 0x640   in BuildCap__16cRoofMeshFactoryFi+0xccc
+0x2e0330: 3901064c  addi r8, r1, 0x64c   in BuildCap__16cRoofMeshFactoryFi+0xce0
+0x2e039c: 38810658  addi r4, r1, 0x658   in BuildCap__16cRoofMeshFactoryFi+0xd4c
+0x2e03b0: 38c10664  addi r6, r1, 0x664   in BuildCap__16cRoofMeshFactoryFi+0xd60
+0x2e03c4: 39010670  addi r8, r1, 0x670   in BuildCap__16cRoofMeshFactoryFi+0xd74
+0x2e0430: 3881067c  addi r4, r1, 0x67c   in BuildCap__16cRoofMeshFactoryFi+0xde0
+0x2e0444: 38c10688  addi r6, r1, 0x688   in BuildCap__16cRoofMeshFactoryFi+0xdf4
+0x2e0458: 39010694  addi r8, r1, 0x694   in BuildCap__16cRoofMeshFactoryFi+0xe08
+0x2e04c0: 388106a0  addi r4, r1, 0x6a0   in BuildCap__16cRoofMeshFactoryFi+0xe70
+0x2e04d4: 38c106ac  addi r6, r1, 0x6ac   in BuildCap__16cRoofMeshFactoryFi+0xe84
+0x2e04e8: 390106b8  addi r8, r1, 0x6b8   in BuildCap__16cRoofMeshFactoryFi+0xe98
+0x2e0550: 388106c4  addi r4, r1, 0x6c4   in BuildCap__16cRoofMeshFactoryFi+0xf00
+0x2e0564: 38c106d0  addi r6, r1, 0x6d0   in BuildCap__16cRoofMeshFactoryFi+0xf14
+0x2e0578: 390106dc  addi r8, r1, 0x6dc   in BuildCap__16cRoofMeshFactoryFi+0xf28
+0x2e05e0: 388106e8  addi r4, r1, 0x6e8   in BuildCap__16cRoofMeshFactoryFi+0xf90
+0x2e05f4: 38c106f4  addi r6, r1, 0x6f4   in BuildCap__16cRoofMeshFactoryFi+0xfa4
+0x2e0608: 39010700  addi r8, r1, 0x700   in BuildCap__16cRoofMeshFactoryFi+0xfb8
+0x2e067c: 3881070c  addi r4, r1, 0x70c   in BuildCap__16cRoofMeshFactoryFi+0x102c
+0x2e0690: 38c10718  addi r6, r1, 0x718   in BuildCap__16cRoofMeshFactoryFi+0x1040
+0x2e06a4: 39010724  addi r8, r1, 0x724   in BuildCap__16cRoofMeshFactoryFi+0x1054
+0x2e0710: 38810730  addi r4, r1, 0x730   in BuildCap__16cRoofMeshFactoryFi+0x10c0
+0x2e0724: 38c1073c  addi r6, r1, 0x73c   in BuildCap__16cRoofMeshFactoryFi+0x10d4
+0x2e0738: 39010748  addi r8, r1, 0x748   in BuildCap__16cRoofMeshFactoryFi+0x10e8
+0x2e07a0: 38810754  addi r4, r1, 0x754   in BuildCap__16cRoofMeshFactoryFi+0x1150
+0x2e07b4: 38c10760  addi r6, r1, 0x760   in BuildCap__16cRoofMeshFactoryFi+0x1164
+0x2e07c8: 3901076c  addi r8, r1, 0x76c   in BuildCap__16cRoofMeshFactoryFi+0x1178
+0x2e082c: 38810778  addi r4, r1, 0x778   in BuildCap__16cRoofMeshFactoryFi+0x11dc
+0x2e0840: 38c10784  addi r6, r1, 0x784   in BuildCap__16cRoofMeshFactoryFi+0x11f0
+0x31149c: 389d059c  addi r4, r29, 0x59c   in DoCommand__12cTrackPlayerFv+0x15bc
+0x3114dc: 389d05c0  addi r4, r29, 0x5c0   in DoCommand__12cTrackPlayerFv+0x15fc
+0x3115c0: 389d060a  addi r4, r29, 0x60a   in DoCommand__12cTrackPlayerFv+0x16e0
+0x311664: 389d0630  addi r4, r29, 0x630   in DoCommand__12cTrackPlayerFv+0x1784
+0x311830: 389d06bc  addi r4, r29, 0x6bc   in DoCommand__12cTrackPlayerFv+0x1950
+0x311870: 389d06de  addi r4, r29, 0x6de   in DoCommand__12cTrackPlayerFv+0x1990
+0x311944: 389d0722  addi r4, r29, 0x722   in DoCommand__12cTrackPlayerFv+0x1a64
+0x3119ec: 389d0744  addi r4, r29, 0x744   in DoCommand__12cTrackPlayerFv+0x1b0c
+0x351588: 38210590  addi r1, r1, 0x590   in SetOriginals__11BodyStringsFP11BodyStringsRQ23std62vector<15StackString<64>,Q23std28allocator<15StackString<64>>>+0x348
+0x355e08: 389e059a  addi r4, r30, 0x59a   in HandleVitaBoyAnimEvent__9SAnimatorFP8PracticeP4BoneP6MotionP5Propsf+0x568
+0x357678: 387f05f4  addi r3, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0xb8
+0x357688: 389f05f4  addi r4, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0xc8
+0x35769c: 387f05f6  addi r3, r31, 0x5f6   in UpdateEventLog__9SAnimatorFv+0xdc
+0x3576ac: 389f05f6  addi r4, r31, 0x5f6   in UpdateEventLog__9SAnimatorFv+0xec
+0x3576ec: 387f05f4  addi r3, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x12c
+0x3576fc: 389f05f4  addi r4, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x13c
+0x357710: 387f0608  addi r3, r31, 0x608   in UpdateEventLog__9SAnimatorFv+0x150
+0x357720: 389f0608  addi r4, r31, 0x608   in UpdateEventLog__9SAnimatorFv+0x160
+0x3577a4: 387f05f4  addi r3, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x1e4
+0x3577b4: 389f05f4  addi r4, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x1f4
+0x3577c8: 387f0616  addi r3, r31, 0x616   in UpdateEventLog__9SAnimatorFv+0x208
+0x3577d8: 389f0616  addi r4, r31, 0x616   in UpdateEventLog__9SAnimatorFv+0x218
+0x357818: 387f05f4  addi r3, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x258
+0x357828: 389f05f4  addi r4, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x268
+0x35783c: 387f061e  addi r3, r31, 0x61e   in UpdateEventLog__9SAnimatorFv+0x27c
+0x35784c: 389f061e  addi r4, r31, 0x61e   in UpdateEventLog__9SAnimatorFv+0x28c
+0x35788c: 387f05f4  addi r3, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x2cc
+0x35789c: 389f05f4  addi r4, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x2dc
+0x3578f0: 387f05f4  addi r3, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x330
+0x357900: 389f05f4  addi r4, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x340
+0x357958: 387f05f4  addi r3, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x398
+0x357968: 389f05f4  addi r4, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x3a8
+0x357a70: 387f05f4  addi r3, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x4b0
+0x357a80: 389f05f4  addi r4, r31, 0x5f4   in UpdateEventLog__9SAnimatorFv+0x4c0
+0x357ac0: 387f065e  addi r3, r31, 0x65e   in UpdateEventLog__9SAnimatorFv+0x500
+0x357ad0: 389f065e  addi r4, r31, 0x65e   in UpdateEventLog__9SAnimatorFv+0x510
+0x357b04: 389f0668  addi r4, r31, 0x668   in UpdateEventLog__9SAnimatorFv+0x544
+0x357b48: 389f0686  addi r4, r31, 0x686   in UpdateEventLog__9SAnimatorFv+0x588
+0x357b8c: 389f06a8  addi r4, r31, 0x6a8   in UpdateEventLog__9SAnimatorFv+0x5cc
+0x357c00: 389f06dc  addi r4, r31, 0x6dc   in UpdateEventLog__9SAnimatorFv+0x640
+0x357c30: 389f06f0  addi r4, r31, 0x6f0   in UpdateEventLog__9SAnimatorFv+0x670
+0x357cc0: 389f071c  addi r4, r31, 0x71c   in UpdateEventLog__9SAnimatorFv+0x700
+0x357db4: 38210680  addi r1, r1, 0x680   in UpdateEventLog__9SAnimatorFv+0x7f4
+0x35b3dc: 389d074e  addi r4, r29, 0x74e   in UpdateOutfitAndHands__9SAnimatorFb+0x4cc
+0x35b6bc: 389d0756  addi r4, r29, 0x756   in UpdateOutfitAndHands__9SAnimatorFb+0x7ac
+0x35b740: 389d0764  addi r4, r29, 0x764   in UpdateOutfitAndHands__9SAnimatorFb+0x830
+0x35b798: 389d076e  addi r4, r29, 0x76e   in UpdateOutfitAndHands__9SAnimatorFb+0x888
+0x35b7f0: 389d0778  addi r4, r29, 0x778   in UpdateOutfitAndHands__9SAnimatorFb+0x8e0
+0x35be5c: 387f05a8  addi r3, r31, 0x5a8   in UpdateOutfitAndHands__9SAnimatorFb+0xf4c
+0x35be60: 389f05b4  addi r4, r31, 0x5b4   in UpdateOutfitAndHands__9SAnimatorFb+0xf50
+0x35be74: 387f05a8  addi r3, r31, 0x5a8   in UpdateOutfitAndHands__9SAnimatorFb+0xf64
+0x35be88: 389f05a8  addi r4, r31, 0x5a8   in UpdateOutfitAndHands__9SAnimatorFb+0xf78
+0x35be90: 387f05f4  addi r3, r31, 0x5f4   in UpdateOutfitAndHands__9SAnimatorFb+0xf80
+0x35be94: 389f0600  addi r4, r31, 0x600   in UpdateOutfitAndHands__9SAnimatorFb+0xf84
+0x35bea8: 387f05f4  addi r3, r31, 0x5f4   in UpdateOutfitAndHands__9SAnimatorFb+0xf98
+0x35bebc: 389f05f4  addi r4, r31, 0x5f4   in UpdateOutfitAndHands__9SAnimatorFb+0xfac
+0x35bf18: 387f0640  addi r3, r31, 0x640   in UpdateOutfitAndHands__9SAnimatorFb+0x1008
+0x35bf1c: 389f064c  addi r4, r31, 0x64c   in UpdateOutfitAndHands__9SAnimatorFb+0x100c
+0x35bf30: 387f0640  addi r3, r31, 0x640   in UpdateOutfitAndHands__9SAnimatorFb+0x1020
+0x35bf44: 389f0640  addi r4, r31, 0x640   in UpdateOutfitAndHands__9SAnimatorFb+0x1034
+0x35bf4c: 387f068c  addi r3, r31, 0x68c   in UpdateOutfitAndHands__9SAnimatorFb+0x103c
+0x35bf50: 389f0698  addi r4, r31, 0x698   in UpdateOutfitAndHands__9SAnimatorFb+0x1040
+0x35bf64: 387f068c  addi r3, r31, 0x68c   in UpdateOutfitAndHands__9SAnimatorFb+0x1054
+0x35bf78: 389f068c  addi r4, r31, 0x68c   in UpdateOutfitAndHands__9SAnimatorFb+0x1068
+0x35bfd4: 387f06d8  addi r3, r31, 0x6d8   in UpdateOutfitAndHands__9SAnimatorFb+0x10c4
+0x35bfd8: 389f06e4  addi r4, r31, 0x6e4   in UpdateOutfitAndHands__9SAnimatorFb+0x10c8
+0x35bfec: 387f06d8  addi r3, r31, 0x6d8   in UpdateOutfitAndHands__9SAnimatorFb+0x10dc
+0x35c000: 389f06d8  addi r4, r31, 0x6d8   in UpdateOutfitAndHands__9SAnimatorFb+0x10f0
+0x35c008: 387f0724  addi r3, r31, 0x724   in UpdateOutfitAndHands__9SAnimatorFb+0x10f8
+0x35c00c: 389f0730  addi r4, r31, 0x730   in UpdateOutfitAndHands__9SAnimatorFb+0x10fc
+0x35c020: 387f0724  addi r3, r31, 0x724   in UpdateOutfitAndHands__9SAnimatorFb+0x1110
+0x35c034: 389f0724  addi r4, r31, 0x724   in UpdateOutfitAndHands__9SAnimatorFb+0x1124
+0x35c090: 387f0770  addi r3, r31, 0x770   in UpdateOutfitAndHands__9SAnimatorFb+0x1180
+0x35c094: 389f077c  addi r4, r31, 0x77c   in UpdateOutfitAndHands__9SAnimatorFb+0x1184
+0x35c0a8: 387f0770  addi r3, r31, 0x770   in UpdateOutfitAndHands__9SAnimatorFb+0x1198
+0x35c0bc: 389f0770  addi r4, r31, 0x770   in UpdateOutfitAndHands__9SAnimatorFb+0x11ac
+0x35dce0: 389d074e  addi r4, r29, 0x74e   in UpdateOutfitAndHands__9SAnimatorFb+0x2dd0
+0x35fc8c: 389f05f4  addi r4, r31, 0x5f4   in TryAnimate__9SAnimatorFP9StackElemPC15AnimateNewParam+0x1bc
+0x35fdc8: 389f05f4  addi r4, r31, 0x5f4   in TryAnimate__9SAnimatorFP9StackElemPC15AnimateNewParam+0x2f8
+0x35ffa4: 389f05f4  addi r4, r31, 0x5f4   in TryAnimate__9SAnimatorFP9StackElemPC15AnimateNewParam+0x4d4
+0x360384: 389f05f4  addi r4, r31, 0x5f4   in TryAnimate__9SAnimatorFP9StackElemPC15AnimateNewParam+0x8b4
+0x36157c: 386105e8  addi r3, r1, 0x5e8   in ResetSuits__9SAnimatorFv+0x14c
+0x361580: 388105f4  addi r4, r1, 0x5f4   in ResetSuits__9SAnimatorFv+0x150
+0x361594: 386105e8  addi r3, r1, 0x5e8   in ResetSuits__9SAnimatorFv+0x164
+0x3615a8: 388105e8  addi r4, r1, 0x5e8   in ResetSuits__9SAnimatorFv+0x178
+0x3615c8: 386106f4  addi r3, r1, 0x6f4   in ResetSuits__9SAnimatorFv+0x198
+0x3615cc: 38810700  addi r4, r1, 0x700   in ResetSuits__9SAnimatorFv+0x19c
+0x3615e0: 386106f4  addi r3, r1, 0x6f4   in ResetSuits__9SAnimatorFv+0x1b0
+0x3615f4: 388106f4  addi r4, r1, 0x6f4   in ResetSuits__9SAnimatorFv+0x1c4
+0x3910d8: 388105f0  addi r4, r1, 0x5f0   in LoadIndexFromFile__9VBAnimMgrFRC9CTGStringP7CTGFileP8RsrcSite+0x78
+0x3911a0: 386105f0  addi r3, r1, 0x5f0   in LoadIndexFromFile__9VBAnimMgrFRC9CTGStringP7CTGFileP8RsrcSite+0x140
+0x3911bc: 388105f0  addi r4, r1, 0x5f0   in LoadIndexFromFile__9VBAnimMgrFRC9CTGStringP7CTGFileP8RsrcSite+0x15c
+0x3912e0: 388105f0  addi r4, r1, 0x5f0   in LoadIndexFromFile__9VBAnimMgrFRC9CTGStringP7CTGFileP8RsrcSite+0x280
+0x3913a8: 386105f0  addi r3, r1, 0x5f0   in LoadIndexFromFile__9VBAnimMgrFRC9CTGStringP7CTGFileP8RsrcSite+0x348
+0x3913c4: 388105f0  addi r4, r1, 0x5f0   in LoadIndexFromFile__9VBAnimMgrFRC9CTGStringP7CTGFileP8RsrcSite+0x364
+0x3914e8: 388105f0  addi r4, r1, 0x5f0   in LoadIndexFromFile__9VBAnimMgrFRC9CTGStringP7CTGFileP8RsrcSite+0x488
+0x3915b0: 386105f0  addi r3, r1, 0x5f0   in LoadIndexFromFile__9VBAnimMgrFRC9CTGStringP7CTGFileP8RsrcSite+0x550
+0x3915cc: 388105f0  addi r4, r1, 0x5f0   in LoadIndexFromFile__9VBAnimMgrFRC9CTGStringP7CTGFileP8RsrcSite+0x56c
+0x391d58: 38210610  addi r1, r1, 0x610   in LoadAllAnimations__9VBAnimMgrFP8RsrcSitebPC9CTGStringPC9CTGString+0x58b
+0x3beb08: 38e105b0  addi r7, r1, 0x5b0   in RemapPalettizedSurface__10AnimDeviceFR35DDDCOMWrapper<18IDirectDrawSurface>R35DDDCOMWrapper<18IDirectDrawPalette>+0xb8
+0x3beb58: 390105b0  addi r8, r1, 0x5b0   in RemapPalettizedSurface__10AnimDeviceFR35DDDCOMWrapper<18IDirectDrawSurface>R35DDDCOMWrapper<18IDirectDrawPalette>+0x108
+0x3c35dc: 38210620  addi r1, r1, 0x620   in CreateBuffers__10AnimDeviceFRC8RectDimsiP15tagPALETTEENTRY+0xa8c
+0x3c489c: 387f0598  addi r3, r31, 0x598   in __ct__10AnimDeviceFv+0x23c
+0x3c9c30: 3866073a  addi r3, r6, 0x73a   in D3DErrorString__Fl+0x1000
+0x3fd040: 3a4105b4  addi r18, r1, 0x5b4   in CycleThroughImports__12cWinDowntownFv+0xd0
+0x3fd4bc: 386105a8  addi r3, r1, 0x5a8   in CycleThroughImports__12cWinDowntownFv+0x54c
+0x3fd4d0: 388105a8  addi r4, r1, 0x5a8   in CycleThroughImports__12cWinDowntownFv+0x560
+0x3fd4e0: 386105a8  addi r3, r1, 0x5a8   in CycleThroughImports__12cWinDowntownFv+0x570
+0x3fd4f0: 386106b8  addi r3, r1, 0x6b8   in CycleThroughImports__12cWinDowntownFv+0x580
+0x3fd4f8: 386106b8  addi r3, r1, 0x6b8   in CycleThroughImports__12cWinDowntownFv+0x588
+0x3fd4fc: 388105a8  addi r4, r1, 0x5a8   in CycleThroughImports__12cWinDowntownFv+0x58c
+0x3fd528: 388106b8  addi r4, r1, 0x6b8   in CycleThroughImports__12cWinDowntownFv+0x5b8
+0x3fd584: 386106b8  addi r3, r1, 0x6b8   in CycleThroughImports__12cWinDowntownFv+0x614
+0x3fd5a8: 386106b8  addi r3, r1, 0x6b8   in CycleThroughImports__12cWinDowntownFv+0x638
+0x3fdfb4: 3aa105ac  addi r21, r1, 0x5ac   in CheckNeighborhoodFileLocked__12cWinDowntownFv+0x1a4
+0x3fdfd8: 386105a0  addi r3, r1, 0x5a0   in CheckNeighborhoodFileLocked__12cWinDowntownFv+0x1c8
+0x3fdffc: 388105a0  addi r4, r1, 0x5a0   in CheckNeighborhoodFileLocked__12cWinDowntownFv+0x1ec
+0x3fe25c: 3aa106b8  addi r21, r1, 0x6b8   in CheckNeighborhoodFileLocked__12cWinDowntownFv+0x44c
+0x3fe280: 386106ac  addi r3, r1, 0x6ac   in CheckNeighborhoodFileLocked__12cWinDowntownFv+0x470
+0x3fe2a4: 388106ac  addi r4, r1, 0x6ac   in CheckNeighborhoodFileLocked__12cWinDowntownFv+0x494
+0x40626c: 38630640  addi r3, r3, 0x640   in Init__12cWinInterestFv+0xcc
+0x43f4d0: 3a410644  addi r18, r1, 0x644   in CycleThroughImports__12cWinVacationFv+0xd0
+0x43fb70: 38610638  addi r3, r1, 0x638   in CycleThroughImports__12cWinVacationFv+0x770
+0x43fb84: 38810638  addi r4, r1, 0x638   in CycleThroughImports__12cWinVacationFv+0x784
+0x43fb94: 38610638  addi r3, r1, 0x638   in CycleThroughImports__12cWinVacationFv+0x794
+0x43fba4: 38610748  addi r3, r1, 0x748   in CycleThroughImports__12cWinVacationFv+0x7a4
+0x43fbac: 38610748  addi r3, r1, 0x748   in CycleThroughImports__12cWinVacationFv+0x7ac
+0x43fbb0: 38810638  addi r4, r1, 0x638   in CycleThroughImports__12cWinVacationFv+0x7b0
+0x43fbdc: 38810748  addi r4, r1, 0x748   in CycleThroughImports__12cWinVacationFv+0x7dc
+0x43fc38: 38610748  addi r3, r1, 0x748   in CycleThroughImports__12cWinVacationFv+0x838
+0x43fc5c: 38610748  addi r3, r1, 0x748   in CycleThroughImports__12cWinVacationFv+0x85c
+0x440894: 3aa105ac  addi r21, r1, 0x5ac   in CheckNeighborhoodFileLocked__12cWinVacationFv+0x1a4
+0x4408b8: 386105a0  addi r3, r1, 0x5a0   in CheckNeighborhoodFileLocked__12cWinVacationFv+0x1c8
+0x4408dc: 388105a0  addi r4, r1, 0x5a0   in CheckNeighborhoodFileLocked__12cWinVacationFv+0x1ec
+0x440b3c: 3aa106b8  addi r21, r1, 0x6b8   in CheckNeighborhoodFileLocked__12cWinVacationFv+0x44c
+0x440b60: 386106ac  addi r3, r1, 0x6ac   in CheckNeighborhoodFileLocked__12cWinVacationFv+0x470
+0x440b84: 388106ac  addi r4, r1, 0x6ac   in CheckNeighborhoodFileLocked__12cWinVacationFv+0x494
+0x466a00: 3a6105b4  addi r19, r1, 0x5b4   in CycleCommunityImports__18cWinNeighborhoodULFv+0xd0
+0x466e50: 386105a8  addi r3, r1, 0x5a8   in CycleCommunityImports__18cWinNeighborhoodULFv+0x520
+0x466e64: 388105a8  addi r4, r1, 0x5a8   in CycleCommunityImports__18cWinNeighborhoodULFv+0x534
+0x466e74: 386105a8  addi r3, r1, 0x5a8   in CycleCommunityImports__18cWinNeighborhoodULFv+0x544
+0x466e84: 386106b8  addi r3, r1, 0x6b8   in CycleCommunityImports__18cWinNeighborhoodULFv+0x554
+0x466e8c: 386106b8  addi r3, r1, 0x6b8   in CycleCommunityImports__18cWinNeighborhoodULFv+0x55c
+0x466e90: 388105a8  addi r4, r1, 0x5a8   in CycleCommunityImports__18cWinNeighborhoodULFv+0x560
+0x466ebc: 388106b8  addi r4, r1, 0x6b8   in CycleCommunityImports__18cWinNeighborhoodULFv+0x58c
+0x466f1c: 386106b8  addi r3, r1, 0x6b8   in CycleCommunityImports__18cWinNeighborhoodULFv+0x5ec
+0x466f54: 386106b8  addi r3, r1, 0x6b8   in CycleCommunityImports__18cWinNeighborhoodULFv+0x624
+0x4672c0: 3a6105b4  addi r19, r1, 0x5b4   in CycleResidentialImports__18cWinNeighborhoodULFv+0xd0
+0x467710: 386105a8  addi r3, r1, 0x5a8   in CycleResidentialImports__18cWinNeighborhoodULFv+0x520
+0x467724: 388105a8  addi r4, r1, 0x5a8   in CycleResidentialImports__18cWinNeighborhoodULFv+0x534
+0x467734: 386105a8  addi r3, r1, 0x5a8   in CycleResidentialImports__18cWinNeighborhoodULFv+0x544
+0x467744: 386106b8  addi r3, r1, 0x6b8   in CycleResidentialImports__18cWinNeighborhoodULFv+0x554
+0x46774c: 386106b8  addi r3, r1, 0x6b8   in CycleResidentialImports__18cWinNeighborhoodULFv+0x55c
+0x467750: 388105a8  addi r4, r1, 0x5a8   in CycleResidentialImports__18cWinNeighborhoodULFv+0x560
+0x46777c: 388106b8  addi r4, r1, 0x6b8   in CycleResidentialImports__18cWinNeighborhoodULFv+0x58c
+0x4677dc: 386106b8  addi r3, r1, 0x6b8   in CycleResidentialImports__18cWinNeighborhoodULFv+0x5ec
+0x467814: 386106b8  addi r3, r1, 0x6b8   in CycleResidentialImports__18cWinNeighborhoodULFv+0x624
+0x467b8c: 39c105ac  addi r14, r1, 0x5ac   in CycleThroughImports__18cWinNeighborhoodULFv+0xdc
+0x468868: 38210660  addi r1, r1, 0x660   in CycleThroughImports__18cWinNeighborhoodULFv+0xdb8
+0x46a3f0: 3ac105ac  addi r22, r1, 0x5ac   in CheckNeighborhoodFileLocked__18cWinNeighborhoodULFv+0x1df
+0x46a414: 386105a0  addi r3, r1, 0x5a0   in CheckNeighborhoodFileLocked__18cWinNeighborhoodULFv+0x203
+0x46a438: 388105a0  addi r4, r1, 0x5a0   in CheckNeighborhoodFileLocked__18cWinNeighborhoodULFv+0x227
+0x46a6d8: 3a8106b8  addi r20, r1, 0x6b8   in CheckNeighborhoodFileLocked__18cWinNeighborhoodULFv+0x4c7
+0x46a6fc: 386106ac  addi r3, r1, 0x6ac   in CheckNeighborhoodFileLocked__18cWinNeighborhoodULFv+0x4eb
+0x46a720: 388106ac  addi r4, r1, 0x6ac   in CheckNeighborhoodFileLocked__18cWinNeighborhoodULFv+0x50f
+0x46e088: 387e0746  addi r3, r30, 0x746   in __sinit_:WinNeighborhoodUL_cpp+0x14e
+0x46e104: 389e0746  addi r4, r30, 0x746   in __sinit_:WinNeighborhoodUL_cpp+0x1ca
+0x46e118: 387e0638  addi r3, r30, 0x638   in __sinit_:WinNeighborhoodUL_cpp+0x1de
+0x470580: 3ae105a4  addi r23, r1, 0x5a4   in CycleThroughImports__18cWinNeighborhoodVCFv+0xe0
+0x471180: 38210650  addi r1, r1, 0x650   in CycleThroughImports__18cWinNeighborhoodVCFv+0xce0
+0x472720: 3ac105ac  addi r22, r1, 0x5ac   in CheckNeighborhoodFileLocked__18cWinNeighborhoodVCFv+0x1c0
+0x472744: 386105a0  addi r3, r1, 0x5a0   in CheckNeighborhoodFileLocked__18cWinNeighborhoodVCFv+0x1e4
+0x472768: 388105a0  addi r4, r1, 0x5a0   in CheckNeighborhoodFileLocked__18cWinNeighborhoodVCFv+0x208
+0x4729ec: 3a8106b8  addi r20, r1, 0x6b8   in CheckNeighborhoodFileLocked__18cWinNeighborhoodVCFv+0x48c
+0x472a10: 386106ac  addi r3, r1, 0x6ac   in CheckNeighborhoodFileLocked__18cWinNeighborhoodVCFv+0x4b0
+0x472a34: 388106ac  addi r4, r1, 0x6ac   in CheckNeighborhoodFileLocked__18cWinNeighborhoodVCFv+0x4d4
+0x478b00: 3a4105b4  addi r18, r1, 0x5b4   in CycleThroughImports__14cWinStudiotownFv+0xd0
+0x478f6c: 386105a8  addi r3, r1, 0x5a8   in CycleThroughImports__14cWinStudiotownFv+0x53c
+0x478f80: 388105a8  addi r4, r1, 0x5a8   in CycleThroughImports__14cWinStudiotownFv+0x550
+0x478f90: 386105a8  addi r3, r1, 0x5a8   in CycleThroughImports__14cWinStudiotownFv+0x560
+0x478fa0: 386106b8  addi r3, r1, 0x6b8   in CycleThroughImports__14cWinStudiotownFv+0x570
+0x478fa8: 386106b8  addi r3, r1, 0x6b8   in CycleThroughImports__14cWinStudiotownFv+0x578
+0x478fac: 388105a8  addi r4, r1, 0x5a8   in CycleThroughImports__14cWinStudiotownFv+0x57c
+0x478fd8: 388106b8  addi r4, r1, 0x6b8   in CycleThroughImports__14cWinStudiotownFv+0x5a8
+0x479034: 386106b8  addi r3, r1, 0x6b8   in CycleThroughImports__14cWinStudiotownFv+0x604
+0x479058: 386106b8  addi r3, r1, 0x6b8   in CycleThroughImports__14cWinStudiotownFv+0x628
+0x479a74: 3aa105ac  addi r21, r1, 0x5ac   in CheckNeighborhoodFileLocked__14cWinStudiotownFv+0x1a4
+0x479a98: 386105a0  addi r3, r1, 0x5a0   in CheckNeighborhoodFileLocked__14cWinStudiotownFv+0x1c8
+0x479abc: 388105a0  addi r4, r1, 0x5a0   in CheckNeighborhoodFileLocked__14cWinStudiotownFv+0x1ec
+0x479d1c: 3aa106b8  addi r21, r1, 0x6b8   in CheckNeighborhoodFileLocked__14cWinStudiotownFv+0x44c
+0x479d40: 386106ac  addi r3, r1, 0x6ac   in CheckNeighborhoodFileLocked__14cWinStudiotownFv+0x470
+0x479d64: 388106ac  addi r4, r1, 0x6ac   in CheckNeighborhoodFileLocked__14cWinStudiotownFv+0x494
+0x482e20: 38210680  addi r1, r1, 0x680   in InitializeManager__8AnimatorFP8Device3DPC16StackString<260>+0x1230
+0x4c55a0: 38860592  addi r4, r6, 0x592   in GetMonthName__18cTSLanguageUtilityFUcR9cTSString+0xa50
+0x4c55d0: 3886059e  addi r4, r6, 0x59e   in GetMonthName__18cTSLanguageUtilityFUcR9cTSString+0xa80
+0x4c55f0: 388605aa  addi r4, r6, 0x5aa   in GetMonthName__18cTSLanguageUtilityFUcR9cTSString+0xaa0
+0x4c5620: 388605c2  addi r4, r6, 0x5c2   in GetMonthName__18cTSLanguageUtilityFUcR9cTSString+0xad0
+0x4c5654: 388605ca  addi r4, r6, 0x5ca   in GetMonthName__18cTSLanguageUtilityFUcR9cTSString+0xb04
+0x4c5664: 388605d2  addi r4, r6, 0x5d2   in GetMonthName__18cTSLanguageUtilityFUcR9cTSString+0xb14
+0x4c5684: 388605de  addi r4, r6, 0x5de   in GetMonthName__18cTSLanguageUtilityFUcR9cTSString+0xb34
+0x4c56b4: 388605f0  addi r4, r6, 0x5f0   in GetMonthName__18cTSLanguageUtilityFUcR9cTSString+0xb64
+0x4c56d4: 38860600  addi r4, r6, 0x600   in GetMonthName__18cTSLanguageUtilityFUcR9cTSString+0xb84
+0x4c5704: 3886061e  addi r4, r6, 0x61e   in GetMonthName__18cTSLanguageUtilityFUcR9cTSString+0xbb4
+0x4c5ba4: 38860638  addi r4, r6, 0x638   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x94
+0x4c5bb4: 3886063c  addi r4, r6, 0x63c   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0xa4
+0x4c5bc4: 38860640  addi r4, r6, 0x640   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0xb4
+0x4c5bf8: 38860644  addi r4, r6, 0x644   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0xe8
+0x4c5c18: 38860648  addi r4, r6, 0x648   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x108
+0x4c5c28: 3886064c  addi r4, r6, 0x64c   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x118
+0x4c5c38: 38860650  addi r4, r6, 0x650   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x128
+0x4c5c48: 38860654  addi r4, r6, 0x654   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x138
+0x4c5c58: 38860658  addi r4, r6, 0x658   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x148
+0x4c5c8c: 3886065c  addi r4, r6, 0x65c   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x17c
+0x4c5cac: 38860662  addi r4, r6, 0x662   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x19c
+0x4c5ccc: 38860668  addi r4, r6, 0x668   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x1bc
+0x4c5cec: 3886066e  addi r4, r6, 0x66e   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x1dc
+0x4c5efc: 388606ba  addi r4, r6, 0x6ba   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x3ec
+0x4c5f2c: 388606c0  addi r4, r6, 0x6c0   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x41c
+0x4c5f70: 388606c6  addi r4, r6, 0x6c6   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x460
+0x4c5f90: 388606ca  addi r4, r6, 0x6ca   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x480
+0x4c5fa0: 388606ce  addi r4, r6, 0x6ce   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x490
+0x4c5fb0: 388606d2  addi r4, r6, 0x6d2   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x4a0
+0x4c6004: 388606d6  addi r4, r6, 0x6d6   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x4f4
+0x4c6024: 388606dc  addi r4, r6, 0x6dc   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x514
+0x4c6044: 388606e2  addi r4, r6, 0x6e2   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x534
+0x4c6064: 388606e8  addi r4, r6, 0x6e8   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x554
+0x4c60a8: 388606ee  addi r4, r6, 0x6ee   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x598
+0x4c60c8: 388606f4  addi r4, r6, 0x6f4   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x5b8
+0x4c60e8: 3886066e  addi r4, r6, 0x66e   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x5d8
+0x4c60f8: 388606fa  addi r4, r6, 0x6fa   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x5e8
+0x4c612c: 388606fc  addi r4, r6, 0x6fc   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x61c
+0x4c614c: 38860702  addi r4, r6, 0x702   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x63c
+0x4c616c: 38860708  addi r4, r6, 0x708   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x65c
+0x4c618c: 3886070e  addi r4, r6, 0x70e   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x67c
+0x4c61d0: 38860714  addi r4, r6, 0x714   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x6c0
+0x4c61f0: 3886071a  addi r4, r6, 0x71a   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x6e0
+0x4c6210: 38860720  addi r4, r6, 0x720   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x700
+0x4c6254: 38860726  addi r4, r6, 0x726   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x744
+0x4c6274: 3886072c  addi r4, r6, 0x72c   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x764
+0x4c6294: 38860732  addi r4, r6, 0x732   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x784
+0x4c62b4: 38860738  addi r4, r6, 0x738   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x7a4
+0x4c6328: 38860638  addi r4, r6, 0x638   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x818
+0x4c6338: 3886063c  addi r4, r6, 0x63c   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x828
+0x4c6348: 38860640  addi r4, r6, 0x640   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x838
+0x4c63bc: 38860748  addi r4, r6, 0x748   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x8ac
+0x4c63cc: 3886074a  addi r4, r6, 0x74a   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x8bc
+0x4c63dc: 3886074c  addi r4, r6, 0x74c   in GetAbbrDayName__18cTSLanguageUtilityFUcR9cTSString+0x8cc
+0x4c64c4: 38860756  addi r4, r6, 0x756   in GetDayName__18cTSLanguageUtilityFUcR9cTSString+0x64
+0x4c64d4: 3886075e  addi r4, r6, 0x75e   in GetDayName__18cTSLanguageUtilityFUcR9cTSString+0x74
+0x4c64e4: 38860768  addi r4, r6, 0x768   in GetDayName__18cTSLanguageUtilityFUcR9cTSString+0x84
+0x4c6504: 38860778  addi r4, r6, 0x778   in GetDayName__18cTSLanguageUtilityFUcR9cTSString+0xa4
+0x4c6548: 38860788  addi r4, r6, 0x788   in GetDayName__18cTSLanguageUtilityFUcR9cTSString+0xe8
+0x4c6e04: 38860756  addi r4, r6, 0x756   in GetDayName__18cTSLanguageUtilityFUcR9cTSString+0x9a4
+0x4c6e14: 3886075e  addi r4, r6, 0x75e   in GetDayName__18cTSLanguageUtilityFUcR9cTSString+0x9b4
+0x4c6e24: 38860768  addi r4, r6, 0x768   in GetDayName__18cTSLanguageUtilityFUcR9cTSString+0x9c4
+0x4c6e44: 38860778  addi r4, r6, 0x778   in GetDayName__18cTSLanguageUtilityFUcR9cTSString+0x9e4
+0x4c6ec8: 38860748  addi r4, r6, 0x748   in GetDayName__18cTSLanguageUtilityFUcR9cTSString+0xa68
+0x4c6ed8: 3886074a  addi r4, r6, 0x74a   in GetDayName__18cTSLanguageUtilityFUcR9cTSString+0xa78
+0x4c6ee8: 3886074c  addi r4, r6, 0x74c   in GetDayName__18cTSLanguageUtilityFUcR9cTSString+0xa88
+0x5464e4: 38210590  addi r1, r1, 0x590   in FindFirstFileA__14CTGFileManagerFPCcR12sCTGFindData+0x2c4
+0x576bc4: 387d05b6  addi r3, r29, 0x5b6   in Carbon_ImportCoreGraphics+0xab4
+0x576c90: 387d061e  addi r3, r29, 0x61e   in Carbon_ImportCoreGraphics+0xb80
+0x576ce0: 387d0652  addi r3, r29, 0x652   in Carbon_ImportCoreGraphics+0xbd0
+0x576d30: 387d0676  addi r3, r29, 0x676   in Carbon_ImportCoreGraphics+0xc20
+0x576d58: 387d0686  addi r3, r29, 0x686   in Carbon_ImportCoreGraphics+0xc48
+0x576da8: 387d06a6  addi r3, r29, 0x6a6   in Carbon_ImportCoreGraphics+0xc98
+0x5826f0: 3a4105ac  addi r18, r1, 0x5ac   in CycleCommunityImports__13cWinMagiclandFv+0xd0
+0x582b28: 386105a0  addi r3, r1, 0x5a0   in CycleCommunityImports__13cWinMagiclandFv+0x508
+0x582b3c: 388105a0  addi r4, r1, 0x5a0   in CycleCommunityImports__13cWinMagiclandFv+0x51c
+0x582b4c: 386105a0  addi r3, r1, 0x5a0   in CycleCommunityImports__13cWinMagiclandFv+0x52c
+0x582b5c: 386106b0  addi r3, r1, 0x6b0   in CycleCommunityImports__13cWinMagiclandFv+0x53c
+0x582b64: 386106b0  addi r3, r1, 0x6b0   in CycleCommunityImports__13cWinMagiclandFv+0x544
+0x582b68: 388105a0  addi r4, r1, 0x5a0   in CycleCommunityImports__13cWinMagiclandFv+0x548
+0x582b94: 388106b0  addi r4, r1, 0x6b0   in CycleCommunityImports__13cWinMagiclandFv+0x574
+0x582bf0: 386106b0  addi r3, r1, 0x6b0   in CycleCommunityImports__13cWinMagiclandFv+0x5d0
+0x582c14: 386106b0  addi r3, r1, 0x6b0   in CycleCommunityImports__13cWinMagiclandFv+0x5f4
+0x582fa0: 3ac105a4  addi r22, r1, 0x5a4   in CycleResidentialImports__13cWinMagiclandFv+0xe0
+0x583c54: 38210650  addi r1, r1, 0x650   in CycleResidentialImports__13cWinMagiclandFv+0xd94
+0x5849e4: 3aa105ac  addi r21, r1, 0x5ac   in CheckNeighborhoodFileLocked__13cWinMagiclandFv+0x1a4
+0x584a08: 386105a0  addi r3, r1, 0x5a0   in CheckNeighborhoodFileLocked__13cWinMagiclandFv+0x1c8
+0x584a2c: 388105a0  addi r4, r1, 0x5a0   in CheckNeighborhoodFileLocked__13cWinMagiclandFv+0x1ec
+0x584c8c: 3aa106b8  addi r21, r1, 0x6b8   in CheckNeighborhoodFileLocked__13cWinMagiclandFv+0x44c
+0x584cb0: 386106ac  addi r3, r1, 0x6ac   in CheckNeighborhoodFileLocked__13cWinMagiclandFv+0x470
+0x584cd4: 388106ac  addi r4, r1, 0x6ac   in CheckNeighborhoodFileLocked__13cWinMagiclandFv+0x494
+0x58bfd4: 38210600  addi r1, r1, 0x600   in Init__13CWinMagicBookFv+0xd74

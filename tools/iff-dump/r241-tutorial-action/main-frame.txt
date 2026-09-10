@@ -1,0 +1,41 @@
+                ; ==== .GetMainSimElem__7TreeSimFv ====
+00153570: 93e1fffc  stw      r31, -4(r1)
+00153574: 7c0802a6  mflr     r0
+00153578: 93c1fff8  stw      r30, -8(r1)
+0015357c: 93a1fff4  stw      r29, -0xc(r1)
+00153580: 3ba30000  addi     r29, r3, 0
+00153584: 387d0004  addi     r3, r29, 4
+00153588: 90010008  stw      r0, 8(r1)
+0015358c: 9421ffb0  stwu     r1, -0x50(r1)
+00153590: 4bffef71  bl       0x152500   ; .GetStackSize__9TreeStackFv
+00153594: 3bc3ffff  addi     r30, r3, -1
+00153598: 3be00000  li       r31, 0
+0015359c: 48000040  b        0x1535dc
+001535a0: 387d0000  addi     r3, r29, 0
+001535a4: 7fe40734  extsh    r4, r31
+001535a8: 4bffff69  bl       0x153510   ; .GetNthElem__7TreeSimFs
+001535ac: a8630000  lha      r3, 0(r3)
+001535b0: 3800ffff  li       r0, -1
+001535b4: 2c03ffff  cmpwi    r3, -1
+001535b8: 4182000c  beq      0x1535c4
+001535bc: 5460045e  rlwinm   r0, r3, 0, 0x11, 0xf
+001535c0: 7c000734  extsh    r0, r0
+001535c4: 7c000734  extsh    r0, r0
+001535c8: 2c00ffff  cmpwi    r0, -1
+001535cc: 4082000c  bne      0x1535d8
+001535d0: 3bdfffff  addi     r30, r31, -1
+001535d4: 48000010  b        0x1535e4
+001535d8: 3bff0001  addi     r31, r31, 1
+001535dc: 7c1ff000  cmpw     r31, r30
+001535e0: 4081ffc0  ble      0x1535a0
+001535e4: 2c1effff  cmpwi    r30, -1
+001535e8: 4082000c  bne      0x1535f4
+001535ec: 38600000  li       r3, 0
+001535f0: 48000010  b        0x153600
+001535f4: 387d0000  addi     r3, r29, 0
+001535f8: 7fc40734  extsh    r4, r30
+001535fc: 4bffff15  bl       0x153510   ; .GetNthElem__7TreeSimFs
+00153600: 80010058  lwz      r0, 0x58(r1)
+00153604: 38210050  addi     r1, r1, 0x50
+00153608: 83e1fffc  lwz      r31, -4(r1)
+0015360c: 83c1fff8  lwz      r30, -8(r1)

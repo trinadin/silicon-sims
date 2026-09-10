@@ -1,0 +1,29 @@
+
+{INCLUDE,Res_Other.h}
+{INCLUDE,Res_Languages.h}
+
+{BITMAP,kSpeechMediumBmp,"Other/SpeechMedium.bmp"}
+{BITMAP,kSpeechLargeBmp,"Other/SpeechLarge.bmp"}
+{BITMAP,kQueueCancelOverlay,"Other/QueueCancel.bmp"}
+{BITMAP,kTragedyUnhappyMask,"Other/TragedyMask.bmp"}
+
+{BITMAP,kMaxisLogo,"Other/MaxisLogo.bmp"}
+
+{BITMAP,kSimsLogo,"Other/setup.bmp"}
+{BITMAP,kSimsLogo,"Other/setupuk.bmp", kRes_LanguageUKEnglish}
+{BITMAP,kSimsLogo,"Other/setupfr.bmp", kRes_LanguageFrench}
+{BITMAP,kSimsLogo,"Other/setupde.bmp", kRes_LanguageGerman}
+{BITMAP,kSimsLogo,"Other/setupdu.bmp", kRes_LanguageDutch}
+{BITMAP,kSimsLogo,"Other/setupsw.bmp", kRes_LanguageSwedish}
+{BITMAP,kSimsLogo,"Other/setupit.bmp", kRes_LanguageItalian}
+{BITMAP,kSimsLogo,"Other/setupjp.bmp", kRes_LanguageJapanese}
+{BITMAP,kSimsLogo,"Other/setupth.bmp", kRes_LanguageThai}
+{BITMAP,kSimsLogo,"Other/setuptc.bmp", kRes_LanguageTraditionalChinese}
+{BITMAP,kSimsLogo,"Other/setupsp.bmp", kRes_LanguageSpanish}
+{BITMAP,kSimsLogo,"Other/setuppg.bmp", kRes_LanguagePortuguese}
+{BITMAP,kSimsLogo,"Other/setupsc.bmp", kRes_LanguageSimplifiedChinese}
+{BITMAP,kSimsLogo,"Other/setuppo.bmp", kRes_LanguagePolish}
+{BITMAP,kSimsLogo,"Other/setupko.bmp", kRes_LanguageKorean}
+{BITMAP,kSimsLogo,"Other/setupdn.bmp", kRes_LanguageDanish}
+{BITMAP,kSimsLogo,"Other/setupno.bmp", kRes_LanguageNorwegian}
+{BITMAP,kSimsLogo,"Other/setupfi.bmp", kRes_LanguageFinnish}

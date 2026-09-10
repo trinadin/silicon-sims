@@ -393,7 +393,7 @@ namespace Simitone.Client.UI.Panels
                         if (Holding.CanPlace != VMPlacementError.Success)
                         {
                             state.UIState.TooltipProperties.Show = true;
-                            state.UIState.TooltipProperties.Color = Color.Black;
+                            state.UIState.TooltipProperties.Color = Simitone.Client.UI.Panels.UILotControl.TooltipDefaultColor;
                             state.UIState.TooltipProperties.Opacity = 1;
                             state.UIState.TooltipProperties.Position = new Vector2(MouseDownX,
                                 MouseDownY);
@@ -546,7 +546,7 @@ namespace Simitone.Client.UI.Panels
         {
             if (Holding == null) return;
             state.UIState.TooltipProperties.Show = true;
-            state.UIState.TooltipProperties.Color = Color.Black;
+            state.UIState.TooltipProperties.Color = Simitone.Client.UI.Panels.UILotControl.TooltipDefaultColor;
             state.UIState.TooltipProperties.Opacity = 1;
             state.UIState.TooltipProperties.Position = new Vector2(MouseDownX,
                 MouseDownY);

@@ -1,0 +1,36 @@
+0x299fa0: 93e1fffc  stw r31, -4(r1)                            |....|
+0x299fa4: 7c0802a6  mfxer r0                                   ||...|
+0x299fa8: 2c040001  cmpwi r0, r4, 1                            |,...|
+0x299fac: 3be30000  addi r31, r3, 0                            |;...|
+0x299fb0: 90010008  stw r0, 8(r1)                              |....|
+0x299fb4: 9421ffb0  stwu r1, -80(r1)                           |.!..|
+0x299fb8: 41820008  bne(2) 0x299fc0                            |A...|
+0x299fbc: 4800004c  b 0x29a008                                  ; -> 29a008 |H..L|
+0x299fc0: 801f00e4  lwz r0, 228(r31)                           |....|
+0x299fc4: 28000000  cmplwi r0, r0, 0                           |(...|
+0x299fc8: 41820048  bne(2) 0x29a010                            |A..H|
+0x299fcc: 38000000  addi r0, r0, 0                             |8...|
+0x299fd0: 901f00d0  stw r0, 208(r31)                           |....|
+0x299fd4: 38800000  addi r4, r0, 0                             |8...|
+0x299fd8: 981f00de  stb r0, 222(r31)                           |....|
+0x299fdc: 4bfff885  bl 0x299860                                 ; .Fade__20cWinPictureInPictureFb |K...|
+0x299fe0: 801f00d4  lwz r0, 212(r31)                           |....|
+0x299fe4: 28000000  cmplwi r0, r0, 0                           |(...|
+0x299fe8: 41820028  bne(2) 0x29a010                            |A..(|
+0x299fec: 80628e04  lwz r3, -29180(r2)                         |.b..|
+0x299ff0: 7fe4fb78  or r31, r4, r31                            |...x|
+0x299ff4: 80630000  lwz r3, 0(r3)                              |.c..|
+0x299ff8: 48282169  bl 0x51c160                                 ; .UnsubscribeTimerMsg__12cTSWinMgrW95FP6cTSWin |H(!i|
+0x299ffc: 38000000  addi r0, r0, 0                             |8...|
+0x29a000: 901f00d4  stw r0, 212(r31)                           |....|
+0x29a004: 4800000c  b 0x29a010                                  ; -> 29a010 |H...|
+0x29a008: 4826abe9  bl 0x504bf0                                 ; .TSOnCommand__6cTSWinFUlUl |H&..|
+0x29a00c: 48000008  b 0x29a014                                  ; -> 29a014 |H...|
+0x29a010: 38600001  addi r3, r0, 1                             |8`..|
+0x29a014: 80010058  lwz r0, 88(r1)                             |...X|
+0x29a018: 38210050  addi r1, r1, 80                            |8!.P|
+0x29a01c: 83e1fffc  lwz r31, -4(r1)                            |....|
+0x29a020: 7c0803a6  mtxer r0                                   ||...|
+0x29a024: 4e800020  bclr                                       |N.. |
+0x29a028: 00000000  .long                                      |....|
+0x29a02c: 00092041  .long                                      |.. A|

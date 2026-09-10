@@ -1,0 +1,72 @@
+0x1d7110: 93e1fffc  stw r31, -4(r1)                            |....|
+0x1d7114: 7c0802a6  mfxer r0                                   ||...|
+0x1d7118: 93c1fff8  stw r30, -8(r1)                            |....|
+0x1d711c: 3bc40000  addi r30, r4, 0                            |;...|
+0x1d7120: 93a1fff4  stw r29, -12(r1)                           |....|
+0x1d7124: 7c7d1b78  or r3, r29, r3                             ||}.x|
+0x1d7128: 90010008  stw r0, 8(r1)                              |....|
+0x1d712c: 9421ffb0  stwu r1, -80(r1)                           |.!..|
+0x1d7130: 83e30018  lwz r31, 24(r3)                            |....|
+0x1d7134: 7c1ff000  cmp cr0, r31, r30                          ||...|
+0x1d7138: 4082000c  beq(2) 0x1d7144                            |@...|
+0x1d713c: 54a0063f  rlwinm r0, r5, 0, 24, 31                   |T..?|
+0x1d7140: 4182009c  bne(2) 0x1d71dc                            |A...|
+0x1d7144: 480eb8ad  bl 0x2c29f0                                 ; .GetWallManager__11WallManagerFv |H...|
+0x1d7148: 38bf0000  addi r5, r31, 0                            |8...|
+0x1d714c: 38800000  addi r4, r0, 0                             |8...|
+0x1d7150: 480ebe41  bl 0x2c2f90                                 ; .SetCutaway__11WallManagerFbi |H..A|
+0x1d7154: 807d01fc  lwz r3, 508(r29)                           |.}..|
+0x1d7158: 4bfd2d09  bl 0x1a9e60                                 ; .clear__11cCutawaySetFv |K.-.|
+0x1d715c: 38000001  addi r0, r0, 1                             |8...|
+0x1d7160: 981d004e  stb r0, 78(r29)                            |...N|
+0x1d7164: 881d0049  lbz r0, 73(r29)                            |...I|
+0x1d7168: 28000000  cmplwi r0, r0, 0                           |(...|
+0x1d716c: 4182000c  bne(2) 0x1d7178                            |A...|
+0x1d7170: 7fa3eb78  or r29, r3, r29                            |...x|
+0x1d7174: 4bff80cd  bl 0x1cf240                                 ; .ResetDynamicCutaway__11HouseViewerFv |K...|
+0x1d7178: 93dd0018  stw r30, 24(r29)                           |....|
+0x1d717c: 7fc4f378  or r30, r4, r30                            |...x|
+0x1d7180: 80628874  lwz r3, -30604(r2)                         |.b.t|
+0x1d7184: 80630000  lwz r3, 0(r3)                              |.c..|
+0x1d7188: 80630000  lwz r3, 0(r3)                              |.c..|
+0x1d718c: 80630024  lwz r3, 36(r3)                             |.c.$|
+0x1d7190: 4bf51951  bl 0x128ae0                                 ; .ComputeCutaway__11RoomManagerFi |K..Q|
+0x1d7194: 881d0049  lbz r0, 73(r29)                            |...I|
+0x1d7198: 28000000  cmplwi r0, r0, 0                           |(...|
+0x1d719c: 41820010  bne(2) 0x1d71ac                            |A...|
+0x1d71a0: 889d01f8  lbz r4, 504(r29)                           |....|
+0x1d71a4: 7fa3eb78  or r29, r3, r29                            |...x|
+0x1d71a8: 4bff8209  bl 0x1cf3b0                                 ; .DoDynamicCutaway__11HouseViewerFb |K...|
+0x1d71ac: 7fa3eb78  or r29, r3, r29                            |...x|
+0x1d71b0: 819d0004  lwz r12, 4(r29)                            |....|
+0x1d71b4: 818c0050  lwz r12, 80(r12)                           |...P|
+0x1d71b8: 483cb829  bl 0x5a29e0                                 ; .sub_5a29e0 |H<.)|
+0x1d71bc: 80410014  lwz r2, 20(r1)                             |.A..|
+0x1d71c0: 80628ca4  lwz r3, -29532(r2)                         |.b..|
+0x1d71c4: 80630000  lwz r3, 0(r3)                              |.c..|
+0x1d71c8: 81830000  lwz r12, 0(r3)                             |....|
+0x1d71cc: 818c0020  lwz r12, 32(r12)                           |... |
+0x1d71d0: 483cb811  bl 0x5a29e0                                 ; .sub_5a29e0 |H<..|
+0x1d71d4: 80410014  lwz r2, 20(r1)                             |.A..|
+0x1d71d8: 48344d39  bl 0x51bf10                                 ; .PumpMouseMoveMsg__12cTSWinMgrW95Fv |H4M9|
+0x1d71dc: 80010058  lwz r0, 88(r1)                             |...X|
+0x1d71e0: 38210050  addi r1, r1, 80                            |8!.P|
+0x1d71e4: 83e1fffc  lwz r31, -4(r1)                            |....|
+0x1d71e8: 83c1fff8  lwz r30, -8(r1)                            |....|
+0x1d71ec: 7c0803a6  mtxer r0                                   ||...|
+0x1d71f0: 83a1fff4  lwz r29, -12(r1)                           |....|
+0x1d71f4: 4e800020  bclr                                       |N.. |
+0x1d71f8: 00000000  .long                                      |....|
+0x1d71fc: 00092041  .long                                      |.. A|
+0x1d7200: 80030000  lwz r0, 0(r3)                              |....|
+0x1d7204: 000000e8  .long                                      |....|
+0x1d7208: 001b2e53  .long                                      |...S|
+0x1d720c: 65744c65  oris r11, r20, 19557                       |etLe|
+0x1d7210: 76656c5f  andis. r19, r5, 27743                      |vel_|
+0x1d7214: 5f313148  .long                                      |_11H|
+0x1d7218: 6f757365  xoris r27, r21, 29541                      |ouse|
+0x1d721c: 56696577  rlwinm r9, r19, 12, 21, 27                 |View|
+0x1d7220: 65724669  oris r11, r18, 18025                       |erFi|
+0x1d7224: 62000000  ori r16, r0, 0                             |b...|
+0x1d7228: 00000000  .long                                      |....|
+0x1d722c: 00000000  .long                                      |....|

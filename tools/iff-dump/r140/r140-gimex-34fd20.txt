@@ -1,0 +1,56 @@
+0x34fd20: 7c0802a6  mfxer r0                                   ||...|
+0x34fd24: 80e2b404  lwz r7, -19452(r2)                         |....|
+0x34fd28: 90010008  stw r0, 8(r1)                              |....|
+0x34fd2c: 9421ffc0  stwu r1, -64(r1)                           |.!..|
+0x34fd30: 81870010  lwz r12, 16(r7)                            |....|
+0x34fd34: 280c0000  cmplwi r0, r12, 0                          |(...|
+0x34fd38: 41820010  bne(2) 0x34fd48                            |A...|
+0x34fd3c: 48252ca5  bl 0x5a29e0                                |H%,.|
+0x34fd40: 80410014  lwz r2, 20(r1)                             |.A..|
+0x34fd44: 48000020  b 0x34fd64                                 |H.. |
+0x34fd48: 81870050  lwz r12, 80(r7)                            |...P|
+0x34fd4c: 280c0000  cmplwi r0, r12, 0                          |(...|
+0x34fd50: 41820010  bne(2) 0x34fd60                            |A...|
+0x34fd54: 48252c8d  bl 0x5a29e0                                |H%,.|
+0x34fd58: 80410014  lwz r2, 20(r1)                             |.A..|
+0x34fd5c: 48000008  b 0x34fd64                                 |H...|
+0x34fd60: 38600000  addi r3, r0, 0                             |8`..|
+0x34fd64: 80010048  lwz r0, 72(r1)                             |...H|
+0x34fd68: 38210040  addi r1, r1, 64                            |8!.@|
+0x34fd6c: 7c0803a6  mtxer r0                                   ||...|
+0x34fd70: 4e800020  bclr                                       |N.. |
+0x34fd74: 00000000  .long                                      |....|
+0x34fd78: 00092041  .long                                      |.. A|
+0x34fd7c: 80000000  lwz r0, 0(r0)                              |....|
+0x34fd80: 00000054  .long                                      |...T|
+0x34fd84: 000b2e47  .long                                      |...G|
+0x34fd88: 494d4558  b 0x18242e0                                |IMEX|
+0x34fd8c: 5f6f7065  .long                                      |_ope|
+0x34fd90: 6e000000  xoris r16, r0, 0                           |n...|
+0x34fd94: 00000000  .long                                      |....|
+0x34fd98: 00000000  .long                                      |....|
+0x34fd9c: 00000000  .long                                      |....|
+0x34fda0: 7c0802a6  mfxer r0                                   ||...|
+0x34fda4: 8062b404  lwz r3, -19452(r2)                         |.b..|
+0x34fda8: 90010008  stw r0, 8(r1)                              |....|
+0x34fdac: 9421ffc0  stwu r1, -64(r1)                           |.!..|
+0x34fdb0: 81830004  lwz r12, 4(r3)                             |....|
+0x34fdb4: 280c0000  cmplwi r0, r12, 0                          |(...|
+0x34fdb8: 4182000c  bne(2) 0x34fdc4                            |A...|
+0x34fdbc: 48252c25  bl 0x5a29e0                                |H%,%|
+0x34fdc0: 80410014  lwz r2, 20(r1)                             |.A..|
+0x34fdc4: 80010048  lwz r0, 72(r1)                             |...H|
+0x34fdc8: 38210040  addi r1, r1, 64                            |8!.@|
+0x34fdcc: 7c0803a6  mtxer r0                                   ||...|
+0x34fdd0: 4e800020  bclr                                       |N.. |
+0x34fdd4: 00000000  .long                                      |....|
+0x34fdd8: 00092041  .long                                      |.. A|
+0x34fddc: 80000000  lwz r0, 0(r0)                              |....|
+0x34fde0: 00000034  .long                                      |...4|
+0x34fde4: 000e2e47  .long                                      |...G|
+0x34fde8: 494d4558  b 0x1824340                                |IMEX|
+0x34fdec: 5f726573  .long                                      |_res|
+0x34fdf0: 746f7265  andis. r3, r15, 29285                      |tore|
+0x34fdf4: 00000000  .long                                      |....|
+0x34fdf8: 00000000  .long                                      |....|
+0x34fdfc: 00000000  .long                                      |....|

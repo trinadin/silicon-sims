@@ -1,0 +1,22 @@
+                ; ==== .GetTutorialObject__12ObjectModuleFv ====
+000e2d80: 806300ac  lwz      r3, 0xac(r3)
+000e2d84: 4e800020  blr      
+000e2d88: 00000000  .long    0x00000000
+000e2d8c: 00092040  .long    0x00092040
+000e2d90: 00000000  .long    0x00000000
+000e2d94: 00000008  .long    0x00000008
+000e2d98: 00242e47  .long    0x00242e47
+000e2d9c: 65745475  oris     r20, r11, 0x5475
+000e2da0: 746f7269  andis.   r15, r3, 0x7269
+000e2da4: 616c4f62  ori      r12, r11, 0x4f62
+000e2da8: 6a656374  xori     r5, r19, 0x6374
+000e2dac: 5f5f3132  rlwnm    r31, r26, r6, 4, 0x19
+000e2db0: 4f626a65  .long    0x4f626a65
+000e2db4: 63744d6f  ori      r20, r27, 0x4d6f
+000e2db8: 64756c65  oris     r21, r3, 0x6c65
+000e2dbc: 46760000  .long    0x46760000
+                ; ==== .OffsetWorld__12ObjectModuleFRC7CTilePt ====
+000e2dc0: bf21ffe4  stmw     r25, -0x1c(r1)
+000e2dc4: 7c0802a6  mflr     r0
+000e2dc8: 83e28cac  lwz      r31, -0x7354(r2)
+000e2dcc: 7c7b1b78  mr       r27, r3

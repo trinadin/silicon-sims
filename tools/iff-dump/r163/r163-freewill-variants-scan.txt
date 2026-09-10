@@ -1,0 +1,27 @@
+R163 FREE-WILL DYNAMIC-VARIANT CORPUS SCAN
+scope: every physical loose/FAR-member IFF record; shadowed duplicate records retained
+parser: R154 resynchronizing IFF/FAR reader + TTAB v4-v10 normal/field-code mirror
+corpus IFF records: 2238
+BHAVs containing opcode 50 (Change Action String): 692
+physical containers containing opcode 50: 268
+direct local auto-TTAB tests containing opcode 50: 16
+
+Downloads/ShrimpCartReal/ShrimpCartReal.far!ShrimpCart.iff | TTAB 33536 'Food Counter - Cheap tree table' | tta=8 action=4139 test=4112 'Interaction - Buy Pizza TEST' | motive-delta=7:39
+ExpansionPack/ExpansionPack.far!Fridges2.iff | TTAB 32768 'Fridge - Icebox - Castle tree table' | tta=2 action=4107 test=4112 'Serve Meal check' | motive-delta=5:-10,7:70
+ExpansionPack/ExpansionPack.far!Fridges2.iff | TTAB 33024 'Fridge - Expensive tree table' | tta=2 action=4107 test=4112 'Serve Meal check' | motive-delta=5:-10,7:70
+ExpansionPack/ExpansionPack.far!Fridges2.iff | TTAB 33280 'Fridge - Moderate tree table' | tta=2 action=4107 test=4112 'Serve Meal check' | motive-delta=5:-10,7:70
+ExpansionPack3/ExpansionPack3.far!FoodCounter.iff | TTAB 33536 'Food Counter - Cheap tree table' | tta=8 action=4139 test=4112 'Interaction - Buy Pizza TEST' | motive-delta=7:39
+ExpansionPack4/ExpansionPack4.far!FoodCartVacation.iff | TTAB 33536 'Food Counter - Cheap tree table' | tta=8 action=4139 test=4112 'Interaction - Buy Pizza TEST' | motive-delta=7:40
+ExpansionPack5/ExpansionPack5.FAR!foodcounterunleashed.iff | TTAB 33536 'Food Counter - Cheap tree table' | tta=8 action=4139 test=4112 'Interaction - Buy Pizza TEST' | motive-delta=7:39
+ExpansionPack5/ExpansionPack5.FAR!pantryunleashed.iff | TTAB 32768 'Fridge - Cheap tree table' | tta=2 action=4107 test=4112 'Serve Meal check' | motive-delta=5:-10,7:70
+ExpansionPack5/ExpansionPack5.FAR!pantryunleashed.iff | TTAB 33024 'Pantry - Rustic tree table' | tta=2 action=4107 test=4112 'Serve Meal check' | motive-delta=5:-10,7:69
+ExpansionPack5/ExpansionPack5.FAR!pantryunleashed.iff | TTAB 33280 'Fridge - Moderate tree table' | tta=2 action=4107 test=4112 'Serve Meal check' | motive-delta=5:-10,7:70
+ExpansionPack6/ExpansionPack6.far!FoodCounterSuperstar.iff | TTAB 33536 'Food Counter - Cheap tree table' | tta=8 action=4139 test=4112 'Interaction - Buy Apple TEST' | motive-delta=7:39
+ExpansionPack6/ExpansionPack6.far!SpaSteamer.iff | TTAB 33024 'SpaSteamer tree table' | tta=0 action=4113 test=4112 'Take Steam Bath - TEST' | motive-delta=6:20,8:60
+ExpansionPack7/ExpansionPack7.far!FridgesSpellbound.iff | TTAB 32768 'Fridge - Tuscan tree table' | tta=2 action=4107 test=4112 'Serve Meal check' | motive-delta=5:-10,7:70
+GameData/Objects/Objects.far!Fridges.iff | TTAB 32768 'Fridge - Cheap tree table' | tta=2 action=4107 test=4112 'Serve Meal check' | motive-delta=5:-10,7:70
+GameData/Objects/Objects.far!Fridges.iff | TTAB 33024 'Fridge - Expensive tree table' | tta=2 action=4107 test=4112 'Serve Meal check' | motive-delta=5:-10,7:70
+GameData/Objects/Objects.far!Fridges.iff | TTAB 33280 'Fridge - Moderate tree table' | tta=2 action=4107 test=4112 'Serve Meal check' | motive-delta=5:-10,7:70
+
+Interpretation: this is a lower bound. Indirect/called Change Action String tests and
+semiglobal/global test roots are intentionally not credited to the 16-entry reach total.

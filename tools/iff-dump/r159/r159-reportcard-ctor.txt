@@ -1,0 +1,35 @@
+0x2a6bf0: 93e1fffc  stw r31, -4(r1)                            |....|
+0x2a6bf4: 7c0802a6  mfxer r0                                   ||...|
+0x2a6bf8: 3be50000  addi r31, r5, 0                            |;...|
+0x2a6bfc: 93c1fff8  stw r30, -8(r1)                            |....|
+0x2a6c00: 3bc40000  addi r30, r4, 0                            |;...|
+0x2a6c04: 93a1fff4  stw r29, -12(r1)                           |....|
+0x2a6c08: 3ba30000  addi r29, r3, 0                            |;...|
+0x2a6c0c: 90010008  stw r0, 8(r1)                              |....|
+0x2a6c10: 9421ffb0  stwu r1, -80(r1)                           |.!..|
+0x2a6c14: 482629fd  bl 0x509610                                |H&).|
+0x2a6c18: 800296a8  lwz r0, -26968(r2)                         |....|
+0x2a6c1c: 387d00cc  addi r3, r29, 204                          |8}..|
+0x2a6c20: 901d0000  stw r0, 0(r29)                             |....|
+0x2a6c24: 4824e24d  bl 0x4f4e70                                |H$.M|
+0x2a6c28: 387d00d0  addi r3, r29, 208                          |8}..|
+0x2a6c2c: 4824e245  bl 0x4f4e70                                |H$.E|
+0x2a6c30: 387d00d4  addi r3, r29, 212                          |8}..|
+0x2a6c34: 4824e23d  bl 0x4f4e70                                |H$.=|
+0x2a6c38: 38000000  addi r0, r0, 0                             |8...|
+0x2a6c3c: 901d00d8  stw r0, 216(r29)                           |....|
+0x2a6c40: 7fa3eb78  or r29, r3, r29                            |...x|
+0x2a6c44: 93dd00dc  stw r30, 220(r29)                          |....|
+0x2a6c48: 93fd00e4  stw r31, 228(r29)                          |....|
+0x2a6c4c: 80010058  lwz r0, 88(r1)                             |...X|
+0x2a6c50: 38210050  addi r1, r1, 80                            |8!.P|
+0x2a6c54: 7c0803a6  mtxer r0                                   ||...|
+0x2a6c58: 83e1fffc  lwz r31, -4(r1)                            |....|
+0x2a6c5c: 83c1fff8  lwz r30, -8(r1)                            |....|
+0x2a6c60: 83a1fff4  lwz r29, -12(r1)                           |....|
+0x2a6c64: 4e800020  bclr                                       |N.. |
+0x2a6c68: 00000000  .long                                      |....|
+0x2a6c6c: 00092041  .long                                      |.. A|
+0x2a6c70: 80030000  lwz r0, 0(r3)                              |....|
+0x2a6c74: 00000078  .long                                      |...x|
+0x2a6c78: 003f2e5f  .long                                      |.?._|

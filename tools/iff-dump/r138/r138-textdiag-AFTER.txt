@@ -1,0 +1,415 @@
+TEXTDIAG START
+01:16:58.789 exit-probe: before Run
+01:16:58.798 exit-probe: Game.Run(Sync) enter
+01:16:59.125 exit-probe: Initialize enter
+Warning: Failed to set window icon: Unable to load shared library 'libSDL2.dylib' or one of its dependencies. In order to help diagnose loading problems, consider setting the DYLD_PRINT_LIBRARIES environment variable: 
+dlopen(/private/tmp/simitone-r138diag/libSDL2.dylib, 0x0001): tried: '/private/tmp/simitone-r138diag/libSDL2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/private/tmp/simitone-r138diag/libSDL2.dylib' (no such file), '/private/tmp/simitone-r138diag/libSDL2.dylib' (no such file)
+dlopen(libSDL2.dylib, 0x0001): tried: 'libSDL2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibSDL2.dylib' (no such file), '/usr/lib/libSDL2.dylib' (no such file, not in dyld cache), 'libSDL2.dylib' (no such file)
+dlopen(/private/tmp/simitone-r138diag/liblibSDL2.dylib, 0x0001): tried: '/private/tmp/simitone-r138diag/liblibSDL2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/private/tmp/simitone-r138diag/liblibSDL2.dylib' (no such file), '/private/tmp/simitone-r138diag/liblibSDL2.dylib' (no such file)
+dlopen(liblibSDL2.dylib, 0x0001): tried: 'liblibSDL2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OSliblibSDL2.dylib' (no such file), '/usr/lib/liblibSDL2.dylib' (no such file, not in dyld cache), 'liblibSDL2.dylib' (no such file)
+dlopen(/private/tmp/simitone-r138diag/libSDL2.dylib.dylib, 0x0001): tried: '/private/tmp/simitone-r138diag/libSDL2.dylib.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/private/tmp/simitone-r138diag/libSDL2.dylib.dylib' (no such file), '/private/tmp/simitone-r138diag/libSDL2.dylib.dylib' (no such file)
+dlopen(libSDL2.dylib.dylib, 0x0001): tried: 'libSDL2.dylib.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibSDL2.dylib.dylib' (no such file), '/usr/lib/libSDL2.dylib.dylib' (no such file, not in dyld cache), 'libSDL2.dylib.dylib' (no such file)
+dlopen(/private/tmp/simitone-r138diag/liblibSDL2.dylib.dylib, 0x0001): tried: '/private/tmp/simitone-r138diag/liblibSDL2.dylib.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/private/tmp/simitone-r138diag/liblibSDL2.dylib.dylib' (no such file), '/private/tmp/simitone-r138diag/liblibSDL2.dylib.dylib' (no such file)
+dlopen(liblibSDL2.dylib.dylib, 0x0001): tried: 'liblibSDL2.dylib.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OSliblibSDL2.dylib.dylib' (no such file), '/usr/lib/liblibSDL2.dylib.dylib' (no such file, not in dyld cache), 'liblibSDL2.dylib.dylib' (no such file)
+
+01:16:59.328 exit-probe: Initialize exit
+01:16:59.330 screen: EnterLoading
+01:16:59.384 loadscreen: DIRECT FAR mount original kSimsLogo boot screen 800x600 len=1440056 sha=8ecf9500 (from frame one; Simitone loader chrome deleted R118)
+01:16:59.385 content-init: begin
+01:16:59.394 loadscreen: splashprogress mount EXC (logs once) NullReferenceException Object reference not set to an instance of an object.
+TEXTDIAG table Fonts\variablesans_07.ffn chars=224 atlas=256x83 missing32_255=0
+TEXTDIAG table Fonts\variablesans_08.ffn chars=224 atlas=256x107 missing32_255=0
+TEXTDIAG table Fonts\variablesans_09.ffn chars=224 atlas=256x115 missing32_255=0
+TEXTDIAG table Fonts\variablesans_10.ffn chars=224 atlas=256x121 missing32_255=0
+TEXTDIAG table Fonts\variablesans_11.ffn chars=224 atlas=256x152 missing32_255=0
+TEXTDIAG table Fonts\variablesans_12.ffn chars=224 atlas=256x180 missing32_255=0
+TEXTDIAG table Fonts\variablesans_14.ffn chars=224 atlas=256x224 missing32_255=0
+TEXTDIAG table Fonts\variablesans_16.ffn chars=224 atlas=256x316 missing32_255=0
+TEXTDIAG table Fonts\variablesans_18.ffn chars=224 atlas=256x325 missing32_255=0
+TEXTDIAG table Fonts\variablesans_20.ffn chars=224 atlas=256x427 missing32_255=0
+TEXTDIAG table Fonts\variablesans_12_bs.ffn chars=224 atlas=256x204 missing32_255=0
+TEXTDIAG table Fonts\variablesans_11_s.ffn chars=224 atlas=256x174 missing32_255=0
+TEXTDIAG table Fonts\variablesans_48.ffn chars=16 atlas=248x146 missing32_255=208
+TEXTDIAG ==== DIRECT tint=(255,255,255,255) bg=(0,0,0,0) text='Handgloves 0123'
+TEXTDIAG ink=854 bbox=4,9)-(160,29 alphaSolid(>=250)=222 alphaMid(30..249)=562 rgbSaturated(>=250)=222 rgbEqAlpha=854
+TEXTDIAG -- alpha art --
+TEXTDIAG A| .       .                           .#=                    %-                                      
+TEXTDIAG A|%@+      @+                          #@@=                   #@:                                     
+TEXTDIAG A|@#@-     @#                          @+#@=                   #@                                     
+TEXTDIAG A|+.@-    .@*                          * .%@-                   -                                     
+TEXTDIAG A|-+@.    :@=                             .#-                 .-:                                     
+TEXTDIAG A|@@+     :@=    :-:            .-  -   -.                    @@@   .-:                -      #+      
+TEXTDIAG A|@+      :@=    @@@*       .   *@. +   @#         -          #=-  +@@@@-             .@ .   +@+   .  
+TEXTDIAG A|@=  .   :@-    +-#@=      .   #@. +   @#      #  =        .      @%--%@              @ #  +@#    % -
+TEXTDIAG A|#@ .@:  :@*-*     %%    * .   #@  +  .@*     -@  =        *      @.   .   =          + @+*@#    =@ @
+TEXTDIAG A|.@=.@-  :@@@@     +@.   @     %@  =  :@=     +@  =        @      +        %          . #@@#     #% -
+TEXTDIAG A| *@*@:  :@*:.     +@.  :@     %@  *  :@=     #@  = .-:   :@      .        @            #@@.     @#  
+TEXTDIAG A| .@@%   .@-       +@.  :@ .   %@  #  :@=     #@  -:@@@#  :@               @            @#@#     @@  
+TEXTDIAG A|  #@+   -@=       %@   .@ .   #@  #  :@=     +@  #@#-#@. .@ ..+  .        %            * *@+    @@  
+TEXTDIAG A|-#@@@.  +@-      +@=    # +..-%%  #  :@=     .@  @#  -@-  # @@@  #.  -#   =               %@-   +@ .
+TEXTDIAG A|@@+-@+  +@.    @@@#     : @@@@@@  #  :@=      -  @.  -@-  . ++-  @@%@@%                   .@@.   + @
+TEXTDIAG A|=.  #%  -@.    %%+        =++-*@. -   +.         +   -@-         -#%#=                     -+      +
+TEXTDIAG A|     .                         .                 =   -@-                                            
+TEXTDIAG A|                                                 =   .@*                                            
+TEXTDIAG A|                                                 =    @#  -                                         
+TEXTDIAG A|                                                 -    @@ :@                                         
+TEXTDIAG A|                                                      +#  :                                         
+TEXTDIAG -- rgb ink art (max channel) --
+TEXTDIAG R| .       .                           .#=                    %-                                      
+TEXTDIAG R|%@+      @+                          #@@=                   #@:                                     
+TEXTDIAG R|@#@-     @#                          @+#@=                   #@                                     
+TEXTDIAG R|+.@-    .@*                          * .%@-                   -                                     
+TEXTDIAG R|-+@.    :@=                             .#-                 .-:                                     
+TEXTDIAG R|@@+     :@=    :-:            .-  -   -.                    @@@   .-:                -      #+      
+TEXTDIAG R|@+      :@=    @@@*       .   *@. +   @#         -          #=-  +@@@@-             .@ .   +@+   .  
+TEXTDIAG R|@=  .   :@-    +-#@=      .   #@. +   @#      #  =        .      @%--%@              @ #  +@#    % -
+TEXTDIAG R|#@ .@:  :@*-*     %%    * .   #@  +  .@*     -@  =        *      @.   .   =          + @+*@#    =@ @
+TEXTDIAG R|.@=.@-  :@@@@     +@.   @     %@  =  :@=     +@  =        @      +        %          . #@@#     #% -
+TEXTDIAG R| *@*@:  :@*:.     +@.  :@     %@  *  :@=     #@  = .-:   :@      .        @            #@@.     @#  
+TEXTDIAG R| .@@%   .@-       +@.  :@ .   %@  #  :@=     #@  -:@@@#  :@               @            @#@#     @@  
+TEXTDIAG R|  #@+   -@=       %@   .@ .   #@  #  :@=     +@  #@#-#@. .@ ..+  .        %            * *@+    @@  
+TEXTDIAG R|-#@@@.  +@-      +@=    # +..-%%  #  :@=     .@  @#  -@-  # @@@  #.  -#   =               %@-   +@ .
+TEXTDIAG R|@@+-@+  +@.    @@@#     : @@@@@@  #  :@=      -  @.  -@-  . ++-  @@%@@%                   .@@.   + @
+TEXTDIAG R|=.  #%  -@.    %%+        =++-*@. -   +.         +   -@-         -#%#=                     -+      +
+TEXTDIAG R|     .                         .                 =   -@-                                            
+TEXTDIAG R|                                                 =   .@*                                            
+TEXTDIAG R|                                                 =    @#  -                                         
+TEXTDIAG R|                                                 -    @@ :@                                         
+TEXTDIAG R|                                                      +#  :                                         
+TEXTDIAG ==== DIRECT tint=(255,255,255,255) bg=(0,0,0,0) text='Household Net Worth: <00A7>12,345'
+TEXTDIAG ink=1492 bbox=4,9)-(297,26 alphaSolid(>=250)=381 alphaMid(30..249)=976 rgbSaturated(>=250)=381 rgbEqAlpha=1492
+TEXTDIAG -- alpha art --
+TEXTDIAG A| .       .                                                                       %-   .#=           
+TEXTDIAG A|%@+      @+                                                        :             #@:  #@@=          
+TEXTDIAG A|@#@-     @#                                                .       :              #@  @+#@=         
+TEXTDIAG A|+.@-    .@*                                                @@#:    :               -  * .%@-        
+TEXTDIAG A|-+@.    :@=                            -                   +#@@-   :             .-:     .#-        
+TEXTDIAG A|@@+     :@=     .-:       ------.     :@-           #+       :@@.  :   .-:       @@@   -.           
+TEXTDIAG A|@+      :@=    +@@@@-     @@@@@@* =   .@-      .   +@+   .    -@-  :  +@@@@-     #=-   @#           
+TEXTDIAG A|@=  .   :@-    @%--%@     +++*@@: *  -+@*--    #  +@#    %    -@-  :  @%--%@           @#      #    
+TEXTDIAG A|#@ .@:  :@*-*  @.   .   =    +@=  #  @@@@@@*   @+*@#    =@    *@.  :  @.   .   =      .@*     -@    
+TEXTDIAG A|.@=.@-  :@@@@  +        %   -@#   #  -+@*--.   #@@#     #%  .+@#   :  +        %      :@=     +@    
+TEXTDIAG A| *@*@:  :@*:.  .        @   @@    #   .@-      #@@.     @# %@@#    :  .        @      :@=     #@    
+TEXTDIAG A| .@@%   .@-             @  *@-    *   -@-      @#@#     @@ %*-     :           @      :@=     #@    
+TEXTDIAG A|  #@+   -@=    .        % +@*     =    -       * *@+    @@         :  .        % ..+  :@=     +@    
+TEXTDIAG A|-#@@@.  +@-    #.  -#   = @%..    -  .. ...  .    %@-   +@         :  #.  -#   = @@@  :@=     .@    
+TEXTDIAG A|@@+-@+  +@.    @@%@@%     @@@@@%- .  @@@@@@* .    .@@.   +         =  @@%@@%     ++-  :@=      -    
+TEXTDIAG A|=.  #%  -@.    -#%#=      %*++#%-    +++---.       -+              .  -#%#=            +.           
+TEXTDIAG A|     .                                                                                              
+TEXTDIAG A|                                                                                                    
+TEXTDIAG -- rgb ink art (max channel) --
+TEXTDIAG R| .       .                                                                       %-   .#=           
+TEXTDIAG R|%@+      @+                                                        :             #@:  #@@=          
+TEXTDIAG R|@#@-     @#                                                .       :              #@  @+#@=         
+TEXTDIAG R|+.@-    .@*                                                @@#:    :               -  * .%@-        
+TEXTDIAG R|-+@.    :@=                            -                   +#@@-   :             .-:     .#-        
+TEXTDIAG R|@@+     :@=     .-:       ------.     :@-           #+       :@@.  :   .-:       @@@   -.           
+TEXTDIAG R|@+      :@=    +@@@@-     @@@@@@* =   .@-      .   +@+   .    -@-  :  +@@@@-     #=-   @#           
+TEXTDIAG R|@=  .   :@-    @%--%@     +++*@@: *  -+@*--    #  +@#    %    -@-  :  @%--%@           @#      #    
+TEXTDIAG R|#@ .@:  :@*-*  @.   .   =    +@=  #  @@@@@@*   @+*@#    =@    *@.  :  @.   .   =      .@*     -@    
+TEXTDIAG R|.@=.@-  :@@@@  +        %   -@#   #  -+@*--.   #@@#     #%  .+@#   :  +        %      :@=     +@    
+TEXTDIAG R| *@*@:  :@*:.  .        @   @@    #   .@-      #@@.     @# %@@#    :  .        @      :@=     #@    
+TEXTDIAG R| .@@%   .@-             @  *@-    *   -@-      @#@#     @@ %*-     :           @      :@=     #@    
+TEXTDIAG R|  #@+   -@=    .        % +@*     =    -       * *@+    @@         :  .        % ..+  :@=     +@    
+TEXTDIAG R|-#@@@.  +@-    #.  -#   = @%..    -  .. ...  .    %@-   +@         :  #.  -#   = @@@  :@=     .@    
+TEXTDIAG R|@@+-@+  +@.    @@%@@%     @@@@@%- .  @@@@@@* .    .@@.   +         =  @@%@@%     ++-  :@=      -    
+TEXTDIAG R|=.  #%  -@.    -#%#=      %*++#%-    +++---.       -+              .  -#%#=            +.           
+TEXTDIAG R|     .                                                                                              
+TEXTDIAG R|                                                                                                    
+TEXTDIAG ==== DIRECT tint=(255,255,255,255) bg=(0,0,0,0) text='win1252: <0093>Q<0094> <0092>t<0092> <0085>'
+TEXTDIAG ink=694 bbox=4,9)-(165,25 alphaSolid(>=250)=173 alphaMid(30..249)=457 rgbSaturated(>=250)=173 rgbEqAlpha=694
+TEXTDIAG -- alpha art --
+TEXTDIAG A|                                ..                                                                  
+TEXTDIAG A|              ..               #@@%-    +++--       ++-     :+  +++--                      -@+      
+TEXTDIAG A|              @@@#             @**@@-   @@@@@@   .  @@@#    -@  @@@@@@   .                .@@:      
+TEXTDIAG A|              *+#%             .   %@.  #@:+#*  .@  ..+@-   .@  #@:+#*  .@                #@:       
+TEXTDIAG A|                                   -@=  #%      .*     @*   :@  #%      .*               =@=        
+TEXTDIAG A|     .   :.             .-  -       @#  @#            .@*   :@  @#           #%.          :         
+TEXTDIAG A|  .+#@-  @#         .   *@. +       %@  @#           .#@-   =@  @#           -@#                    
+TEXTDIAG A|:#@@@@+  @@   *+-   .   #@. +       %%  @#          @@@-    +@  @#            +@                    
+TEXTDIAG A|@@*-.@#  #@   @@@%  .   #@  +       %@  @#          %@@#.   +@  @#             =                    
+TEXTDIAG A|@-   :.  *@..  .+@      %@  =       @#  @#            =@%   .-  @#                                  
+TEXTDIAG A|@%#=.    =@.-    +      %@  *      .@+  @#       :     +@-      @#       :     #                    
+TEXTDIAG A|+@@@@-   -@-#    :  .   %@  #      -@-  @#       @     :@-      @#       @   .%@               .    
+TEXTDIAG A| .-+@@.  .@+@    *  .   #@  #      %@.  @*      .@     +@-  .-  @*      .@  .@@-               -    
+TEXTDIAG A|    -@-   %@@  :#@  +..-%%  #  =..#@*   @%=--.  :@  ..=@@   #@  @%=--.  :@   +.                     
+TEXTDIAG A|-   +@-   *@# @@@+  @@@@@@  #  @@@@#    @@@@@#  .@  @@@%.   :@  @@@@@#  .@                          
+TEXTDIAG A|@@%@@#    :%. #+.   =++-*@. -  -++-     -----.   -  ++-      .  -----.   -                          
+TEXTDIAG A|+#%#+                    .                                                                          
+TEXTDIAG -- rgb ink art (max channel) --
+TEXTDIAG R|                                ..                                                                  
+TEXTDIAG R|              ..               #@@%-    +++--       ++-     :+  +++--                      -@+      
+TEXTDIAG R|              @@@#             @**@@-   @@@@@@   .  @@@#    -@  @@@@@@   .                .@@:      
+TEXTDIAG R|              *+#%             .   %@.  #@:+#*  .@  ..+@-   .@  #@:+#*  .@                #@:       
+TEXTDIAG R|                                   -@=  #%      .*     @*   :@  #%      .*               =@=        
+TEXTDIAG R|     .   :.             .-  -       @#  @#            .@*   :@  @#           #%.          :         
+TEXTDIAG R|  .+#@-  @#         .   *@. +       %@  @#           .#@-   =@  @#           -@#                    
+TEXTDIAG R|:#@@@@+  @@   *+-   .   #@. +       %%  @#          @@@-    +@  @#            +@                    
+TEXTDIAG R|@@*-.@#  #@   @@@%  .   #@  +       %@  @#          %@@#.   +@  @#             =                    
+TEXTDIAG R|@-   :.  *@..  .+@      %@  =       @#  @#            =@%   .-  @#                                  
+TEXTDIAG R|@%#=.    =@.-    +      %@  *      .@+  @#       :     +@-      @#       :     #                    
+TEXTDIAG R|+@@@@-   -@-#    :  .   %@  #      -@-  @#       @     :@-      @#       @   .%@               .    
+TEXTDIAG R| .-+@@.  .@+@    *  .   #@  #      %@.  @*      .@     +@-  .-  @*      .@  .@@-               -    
+TEXTDIAG R|    -@-   %@@  :#@  +..-%%  #  =..#@*   @%=--.  :@  ..=@@   #@  @%=--.  :@   +.                     
+TEXTDIAG R|-   +@-   *@# @@@+  @@@@@@  #  @@@@#    @@@@@#  .@  @@@%.   :@  @@@@@#  .@                          
+TEXTDIAG R|@@%@@#    :%. #+.   =++-*@. -  -++-     -----.   -  ++-      .  -----.   -                          
+TEXTDIAG R|+#%#+                    .                                                                          
+TEXTDIAG ==== DIRECT tint=(255,255,255,255) bg=(0,0,0,0) text='unicode: <201C>Q<201D> <2019>t<2019> <2026>'
+TEXTDIAG ink=523 bbox=4,9)-(120,25 alphaSolid(>=250)=117 alphaMid(30..249)=351 rgbSaturated(>=250)=117 rgbEqAlpha=523
+TEXTDIAG -- alpha art --
+TEXTDIAG A|                                                  .#=                                               
+TEXTDIAG A|                      ..                          #@@=                                             :
+TEXTDIAG A|                      @@@#                        @+#@=                                          :#@
+TEXTDIAG A|                      *+#%                        * .%@-                                        +@@+
+TEXTDIAG A|                                                     .#-                                       -@%. 
+TEXTDIAG A|------.        .-  -        .--.        .-:        -.              #+      #%.                .@%.  
+TEXTDIAG A|@@@@@@* =  .   *@. +        @@@@#      +@@@@-      @#         .   +@+   .  -@#                =@-   
+TEXTDIAG A|+++*@@: *  .   #@. +  *+-   #--+@+     @%--%@      @#      #  #  +@#    %   +@                %@    
+TEXTDIAG A|   +@=  #  .   #@  +  @@@%     =@+     @.   .   = .@*     -@  @+*@#    =@    =                @#    
+TEXTDIAG A|  -@#   #      %@  =   .+@   =@@#   -  +        % :@=     +@  #@@#     #%                     @#    
+TEXTDIAG A|  @@    #      %@  *     +  @@%-    *  .        @ :@=     #@  #@@.     @#    #                @%    
+TEXTDIAG A| *@-    *  .   %@  #     :  @-      #           @ :@=     #@  @#@#     @@  .%@       .        +@:   
+TEXTDIAG A|+@*     =  .   #@  #     *       :. *  .        % :@=     +@  * *@+    @@ .@@-       -        .@%.  
+TEXTDIAG A|@%..    -  +..-%%  #   :#@  =..:*@+ -  #.  -#   = :@=     .@     %@-   +@  +.                  =@#. 
+TEXTDIAG A|@@@@@%- .  @@@@@@  #  @@@+  @@@@@#     @@%@@%     :@=      -     .@@.   +                       +@@*
+TEXTDIAG A|%*++#%-    =++-*@. -  #+.   -++=.      -#%#=       +.             -+                             -%@
+TEXTDIAG A|                .                                                                                  .
+TEXTDIAG -- rgb ink art (max channel) --
+TEXTDIAG R|                                                  .#=                                               
+TEXTDIAG R|                      ..                          #@@=                                             :
+TEXTDIAG R|                      @@@#                        @+#@=                                          :#@
+TEXTDIAG R|                      *+#%                        * .%@-                                        +@@+
+TEXTDIAG R|                                                     .#-                                       -@%. 
+TEXTDIAG R|------.        .-  -        .--.        .-:        -.              #+      #%.                .@%.  
+TEXTDIAG R|@@@@@@* =  .   *@. +        @@@@#      +@@@@-      @#         .   +@+   .  -@#                =@-   
+TEXTDIAG R|+++*@@: *  .   #@. +  *+-   #--+@+     @%--%@      @#      #  #  +@#    %   +@                %@    
+TEXTDIAG R|   +@=  #  .   #@  +  @@@%     =@+     @.   .   = .@*     -@  @+*@#    =@    =                @#    
+TEXTDIAG R|  -@#   #      %@  =   .+@   =@@#   -  +        % :@=     +@  #@@#     #%                     @#    
+TEXTDIAG R|  @@    #      %@  *     +  @@%-    *  .        @ :@=     #@  #@@.     @#    #                @%    
+TEXTDIAG R| *@-    *  .   %@  #     :  @-      #           @ :@=     #@  @#@#     @@  .%@       .        +@:   
+TEXTDIAG R|+@*     =  .   #@  #     *       :. *  .        % :@=     +@  * *@+    @@ .@@-       -        .@%.  
+TEXTDIAG R|@%..    -  +..-%%  #   :#@  =..:*@+ -  #.  -#   = :@=     .@     %@-   +@  +.                  =@#. 
+TEXTDIAG R|@@@@@%- .  @@@@@@  #  @@@+  @@@@@#     @@%@@%     :@=      -     .@@.   +                       +@@*
+TEXTDIAG R|%*++#%-    =++-*@. -  #+.   -++=.      -#%#=       +.             -+                             -%@
+TEXTDIAG R|                .                                                                                  .
+TEXTDIAG ==== DIRECT tint=(255,249,157,255) bg=(40,40,60,255) text='Handgloves on bg'
+TEXTDIAG ink=23040 bbox=0,0)-(479,47 alphaSolid(>=250)=23040 alphaMid(30..249)=0 rgbSaturated(>=250)=204 rgbEqAlpha=204
+TEXTDIAG -- alpha art --
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG A|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+TEXTDIAG -- rgb ink art (max channel) --
+TEXTDIAG R|::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::::::::::::::::::::::::::::::::::::::::%+::::::::::::::::::::%=::::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::%@*::::::@*::::::::::::::::::::::::::#@@+:::::::::::::::::::%@-:::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::@%@=:::::@#::::::::::::::::::::::::::@*%@+:::::::::::::::::::#@:::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::+-@=::::-@#::::::::::::::::::::::::::#::%@=:::::::::::::::::::=:::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::=*@-::::-@+::::::::::::::::::::::::::::::%=::::::::::::::::::=-:::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::@@*:::::-@+::::-=-::::::::::::-=::=:::=-::::::::::::::::::::@@@:::-=-::::::::::::::::=::::::#+::
+TEXTDIAG R|::::@*::::::-@+::::@@@#:::::::-:::#@::+:::@#:::::::::=::::::::::%+=::+@@@@=:::::::::::::-@:::::+@*::
+TEXTDIAG R|::::@+::::::-@=::::*=#@+::::::-:::%@-:+:::@#::::::#::+:::::::::::::::@%==%@::::::::::::::@:%::+@%:::
+TEXTDIAG R|::::#@::@-::-@#=#:::::%%::::#:::::%@::+::-@#:::::=@::+::::::::#::::::@::::::::+::::::::::+:@+#@%::::
+TEXTDIAG R|::::-@+-@=::-@@@@:::::*@::::@:::::%@::+::-@+:::::*@::+::::::::@::::::+::::::::%::::::::::-:%@@%:::::
+TEXTDIAG R|:::::#@#@-::-@#-::::::*@-::-@:::::%@::#::-@+:::::%@::+::=-:::-@:::::::::::::::@::::::::::::#@@-:::::
+TEXTDIAG R|::::::@@%:::-@=:::::::*@:::-@:-:::%@::%::-@+:::::#@::=-@@@%::-@:::::::::::::::@::::::::::::@%@%:::::
+TEXTDIAG R|::::::%@+:::=@+:::::::%@:::-@:-:::%@::%::-@+:::::+@::#@%=%@::-@:::+:::::::::::%::::::::::::#:#@+::::
+TEXTDIAG R|::::=%@@@:::+@=::::::+@+::::%:*:-=%%::#::-@+::::::@::@#::=@=::%:@@@::#:::=#:::+:::::::::::::::%@=:::
+TEXTDIAG R|::::@@+=@*::+@-::::@@@%:::::-:@@@@@@::%::-@+::::::=::@:::=@=::-:**=::@@%@@%:::::::::::::::::::-@@:::
+TEXTDIAG R|::::+-::#%::=@:::::%%+::::::::+**=#@::=:::*-:::::::::*:::=@=:::::::::=#%%+:::::::::::::::::::::=+:::
+TEXTDIAG R|:::::::::::::::::::::::::::::::::::::::::::::::::::::+:::=@=::::::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|:::::::::::::::::::::::::::::::::::::::::::::::::::::+:::-@#::::::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|:::::::::::::::::::::::::::::::::::::::::::::::::::::+::::@#::=:::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|:::::::::::::::::::::::::::::::::::::::::::::::::::::=::::@@:-@:::::::::::::::::::::::::::::::::::::
+TEXTDIAG R|::::::::::::::::::::::::::::::::::::::::::::::::::::::::::+#::-:::::::::::::::::::::::::::::::::::::
+TEXTDIAG ==== DIRECT tint=(255,255,255,255) bg=(0,0,0,0) text='Bold 12: Handgloves'
+TEXTDIAG ink=1045 bbox=4,8)-(172,26 alphaSolid(>=250)=0 alphaMid(30..249)=933 rgbSaturated(>=250)=0 rgbEqAlpha=1045
+TEXTDIAG -- alpha art --
+TEXTDIAG A|  --                      --                 -                                    -                 
+TEXTDIAG A|  ++-   =+                ++++=             -+=     -===-                        =+-                
+TEXTDIAG A| -+#    ++                ***++=            ++#:   ++++++-                       ++%.               
+TEXTDIAG A|+++*#-  ++                   %% .          -++ .   ++#*+#. +            +-       ++%.               
+TEXTDIAG A|++++++- ++     -          -   -.          .++#     +  :+%: -  --        ++-      ++%.  --      -    
+TEXTDIAG A|#+*%% . ++ -  -++         ===-      -     #++ :      - - .   ++++       *++-     ++%.+++++-    ++=  
+TEXTDIAG A|=+# ..  ++ #- =+#:  -     +++++    =+     ++# -     -        ++++       -++#-    ++%.++**+%-  -*++= 
+TEXTDIAG A|++ .    ++ *. ++ :  +---  %%## :   ++     ++ :     .         * #+        -++:    ++*++% :% -  + #+*.
+TEXTDIAG A|++#+-   ++ +:=+* - -+++++ :..::-  -+*     +# -               # *+        -++     +++*+++- .  -+.-++ 
+TEXTDIAG A|+++++-  ++ +**+%:  -++#*+         -+*     + :         --   - ++++        -++ -   ++% =*++=   -+ -++ 
+TEXTDIAG A|+#%% :  ++ +++* .  -+* :+ -       -++     * -        -++-  + ++#*        ++#     ++ . .:*+=  -+ -+* 
+TEXTDIAG A|+ ...-  ++ =++#     ++#++ -        ++     %:       =+++* - + -  :       =++ :   -++ -=-=*+%.  +-++# 
+TEXTDIAG A|*       ++ -+* .    -+++* -         +      .       ++*# :  =   -        ++% -   -++ -++++* .  -++* .
+TEXTDIAG A| :      -#  -        -%   -                        %   .                #  .     +# -###% :    ## : 
+TEXTDIAG A|.-       -   .-       -..                 .        ...                  :.-       :: -.:..     .:.  
+TEXTDIAG A|                                                                                                    
+TEXTDIAG A|                                                                                                    
+TEXTDIAG A|                                                                                                    
+TEXTDIAG A|                                                                                                    
+TEXTDIAG -- rgb ink art (max channel) --
+TEXTDIAG R|  --                      --                 -                                    -                 
+TEXTDIAG R|  ++-   =+                ++++=             -+=     -===-                        =+-                
+TEXTDIAG R| -+#    ++                ***++=            ++#:   ++++++-                       ++%.               
+TEXTDIAG R|+++*#-  ++                   %% .          -++ .   ++#*+#. +            +-       ++%.               
+TEXTDIAG R|++++++- ++     -          -   -.          .++#     +  :+%: -  --        ++-      ++%.  --      -    
+TEXTDIAG R|#+*%% . ++ -  -++         ===-      -     #++ :      - - .   ++++       *++-     ++%.+++++-    ++=  
+TEXTDIAG R|=+# ..  ++ #- =+#:  -     +++++    =+     ++# -     -        ++++       -++#-    ++%.++**+%-  -*++= 
+TEXTDIAG R|++ .    ++ *. ++ :  +---  %%## :   ++     ++ :     .         * #+        -++:    ++*++% :% -  + #+*.
+TEXTDIAG R|++#+-   ++ +:=+* - -+++++ :..::-  -+*     +# -               # *+        -++     +++*+++- .  -+.-++ 
+TEXTDIAG R|+++++-  ++ +**+%:  -++#*+         -+*     + :         --   - ++++        -++ -   ++% =*++=   -+ -++ 
+TEXTDIAG R|+#%% :  ++ +++* .  -+* :+ -       -++     * -        -++-  + ++#*        ++#     ++ . .:*+=  -+ -+* 
+TEXTDIAG R|+ ...-  ++ =++#     ++#++ -        ++     %:       =+++* - + -  :       =++ :   -++ -=-=*+%.  +-++# 
+TEXTDIAG R|*       ++ -+* .    -+++* -         +      .       ++*# :  =   -        ++% -   -++ -++++* .  -++* .
+TEXTDIAG R| :      -#  -        -%   -                        %   .                #  .     +# -###% :    ## : 
+TEXTDIAG R|.-       -   .-       -..                 .        ...                  :.-       :: -.:..     .:.  
+TEXTDIAG R|                                                                                                    
+TEXTDIAG R|                                                                                                    
+TEXTDIAG R|                                                                                                    
+TEXTDIAG R|                                                                                                    
+TEXTDIAG ==== DIRECT tint=(255,255,255,255) bg=(0,0,0,0) text='Small 11s: Handgloves'
+TEXTDIAG ink=865 bbox=4,8)-(159,24 alphaSolid(>=250)=0 alphaMid(30..249)=739 rgbSaturated(>=250)=0 rgbEqAlpha=865
+TEXTDIAG -- alpha art --
+TEXTDIAG A| ---                                         -      -                      -----    --              
+TEXTDIAG A|++++-                          .   .         ++-+-  ++-+-                  +++++-   +#-             
+TEXTDIAG A|*%#+%-    -                    :   :         -++# . -++# .                  **%  -  +#.             
+TEXTDIAG A| :.+ .   -+        --          :   :        -+*+%.--+*+%.--+-     -+       .+#:.-   +#.           --
+TEXTDIAG A|:   :-   -+-=++    -+-=-++=-   : - : -      -: #+- -: #+- -+      -++       +#:     +#.-++=-      =+
+TEXTDIAG A|-         +*+#++   =*#++##*+-  :-+ :-+       -#++%  -#++% =+#=-     +       +#:     +#.+##*+-     -+
+TEXTDIAG A|          -+  +#.  -++ * :. .  %+# %+#      -++%**.-++%**.++++:-    -       +#:     +*** :. .      -
+TEXTDIAG A|           # -+#:  -+%  :      ++  ++       =* :=*:=* :=*:%+   .   -+       +#:     +*# :           
+TEXTDIAG A|   -        . +#:  -+ - -      %** %**      +#  =* +#  =* -+ -    -+:       +#.     +%  -           
+TEXTDIAG A| -++-   -+- - +#:  -+           .+  .+      +#. +# +#. +#  .       -        +%.    -+ .             
+TEXTDIAG A|=++%    -++   =*:  =+  *--+=   . - . -      =+=++ :=+=++ :++*+-     -      -+ .    -+ -*--+=      -=
+TEXTDIAG A|*#  -    -#   -*:  -*  *++* .  .   .         =**% - =**% -#### -           +* -    -+ -*++* .    -+#
+TEXTDIAG A|  .-      -    =    -: .:  :-  .   .          .  .   .  . :::..-           # :      - -.:  :-    -* 
+TEXTDIAG A|                -        --                                                .:-       -   --       : 
+TEXTDIAG A|                                                                                                    
+TEXTDIAG A|                                                                                                    
+TEXTDIAG A|                                                                                                    
+TEXTDIAG -- rgb ink art (max channel) --
+TEXTDIAG R| ---                                         -      -                      -----    --              
+TEXTDIAG R|++++-                          .   .         ++-+-  ++-+-                  +++++-   +#-             
+TEXTDIAG R|*%#+%-    -                    :   :         -++# . -++# .                  **%  -  +#.             
+TEXTDIAG R| :.+ .   -+        --          :   :        -+*+%.--+*+%.--+-     -+       .+#:.-   +#.           --
+TEXTDIAG R|:   :-   -+-=++    -+-=-++=-   : - : -      -: #+- -: #+- -+      -++       +#:     +#.-++=-      =+
+TEXTDIAG R|-         +*+#++   =*#++##*+-  :-+ :-+       -#++%  -#++% =+#=-     +       +#:     +#.+##*+-     -+
+TEXTDIAG R|          -+  +#.  -++ * :. .  %+# %+#      -++%**.-++%**.++++:-    -       +#:     +*** :. .      -
+TEXTDIAG R|           # -+#:  -+%  :      ++  ++       =* :=*:=* :=*:%+   .   -+       +#:     +*# :           
+TEXTDIAG R|   -        . +#:  -+ - -      %** %**      +#  =* +#  =* -+ -    -+:       +#.     +%  -           
+TEXTDIAG R| -++-   -+- - +#:  -+           .+  .+      +#. +# +#. +#  .       -        +%.    -+ .             
+TEXTDIAG R|=++%    -++   =*:  =+  *--+=   . - . -      =+=++ :=+=++ :++*+-     -      -+ .    -+ -*--+=      -=
+TEXTDIAG R|*#  -    -#   -*:  -*  *++* .  .   .         =**% - =**% -#### -           +* -    -+ -*++* .    -+#
+TEXTDIAG R|  .-      -    =    -: .:  :-  .   .          .  .   .  . :::..-           # :      - -.:  :-    -* 
+TEXTDIAG R|                -        --                                                .:-       -   --       : 
+TEXTDIAG R|                                                                                                    
+TEXTDIAG R|                                                                                                    
+TEXTDIAG R|                                                                                                    
+TEXTDIAG ==== UILABEL size=12 text='UILabel12: The quick brown fox'
+TEXTDIAG ink=1087 bbox=0,1)-(248,18 alphaSolid(>=250)=230 alphaMid(30..249)=758 rgbSaturated(>=250)=230 rgbEqAlpha=1087
+TEXTDIAG -- alpha art --
+TEXTDIAG A|                                        ..                 **+                                      
+TEXTDIAG A|.+*+=    =.    .+     +:     :          @@@=               @@@ -                          =*+:   -*+
+TEXTDIAG A|@@@@@   .@-    -@-   .@%     -          =-*@+   .           -@ -      .                  %@@@@-  +@@
+TEXTDIAG A|#. +@.  .@-    .@+   -@@.    -             =@.  .           -@ -      .       .          @.  %#    .
+TEXTDIAG A|   .+   .@-    .@+   *@@.    -    .     .   @-  . .   =:    -@ -  .   .                  *   +@     
+TEXTDIAG A|        .@-     @*   @%@-    - -=@@-    .  -@:  . @.  @#    -@ -=@@#  .                  @. :@#     
+TEXTDIAG A|        .@-     @*   @-@=    - %@=#@    . :@%   . -   +-    -@ #@=+@. .                  @@@@#      
+TEXTDIAG A|        .@- *   @*   @ %#    - @: -@.   @@@%.   .           -@ @- .@- .         .+       @%*%@-     
+TEXTDIAG A|        .@- @+  @*   * #@    - *  -@.   +*-     .           -@ *  .@- .         +@       #   *@.    
+TEXTDIAG A|         @* -@- @*   - =@.   - :  -@.  .        .     ..    +# -  .@- .          -       .   .@-    
+TEXTDIAG A|  .#+    #@  +@-%*     :@-   - .  -@.  .        . #   #@    #+ -  .@+                    .   .@-    
+TEXTDIAG A|.-@@-    .@   +@@*     .@*   + .  .@-           . +   +%   -@: -   @*    :+*  .          #:..#@.    
+TEXTDIAG A|@@#:      -    +@+      %@   * .  .@+           .      .   @#  .   #@ %%@@@#             @@@@@-     
+TEXTDIAG A|-.              -       -#   :     +:                      .       .: %#*-.               --:       
+TEXTDIAG A|                                                                                                    
+TEXTDIAG A|                                                                                                    
+TEXTDIAG A|                                                                                                    
+TEXTDIAG A|                                                                                                    
+TEXTDIAG -- rgb ink art (max channel) --
+TEXTDIAG R|                                        ..                 **+                                      
+TEXTDIAG R|.+*+=    =.    .+     +:     :          @@@=               @@@ -                          =*+:   -*+
+TEXTDIAG R|@@@@@   .@-    -@-   .@%     -          =-*@+   .           -@ -      .                  %@@@@-  +@@
+TEXTDIAG R|#. +@.  .@-    .@+   -@@.    -             =@.  .           -@ -      .       .          @.  %#    .
+TEXTDIAG R|   .+   .@-    .@+   *@@.    -    .     .   @-  . .   =:    -@ -  .   .                  *   +@     
+TEXTDIAG R|        .@-     @*   @%@-    - -=@@-    .  -@:  . @.  @#    -@ -=@@#  .                  @. :@#     
+TEXTDIAG R|        .@-     @*   @-@=    - %@=#@    . :@%   . -   +-    -@ #@=+@. .                  @@@@#      
+TEXTDIAG R|        .@- *   @*   @ %#    - @: -@.   @@@%.   .           -@ @- .@- .         .+       @%*%@-     
+TEXTDIAG R|        .@- @+  @*   * #@    - *  -@.   +*-     .           -@ *  .@- .         +@       #   *@.    
+TEXTDIAG R|         @* -@- @*   - =@.   - :  -@.  .        .     ..    +# -  .@- .          -       .   .@-    
+TEXTDIAG R|  .#+    #@  +@-%*     :@-   - .  -@.  .        . #   #@    #+ -  .@+                    .   .@-    
+TEXTDIAG R|.-@@-    .@   +@@*     .@*   + .  .@-           . +   +%   -@: -   @*    :+*  .          #:..#@.    
+TEXTDIAG R|@@#:      -    +@+      %@   * .  .@+           .      .   @#  .   #@ %%@@@#             @@@@@-     
+TEXTDIAG R|-.              -       -#   :     +:                      .       .: %#*-.               --:       
+TEXTDIAG R|                                                                                                    
+TEXTDIAG R|                                                                                                    
+TEXTDIAG R|                                                                                                    
+TEXTDIAG R|                                                                                                    
+TEXTDIAG ==== UILABEL size=13 text='UILabel13: off-ladder scale'
+TEXTDIAG ink=1642 bbox=0,1)-(233,16 alphaSolid(>=250)=8 alphaMid(30..249)=1130 rgbSaturated(>=250)=8 rgbEqAlpha=1642
+TEXTDIAG -- alpha art --
+TEXTDIAG A|                                            .                   +++                                 
+TEXTDIAG A|.-+==.   .-     .-:  .  -:     .           #%#+:                %@@ =        -+=:                   
+TEXTDIAG A|*%%%%-   :#:    :*+. : :%*     :           #+*#*-   .           :=@ +.      #%%%#=.  .              
+TEXTDIAG A|%=-*%=   -%-    .##:   =@%.    :           =..=#*.  .            -@ +.      #=--*%-  .              
+TEXTDIAG A|-  :+-   -%-    .*#:   *@@:    :           =  .=%:  .     .:.    -@ +.      -   -%=                 
+TEXTDIAG A|    :.   -%-     *#-   %@@-    :  :-++.    =   =%:  . +.  -*-    -@ +:=+=:      =%-             =:  
+TEXTDIAG A|         -%-     +#-   %*@=    :  +##%+    =  -*#.  . #:  -*-    -@ **##%+     -%*:             #+. 
+TEXTDIAG A|         -%- :   +#-   %-@+    :  %*-*@.   *-=*%=   . -   .:.    -% %#=-*#.  .=##-      :       +#+-
+TEXTDIAG A|         -%- #:  +#-   * %#    :  *. =@.   %%%#=.   .         .  -% @=. =#: :*%#:      -#       :*%#
+TEXTDIAG A|         -%- %*. +#-   = *@.   :  -  =@.   *+=.     .         .  =% *:  =#: #%=.       +%        =%@
+TEXTDIAG A|         :%* -%+.*#-   : =@:   :  .  =@.   -        . :   .:. .  +# +.  =#: %-         .-       :#@%
+TEXTDIAG A|  .++:   .#%  +%+*#-     :@=   :     =@:   -        . %:  -#+ .  #* +.  =%- +        :          #%++
+TEXTDIAG A|.-%@+.    -@   =%@#-     .@*.  -     :@-   -        . =.  :#+   =@- +.  -%= ++***=.  =          %= :
+TEXTDIAG A|%@%=.      =    =%#: .    %%.  -     :@+   -        .      ..   @#. -   -%* @%%%%@-  .          =   
+TEXTDIAG A|+-.              -:       =#.  .      *-   .                    :.  .   .-: :....:.                 
+TEXTDIAG A|                                                                                                    
+TEXTDIAG -- rgb ink art (max channel) --
+TEXTDIAG R|                                            .                   +++                                 
+TEXTDIAG R|.-+==.   .-     .-:  .  -:     .           #%#+:                %@@ =        -+=:                   
+TEXTDIAG R|*%%%%-   :#:    :*+. : :%*     :           #+*#*-   .           :=@ +.      #%%%#=.  .              
+TEXTDIAG R|%=-*%=   -%-    .##:   =@%.    :           =..=#*.  .            -@ +.      #=--*%-  .              
+TEXTDIAG R|-  :+-   -%-    .*#:   *@@:    :           =  .=%:  .     .:.    -@ +.      -   -%=                 
+TEXTDIAG R|    :.   -%-     *#-   %@@-    :  :-++.    =   =%:  . +.  -*-    -@ +:=+=:      =%-             =:  
+TEXTDIAG R|         -%-     +#-   %*@=    :  +##%+    =  -*#.  . #:  -*-    -@ **##%+     -%*:             #+. 
+TEXTDIAG R|         -%- :   +#-   %-@+    :  %*-*@.   *-=*%=   . -   .:.    -% %#=-*#.  .=##-      :       +#+-
+TEXTDIAG R|         -%- #:  +#-   * %#    :  *. =@.   %%%#=.   .         .  -% @=. =#: :*%#:      -#       :*%#
+TEXTDIAG R|         -%- %*. +#-   = *@.   :  -  =@.   *+=.     .         .  =% *:  =#: #%=.       +%        =%@
+TEXTDIAG R|         :%* -%+.*#-   : =@:   :  .  =@.   -        . :   .:. .  +# +.  =#: %-         .-       :#@%
+TEXTDIAG R|  .++:   .#%  +%+*#-     :@=   :     =@:   -        . %:  -#+ .  #* +.  =%- +        :          #%++
+TEXTDIAG R|.-%@+.    -@   =%@#-     .@*.  -     :@-   -        . =.  :#+   =@- +.  -%= ++***=.  =          %= :
+TEXTDIAG R|%@%=.      =    =%#: .    %%.  -     :@+   -        .      ..   @#. -   -%* @%%%%@-  .          =   
+TEXTDIAG R|+-.              -:       =#.  .      *-   .                    :.  .   .-: :....:.                 
+TEXTDIAG R|                                                                                                    
+TEXTDIAG END

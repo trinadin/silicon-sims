@@ -1,0 +1,73 @@
+00112840: c03e0058  lfs      f1, 0x58(r30)
+00112844: 4bf738ed  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+00112848: 80a28f18  lwz      r5, -0x70e8(r2)
+0011284c: 38610040  addi     r3, r1, 0x40
+00112850: 389f0206  addi     r4, r31, 0x206
+00112854: d0250000  stfs     f1, 0(r5)
+00112858: 38c00001  li       r6, 1
+0011285c: c03e0050  lfs      f1, 0x50(r30)
+00112860: 4bf738d1  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+00112864: 80a28f14  lwz      r5, -0x70ec(r2)
+00112868: 38610040  addi     r3, r1, 0x40
+0011286c: 389f021e  addi     r4, r31, 0x21e
+00112870: d0250000  stfs     f1, 0(r5)
+00112874: 38c00001  li       r6, 1
+00112878: c03e0054  lfs      f1, 0x54(r30)
+0011287c: 4bf738b5  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+00112880: 80a28f10  lwz      r5, -0x70f0(r2)
+00112884: 38610040  addi     r3, r1, 0x40
+00112888: 389f023b  addi     r4, r31, 0x23b
+0011288c: d0250000  stfs     f1, 0(r5)
+00112890: 38c00001  li       r6, 1
+00112894: c03e0058  lfs      f1, 0x58(r30)
+00112898: 4bf73899  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+0011289c: 80a28f0c  lwz      r5, -0x70f4(r2)
+001128a0: 38610040  addi     r3, r1, 0x40
+001128a4: 389f0254  addi     r4, r31, 0x254
+001128a8: d0250000  stfs     f1, 0(r5)
+001128ac: 38c00001  li       r6, 1
+001128b0: c03e0048  lfs      f1, 0x48(r30)
+001128b4: 4bf7387d  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+001128b8: 80a28f34  lwz      r5, -0x70cc(r2)
+001128bc: 38610040  addi     r3, r1, 0x40
+001128c0: 389f0273  addi     r4, r31, 0x273
+001128c4: d0250000  stfs     f1, 0(r5)
+001128c8: 38c00001  li       r6, 1
+001128cc: c03e005c  lfs      f1, 0x5c(r30)
+001128d0: 4bf73861  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+001128d4: fc00081e  fctiwz   f0, f1
+001128d8: 80a28f38  lwz      r5, -0x70c8(r2)
+001128dc: c03e0060  lfs      f1, 0x60(r30)
+001128e0: 38610040  addi     r3, r1, 0x40
+001128e4: 389f028a  addi     r4, r31, 0x28a
+001128e8: d8010050  stfd     f0, 0x50(r1)
+001128ec: 38c00001  li       r6, 1
+001128f0: 80010054  lwz      r0, 0x54(r1)
+001128f4: 90050000  stw      r0, 0(r5)
+001128f8: 4bf73839  bl       0x86130   ; .Get__14FloatConstantsFPCcfb
+001128fc: fc00081e  fctiwz   f0, f1
+00112900: 80a28d94  lwz      r5, -0x726c(r2)
+00112904: c03e0008  lfs      f1, 8(r30)
+00112908: 38610040  addi     r3, r1, 0x40
+0011290c: 389f029f  addi     r4, r31, 0x29f
+00108160: 65526f75  oris     r18, r10, 0x6f75
+00108164: 7465735f  andis.   r5, r3, 0x735f
+00108168: 5f386358  rlwnm    r24, r25, r12, 0xd, 0xc
+0010816c: 50657273  rlwimi.  r5, r3, 0xe, 9, 0x19
+00108170: 6f6e4676  xoris    r14, r27, 0x4676
+00108174: 00000000  .long    0x00000000
+00108178: 00000000  .long    0x00000000
+0010817c: 00000000  .long    0x00000000
+                ; ==== .IsSleeping__8cXPersonFv ====
+00108180: 8082a718  lwz      r4, -0x58e8(r2)
+00108184: c02307b8  lfs      f1, 0x7b8(r3)
+00108188: c0040004  lfs      f0, 4(r4)
+0010818c: fc010040  .long    0xfc010040
+00108190: 7c000026  mfcr     r0
+00108194: 54030ffe  srwi     r3, r0, 0x1f
+00108198: 4e800020  blr      
+0010819c: 00000000  .long    0x00000000
+001081a0: 00092040  .long    0x00092040
+001081a4: 00000000  .long    0x00000000
+001081a8: 0000001c  .long    0x0000001c
+001081ac: 00182e49  .long    0x00182e49

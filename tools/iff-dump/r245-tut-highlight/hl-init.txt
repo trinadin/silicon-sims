@@ -1,0 +1,35 @@
+                ; ==== .Init__23cTSWinTutorialHighlightFv ====
+00539250: 93e1fffc  stw      r31, -4(r1)
+00539254: 7c0802a6  mflr     r0
+00539258: 7c7f1b78  mr       r31, r3
+0053925c: 90010008  stw      r0, 8(r1)
+00539260: 9421ffb0  stwu     r1, -0x50(r1)
+00539264: 81830000  lwz      r12, 0(r3)
+00539268: 818c00d0  lwz      r12, 0xd0(r12)
+0053926c: 48069775  bl       0x5a29e0
+00539270: 80410014  lwz      r2, 0x14(r1)
+00539274: 5460063f  clrlwi.  r0, r3, 0x18
+00539278: 41820010  beq      0x539288
+0053927c: 7fe3fb78  mr       r3, r31
+00539280: 4bfd0171  bl       0x5093f0   ; .Init__6cTSWinFv
+00539284: 48000040  b        0x5392c4
+00539288: 7fe3fb78  mr       r3, r31
+0053928c: 4bfd0165  bl       0x5093f0   ; .Init__6cTSWinFv
+00539290: 5460063f  clrlwi.  r0, r3, 0x18
+00539294: 4082000c  bne      0x5392a0
+00539298: 38600000  li       r3, 0
+0053929c: 48000028  b        0x5392c4
+005392a0: 80628e04  lwz      r3, -0x71fc(r2)
+005392a4: 38800000  li       r4, 0
+005392a8: 80630000  lwz      r3, 0(r3)
+005392ac: 80630190  lwz      r3, 0x190(r3)
+005392b0: 4bf5e021  bl       0x4972d0   ; .GetStandardCursor__16cTSCursorManagerFQ29cTSCursor14StandardCursor
+005392b4: 38830000  addi     r4, r3, 0
+005392b8: 387f0000  addi     r3, r31, 0
+005392bc: 4bfcac45  bl       0x503f00   ; .SetCursor__6cTSWinFP9cTSCursor
+005392c0: 38600001  li       r3, 1
+005392c4: 80010058  lwz      r0, 0x58(r1)
+005392c8: 38210050  addi     r1, r1, 0x50
+005392cc: 83e1fffc  lwz      r31, -4(r1)
+005392d0: 7c0803a6  mtlr     r0
+005392d4: 4e800020  blr      

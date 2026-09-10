@@ -149,6 +149,11 @@ namespace Simitone.Client.UI.Panels
         public override void PreDraw(UISpriteBatch batch)
         {
             if (!Visible) return;
+            // R144: this strip is mobile-era chrome with a stale thumbnail that
+            // painted over the original toolbar (survey slab at (389,674));
+            // desktop keeps the logic but never paints it. The ORIGINAL pickup
+            // chrome (cWinDisposePopup family) is a future round.
+            if (!FSO.Common.FSOEnvironment.SoftwareKeyboard) return;
             base.PreDraw(batch);
             Thumb3D?.Draw();
         }
@@ -156,6 +161,7 @@ namespace Simitone.Client.UI.Panels
         public override void Draw(UISpriteBatch batch)
         {
             if (!Visible) return;
+            if (!FSO.Common.FSOEnvironment.SoftwareKeyboard) return;
             base.Draw(batch);
             var targSize = 180f;
 

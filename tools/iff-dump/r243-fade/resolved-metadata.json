@@ -1,0 +1,72 @@
+{
+  "PIPVtableData": "0x587d8",
+  "slots": {
+    "0x78": {
+      "descriptor": "0xd660",
+      "file": "0xcbb50"
+    },
+    "0x7c": {
+      "descriptor": "0xd668",
+      "file": "0xcbc40"
+    },
+    "0x94": {
+      "descriptor": "0xd690",
+      "file": "0xcbed0"
+    },
+    "0x98": {
+      "descriptor": "0x14248",
+      "file": "0x509180"
+    },
+    "0x9c": {
+      "descriptor": "0x14250",
+      "file": "0x5029d0"
+    },
+    "0xa0": {
+      "descriptor": "0xfc60",
+      "file": "0x298dc0"
+    },
+    "0xb0": {
+      "descriptor": "0x14268",
+      "file": "0x502e10"
+    },
+    "0xb8": {
+      "descriptor": "0x14278",
+      "file": "0x502770"
+    },
+    "0xbc": {
+      "descriptor": "0xfc78",
+      "file": "0x298c90"
+    },
+    "0xd8": {
+      "descriptor": "0x142a8",
+      "file": "0x506200"
+    },
+    "0x170": {
+      "descriptor": "0x143d0",
+      "file": "0x502a30"
+    },
+    "0x174": {
+      "descriptor": "0x143d8",
+      "file": "0x503e10"
+    },
+    "0x17c": {
+      "descriptor": "0x143e8",
+      "file": "0x505840"
+    },
+    "0x180": {
+      "descriptor": "0x143f0",
+      "file": "0x5065b0"
+    },
+    "0x184": {
+      "descriptor": "0x143f8",
+      "file": "0x506570"
+    }
+  },
+  "defaultFlags": "0x13",
+  "rampConstants": [
+    0.5,
+    255.0,
+    1.0,
+    0.0
+  ]
+}

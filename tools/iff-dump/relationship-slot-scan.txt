@@ -1,0 +1,9 @@
+# Relationship slot semantics scan of the original Global.iff (251 BHAVs, 51 rel. calls)
+# RelVar semantics are defined by the ORIGINAL bytecode; engine passes RelVar positionally (VMRelationship.cs).
+
+===== Global.iff
+  total relationship calls: 51
+  RelVar 0  [friendship(daily)] :: End Jealousy=4 | Relationship Impact for Join=3 | relationship=2 | group talk create=2 | am I friends with temp 0=2 | Dream - Pet - About Other Sim=2 | Get Social Availability Scale - 1.4=2 | get my relationship to temp 0=1 | Create Stool=1 | fall on floor - end=1 | is temp 0 friends with me?=1 | fall on floor - begin=1 | Am I a clone?=1 | group talk add person=1
+  RelVar 1  [love(lifetime)] :: Relationship Impact for Join=2 | Find someone i love=2 | Allow Autonomous?=2 | Start Jealousy=2 | End Jealousy=2 | Do I Love temp 0?=1 | does stack object love anyone?=1 | do I love anyone?=1 | group talk cancel=1 | group talk exit person=1 | group talk do=1 | group talk add person=1 | Dream - Pet - About Other Sim=1 | Get Social Availability Scale - 1.4=1
+  RelVar 2  [social-score?] :: Get Social Availability Scale - 1.4=2
+  RelVar 3  [social-score?] :: Does temp 0 love me?=1 | Get Social Availability Scale - 1.4=1

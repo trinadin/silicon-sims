@@ -1,0 +1,451 @@
+R122 canon dump — UIText.iff STR# 150 'BuyModeCatalogSortTips' + all buy/catalog/room/sort/function/category/build-labeled STR# tables
+Source: /Users/nathannoom/Developer/Games/The Sims/simitone-fork/game-data/The Sims/GameData/UIText.iff (2300704 bytes; full-file sha256 b229da197eb9678370844c4da7c88640c3d1ce9a5e528654bfd71df6ef12a9ad)
+Parser: 60-byte Maxis header, first chunk @0x40, 76-byte chunk headers, BE sizes; STR# data LE, format -3 = language pairs {u8 lang, cstring value, cstring comment}, lang 1 = English; full-chunk sha includes the 76-byte header (gate convention).
+Total chunks walked: 75 (74 STR# tables)
+
+################ INVENTORY: ALL STR# TABLES (id<TAB>label<TAB>raw declared count) ################
+
+128	'PickFamilyStrs'	400
+129	'DesignFamilyStrs'	270
+130	'DesignCharStrs'	504
+131	'EvictModeStrs'	460
+132	'MoveInModeStrs'	480
+133	'RegularModeStrs'	68
+134	'NghRollover'	780
+135	'Ranger'	1
+136	'DisposeButtonStrs'	108
+137	'PlacementErrs'	846
+138	'VCtlTips'	432
+139	'BldTips'	288
+140	'cammodestrs'	360
+141	'scrapbookstrs'	17
+142	'ObjDialogs'	90
+143	'ImportStrs'	162
+144	'ScrapStrs'	414
+145	'optionstrs'	1512
+146	'budgetstrs'	648
+147	'roofpanelstrs'	324
+148	'Pause'	34
+149	'DirtToolErrs'	126
+150	'BuyModeCatalogSortTips'	960
+151	'NghbBtnTips'	280
+152	'DefaultDialogButtons'	72
+153	'AppStrings'	480
+154	'MiscStrings'	460
+155	'splashprogress'	340
+156	'PIPStrings'	17
+157	'ConfigStrings'	252
+158	'WebPageStrings'	260
+159	'ObjectTTs'	180
+160	'CatalogRatings'	400
+161	'LocalKeys'	558
+162	'FriendCountDlg'	54
+163	'credits'	65
+164	'signs'	252
+165	'SignPopups'	432
+166	'Help'	1598
+167	'HTMLUpdate'	51
+168	'TranslateImport'	119
+169	'Downtown Screen Tooltips'	85
+170	'Vacation Island Screen Tooltips'	100
+171	'Filter Bar'	260
+172	'Unleashed Import Strings'	40
+173	'Studio Town Screen Tooltips'	100
+174	'Magic land Screen Tooltips'	120
+180	'Phonebook Dialog'	60
+200	'Seating Function Sub Sorts'	102
+201	'Surfaces Function Sub Sorts'	102
+202	'Decorative Function Sub Sorts'	102
+203	'Electronics Function Sub Sorts'	102
+204	'Appliances Function Sub Sorts'	102
+205	'Plumbing Function Sub Sorts'	102
+206	'Lighting Function Sub Sorts'	102
+207	'Miscellaneous Function Sub Sorts'	102
+210	'Function Sub Sort Extra Strings'	100
+211	'Townies'	90
+212	'Go Downtown Dialog Strings'	60
+213	'Vacation Dialog Strings'	60
+220	'Clothing Dialog Text'	136
+221	'Pet Dialog Strings'	160
+225	'Neighborhood Screen change button failure tooltips'	100
+230	'Tourists Strings'	120
+240	'Relationship Panel Sort Button Tooltip Text'	80
+241	'Inventory Panel Sort Button Tooltip Text'	60
+250	'Rezone Mode strings'	40
+251	'Zoning Types'	40
+260	'Visit Mode Neighborhood Strings'	40
+261	'Visit Mode Magictown Strings'	40
+270	'Unleashed Welcome Dialog'	40
+271	'Celebrity Strings for Loading Dialog'	200
+272	'Magic town Strings for Pool Dialog'	200
+273	'Transform Me Dialog'	160
+
+################ TARGET: STR# 150 ################
+
+=== STR# 150 'BuyModeCatalogSortTips' (chunkSize 74299; 960 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x1d0441..0x1e267c  flags=0x0010
+full-chunk sha256 d99134a4b8d6b2b58bad808f6a33e3b79c32a67cbfb484187990e473e0e5de6e   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 e90d87e19071105396575381571a7dddf8d58688c9cf25302652364b4dc51fec
+raw declared count: 960   English (lang-1) count: 48
+languages present: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 960 = 48 English x 20 languages
+trailer: 960 bytes, UNEXPECTED non-0xA3 bytes: b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+entries containing an '(x;y)' layout directive: 0 of 48 English
+
+English entries [0..47], verbatim (mac_roman), as idx<TAB>text:
+0	Living Room
+1	Dining Room
+2	Bedroom
+3	Study
+4	Kitchen
+5	Bathroom
+6	Outside
+7	Miscellaneous
+8	Seating
+9	Surfaces
+10	Decorative
+11	Electronics
+12	Appliances
+13	Plumbing
+14	Lighting
+15	Miscellaneous
+16	Dining
+17	Shops
+18	Outdoors
+19	Street
+20	Entertainment
+21	Bathroom
+22	Decorative
+23	Miscellaneous
+24	Lodging
+25	Shops
+26	Recreation
+27	Amenities
+28	Vacation Five(Unused)
+29	Vacation Six(Unused)
+30	Vacation Seven(Unused)
+31	Miscellaneous
+32	Food
+33	Shops
+34	Outdoors
+35	Street
+36	Unleashed Five(Unused)
+37	Unleashed Six(Unused)
+38	Unleashed Seven(Unused)
+39	Miscellaneous
+40	Food
+41	Shops
+42	Studio
+43	Spa
+44	MagiCo
+45	Superstar Six (Unused)
+46	Superstar Seven (Unused)
+47	Miscellaneous
+
+################ KEYWORD MATCHES (labels containing buy/catalog/room/sort/function/category/build; target excluded) ################
+
+matched: 160 'CatalogRatings', 200 'Seating Function Sub Sorts', 201 'Surfaces Function Sub Sorts', 202 'Decorative Function Sub Sorts', 203 'Electronics Function Sub Sorts', 204 'Appliances Function Sub Sorts', 205 'Plumbing Function Sub Sorts', 206 'Lighting Function Sub Sorts', 207 'Miscellaneous Function Sub Sorts', 210 'Function Sub Sort Extra Strings', 240 'Relationship Panel Sort Button Tooltip Text', 241 'Inventory Panel Sort Button Tooltip Text'
+
+=== STR# 160 'CatalogRatings' (chunkSize 54558; 400 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x114ede..0x1223fc  flags=0x0010
+full-chunk sha256 3a8571a9b02dd787ea59223ca408a27e1ad806ec2912646ad2d900f80a265c05   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 7a825ab7433e46eb47554876de6a54f2efb7602c551c39850f63724386d5c4ff
+raw declared count: 400   English (lang-1) count: 20
+languages present: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 400 = 20 English x 20 languages
+trailer: 400 bytes, UNEXPECTED non-0xA3 bytes: b'\x00\x00\xa3\x00\x00\x00\xa3\x00\x00\x00\xa3\x00\x00\x00\xa3\x00\x00\x00\xa3\x00\x00\x00\xa3\x00\x00\x00\xa3\x00\x00\x00\xa3\x00'
+entries containing an '(x;y)' layout directive: 0 of 20 English
+
+English entries [0..19], verbatim (mac_roman), as idx<TAB>text:
+0	Hunger: %d
+1	Comfort: %d
+2	Hygiene: %d
+3	Bladder: %d
+4	Energy: %d
+5	Fun: %d
+6	Room: %d
+7	+ Cooking
+8	+ Mechanical
+9	+ Logic
+10	+ Body
+11	+ Creativity
+12	+ Charisma
+13	+ Study
+14	Can only be used by adults
+15	Can only be used by kids
+16	Group Activity
+17	Can only be used by pets
+18	Can only be used by dogs
+19	Can only be used by cats
+
+=== STR# 200 'Seating Function Sub Sorts' (chunkSize 4386; 102 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x1fe3..0x3105  flags=0x0010
+full-chunk sha256 2223c7c95a33a513a9096735962c702207147a8f706cdc0ea9f77747164fcfa5   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 6e95d7f770a2c6e2a6b542cb78bcc1fe6aa83883757700f844edad6d741b4967
+raw declared count: 102   English (lang-1) count: 6
+languages present: [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 102 = 6 English x 17 languages
+trailer: 102 bytes, all 0xA3 padding (FreeSo STR writer quirk)
+entries containing an '(x;y)' layout directive: 0 of 6 English
+
+English entries [0..5], verbatim (mac_roman), as idx<TAB>text:
+0	Dining Chairs
+1	Lounge Chairs
+2	Sofas
+3	Beds
+4	
+5	
+
+=== STR# 201 'Surfaces Function Sub Sorts' (chunkSize 4417; 102 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x145d59..0x146e9a  flags=0x0010
+full-chunk sha256 78d467ef232e67d17b834c1e0e36782a3d6b0d85231b19564ef99d5f28e6996d   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 95b0ebb3df3220bdd55cc8d6738622d9d83ea10870dfc513b2557798899b2dca
+raw declared count: 102   English (lang-1) count: 6
+languages present: [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 102 = 6 English x 17 languages
+trailer: 102 bytes, UNEXPECTED non-0xA3 bytes: b'\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3\xa3'
+entries containing an '(x;y)' layout directive: 0 of 6 English
+
+English entries [0..5], verbatim (mac_roman), as idx<TAB>text:
+0	Counters
+1	Tables
+2	End Tables
+3	Desks
+4	
+5	
+
+=== STR# 202 'Decorative Function Sub Sorts' (chunkSize 4492; 102 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x3105..0x4291  flags=0x0010
+full-chunk sha256 aa32d2baa6f55139df4bab3704bbd2efbbbe7b957a3f3bf2b0a1e377e01f4b3e   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 fcc39e2d18985b728d0aabff684e85c43d79c104e35f4033a30e8eeb9b56783e
+raw declared count: 102   English (lang-1) count: 6
+languages present: [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 102 = 6 English x 17 languages
+trailer: 102 bytes, all 0xA3 padding (FreeSo STR writer quirk)
+entries containing an '(x;y)' layout directive: 0 of 6 English
+
+English entries [0..5], verbatim (mac_roman), as idx<TAB>text:
+0	Paintings
+1	Sculptures
+2	Rugs
+3	Plants
+4	
+5	
+
+=== STR# 203 'Electronics Function Sub Sorts' (chunkSize 4621; 102 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x144b4c..0x145d59  flags=0x0010
+full-chunk sha256 60d4fff10be2df121fcfe2c91b55328199a15361d79c2eb8b60160fd8b4bf384   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 e53be9c394ac39659c5e6f2bf13d7ccff6be79aaa04c8e1b7bceb2cfb784c3d4
+raw declared count: 102   English (lang-1) count: 6
+languages present: [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 102 = 6 English x 17 languages
+trailer: 102 bytes, UNEXPECTED non-0xA3 bytes: b'\x00\x14\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+entries containing an '(x;y)' layout directive: 0 of 6 English
+
+English entries [0..5], verbatim (mac_roman), as idx<TAB>text:
+0	Entertainment
+1	Video
+2	Audio
+3	Phones
+4	
+5	
+
+=== STR# 204 'Appliances Function Sub Sorts' (chunkSize 4815; 102 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x4291..0x5560  flags=0x0010
+full-chunk sha256 82f9c6d22b5835f8c94e12c638291818297b8e84dcdb1be735c2d53c851ebf68   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 6aefb9d66f71a32951cf66b07ca144903f312363f33773963798c03e8e2bccc5
+raw declared count: 102   English (lang-1) count: 6
+languages present: [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 102 = 6 English x 17 languages
+trailer: 102 bytes, all 0xA3 padding (FreeSo STR writer quirk)
+entries containing an '(x;y)' layout directive: 0 of 6 English
+
+English entries [0..5], verbatim (mac_roman), as idx<TAB>text:
+0	Stoves
+1	Refrigerators
+2	Small Appliances
+3	Large Appliances
+4	
+5	
+
+=== STR# 205 'Plumbing Function Sub Sorts' (chunkSize 4548; 102 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x8e1f0..0x8f3b4  flags=0x0010
+full-chunk sha256 da0036073e61e18458dcaf900d187bdcda5c9ec7870ed362a67e3241b6ffe968   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 d6df7616fa6dbcaa6a2301564e0afa94dd618144bf0187e1643de156b86ededd
+raw declared count: 102   English (lang-1) count: 6
+languages present: [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 102 = 6 English x 17 languages
+trailer: 102 bytes, all 0xA3 padding (FreeSo STR writer quirk)
+entries containing an '(x;y)' layout directive: 0 of 6 English
+
+English entries [0..5], verbatim (mac_roman), as idx<TAB>text:
+0	Toilets
+1	Showers/Tubs
+2	Sinks
+3	Hot Tubs
+4	
+5	
+
+=== STR# 206 'Lighting Function Sub Sorts' (chunkSize 4466; 102 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x8f3b4..0x90526  flags=0x0010
+full-chunk sha256 bc05c712d511eb2bc4e224c91679a291e06318fae24ea1561d8c8809c74298a7   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 dc5cc27802f66300123c077e9944182335f4ad387148bb4fd3e80b93b2288fc0
+raw declared count: 102   English (lang-1) count: 6
+languages present: [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 102 = 6 English x 17 languages
+trailer: 102 bytes, all 0xA3 padding (FreeSo STR writer quirk)
+entries containing an '(x;y)' layout directive: 0 of 6 English
+
+English entries [0..5], verbatim (mac_roman), as idx<TAB>text:
+0	Table Lamps
+1	Standing Lamps
+2	Wall Lamps
+3	Hanging Lamps
+4	
+5	
+
+=== STR# 207 'Miscellaneous Function Sub Sorts' (chunkSize 4280; 102 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x90526..0x915de  flags=0x0010
+full-chunk sha256 171bfd561b9f052b049a660baefa7bbf95ea1c8f01ffc484554271e6d9086137   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 fb9b28689995f1c849d72298f41459d13a20462690ccab7bb27b33a6db938b94
+raw declared count: 102   English (lang-1) count: 6
+languages present: [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 102 = 6 English x 17 languages
+trailer: 102 bytes, all 0xA3 padding (FreeSo STR writer quirk)
+entries containing an '(x;y)' layout directive: 0 of 6 English
+
+English entries [0..5], verbatim (mac_roman), as idx<TAB>text:
+0	Recreation
+1	Knowledge
+2	Creativity
+3	Wardrobe
+4	
+5	
+
+=== STR# 210 'Function Sub Sort Extra Strings' (chunkSize 6028; 100 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x173ebc..0x175648  flags=0x0010
+full-chunk sha256 7f3df62efeeb9011ce2205accab661ef89b02ca7220083e0bf3f13f4698b2636   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 b038d34e8cfa516e0b6b563e863a9fa8a1e533a0d9d0e3e007a64f55f472dab6
+raw declared count: 100   English (lang-1) count: 5
+languages present: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 100 = 5 English x 20 languages
+trailer: 100 bytes, UNEXPECTED non-0xA3 bytes: b'\x00ip - Shows All objects\x00\x14\xbe\xd6\xbf\xcf\xb5\xbf\xb9'
+entries containing an '(x;y)' layout directive: 0 of 5 English
+
+English entries [0..4], verbatim (mac_roman), as idx<TAB>text:
+0	Back
+1	Other
+2	All
+3	Pets
+4	Magic
+
+=== STR# 240 'Relationship Panel Sort Button Tooltip Text' (chunkSize 5952; 80 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x146e9a..0x1485da  flags=0x0010
+full-chunk sha256 ac8b98b6e2382cdf2914fb4c2db56172253edeed138a2ad7c93a8c4995e4238b   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 75233e0997f4ded091dc933732a03ef369d16d08f7b291cff00b8816ae17c054
+raw declared count: 80   English (lang-1) count: 4
+languages present: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 80 = 4 English x 20 languages
+trailer: 80 bytes, UNEXPECTED non-0xA3 bytes: b'the relationship sort buttons\x00\x14\xc0'
+entries containing an '(x;y)' layout directive: 0 of 4 English
+
+English entries [0..3], verbatim (mac_roman), as idx<TAB>text:
+0	Family Only
+1	Friends Only
+2	Famous Only
+3	All
+
+=== STR# 241 'Inventory Panel Sort Button Tooltip Text' (chunkSize 3364; 60 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x204e01..0x205b25  flags=0x0010
+full-chunk sha256 d23dd340ef9ba39666d995d8b8b7ed595e16816805d0570a8e67a9ca6eb30670   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 1415d809929905be5017987163b3b84c297ab00726230694480e9616f565c6c4
+raw declared count: 60   English (lang-1) count: 3
+languages present: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 60 = 3 English x 20 languages
+trailer: 60 bytes, UNEXPECTED non-0xA3 bytes: b'slation\x00n\x00\x00ion\x00on\x00tion\x00lation\x00n\x00'
+entries containing an '(x;y)' layout directive: 0 of 3 English
+
+English entries [0..2], verbatim (mac_roman), as idx<TAB>text:
+0	Other Items
+1	Magic Items
+2	Ingredients
+
+################ NEIGHBORHOOD: STR# ids 130..200 ################
+
+130   'DesignCharStrs'
+131   'EvictModeStrs'
+132   'MoveInModeStrs'
+133   'RegularModeStrs'
+134   'NghRollover'
+135   'Ranger'
+136   'DisposeButtonStrs'
+137   'PlacementErrs'
+138   'VCtlTips'
+139   'BldTips'
+140   'cammodestrs'
+141   'scrapbookstrs'
+142   'ObjDialogs'
+143   'ImportStrs'
+144   'ScrapStrs'
+145   'optionstrs'
+146   'budgetstrs'
+147   'roofpanelstrs'
+148   'Pause'
+149   'DirtToolErrs'
+150   'BuyModeCatalogSortTips'
+151   'NghbBtnTips'
+152   'DefaultDialogButtons'
+153   'AppStrings'
+154   'MiscStrings'
+155   'splashprogress'
+156   'PIPStrings'
+157   'ConfigStrings'
+158   'WebPageStrings'
+159   'ObjectTTs'
+160   'CatalogRatings'
+161   'LocalKeys'
+162   'FriendCountDlg'
+163   'credits'
+164   'signs'
+165   'SignPopups'
+166   'Help'
+167   'HTMLUpdate'
+168   'TranslateImport'
+169   'Downtown Screen Tooltips'
+170   'Vacation Island Screen Tooltips'
+171   'Filter Bar'
+172   'Unleashed Import Strings'
+173   'Studio Town Screen Tooltips'
+174   'Magic land Screen Tooltips'
+180   'Phonebook Dialog'
+200   'Seating Function Sub Sorts'
+
+################ BONUS (manual add; label contains none of the keywords) ################
+
+=== STR# 139 'BldTips' (chunkSize 20064; 288 raw entries; format -3; blocked-by-language (English block first)) ===
+file range 0x2da96..0x328f6  flags=0x0010
+full-chunk sha256 367ee0e830ba1c87dfa7eda09875518f8035e33f25b9ce392d309d7c69cc8769   (includes the 76-byte chunk header; gate convention)
+body-only  sha256 3b7f2faf20e6b766d60eb2ffc9d3ff15272f87bc6736fc90610e4c5dbeda7843
+raw declared count: 288   English (lang-1) count: 16
+languages present: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20]  (lang 1 = English)
+raw 288 = 16 English x 18 languages
+trailer: 288 bytes, all 0xA3 padding (FreeSo STR writer quirk)
+entries containing an '(x;y)' layout directive: 0 of 16 English
+
+English entries [0..15], verbatim (mac_roman), as idx<TAB>text:
+0	Terrain Tool
+1	Water Tool
+2	Wall & Fence Tool
+3	Wallpaper Tool
+4	Stair Tool
+5	Fireplace Tool
+6	Plant Tool
+7	Floor Tool
+8	Door Tool
+9	Window Tool
+10	Roof Tool
+11	Hand Tool
+12	Undo Last
+13	Redo Last
+14	Previous Page
+15	Next Page

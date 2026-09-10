@@ -1,0 +1,2 @@
+# EMPTY BY RESULT: zero {key,val} entry-pair runs found in any variant.
+# See ladder-hunt-report.txt for the full scan matrix (negative) and float-run candidates.

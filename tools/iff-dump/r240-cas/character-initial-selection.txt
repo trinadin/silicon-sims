@@ -1,0 +1,32 @@
+002cf960: 88100119  lbz      r0, 0x119(r16)
+002cf964: 80700114  lwz      r3, 0x114(r16)
+002cf968: 7c000034  cntlzw   r0, r0
+002cf96c: 5404d97e  srwi     r4, r0, 5
+002cf970: 4bf71a51  bl       0x2413c0
+002cf974: 88100118  lbz      r0, 0x118(r16)
+002cf978: 28000000  cmplwi   r0, 0
+002cf97c: 41820014  beq      0x2cf990
+002cf980: 38000000  li       r0, 0
+002cf984: 90100168  stw      r0, 0x168(r16)
+002cf988: 9010016c  stw      r0, 0x16c(r16)
+002cf98c: 4800001c  b        0x2cf9a8
+002cf990: 80700114  lwz      r3, 0x114(r16)
+002cf994: 4bf6ecdd  bl       0x23e670   ; .GetHeadSuit__12PersonFinderFi
+002cf998: 90700168  stw      r3, 0x168(r16)
+002cf99c: 80700114  lwz      r3, 0x114(r16)
+002cf9a0: 4bf6f361  bl       0x23ed00   ; .GetBodySuit__12PersonFinderFi
+002cf9a4: 9070016c  stw      r3, 0x16c(r16)
+002cf9a8: 38000000  li       r0, 0
+002cf9ac: 98100120  stb      r0, 0x120(r16)
+002cf9b0: 80700114  lwz      r3, 0x114(r16)
+002cf9b4: 80900168  lwz      r4, 0x168(r16)
+002cf9b8: 4bf6eb99  bl       0x23e550   ; .SetHeadSuit__12PersonFinderFii
+002cf9bc: 80700114  lwz      r3, 0x114(r16)
+002cf9c0: 8090016c  lwz      r4, 0x16c(r16)
+002cf9c4: 4bf6f21d  bl       0x23ebe0   ; .SetBodySuit__12PersonFinderFii
+002cf9c8: 8070017c  lwz      r3, 0x17c(r16)
+002cf9cc: 80900114  lwz      r4, 0x114(r16)
+002cf9d0: 4800c7d1  bl       0x2dc1a0   ; .SetPerson__11cWinVitaBtnFi
+002cf9d4: 7e038378  mr       r3, r16
+002cf9d8: 4bffcfd9  bl       0x2cc9b0   ; .PrepareButtons__19cWinDesignCharacterFv
+002cf9dc: 88100118  lbz      r0, 0x118(r16)

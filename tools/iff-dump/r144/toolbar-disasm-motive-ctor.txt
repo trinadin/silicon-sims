@@ -1,0 +1,133 @@
+0027fa50: bee1ffdc  stmw     r23, -0x24(r1)
+0027fa54: 7c0802a6  mflr     r0
+0027fa58: 83628874  lwz      r27, -0x778c(r2)   ; TOC[-0x778c]->BSS off 0x8510c
+0027fa5c: 7c7d1b78  mr       r29, r3
+0027fa60: 8382afec  lwz      r28, -0x5014(r2)   ; TOC[-0x5014]->CODE file 0x5a4478 firstword=1056964608(0x3f000000)
+0027fa64: 3ae40000  addi     r23, r4, 0
+0027fa68: 3b050000  addi     r24, r5, 0
+0027fa6c: 3b460000  addi     r26, r6, 0
+0027fa70: 3b270000  addi     r25, r7, 0
+0027fa74: 3bc80000  addi     r30, r8, 0
+0027fa78: 3be90000  addi     r31, r9, 0
+0027fa7c: 90010008  stw      r0, 8(r1)
+0027fa80: 9421ff70  stwu     r1, -0x90(r1)
+0027fa84: 4828dc9d  bl       0x50d720   ; .__ct__9cTSWinBtnFv
+0027fa88: 8002962c  lwz      r0, -0x69d4(r2)   ; TOC[-0x69d4]->DATA off 0x57948
+0027fa8c: 387d01ac  addi     r3, r29, 0x1ac
+0027fa90: 901d0000  stw      r0, 0(r29)
+0027fa94: 480002dd  bl       0x27fd70
+0027fa98: c03c0004  lfs      f1, 4(r28)
+0027fa9c: 387d01dc  addi     r3, r29, 0x1dc
+0027faa0: fc400890  fmr      f2, f1
+0027faa4: 4becef0d  bl       0x14e9b0   ; .__ct__13RampGeneratorFff
+0027faa8: c03c0004  lfs      f1, 4(r28)
+0027faac: 387d0210  addi     r3, r29, 0x210
+0027fab0: fc400890  fmr      f2, f1
+0027fab4: 4beceefd  bl       0x14e9b0   ; .__ct__13RampGeneratorFff
+0027fab8: 38000000  li       r0, 0
+0027fabc: 901d018c  stw      r0, 0x18c(r29)
+0027fac0: 7ee3bb78  mr       r3, r23
+0027fac4: 4bec68ed  bl       0x1463b0   ; .__ml__13StringSetIterCFv
+0027fac8: 4831d269  bl       0x59cd30
+0027facc: 38630001  addi     r3, r3, 1
+0027fad0: 48311aa1  bl       0x591570
+0027fad4: 907d01a0  stw      r3, 0x1a0(r29)
+0027fad8: 7ee3bb78  mr       r3, r23
+0027fadc: 4bec68d5  bl       0x1463b0   ; .__ml__13StringSetIterCFv
+0027fae0: 7c641b78  mr       r4, r3
+0027fae4: 807d01a0  lwz      r3, 0x1a0(r29)
+0027fae8: 4831d269  bl       0x59cd50
+0027faec: 7ee3bb78  mr       r3, r23
+0027faf0: 4bec6881  bl       0x146370   ; .__pp__13StringSetIterFv
+0027faf4: 7ee3bb78  mr       r3, r23
+0027faf8: 4bec68b9  bl       0x1463b0   ; .__ml__13StringSetIterCFv
+0027fafc: 4831d235  bl       0x59cd30
+0027fb00: 38630001  addi     r3, r3, 1
+0027fb04: 48311a6d  bl       0x591570
+0027fb08: 907d01a4  stw      r3, 0x1a4(r29)
+0027fb0c: 7ee3bb78  mr       r3, r23
+0027fb10: 4bec68a1  bl       0x1463b0   ; .__ml__13StringSetIterCFv
+0027fb14: 7c641b78  mr       r4, r3
+0027fb18: 807d01a4  lwz      r3, 0x1a4(r29)
+0027fb1c: 4831d235  bl       0x59cd50
+0027fb20: 7ee3bb78  mr       r3, r23
+0027fb24: 4bec684d  bl       0x146370   ; .__pp__13StringSetIterFv
+0027fb28: 809d01a0  lwz      r4, 0x1a0(r29)
+0027fb2c: 38610040  addi     r3, r1, 0x40
+0027fb30: 48275161  bl       0x4f4c90   ; .__ct__9cTSStringFPCc
+0027fb34: 387d0000  addi     r3, r29, 0
+0027fb38: 38810040  addi     r4, r1, 0x40
+0027fb3c: 819d0000  lwz      r12, 0(r29)
+0027fb40: 818c00a4  lwz      r12, 0xa4(r12)
+0027fb44: 48322e9d  bl       0x5a29e0
+0027fb48: 80410014  lwz      r2, 0x14(r1)
+0027fb4c: 38610040  addi     r3, r1, 0x40
+0027fb50: 3880ffff  li       r4, -1
+0027fb54: 48274e2d  bl       0x4f4980   ; .__dt__9cTSStringFv
+0027fb58: 3800ffff  li       r0, -1
+0027fb5c: 2c1a0000  cmpwi    r26, 0
+0027fb60: 901d0190  stw      r0, 0x190(r29)
+0027fb64: 38600000  li       r3, 0
+0027fb68: 931d0194  stw      r24, 0x194(r29)
+0027fb6c: 907d019c  stw      r3, 0x19c(r29)
+0027fb70: 40820008  bne      0x27fb78
+0027fb74: 48000014  b        0x27fb88
+0027fb78: 807b0000  lwz      r3, 0(r27)
+0027fb7c: 7f44d378  mr       r4, r26
+0027fb80: 80630028  lwz      r3, 0x28(r3)
+0027fb84: 4be5a55d  bl       0xda0e0   ; .GetSelectorByGUID__12ObjectFolderFl
+0027fb88: 2c190000  cmpwi    r25, 0
+0027fb8c: 3b430000  addi     r26, r3, 0
+0027fb90: 4082000c  bne      0x27fb9c
+0027fb94: 3b800000  li       r28, 0
+0027fb98: 48000018  b        0x27fbb0
+0027fb9c: 807b0000  lwz      r3, 0(r27)
+0027fba0: 7f24cb78  mr       r4, r25
+0027fba4: 80630028  lwz      r3, 0x28(r3)
+0027fba8: 4be5a539  bl       0xda0e0   ; .GetSelectorByGUID__12ObjectFolderFl
+0027fbac: 7c7c1b78  mr       r28, r3
+0027fbb0: 38600084  li       r3, 0x84
+0027fbb4: 4831188d  bl       0x591440
+0027fbb8: 7c771b79  or.      r23, r3, r3
+0027fbbc: 41820030  beq      0x27fbec
+0027fbc0: 38000000  li       r0, 0
+0027fbc4: 90010038  stw      r0, 0x38(r1)
+0027fbc8: 38dd0000  addi     r6, r29, 0
+0027fbcc: 38fa0000  addi     r7, r26, 0
+0027fbd0: 9001003c  stw      r0, 0x3c(r1)
+0027fbd4: 393c0000  addi     r9, r28, 0
+0027fbd8: 39000000  li       r8, 0
+0027fbdc: 809d01a0  lwz      r4, 0x1a0(r29)
+0027fbe0: 39400000  li       r10, 0
+0027fbe4: 80bd01a4  lwz      r5, 0x1a4(r29)
+0027fbe8: 4bffab89  bl       0x27a770
+0027fbec: 28170000  cmplwi   r23, 0
+0027fbf0: 92fd0198  stw      r23, 0x198(r29)
+0027fbf4: 41820050  beq      0x27fc44
+0027fbf8: 8082afe0  lwz      r4, -0x5020(r2)   ; TOC[-0x5020]->DATA off 0x57b08 str="motives"
+0027fbfc: 38610044  addi     r3, r1, 0x44
+0027fc00: 38a0ffff  li       r5, -1
+0027fc04: 4bec1a3d  bl       0x141640
+0027fc08: 38770018  addi     r3, r23, 0x18
+0027fc0c: 38810044  addi     r4, r1, 0x44
+0027fc10: 4bec2501  bl       0x142110
+0027fc14: 2c1e0000  cmpwi    r30, 0
+0027fc18: 41820014  beq      0x27fc2c
+0027fc1c: 807d0198  lwz      r3, 0x198(r29)
+0027fc20: 38be0000  addi     r5, r30, 0
+0027fc24: 38800000  li       r4, 0
+0027fc28: 4bff9ca9  bl       0x2798d0   ; .SetSpecialScale__19cWinLivePopupClientFii
+0027fc2c: 2c1f0000  cmpwi    r31, 0
+0027fc30: 41820014  beq      0x27fc44
+0027fc34: 807d0198  lwz      r3, 0x198(r29)
+0027fc38: 38bf0000  addi     r5, r31, 0
+0027fc3c: 38800001  li       r4, 1
+0027fc40: 4bff9c91  bl       0x2798d0   ; .SetSpecialScale__19cWinLivePopupClientFii
+0027fc44: 38000000  li       r0, 0
+0027fc48: 901d01a8  stw      r0, 0x1a8(r29)
+0027fc4c: 7fa3eb78  mr       r3, r29
+0027fc50: 981d0220  stb      r0, 0x220(r29)
+0027fc54: 80010098  lwz      r0, 0x98(r1)
+0027fc58: 38210090  addi     r1, r1, 0x90
+0027fc5c: 7c0803a6  mtlr     r0
+0027fc60: bae1ffdc  lmw      r23, -0x24(r1)

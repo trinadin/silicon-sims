@@ -1,0 +1,2363 @@
+# Global behavior corpus (extracted from GameData/Global/Global.far, original Complete Collection DVD data)
+# Reverse-engineered via tools/extract_globals.py. BHAV chunk labels are Maxis function names.
+
+## DoorGlobals.iff  (3 chunks, 2 BHAVs)
+
+- fail portal call
+- Init Door
+
+## FameObjectGlobals.iff  (25 chunks, 20 BHAVs)
+
+- Match Part
+- Director Choice
+- Change Fame
+- Sync All To State - 3 Sim
+- Perform Scene Part
+- Calculate and Pay Sim
+- Start Motive Decay
+- Idle Director
+- Sync All To State - 2 Sim
+- Prelude
+- Sound Tags - Director Idles
+- Costume Change
+- Get Award?
+- Calc and Pay Sim 2.0
+- Perform Scene
+- Perform Scene Anim Backward
+- Perform Scene Anim
+- Director - React
+- Sound Tags - Director Scene
+- Direct Scene
+
+## LevelGlobals.iff  (5 chunks, 3 BHAVs)
+
+- init level
+- test neighbors romantic
+- common load tree
+
+## LightGlobals.iff  (13 chunks, 12 BHAVs)
+
+- user pickup function
+- main - animated
+- main - non - animated
+- init - Floor
+- init - ceiling
+- user place function
+- init - Street Lamps
+- set graphic and lighting for on/off
+- init - Wall
+- do auto on for outside
+- do auto on for inside
+- init - Table
+
+## PetSitGlobals.iff  (26 chunks, 22 BHAVs)
+
+- Main
+- Init
+- Interaction - Push Sleep - Dog
+- CT - Object Menu Command
+- Praise/Scold - Stop
+- Praise/Scold - Start
+- Interaction - Push Sit - Cat
+- Interaction - Push Sit - Dog
+- Interaction - Push Sleep - Cat
+- Lay
+- Sit
+- Interaction - Sit - TEST
+- Interaction - Sleep TEST
+- Interaction - Praise
+- Interaction - Scold
+- find chair for sit
+- CT - Object Menu
+- jump up and stand
+- Interaction - Sit
+- Should Exit
+- Sleep
+- Interaction - Sleep
+
+## PhoneGlobals.iff  (151 chunks, 149 BHAVs)
+
+- anim - dial
+- anim - earsplit
+- notify line
+- set graphic by state
+- anim - idle
+- anim - talk
+- do talk balloon
+- anim - talk loop
+- Common exit
+- Test - allow chance call?
+- dialog - negative chance
+- dialog - positive chance
+- Test - prank call make angry?
+- dialog - prank call
+- RandomCallDialog
+- Interaction - Answer phone
+- Interaction - Answer phone TEST
+- burglar?
+- dialog - accept
+- dialog - already visiting
+- dialog - bad time to call
+- dialog - bring friends
+- dialog - fire
+- dialog - invitee at work
+- dialog - no phone
+- dialog - refuse
+- dialog - refuse service
+- Test - bad time to call?
+- Test - child accept visit?
+- Test - person at work?
+- Test - person in current house?
+- CT - OK to call?
+- CT - Save Talk Call Info
+- either person a child
+- check for food
+- import lot
+- run?
+- start fire fighter
+- start police officer
+- Interaction - Call Fire Department
+- show talk fail dialog
+- show talk balloon
+- show party dialog
+- should allow invite
+- select a topic I like
+- select a topic friend likes
+- ring
+- main delay
+- main - phone save
+- friend say hello for talk
+- adjust rel for talk
+- friends with neighbor?
+- have Gardener?
+- have Maid?
+- hire maid
+- hire repairman
+- init - Phone save
+- Interaction - Call Plugin
+- anim - answer pick up
+- anim - volley
+- Interaction - Call Maid
+- get nth kid
+- count kids
+- family invite
+- set phone balloon for talk X
+- set phone balloon for talk
+- set my balloon for talk X
+- set my balloon for talk
+- my talk
+- listen sound
+- friend talks
+- friends invite
+- Interaction - Call Gardener
+- Interaction - Call Repairman
+- dialog - service - if you change your mind
+- anim - listen loop
+- Is Neighbor a child?
+- special call - set person
+- special call - answer
+- gardener available?
+- maid available?
+- repairman available?
+- save call talk info - phones
+- OK to talk?
+- notify party controller
+- Interaction - Call Gardener Test
+- Interaction - Call Maid test
+- Interaction - Call Plugin TEST
+- Interaction - Call Police Department TEST
+- Interaction - Call Repairman TEST
+- assign to line
+- init common
+- CT - Is 1.4 Phone?
+- Interaction - Call for Party
+- Invite or Talk?
+- Interaction - Call Fire Department TEST
+- can call neighbor
+- just talk to friend
+- invite friend over
+- invite downtown
+- talk to plug in
+- Dialog Accept Invite Downtown
+- Dialog Refuse Invite Downtown
+- invite on vacation
+- Where To Go?
+- push call cab
+- init Table top
+- Invite To Neighborhood
+- Invite or Talk or Go Somewhere
+- Interaction - New Call Friend
+- Is Location Phone
+- hire gardener
+- Test - service available
+- butler available?
+- Wait for pickup
+- do party balloon
+- hire masseuse
+- Interaction - Call for pizza test
+- Interaction - Call for pizza
+- create pizza dude
+- Interaction - Call Friend
+- Interaction - New Call Friend TEST
+- Interaction - Call Friend test
+- set NPC
+- Interaction - Call Police Department
+- Here Already?
+- Can Party?
+- main
+- calc max starpower of household
+- Count Potential Partigoers
+- get nth friend
+- count friends
+- dialog - hire service
+- anim - hang up
+- hire butler
+- Call Service
+- Interaction - Call Butler
+- Schedule Masseuse
+- Create Masseuse
+- Interaction - Call Masseuse
+- Interaction - Call Butler Test
+- Interaction - Call Masseuse - TEST
+- is wall phone
+- init wall phone
+- anim - pick up
+- Common entry
+- Auto Call Cab
+- Interaction - Call for Party TEST
+- invite guests for party
+
+## RentalClerkGlobals.iff  (210 chunks, 194 BHAVs)
+
+- Fire NPC Test
+- Wake Up
+- test:low social
+- test:manual
+- route ask to move animation
+- visitor say hello
+- Kiss test privacy
+- ghost main
+- test:fridge
+- Cancel Interaction
+- Shoo out TEST
+- Wake Up TEST
+- check environment
+- Collect Kids TEST
+- check entertained
+- check stress
+- check social
+- hunger motive display
+- sleep anim
+- Check for kid collection
+- Allow Attack?
+- Allow Brag
+- Allow Cheer Up?
+- swim bladder failure
+- Shoo out
+- Fire NPC
+- check hunger
+- sitting anim delay
+- test all failure anims
+- move away from door
+- get me out of pool
+- check hygiene
+- check for military school
+- schedule a parent
+- generate gift
+- Collect Kids
+- visitor leave help
+- failure hunger
+- try burn to death
+- Same Guids?
+- burn to death
+- stand up
+- check comfort
+- check bladder
+- do swimming idle
+- test state consistency
+- cleanup function
+- transition to idle
+- transition from idle
+- Greet
+- Am I a clone?
+- failure sleep
+- do idle
+- check energy
+- reset idle
+- design-a-person
+- failure bladder
+- PC - Bladder Failure
+- PC - Sleep Failure
+- PC - Check Motive Failures
+- PC - main
+- begin visiting
+- re-find exit
+- is any resident awake?
+- Kiss
+- Talk
+- do I love anyone?
+- does stack object love anyone?
+- Scare TEST
+- Hello
+- Allow Dance?
+- STR & LTR Me to StackObject => x?
+- Allow Entertain?
+- Hello TEST
+- Stats TEST
+- Stats
+- process visitors
+- visitor leave - with dialog
+- Allow Insult?
+- init NPC
+- add LTR if needed
+- Autofollow - Use Restroom
+- Convert Interests to 0-1000
+- Allow Kiss?
+- Allow Nag
+- Build Change Subject Menu
+- Propose
+- Call over
+- Cheat - FALSE TEST
+- Cheat - Ungreet
+- Call over TEST
+- Sit With
+- STR & LTR Me to StackObject <= x?
+- Allow Compliment?
+- Move In TEST
+- Allow Autonomous?
+- Allow Hug?
+- Allow Flirt?
+- up social ad by relationship
+- Move In
+- Allow Tickle?
+- Allow Tease?
+- randomize Ad
+- Greet Walkby TEST
+- get interaction eligibility
+- get social eligibility
+- Allow Greet
+- random social ad
+- Cancel Interaction TEST
+- init relationships
+- Downtown Auto Follow
+- Allow Plead?
+- can be sat with
+- Sit With TEST
+- check queue
+- try autonomy
+- try autonomy - no people
+- Is Date from my family?
+- Allow Goodbye?
+- do new adult middle stand
+- do new adult right stand
+- do new adult left stand hips
+- do new adult left stand crossed
+- do new adult middle stand hips
+- do new adult middle stand crossed
+- do new adult right stand hips
+- do new adult right stand crossed
+- do idle and mood
+- Add Hot Date Interests
+- init visitor
+- init motives
+- Init person
+- Init NPC Jobs
+- fill townie friend count
+- load tree
+- Check Auto-follow Conditions
+- check motive failure
+- Autofollow
+- check a motive
+- check next motive
+- look at something
+- route waiting animation
+- Greet with Gift Test
+- person main loop
+- person main
+- process mood
+- do idle core
+- do new adult left stand
+- do new adult idle
+- Clerk - examine
+- Interaction - Push Boat
+- Interaction - Push Fish
+- Interaction - Push Picnic Basket
+- Return in Temp 0 - Stay in Booth Ticks
+- Clerk - Exit Shack
+- Clerk - Find random object in my room
+- Clerk - load tree
+- Clerk - Tend
+- Clerk - Restore Motives
+- Clerk - Idle - Booth
+- Interaction - Push Metal Detector
+- Interaction - Volleyball - TEST
+- Interaction - Push Bow & Arrow
+- Interaction - Push Fishing Pole
+- Interaction - Push Sandcastle
+- Interaction - Push Snowman
+- Interaction - Push Tent Rent
+- Interaction - Push Volleyball
+- Return in Temp 0 - Random Picnic Basket 1.5
+- Return in Temp 0 - Random Koi Pond
+- Clerk - init traits
+- Clerk - init tree
+- Interaction - Push Sandcastle - TEST
+- Interaction - Push Snowman - TEST
+- Interaction - Push Volleyball - TEST
+- Interaction - Push Tent Rent - TEST
+- Interaction - Push Igloo Rent - TEST
+- Interaction - Push Igloo Rent
+- Interaction - TEST
+- Interaction - Push Bow & Arrow - TEST
+- Interaction - Push Fishing Pole - TEST
+- Interaction - Pond Stuff - TEST
+- Interaction - Push Golf Rental
+- Interaction - Push Golf Rental - TEST
+- Return in Temp 0 - Random SnowCastle
+- Clerk - try to kill a snowman or sandcastle
+- Return in Temp 0 - Random Picnic Basket
+- Clerk - try to kill a picnic basket
+- Interaction - Vacation - TEST
+- Clerk - Pick Idle
+- Clerk - Goto and Enter Shack
+- Clerk - try to feed fish
+- Clerk - do something
+- Clerk - Main
+
+## RentalShackGlobals.iff  (79 chunks, 77 BHAVs)
+
+- X - Cut - Play in Shack - Push
+- X - Cut - Play in Shack - Person A
+- X - Cut - Play in Shack - Person B
+- X - Cut - Play in Shack - Push - TEST
+- X - Cut - Play in Shack - TEST
+- Play In - Get In
+- Play In - Get Out
+- CT - Do Clerk Idle
+- CT - Snap Into Shack
+- Return in Temp 0 - Available Volleyball Court
+- Return in Temp 0 - Random Koi Pond
+- Interaction - Give MiniGolf Clubs & Balls
+- Turn Attendant Door Off | On
+- CT - Attendant Exit
+- Create Picnic Basket TEST
+- Set Shack Graphic
+- CT - Have Clerk Close Window
+- Init
+- Sub - Available Slot for Me?
+- Return in Temp 0 - Available Fishing Pier
+- Interaction - Get MiniGolf Clubs & Balls - TEST
+- Interaction - Get Snowman Kit - TEST
+- Load
+- Create Picnic Basket
+- CT - Have Clerk Open Window
+- Interaction - Attendant Enter
+- Interaction - Get Metal Detector - TEST
+- Interaction - Get SandCastle Kit - TEST
+- Interaction - Get VolleyBall - TEST
+- Interaction - Get Key to Tent - TEST
+- Interaction - Get Key to Igloo - TEST
+- Interaction - Get Fish Food - TEST
+- Interaction - Get Boat - TEST
+- Interaction - Get Picnic Basket - TEST
+- Interaction - Get Bow & Arrow - TEST
+- Interaction - Get Fishing Pole - TEST
+- Interaction - Attendant Enter - TEST
+- Force Vendor to Booth
+- Get Attendant in Temp 0
+- Interaction - Give Boat - TEST
+- Interaction - Give Fish Food - TEST
+- Interaction - Give Picnic Basket - TEST
+- Main
+- Process Sprite Animation Tags
+- Interaction - Give Metal Detector - TEST
+- Interaction - Give Volleyball - TEST
+- Interaction - Give Key to Tent/Igloo - TEST
+- Interaction - Give Bow & Arrow - TEST
+- Interaction - Give Fishing Pole - TEST
+- Interaction - Give MiniGolf Clubs & Balls - TEST
+- Interaction - Give SandCastle Kit - TEST
+- Interaction - Give Snowman Kit - TEST
+- Validate Customer
+- Interaction - Give Boat
+- Interaction - Give Fish Food
+- Interaction - Give Fishing Pole
+- Interaction - Give Key to Tent/Igloo
+- Interaction - Give Metal Detector
+- Interaction - Give Picnic Basket
+- Interaction - Give SandCastle Kit
+- Interaction - Give Snowman Kit
+- Interaction - Give Volleyball
+- Goto Shack
+- Wait for Attendant
+- Interaction - Get Boat
+- Interaction - Get Bow & Arrow
+- Interaction - Give Bow & Arrow
+- Interaction - Get Fish Food
+- Interaction - Get Fishing Pole
+- Interaction - Get Key to Igloo
+- Interaction - Get Key to Tent
+- Interaction - Get Metal Detector
+- Interaction - Get MiniGolf Clubs & Balls
+- Interaction - Get SandCastle Kit
+- Interaction - Get Picnic Basket
+- Interaction - Get Snowman Kit
+- Interaction - Get VolleyBall
+
+## SalesClerkGlobals.iff  (87 chunks, 74 BHAVs)
+
+- route ask to move animation
+- Cancel Interaction
+- check environment
+- init motives
+- init visitor
+- check entertained
+- check stress
+- check social
+- hunger motive display
+- randomize Ad
+- swim bladder failure
+- check hunger
+- random social ad
+- sitting anim delay
+- Cancel Interaction TEST
+- route waiting animation
+- move away from door
+- get me out of pool
+- check hygiene
+- failure hunger
+- Same Guids?
+- stand up
+- check a motive
+- process mood
+- check comfort
+- check bladder
+- do swimming idle
+- cleanup function
+- transition to idle
+- transition from idle
+- do idle
+- check energy
+- reset idle
+- design-a-person
+- init relationships
+- failure bladder
+- look at something
+- is any resident awake?
+- check queue
+- do idle and mood
+- does stack object love anyone?
+- STR & LTR Me to StackObject <= x?
+- STR & LTR Me to StackObject => x?
+- get social eligibility
+- check next motive
+- do new adult idle
+- do new adult left stand
+- do new adult left stand crossed
+- do new adult left stand hips
+- do new adult middle stand
+- do new adult middle stand crossed
+- do new adult middle stand hips
+- do new adult right stand
+- do idle core
+- do new adult right stand crossed
+- do new adult right stand hips
+- add LTR if needed
+- try autonomy
+- Add Hot Date Interests
+- Convert Interests to 0-1000
+- Downtown Auto Follow
+- check motive failure
+- Check Auto-follow Conditions
+- get interaction eligibility
+- person main
+- failure sleep
+- person main loop
+- Init person
+- init NPC
+- load tree
+- Clerk - Idle
+- Initialize - Female
+- Initialize - Male
+- Main - Clerk
+
+## SocialGlobals.iff  (102 chunks, 101 BHAVs)
+
+- Cancel
+- Update Person Count
+- check temp 0 person
+- Dialog - lost family friend
+- Help System - family friend
+- Is either person a vistitor?
+- Adjust my Fun
+- Help System - Bad Mood
+- Help System - First Social
+- Help System - First Talk
+- clear door
+- face Person A
+- show pip
+- wedding route
+- wait for Person B command
+- wait for Person A to be here or higher state
+- reposition
+- process Person B commands
+- dirty yuck B
+- Is listener human?
+- is either person a child?
+- is person B NPC?
+- verify completion
+- update stack objects person count
+- verify receiver
+- wait for me to be active
+- wait for person to join
+- wait for receiver
+- turn around
+- are both people in love with each other?
+- should have baby?
+- opposite sex couple?
+- is talker a child?
+- do leave
+- increment social
+- Is other person an NPC?
+- Set Long Term Relationship to Person B
+- Adjust Long Term Rel. to Person B
+- get person B drink level in Temp 0
+- DTR
+- end jealousy
+- set date motives
+- get other persons relationship to me in Temp 0
+- adjust relationship by topic interest
+- wait for my turn
+- Person A sync animation wait
+- Person B sync animation wait
+- Adjust my STR to Person B
+- Look at Talker
+- SHD do I like topic?
+- walk away
+- exit and routeaway Person B
+- have baby
+- Main
+- Show Failure Balloon
+- route behind Person B
+- person B sitting?
+- Am I in Person B's Room?
+- is other person greeted?
+- Find - Dog in Family?
+- Find - Cat in Family?
+- Find - Dog in Stack Object's Family
+- Find - Cat in Stack Object's Family?
+- Adjust Long Term Rel. to Person A
+- increment my opposite gender preference
+- increment my same gender preference
+- Relationship - is either person a visitor?
+- Relationship - is either person a resident?
+- Relationship - is either person a child?
+- Relationship - Adjust my STR to Stack Object
+- Relationship - Set Soc&Rel to Stack Object
+- Relationship - Adjust Long Term Rel. to Stack Object
+- Is either a Sim?
+- Set Long Term Relationship to Person A
+- is either person a pet?
+- Find - Fame Delta( Me and Stack Object )
+- start jealousy
+- Paparazzi Moment
+- wait for Person A state
+- exit person B
+- wait for Person B state
+- Paparazzi Tokens
+- Is either person a resident?
+- get family friend count in Temp 0
+- Dialog - new family friend
+- Adjust my STR to Person A
+- route in front of Person B
+- Face Person B
+- Magic - Attraction?
+- go to Person B's room
+- route to Person B
+- common Person B entry
+- common Person A entry
+- Verify Person A exists
+- Verify Person B exists
+- Magic - Anti-Attraction?
+- Init
+- NPC or Ghost Test
+- Set Soc&Rel to Person B
+- Set Soc&Rel to Person A
+- exit person A
+
+## SofaGlobals.iff  (106 chunks, 99 BHAVs)
+
+- can I nap?
+- clear couch in use
+- display nap failure
+- set couch in use
+- tweak force awake
+- init - right - 3 tile
+- init - center - 3 tile
+- init - right - 2 tile
+- init - left - 3 tile
+- Return in Temp 0 - Person A State
+- Set - Person A State
+- Push Sit on AutoFollow Sim
+- find nap piece
+- Return in Temp 0 - Person B
+- CT - Relax
+- Return in Temp 0 - Person Sitting to My Left
+- tweak nap begin
+- Interaction - Nap
+- set nap motive deltas
+- tweak nap inc
+- tweak nap finished
+- tweak main delay
+- tweak main inc
+- Set - Person B State
+- Return in Temp 0 - Person B State
+- Return in Temp 0 - Stk Obj of Sofa Tile to My Left
+- Verify Person A
+- Verify Person B
+- increment my opposite gender preference
+- increment my same gender preference
+- is either person a visitor?
+- opposite sex couple?
+- is either person a resident?
+- Soc & Rel - Carress A
+- Soc & Rel - Carress B
+- Soc & Rel - Cuddle B
+- Soc & Rel - Embrace A
+- Soc & Rel - Embrace B
+- Soc & Rel - Kiss B
+- group talk - add person
+- Cuddle - Idle - Person B
+- group talk - exit person
+- Interaction - Nap - TEST
+- stand function
+- Set - Person B
+- Push Swap on Person B
+- init common
+- Set - Person A
+- Swap Seats - B
+- init - left - 2 tile
+- group talk - do
+- group talk - create
+- Interaction - Sit - TEST
+- Return in Temp 0 - Person Sitting to My Right
+- Direction to Person A ( with T=Left F=Right)
+- Scoot TEST
+- Scoot
+- Adjust STR to Person A
+- Adjust LTR to Person A
+- Set Soc&Rel to Person A
+- Adjust LTR to Person B
+- Adjust STR to Person B
+- Set Soc&Rel to Person B
+- Soc & Rel - Kiss A
+- In Object - TEST
+- CT - Object Menu
+- CT - Object Menu Command
+- Push Entry on Person B
+- Swap Seats - A
+- Interaction - Sit
+- sit function
+- Am I Sitting on this Sofa?
+- Is Param 0 Sitting on This Sofa?
+- Cuddle - Kiss - Person B
+- main
+- Reaction - Embrace
+- Cuddle - Embrace - Person B
+- Reaction - Kiss
+- Reaction - Entry - Yawn
+- Direction to Person B (with T=Left F=Right)
+- Return in Temp 0 - Stk Obj of Sofa Tile to My Right
+- Soc & Rel - Cuddle A
+- Exit Cuddle?
+- Cuddle - Idle - Person A
+- Cuddle - Carress - Person A
+- Cuddle - Embrace - Person A
+- Cuddle - Kiss - Person A
+- Cuddle Fun
+- Cuddle - Person A - Loop
+- Cuddle - Person B - Loop
+- Interaction - Cuddle - B - Entry
+- Interaction - Cuddle - A - Entry - Yawn
+- Swap Seats - A - TEST
+- Interaction - Cuddle - A - TEST
+- Interaction - Cuddle - B - TEST
+- Reaction - Carress
+- DRT - Kiss
+- Return in Temp 0 - Person A
+- Cuddle - Carress - Person B
+
+## VacationCarnieGlobals.iff  (88 chunks, 75 BHAVs)
+
+- route ask to move animation
+- Cancel Interaction
+- check environment
+- init motives
+- init visitor
+- check entertained
+- check stress
+- check social
+- hunger motive display
+- randomize Ad
+- swim bladder failure
+- check hunger
+- random social ad
+- sitting anim delay
+- Cancel Interaction TEST
+- route waiting animation
+- move away from door
+- get me out of pool
+- check hygiene
+- failure hunger
+- Same Guids?
+- stand up
+- check a motive
+- process mood
+- check comfort
+- check bladder
+- do swimming idle
+- cleanup function
+- transition to idle
+- transition from idle
+- do idle
+- check energy
+- reset idle
+- design-a-person
+- init relationships
+- failure bladder
+- look at something
+- is any resident awake?
+- check queue
+- do idle and mood
+- does stack object love anyone?
+- STR & LTR Me to StackObject <= x?
+- STR & LTR Me to StackObject => x?
+- get social eligibility
+- check next motive
+- do new adult idle
+- do new adult left stand
+- do new adult left stand crossed
+- do new adult left stand hips
+- do new adult middle stand
+- do new adult middle stand crossed
+- do new adult middle stand hips
+- do new adult right stand
+- do idle core
+- do new adult right stand crossed
+- do new adult right stand hips
+- try autonomy
+- Add Hot Date Interests
+- Convert Interests to 0-1000
+- Downtown Auto Follow
+- check motive failure
+- Check Auto-follow Conditions
+- get interaction eligibility
+- person main
+- failure sleep
+- person main loop
+- Init person
+- init NPC
+- load tree
+- Initialize - Female
+- Initialize - Male
+- Main - Clerk
+- Clerk - Idle
+- add LTR if needed
+- Carnie - Idle
+
+## VacationDirectorGlobals.iff  (98 chunks, 85 BHAVs)
+
+- check environment
+- init motives
+- init visitor
+- check entertained
+- check stress
+- check social
+- hunger motive display
+- randomize Ad
+- swim bladder failure
+- check hunger
+- random social ad
+- sitting anim delay
+- route waiting animation
+- move away from door
+- get me out of pool
+- check hygiene
+- failure hunger
+- Same Guids?
+- stand up
+- check a motive
+- process mood
+- check comfort
+- check bladder
+- do swimming idle
+- transition to idle
+- transition from idle
+- do idle
+- check energy
+- reset idle
+- design-a-person
+- failure bladder
+- look at something
+- is any resident awake?
+- do idle and mood
+- does stack object love anyone?
+- STR & LTR Me to StackObject => x?
+- get social eligibility
+- check next motive
+- do new adult idle
+- do new adult left stand
+- do new adult left stand crossed
+- do new adult left stand hips
+- do new adult middle stand
+- do new adult middle stand crossed
+- do new adult middle stand hips
+- do new adult right stand
+- do idle core
+- do new adult right stand crossed
+- do new adult right stand hips
+- add LTR if needed
+- try autonomy
+- Add Hot Date Interests
+- Convert Interests to 0-1000
+- Downtown Auto Follow
+- check motive failure
+- failure sleep
+- person main loop
+- Initialize - Male
+- cleanup function
+- init relationships
+- Cancel Interaction TEST
+- Cancel Interaction
+- route ask to move animation
+- person main
+- STR & LTR Me to StackObject <= x?
+- check queue
+- Check Auto-follow Conditions
+- get interaction eligibility
+- Interaction - Give Souvenir - TEST
+- Init person
+- init NPC
+- Do Initial Welcome TEST
+- Do Initial Welcome
+- Interaction - Give Souvenir
+- Initialize - Female
+- CT - Scold
+- CT - Fine
+- load tree
+- Clerk - Idle
+- CT - Initial Welcome
+- Ask
+- CT - Ask
+- Ask About - TEST
+- Main - Clerk
+- Main - Lana
+
+## VacationMascotGlobals.iff  (93 chunks, 80 BHAVs)
+
+- route ask to move animation
+- Cancel Interaction
+- check environment
+- init motives
+- init visitor
+- check entertained
+- check stress
+- check social
+- hunger motive display
+- randomize Ad
+- swim bladder failure
+- check hunger
+- random social ad
+- sitting anim delay
+- route waiting animation
+- move away from door
+- get me out of pool
+- check hygiene
+- failure hunger
+- Same Guids?
+- stand up
+- check a motive
+- process mood
+- check comfort
+- check bladder
+- do swimming idle
+- transition to idle
+- transition from idle
+- do idle
+- check energy
+- reset idle
+- design-a-person
+- init relationships
+- failure bladder
+- look at something
+- is any resident awake?
+- check queue
+- do idle and mood
+- does stack object love anyone?
+- STR & LTR Me to StackObject <= x?
+- STR & LTR Me to StackObject => x?
+- check next motive
+- do new adult idle
+- do new adult left stand
+- do new adult left stand crossed
+- do new adult left stand hips
+- do new adult middle stand
+- do new adult middle stand crossed
+- do new adult middle stand hips
+- do new adult right stand
+- do idle core
+- do new adult right stand crossed
+- do new adult right stand hips
+- add LTR if needed
+- try autonomy
+- Add Hot Date Interests
+- Convert Interests to 0-1000
+- Downtown Auto Follow
+- check motive failure
+- Check Auto-follow Conditions
+- person main
+- failure sleep
+- person main loop
+- Init person
+- init NPC
+- Initialize - Female
+- Initialize - Male
+- load tree
+- cleanup function
+- Clerk - Idle
+- Mascot - Dance
+- Mascot - Wave 2
+- Mascot - Wave 1
+- get interaction eligibility
+- get social eligibility
+- Mascot - Find a child and route to them
+- Cancel Interaction TEST
+- Mascot - Find Child and Hug
+- Mascot - Push Hug
+- Main - Mascot
+
+## WaiterGlobals.iff  (93 chunks, 80 BHAVs)
+
+- Cancel Interaction
+- check environment
+- init motives
+- init visitor
+- check entertained
+- check stress
+- check social
+- hunger motive display
+- randomize Ad
+- swim bladder failure
+- check hunger
+- random social ad
+- sitting anim delay
+- Cancel Interaction TEST
+- move away from door
+- get me out of pool
+- check hygiene
+- failure hunger
+- Same Guids?
+- stand up
+- check a motive
+- process mood
+- check comfort
+- check bladder
+- do swimming idle
+- cleanup function
+- transition to idle
+- transition from idle
+- do idle
+- check energy
+- reset idle
+- design-a-person
+- init relationships
+- failure bladder
+- look at something
+- is any resident awake?
+- check queue
+- do idle and mood
+- does stack object love anyone?
+- STR & LTR Me to StackObject <= x?
+- STR & LTR Me to StackObject => x?
+- get social eligibility
+- check next motive
+- do new adult idle
+- do new adult left stand
+- do new adult left stand crossed
+- do new adult left stand hips
+- do new adult middle stand
+- do new adult middle stand crossed
+- do new adult middle stand hips
+- do new adult right stand
+- do idle core
+- do new adult right stand crossed
+- do new adult right stand hips
+- add LTR if needed
+- Add Hot Date Interests
+- Convert Interests to 0-1000
+- Downtown Auto Follow
+- check motive failure
+- Check Auto-follow Conditions
+- get interaction eligibility
+- person main
+- failure sleep
+- person main loop
+- Init person
+- init NPC
+- Clerk - Idle
+- Initialize - Male
+- Initialize - Female
+- try autonomy
+- load tree
+- return to podium
+- get my podium
+- Seat Someone
+- route waiting animation
+- route ask to move animation
+- Take Orders
+- Do Next Course
+- Main - Server
+- Serve Someone
+
+## CatGlobals.iff  (203 chunks, 179 BHAVs)
+
+- Action - Scratch Back
+- Cancel Interaction TEST
+- Cancel Interaction
+- move away from door
+- get me out of pool
+- do swimming idle
+- swim bladder failure
+- bounds check skills
+- check environment
+- check queue
+- sitting anim delay
+- Sub - Check for Room
+- Sub - Find Best Location for Bladder
+- Refresh Motive Change Based on Idle Pose
+- create poop under me
+- transition to idle
+- Action - Go Outside
+- Action - Rest TEST
+- Command - Bladder
+- My Pet?
+- check for animal services
+- Action - Drink Toilet
+- Turn Dog to Face Direction
+- Action - Self Outside TEST
+- Action - Sit Bark TEST
+- Action - Sit Wag TEST
+- Action - Howl TEST
+- Action - Howl
+- randomize Ad
+- Action - Dig TEST
+- Action - Run Away
+- try autonomy
+- check visitor mood
+- transition from idle
+- Action - Dig
+- check loyal&obedient
+- Interaction - Adopt
+- Interaction - Fight
+- Interaction - Call Over
+- Interaction - Greet
+- Interaction - Hug
+- Interaction - Object Menu
+- Interaction - Pet
+- Interaction - Pet Show Start
+- Interaction - Play - Fetch
+- Interaction - Play - Other Dog
+- Kill pet for Good
+- Interaction - Pounce
+- Interaction - Praise
+- Interaction - Put On Collar
+- Interaction - Scratch
+- Interaction - Sit on Furniture
+- Interaction - SitStay
+- Interaction - Sleep on Furniture
+- Interaction - Sniff Other
+- Interaction - Stomp
+- Interaction - Trick - High Flip
+- Interaction - Trick - Play Dead
+- Interaction - Trick - Train High Flip
+- Interaction - Wrestle
+- Interaction - Scold
+- Interaction - Attack
+- Interaction - Interrupt
+- Idle Anim - Scratch Ears
+- Idle Anim - Sit
+- Idle Anim - Sit-Yawn
+- Idle Anim - Stand Wag
+- Interaction - Snuggle
+- Action - Sit Bark
+- Action - Sit Wag
+- Interaction - Shoo
+- reset idle
+- Action - Hide TEST
+- check a motive
+- check next motive
+- check motive failure
+- Idle Anim - Stretch
+- Idle Anim - Clean Self
+- Idle Anim - Circle
+- Interaction - Trick - Train Low Flip
+- Interaction - Trick - Bounce
+- Interaction - Trick - Low Flip
+- Interaction - Trick - Jump
+- Interaction - Trick - Train Jump
+- Interaction - Trick - Train Bounce
+- Interaction - Give Mouse Toy
+- Interaction - Give Squeak Toy
+- Action - Self TEST
+- Restore Collar
+- Action - Pee On
+- stand up
+- Transition to Sleep
+- move from filled tile
+- Action - Follow Friend
+- failure hunger
+- check bladder
+- check comfort
+- check energy
+- check hunger
+- check entertained
+- check social
+- check hygiene
+- Idle Anim - Lay
+- failure sleep
+- get interaction eligibility
+- Interaction - Treat
+- Action - Rest
+- idle pet
+- Initialize Object
+- Initialize Motives
+- On Initialization
+- On Load
+- init relationships
+- Main
+- Interaction - Call Over TEST
+- Interaction - Fight TEST
+- Interaction - Give Mouse Toy TEST
+- Interaction - Give Squeak Toy TEST
+- Interaction - Greet Test
+- Interaction - Hug TEST
+- Interaction - Interrupt TEST
+- Interaction - Object Menu TEST
+- Interaction - Pet Show Start TEST
+- Interaction - Pet TEST
+- Interaction - Play - Fetch TEST
+- Interaction - Play Tag TEST
+- Interaction - Pounce TEST
+- Interaction - Praise TEST
+- Interaction - Put On Collar TEST
+- Interaction - Scratch TEST
+- Interaction - Shoo TEST
+- Interaction - Sit on Furniture TEST
+- Interaction - SitStay TEST
+- Interaction - Sniff Other TEST
+- Interaction - Stomp TEST
+- Interaction - Treat TEST
+- Interaction - Trick - Bounce TEST
+- Interaction - Trick - High Flip TEST
+- Interaction - Trick - Jump TEST
+- Interaction - Trick - Low Flip TEST
+- Interaction - Trick - Play Dead TEST
+- Interaction - Trick - Train Bounce TEST
+- Interaction - Trick - Train High Flip TEST
+- Interaction - Trick - Train Jump TEST
+- Interaction - Trick - Train Low Flip TEST
+- Interaction - Trick - Train Play Dead
+- Interaction - Trick - Train Play Dead TEST
+- Interaction - Wrestle TEST
+- Wake Up TEST
+- Interaction - Attack TEST
+- burn to death
+- try burn to death
+- main loop
+- Action - Self Pee TEST
+- Action - Pee On TEST
+- Wake Up
+- failure bladder
+- Find Someone I Like
+- Find Current Master
+- Action - Lick Self TEST
+- Action - Lick Self
+- Action - Chase Tail
+- Action - Chase Tail TEST
+- Idle Anim - Sleep
+- Interaction - Play Tag
+- Interaction - Play - Other Dog TEST
+- Dog - Randomize Ad
+- Interaction - Snuggle TEST
+- Interaction - Adopt TEST
+- Interaction - Sniff TEST
+- Interaction - Sniff
+- Interaction - Scold TEST
+- Action - Go Outside TEST
+- get social eligibility
+- Action - Hide
+- Interaction - Pet to Adult
+- Interaction - Scare TEST
+- Interaction - Scare
+- Interaction - Pet to Adult TEST
+
+## DogGlobals.iff  (200 chunks, 177 BHAVs)
+
+- On Load
+- Action - Scratch Back
+- Cancel Interaction TEST
+- Cancel Interaction
+- Initialize Object
+- init relationships
+- do swimming idle
+- swim bladder failure
+- Interaction - Call Over
+- bounds check skills
+- check environment
+- Interaction - Stomp
+- Interaction - Scratch
+- Interaction - Treat
+- check queue
+- sitting anim delay
+- Sub - Check for Room
+- Sub - Find Best Location for Bladder
+- stand up
+- Refresh Motive Change Based on Idle Pose
+- create poop under me
+- reset idle
+- transition from idle
+- transition to idle
+- Action - Go Outside
+- Initialize Motives
+- Action - Rest TEST
+- Interaction - Trick - High Flip
+- Command - Bladder
+- Interaction - Scold
+- Interaction - Play Tag
+- Wake Up TEST
+- My Pet?
+- Interaction - Object Menu
+- Interaction - Pounce
+- check for animal services
+- Action - Self TEST
+- Action - Drink Toilet
+- Turn Dog to Face Direction
+- Action - Self Outside TEST
+- Interaction - Wrestle
+- Interaction - Play - Fetch
+- Interaction - Trick - Bounce
+- Interaction - Trick - Low Flip
+- Interaction - Trick - Jump
+- Action - Sit Bark TEST
+- Action - Sit Wag TEST
+- Interaction - Trick - Play Dead
+- Interaction - SitStay
+- Interaction - Pet Show Start
+- Interaction - Sniff
+- Interaction - Play - Other Dog
+- Find Current Master
+- Interaction - Fight
+- Interaction - Sniff Other
+- get interaction eligibility
+- Interaction - Put On Collar
+- Restore Collar
+- Interaction - Sit on Furniture
+- Interaction - Sleep on Furniture
+- Interaction - Trick - Train Bounce
+- Interaction - Trick - Train Low Flip
+- Interaction - Trick - Train Play Dead
+- Kill pet for Good
+- randomize Ad
+- Action - Go Outside TEST
+- Action - Run Away
+- try autonomy
+- Interaction - Interrupt
+- Interaction - Pet
+- Idle Anim - Stand Wag
+- Interaction - Trick - Train Jump
+- On Initialization
+- Idle Anim - Sit
+- Idle Anim - Circle
+- Interaction - Hug
+- Idle Anim - Scratch Ears
+- Interaction - Greet
+- check visitor mood
+- Action - Sit Bark
+- Action - Sit Wag
+- Interaction - Shoo
+- Interaction - Give Squeak Toy
+- Interaction - Give Chew Toy
+- Interaction - Attack
+- Interaction - Snuggle
+- Action - Howl
+- check a motive
+- check next motive
+- Idle Anim - Stretch
+- Interaction - Attack TEST
+- Idle Anim - Sit-Yawn
+- idle pet
+- move away from door
+- move from filled tile
+- failure hunger
+- check comfort
+- check energy
+- check hunger
+- check hygiene
+- check entertained
+- check social
+- check loyal&obedient
+- Idle Anim - Lay
+- get me out of pool
+- Transition to Sleep
+- failure sleep
+- Interaction - Play In( DH )
+- Action - Chase Tail
+- Action - Rest
+- Interaction - Play Tag TEST
+- Main
+- get social eligibility
+- Dog - Randomize Ad
+- Interaction - Attack NPC TEST
+- Interaction - Call Over TEST
+- Interaction - Fight TEST
+- Interaction - Give Chew Toy TEST
+- Interaction - Give Squeak Toy TEST
+- Interaction - Greet Test
+- Interaction - Hug TEST
+- Interaction - Interrupt TEST
+- Interaction - Object Menu TEST
+- Interaction - Pet Show Start TEST
+- Interaction - Play - Fetch TEST
+- Interaction - Play - Other Dog TEST
+- Interaction - Play In( DH ) TEST
+- Interaction - Pounce TEST
+- Interaction - Praise TEST
+- Interaction - Put On Collar TEST
+- Interaction - Scold TEST
+- Interaction - Scratch TEST
+- Interaction - Shoo TEST
+- Interaction - Sit on Furniture TEST
+- Interaction - SitStay TEST
+- Interaction - Sniff Other TEST
+- Interaction - Sniff TEST
+- Interaction - Snuggle TEST
+- Interaction - Stomp TEST
+- Interaction - Treat TEST
+- Interaction - Trick - Bounce TEST
+- Interaction - Trick - High Flip TEST
+- Interaction - Trick - Jump TEST
+- Interaction - Trick - Low Flip TEST
+- Interaction - Trick - Play Dead TEST
+- Interaction - Trick - Train Bounce TEST
+- Interaction - Trick - Train High Flip
+- Interaction - Trick - Train High Flip TEST
+- Interaction - Trick - Train Jump TEST
+- Interaction - Trick - Train Low Flip TEST
+- Interaction - Trick - Train Play Dead TEST
+- Interaction - Wrestle TEST
+- burn to death
+- try burn to death
+- main loop
+- Action - Pee On
+- check bladder
+- check motive failure
+- Action - Self Pee TEST
+- Wake Up
+- failure bladder
+- Find Someone I Like
+- Action - Follow Friend
+- Action - Chase Tail TEST
+- Action - Dig
+- Action - Dig TEST
+- Action - Howl TEST
+- Action - Lick Self
+- Idle Anim - Sleep
+- Interaction - Adopt
+- Interaction - Adopt TEST
+- Interaction - Praise
+- Interaction - Pet TEST
+- Interaction - Pet to Adult
+- Interaction - Scare TEST
+- Interaction - Scare
+- Interaction - Pet to Adult TEST
+
+## DragonGlobals.iff  (49 chunks, 46 BHAVs)
+
+- Idle - Observe
+- Is Stack Object A Gnome?
+- Is Stack Object A Cat?
+- Is Stack Object A Dog?
+- Interaction - Give Treat
+- Leave In A Hurry
+- Process Wing Tags
+- Idle - Fly
+- Interaction - Scare
+- Interaction - Groom
+- Interaction - Tickle
+- Interaction - Pet
+- Interaction - Give Toy
+- Inc Trash Amount
+- Interaction - Set Free
+- Interaction - Give Toy TEST
+- Interaction - Give Treat TEST
+- Interaction - Groom TEST
+- Interaction - Pet TEST
+- Interaction - Scare TEST
+- Interaction - Set Free TEST
+- Interaction - Tickle TEST
+- Get Worst Motive
+- Is Stack Object A Dragon?
+- Action - Leave
+- Refresh Motives
+- try to eat from trashcan
+- Burn Stack Object
+- Init Object
+- Burn Exclusion List
+- Clear Flags
+- Action - Set Fire to Bed
+- Find - Energy Action
+- Action - Set Fire to Random Object
+- Interaction - Play Tag
+- Interaction - Play Tag TEST
+- Get Social Eligibility
+- Get Interaction Eligibility
+- Action - Eat A Toad
+- Find - Hunger Action
+- Find - Best Action
+- Main - Dragon
+- Find - Social Action
+- Find - Fun Action
+- Init
+- Init Motives
+
+## PersonGlobals.iff  (490 chunks, 473 BHAVs)
+
+- Fire NPC Test
+- Wake Up
+- test:low social
+- test:manual
+- route ask to move animation
+- Kiss test privacy
+- test:fridge
+- Cancel Interaction
+- Shoo out TEST
+- Wake Up TEST
+- check environment
+- Collect Kids TEST
+- check entertained
+- check stress
+- check social
+- hunger motive display
+- sleep anim
+- Allow Brag
+- Allow Cheer Up?
+- swim bladder failure
+- Shoo out
+- check hunger
+- move away from door
+- get me out of pool
+- check hygiene
+- check for military school
+- schedule a parent
+- generate gift
+- Collect Kids
+- Same Guids?
+- check comfort
+- check bladder
+- test state consistency
+- cleanup function
+- transition to idle
+- transition from idle
+- Greet
+- Am I a clone?
+- do idle
+- reset idle
+- design-a-person
+- PC - Bladder Failure
+- PC - Sleep Failure
+- PC - Check Motive Failures
+- PC - main
+- re-find exit
+- is any resident awake?
+- Interaction - Attack Fight
+- Kiss
+- Interaction - Attack Shove
+- Interaction - Attack Slap
+- Interaction - Brag About Self
+- Interaction - Tickle Ribs
+- Interaction - Tickle Extreme
+- Interaction - Tickle Chin
+- Interaction - Tease Taunt
+- Interaction - Tease Raspberry
+- Interaction - Tease Imitate w/Puppet
+- Interaction - Nag Place
+- Interaction - Nag House
+- Interaction - Nag Friends
+- Interaction - Kiss Cheek
+- Interaction - Kiss Hand
+- Interaction - Kiss Dip
+- Interaction - Kiss Polite
+- Interaction - Insult Poke Chest
+- Interaction - Insult Shake Fist
+- Interaction - Hug Romantic
+- Interaction - Hug Friendly
+- Interaction - Hug Flying
+- Interaction - Hug Body
+- Interaction - Flirt Suggestion
+- Interaction - Flirt Serenade
+- Interaction - Flirt Give Back Rub
+- Interaction - Flirt Check Out
+- Interaction - Entertain Joke
+- Interaction - Dance Slow
+- Interaction - Dance Energetic
+- Interaction - Compliment Worship
+- Interaction - Cheerup Sensitive
+- Interaction - Cheerup Puppet
+- Interaction - Cheerup Motivational
+- Interaction - Kiss Passionate
+- Interaction - Kiss Face
+- Interaction - Ask About Needs
+- Interaction - Plead Apologize
+- Interaction - Ask About Personality TEST
+- do I love anyone?
+- Interaction - Flirt Sexy Growl
+- Interaction - Greet Air Kiss
+- Interaction - Greet Shake Hands
+- Interaction - Greet Romantic Kiss
+- Interaction - Greet Wave
+- does stack object love anyone?
+- Interaction - Entertain with Harm
+- Hello
+- Allow Dance?
+- Interaction - Say Goodbye Hug
+- Interaction - Give Gift
+- Interaction - Say Goodbye Kiss
+- Interaction - Say Goodbye Kiss Hand
+- Interaction - Brag About Self TEST
+- Interaction - Entertain Puppet
+- Interaction - Say Goodbye Passionate
+- Interaction - Say Goodbye Shoo
+- Interaction - Tease Raspberry TEST
+- Interaction - Greet Wave TEST
+- Hello TEST
+- Interaction - Say Goodbye Shake Hands
+- Interaction - Say Goodbye Wave
+- Stats TEST
+- Stats
+- Allow Insult?
+- Interaction - Insult Shake Fist TEST
+- Interaction - Nag Place TEST
+- Interaction - Nag Money
+- Interaction - Compliment Admire
+- add LTR if needed
+- Autofollow - Use Restroom
+- Convert Interests to 0-1000
+- Build Change Subject Menu
+- Interaction - Give Rose - TEST
+- Interaction - Tickle Chin TEST
+- Interaction - Ask About Mood TEST
+- Interaction - Ask About Interests
+- Interaction - Greet Shake Hands TEST
+- Interaction - Proposition Propose TEST
+- Propose
+- Interaction - Plead Grovel
+- Child - Insult
+- Call over
+- Child - Cheer up
+- Child - Tease
+- Child - Talk
+- Child - Tickle
+- Interaction - Tickle Ribs TEST
+- Cheat - FALSE TEST
+- Cheat - Ungreet
+- Call over TEST
+- Interaction - Ask to Date
+- Interaction - Ask to Hangout
+- Interaction - Proposition Invite Home
+- Interaction - Proposition Move In TEST
+- Interaction - Attack Sissy Fight
+- Sit With
+- Interaction - Tease Imitate w/puppet TEST
+- STR & LTR Me to StackObject <= x?
+- Interaction - Tickle Extreme TEST
+- Move In TEST
+- Allow Autonomous?
+- Interaction - Cheerup Motivational TEST
+- Interaction - Cheerup Puppet TEST
+- Interaction - Cheerup Sensitive TEST
+- Interaction - Entertain With Puppet TEST
+- Interaction - Kiss Passionate TEST
+- Interaction - Kiss Polite TEST
+- Interaction - Hug Flying TEST
+- Interaction - Flirt Check Out TEST
+- Interaction - Flirt Serenade TEST
+- Interaction - Flirt Sexy Growl TEST
+- Interaction - Flirt Suggestion TEST
+- Interaction - Brag Primp Male
+- Interaction - Brag Primp Female
+- Interaction - Brag Primp TEST
+- Interaction - Brag Flex TEST
+- Interaction - Compliment Worship TEST
+- Interaction - Dance Energetic TEST
+- Interaction - Dance Slow TEST
+- Interaction - Hug Body TEST
+- Interaction - Hug Romantic TEST
+- Interaction - Kiss Face TEST
+- Interaction - Kiss Hand TEST
+- Interaction - Kiss Dip TEST
+- Interaction - Nag House TEST
+- Allow Tickle?
+- Child - Ask To Leave
+- Child - Handstand
+- Child - Talk TEST
+- Cancel Interaction TEST
+- Interaction - Proposition Invite Downtown
+- init relationships
+- Interaction - Plead Apologize TEST
+- Interaction - Plead Grovel TEST
+- Allow Plead?
+- can be sat with
+- Sit With TEST
+- try autonomy - no people
+- Interaction - Ask to Hangout TEST
+- Interaction - Proposition Invite Home TEST
+- do new adult left stand
+- do new adult middle stand
+- do new adult right stand
+- do new adult left stand hips
+- do new adult left stand crossed
+- do new adult middle stand hips
+- do new adult middle stand crossed
+- do new adult right stand hips
+- do new adult right stand crossed
+- Add Hot Date Interests
+- init visitor
+- init motives
+- Init person
+- fill townie friend count
+- load tree
+- check a motive
+- route waiting animation
+- Child - Hug - Normal
+- Child - Hug - Tent
+- Child - Hug - Tent TEST
+- Child - Jabber TEST
+- Child - Annoy Poke
+- Child - Annoy Poke TEST
+- Child - Scold
+- Child - Joke
+- Child - Annoy Push
+- Child - Annoy Push TEST
+- Child - Annoy Kick Shin
+- Child - Annoy Kick Shin TEST
+- Child - Brag
+- Child - Hug - Normal TEST
+- Child - Brag TEST
+- Child - Joke TEST
+- Child - Cheer up TEST
+- Child - Scare
+- Interaction - Entertain Juggle
+- Child - Tickle TEST
+- Child - Entertain
+- Child - Jabber
+- Child - RPS
+- Child - Play Fight
+- Interaction - Insult Poke Chest TEST
+- Child - Play Tag
+- Child - Play Tag TEST
+- Interaction - Tease Scare
+- Interaction - Wait
+- Child - Spazz Dance
+- Scare TEST
+- Move In
+- Child - Insult - Test
+- Child - RPS TEST
+- Child - Whisper
+- Child - Whisper TEST
+- Child - Ask to leave TEST
+- Child - Greet
+- Child - Entertain TEST
+- Child - Tease TEST
+- Child - Scare TEST
+- check queue
+- look at something
+- do swimming idle
+- Child - Spazz Dance TEST
+- Child - Handstand TEST
+- Interaction - Give Rose
+- Child - Play Fight - TEST
+- Talk
+- CT - Does Stk Obj have Vacation Award?
+- Child - Scold TEST
+- CT - Has Disease?
+- Interaction - Ask About Needs TEST
+- Interaction - Ask to Date TEST
+- process mood
+- Init NPC Jobs
+- Vacation - Date Sleep
+- Interaction - Dog - Pounce
+- Interaction - Give Gift TEST
+- Allow Nag
+- Interaction - Nag Money TEST
+- Interaction - Nag Friends TEST
+- random social ad
+- Interaction - Dog - Pounce TEST
+- Interaction - Talk - Gossip
+- Find - Dog in Family?
+- Interaction - Talk - About Dog TEST
+- Find - Cat in Family?
+- Find - Dog on Lot?
+- Interaction - Talk - About Cat
+- Interaction - Talk - About Dog
+- do shy child
+- stand up
+- Interaction - Brag Flex
+- begin visiting
+- visitor leave help
+- visitor say hello
+- process visitors
+- Interaction - Proposition Invite Somewhere
+- Interaction - Proposition Invite Downtown TEST
+- Interaction - Proposition Invite Somewhere TEST
+- Interaction - Cat - RubOnLegs
+- Check for kid collection
+- try autonomy
+- Is Date from my family?
+- Push Bark at door
+- failure hunger
+- randomize Ad
+- Interaction - Cat - RubOnLegs TEST
+- Interaction - Dog - Whine TEST
+- Interaction - Dog - Beg TEST
+- Interaction - Dog - Whine
+- Interaction - Dog - Beg
+- Interaction - Ask About Job TEST
+- STR & LTR Me to StackObject => x?
+- Interaction - SS - Biggest Fan
+- Interaction - SS - For Autograph
+- Interaction - SS - Hug You?
+- Interaction - SS - Kiss Superstar
+- Interaction - SS - Photo Op
+- Interaction - SS - Publicity Event
+- Interaction - SS - Talk About Biz
+- Interaction - SS - You Famous?
+- Interaction - SS - Star Quality
+- Interaction - SS - Talk About Self
+- init NPC
+- Interaction - Object Menu
+- Interaction - Object Menu TEST
+- Interaction - Invite in Trailer
+- Interaction - Talk Name Drop TEST
+- Interaction - Talk Change Subject
+- Interaction - Talk Change Subject TEST
+- Interaction - Talk Change Gossip
+- Interaction - Greet Kiss Hand
+- Interaction - SS - Greet - Shake Hands
+- Interaction - SS - Can Call You?
+- Interaction - SS - Brag/Boast
+- Interaction - SS - Give Autograph
+- check next motive
+- Interaction - Invite in Trailer - TEST
+- Interaction - SS - Greet - Wave
+- Interaction - SS - Greet Kiss
+- Interaction - SS - Grovel
+- SS - get social eligibility
+- Interaction - SS - Kiss Superstar TEST
+- get social eligibility( old )
+- Interaction - Say Goodbye Hug TEST
+- Interaction - Say Goodbye Kiss Cheeks
+- Interaction - Say Goodbye Kiss Cheeks TEST
+- Interaction - Say Goodbye Kiss Hand TEST
+- Interaction - Say Goodbye Kiss TEST
+- Interaction - Say Goodbye Passionate TEST
+- Interaction - Say Goodbye Shake Hands TEST
+- Interaction - SS - Give Autograph TEST
+- do new adult idle
+- visitor leave - with dialog
+- Check Auto-follow Conditions
+- check motive failure
+- get interaction eligibility( old )
+- Interaction - SS - Biggest Fan TEST
+- Interaction - SS - Hug You? TEST
+- Interaction - SS - Talk About Self TEST
+- Interaction - SS - Brag/Boast TEST
+- Interaction - SS - Talk About Biz TEST
+- Interaction - SS - Star Quality TEST
+- Fire NPC
+- Interaction - SS - Grovel TEST
+- Interaction - SS - Greet - Shake Hands TEST
+- Interaction - SS - Greet - Wave TEST
+- Interaction - SS - Greet Kiss TEST
+- Interaction - SS - For Autograph TEST
+- Autofollow
+- verify date
+- Interaction - SS - Publicity Event TEST
+- Interaction - SS - Photo Op TEST
+- Interaction - SS - You Famous? TEST
+- Interaction - SS - Can Call You? TEST
+- Magic - get social eligibility
+- Interaction - Magic - Hotfoot
+- Interaction - Magic - Levitate
+- Interaction - Magic - Shock
+- Interaction - Magic - Spook
+- check energy
+- do idle core
+- do idle and mood
+- Downtown Auto Follow
+- sitting anim delay
+- Magic - Attraction
+- up social ad by relationship
+- Interaction - Talk Gossip TEST
+- Allow Kiss?
+- Interaction - Magic - Toad
+- Interaction - Magic - Hypnotize
+- test all failure anims
+- failure sleep
+- Interaction - Magic - Mood Up
+- ghost main
+- Ghost - Can Scare or Wake Person?
+- Interaction - Ask About Interests TEST
+- Allow Compliment?
+- Interaction - Dismiss TEST
+- Interaction - Dismiss
+- Interaction - Entertain Joke TEST
+- Allow Entertain?
+- Interaction - Entertain Juggle TEST
+- Interaction - Entertain With Harm TEST
+- Allow Goodbye?
+- Interaction - Say Goodbye Wave TEST
+- Interaction - Say Goodbye Shoo TEST
+- Allow Tease?
+- Interaction - Tease Taunt TEST
+- Interaction - Talk About Interests TEST
+- Interaction - Magic - Banish
+- Allow Flirt?
+- Interaction - Magic - Talk About Magic
+- SS - get interaction eligibility
+- Magic - get interaction eligibility
+- Interaction - Wake Up Clone
+- Interaction - Wake Up Clone TEST
+- Query - Is Object a Fridge
+- Magic - Anti-Attraction
+- Clone - Find My Charm
+- Allow Attack?
+- Clone - Hungry
+- Interaction - Magic - Hotfoot TEST
+- Interaction - Magic - Hypnotize TEST
+- Interaction - Magic - Levitate TEST
+- Interaction - Magic - Love Me
+- Interaction - Magic - Love Me TEST
+- Interaction - Magic - MagicTrick
+- Interaction - Magic - Relationship Up TEST
+- Interaction - Magic - Shock TEST
+- Interaction - Magic - Spook TEST
+- Interaction - Magic - Toad TEST
+- Interaction - Ask About Job
+- Interaction - Magic - Talk About Magic TEST
+- Magic - Token Remove
+- Interaction - Magic - Freak out TEST
+- Interaction - Tease Scare TEST
+- MAGIC - Ghost Social Test
+- Interaction - Magic - Marry Me
+- Interaction - Magic - Marry Me TEST
+- Interaction - Magic - MagicTrick TEST
+- Interaction - Magic - Mood Up TEST
+- Interaction - Magic - Make Friend
+- Interaction - Magic - Make Friend TEST
+- Clone - Main Loop
+- failure bladder
+- burn to death
+- try burn to death
+- person main loop
+- person main
+- Allow Greet
+- Interaction - Greet Hug
+- Interaction - Greet Hug TEST
+- Interaction - Greet Kiss Hand TEST
+- Interaction - Greet Polite Kiss
+- Interaction - Greet Romantic TEST
+- Interaction - Greet Polite Kiss TEST
+- Interaction - Greet Air Kiss TEST
+- Greet Walkby TEST
+- Greet with Gift Test
+- Child - Greet TEST
+- Interaction - Magic - Talk About Quest
+- get interaction eligibility
+- get social eligibility
+- Interaction - Compliment Admire TEST
+- Interaction - Flirt Give Back Rub TEST
+- Interaction - Attack Slap TEST
+- Interaction - Attack Fight TEST
+- Interaction - Attack Sissy Fight TEST
+- Interaction - Attack Shove TEST
+- Allow Hug?
+- Interaction - Hug Friendly TEST
+- Interaction - Kiss Cheek TEST
+- Interaction - Magic - Banish TEST
+- Interaction - Magic - Freak Out
+- Find - Cat on Lot?
+- Interaction - Talk - About Cat TEST
+- Interaction - Talk Change Gossip TEST
+- Clone - Bad
+- Ghost - Wander
+- Ghost - Scare
+- Ghost - Play Haunt Sound
+- Ghost - Main Loop
+- Interaction - Magic - Relationship Up
+- Interaction - Magic - Talk About Quest TEST
+
+## FunHouseGlobals.iff  (32 chunks, 28 BHAVs)
+
+- Track - Pick Up - Entrance
+- Track - Pick Up - Exit
+- Cart - Turn On Start?
+- Process Tags - HH1
+- Process Tags
+- Process Tags - FH3
+- Process Tags - HH2
+- Face Entrance
+- Wait In Line
+- Process Tags - HH3
+- Process Tags - FH1
+- Process Tags - FH2
+- Is Stack Object FH2 or HH2?
+- Calc Ride Price
+- Wait For Next
+- Pick Up - Exit
+- Pick Up - Entrance
+- Find Track Exit
+- Find Track Entrance
+- Interaction - Ride TEST
+- Track - Placement - Entrance
+- Track - Placement - Exit
+- Placement - Exit
+- Placement - Entrance
+- Thrilled or Scared?
+- Lights Off
+- Lights On
+- Interaction - Ride
+
+## ArtGlobals.iff  (8 chunks, 7 BHAVs)
+
+- adjust value
+- Interaction - View TEST
+- main - painting
+- init painting common
+- init - sculptures common
+- Interaction - View
+- react
+
+## CarGlobals.iff  (22 chunks, 17 BHAVs)
+
+- load tree
+- go to work TEST
+- notify car portal
+- is this car for stack object?
+- auto to work
+- Leave?
+- allow intersection
+- leave sound
+- honk horn
+- is this car for me
+- CT - Drop Off
+- set visitor motives
+- go to work
+- Find Clone
+- init
+- shared main
+- drive away
+
+## CounterGlobals.iff  (42 chunks, 36 BHAVs)
+
+- please update wall adj
+- tweak dirt inc
+- play counter sound
+- force slot object to same direction
+- get food for prep
+- prepare core
+- get food difficulty
+- prepare function
+- tweak prepare begin
+- signal prep progress
+- tweak prepared finished
+- prepare loop
+- tweak prepare inc
+- My Entry
+- serving surface function
+- My Exit
+- surface function
+- Clean
+- get from eating surface
+- sit with an emtpy slot
+- food placement function
+- are all slots empty?
+- food slot test
+- sim placement tree
+- help - corners
+- Main
+- Init
+- align
+- find adjacent good chair
+- update all counters
+- CT - I Am a Counter
+- is stack object a counter?
+- dynamic update
+- update just me
+- pickup function
+- set adj
+
+## Global.iff  (407 chunks, 251 BHAVs)
+
+- missing animation tree
+- get my relationship to temp 0
+- random motion
+- divide tick counts
+- standard multi-tile exit
+- set object hidden
+- SetComfortFromInt
+- set sprite visibility
+- censor
+- SetEnvironment
+- SetStress
+- SetEntertained
+- SetSocial
+- standard multi-tile entry
+- SetEnergy
+- Test Behind
+- mod8
+- SetComfort
+- IncComfort-g
+- Create Stool
+- my dirt inc
+- sfx Hit Person
+- fail food chain object
+- Schedule with Hour
+- Schedule with param
+- enable debug balloons?
+- is object's room outside
+- enable social outcome choice?
+- old idle
+- Schedule
+- Is Object in Use Flag Set?
+- Standard Exit
+- count people in house
+- set room impact
+- Check Schedule
+- Dress Work
+- Clean
+- Exit Skill Object
+- In Use?
+- try fliiping object
+- create multiple floods under me
+- create flood in front of object
+- create flood in front of me
+- fall on floor - end
+- NPC Get Paid
+- repair finished
+- Relationship Impact for Join
+- schedule phone call
+- schedule phone call with neighbor
+- relationship
+- Do I Love temp 0?
+- is temp 0 friends with me?
+- help display - broken object
+- help display - autosnapshot
+- repair start
+- help display - object dirty
+- create multiple floods in front of object
+- fall on floor - begin
+- Exit Repair Function
+- drop object from my slot to floor
+- do the drop
+- Is Stack Object held by person?
+- go over and wait around
+- do electrocution
+- repair - Should Tantrum?
+- Dress Swimsuit
+- Robot Sound?
+- Am I a clone?
+- SetComfortFromMain
+- Fun Object Test
+- Trigger Prude Hit - 1.4
+- Find someone i love
+- verify stack obj id
+- hide menu
+- Home Only
+- does stack object love anyone?
+- do I love anyone?
+- Create Trash Pile By Size
+- old Wait for Notify
+- test for user interrupt
+- Trigger Prude Finger - 1.4
+- Boost STR 1.4
+- Allow Autonomous?
+- Push Date Response - 1.4
+- Get Stack Object's Autofollow Sim and Place In Temp 0
+- Find Closest Person
+- Downtown - Double ad for night
+- Exit fun object
+- wash hands if neat
+- Bored Social - 1.4
+- Start Jealousy
+- End Jealousy
+- Get My Autofollow Sim in Temp 0 - 1.4
+- Clean test
+- Exit Downtown Object?
+- Turn on All TV's in Room 1.4
+- Autofollow my family member?
+- push slap onto temp0 and temp1
+- Is lot a Downtown Lot?
+- Return in Temp 0 - Make WORD - 1.5
+- Return in Temp 0 & 1 - HIBYTE and LOBYTE - 1.5
+- Am I a Child?
+- Is Temp 0 a Child? - 1.5
+- Move forward n tiles (n)
+- Set Multi-Tile Dyn Sprite - 1.5
+- Prize Token - Get Num in Temp - 1.5
+- set direction
+- Turn Sim to Face Direction - 1.5
+- Set Multi-Tile Lighting - 1.5
+- set object lighting
+- Notify Multi-Tile - 1.5
+- set object graphic
+- Return in Temp 0 & 1 - Mutli-Tile Dimensions [base 0] - 1.5
+- Set Multi-Tile Wall Placement Flags - 1.5
+- Init Object
+- group talk create
+- group talk cancel
+- group talk exit person
+- group talk do
+- Turn Off All Dyn Sprites - 1.5
+- Return in Temp 0 - Tile ID w/ Lowest Subindex - 1.5
+- Group Talk - MT - Create - 1.5
+- group talk add person
+- Group Talk - MT -  Add Person - 1.5
+- Group Talk - MT - Do - 1.5
+- Group Talk - MT - Exit Person - 1.5
+- can join away from home? - 1.5
+- Push Interaction by Number - 1.5
+- Find Nearest Rental Shack - 1.5
+- Find Nearest Rent Shack and Push Interaction - 1.5
+- verify person in stack obj
+- am I friends with temp 0
+- idle minutes
+- Set All Wall Placement Flags - 1.5
+- Get Available Family Kid in Temp 0 - 1.5
+- Add Deviant Act to Vacation Controller - 1.5
+- wake everyone in my room with balloon
+- wake everyone sleeping in lot
+- animated idle for - 1.5
+- animated idle for
+- Is Stack Object in the Selected Sim's Party - 1.5
+- repair inc
+- Vacation - Add to Vacation Score 1.5
+- dirty inc
+- Route a away if dating
+- can join?
+- Exit Vacation Object? 1.5
+- verify stack obj id with category - 1.5
+- Is lot a Vacation Lot?
+- Prize Token - Remove - 1.5
+- Prize Token - Add - 1.5
+- Vacation - Subtract from Vacation Score 1.5
+- Vacation - Get Vacation Score in Temp 0 1.5
+- Vacation - Save Score
+- Standard entry
+- set multi-object graphic
+- set graphic
+- Remove Time Tokens
+- Allow in Downtown Only
+- Is lot a Residential Lot?
+- Allow on Vacation Only
+- Find Cash Register 1.4
+- Downtown - Half ad for night
+- Push Browse of Same Type
+- Allow On Neighborhood Lots Only
+- Does temp 0 love me?
+- clean inc
+- Dream - Pet - About Other Sim
+- Dream - Pet
+- Dream - Pet - About Object
+- Get Available Family Adult in Temp 0
+- Are there any Community Lots?
+- Allow On Community Only
+- Is lot a Vacation Snow Lot? - 1.5
+- Is lot a Vacation Forest Lot? - 1.5
+- Is lot a Vacation Beach Lot? - 1.5
+- dress normal - just dress
+- Is family full?
+- Is Away From Home Family Full (1.6)
+- Push Interaction on My Autofollow - 1.4
+- count my (non-pet) family members - 1.5
+- Allow Pet Intersection
+- Is Lot A Community Lot?
+- show skill progress
+- Is either person a child?
+- help display - route failure
+- create flood under me
+- Refuse Fun Object?
+- Allow on Studio Lots Only
+- idle hours
+- Am I an Adult?
+- Am I a Star?
+- Get Social Availability Scale - 1.4
+- Am I a Dog?
+- Am I a Cat?
+- Dress Formal
+- Dress Winter
+- Dress High Fashion
+- create reaper
+- Am I in Selected Sims Party? - 1.5
+- privacy - should ignore person
+- Is Sim in Stack Object on Fame Track?
+- End Autofollow - Bad Behavior 1.4
+- Adjust my Fame 1.8
+- Dress in specified outfit
+- verify neighbor in stack object
+- route failure feedback
+- Is Stack Object My Peer( Fame )?
+- Leave
+- Adjust Stack Object's Fame 1.8
+- ensure Sim is standing
+- Allow on Magic Lots Only
+- Is lot a Studio Lot?
+- Allow in Locations only
+- Wait For Notify
+- Am I On a Quest?
+- Magic - Get Spell From Ingredients
+- Magic - Get Ingredients for Spell
+- Magic - Get Ingredients for Press/Oven
+- Magic - Has Made Spell/Recipe?
+- Magic - Mark Spell/Recipe as made
+- Magic - Get Recipe from Ingredients
+- flip Sim around
+- Is lot a Magic Lot?
+- Remove Stool
+- wake everyone up in stack objects room
+- Charge for Downtown - 1.4
+- Allow on Residential Lots only
+- Magic - Am I a Doppelganger
+- do grim reaper
+- kill person for good
+- Dress for Bed
+- privacy - ask Sims to Shoo
+- privacy - do shoo
+- dress naked
+- dress normal
+- privacy - test alone
+- Refuse Skill Object?
+- find random portal
+- Charge for Away from Home 1.5 - 1.6
+- Wander
+- Magic - Teleport to Stack Object
+- Magic - Check For Abuse
+- idle
+- set to leave
+- Magic - Add Token( Invisible )
+- Magic - Find Token( Invisible )
+- Magic - Remove Token( Invisible )
+- Magic - Add Token
+- Magic - Find Token
+- Magic - Remove Token
+
+TOTAL BHAVs: 2287

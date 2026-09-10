@@ -1,0 +1,56 @@
+00216ca0: 93e1fffc  stw      r31, -4(r1)
+00216ca4: 7c0802a6  mflr     r0
+00216ca8: 83e2ac84  lwz      r31, -0x537c(r2)
+00216cac: 93c1fff8  stw      r30, -8(r1)
+00216cb0: 83c29234  lwz      r30, -0x6dcc(r2)
+00216cb4: 93a1fff4  stw      r29, -0xc(r1)
+00216cb8: 7c7d1b78  mr       r29, r3
+00216cbc: 90010008  stw      r0, 8(r1)
+00216cc0: 9421ff90  stwu     r1, -0x70(r1)
+00216cc4: 8802ee13  lbz      r0, -0x11ed(r2)
+00216cc8: 28000000  cmplwi   r0, 0
+00216ccc: 408200f8  bne      0x216dc4
+00216cd0: 38000001  li       r0, 1
+00216cd4: 38610040  addi     r3, r1, 0x40
+00216cd8: 9802ee13  stb      r0, -0x11ed(r2)
+00216cdc: 389f0078  addi     r4, r31, 0x78
+00216ce0: 38a00000  li       r5, 0
+00216ce4: 481a3e0d  bl       0x3baaf0   ; .__ct__Q214cTimePartition6SampleFPCcUl
+00216ce8: 801e0004  lwz      r0, 4(r30)
+00216cec: 7fc3f378  mr       r3, r30
+00216cf0: 809e0008  lwz      r4, 8(r30)
+00216cf4: 38c10040  addi     r6, r1, 0x40
+00216cf8: 54002036  slwi     r0, r0, 4
+00216cfc: 7c840214  add      r4, r4, r0
+00216d00: 38a00001  li       r5, 1
+00216d04: 4bfc3ccd  bl       0x1da9d0
+00216d08: 387d01a0  addi     r3, r29, 0x1a0
+00216d0c: 4bf37325  bl       0x14e030   ; .Strobe__16TBFrequencyProbeFv
+00216d10: 807d016c  lwz      r3, 0x16c(r29)
+00216d14: 28030000  cmplwi   r3, 0
+00216d18: 41820014  beq      0x216d2c
+00216d1c: 81830000  lwz      r12, 0(r3)
+00216d20: 818c0038  lwz      r12, 0x38(r12)
+00216d24: 4838bcbd  bl       0x5a29e0
+00216d28: 80410014  lwz      r2, 0x14(r1)
+00216d2c: 7fa3eb78  mr       r3, r29
+00216d30: 4bffd981  bl       0x2146b0   ; .UpdateActionIcons__12cDDDSimsViewFv
+00216d34: 807d119c  lwz      r3, 0x119c(r29)
+00216d38: 28030000  cmplwi   r3, 0
+00216d3c: 41820008  beq      0x216d44
+00216d40: 480474c1  bl       0x25e200   ; .Animate__13cTutorialIconFv
+00216d44: 80628e04  lwz      r3, -0x71fc(r2)
+00216d48: 80630000  lwz      r3, 0(r3)
+00216d4c: 48304e35  bl       0x51bb80   ; .AccumulateOverlapDamage__12cTSWinMgrW95Fv
+00216d50: 80628874  lwz      r3, -0x778c(r2)
+00216d54: 38800000  li       r4, 0
+00216d58: 80630000  lwz      r3, 0(r3)
+00216d5c: 80630004  lwz      r3, 4(r3)
+00216d60: 81830004  lwz      r12, 4(r3)
+00216d64: 818c0044  lwz      r12, 0x44(r12)
+00216d68: 4838bc79  bl       0x5a29e0
+00216d6c: 80410014  lwz      r2, 0x14(r1)
+00216d70: 38610050  addi     r3, r1, 0x50
+00216d74: 389f008c  addi     r4, r31, 0x8c
+00216d78: 38a00000  li       r5, 0
+00216d7c: 481a3d75  bl       0x3baaf0   ; .__ct__Q214cTimePartition6SampleFPCcUl

@@ -1,0 +1,61 @@
+### BHAV 4102 'At Work' (60 instructions)
+ins0  T254/F1  CALL 4139 (own-iff) opd=ffffffffffffffff
+ins1  T2/F253  PRIM changeActionString (50) opd=2e01000002000000
+ins2  T3/F255  CALL 4110 (own-iff) opd=ffffffffffffffff
+ins3  T4/F253  CALL 378 (global.iff) opd=0000000000000000
+ins4  T38/F17  CALL 4105 (own-iff) opd=ffffffffffffffff
+ins5  T6/F253  Local[0] = MyMotives[3]
+ins6  T16/F253 Temp[0] = MyPD[56]
+ins7  T8/F253  Temp[1] = MyPD[57]
+ins8  T34/F253 MyPD[63] += MyMotives[3]
+ins9  T35/F253 MyPD[63] /= Lit[3]
+ins10 T24/F11  JobData[13] == Global[0]
+ins11 T14/F253 CALL 280 (global.iff) opd=3c00000000000000
+ins12 T33/F253 MyObj[34] = Lit[0]
+ins13 T29/F253 CALL 4103 (own-iff) opd=ffffffffffffffff
+ins14 T15/F253 Temp[0] = MyPD[56]
+ins15 T10/F253 Temp[1] = MyPD[57]
+ins16 T7/F253  PRIM changeSuit (6) opd=0001000000000000
+ins17 T39/F253 MyObj[34] = Lit[0]
+ins18 T255/F253 CALL 280 (global.iff) opd=1e00000000000000
+ins19 T21/F253 MyPD[30] = Lit[128]
+ins20 T22/F253 PRIM changeSuit (6) opd=0001000000000000
+ins21 T20/F253 CALL 280 (global.iff) opd=0a00000000000000
+ins22 T23/F253 CALL 280 (global.iff) opd=0a00000000000000
+ins23 T254/F253 MyPD[30] = Lit[0]
+ins24 T30/F253 Local[2] = StkObjID[0]
+ins25 T58/F17  CALL 4111 (own-iff) opd=ffffffffffffffff
+ins26 T46/F253 CALL 4112 (own-iff) opd=ffffffffffffffff
+ins27 T31/F253 PRIM setMotiveChange (29) opd=0707050114006400
+ins28 T59/F11  CALL 4113 (own-iff) opd=ffffffffffffffff
+ins29 T42/F253 StkObjID[0] = MyObj[11]
+ins30 T27/F253 CALL 4120 (own-iff) opd=ffffffffffffffff
+ins31 T41/F11  CALL 4121 (own-iff) opd=ffffffffffffffff
+ins32 T14/F253 MyPD[69] = Global[1]
+ins33 T13/F253 CALL 280 (global.iff) opd=0100000000000000
+ins34 T9/F253  MyPD[63] += MyMotives[3]
+ins35 T26/F36  MyPD[63] > Lit[20]
+ins36 T26/F253 CALL 4128 (own-iff) opd=ffffffffffffffff
+ins37 T25/F253 CALL 4131 (own-iff) opd=ffffffffffffffff
+ins38 T37/F253 PRIM changeActionString (50) opd=2e01000003000000
+ins39 T18/F39  PRIM animateSim (44) opd=0000000000000000
+ins40 T254/F253 CALL 4136 (own-iff) opd=ffffffffffffffff
+ins41 T28/F253 CALL 4138 (own-iff) opd=ffffffffffffffff
+ins42 T43/F253 Local[3] = Lit[10]
+ins43 T49/F253 CALL 280 (global.iff) opd=1e00000000000000
+ins44 T40/F45  CALL 281 (global.iff) opd=0000000000000000
+ins45 T43/F40  Local[3] --&> Lit[0]
+ins46 T32/F32  CALL 4140 (own-iff) opd=ffffffffffffffff
+ins47 T48/F253 CALL 280 (global.iff) opd=3200000000000000
+ins48 T47/F47  PRIM removeObjectInstance (18) opd=0000030000000000
+ins49 T55/F44  CALL 4142 (own-iff) opd=ffffffffffffffff
+ins50 T51/F253 StkObjPD[56] = MyPD[56]
+ins51 T52/F253 StkObjPD[57] = MyPD[57]
+ins52 T53/F253 StkObjPD[24] = MyPD[24]
+ins53 T47/F253 StkObjPD[63] = MyPD[63]
+ins54 T11/F253 Temp[4] = JobData[13]
+ins55 T56/F253 StkObjID[0] = Temp[2]
+ins56 T57/F47  CALL 355 (global.iff) opd=ffffffffffffffff
+ins57 T50/F47  StkObjPD[56] == MyPD[56]
+ins58 T5/F253  MyPD[87] = Lit[1]
+ins59 T12/F253 MyPD[87] = Lit[0]

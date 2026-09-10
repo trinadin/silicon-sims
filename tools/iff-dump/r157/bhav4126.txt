@@ -1,0 +1,33 @@
+### BHAV 4126 'warn/fire people who miss work' (32 instructions)
+ins0  T254/F9  MyAttr[11] == Global[0]
+ins1  T2/F253  StkObjID[0] = Lit[0]
+ins2  T27/F254 setToNext Person guid=0x00000000 -> StkObjID[0] (flags=0x81)
+ins3  T4/F2    StkObj[34] == Lit[0]
+ins4  T5/F2    CALL 4127 (own-iff) opd=ffffffffffffffff
+ins5  T24/F253 Local[1] = Global[1]
+ins6  T29/F253 Local[1] -= StkObjPD[69]
+ins7  T10/F8   Local[1] < Lit[0]
+ins8  T19/F12  Local[1] == Lit[2]
+ins9  T1/F253  MyAttr[11] = Global[0]
+ins10 T8/F253  Local[1] += Lit[30]
+ins11 T15/F15  PRIM createObjectInstance (42) opd=640487f706000000
+ins12 T13/F2   Local[1] == Lit[1]
+ins13 T11/F253 Local[2] = StkObjID[0]
+ins14 T2/F253  StkObjID[0] = Local[2]
+ins15 T16/F253 Temp[1] = Local[2]
+ins16 T17/F253 Temp[0] = Lit[1]
+ins17 T14/F14  PRIM runTreeByName (28) opd=2f01000002020000
+ins18 T21/F21  PRIM createObjectInstance (42) opd=640487f706000000
+ins19 T18/F253 Local[2] = StkObjID[0]
+ins20 T2/F253  StkObjID[0] = Local[2]
+ins21 T22/F253 Temp[1] = Local[2]
+ins22 T23/F253 Temp[0] = Lit[2]
+ins23 T20/F20  PRIM runTreeByName (28) opd=2f01000002020000
+ins24 T25/F6   StkObjPD[69] <= Lit[0]
+ins25 T26/F253 StkObjPD[69] = Local[1]
+ins26 T2/F253  StkObjPD[69] -= Lit[1]
+ins27 T28/F2   StkObjPD[32] == Tuning[16896]
+ins28 T2/F3    StkObjPD[68] flagSet Lit[1]
+ins29 T31/F30  JobData[12] > Lit[0]
+ins30 T7/F253  Local[1] -= Lit[1]
+ins31 T7/F30   JobData[12] < Lit[20]

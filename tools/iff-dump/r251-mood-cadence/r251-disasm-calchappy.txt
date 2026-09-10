@@ -1,0 +1,88 @@
+0010b9c0: 8102a718  lwz       r8, -0x58e8(r2)
+0010b9c4: 38a00000  li        r5, 0
+0010b9c8: a8830600  lha       r4, 0x600(r3)
+0010b9cc: c0c80004  lfs       f6, 4(r8)
+0010b9d0: 7c800735  extsh.    r0, r4
+0010b9d4: fca03090  fmr       f5, f6
+0010b9d8: 41820010  beq       0x10b9e8
+0010b9dc: 2c040012  cmpwi     r4, 0x12
+0010b9e0: 40800008  bge       0x10b9e8
+0010b9e4: 38a00001  li        r5, 1
+0010b9e8: 54a0063f  clrlwi.   r0, r5, 0x18
+0010b9ec: 4182000c  beq       0x10b9f8
+0010b9f0: 8082a704  lwz       r4, -0x58fc(r2)
+0010b9f4: 48000008  b         0x10b9fc
+0010b9f8: 8082a700  lwz       r4, -0x5900(r2)
+0010b9fc: 80040004  lwz       r0, 4(r4)
+0010ba00: 80840000  lwz       r4, 0(r4)
+0010ba04: 1c000014  mulli     r0, r0, 0x14
+0010ba08: 7d240214  add       r9, r4, r0
+0010ba0c: 48000100  b         0x10bb0c
+0010ba10: 80040010  lwz       r0, 0x10(r4)
+0010ba14: 80c40008  lwz       r6, 8(r4)
+0010ba18: 5405103a  slwi      r5, r0, 2
+0010ba1c: 3805078c  addi      r0, r5, 0x78c
+0010ba20: 2c060000  cmpwi     r6, 0
+0010ba24: 7c83042e  lfsx      f4, r3, r0
+0010ba28: 4082000c  bne       0x10ba34
+0010ba2c: c0280004  lfs       f1, 4(r8)
+0010ba30: 480000a4  b         0x10bad4
+0010ba34: 3546ffff  addic.    r10, r6, -1
+0010ba38: 380a0001  addi      r0, r10, 1
+0010ba3c: 7c0903a6  mtctr     r0
+0010ba40: 55471838  slwi      r7, r10, 3
+0010ba44: 41800028  blt       0x10ba6c
+0010ba48: 80a40000  lwz       r5, 0(r4)
+0010ba4c: c0080004  lfs       f0, 4(r8)
+0010ba50: 7c253c2e  lfsx      f1, r5, r7
+0010ba54: ec640828  fsubs     f3, f4, f1
+0010ba58: fc030040  fcmpu cr0, f3, f0
+0010ba5c: 41810010  bgt       0x10ba6c
+0010ba60: 38e7fff8  addi      r7, r7, -8
+0010ba64: 394affff  addi      r10, r10, -1
+0010ba68: 4200ffe0  bdnz      0x10ba48
+0010ba6c: 3806ffff  addi      r0, r6, -1
+0010ba70: 7c0a0000  cmpw      r10, r0
+0010ba74: 40820018  bne       0x10ba8c
+0010ba78: 55451838  slwi      r5, r10, 3
+0010ba7c: 80c40000  lwz       r6, 0(r4)
+0010ba80: 38050004  addi      r0, r5, 4
+0010ba84: 7c26042e  lfsx      f1, r6, r0
+0010ba88: 4800004c  b         0x10bad4
+0010ba8c: 2c0affff  cmpwi     r10, -1
+0010ba90: 40820010  bne       0x10baa0
+0010ba94: 80a40000  lwz       r5, 0(r4)
+0010ba98: c0250004  lfs       f1, 4(r5)
+0010ba9c: 48000038  b         0x10bad4
+0010baa0: 80a40000  lwz       r5, 0(r4)
+0010baa4: 55401838  slwi      r0, r10, 3
+0010baa8: 80e40004  lwz       r7, 4(r4)
+0010baac: 5546103a  slwi      r6, r10, 2
+0010bab0: 7ca50214  add       r5, r5, r0
+0010bab4: 7c27342e  lfsx      f1, r7, r6
+0010bab8: c0450004  lfs       f2, 4(r5)
+0010babc: c005000c  lfs       f0, 0xc(r5)
+0010bac0: ec630072  fmuls     f3, f3, f1
+0010bac4: ec001028  fsubs     f0, f0, f2
+0010bac8: ec630032  fmuls     f3, f3, f0
+0010bacc: ec63102a  fadds     f3, f3, f2
+0010bad0: fc201890  fmr       f1, f3
+0010bad4: a8c3060e  lha       r6, 0x60e(r3)
+0010bad8: 38000001  li        r0, 1
+0010badc: 7cc00278  xor       r0, r6, r0
+0010bae0: 7c050e70  srawi     r5, r0, 1
+0010bae4: 7c003038  and       r0, r0, r6
+0010bae8: 7c002850  subf      r0, r0, r5
+0010baec: 54000fff  rlwinm.   r0, r0, 1, 0x1f, 0x1f
+0010baf0: 41820010  beq       0x10bb00
+0010baf4: c0080030  lfs       f0, 0x30(r8)
+0010baf8: fc002000  fcmpu     cr0, f0, f4
+0010bafc: 4182000c  beq       0x10bb08
+0010bb00: ecc4307a  fmadds    f6, f4, f1, f6
+0010bb04: eca5082a  fadds     f5, f5, f1
+0010bb08: 38840014  addi      r4, r4, 0x14
+0010bb0c: 7c044840  cmplw     r4, r9
+0010bb10: 4082ff00  bne       0x10ba10
+0010bb14: ec062824  fdivs     f0, f6, f5
+0010bb18: d0030798  stfs      f0, 0x798(r3)
+0010bb1c: 4e800020  blr       

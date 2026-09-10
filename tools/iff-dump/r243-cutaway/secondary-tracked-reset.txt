@@ -1,0 +1,46 @@
+001c0e28: 482c0bd9  bl       0x481a00   ; .GetPickingObject__8AnimatorFv
+001c0e2c: 80829048  lwz      r4, -0x6fb8(r2)
+001c0e30: 7c6e1b78  mr       r14, r3
+001c0e34: 80a28f48  lwz      r5, -0x70b8(r2)
+001c0e38: 38e00000  li       r7, 0
+001c0e3c: 80040000  lwz      r0, 0(r4)
+001c0e40: 80650000  lwz      r3, 0(r5)
+001c0e44: 38800028  li       r4, 0x28
+001c0e48: 901f0164  stw      r0, 0x164(r31)
+001c0e4c: 80a28da4  lwz      r5, -0x725c(r2)
+001c0e50: 80c28c00  lwz      r6, -0x7400(r2)
+001c0e54: 483d03dd  bl       0x591230
+001c0e58: 80828dc0  lwz      r4, -0x7240(r2)
+001c0e5c: 7c6d1b78  mr       r13, r3
+001c0e60: 837e0008  lwz      r27, 8(r30)
+001c0e64: 3b800000  li       r28, 0
+001c0e68: 833e000c  lwz      r25, 0xc(r30)
+001c0e6c: 81f00018  lwz      r15, 0x18(r16)
+001c0e70: 3ae00000  li       r23, 0
+001c0e74: 819e0000  lwz      r12, 0(r30)
+001c0e78: 38600000  li       r3, 0
+001c0e7c: 817e0004  lwz      r11, 4(r30)
+001c0e80: 81500028  lwz      r10, 0x28(r16)
+001c0e84: 8130002c  lwz      r9, 0x2c(r16)
+001c0e88: 81100030  lwz      r8, 0x30(r16)
+001c0e8c: 80f00034  lwz      r7, 0x34(r16)
+001c0e90: 88d00048  lbz      r6, 0x48(r16)
+001c0e94: 88b00049  lbz      r5, 0x49(r16)
+001c0e98: 881001f8  lbz      r0, 0x1f8(r16)
+001c0e9c: 8b040000  lbz      r24, 0(r4)
+001c0ea0: 937f0110  stw      r27, 0x110(r31)
+001c0ea4: 933f0114  stw      r25, 0x114(r31)
+001c0ea8: 91ff0118  stw      r15, 0x118(r31)
+001c0eac: 919f011c  stw      r12, 0x11c(r31)
+001c0eb0: 917f0120  stw      r11, 0x120(r31)
+001c0eb4: 915f0124  stw      r10, 0x124(r31)
+001c0eb8: 913f0128  stw      r9, 0x128(r31)
+001c0ebc: 911f012c  stw      r8, 0x12c(r31)
+001c0ec0: 90ff0130  stw      r7, 0x130(r31)
+001c0ec4: 98df0134  stb      r6, 0x134(r31)
+001c0ec8: 98bf0135  stb      r5, 0x135(r31)
+001c0ecc: 981f0136  stb      r0, 0x136(r31)
+001c0ed0: 9b840000  stb      r28, 0(r4)
+001c0ed4: 482bbc3d  bl       0x47cb10   ; .SetTrackedObject__8AnimatorFP8cXObject
+001c0ed8: 38600000  li       r3, 0
+001c0edc: 482c0ae5  bl       0x4819c0   ; .SetPickingObject__8AnimatorFb

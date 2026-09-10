@@ -1,0 +1,9 @@
+PASS: NGBH v0x3f words=16 original[1]=1 original[2]=0; interpreter read + JIT delegation, bounds=1..15, writes=read-only.
+PASS: NGBH v0x3e words=16 original[1]=1 original[2]=7; interpreter read + JIT delegation, bounds=1..15, writes=read-only.
+PASS: NGBH v0x3f words=16 original[1]=1 original[2]=0; interpreter read + JIT delegation, bounds=1..15, writes=read-only.
+PASS: NGBH v0x3f words=16 original[1]=1 original[2]=0; interpreter read + JIT delegation, bounds=1..15, writes=read-only.
+PASS: NGBH v0x3f words=16 original[1]=1 original[2]=0; interpreter read + JIT delegation, bounds=1..15, writes=read-only.
+PASS: NGBH v0x3f words=16 original[1]=1 original[2]=0; interpreter read + JIT delegation, bounds=1..15, writes=read-only.
+PASS: NGBH v0x3f words=16 original[1]=1 original[2]=0; interpreter read + JIT delegation, bounds=1..15, writes=read-only.
+PASS: NGBH v0x3f words=16 original[1]=1 original[2]=0; interpreter read + JIT delegation, bounds=1..15, writes=read-only.
+PASS: NGBH v0x3f words=16 original[1]=1 original[2]=0; interpreter read + JIT delegation, bounds=1..15, writes=read-only.

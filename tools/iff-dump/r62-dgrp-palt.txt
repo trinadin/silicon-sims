@@ -1,0 +1,1 @@
+DGRP chunks=20522 refs=514716 PALT chunks=5238 entries=1340928
