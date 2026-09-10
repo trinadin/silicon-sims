@@ -1,4 +1,4 @@
-﻿using FSO.HIT.Model;
+using FSO.HIT.Model;
 using System;
 using System.Collections.Generic;
 
@@ -21,10 +21,22 @@ namespace FSO.HIT
         public HITVolumeGroup VolGroup;
         public string Name;
 
+        // AUD-06 native ducking law. A sound's suffered duck priority (reg 25
+        // `duckpri`) and its announced main_duckpri (reg 123, 0 = none). The
+        // law: a sound is attenuated to 50% iff it announced a non-zero
+        // main_duckpri AND that equals its own duckpri (equality, not <).
+        public int DuckPri;            // suffered duck priority (reg 25 equivalent)
+        public int MainDuckPri;        // announced main_duckpri (reg 123), 0 = none
+
         public HITSound()
         {
             Owners = new List<int>();
         }
+
+        // AUD-07 integration hardening (coordinator): externally disposed sounds
+        // (probe/teardown paths that dispose without going through HITVM.Tick)
+        // must be reaped, not ticked. Set by Dispose implementations.
+        public bool IsDisposed;
 
         public abstract bool Tick();
 
@@ -77,12 +89,23 @@ namespace FSO.HIT
         public void RecalculateVolume()
         {
             VolumeSet = true;
-            Volume = InstVolume * GetVolFactor();
+            Volume = InstVolume * GetVolFactor() * GetDuckFactor();
         }
 
         public float GetVolFactor()
         {
             return VM?.GetMasterVolume(VolGroup) ?? 1f;
+        }
+
+        /// <summary>
+        /// AUD-06 native ducking law: 0.5 iff this sound announced a non-zero
+        /// main_duckpri (reg 123) that equals its own suffered duckpri (reg 25).
+        /// Equality, not less-than (corrects a would-be '<' misread).
+        /// </summary>
+        public float GetDuckFactor()
+        {
+            if (MainDuckPri != 0 && MainDuckPri == DuckPri) return 0.5f;
+            return 1.0f;
         }
 
         public void AddOwner(int id)

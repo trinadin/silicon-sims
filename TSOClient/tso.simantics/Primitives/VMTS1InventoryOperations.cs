@@ -133,22 +133,22 @@ namespace FSO.SimAntics.Primitives
                 case VMTS1InventoryMode.Temp0NeighborAsAutofollow:
                     inventory = InitInventory(neighbour, inventory);
                     //if we have an existing item replace it
-                    aitem = inventory.FirstOrDefault(x => x.GUID == 0 && x.Type == 2);
+                    aitem = inventory.FirstOrDefault(x => x.GUID == 10 && x.Type == 2);
 
                     if (aitem == null)
                         inventory.Add(new InventoryItem() { Count = (ushort)context.Thread.TempRegisters[0], GUID = 10, Type = 2 });
                     else
-                        aitem.Count = (ushort)count;
+                        aitem.Count = (ushort)context.Thread.TempRegisters[0];
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 case VMTS1InventoryMode.Temp0NeighborAsFollowHome:
                     inventory = InitInventory(neighbour, inventory);
                     //if we have an existing item replace it
-                    aitem = inventory.FirstOrDefault(x => x.GUID == 1 && x.Type == 2);
+                    aitem = inventory.FirstOrDefault(x => x.GUID == 11 && x.Type == 2);
 
                     if (aitem == null)
                         inventory.Add(new InventoryItem() { Count = (ushort)context.Thread.TempRegisters[0], GUID = 11, Type = 2 });
                     else
-                        aitem.Count = (ushort)count;
+                        aitem.Count = (ushort)context.Thread.TempRegisters[0];
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 default:
                     return VMPrimitiveExitCode.GOTO_TRUE;

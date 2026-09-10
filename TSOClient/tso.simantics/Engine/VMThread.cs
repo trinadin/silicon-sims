@@ -60,6 +60,12 @@ namespace FSO.SimAntics.Engine
         public VMPrimitiveExitCode LastStackExitCode = VMPrimitiveExitCode.GOTO_FALSE;
 
         public VMAsyncState BlockingState;
+        // R249: explicit per-Tick yield signal. A primitive that does not finish within
+        // the Tick (CONTINUE_NEXT_TICK / CONTINUE_FUTURE_TICK, or a GOTO_*_NEXT_TICK that
+        // had to re-schedule) sets this in HandleResult; Tick clears it on entry. Check
+        // evaluation uses it to apply the synchronous-serving law directly instead of
+        // inferring a yield from an unmoved instruction pointer.
+        public bool YieldedThisTick;
         public VMEODPluginThreadState EODConnection;
         public bool Interrupt;
 
@@ -89,7 +95,31 @@ namespace FSO.SimAntics.Engine
             return EvaluateCheck(context, entity, initFrame, action, null);
         }
 
+
+        // R249: nesting bound for check evaluations. Primitives like Run Functional Tree
+        // re-enter EvaluateCheck from inside a running check; a cyclic functional-tree
+        // chain (an autonomy check tree running Find Best Object For Function, whose
+        // nested checks re-enter the same tree) recurses with a branching factor of the
+        // whole object module — effectively unbounded work. Legitimate nesting is
+        // shallow; the cap fails pathological chains. The native interpreter bounds its
+        // tree stack instead.
+        [ThreadStatic] private static int CheckDepth;
+
         public static VMPrimitiveExitCode EvaluateCheck(VMContext context, VMEntity entity, VMStackFrame initFrame, VMQueuedAction action, List<VMPieMenuInteraction> actionStrings)
+        {
+            if (CheckDepth >= 16) return VMPrimitiveExitCode.RETURN_FALSE;
+            CheckDepth++;
+            try
+            {
+                return EvaluateCheckInner(context, entity, initFrame, action, actionStrings);
+            }
+            finally
+            {
+                CheckDepth--;
+            }
+        }
+
+        private static VMPrimitiveExitCode EvaluateCheckInner(VMContext context, VMEntity entity, VMStackFrame initFrame, VMQueuedAction action, List<VMPieMenuInteraction> actionStrings)
         {
             var temp = new VMThread(context, entity, 5);
             var forceClone = !context.VM.Scheduler.RunningNow;
@@ -107,11 +137,51 @@ namespace FSO.SimAntics.Engine
                 temp.Queue.Add(action); //this check runs an action. We may need its interaction number, etc.
                 temp.ActiveQueueBlock = 0;
             }
-            while (temp.Stack.Count > 0 && temp.DialogCooldown == 0 && !temp.Entity.Dead) //keep going till we're done! idling is for losers!
+            // R249: bound the check-tree stack depth. The native interpreter caps its
+            // tree stack and fails the check when the cap is hit; without a cap here a
+            // TS1 test tree whose gosub chain cycles (several autonomy 'sit' trees do)
+            // recurses forever inside this while and freezes the whole VM tick.
+            //
+            // R249 CHECK-TREE SERVING LAW (deliberate, all EvaluateCheck callers): a
+            // check that yields is a FAILED check. The check server must hand the caller
+            // an answer synchronously; a primitive that defers to a later tick has no
+            // answer, so the check fails (RETURN_FALSE) immediately. The yield is read
+            // explicitly from the thread's YieldedThisTick signal (set by HandleResult),
+            // NOT inferred from an unmoved instruction pointer. Scope: EVERY check tree
+            // — TS1 CheckTS1Action (this port's only live TTAB path), the TSO CheckAction
+            // twin, routing/direct-control entry-point condition checks, and the nested
+            // Run Functional Tree / Find Best Object For Function checks. Audited: no
+            // caller legitimately yields — upstream this loop spun forever on a yielding
+            // check ("idling is for losers!"), so any yielding tree was already a freeze,
+            // not a feature; the brain's 'try autonomy' (8233) fall-through is the
+            // unknown-opcode GOTO_FALSE law, not a yield; and the known yielding TS1
+            // trees (chair 'sit' 4107, slot routing unported downstream) already fail
+            // and drop at the hand-off — this only makes the fail immediate. The stuck
+            // detector below is kept for a DIFFERENT condition: a suppressed-exception
+            // primitive that leaves the frame pointer stuck with no yield signal (the
+            // tick-level handler swallows the loop-guard throw without popping the
+            // frame) — it fails the check after 5 spins. Neither guard may kill the VM.
+            var checkGuard = 0;
+            var stuckTicks = 0;
+            while (temp.Stack.Count > 0 && temp.Stack.Count < 64 && temp.DialogCooldown == 0 && !temp.Entity.Dead) //keep going till we're done! idling is for losers!
             {
+                var beforeCount = temp.Stack.Count;
+                var beforeFrame = temp.Stack[temp.Stack.Count - 1];
+                var beforeIp = beforeFrame.InstructionPointer;
                 temp.Tick();
                 temp.ThreadBreak = VMThreadBreakMode.Active; //cannot breakpoint in check trees
+                if (temp.YieldedThisTick)
+                {
+                    return VMPrimitiveExitCode.RETURN_FALSE; // a check that yields is a failed check (synchronous-serving law)
+                }
+                if (temp.Stack.Count == beforeCount && temp.Stack.Count > 0 &&
+                    temp.Stack[temp.Stack.Count - 1].InstructionPointer == beforeIp)
+                {
+                    if (++stuckTicks > 4) return VMPrimitiveExitCode.RETURN_FALSE; // stuck frame (suppressed exception, no yield signal)
+                }
+                if (++checkGuard > 200000) return VMPrimitiveExitCode.RETURN_FALSE;
             }
+            if (temp.Stack.Count >= 64) return VMPrimitiveExitCode.RETURN_FALSE; // depth-capped: the check fails (native max-tree-depth law)
             if (actionStrings != null && actionStrings.Count == 0)
             {
                 //add an action string containing any modified ads
@@ -162,8 +232,22 @@ namespace FSO.SimAntics.Engine
 
             try
             {
-                while (Stack.Count > 0)
+                // R249: respect the scheduler and bound the stack — this loop previously
+                // ran `while (Stack.Count > 0) NextInstruction();` unguarded, so any
+                // primitive yielding (CONTINUE_NEXT_TICK — an idle/wait node in a brain
+                // tree) or a gosub cycle spun the caller forever on the game's main
+                // thread (the R249 window freeze). The pushed frame now resumes over
+                // subsequent ticks exactly like a normal thread stack, and a runaway
+                // gosub chain is failed at the native max-tree-depth bound.
+                ContinueExecution = true;
+                while (Stack.Count > 0 && Stack.Count < 64 && (ContinueExecution || IsCheck))
                 {
+                    if (ContinueExecution && TicksThisFrame++ > MAX_LOOP_COUNT)
+                    {
+                        TicksThisFrame = 0;
+                        throw new Exception("Thread entered infinite loop! ( >" + MAX_LOOP_COUNT + " primitives)");
+                    }
+                    ContinueExecution = false;
                     NextInstruction();
                 }
             }
@@ -299,6 +383,7 @@ namespace FSO.SimAntics.Engine
             }
 #endif
 
+            YieldedThisTick = false; //cleared every Tick; HandleResult sets it when a primitive defers
             if (BlockingState != null) BlockingState.WaitTime++;
             if (DialogCooldown > 0) DialogCooldown--;
 #if !THROW_SIMANTICS
@@ -377,6 +462,27 @@ namespace FSO.SimAntics.Engine
 
                     var simExcept = new VMSimanticsException(e.Message + StackTraceSimplify(e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(".cs")) ?? ""), context);
                     string exceptionStr = "A SimAntics Exception has occurred, and has been suppressed: \r\n\r\n" + simExcept.ToString() + "\r\n\r\nThe object will be reset. Please report this!";
+                    // IFF-literalism: mirror the literal suppressed-exception alert text to the gate log (throttled to every 600 ticks).
+                    // r157: the mirror now carries the failing ENTITY (callee id + owning IFF) and the one-lined VM
+                    // stack (routine:ip per frame) — the message alone cannot attribute a crash to its owner, which
+                    // the commute-tail diagnosis needed (the r156 soak showed 129 unattributed avatar exceptions).
+                    var vmStackOneLine = new System.Text.StringBuilder();
+                    try
+                    {
+                        vmStackOneLine.Append("callee=").Append(context.Callee?.ObjectID ?? 0)
+                            .Append(" iff=").Append(context.Callee?.Object?.Resource?.MainIff?.Filename ?? "?");
+                        var exStack = context.Thread?.Stack;
+                        if (exStack != null)
+                            for (int si = exStack.Count - 1; si >= 0 && si >= exStack.Count - 6; si--)
+                            {
+                                var sf = exStack[si];
+                                vmStackOneLine.Append(" > ");
+                                if (sf is VMRoutingFrame) vmStackOneLine.Append("route");
+                                else vmStackOneLine.Append((sf.Routine?.Rti?.Name ?? "?").TrimEnd('\0')).Append(':').Append(sf.InstructionPointer);
+                            }
+                    }
+                    catch { vmStackOneLine.Append(" (stack-read-failed)"); }
+                    System.Console.WriteLine("[SimAnticsExc] " + simExcept.Message + " {" + vmStackOneLine + "}");
                     VMDialogInfo info = new VMDialogInfo
                     {
                         Caller = null,
@@ -518,6 +624,18 @@ namespace FSO.SimAntics.Engine
             Push(childFrame);
         }
 
+        /// <summary>
+        /// R249: mirrors the routine resolution of ExecuteSubRoutine(ushort) so the
+        /// dispatcher can apply the native unknown-opcode law (false, never abort)
+        /// before committing to the gosub. Purely TS1.
+        /// </summary>
+        private bool TS1SubRoutineResolves(VMStackFrame frame, ushort opcode)
+        {
+            if (opcode >= 8192) return frame.ScopeResource?.SemiGlobal?.GetRoutine(opcode) != null;
+            if (opcode >= 4096) return frame.ScopeResource?.GetRoutine(opcode) != null;
+            return frame.Global?.Resource?.GetRoutine(opcode) != null;
+        }
+
         public VMPrimitiveExitCode ExecuteSubRoutine(VMStackFrame frame, ushort opcode, VMSubRoutineOperand operand)
         {
             VMRoutine bhav = null;
@@ -565,6 +683,24 @@ namespace FSO.SimAntics.Engine
 
             if (opcode >= 256)
             {
+                // R249: the native unknown-opcode law. The native dispatch accepts
+                // opcodes 3..0x2f (cXPerson::TryElement 0x10c3cc-0x10c3e8, jump table
+                // *(TOC-0x5904)) and 0..0x33 (cXObject::TryElement 0xf0444-0xf058);
+                // anything else falls into 0xf0c8c: alert via 0x590720 and return
+                // r26 = -1 — the primitive yields FALSE and the tree branches to the
+                // instruction's false pointer; the thread is NEVER aborted. The brain's
+                // 'try autonomy' (PersonGlobals 8233) instruction 0 (raw 41 01 01 07:
+                // opcode 0x141, unhandled natively) depends on this — control falls to
+                // instruction 7 (global 30 == free will == 1) and only there dispatches
+                // prim 3 FindBestAction at instruction 1. The port's gosub encoding
+                // (>= 256) still applies when the routine actually resolves; an
+                // unresolvable opcode in a TS1 tree is the native unknown (false), not
+                // an error-pop that kills the whole stack.
+                if (Context.VM.TS1 && !TS1SubRoutineResolves(frame, opcode))
+                {
+                    HandleResult(frame, instruction, VMPrimitiveExitCode.GOTO_FALSE);
+                    return;
+                }
                 ExecuteSubRoutine(frame, opcode, (VMSubRoutineOperand)instruction.Operand);
                 return;
             }
@@ -591,9 +727,11 @@ namespace FSO.SimAntics.Engine
                     ScheduleIdleStart = Context.VM.Scheduler.CurrentTickID;
                     Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
                     ContinueExecution = false;
+                    YieldedThisTick = true; //R249: the primitive deferred — visible to check evaluation
                     break;
                 case VMPrimitiveExitCode.CONTINUE_FUTURE_TICK:
                     ContinueExecution = false;
+                    YieldedThisTick = true;
                     break;
                 case VMPrimitiveExitCode.ERROR:
                     ContinueExecution = false;
@@ -617,6 +755,7 @@ namespace FSO.SimAntics.Engine
                         ScheduleIdleStart = Context.VM.Scheduler.CurrentTickID;
                         Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
                         ContinueExecution = false;
+                        YieldedThisTick = true;
                     }
                     break;
                 case VMPrimitiveExitCode.GOTO_FALSE_NEXT_TICK:
@@ -626,6 +765,7 @@ namespace FSO.SimAntics.Engine
                         ScheduleIdleStart = Context.VM.Scheduler.CurrentTickID;
                         Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
                         ContinueExecution = false;
+                        YieldedThisTick = true;
                     }
                     break;
                 case VMPrimitiveExitCode.CONTINUE:
@@ -878,7 +1018,7 @@ namespace FSO.SimAntics.Engine
             return Push(frame);
         }
 
-        public List<VMPieMenuInteraction> CheckTS1Action(VMQueuedAction action, bool auto)
+        public List<VMPieMenuInteraction> CheckTS1Action(VMQueuedAction action, bool auto, short[] args = null)
         {
             var result = new List<VMPieMenuInteraction>();
 
@@ -926,8 +1066,11 @@ namespace FSO.SimAntics.Engine
             }
             if (action.CheckRoutine != null)
             {
-                var args = new short[4];
-                if (auto) args[0] = 1;
+                // R249: callers may pass explicit tree params — the native test-tree call
+                // (0x106570) passes (auto, 0, TTAB action number, 0) with the action number
+                // riding params[2] (skeptic S10). Default behaviour is unchanged.
+                var treeArgs = args ?? new short[4];
+                if (auto) treeArgs[0] = 1;
                 if (EvaluateCheck(Context, Entity, new VMStackFrame()
                 {
                     Caller = Entity,
@@ -935,7 +1078,7 @@ namespace FSO.SimAntics.Engine
                     CodeOwner = action.CodeOwner,
                     StackObject = action.StackObject,
                     Routine = action.CheckRoutine,
-                    Args = args
+                    Args = treeArgs
                 }, null, result) != VMPrimitiveExitCode.RETURN_TRUE)
                 {
                     return null;

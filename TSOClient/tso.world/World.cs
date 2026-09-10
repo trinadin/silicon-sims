@@ -22,7 +22,7 @@ namespace FSO.LotView
     /// <summary>
     /// Represents world (I.E lots in the game.)
     /// </summary>
-    public class World : _3DScene
+    public partial class World : _3DScene
     {
         /// <summary>
         /// Creates a new World instance.
@@ -623,20 +623,33 @@ namespace FSO.LotView
         protected void BoundView()
         {
             if (!LimitScroll) return;
-            //bound the scroll so we can't see gray space.
-            float boundfactor = 0.5f;
-            switch (State.Zoom)
-            {
-                case WorldZoom.Near:
-                    boundfactor = 1.20f; break;
-                case WorldZoom.Medium:
-                    boundfactor = 1.05f; break;
-            }
-            boundfactor *= Blueprint?.Width ?? 64;
-            var off = 0.5f * (Blueprint?.Width ?? 64);
+            if (Blueprint == null) return;
+            if (State.CameraMode >= CameraRenderMode._3D) return;
+            // R147 (TS1 parity): cage the camera to the terrain. The original
+            // lot view never reveals beyond-terrain void — scrolling stops when
+            // the view reaches the lot terrain's bounds. Clamp the rotated view
+            // coordinates u = (x - y) (screen-X direction) and
+            // v = (x + y - width) (screen-Y direction) so the view rectangle
+            // stays inside the terrain diamond's bounding box. When the view is
+            // larger than the terrain, center on the lot. The previous fixed
+            // boundfactors (1.20/1.05/0.5 x lot size) never bound a TS1 lot and
+            // let the camera roam far off-lot into the void.
+            var width = Blueprint.Width;
+            var tW = State.WorldSpace.TilePxWidthHalf;
+            var tH = State.WorldSpace.TilePxHeightHalf;
+            var halfViewW = State.WorldSpace.WorldPxWidth / (2f * State.PreciseZoom);
+            var halfViewH = State.WorldSpace.WorldPxHeight / (2f * State.PreciseZoom);
+            var uMax = (width * tW - halfViewW) / tW; // tile units of (x - y)
+            var vMax = (width * tH - halfViewH) / tH; // tile units of (x + y - width)
+            if (uMax < 0f) uMax = 0f;
+            if (vMax < 0f) vMax = 0f;
             var tile = State.CenterTile;
-            tile = new Vector2(Math.Min(boundfactor + off, Math.Max(off - boundfactor, tile.X)), Math.Min(boundfactor + off, Math.Max(off - boundfactor, tile.Y)));
-            if (tile != State.CenterTile) State.CenterTile = tile;
+            var u = tile.X - tile.Y;
+            var v = tile.X + tile.Y - width;
+            if (u > uMax) u = uMax; else if (u < -uMax) u = -uMax;
+            if (v > vMax) v = vMax; else if (v < -vMax) v = -vMax;
+            var clamped = new Vector2((u + v + width) / 2f, (v - u + width) / 2f);
+            if (clamped != State.CenterTile) State.CenterTile = clamped;
         }
 
         /// <summary>

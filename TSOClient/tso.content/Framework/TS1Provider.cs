@@ -1,4 +1,4 @@
-﻿using FSO.Common.Content;
+using FSO.Common.Content;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -90,6 +90,16 @@ namespace FSO.Content.Framework
 
         public object Get(string item) {
             return FarProvider.Get(item) ?? FileProvider.Get(item);
+        }
+
+        public List<Far1ProviderEntry<object>> GetFarEntries(string ext)
+        {
+            return FarProvider.GetEntriesForExtension(ext);
+        }
+
+        public object GetFar(string filename)
+        {
+            return FarProvider.Get(filename);
         }
     }
 

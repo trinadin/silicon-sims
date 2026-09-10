@@ -1,4 +1,5 @@
 ﻿using FSO.Files.Utils;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FSO.Files.Formats.IFF.Chunks
@@ -10,6 +11,16 @@ namespace FSO.Files.Formats.IFF.Chunks
     {
         //no difference!
 
+        /// <summary>
+        /// Structured (name, float) pairs for this table, filled during Read.
+        /// The native FloatConstants resource (FCNS) is consumed by name, e.g. the
+        /// twelve autonomy constants in Global.iff FCNS id 2 that override the
+        /// compiled AutonomyConstants/MotiveConstants defaults at boot
+        /// (AutonomyConstantsClient::UpdateConstants 0x112750, r249-freewill-cfg).
+        /// </summary>
+        public List<string> ConstantNames = new List<string>();
+        public List<float> ConstantValues = new List<float>();
+
         public override void Read(IffFile iff, Stream stream)
         {
             using (var io = IoBuffer.FromStream(stream, ByteOrder.LITTLE_ENDIAN))
@@ -19,6 +30,8 @@ namespace FSO.Files.Formats.IFF.Chunks
                 string magic = io.ReadCString(4); //NSCF
                 var count = io.ReadInt32();
 
+                ConstantNames.Clear();
+                ConstantValues.Clear();
                 LanguageSets[0].Strings = new STRItem[count];
                 for (int i=0; i<count; i++)
                 {
@@ -44,6 +57,8 @@ namespace FSO.Files.Formats.IFF.Chunks
                         Value = name + ": " + value,
                         Comment = desc
                     };
+                    ConstantNames.Add(name);
+                    ConstantValues.Add(value);
                 }
             }
         }

@@ -54,6 +54,66 @@ namespace FSO.SimAntics
         public VM VM;
         public bool DisableRouteInvalidation;
 
+        // The original ObjectModule serializes this latch as an object ID.
+        // Resolve against the current VM so save/load cannot retain an old entity.
+        public VMEntity TutorialObject => VM?.TS1 == true
+            ? VM.GetObjectById(VM.TS1State.TutorialObjectID) : null;
+        public event Action<VMEntity, VMEntity> TutorialObjectChanged;
+
+        public bool SetTutorialObject(VMEntity owner)
+        {
+            if (VM?.TS1 != true) return false;
+            var previous = TutorialObject;
+            // Even acquiring twice with the same object fails in the original.
+            if (previous != null && owner != null) return false;
+            if (previous == owner)
+            {
+                // An imported ID can name an object that failed to load.
+                if (owner == null) VM.TS1State.TutorialObjectID = 0;
+                return true;
+            }
+            if (previous != null)
+            {
+                // ObjectDialog::Abort removes the outstanding dialog, rather
+                // than manufacturing a successful button response.
+                if (previous.Thread?.BlockingState is VMDialogResult)
+                    previous.Thread.BlockingState = null;
+                if (VM.GlobalBlockingDialog == previous)
+                {
+                    VM.GlobalBlockingDialog = null;
+                    if (VM.SpeedMultiplier < 0)
+                        VM.SpeedMultiplier = Math.Max(0, VM.LastSpeedMultiplier);
+                }
+            }
+            VM.TS1State.TutorialObjectID = owner?.ObjectID ?? 0;
+            TutorialObjectChanged?.Invoke(previous, owner);
+            return true;
+        }
+
+        /// <summary>
+        /// Port of the ESC handler case in cDDDSimsView::TSOnKeyDown (key 0x1b at
+        /// 0x217608 → call site 0x217ad0) plus CancelTutorial (0xad930; r247
+        /// decode.md §D, skeptic correction 3): run the tutorial owner's named
+        /// tree "cancel tutorial", then kill the owner by its object id
+        /// (ObjectModule::KillObject((s16)owner->+0xf0)). The tree always runs
+        /// before the kill; a missing tree runs nothing. The kill goes through
+        /// RemoveObjectInstance, which clears the TutorialObject latch and raises
+        /// TutorialObjectChanged — the tutorial highlighter hide is the client's
+        /// reaction to that event, mirroring the original's HideWindow call after
+        /// CancelTutorial returns. Must be called on the VM thread (same contract
+        /// as TutorialEventPoller.Poll).
+        /// </summary>
+        public bool RequestTutorialCancel()
+        {
+            if (VM?.TS1 != true) return false;
+            var owner = TutorialObject;
+            if (owner == null || owner.Dead) return false;
+            if (owner.TreeByName == null) owner.FetchTreeByName(VM.Context);
+            owner.ExecuteNamedEntryPoint("cancel tutorial", this, true, null, new short[4]);
+            owner.Delete(true, this);
+            return true;
+        }
+
         public HashSet<ushort> DeferredLightingRefresh = new HashSet<ushort>();
 
         public VMContext(LotView.World world) : this(world, null) { }
@@ -151,7 +211,12 @@ namespace FSO.SimAntics
                 OperandModel = typeof(VMBurnOperand)
             });
 
-            //Sims 1.0 tutorial
+            AddPrimitive(new VMPrimitiveRegistration(new VMTS1Tutorial())
+            {
+                Opcode = 10,
+                Name = "sims1_tutorial",
+                OperandModel = typeof(VMTS1TutorialOperand)
+            });
 
             AddPrimitive(new VMPrimitiveRegistration(new VMGetDistanceTo())
             {
@@ -301,7 +366,14 @@ namespace FSO.SimAntics
 
             //TODO: find 5 worst motives
 
-            //TODO: ui effect (used?)
+            //TS1 tutorial ui effect: TryElement 0x22 flashes lesson controls
+            //(decode.md r245 §6; tryelement-region.txt).
+            AddPrimitive(new VMPrimitiveRegistration(new VMUiEffect())
+            {
+                Opcode = 34,
+                Name = "ui_effect",
+                OperandModel = typeof(VMUiEffectOperand)
+            });
 
             AddPrimitive(new VMPrimitiveRegistration(new VMSpecialEffect())
             {
@@ -634,11 +706,35 @@ namespace FSO.SimAntics
             if (RoomInfo == null || room == 0) return;
             var info = RoomInfo[room];
             room = info.Room.LightBaseRoom;
-            info = RoomInfo[room];
+            var baseInfo = RoomInfo[room];
 
-            if (info.Light == null) info.Light = new RoomLighting();
-            else info.Light.RoomScore = 0;
-            var light = info.Light;
+            if (baseInfo.Light == null) baseInfo.Light = new RoomLighting();
+            else baseInfo.Light.RoomScore = 0;
+
+            // (R235) INSIDE rooms: the ORIGINAL ComputeRoom law (fully decoded from
+            // The Sims Complete PPC — tools/iff-dump/r228..r234 in the simitone repo):
+            //   half = tile56/2 (tile56 = wall-tile +1, open tile +2)
+            //   score = clamp( (min(half,60) - 30) + (room108*40 - 20)
+            //                 + ((room60/room80)*40 - 40) + (room84*10/clamp(half,10,45))
+            //                 + (room96 ? (room96/room100)*40 - 40 : 0), -100, +100)
+            // with room60 = 2x window-ish walls, room96/100 = window/door counts
+            // (style/pattern code sets {1,7,8,9} / {3,5,6,15,23}). DISCLOSED
+            // approximations (the R234 decision): room80-inside = the room's entity
+            // count (the R231 shadow-calibrated bridge) and room108 = 1.621f (the
+            // original's light-computed phase-1 BSS value is not statically
+            // recoverable; 2.05 is fit against the unambiguous House07 fixture (Bob &
+            // Betty's engine room 3, stored 50.222); the Goth fixture is unattributable
+            // (they load outside — see r234) against the two original-save
+            // fixtures 86.333/50.222 — the same disclosure class as the censor-mosaic
+            // palette and the Vita sway amplitude). OUTSIDE rooms keep the prior port
+            // model (the original's outside path seeds per-tile maps).
+            if (!baseInfo.Room.IsOutside && Architecture != null)
+            {
+                baseInfo.Light.RoomScore = ComputeRoomScoreOriginal(baseInfo);
+                return;
+            }
+            var light = baseInfo.Light;
+            info = baseInfo;
 
             var area = 0;
             var roomScore = 0;
@@ -660,6 +756,82 @@ namespace FSO.SimAntics
             roomScore -= (info.Room.IsOutside) ? 15 : 10;
 
             light.RoomScore = (short)Math.Min(100, Math.Max(-100, roomScore));
+        }
+
+        // (R235) the decoded ORIGINAL constants (RoomScoreConstants, r225): the
+        // wall-term bracket 60/-30, the object-term scale 40/-20, the ratio-term
+        // scale 40/-40, the clamp-divisor bounds 10/45, the t2 scale 10, and the
+        // final clamp +/-100. room108's true value is light-computed at runtime in
+        // the original (BSS) — the disclosed fixture-calibrated constant below.
+        private const float RoomScoreK_WallCap = 60f;
+        private const float RoomScoreK_WallBase = -30f;
+        private const float RoomScoreK_ObjScale = 40f;
+        private const float RoomScoreK_ObjBase = -20f;
+        private const float RoomScoreK_RatioScale = 40f;
+        private const float RoomScoreK_RatioBase = -40f;
+        private const float RoomScoreK_DivMin = 10f;
+        private const float RoomScoreK_DivMax = 45f;
+        private const float RoomScoreK_T2Scale = 10f;
+        private const float RoomScoreK_Room108 = 2.05f; // DISCLOSED approximation (see RefreshRoomScore)
+
+        // (R227/r134) the original's wall-segment style/pattern code sets:
+        // window-ish {1,7,8,9}, door-ish {3,5,6,15,23}.
+        private static readonly ushort[] RoomScoreWindowCodes = { 1, 7, 8, 9 };
+        private static readonly ushort[] RoomScoreDoorCodes = { 3, 5, 6, 15, 23 };
+
+        private short ComputeRoomScoreOriginal(VMRoomInfo baseInfo)
+        {
+            int tile56 = 0, windows = 0, doors = 0, entities = 0;
+            try
+            {
+                entities = baseInfo.Entities != null ? baseInfo.Entities.Count : 0;
+                var arch = Architecture;
+                int level = baseInfo.Room.Floor; // 0-based level for the Rooms[]/Walls[] arrays
+                if (level >= 0 && level < arch.Rooms.Length && level < arch.Walls.Length)
+                {
+                    var map = arch.Rooms[level].Map;
+                    var walls = arch.Walls[level];
+                    if (map != null && walls != null)
+                    {
+                        var want = baseInfo.Room.RoomID;
+                        for (int i = 0; i < map.Length; i++)
+                        {
+                            if ((map[i] & 0xFFFF) != want) continue;
+                            var segs = walls[i].Segments;
+                            if (segs == 0) { tile56 += 2; continue; }
+                            tile56 += 1;
+                            // (R235 calibration fix) classify by the wall PATTERNS only:
+                            // the port's TopLeftStyle 1 means "normal wall" — NOT the
+                            // original's window code 1. The shadow calibration (r231)
+                            // used pattern codes and reproduced both fixtures.
+                            var tlp = walls[i].TopLeftPattern;
+                            var trp = walls[i].TopRightPattern;
+                            foreach (var c in RoomScoreWindowCodes)
+                            {
+                                if (tlp == c) windows++;
+                                if (trp == c) windows++;
+                            }
+                            foreach (var c in RoomScoreDoorCodes)
+                            {
+                                if (tlp == c) doors++;
+                                if (trp == c) doors++;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            int half = tile56 / 2;
+            var wallTerm = Math.Min(half, RoomScoreK_WallCap) + RoomScoreK_WallBase;
+            var objTerm = RoomScoreK_Room108 * RoomScoreK_ObjScale + RoomScoreK_ObjBase;
+            var room60 = 2 * windows;
+            var room80 = entities; // the disclosed bridge (R231 hypC)
+            var t1 = room80 > 0 ? ((float)room60 / room80) * RoomScoreK_RatioScale + RoomScoreK_RatioBase : 0f;
+            var f8 = Math.Max(RoomScoreK_DivMin, Math.Min(RoomScoreK_DivMax, half));
+            var t2 = entities > 0 ? (entities * RoomScoreK_T2Scale) / f8 : 0f;
+            var t3 = (windows > 0 && doors > 0) ? ((float)windows / doors) * RoomScoreK_RatioScale + RoomScoreK_RatioBase : 0f;
+            var score = wallTerm + objTerm + t1 + t2 + t3;
+            return (short)Math.Min(100, Math.Max(-100, score));
         }
 
         public void ProcessLightingChanges()
@@ -828,12 +1000,22 @@ namespace FSO.SimAntics
                     light.OutsideLight = 100;
                 }
 
-                float areaRScale = Math.Max(1, area / 12f);
-                if (info.Room.IsOutside) areaRScale = 30;
-                roomScore = (short)(roomScore / areaRScale);
-                roomScore -= (info.Room.IsOutside) ? 15 : 10;
+                // (R235) INSIDE rooms take the decoded original ComputeRoom law
+                // (see RefreshRoomScore for the law + the disclosed approximations);
+                // OUTSIDE rooms keep the prior port model.
+                if (!info.Room.IsOutside && Architecture != null)
+                {
+                    light.RoomScore = ComputeRoomScoreOriginal(info);
+                }
+                else
+                {
+                    float areaRScale = Math.Max(1, area / 12f);
+                    if (info.Room.IsOutside) areaRScale = 30;
+                    roomScore = (short)(roomScore / areaRScale);
+                    roomScore -= (info.Room.IsOutside) ? 15 : 10;
 
-                light.RoomScore = (short)Math.Min(100, Math.Max(-100, roomScore));
+                    light.RoomScore = (short)Math.Min(100, Math.Max(-100, roomScore));
+                }
 
                 if (useWorld)
                 {
@@ -1533,6 +1715,7 @@ namespace FSO.SimAntics
 
         public void RemoveObjectInstance(VMEntity target)
         {
+            if (TutorialObject == target) SetTutorialObject(null);
             target.PrePositionChange(this);
             if (!target.GhostImage)
             {

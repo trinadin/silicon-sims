@@ -101,7 +101,10 @@ namespace FSO.SimAntics.Engine.Primitives
 
             if (animation == null)
             {
-                return VMPrimitiveExitCode.GOTO_TRUE_NEXT_TICK;
+                // CC-03: an unresolvable animation (e.g. a removed custom anim)
+                // must not wedge the interaction in a per-tick retry loop —
+                // complete the primitive so the BHAV continues.
+                return VMPrimitiveExitCode.GOTO_TRUE;
             }
 
             switch (operand.Mode)

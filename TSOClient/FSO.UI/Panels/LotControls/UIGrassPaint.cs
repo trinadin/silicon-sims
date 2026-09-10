@@ -128,11 +128,18 @@ namespace FSO.Client.UI.Panels.LotControls
                 if (cost != 0)
                 {
                     var disallowed = Parent.ActiveEntity != null && cost > Parent.Budget;
+                    // R203 dirt-tool law: every dirt-tool message rides the shared
+                    // tooltip window and never recolors (BLACK). An unaffordable drag
+                    // is STR# 149[5] 'Insufficient funds'; a normal drag is the
+                    // engine's plain "$N"/"-$N" cost readout. The old DarkRed cost
+                    // tooltip had no engine counterpart (tso.client copy carries the
+                    // same law; see tools/iff-dump/r203/r203-dirt-tool-law.md).
                     state.UIState.TooltipProperties.Show = true;
-                    state.UIState.TooltipProperties.Color = disallowed ? Color.DarkRed : Color.Black;
+                    state.UIState.TooltipProperties.Color = Color.Black;
                     state.UIState.TooltipProperties.Opacity = 1;
                     state.UIState.TooltipProperties.Position = new Vector2(MousePosition.X, MousePosition.Y);
-                    state.UIState.Tooltip = (cost < 0) ? ("-$" + (-cost)) : ("$" + cost);
+                    state.UIState.Tooltip = disallowed ? TerrainToolErrors.Text(TerrainToolErrors.CodeInsufficientFunds)
+                        : TerrainToolErrors.CostText(cost);
                     state.UIState.TooltipProperties.UpdateDead = false;
 
                     if (!cmds[0].Equals(LastCmd) && disallowed)

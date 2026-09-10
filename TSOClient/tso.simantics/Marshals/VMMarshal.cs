@@ -24,7 +24,9 @@ namespace FSO.SimAntics.Marshals
         // 36 - FSO Inventory Token (inventory ops async state has temp list)
         // 37 - Inventory Token Total
         // 38 - Direct Control Frame
-        public static readonly int LATEST_VERSION = 38;
+        // 39 - TS1 tutorial owner (TS1 platform payload only)
+        // 40 - Per-frame TS1 user-event prepare/dispatch phase (one byte on every frame)
+        public static readonly int LATEST_VERSION = 40;
 
         public int Version = LATEST_VERSION;
         public bool Compressed = true;

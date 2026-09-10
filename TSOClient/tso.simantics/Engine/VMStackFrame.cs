@@ -67,6 +67,9 @@ namespace FSO.SimAntics.Engine
          **/
         public bool ActionTree;
 
+        // Original StackElem+8 latch for primitive 35, independent per frame.
+        public byte TS1UserEventPhase;
+
         /** Used to get strings and other resources (for primitives) from the code owner, as it may not be the callee but instead a semiglobal or global. **/
         public GameIffResource ScopeResource {
             get
@@ -149,6 +152,7 @@ namespace FSO.SimAntics.Engine
                 Args = (short[])Args?.Clone(),
                 SpecialResult = SpecialResult,
                 ActionTree = ActionTree,
+                TS1UserEventPhase = TS1UserEventPhase,
             };
         }
 
@@ -177,6 +181,7 @@ namespace FSO.SimAntics.Engine
             Args = input.Args;
             SpecialResult = input.SpecialResult;
             ActionTree = input.ActionTree;
+            TS1UserEventPhase = input.TS1UserEventPhase;
         }
 
         public VMStackFrame(VMStackFrameMarshal input, VMContext context, VMThread thread)

@@ -1247,6 +1247,7 @@ namespace FSO.SimAntics.Engine
                 Locals = start.Locals,
                 Args = start.Args,
                 ActionTree = start.ActionTree,
+                TS1UserEventPhase = start.TS1UserEventPhase,
                 //above is stack frame stuff
 
                 Rooms = Rooms.ToArray(),

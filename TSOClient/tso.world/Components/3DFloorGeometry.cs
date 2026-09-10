@@ -249,6 +249,7 @@ namespace FSO.LotView.Components
         };
 
         private bool Alt;
+        internal bool AlternateDrawState { get => Alt; set => Alt = value; }
 
         private Vector4 GetParallaxMatrix(WorldState state)
         {

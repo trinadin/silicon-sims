@@ -1,3 +1,6 @@
+# Round-50 housekeeping: dotnet11 CLI home/nuget dirs materialized by publish inside subprojects
+.dotnet-cli/
+.nuget-packages/
 # Build and Release Folders
 [Dd]ebugPublic/
 [Rr]elease/

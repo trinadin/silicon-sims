@@ -211,7 +211,7 @@ namespace FSO.LotView
             }
             set
             {
-                if (_BuildMode != value) World.InvalidateFloor();
+                if (_BuildMode != value) World?.InvalidateFloor();
                 _BuildMode = value;
             }
         }
@@ -223,7 +223,7 @@ namespace FSO.LotView
         public sbyte Level
         {
             get { return _Level; }
-            set { _Level = value; World.InvalidateFloor(); }
+            set { _Level = value; World?.InvalidateFloor(); }
         }
 
         /// <summary>
@@ -309,27 +309,27 @@ namespace FSO.LotView
         {
             WorldSpace.Invalidate();
             InvalidateCamera();
-            World.InvalidateZoom();
+            World?.InvalidateZoom();
         }
 
         protected void InvalidatePreciseZoom()
         {
             InvalidateCamera();
-            World.InvalidatePreciseZoom();
+            World?.InvalidatePreciseZoom();
         }
 
         protected void InvalidateRotation()
         {
             WorldSpace.Invalidate();
             InvalidateCamera();
-            World.InvalidateRotation();
+            World?.InvalidateRotation();
         }
 
         protected void InvalidateScroll()
         {
             WorldSpace.Invalidate();
             InvalidateCamera();
-            World.InvalidateScroll();
+            World?.InvalidateScroll();
         }
 
         protected void InvalidateWorldSize()

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using FSO.Content;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FSO.SimAntics.Utils
@@ -12,7 +13,9 @@ namespace FSO.SimAntics.Utils
         private static Dictionary<VMCheatType, ExecuteHandler> predefinedBehavior = new Dictionary<VMCheatType, ExecuteHandler>()
             {
                 { VMCheatType.Budget, new ExecuteHandler(ExecuteBudget) },
-                { VMCheatType.MoveObjects, new ExecuteHandler(ExecuteMoveObjects) }
+                { VMCheatType.MoveObjects, new ExecuteHandler(ExecuteMoveObjects) },
+                { VMCheatType.Tutorial, new ExecuteHandler(ExecuteTutorial) },
+                { VMCheatType.RestoreTut, new ExecuteHandler(ExecuteRestoreTut) }
             };
 
         public enum VMCheatParameterType
@@ -46,7 +49,22 @@ namespace FSO.SimAntics.Utils
             /// For transaction cheats it adds the amount to the user's budget
             /// </summary>
             Budget = 1,
-            MoveObjects = 2
+            MoveObjects = 2,
+            /// <summary>
+            /// The Sims' `tutorial` cheat (id 0x3d, type 2; names "on"/"off").
+            /// Modifier true ("on"/1) clears the tutorial object spawner's inhibit
+            /// flag — spawning allowed; false ("off"/0) sets it — spawning
+            /// disabled. The original stores flag = (param == 0) (r247 skeptic
+            /// correction 1; decode.md §F had the direction backwards).
+            /// </summary>
+            Tutorial = 3,
+            /// <summary>
+            /// The Sims' `restore_tut` cheat (id 0x2d, type 0): performs the
+            /// ResetTutorial file action — stage the pristine Tutorial.FAM into
+            /// UserData/Import, fail-if-exists, read-only cleared. The confirm
+            /// dialog and save gate around it are the client dialog flow's job.
+            /// </summary>
+            RestoreTut = 4
         }
         /// <summary>
         /// The selected cheat to run
@@ -89,6 +107,31 @@ namespace FSO.SimAntics.Utils
         {
             vm.Context.Cheats.MoveObjects = context.Modifier;
             result = true;
+        }
+
+        private static void ExecuteTutorial(VM vm, VMAvatar caller, VMCheatContext context, out bool result)
+        {
+            //AppCheatCallback case 0x250128 computes flag = (param == 0) from
+            //the parsed parameter r24: "on" → 1, "off" → 0, numerics → their
+            //value, missing → 0 (skeptic correction 1). The client parse
+            //carries on/off in Modifier and numerics in Amount, so
+            //param = Modifier ? 1 : Amount reconstructs r24 exactly; spawn is
+            //inhibited iff param == 0 ("tutorial 5" therefore ALLOWS spawning
+            //just like "on" — the numeric law, not a bool NOT of Modifier).
+            var param = context.Modifier ? 1 : context.Amount;
+            VMTS1TutorialSpawner.InhibitSpawn = param == 0;
+            result = true;
+        }
+
+        private static void ExecuteRestoreTut(VM vm, VMAvatar caller, VMCheatContext context, out bool result)
+        {
+            //AppCheatCallback case 0x2d calls ResetTutorial directly; its dialog
+            //and save gate are the client dialog flow's responsibility here, so
+            //this runs only the file action. Same neighborhood guard as
+            //TutorialCompleted: no provider/runtime neighborhood, no action.
+            var nbhd = Content.Content.Get()?.Neighborhood;
+            if (nbhd?.Neighborhood == null) { result = false; return; }
+            result = nbhd.StageTutorialReset();
         }
 
         #region VMSerializable Members

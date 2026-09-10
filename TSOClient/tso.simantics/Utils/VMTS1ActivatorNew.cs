@@ -35,6 +35,7 @@ namespace FSO.SimAntics.Utils
         private int Size;
         private bool FlipRoad;
         private short HouseNumber;
+        private readonly Dictionary<short, string> StaleThreadContinuations = new Dictionary<short, string>();
 
         public VMTS1ActivatorNew(VM vm, short hn)
         {
@@ -80,11 +81,37 @@ namespace FSO.SimAntics.Utils
             }
 
             VMRoutine routine;
-            if (frame.RoutineID >= 8192) routine = (VMRoutine)res.SemiGlobal.GetRoutine(frame.RoutineID);
+            if (frame.RoutineID >= 8192) routine = (VMRoutine)res.SemiGlobal?.GetRoutine(frame.RoutineID);
             else if (frame.RoutineID >= 4096) routine = (VMRoutine)res.GetRoutine(frame.RoutineID);
             else routine = (VMRoutine)VM.Context.Globals.Resource.GetRoutine(frame.RoutineID);
 
             return routine;
+        }
+
+        private bool IsRestorableStack(VMStackFrameMarshal[] stack, out string invalidFrames)
+        {
+            var invalid = new List<string>();
+            foreach (var frame in stack ?? new VMStackFrameMarshal[0])
+            {
+                VMRoutine routine = null;
+                try
+                {
+                    routine = GetRoutine(frame);
+                }
+                catch
+                {
+                    // A missing code owner or semi-global is itself a stale continuation.
+                }
+
+                var instructions = routine?.Instructions;
+                if (instructions == null || instructions.Length == 0 || frame.InstructionPointer >= instructions.Length)
+                {
+                    invalid.Add(frame.RoutineID + ":" + frame.InstructionPointer + "@" + frame.CodeOwnerGUID.ToString("x8")
+                        + "(len=" + (instructions == null ? "missing" : instructions.Length.ToString()) + ")");
+                }
+            }
+            invalidFrames = string.Join(",", invalid);
+            return invalid.Count == 0;
         }
 
         private VMArchitectureMarshal ConvertArchitecture(IffFile iff, HOUS hous, int size)
@@ -243,6 +270,49 @@ namespace FSO.SimAntics.Utils
                 };
             }
 
+            // Expansion installs can replace an object's private/semiglobal BHAVs without
+            // rewriting the OBJM continuation stored in an older lot. Restored frames bypass
+            // VMThread.Push, so a missing routine or stale instruction pointer would otherwise
+            // fault later when an idle child unwinds. A call stack is atomic: if any frame is no
+            // longer executable, reject the entire continuation and reset this object once after
+            // VM.Load has restored all object/group references. This is deliberately TS1-import
+            // only; TSO/network snapshots retain their existing load contract.
+            if (!IsRestorableStack(thread.Stack, out var invalidFrames))
+            {
+                StaleThreadContinuations[myID] = invalidFrames;
+                thread.Stack = new VMStackFrameMarshal[0];
+                thread.Queue = new VMQueuedActionMarshal[0];
+                thread.ActiveQueueBlock = -1;
+                thread.ActionUID = 0;
+                thread.Interrupt = false;
+
+                if (inst.PersonData.HasValue)
+                {
+                    var personData = inst.PersonData.Value.PersonData;
+                    var priority = (int)VMPersonDataVariable.Priority;
+                    var nonInterruptable = (int)VMPersonDataVariable.NonInterruptable;
+                    if (personData != null && priority < personData.Length) personData[priority] = 0;
+                    if (personData != null && nonInterruptable < personData.Length) personData[nonInterruptable] = 0;
+                    var flags = (int)VMStackObjectVariable.Flags;
+                    if (inst.ObjectData != null && flags < inst.ObjectData.Length)
+                        inst.ObjectData[flags] &= (short)~VMEntityFlags.InteractionCanceled;
+                }
+                return thread;
+            }
+
+            // Original TreeStack::ReconStream stores the generic StackElem+8
+            // word. It is a user-event phase only at an actual opcode35 node;
+            // private tree IDs alone are not unique across code owners.
+            for (int i = 0; i < thread.Stack.Length; i++)
+            {
+                var phase = inst.Stack[i].PrimitiveState;
+                if (phase != 1 && phase != 2) continue;
+                var frame = thread.Stack[i];
+                var routine = GetRoutine(frame); // validated atomically above
+                if (routine.Instructions[frame.InstructionPointer].Opcode == 35)
+                    frame.TS1UserEventPhase = (byte)phase;
+            }
+
             if (inst.PersonData != null)
             {
                 // Restore interaction queue, use counts
@@ -360,7 +430,7 @@ namespace FSO.SimAntics.Utils
             };
         }
 
-        private VMAvatarMarshal ConvertAvatar(OBJMInstance inst)
+        private VMAvatarMarshal ConvertAvatar(OBJMInstance inst, NBRS neighbors)
         {
             var person = inst.PersonData.Value;
 
@@ -394,7 +464,7 @@ namespace FSO.SimAntics.Utils
 
                 BodyOutfit = person.Body == "" ? null : new VMOutfitReference($"{person.Body},{person.BodyTex}", false),
                 HeadOutfit = person.Head == "" ? null : new VMOutfitReference($"{person.Head},{person.HeadTex}", true),
-                SkinTone = (AppearanceType)person.PersonData[(int)VMPersonDataVariable.SkinColor]
+                SkinTone = DiskSkinToAppearance(person.PersonData[(int)VMPersonDataVariable.SkinColor], RecordVersionFor(neighbors, person))
             };
 
             for (int i = 0; i < 16; i++)
@@ -413,8 +483,79 @@ namespace FSO.SimAntics.Utils
             return ava;
         }
 
+        /// <summary>
+        /// R252: original-format skin remap (read boundary). The original TS1 disk
+        /// encoding for pd[60]/SkinColor is lgt=1, drk=2, med=3 (non-monotonic),
+        /// whereas AppearanceType is Light=0, Medium=1, Dark=2. The old code cast
+        /// the disk value straight to AppearanceType, so a light sim (disk 1)
+        /// rendered as Medium and a medium sim (disk 3) mapped to an out-of-range
+        /// enum. Which dialect is in person.PersonData[60] depends on the NBRS
+        /// record Version that produced the sim: Version 0x4 (original) stores
+        /// 1/2/3, Version 0xA (the port's legacy format) stored 0/1/2. The stored
+        /// array is NOT mutated, so a save round-trips the disk value verbatim.
+        /// </summary>
+        // R252 P0-2: public seam for the disk skin remap so the port's own
+        // recordfmt autotest (AutotestCASFlow in Simitone.Client) can assert the
+        // production map directly. Mirrors the public SkinToDisk write-side helper
+        // in SimitoneNeighbourGenerator.
+        public static AppearanceType DiskSkinToAppearance(short disk, int recordVersion)
+        {
+            if (recordVersion == 0x4)
+            {
+                // original encoding: 1=light, 2=dark, 3=medium
+                switch (disk)
+                {
+                    case 3: return AppearanceType.Medium;
+                    case 2: return AppearanceType.Dark;
+                    case 1: default: return AppearanceType.Light;
+                }
+            }
+            // legacy 0xA port encoding: 0=light, 1=medium, 2=dark
+            switch (disk)
+            {
+                case 2: return AppearanceType.Dark;
+                case 1: return AppearanceType.Medium;
+                case 0: default: return AppearanceType.Light;
+            }
+        }
+
+        /// <summary>
+        /// Resolve the NBRS record Version for an avatar's person data so the skin
+        /// dialect can be chosen. The record is looked up by the NeighborId stored
+        /// in the person data (VMPersonDataVariable.NeighborId = 31).
+        ///
+        /// NOTE (R252 P0): pd[31] is 0 on BOTH the shipped original saves AND the
+        /// port's own new-format records — the real NeighbourID is a separate NBRS
+        /// record field (Neighbour.NeighbourID), never written into the person-data
+        /// shorts by the CAS writer (SimitoneNeighbourGenerator.MakePersonData
+        /// leaves index 31 at its 0 default; only ImportAddNeighbor writes it, and
+        /// runtime spawn also sets it via VMAvatar). So the NeighbourByID lookup
+        /// below always misses (key 0 is never a live neighbour id, which start at
+        /// 1), and this method ALWAYS takes the fallback. The fallback must
+        /// therefore select the ORIGINAL 0x4 dialect — what both the shipped
+        /// original saves and everything R252 writes carry — NOT the legacy 0xA
+        /// dialect. Otherwise a light sim (disk 1) renders as Medium and a medium
+        /// sim (disk 3) as Light, because a legacy-dialect read would interpret
+        /// the original 1/2/3 disk values through the 0/1/2 map.
+        /// </summary>
+        private static int RecordVersionFor(NBRS neighbors, OBJMPerson person)
+        {
+            try
+            {
+                var neighborId = person.PersonData[(int)VMPersonDataVariable.NeighborId];
+                if (neighbors != null && neighbors.NeighbourByID.TryGetValue(neighborId, out var nb))
+                    return nb.Version;
+            }
+            catch { }
+            // R252 P0: pd[31] is always 0 on original + new records (see the note
+            // above), so this is effectively the only path taken and it MUST be the
+            // ORIGINAL dialect 0x4, not the legacy 0xA.
+            return 0x4;
+        }
+
         public Blueprint LoadFromIff(IffFile iff)
         {
+            StaleThreadContinuations.Clear();
             var content = Content.Content.Get();
             var simi = iff.Get<SIMI>(1);
             var hous = iff.Get<HOUS>(0);
@@ -471,6 +612,7 @@ namespace FSO.SimAntics.Utils
 
             var sims1 = new VMTS1LotState();
             sims1.SimulationInfo = simi;
+            sims1.CurrentHouse = HouseNumber;
             // vm is initialized at the end...
 
             fsov.PlatformState = sims1;
@@ -491,6 +633,7 @@ namespace FSO.SimAntics.Utils
             });
 
             var objectCount = objm.ObjectData.Count;
+            sims1.TutorialObjectID = objm.TutorialObjectID;
 
             var objects = new List<VMEntityMarshal>();
             var threads = new List<VMThreadMarshal>();
@@ -533,7 +676,7 @@ namespace FSO.SimAntics.Utils
 
                 if (inst.PersonData != null)
                 {
-                    var ava = ConvertAvatar(inst);
+                    var ava = ConvertAvatar(inst, neighbors);
 
                     ava.PlatformState = new VMTS1AvatarState();
 
@@ -685,6 +828,24 @@ namespace FSO.SimAntics.Utils
                     VM.Context.CreateObjectInstance(controller, LotTilePos.OUT_OF_WORLD, Direction.NORTH);
                 }
             }
+
+            // Match the recovery the interpreter previously reached only after throwing, but do
+            // it deterministically before the first simulation tick. Controller creation stays
+            // ahead of behavior recovery, matching the lifecycle that the old first-tick reset
+            // observed. Reset entry points run only for rejected saved continuations.
+            VM.TS1State.SanitizedThreadObjectIDs = StaleThreadContinuations.Keys.OrderBy(x => x).ToArray();
+            foreach (var stale in StaleThreadContinuations.OrderBy(x => x.Key))
+            {
+                var entity = VM.GetObjectById(stale.Key);
+                if (entity == null) continue;
+                entity.Reset(VM.Context);
+                if (entity is VMAvatar avatar) avatar.ClearMotiveChanges();
+                Console.WriteLine("[TS1StackRepair] object=" + stale.Key
+                    + " guid=" + entity.Object.GUID.ToString("x8")
+                    + " invalid=" + stale.Value + " recovery=reset");
+            }
+            if (StaleThreadContinuations.Count > 0)
+                Console.WriteLine("[TS1StackRepair] total=" + StaleThreadContinuations.Count);
 
             // Attempt to recover queue names.
             foreach (var ava in VM.Context.ObjectQueries.Avatars)

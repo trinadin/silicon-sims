@@ -92,7 +92,12 @@ namespace FSO.HIT.Events
             this.VM = vm;
             Station = "";
 
-            if (id == 5)
+            // AUD-03 (D2): in TS1 the load loop is a normal music mode —
+            // MusicModes[5]="KLOD" -> Music/Modes/Load/ (loadloop.wav) — while the
+            // TSO client resolves it through the stub Patch(0x4f85) FileID. Keep
+            // the TSO path byte-for-byte. The station loader only scans .xa/.mp3,
+            // so the TS1 wav is resolved straight into the SFX cache.
+            if (id == 5 && !Content.Content.Get().TS1)
             {
                 //loadloop. load direct sound...
                 var sfx = Content.Content.Get().Audio.GetSFX(new Patch(0x00004f85));
@@ -102,6 +107,24 @@ namespace FSO.HIT.Events
                 Instance.Volume = GetVolFactor();
                 Instance.IsLooped = true;
                 Instance.Play();
+            }
+            else if (id == 5)
+            {
+                var aud = Content.Content.Get().Audio;
+                if (aud.MusicModes.TryGetValue((int)id, out Station) &&
+                    aud.StationPaths.TryGetValue(Station, out var rel))
+                {
+                    var dir = Path.Combine(Content.Content.Get().TS1BasePath, CleanPath(rel));
+                    if (Directory.Exists(dir))
+                    {
+                        foreach (var wav in Directory.GetFiles(dir, "*.wav"))
+                        {
+                            // keep the stream alive: MonoGame may read lazily from it
+                            SFXCache[wav] = SoundEffect.FromStream(new MemoryStream(File.ReadAllBytes(wav)));
+                            Sounds.Add(wav);
+                        }
+                    }
+                }
             }
             else
             {

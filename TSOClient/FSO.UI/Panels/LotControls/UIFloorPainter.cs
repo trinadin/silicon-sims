@@ -6,6 +6,7 @@ using FSO.Common.Rendering.Framework.Model;
 using FSO.HIT;
 using FSO.SimAntics;
 using FSO.SimAntics.Model;
+using FSO.SimAntics.Utils;
 using FSO.SimAntics.NetPlay.Model.Commands;
 using FSO.Client.UI.Model;
 using FSO.UI.Panels.LotControls;
@@ -79,6 +80,22 @@ namespace FSO.Client.UI.Panels.LotControls
             }*/
             if (Modifiers.IsSet(UILotControlModifiers.SHIFT) && pattern < 65534)
             {
+                // R216: the fill seed obeys the same rim law as the rect (the
+                // engine's fill walks TileIsFloorable tiles only; the port
+                // clamps the seed — the walk itself stops at pattern changes,
+                // and the rim carries no placeable floors).
+                var seed = VMArchitectureTools.ClipFloorRectToFloorable(vm.Context.Architecture,
+                    new Rectangle(cursor.X, cursor.Y, 0, 0));
+                if (seed == null)
+                {
+                    if (Commands.Count > 0)
+                    {
+                        Commands.Clear();
+                        vm.Context.Architecture.SignalRedraw();
+                    }
+                    vm.Context.Architecture.Commands.Clear();
+                    return;
+                }
                 if (Commands.Count == 0 || Commands[0].Type != VMArchitectureCommandType.FLOOR_FILL)
                 {
                     Commands.Clear();
@@ -89,8 +106,8 @@ namespace FSO.Client.UI.Panels.LotControls
                         level = World.State.Level,
                         pattern = pattern,
                         style = 0,
-                        x = cursor.X,
-                        y = cursor.Y,
+                        x = seed.Value.X,
+                        y = seed.Value.Y,
                     });
                 }
             } else
@@ -106,7 +123,7 @@ namespace FSO.Client.UI.Panels.LotControls
                     StartX = cursor.X;
                     StartY = cursor.Y;
                 }
-                
+
                 int dir = 0;
                 Vector2 fract = new Vector2(tilePos.X - cursor.X, tilePos.Y - cursor.Y);
                 if (fract.X-fract.Y > 0)
@@ -121,6 +138,27 @@ namespace FSO.Client.UI.Panels.LotControls
                 int smallY = Math.Min(StartY, cursor.Y);
                 int bigX = Math.Max(StartX, cursor.X);
                 int bigY = Math.Max(StartY, cursor.Y);
+
+                // R216 engine law (cNewFloorTool::TileIsFloorable @0x17a6f0):
+                // the floor tool never covers the lot's outer tile ring. Clip
+                // the pending rect BEFORE the command exists so the preview
+                // and the placement agree; an entirely-rim rect shows nothing.
+                var floorable = VMArchitectureTools.ClipFloorRectToFloorable(vm.Context.Architecture,
+                    new Rectangle(smallX, smallY, bigX - smallX, bigY - smallY));
+                if (floorable == null)
+                {
+                    if (Commands.Count > 0)
+                    {
+                        Commands.Clear();
+                        vm.Context.Architecture.SignalRedraw();
+                    }
+                    vm.Context.Architecture.Commands.Clear();
+                    return;
+                }
+                smallX = floorable.Value.X;
+                smallY = floorable.Value.Y;
+                bigX = floorable.Value.X + floorable.Value.Width;
+                bigY = floorable.Value.Y + floorable.Value.Height;
 
                 var cmd = new VMArchitectureCommand
                 {

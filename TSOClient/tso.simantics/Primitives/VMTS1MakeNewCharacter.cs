@@ -1,4 +1,4 @@
-﻿using FSO.Content.TS1;
+using FSO.Content.TS1;
 using FSO.Files.Utils;
 using FSO.SimAntics.Engine;
 using FSO.SimAntics.Utils;
@@ -115,8 +115,12 @@ namespace FSO.SimAntics.Primitives
 
             info.Name = context.StackObject.Name;
             info.Bio = "";
-            for (int i = 0; i < 5; i++)
-                info.PersonalityPoints[i] = 500; //todo: randomize
+            // IFF 'init NPC' (8298) sets all six base personalities = 1000 (NPC canon, engine-driven
+            // in the original); mirror that for characters this primitive creates (was 500 placeholder,
+            // and only 5 of the 6 slots were written). Personality for playable sims is player-allocated
+            // via the original 'design a person' flow - separate PARITY gap (no personality UI in Simitone).
+            for (int i = 0; i < 6; i++)
+                info.PersonalityPoints[i] = 1000;
 
             var n = SimitoneNeighbourGenerator.CreateNeighbor(guid, info);
 

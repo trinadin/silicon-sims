@@ -33,6 +33,38 @@ namespace FSO.Common.Utils
         private static RenderTarget2D ActiveDepth;
         private static int StencilValue;
 
+        /// <summary>Temporarily render a secondary view, preserving PPX and GPU targets.</summary>
+        public static System.IDisposable PushTarget(RenderTarget2D color, RenderTarget2D depth, Color clearColor)
+        {
+            var scope = new TargetScope();
+            try { SetPPXTarget(color, depth, true, clearColor); }
+            catch { scope.Dispose(); throw; }
+            return scope;
+        }
+
+        private sealed class TargetScope : System.IDisposable
+        {
+            private readonly RenderTarget2D Color = ActiveColor;
+            private readonly RenderTarget2D Depth = ActiveDepth;
+            private readonly int Stencil = StencilValue;
+            private readonly RenderTargetBinding[] Targets = GD.GetRenderTargets();
+            private readonly Viewport View = GD.Viewport;
+            private readonly Rectangle Scissor = GD.ScissorRectangle;
+            private bool Disposed;
+
+            public void Dispose()
+            {
+                if (Disposed) return;
+                Disposed = true;
+                ActiveColor = Color;
+                ActiveDepth = Depth;
+                StencilValue = Stencil;
+                GD.SetRenderTargets(Targets);
+                GD.Viewport = View;
+                GD.ScissorRectangle = Scissor;
+            }
+        }
+
         public static void SetPPXTarget(RenderTarget2D color, RenderTarget2D depth, bool clear)
         {
             SetPPXTarget(color, depth, clear, ColorExtensions.TransparentBlack);
@@ -130,6 +162,12 @@ namespace FSO.Common.Utils
                 gd.SetRenderTarget(depth);
                 proc(true);
                 effect.Parameters["depthOutMode"].SetValue(false);
+                //restore the color target, like the SoftwareDepth branch above.
+                //without this, every draw after a non-MRT sprite segment lands in
+                //the DEPTH target — the avatar mesh pass (WorldEntities.DrawAvatars)
+                //drew the sims into the depth buffer, so avatars were invisible
+                //in the composed frame while everything sprite-based rendered fine.
+                gd.SetRenderTarget(color);
             }
             else
             {

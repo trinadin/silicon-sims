@@ -64,6 +64,10 @@ namespace FSO.SimAntics.NetPlay.Model.Commands
                 }
 
                 vm.TS1State.VerifyFamily(vm);
+
+                //The LoadHouse tail (native runs it after PostLoad): evaluate the
+                //tutorial object spawner's five guards and spawn out-of-world.
+                VMTS1TutorialSpawner.RunHouseLoadSpawn(vm);
             }
             else
             {

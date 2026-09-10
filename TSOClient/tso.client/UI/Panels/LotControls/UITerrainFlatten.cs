@@ -156,11 +156,17 @@ namespace FSO.Client.UI.Panels.LotControls
                 if (cost != 0)
                 {
                     var disallowed = Parent.ActiveEntity != null && cost > Parent.ActiveEntity.TSOState.Budget.Value;
+                    // R203 dirt-tool law: every dirt-tool message rides the shared
+                    // tooltip window and never recolors (BLACK). An unaffordable drag
+                    // is STR# 149[5] 'Insufficient funds'; a normal drag is the
+                    // engine's plain "$N"/"-$N" cost readout. The old DarkRed cost
+                    // tooltip had no engine counterpart.
                     state.UIState.TooltipProperties.Show = true;
-                    state.UIState.TooltipProperties.Color = disallowed ? Color.DarkRed : Color.Black;
+                    state.UIState.TooltipProperties.Color = Color.Black;
                     state.UIState.TooltipProperties.Opacity = 1;
                     state.UIState.TooltipProperties.Position = new Vector2(state.MouseState.X, state.MouseState.Y);
-                    state.UIState.Tooltip = (cost < 0) ? ("-$" + (-cost)) : ("$" + cost);
+                    state.UIState.Tooltip = disallowed ? TerrainToolErrors.Text(TerrainToolErrors.CodeInsufficientFunds)
+                        : TerrainToolErrors.CostText(cost);
                     state.UIState.TooltipProperties.UpdateDead = false;
 
                     if (!cmds[0].Equals(LastCmd) && disallowed)
@@ -173,12 +179,16 @@ namespace FSO.Client.UI.Panels.LotControls
                     var failed = vm.Context.Architecture.LastFailReason;
                     if (failed > 0)
                     {
-                        if (failed == 1)
-                            ShowErrorAtMouse(state, VMPlacementError.CantPlaceOnSlope, state.MouseState.Position);
-                        else if (failed == 2)
-                            ShowErrorAtMouse(state, VMPlacementError.LocationOutOfBounds, state.MouseState.Position);
-                        else
-                            ShowErrorAtMouse(state, VMPlacementError.LocationOutOfBounds, state.MouseState.Position);
+                        // R203: a failed terrain modification is STR# 149[0] 'Tile
+                        // cannot be modified' on the shared BLACK tooltip (engine
+                        // code 1 — the MayModifyTerrain bounds/roof/object paths);
+                        // the VMPlacementError popups were a port invention.
+                        state.UIState.TooltipProperties.Show = true;
+                        state.UIState.TooltipProperties.Color = Color.Black;
+                        state.UIState.TooltipProperties.Opacity = 1;
+                        state.UIState.TooltipProperties.Position = new Vector2(state.MouseState.X, state.MouseState.Y);
+                        state.UIState.Tooltip = TerrainToolErrors.Text(TerrainToolErrors.CodeTileCannotBeModified);
+                        state.UIState.TooltipProperties.UpdateDead = false;
                         vm.Context.Architecture.SignalTerrainRedraw();
                     }
                     else

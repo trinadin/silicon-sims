@@ -11,6 +11,27 @@ namespace FSO.SimAntics.Engine
 {
     public static class VMDialogHandler
     {
+        private sealed class DialogIconSelection
+        {
+            public bool WasSelected;
+            public VMEntity Entity;
+            public short NeighborID = -1;
+
+            public void SelectStackObject(VMStackFrame context)
+            {
+                WasSelected = true;
+                Entity = context.StackObject;
+                NeighborID = -1;
+            }
+
+            public void SelectNeighbor(VMStackFrame context)
+            {
+                WasSelected = true;
+                Entity = null;
+                NeighborID = context.StackObjectID;
+            }
+        }
+
         //should use a Trie for this in future, for performance reasons
         private static string[] valid = {
             "Object", "Me", "TempXL:", "Temp:", "$", "Attribute:", "DynamicStringLocal:", "Local:", "TimeLocal:", "NameLocal:",
@@ -20,22 +41,80 @@ namespace FSO.SimAntics.Engine
 
         public static void ShowDialog(VMStackFrame context, VMDialogOperand operand, STR source)
         {
-            VMDialogInfo info = new VMDialogInfo
+            context.VM.SignalDialog(BuildDialogInfo(context, operand, source));
+        }
+
+        /// <summary>
+        /// Expand an ObjectDialog and recover its image-selector provenance
+        /// without publishing it to UI listeners. Keeping construction pure
+        /// makes the engine parse order testable and keeps ShowDialog's signal
+        /// side effect in one place.
+        /// </summary>
+        public static VMDialogInfo BuildDialogInfo(VMStackFrame context,
+            VMDialogOperand operand, STR source)
+        {
+            // ObjectDialog parses its response labels, title and message in this
+            // exact order. In automatic-icon mode the last successfully parsed
+            // $Object/$Neighbor token selects the image; $Me does not. If no
+            // token selects one, the signed Stack Object ID is the fallback.
+            var tracker = operand.IconMode == VMDialogIconMode.Automatic
+                ? new DialogIconSelection()
+                : null;
+            var yes = (operand.YesStringID == 0) ? null : ParseDialogString(context,
+                source.GetString(operand.YesStringID - 1), source, 0, tracker);
+            var no = (operand.NoStringID == 0) ? null : ParseDialogString(context,
+                source.GetString(operand.NoStringID - 1), source, 0, tracker);
+            var cancel = (operand.CancelStringID == 0) ? null : ParseDialogString(context,
+                source.GetString(operand.CancelStringID - 1), source, 0, tracker);
+            var title = (operand.TitleStringID == 0) ? "" : ParseDialogString(context,
+                source.GetString(operand.TitleStringID - 1), source, 0, tracker);
+            var message = ParseDialogString(context,
+                source.GetString(Math.Max(0, operand.MessageStringID - 1)), source, 0, tracker);
+            var iconName = "";
+            if (operand.IconMode == VMDialogIconMode.Named
+                && operand.IconNameStringID != 0)
+            {
+                // Only named mode interprets operand byte 1 as a 1-based STR
+                // index. Indexed mode uses that same byte as BMP_(5000+n), and
+                // missing named entries follow the original blank-image path.
+                var rawIconName = source.GetString(operand.IconNameStringID - 1);
+                if (rawIconName != null)
+                    iconName = ParseDialogString(context, rawIconName, source);
+            }
+
+            VMEntity icon = null;
+            short iconNeighborID = -1;
+            if (operand.IconMode == VMDialogIconMode.Automatic)
+            {
+                if (tracker != null && tracker.WasSelected)
+                {
+                    icon = tracker.Entity;
+                    iconNeighborID = tracker.NeighborID;
+                }
+                else icon = context.StackObject;
+            }
+            else if (operand.IconMode == VMDialogIconMode.Neighbor)
+            {
+                iconNeighborID = context.StackObjectID;
+            }
+
+            return new VMDialogInfo
             {
                 Block = (operand.Flags & VMDialogFlags.Continue) == 0,
                 Caller = context.Caller,
-                Icon = context.StackObject,
+                Icon = icon,
+                IconResource = context.ScopeResource,
+                IconNeighborID = iconNeighborID,
                 Operand = operand,
-                Message = ParseDialogString(context, source.GetString(Math.Max(0, operand.MessageStringID - 1)), source),
-                Title = (operand.TitleStringID == 0) ? "" : ParseDialogString(context, source.GetString(operand.TitleStringID - 1), source),
-                IconName = (operand.IconNameStringID == 0) ? "" : ParseDialogString(context, source.GetString(operand.IconNameStringID - 1), source),
+                Message = message,
+                Title = title,
+                IconName = iconName,
 
-                Yes = (operand.YesStringID == 0) ? null : ParseDialogString(context, source.GetString(operand.YesStringID - 1), source),
-                No = (operand.NoStringID == 0) ? null : ParseDialogString(context, source.GetString(operand.NoStringID - 1), source),
-                Cancel = (operand.CancelStringID == 0) ? null : ParseDialogString(context, source.GetString(operand.CancelStringID - 1), source),
+                Yes = yes,
+                No = no,
+                Cancel = cancel,
                 DialogID = (context.CodeOwner.GUID << 32) | ((ulong)context.Routine.ID << 16) | context.InstructionPointer
             };
-            context.VM.SignalDialog(info);
         }
 
         private static bool CommandSubstrValid(string command)
@@ -53,6 +132,12 @@ namespace FSO.SimAntics.Engine
         }
 
         public static string ParseDialogString(VMStackFrame context, string input, STR source, int depth)
+        {
+            return ParseDialogString(context, input, source, depth, null);
+        }
+
+        private static string ParseDialogString(VMStackFrame context, string input, STR source,
+            int depth, DialogIconSelection iconSelection)
         {
             if (depth > 10) return input;
             int state = 0;
@@ -137,6 +222,8 @@ namespace FSO.SimAntics.Engine
                             switch (cmdString)
                             {
                                 case "Object":
+                                    if (iconSelection != null) iconSelection.SelectStackObject(context);
+                                    goto case "DynamicObjectName";
                                 case "DynamicObjectName":
                                     //hack: if stack object doesn't exist and should contain owner's id,
                                     //try output the callee's owner id instead for tip jar.
@@ -210,7 +297,8 @@ namespace FSO.SimAntics.Engine
                                     if (res != null)
                                     {
                                         var str = res.GetString(index);
-                                        output.Append(ParseDialogString(context, str, res, depth++)); // recursive command parsing!
+                                        output.Append(ParseDialogString(context, str, res,
+                                            depth + 1, iconSelection)); // recursive command parsing!
                                         // this is needed for the crafting table.
                                         // though it is also, completely insane?
                                     }
@@ -250,6 +338,7 @@ namespace FSO.SimAntics.Engine
                                 case "Neighbor":
                                     //neighbour in stack object id
                                     if (!context.VM.TS1) break;
+                                    if (iconSelection != null) iconSelection.SelectNeighbor(context);
                                     var guid = Content.Content.Get().Neighborhood.GetNeighborByID(context.StackObjectID)?.GUID ?? 0;
                                     var gobj = Content.Content.Get().WorldObjects.Get(guid);
                                     if (gobj == null) output.Append("Unknown");

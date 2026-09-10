@@ -117,6 +117,9 @@ namespace FSO.Client.UI.Framework
 
                 if (VFont != null)
                 {
+                    // R119: let the font implementation re-select itself for the
+                    // requested size (base MSDFFont returns this, unchanged).
+                    VFont = VFont.SelectForSize(m_pxSize);
                     Scale = (m_pxSize * VFont.VectorScale) / 11.5f;
                     BaselineOffset = m_pxSize + 5;
                 }

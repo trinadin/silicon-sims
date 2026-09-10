@@ -370,6 +370,42 @@ namespace FSO.LotView.Components
             device.DepthStencilState = DepthStencilState.Default;
         }
 
+        internal ParticleComponent CreateIndependentView()
+        {
+            var view = (ParticleComponent)MemberwiseClone();
+            view.Vertices = null;
+            view.Indices = null;
+            view.Indoors = null;
+            view.IndoorsDat = null;
+            if (Mode < ParticleType.GENERIC_BOX) view.Tex = null;
+            return view;
+        }
+
+        internal void SynchronizeIndependentView(ParticleComponent source)
+        {
+            if (Mode != source.Mode || Resource != source.Resource
+                || (Mode >= ParticleType.GENERIC_BOX && Volume != source.Volume)
+                || WeatherIntensity != source.WeatherIntensity)
+            {
+                Dispose();
+                Indoors = null;
+                IndoorsDat = null;
+                if (Mode < ParticleType.GENERIC_BOX) Tex = null;
+                Volume = source.Volume;
+            }
+            Mode = source.Mode;
+            Resource = source.Resource;
+            Time = source.Time;
+            TimeRate = source.TimeRate;
+            StopTime = source.StopTime;
+            FadeProgress = source.FadeProgress;
+            WeatherIntensity = source.WeatherIntensity;
+            Level = source.Level;
+            Owner = source.Owner;
+            OwnerWorld = source.OwnerWorld;
+            if (Mode >= ParticleType.GENERIC_BOX) Tex = source.Tex;
+        }
+
         public void Dispose()
         {
             Vertices?.Dispose();

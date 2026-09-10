@@ -55,6 +55,7 @@ namespace FSO.LotView.Components
         private GrassEffect Effect;
         public bool DrawGrid = false;
         public bool TerrainDirty = true;
+        internal int GeometryRevision;
         private Blueprint Bp;
         public bool _3D = false;
 
@@ -205,6 +206,7 @@ namespace FSO.LotView.Components
                 return;
             }
             TerrainDirty = false;
+            GeometryRevision++;
             if (VertexBuffer != null)
             {
                 IndexBuffer.Dispose();
@@ -848,6 +850,21 @@ namespace FSO.LotView.Components
                 }
                 device.DepthStencilState = depth;
             }
+        }
+
+        // An independent view owns its terrain buffers. The lot description and
+        // terrain samples remain shared; no simulation or world is duplicated.
+        internal TerrainComponent CreateIndependentView()
+        {
+            var view = (TerrainComponent)MemberwiseClone();
+            view.IndexBuffer = null;
+            view.VertexBuffer = null;
+            view.GridIndexBuffer = null;
+            view.TGridIndexBuffer = null;
+            view.GridTex = null;
+            view.TerrainDirty = true;
+            view.DrawGrid = false;
+            return view;
         }
 
         public void Dispose()

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using FSO.SimAntics.Engine;
 using FSO.Files.Utils;
@@ -69,19 +69,19 @@ namespace FSO.SimAntics.Primitives
                     {
                         case 0: //from me to stack object
                             myNID = ((VMAvatar)context.Caller).GetPersonData(Model.VMPersonDataVariable.NeighborId);
-                            targNID = context.StackObjectID;
+                            targNID = UseNeighborLog.UseNeighborNid(context.StackObject, context.StackObjectID);
                             break;
                         case 1: //from stack object to me
-                            myNID = context.StackObjectID;
+                            myNID = UseNeighborLog.UseNeighborNid(context.StackObject, context.StackObjectID);
                             targNID = ((VMAvatar)context.Caller).GetPersonData(Model.VMPersonDataVariable.NeighborId);
                             break;
                         case 2: //from stack object to object in local/stack param
-                            myNID = context.StackObjectID;
+                            myNID = UseNeighborLog.UseNeighborNid(context.StackObject, context.StackObjectID);
                             targNID = (operand is VMOldRelationshipOperand) ? context.Args[0] : context.Locals[operand.Local];
                             break;
                         case 3: //from object in local/stack param to stack object
                             myNID = (operand is VMOldRelationshipOperand) ? context.Args[0] : context.Locals[operand.Local];
-                            targNID = context.StackObjectID;
+                            targNID = UseNeighborLog.UseNeighborNid(context.StackObject, context.StackObjectID);
                             break;
                         default:
                             throw new VMSimanticsException("Invalid relationship type!", context);
@@ -89,6 +89,7 @@ namespace FSO.SimAntics.Primitives
                 }
 
                 var rels = Content.Content.Get().Neighborhood.GetNeighborByID(myNID).Relationships;
+                if (context.VM.TS1) UseNeighborLog.Observe(context, operand, myNID, targNID, rels);
                 if (!rels.ContainsKey(targNID))
                 {
                     if (operand.FailIfTooSmall) return VMPrimitiveExitCode.GOTO_FALSE;

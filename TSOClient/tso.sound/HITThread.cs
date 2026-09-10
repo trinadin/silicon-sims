@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using FSO.Files.HIT;
@@ -92,11 +92,15 @@ namespace FSO.HIT
         public override void Dispose()
         {
             InterruptWaiter?.Unblock();
+            VM?.DuckRemove(this); // AUD-06: kill/dispose deregisters the duck registry
+            IsDisposed = true;
             foreach (var note in Notes) note.instance.Dispose();
         }
 
         public override bool Tick() //true if continue, false if kill
         {
+            if (IsDisposed) return false; // reap externally disposed threads
+
             if (Paused) return true;
             TickN++;
             if (InterruptBlocker != null) return !Dead;
@@ -200,6 +204,11 @@ namespace FSO.HIT
             Registers = new int[16];
             Registers[1] = 12; //gender (offset into object var table)
             LocalVar = new int[54];
+            // AUD-05/AUD-04 pitch law: reg 21 is the integer pitch, native default
+            // 3600 = neutral (rate 22050). The shipped corpus never writes pitch
+            // (AUD-04), so defaulting to 3600 keeps all unpitched tracks neutral
+            // instead of the port's implicit 0 (which would clamp to -1 octave).
+            LocalVar[21 - 0x10] = 3600; //pitch register (reg 21 -> LocalVar[5])
             ObjectVar = new int[29];
 
             Notes = new List<HITNoteEntry>();
@@ -214,6 +223,18 @@ namespace FSO.HIT
         {
             this.VM = VM;
             ResGroup = Src;
+            // AUD-05: this construction path (one-shot "simple mode" thread) must
+            // initialise the same register/var arrays as the primary constructor, or
+            // NoteOn()'s GetPitch() -> ReadVar(21) -> LocalVar[5] NREs on null (seen
+            // as a startup NullReferenceException in the integrated build). Mirror the
+            // primary constructor's init + reg-21 pitch default (3600 = neutral).
+            Registers = new int[16];
+            Registers[1] = 12; //gender (offset into object var table)
+            LocalVar = new int[54];
+            LocalVar[21 - 0x10] = 3600; //pitch register (reg 21 -> LocalVar[5])
+            ObjectVar = new int[29];
+            Stack = new Stack<int>();
+
             Owners = new List<int>();
             Notes = new List<HITNoteEntry>();
             NotesByChannel = new Dictionary<SoundEffectInstance, HITNoteEntry>();
@@ -285,6 +306,7 @@ namespace FSO.HIT
                 HasSetLoop = Loop;
                 LoopDefined = true;
             }
+            DuckPri = (int)DuckPriority; // AUD-06: suffered duckpri (reg 25) from the [Track] kDuckPri
         }
 
         /// <summary>
@@ -298,6 +320,20 @@ namespace FSO.HIT
         }
 
         /// <summary>
+        /// AUD-05/AUD-04 native pitch law. Reg 21 = integer pitch (3600 neutral,
+        /// 100 per semitone, rate = 22050 · 2^((pitch−3600)/1200)). MonoGame's
+        /// SoundEffectInstance.Pitch is a ratio exponent from −1 (half rate) to
+        /// +1 (double rate): Pitch = (pitch−3600)/1200, clamped to [−1,1].
+        /// </summary>
+        public float GetPitch()
+        {
+            float pitch = (ReadVar(21) - 3600) / 1200f;
+            if (pitch < -1f) pitch = -1f;
+            else if (pitch > 1f) pitch = 1f;
+            return pitch;
+        }
+
+        /// <summary>
         /// Plays the current patch.
         /// </summary>
         /// <returns>-1 if unsuccessful, or the id of the note played.</returns>
@@ -307,19 +343,12 @@ namespace FSO.HIT
 
             if (sound != null)
             {
-                switch (sound.Name)
-                {
-                    case "FX":
-                        VolGroup = Model.HITVolumeGroup.FX; break;
-                    case "MUSIC":
-                        VolGroup = Model.HITVolumeGroup.MUSIC; break;
-                    case "VOX":
-                        VolGroup = Model.HITVolumeGroup.VOX; break;
-                }
-                RecalculateVolume();   
+                ResolveVolumeGroup(sound);
+                RecalculateVolume();
 
                 var instance = sound.CreateInstance();
                 instance.Volume = Volume;
+                instance.Pitch = GetPitch(); //AUD-05: native reg-21 pitch law
                 if (Emitter3D == null) instance.Pan = Pan;
                 else Apply3D(instance);
                 //instance.Play();
@@ -348,19 +377,12 @@ namespace FSO.HIT
 
             if (sound != null)
             {
-                switch (sound.Name)
-                {
-                    case "FX":
-                        VolGroup = Model.HITVolumeGroup.FX; break;
-                    case "MUSIC":
-                        VolGroup = Model.HITVolumeGroup.MUSIC; break;
-                    case "VOX":
-                        VolGroup = Model.HITVolumeGroup.VOX; break;
-                }
+                ResolveVolumeGroup(sound);
                 RecalculateVolume();
 
                 var instance = sound.CreateInstance();
                 instance.Volume = Volume;
+                instance.Pitch = GetPitch(); //AUD-05: native reg-21 pitch law
                 if (Emitter3D == null) instance.Pan = Pan;
                 else Apply3D(instance);
                 instance.IsLooped = true;
@@ -377,6 +399,38 @@ namespace FSO.HIT
                 Debug.WriteLine("HITThread: Couldn't find sound");
             }
             return -1;
+        }
+
+        /// <summary>
+        /// AUD-03 (D1): the original routes a note by the track's DECLARED control
+        /// group (SimsSound.hot [Track] column 6, kGroupSFX=1/kGroupMusic=2/
+        /// kGroupVox=3 — verified in the original binary at cTrackPlayer::
+        /// UpdateVolPan 0x30F900), not by the sample content sniff. Tracks without
+        /// a declared group (0/undefined) keep the historic content-sniff routing
+        /// so TSO content is unaffected.
+        /// </summary>
+        private void ResolveVolumeGroup(SoundEffect sound)
+        {
+            switch (ActiveTrack?.ControlGroup ?? 0)
+            {
+                case HITControlGroups.kGroupVox:
+                    VolGroup = Model.HITVolumeGroup.VOX; break;
+                case HITControlGroups.kGroupMusic:
+                    VolGroup = Model.HITVolumeGroup.MUSIC; break;
+                case HITControlGroups.kGroupSFX:
+                    VolGroup = Model.HITVolumeGroup.FX; break;
+                default:
+                    switch (sound.Name)
+                    {
+                        case "FX":
+                            VolGroup = Model.HITVolumeGroup.FX; break;
+                        case "MUSIC":
+                            VolGroup = Model.HITVolumeGroup.MUSIC; break;
+                        case "VOX":
+                            VolGroup = Model.HITVolumeGroup.VOX; break;
+                    }
+                    break;
+            }
         }
 
         /// <summary>
@@ -432,6 +486,7 @@ namespace FSO.HIT
             }
             else if (location < 0x46)
             {
+                if (location == 0x19) DuckPri = value; // AUD-06: duckpri (reg 25) VM write
                 LocalVarSet(location, value); //invoke any special behaviours, like track switch for setting patch
                 LocalVar[location - 0x10] = value;
             }
@@ -441,7 +496,17 @@ namespace FSO.HIT
             }
             else if (location < 0x88)
             {
-                VM.WriteGlobal(location - 0x64, value);
+                if (location == 0x7b)
+                {
+                    // AUD-06: `set main_duckpri, X` — announce X (X!=0) or
+                    // deregister (X==0); republish max + respray all live volumes.
+                    MainDuckPri = value;
+                    VM?.DuckAnnounce(this, value);
+                }
+                else
+                {
+                    VM.WriteGlobal(location - 0x64, value);
+                }
             }
             else if (location < 0x271a)
             {
@@ -461,6 +526,10 @@ namespace FSO.HIT
             } 
             else if (location < 0x46) 
             {
+                // AUD-07 integration hardening: a thread can reach NoteOn (which now
+                // reads reg 21 for the pitch law) before its track allocated LocalVar;
+                // report 0 like the other unmapped ranges instead of NRE-ing.
+                if (LocalVar == null) return 0;
                 return LocalVar[location - 0x10];
             }
             else if (location < 0x64)

@@ -138,8 +138,17 @@ namespace FSO.SimAntics.Engine.Utils
                     return Content.Content.Get().Jobs.GetJobData((ushort)context.Thread.TempRegisters[0], context.Thread.TempRegisters[1], data);
 
                 case VMVariableScope.NeighborhoodData: //34
-                    return 0; //tutorial values only
-                    throw new VMSimanticsException("Should not be used, but if this shows implement an empty shell to return ideal values.", context);
+                    if (!context.VM.TS1) throw new VMSimanticsException("Only valid in TS1.", context);
+                    // The original Complete Collection InterpValue case accepts words 1..15
+                    // and reads the corresponding signed word from the loaded NGBH record.
+                    // Word 2 is also consumed by expansion visitor filters, so returning the
+                    // old tutorial-only zero changes which households are eligible to visit.
+                    if (data <= 0 || data >= 16)
+                        throw new VMSimanticsException("Neighborhood data out of bounds.", context);
+                    var neighborhoodData = Content.Content.Get()?.Neighborhood?.Neighborhood?.NeighborhoodData;
+                    if (neighborhoodData == null || neighborhoodData.Length < 16)
+                        throw new VMSimanticsException("Neighborhood data is unavailable.", context);
+                    return neighborhoodData[data];
 
                 case VMVariableScope.StackObjectFunction: //35
                     return (short)context.StackObject.EntryPoints[data].ActionFunction;

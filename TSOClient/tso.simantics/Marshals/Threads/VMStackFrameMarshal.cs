@@ -16,6 +16,7 @@ namespace FSO.SimAntics.Marshals.Threads
         public short[] Args;
         public VMSpecialResult SpecialResult;
         public bool ActionTree;
+        public byte TS1UserEventPhase;
 
         public int Version;
 
@@ -45,6 +46,7 @@ namespace FSO.SimAntics.Marshals.Threads
 
             if (Version > 3) SpecialResult = (VMSpecialResult)reader.ReadByte();
             ActionTree = reader.ReadBoolean();
+            TS1UserEventPhase = Version >= 40 ? reader.ReadByte() : (byte)0;
         }
 
         public virtual void SerializeInto(BinaryWriter writer)
@@ -61,6 +63,7 @@ namespace FSO.SimAntics.Marshals.Threads
             if (Args != null) VMSerializableUtils.WriteArray(writer, Args);
             writer.Write((byte)SpecialResult);
             writer.Write(ActionTree);
+            writer.Write(TS1UserEventPhase);
         }
     }
 }

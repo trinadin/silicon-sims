@@ -464,26 +464,47 @@ namespace FSO.LotView.Components
 
                     if (tilePos.X >= 0 && tilePos.X < blueprint.Width && tilePos.Y >= 0 && tilePos.Y < blueprint.Height)
                     {
-                        var wall = blueprint.Walls[Level - 1][tilePos.Y * blueprint.Width + tilePos.X];
-                        var cutTest = new Point();
-                        if (!CutawayTests.TryGetValue(AdjacentWall & wall.Segments, out cutTest))
-                        {
-                            CutawayTests.TryGetValue(wall.OccupiedWalls & wall.Segments, out cutTest);
-                        }
-                        var positions = new Point[] { tilePos, tilePos + cutTest };
-
-                        var canContinue = true;
-
-                        foreach (var pos in positions)
-                        {
-                            canContinue = canContinue && (pos.X >= 0 && pos.X < blueprint.Width && pos.Y >= 0 && pos.Y < blueprint.Height
-                                && blueprint.Cutaway[pos.Y * blueprint.Width + pos.X]);
-                            if (!canContinue) break;
-                        }
-                        CutawayHidden = canContinue;
+                        CutawayHidden = ComputeCutawayHidden(blueprint, Level, blueprint.Cutaway, Position, AdjacentWall);
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// The cutaway-hiding tile test shared by the object Update path (and
+        /// reusable by other views). True when the object's tile and its
+        /// wall-adjacent neighbor tile are both cut away.
+        /// NOTE: the caller owns the in-bounds check on the object's rounded
+        /// tile; out of bounds, the Update path leaves CutawayHidden unchanged.
+        /// The 4-argument form skips the wall-adjacency pre-probe; the instance
+        /// Update passes its AdjacentWall state explicitly.
+        /// </summary>
+        public static bool ComputeCutawayHidden(Blueprint bp, sbyte level, bool[] cuts, Vector3 position)
+        {
+            return ComputeCutawayHidden(bp, level, cuts, position, 0);
+        }
+
+        public static bool ComputeCutawayHidden(Blueprint bp, sbyte level, bool[] cuts, Vector3 position, WallSegments adjacentWall)
+        {
+            var tilePos = new Point((int)Math.Round(position.X), (int)Math.Round(position.Y));
+
+            var wall = bp.Walls[level - 1][tilePos.Y * bp.Width + tilePos.X];
+            var cutTest = new Point();
+            if (!CutawayTests.TryGetValue(adjacentWall & wall.Segments, out cutTest))
+            {
+                CutawayTests.TryGetValue(wall.OccupiedWalls & wall.Segments, out cutTest);
+            }
+            var positions = new Point[] { tilePos, tilePos + cutTest };
+
+            var canContinue = true;
+
+            foreach (var pos in positions)
+            {
+                canContinue = canContinue && (pos.X >= 0 && pos.X < bp.Width && pos.Y >= 0 && pos.Y < bp.Height
+                    && cuts[pos.Y * bp.Width + pos.X]);
+                if (!canContinue) break;
+            }
+            return canContinue;
         }
 
         public override float GetHeadlineScale()

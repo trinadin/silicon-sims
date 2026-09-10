@@ -69,13 +69,59 @@ namespace FSO.SimAntics
         /// <summary>
         /// Global toggle for free will (autonomy). When disabled, player family Sims will not
         /// autonomously choose actions. Visitors and pets still have free will.
+        /// R249 native law: the free-will byte (data 0x45f1c, init 1) is mirrored into
+        /// SimAntics global 30 (0x1e) by SetFreeWill__8cXObject (0xc9d40:
+        /// cSimulator::SetGlobal(0x1e, (s16)v) when the simulator chain exists) — this
+        /// property setter is the port's hook for that mirror (weak-ref'd live VMs).
         /// </summary>
-        public static bool FreeWillEnabled = true;
+        private static bool _FreeWillEnabled = true;
+        private static readonly List<WeakReference> _LiveVMs = new List<WeakReference>();
+        // P2-9: the game thread constructs VMs (Add) while the UI thread can flip the
+        // free-will toggle (enumerate + sweep dead refs) — guard the list with a lock.
+        private static readonly object _LiveVMsLock = new object();
+        public static bool FreeWillEnabled
+        {
+            get { return _FreeWillEnabled; }
+            set
+            {
+                if (_FreeWillEnabled == value) return;
+                _FreeWillEnabled = value;
+                lock (_LiveVMsLock)
+                {
+                    for (int i = _LiveVMs.Count - 1; i >= 0; i--)
+                    {
+                        var vm = _LiveVMs[i].Target as VM;
+                        if (vm == null)
+                        {
+                            _LiveVMs.RemoveAt(i);
+                            continue;
+                        }
+                        // SetFreeWill mirror: SimAntics global 0x1e = the BHAV-visible flag.
+                        if (vm.GlobalState != null && vm.GlobalState.Length > 0x1e)
+                            vm.GlobalState[0x1e] = (short)(value ? 1 : 0);
+                    }
+                }
+            }
+        }
 
         private const long TickInterval = 33 * TimeSpan.TicksPerMillisecond;
         public byte[][] HollowAdj;
 
         public VMContext Context { get; internal set; }
+
+        // The port's Tut_CheckForEvents (0x156550) instance: the client ticks
+        // MirrorLastButton + Poll once per view update, mirroring the native's
+        // single call site at cDDDSimsView::Simulate 0x21715c. Created lazily
+        // per VM; obtaining vm.TutorialEvents is the only setup needed.
+        private TutorialEventPoller _TutorialEvents;
+        public TutorialEventPoller TutorialEvents
+        {
+            get
+            {
+                if (_TutorialEvents == null) _TutorialEvents = new TutorialEventPoller(this);
+                return _TutorialEvents;
+            }
+        }
 
         public List<VMEntity> Entities = new List<VMEntity>();
         public HashSet<VMEntity> SoundEntities = new HashSet<VMEntity>();
@@ -126,7 +172,8 @@ namespace FSO.SimAntics
         public event VMEODMessageHandler OnEODMessage;
         public event VMLotSwitchHandler OnRequestLotSwitch;
         public event VMGenericEvtHandler OnGenericVMEvent;
-        
+        public event VMTutorialUIEffectHandler OnTutorialUIEffect;
+
         public delegate void VMDialogHandler(VMDialogInfo info);
         public delegate void VMChatEventHandler(VMChatEvent evt);
         public delegate void VMRefreshHandler();
@@ -134,6 +181,7 @@ namespace FSO.SimAntics
         public delegate void VMEODMessageHandler(VMNetEODMessageCmd msg);
         public delegate void VMLotSwitchHandler(uint lotId);
         public delegate void VMGenericEvtHandler(VMEventType type, object data);
+        public delegate void VMTutorialUIEffectHandler(int subOp, int id, bool on);
 
         public IVMTSOGlobalLink GlobalLink
         {
@@ -160,6 +208,10 @@ namespace FSO.SimAntics
 
             TS1 = Content.Content.Get().TS1;
             GlobTS1 = TS1;
+            lock (_LiveVMsLock) // P2-9: game thread appends while the UI thread enumerates
+            {
+                _LiveVMs.Add(new WeakReference(this)); // for the FreeWillEnabled -> global 0x1e mirror
+            }
         }
 
         private void VM_OnBHAVChange()
@@ -234,6 +286,7 @@ namespace FSO.SimAntics
             GlobalState[20] = 255; //Game Edition. Basically, what "expansion packs" are running. Let's just say all of them.
             GlobalState[25] = 4; //as seen in EA-Land edith's simulator globals, this needs to be set for people to do their idle interactions.
             GlobalState[17] = 4; //Runtime Code Version, is this in EA-Land.
+            GlobalState[0x1e] = (short)(_FreeWillEnabled ? 1 : 0); //free-will byte mirror (SetFreeWill__8cXObject 0xc9d40)
             if (Driver is VMServerDriver) EODHost = new VMEODHost();
             PlatformState.ActivateValidator(this);
         }
@@ -658,6 +711,17 @@ namespace FSO.SimAntics
             OnChatEvent?.Invoke(evt);
         }
 
+        /// <summary>
+        /// Signals a TS1 tutorial UI-effect request (primitive 34 / TryElement
+        /// 0x22: 0 = flash the button with image id, 1 = flash the person
+        /// panel button of a neighbor, 2 = flash the relationship panel) to
+        /// all listeners. (usually a UI)
+        /// </summary>
+        public void SignalTutorialUIEffect(int subOp, int id, bool on)
+        {
+            OnTutorialUIEffect?.Invoke(subOp, id, on);
+        }
+
         public void SignalEODMessage(VMNetEODMessageCmd msg)
         {
             OnEODMessage?.Invoke(msg);
@@ -924,6 +988,14 @@ namespace FSO.SimAntics
             }
 
             GlobalState = input.GlobalState;
+            // SetFreeWill mirror law (SetFreeWill__8cXObject 0xc9d40): SimAntics global
+            // 0x1e always mirrors the live free-will flag. Init() seeded it above, but
+            // this restore replaces the whole array with the saved word, which can be
+            // stale; and FreeWillEnabled's setter early-returns on an unchanged static,
+            // so it would never re-mirror. Re-apply the mirror directly. (Scoped to the
+            // free-will word only — no other global is owned by the port.)
+            if (GlobalState != null && GlobalState.Length > 0x1e)
+                GlobalState[0x1e] = (short)(_FreeWillEnabled ? 1 : 0);
             if (TS1)
             {
                 ((VMTS1LotState)input.PlatformState).CurrentFamily = TS1State.CurrentFamily;
@@ -1088,6 +1160,7 @@ namespace FSO.SimAntics
         TSOTimeout,
         TS1LotChange,
         TS1BuildBuyChange,
-        TSOUpgraded
+        TSOUpgraded,
+        TS1PictureInPicture
     }
 }

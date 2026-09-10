@@ -121,6 +121,20 @@ namespace FSO.Client
             { "ArchiveServerGUID", "" },
             { "ArchiveClientGUID", "" },
             { "TS1FreeWill", "true" },
+
+            // R121: the ORIGINAL Play/Graphics options screen states (STR# 145 'optionstrs').
+            // FreeWill/EdgeScroll/AntiAlias/volumes above have live engine effect; the rest
+            // persist the player's canon-verbatim choice pending engine work (disclosed).
+            { "TS1Shadows", "true" },
+            { "TS1InterfaceFX", "true" },
+            { "TS1TerrainDetail", "2" },
+            { "TS1CharacterDetail", "2" },
+            { "TS1AutoCenter", "true" },
+            { "TS1SimInBackground", "false" },
+            { "TS1QuickTips", "true" },
+            { "TS1AutoSnapshot", "false" },
+            { "TS1LivePIP", "true" },
+            { "TS1ExportHTML", "false" },
         };
 
         public override Dictionary<string, string> DefaultValues
@@ -144,8 +158,34 @@ namespace FSO.Client
         public string StartupPath { get; set; }
         public string DocumentsPath { get; set; }
         public bool Windowed { get; set; }
-        public int GraphicsWidth { get; set; }
-        public int GraphicsHeight { get; set; }
+        private int ConfiguredGraphicsWidth, ConfiguredGraphicsHeight;
+        private int? RuntimeGraphicsWidth, RuntimeGraphicsHeight;
+        public int GraphicsWidth
+        {
+            get => RuntimeGraphicsWidth ?? ConfiguredGraphicsWidth;
+            set { ConfiguredGraphicsWidth = value; RuntimeGraphicsWidth = null; }
+        }
+        public int GraphicsHeight
+        {
+            get => RuntimeGraphicsHeight ?? ConfiguredGraphicsHeight;
+            set { ConfiguredGraphicsHeight = value; RuntimeGraphicsHeight = null; }
+        }
+
+        // UI layout reads the fitted logical viewport, while config.ini keeps
+        // the requested resolution. Persisting fitted dimensions alongside the
+        // requested DPI would enlarge the next launch's physical window.
+        public void SetRuntimeViewport(int width, int height)
+        {
+            RuntimeGraphicsWidth = width;
+            RuntimeGraphicsHeight = height;
+        }
+
+        protected override object GetValueForSave(System.Reflection.PropertyInfo property)
+        {
+            if (property.Name == nameof(GraphicsWidth)) return ConfiguredGraphicsWidth;
+            if (property.Name == nameof(GraphicsHeight)) return ConfiguredGraphicsHeight;
+            return base.GetValueForSave(property);
+        }
         public string LastUser { get; set; }
         public bool SkipIntro { get; set; }
         public ulong DebugHead { get; set; }
@@ -198,6 +238,18 @@ namespace FSO.Client
         public string ArchiveClientGUID { get; set; }
 
         public bool TS1FreeWill { get; set; }
+
+        // R121: original options screen states (see _DefaultValues note).
+        public bool TS1Shadows { get; set; }
+        public bool TS1InterfaceFX { get; set; }
+        public int TS1TerrainDetail { get; set; }
+        public int TS1CharacterDetail { get; set; }
+        public bool TS1AutoCenter { get; set; }
+        public bool TS1SimInBackground { get; set; }
+        public bool TS1QuickTips { get; set; }
+        public bool TS1AutoSnapshot { get; set; }
+        public bool TS1LivePIP { get; set; }
+        public bool TS1ExportHTML { get; set; }
 
         public static int TARGET_COMPAT_STATE = 2;
     }

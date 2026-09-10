@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FSO.LotView.Components;
@@ -51,7 +51,11 @@ namespace FSO.SimAntics
             set
             {
                 m_Message = value;
-                SetPersonData(VMPersonDataVariable.ChatBaloonOn, 1);
+                //R151: word 26 doubles as the Hollywood interest on TS1 data
+                //(cXPerson word map, r151-expansion-interest-decode.md); the
+                //chat-balloon flag is a TSO concept — leave the word alone
+                //in TS1 lots (the balloon visual does not read it).
+                if (Thread?.Context?.VM?.TS1 != true) SetPersonData(VMPersonDataVariable.ChatBaloonOn, 1);
                 MessageTimeout = 150 + value.Length / 2;
             }
         }
@@ -63,9 +67,24 @@ namespace FSO.SimAntics
 
         private VMMotiveChange[] MotiveChanges = new VMMotiveChange[16];
         private VMIMotiveDecay MotiveDecay;
-        private short[] PersonData = new short[101];
+        private const int PERSON_DATA_COUNT = 101;
+        private short[] PersonData = new short[PERSON_DATA_COUNT];
         private short[] MotiveData = new short[16];
         private float _RadianDirection;
+
+        /// <summary>
+        /// Original TS1 OBJM and NBRS records predate later expansion PersonData words, so
+        /// their persisted arrays can be shorter than the VM's complete 0..100 address space.
+        /// The original game treats absent expansion words as zero; normalize only at the
+        /// persisted-data -> live-avatar boundary so every mounted BHAV can safely address them.
+        /// </summary>
+        private static short[] NormalizePersonData(short[] data)
+        {
+            if (data != null && data.Length >= PERSON_DATA_COUNT) return data;
+            var result = new short[PERSON_DATA_COUNT];
+            if (data != null) Array.Copy(data, result, data.Length);
+            return result;
+        }
 
         public int KillTimeout = -1;
         private static readonly int FORCE_DELETE_TIMEOUT = 60 * 30;
@@ -410,6 +429,32 @@ namespace FSO.SimAntics
                 MotiveData[i] = 100;
             }
 
+            if (context.VM.TS1)
+            {
+                // ORIGINAL new-sim need init, PersonGlobals "init NPC"(8298) -> "Init person"(8192)
+                // -> "init motives"(8325): Init person sets MyMotives[7]=50, then per need in
+                // {5,6,7,8,9,14,15} (Energy/Comfort/Hunger/Hygiene/Bladder/Social/Fun):
+                //   MyMotives[i] = random(0, Tuning[BASE]) + Tuning[AMOUNT]
+                // Tuning 8576-8590 decodes (VMMemory.GetTuningVariable, TableIDOffsets 4096/8192/256)
+                // to PersonGlobals BCON 8195: base keys 0-6 = {50,1,1,1,50,1,15}, amount keys 8-14
+                // = {99,99,99,99,50,99,20}. IFF spawns new sims at Bladder 50-100 and Fun 20-35
+                // (low enough to seek entertainment), others 99-100. Previously every motive
+                // started at 100 here (no IFF init); IFF-loaded sims are unaffected because their
+                // saved OBJM MotiveData overrides this later.
+                // Byte-fidelity note: NextRandom(BASE) mirrors the IFF random primitive (result in
+                // [0, BASE-1]); BASE=1 then always adds 0, so Comfort/Hunger/Hygiene/Social are
+                // ALWAYS exactly 99 exactly like IFF init-NPC canon (earlier NextRandom(BASE+1)
+                // leaked 100 into those needs).
+                var iffIdx = new int[] { 5, 6, 7, 8, 9, 14, 15 };
+                var iffBase = new short[] { 50, 1, 1, 1, 50, 1, 15 };
+                var iffAmt = new short[] { 99, 99, 99, 99, 50, 99, 20 };
+                for (int k = 0; k < iffIdx.Length; k++)
+                {
+                    int rnd = (int)context.NextRandom((ulong)(iffBase[k]));
+                    MotiveData[iffIdx[k]] = (short)Math.Max(Math.Min(rnd + iffAmt[k], 100), -100);
+                }
+            }
+
             SetMotiveData(VMMotive.SleepState, 0); //max all motives except sleep state
             if (context.DisableAvatarCollision || (!context.VM.TS1 && Object.GUID != 0x7fd96b54 && context.VM.GetGlobalValue(11) > -1))
                 SetFlag(VMEntityFlags.AllowPersonIntersection, true);
@@ -518,7 +563,7 @@ namespace FSO.SimAntics
                 {
                     if (MessageTimeout == 0)
                     {
-                        SetPersonData(VMPersonDataVariable.ChatBaloonOn, 0);
+                        if (Thread?.Context?.VM?.TS1 != true) SetPersonData(VMPersonDataVariable.ChatBaloonOn, 0);
                         m_Message = "";
                     }
                 }
@@ -526,7 +571,10 @@ namespace FSO.SimAntics
 
             if (Thread != null && Thread.ThreadBreak == Engine.VMThreadBreakMode.Pause) return;
 
-            if (PersonData.Length > (int)VMPersonDataVariable.OnlineJobStatusFlags && PersonData[(int)VMPersonDataVariable.OnlineJobStatusFlags] == 0) PersonData[(int)VMPersonDataVariable.OnlineJobStatusFlags] = 1;
+            if (PlatformState is VMTSOAvatarState
+                && PersonData.Length > (int)VMPersonDataVariable.OnlineJobStatusFlags
+                && PersonData[(int)VMPersonDataVariable.OnlineJobStatusFlags] == 0)
+                PersonData[(int)VMPersonDataVariable.OnlineJobStatusFlags] = 1;
             if (Thread != null)
             {
                 MotiveDecay.Tick(this, Thread.Context);
@@ -582,6 +630,14 @@ namespace FSO.SimAntics
                         }
                     }
                 }
+                // CC-03: a saved animation whose name no longer resolves (custom
+                // anim removed) leaves state.Anim null — treat it as already
+                // finished instead of crashing the tick.
+                if (state.Anim == null)
+                {
+                    state.EndReached = true;
+                    continue;
+                }
                 var status = //(VM.UseWorld) ? Animator.RenderFrame(avatar.Avatar, state.Anim, (int)state.CurrentFrame, state.CurrentFrame % 1f, state.Weight / totalWeight) :
                                 Animator.SilentFrameProgress(avatar.Avatar, state.Anim, (int)state.CurrentFrame);
                 if (status != AnimationStatus.IN_PROGRESS)
@@ -597,7 +653,7 @@ namespace FSO.SimAntics
             }
             UpdateHeadSeek();
 
-            if (avatar.CarryAnimationState != null)
+            if (avatar.CarryAnimationState != null && avatar.CarryAnimationState.Anim != null)
             {
                 var status = //(VM.UseWorld) ? Animator.RenderFrame(avatar.Avatar, avatar.CarryAnimationState.Anim, (int)avatar.CarryAnimationState.CurrentFrame, 0.0f, 1f)
                     //: 
@@ -756,36 +812,42 @@ namespace FSO.SimAntics
 
         public virtual short GetPersonData(VMPersonDataVariable variable)
         {
-            if ((ushort)variable > 100) throw new Exception("Person Data out of bounds!");
+            if ((ushort)variable >= PERSON_DATA_COUNT) throw new Exception("Person Data out of bounds!");
             VMTSOJobInfo jobInfo = null;
             switch (variable)
             {
                 case VMPersonDataVariable.OnlineJobGrade:
+                    if (PlatformState is VMTS1AvatarState) break;
                     if (((VMTSOAvatarState)TSOState).JobInfo.TryGetValue(GetPersonData(VMPersonDataVariable.OnlineJobID), out jobInfo))
                         return jobInfo.Level;
                     return 0;
                 case VMPersonDataVariable.OnlineJobSickDays:
+                    if (PlatformState is VMTS1AvatarState) break;
                     if (((VMTSOAvatarState)TSOState).JobInfo.TryGetValue(GetPersonData(VMPersonDataVariable.OnlineJobID), out jobInfo))
                         return jobInfo.SickDays;
                     return 0;
                 case VMPersonDataVariable.OnlineJobStatusFlags:
+                    if (PlatformState is VMTS1AvatarState) break;
                     if (((VMTSOAvatarState)TSOState).JobInfo.TryGetValue(GetPersonData(VMPersonDataVariable.OnlineJobID), out jobInfo))
                         return jobInfo.StatusFlags;
                     return 0;
                 case VMPersonDataVariable.OnlineJobXP:
+                    if (PlatformState is VMTS1AvatarState) break;
                     if (((VMTSOAvatarState)TSOState).JobInfo.TryGetValue(GetPersonData(VMPersonDataVariable.OnlineJobID), out jobInfo))
                         return jobInfo.Experience;
                     return 0;
                 case VMPersonDataVariable.IsHousemate:
+                    if (PlatformState is VMTS1AvatarState) break; // TS1 word 21 is raw outfit state.
                     var level = AvatarState.Permissions;
                     return (short)((level >= VMTSOAvatarPermissions.BuildBuyRoommate) ? 2 : ((level >= VMTSOAvatarPermissions.Roommate) ? 1 : 0));
                 case VMPersonDataVariable.NumOutgoingFriends:
                 case VMPersonDataVariable.IncomingFriends:
-                    if (Thread?.Context?.VM?.TS1 == true) break;
+                    if (PlatformState is VMTS1AvatarState) break;
                     return (short)(MeToPersist.Count(x => x.Key < 16777216 && x.Value.Count > 1 && x.Value[1] >= 60));
                 case VMPersonDataVariable.SkillLock:
                     // this variable contains a bitmask of skills which should not decay. our skill disable system sets them all,
                     // but perhaps in the original they were used by events
+                    if (PlatformState is VMTS1AvatarState) break; // TS1 word 70 is Zodiac.
                     if (Thread == null) return 0;
                     return (short)((SkillGameplayMul(Thread.Context.VM) == 0)?0x7FFF:0);
             }
@@ -847,7 +909,7 @@ namespace FSO.SimAntics
 
         public virtual bool SetPersonData(VMPersonDataVariable variable, short value)
         {
-            if ((ushort)variable > 100) throw new Exception("Person Data out of bounds!");
+            if ((ushort)variable >= PERSON_DATA_COUNT) throw new Exception("Person Data out of bounds!");
             VMTSOJobInfo jobInfo;
             switch (variable)
             {
@@ -863,6 +925,7 @@ namespace FSO.SimAntics
                         ((AvatarComponent)WorldUI).Scale = value / 100f;
                     break;
                 case VMPersonDataVariable.OnlineJobID:
+                    if (PlatformState is VMTS1AvatarState) break;
                     if (value > 5) return false;
                     if (!((VMTSOAvatarState)TSOState).JobInfo.ContainsKey(value))
                     {
@@ -871,18 +934,22 @@ namespace FSO.SimAntics
                     }
                     break;
                 case VMPersonDataVariable.OnlineJobGrade:
+                    if (PlatformState is VMTS1AvatarState) break;
                     if (((VMTSOAvatarState)TSOState).JobInfo.TryGetValue(GetPersonData(VMPersonDataVariable.OnlineJobID), out jobInfo))
                         jobInfo.Level = value;
                     return true;
                 case VMPersonDataVariable.OnlineJobSickDays:
+                    if (PlatformState is VMTS1AvatarState) break;
                     if (((VMTSOAvatarState)TSOState).JobInfo.TryGetValue(GetPersonData(VMPersonDataVariable.OnlineJobID), out jobInfo))
                         jobInfo.SickDays = value;
                     return true;
                 case VMPersonDataVariable.OnlineJobStatusFlags:
+                    if (PlatformState is VMTS1AvatarState) break;
                     if (((VMTSOAvatarState)TSOState).JobInfo.TryGetValue(GetPersonData(VMPersonDataVariable.OnlineJobID), out jobInfo))
                         jobInfo.StatusFlags = value;
                     return true;
                 case VMPersonDataVariable.OnlineJobXP:
+                    if (PlatformState is VMTS1AvatarState) break;
                     if (((VMTSOAvatarState)TSOState).JobInfo.TryGetValue(GetPersonData(VMPersonDataVariable.OnlineJobID), out jobInfo))
                     {
                         jobInfo.Experience = value;
@@ -904,8 +971,9 @@ namespace FSO.SimAntics
                         ((AvatarComponent)WorldUI).DisplayFlags = flags;
                         WorldUI.UseNormal = flags.HasFlag(AvatarDisplayFlags.FSOGroundAlign);
                     }
-                    return true;
+                    break; // The original BHAV-visible word must retain the same flags.
                 case VMPersonDataVariable.SkillLock:
+                    if (PlatformState is VMTS1AvatarState) break; // TS1 word 70 is Zodiac.
                     return true;
                 case VMPersonDataVariable.IsGhost:
                     if (WorldUI != null) ((AvatarComponent)WorldUI).IsDead = value > 0;
@@ -959,7 +1027,7 @@ namespace FSO.SimAntics
             var lastGender = GetPersonData(VMPersonDataVariable.Gender);
             var lastPersonType = GetPersonData(VMPersonDataVariable.PersonType);
             var sched = GetPersonData(VMPersonDataVariable.VisitorSchedule);
-            if (neigh.PersonData != null) PersonData = neigh.PersonData.ToArray();
+            if (neigh.PersonData != null) PersonData = NormalizePersonData(neigh.PersonData.ToArray());
             SetPersonData(VMPersonDataVariable.Gender, lastGender); //fixes cats switching to children suddenly
             SetPersonData(VMPersonDataVariable.NeighborId, neigh.NeighbourID);
             if (lastPersonType == 0) SetPersonData(VMPersonDataVariable.PersonType, (short)((GetPersonData(VMPersonDataVariable.TS1FamilyNumber) == current?.ChunkID) ? 0 : 1));
@@ -1126,7 +1194,12 @@ namespace FSO.SimAntics
 
         public override VMEntity GetSlot(int slot)
         {
-            return Contained[slot];
+            // Bounds-check like VMGameObject.GetSlot: Contained is only VMEntity[3] but
+            // callers (e.g. VMEntity.Delete) iterate TotalSlots(), which can exceed that;
+            // an unguarded index threw IndexOutOfRangeException during lot teardown
+            // (teardown SIGABRT after AUTOTEST PASS — see PARITY [OBS]).
+            if (Contained != null && slot > -1 && slot < Contained.Length) return Contained[slot];
+            return null;
         }
 
         public override void ClearSlot(int slot)
@@ -1234,7 +1307,7 @@ namespace FSO.SimAntics
 
             MotiveChanges = input.MotiveChanges;
             MotiveDecay = input.MotiveDecay;
-            PersonData = input.PersonData;
+            PersonData = NormalizePersonData(input.PersonData);
             MotiveData = input.MotiveData;
             RadianDirection = input.RadianDirection;
             KillTimeout = input.KillTimeout;

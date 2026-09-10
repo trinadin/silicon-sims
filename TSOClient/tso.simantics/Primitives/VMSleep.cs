@@ -11,6 +11,16 @@ namespace FSO.SimAntics.Primitives
             var operand = (VMSleepOperand)args;
             var idleStart = context.Thread.ScheduleIdleStart;
 
+            if (context.VM.TS1 && context.Thread.Interrupt)
+            {
+                // Native TryIdle consumes a scheduler wake before decrementing:
+                // zero its selected parameter and return without cycling the RNG.
+                context.Args[operand.StackVarToDec] = 0;
+                context.Thread.ScheduleIdleStart = 0;
+                context.Thread.Interrupt = false;
+                return VMPrimitiveExitCode.GOTO_TRUE;
+            }
+
             context.Args[operand.StackVarToDec] -= (short)((idleStart != 0 && idleStart < context.VM.Scheduler.CurrentTickID) ? (context.VM.Scheduler.CurrentTickID - idleStart) : 1);
 
             if (context.Thread.Interrupt)

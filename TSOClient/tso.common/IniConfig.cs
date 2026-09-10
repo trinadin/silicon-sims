@@ -64,6 +64,14 @@ namespace FSO.Common
             }
         }
 
+        // Runtime presentation state may share an accessor with a persisted
+        // preference. Derived settings can serialize the preference without
+        // temporarily mutating values used by the running application.
+        protected virtual object GetValueForSave(System.Reflection.PropertyInfo property)
+        {
+            return property.GetValue(this);
+        }
+
         public void Save()
         {
             try
@@ -75,7 +83,7 @@ namespace FSO.Common
                     foreach (var prop in props)
                     {
                         if (prop.Name == "Default" || prop.Name == "DefaultValues") continue;
-                        stream.WriteLine(prop.Name + "=" + Convert.ToString(prop.GetValue(this), CultureInfo.InvariantCulture));
+                        stream.WriteLine(prop.Name + "=" + Convert.ToString(GetValueForSave(prop), CultureInfo.InvariantCulture));
                     }
                 }
             }

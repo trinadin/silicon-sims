@@ -299,6 +299,30 @@ namespace FSO.SimAntics.Utils
             }
 
             VM.TS1State.VerifyFamily(VM);
+
+            // R150: the ORIGINAL init tree of every TS1 sim calls its
+            // 'init traits' tree, rolling interests into person words 46-55
+            // (bucketed 1x0 / 3x1-3 / 3x4-6 / 3x7-10). The port's VM does not
+            // execute avatar init trees, so family avatars load with a zeroed
+            // interest block and the Interest panel showed empty bars. Mirror
+            // the tree for any avatar that never got interests (generated
+            // townies already carry them from SimitoneNeighbourGenerator).
+            // R153: the r152 sentinel hook (words 46..53 all == 10 ->
+            // VMInterestRandomizer.Apply) is REMOVED — that state has no
+            // writer anywhere (the "sentinel" was a bgt-polarity misread;
+            // the real gate is all-8 <= 10, armed by the creation-time zero
+            // sweep and run BEFORE any record/tree writes, which the port's
+            // generator already mirrors via ApplyTo). Firing it here, after
+            // load, would re-randomize tree-written sims every session.
+            if (VM.UseWorld)
+            {
+                var rand = new Random();
+                foreach (var a in VM.Entities.OfType<VMAvatar>())
+                {
+                    if (VMInterestTraits.IsZeroed(a)) VMInterestTraits.ApplyInitTraits(a, rand);
+                }
+            }
+
             arch.SignalTerrainRedraw();
             VM.Context.World?.InitBlueprint(Blueprint);
             arch.Tick();

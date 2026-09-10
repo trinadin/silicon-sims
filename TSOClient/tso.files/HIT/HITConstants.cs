@@ -1,4 +1,4 @@
-﻿namespace FSO.Files.HIT
+namespace FSO.Files.HIT
 {
     public enum HITArgs
     {
@@ -17,10 +17,12 @@
 
     public enum HITDuckingPriorities
     {
-        duckpri_unknown1 = 32,
-        duckpri_unknown2 = 5000,
+        // AUD-06 (native law, instruction-level): TS1 duck priorities are
+        // always=0, low=10, normal=20, high=30, higher=40, evenhigher=50,
+        // never=100. The spurious 32/5000 members are absent from the TS1
+        // equates and are removed; duckpri_low was mislabelled 1 (should be 10).
         duckpri_always = 0x0,
-        duckpri_low = 0x1,
+        duckpri_low = 0xA,
         duckpri_normal = 0x14,
         duckpri_high = 0x1e,
         duckpri_higher = 0x28,

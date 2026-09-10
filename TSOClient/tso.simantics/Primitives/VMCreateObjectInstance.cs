@@ -1,14 +1,37 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FSO.Files.Utils;
 using FSO.LotView.Model;
 using System.IO;
 using FSO.SimAntics.NetPlay.Model.Commands;
 using FSO.Files.Formats.IFF.Chunks;
+using FSO.SimAntics.Entities;
 
 namespace FSO.SimAntics.Engine.Primitives
 {
     public class VMCreateObjectInstance : VMPrimitiveHandler
     {
+        /// <summary>
+        /// Read-only observation point for successfully created objects. Autotests use this
+        /// to attribute an object to the exact IFF tree that created it; no subscriber may
+        /// alter primitive success or failure.
+        /// </summary>
+        public static event Action<VMStackFrame, VMMultitileGroup, uint> ObjectCreated;
+
+        private static void NotifyObjectCreated(VMStackFrame context, VMMultitileGroup group, uint guid)
+        {
+            var observers = ObjectCreated;
+            if (observers == null) return;
+            foreach (Action<VMStackFrame, VMMultitileGroup, uint> observer in observers.GetInvocationList())
+            {
+                try { observer(context, group, guid); }
+                catch (Exception error)
+                {
+                    Console.WriteLine("[CreateObjectObserver] " + error.GetType().Name + " " + error.Message);
+                }
+            }
+        }
+
         public override VMPrimitiveExitCode Execute(VMStackFrame context, VMPrimitiveOperand args)
         {
             var operand = (VMCreateObjectInstanceOperand)args;
@@ -114,6 +137,26 @@ namespace FSO.SimAntics.Engine.Primitives
             if (mobj == null) return VMPrimitiveExitCode.GOTO_FALSE;
             var obj = mobj.BaseObject;
 
+            // r158 diagnostic mirror: attribute every CAR-IFF object creation to its
+            // creator (entity + owning IFF + routine + ip). The r157 carpool verdict
+            // spawned 18 cars in ~50ms — one burst — and the count law needs the
+            // creating tree named. Volume is bounded by construction: only car-named
+            // IFFs log (carpool bursts, the morning paper carrier).
+            try
+            {
+                var ciff = obj?.Object?.Resource?.MainIff?.Filename;
+                if (ciff != null && ciff.IndexOf("car", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    var callerIff = context.Caller?.Object?.Resource?.MainIff?.Filename;
+                    System.Console.WriteLine("[CarCreate] obj=" + (obj?.ObjectID ?? 0) + " iff=" + ciff +
+                        " guid=0x" + guid.ToString("X8") +
+                        " by=" + (context.Caller?.ObjectID ?? 0) + "/" + (callerIff ?? "?") +
+                        " routine=" + (context.Routine?.Chunk?.ChunkID ?? 0) + ":" + context.InstructionPointer +
+                        " stkObj=" + context.StackObjectID);
+                }
+            }
+            catch { }
+
             if (operand.Position == VMCreateObjectPosition.InSlot0OfStackObject) context.StackObject.PlaceInSlot(obj, 0, true, context.VM.Context);
             else if (operand.Position == VMCreateObjectPosition.InMyHand) context.Caller.PlaceInSlot(obj, 0, true, context.VM.Context);
             else if (operand.Position == VMCreateObjectPosition.UnderneathMe && obj.Position == LotTilePos.OUT_OF_WORLD)
@@ -128,6 +171,7 @@ namespace FSO.SimAntics.Engine.Primitives
                 obj.Delete(true, context.VM.Context);
                 return VMPrimitiveExitCode.GOTO_FALSE;
             }
+            NotifyObjectCreated(context, mobj, guid);
             var cont = false;
             if (operand.ReturnImmediately)
             {

@@ -6,6 +6,23 @@ using System.Linq;
 namespace FSO.Files.Formats.IFF.Chunks
 {
     /// <summary>
+    /// R252 original created-record format constants. The port previously wrote a
+    /// divergent format (NBRS chunk-data version 0x49, record Version 0xA with a
+    /// 256-short PersonData block, PersonMode 9, Name "iffname", skin 0/1/2).
+    /// The original Maxis TS1 format uses: chunk-data version 0x3E (0x3F for the
+    /// UserData2..8 templates), record Version 0x4 (80-short PersonData), and
+    /// PersonMode 5. The skin encoding (lgt=1, drk=2, med=3) is non-monotonic and
+    /// lives in SimitoneNeighbourGenerator/VMTS1ActivatorNew (the logical 0/1/2
+    /// AppearanceType <-> disk 1/3/2 remap), not here.
+    /// </summary>
+    public static class NbrsFormat
+    {
+        public const uint CHUNK_VERSION  = 0x3E; // NBRS chunk-data Version (was 0x49)
+        public const int  RECORD_VERSION = 0x4;  // per-record Version (was 0xA)
+        public const int  PERSON_MODE    = 5;    // person-data-carrying mode (was 9)
+    }
+
+    /// <summary>
     /// This chunk defines all neighbours in a neighbourhood. 
     /// A neighbour is a specific version of a sim object with associated relationships and person data. (skills, person type)
     /// 
@@ -62,9 +79,16 @@ namespace FSO.Files.Formats.IFF.Chunks
             using (var io = IoWriter.FromStream(stream, ByteOrder.LITTLE_ENDIAN))
             {
                 io.WriteUInt32(0);
-                io.WriteUInt32(0x49);
+                io.WriteUInt32(NbrsFormat.CHUNK_VERSION); // 0x3E original; was 0x49 (R252)
                 io.WriteCString("SRBN", 4);
-                io.WriteInt32(Entries.Count);
+                // R253 (integration-audit P1): the header count MUST equal the
+                // number of records actually serialized. The previous code wrote
+                // Entries.Count (which includes placeholders/malformed decodes
+                // that live only in Entries) but iterated NeighbourByID (the
+                // validly decoded, id-keyed records) — a native reader desynced
+                // on the tail. Placeholders are runtime-only and are not
+                // persisted; the count now matches the emitted live records.
+                io.WriteInt32(NeighbourByID.Count);
                 foreach (var n in NeighbourByID.Values)
                 {
                     n.Save(io);
@@ -81,6 +105,26 @@ namespace FSO.Files.Formats.IFF.Chunks
 
             NeighbourByID.Add(nb.NeighbourID, nb);
             DefaultNeighbourByGUID[nb.GUID] = nb.NeighbourID;
+        }
+
+        /// <summary>
+        /// Removes a neighbour record and every lookup it participates in. The
+        /// native DeleteCharacter sweep of the neighborhood import (r247-fam-import
+        /// decode §3, 0xb2510) removes the record from the live Neighbour array;
+        /// this is the same invalidation for the NBRS chunk model. Does nothing
+        /// when the record is absent.
+        /// </summary>
+        public void RemoveNeighbor(Neighbour nb) {
+            if (nb == null) return;
+            Entries.Remove(nb);
+            Entries = Entries.OrderBy(x => x.NeighbourID).ToList();
+            foreach (var entry in Entries)
+                entry.RuntimeIndex = Entries.IndexOf(entry);
+
+            if (NeighbourByID.TryGetValue(nb.NeighbourID, out var byId) && byId == nb)
+                NeighbourByID.Remove(nb.NeighbourID);
+            if (DefaultNeighbourByGUID.TryGetValue(nb.GUID, out var byGuid) && byGuid == nb.NeighbourID)
+                DefaultNeighbourByGUID.Remove(nb.GUID);
         }
 
         public short GetFreeID()
@@ -108,6 +152,21 @@ namespace FSO.Files.Formats.IFF.Chunks
         public int MysteryZero = 0;
         public int PersonMode; //0/5/9
         public short[] PersonData; //can be null
+        // R252: the ACTUAL on-disk PersonData byte span this record consumed
+        // (measured from the stream position delta during read, NOT re-derived
+        // from Version). Exposed so the recordfmt raw scan can assert the written
+        // record is genuinely 0xa0 bytes rather than trusting Version==0x4.
+        public int PersonDataBytes;
+
+        // R253 (integration-audit P1): opaque legacy person-data tail beyond the
+        // 88-short runtime view. Version 0xA records carry 256 shorts on disk but
+        // the VM/runtime PersonData view is 88 shorts; the remaining bytes were
+        // read and discarded, then re-written as zeros — erasing opaque data on
+        // any read+rewrite (e.g. legacy saves round-tripping through the port).
+        // This tail is retained and re-emitted verbatim WITHOUT changing the
+        // runtime interpretation of PersonData. Null for Version 0x4 records
+        // (which carry exactly 0xa0 bytes = 80 shorts, all within the view).
+        public short[] LegacyPersonDataTail;
 
         public short NeighbourID;
         public uint GUID;
@@ -138,17 +197,26 @@ namespace FSO.Files.Formats.IFF.Chunks
             if (PersonMode > 0)
             {
                 var size = (Version == 0x4) ? 0xa0 : 0x200;
+                var pdStart = io.Position; // R252: measure the real byte span
                 PersonData = new short[88];
+                var totalShorts = size / 2;
                 int pdi = 0;
-                for (int i=0; i<size; i+=2)
+                if (totalShorts > 88)
+                    LegacyPersonDataTail = new short[totalShorts - 88];
+                for (int i=0; i<totalShorts; i++)
                 {
-                    if (pdi >= 88)
+                    if (pdi < 88)
                     {
-                        io.ReadBytes(size - i);
-                        break;
+                        // runtime view: first 88 shorts
+                        PersonData[pdi++] = io.ReadInt16();
                     }
-                    PersonData[pdi++] = io.ReadInt16();
+                    else
+                    {
+                        // opaque legacy tail retained for round-trip (R253 P1)
+                        LegacyPersonDataTail[i - 88] = io.ReadInt16();
+                    }
                 }
+                PersonDataBytes = (int)(io.Position - pdStart);
             }
 
             NeighbourID = io.ReadInt16();
@@ -191,15 +259,22 @@ namespace FSO.Files.Formats.IFF.Chunks
             {
                 var size = (Version == 0x4) ? 0xa0 : 0x200;
                 int pdi = 0;
-                for (int i = 0; i < size; i += 2)
+                var totalShorts = size / 2;
+                for (int i = 0; i < totalShorts; i++)
                 {
-                    if (pdi >= 88)
+                    if (pdi < 88)
                     {
-                        io.WriteInt16(0);
+                        io.WriteInt16(PersonData[pdi++]);
+                    }
+                    else if (LegacyPersonDataTail != null && (i - 88) < LegacyPersonDataTail.Length)
+                    {
+                        // R253 (integration-audit P1): re-emit the retained opaque
+                        // legacy tail verbatim instead of zero-filling it.
+                        io.WriteInt16(LegacyPersonDataTail[i - 88]);
                     }
                     else
                     {
-                        io.WriteInt16(PersonData[pdi++]);
+                        io.WriteInt16(0); // no tail captured; legacy zero-fill
                     }
                 }
             }

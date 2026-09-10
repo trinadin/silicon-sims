@@ -665,6 +665,7 @@ namespace FSO.Files.Formats.IFF.Chunks
         private CompressedData[] CompressedObjectInstances;
 
         public Dictionary<int, MappedObject> ObjectData;
+        public short TutorialObjectID;
 
         public override void Read(IffFile iff, Stream stream)
         {
@@ -720,7 +721,12 @@ namespace FSO.Files.Formats.IFF.Chunks
                     CompressedObjectInstances[i] = new CompressedData(offset, io.ReadBytes((int)(skipPosition - io.Position)));
                 }
 
-                // The rest tends to be 0s, then ends with a3.
+                // ObjectModule::DoStream e7fd8-e8040: the first compressed
+                // short after the final object mark is the tutorial owner ID.
+                // skipPosition lands at that mark, not after it. ReconMark
+                // consumes four bytes even when there are no objects.
+                io.ReadInt32();
+                TutorialObjectID = io.HasMore ? new IffFieldEncode(io).ReadInt16() : (short)0;
             }
         }
 

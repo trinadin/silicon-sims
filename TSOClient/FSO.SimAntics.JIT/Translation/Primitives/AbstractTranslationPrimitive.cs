@@ -22,7 +22,8 @@ namespace FSO.SimAntics.JIT.Translation.Primitives
             SharedPrimitives.Reach,
             SharedPrimitives.TSOTransferFunds,
             SharedPrimitives.TS1GosubFoundAction,
-            SharedPrimitives.RemoveObjectInstance
+            SharedPrimitives.RemoveObjectInstance,
+            SharedPrimitives.SpecialEffect
         };
 
         private static Dictionary<SharedPrimitives, PrimitiveReturnType> ReturnTypeMap = new Dictionary<SharedPrimitives, PrimitiveReturnType>()
@@ -33,7 +34,7 @@ namespace FSO.SimAntics.JIT.Translation.Primitives
             { SharedPrimitives.Refresh, PrimitiveReturnType.SimanticsTrue },
             { SharedPrimitives.RandomNumber, PrimitiveReturnType.SimanticsTrue },
 
-            { SharedPrimitives.Sims1Tutorial, PrimitiveReturnType.SimanticsTrue }, //verify
+            { SharedPrimitives.Sims1Tutorial, PrimitiveReturnType.SimanticsTrueFalse },
 
             { SharedPrimitives.GetDistanceTo, PrimitiveReturnType.SimanticsTrue },
             { SharedPrimitives.GetDirectionTo, PrimitiveReturnType.SimanticsTrue },

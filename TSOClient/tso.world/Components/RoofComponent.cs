@@ -101,7 +101,16 @@ namespace FSO.LotView.Components
 
             }
 
-            EdgeTexture = ImageLoader.MipTextureFromFile(device, $"Content/Textures/roof/default_edge.png");
+            try
+            {
+                // REL-04 hardening: this load resolves 'Content/...' against the process
+                // cwd and only fires on roof redraws; a missing file must not abort the
+                // app (same tolerance as the normal-map load above).
+                EdgeTexture = ImageLoader.MipTextureFromFile(device, $"Content/Textures/roof/default_edge.png");
+            }
+            catch (Exception)
+            {
+            }
 
             var color = new Vector4();
             var data = new Color[Texture.Width * Texture.Height];

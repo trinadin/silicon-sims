@@ -1,5 +1,6 @@
 ﻿using FSO.Files.Formats.IFF.Chunks;
 using FSO.Files.Utils;
+using FSO.LotView;
 using FSO.LotView.Components;
 using FSO.LotView.Model;
 using FSO.SimAntics.Engine;
@@ -14,6 +15,37 @@ namespace FSO.SimAntics.Primitives
 {
     public class VMGenericTS1Call : VMPrimitiveHandler
     {
+        /// <summary>
+        /// Reproduces cXObject::TryGenericSimCall mode 12. The original
+        /// BuildRotationLookup uses a fixed 64 by 64 tile domain rather than
+        /// the current lot dimensions.
+        /// </summary>
+        public static short GetDistanceToCamera(short tileX, short tileY, WorldRotation rotation)
+        {
+            int rotatedX;
+            int rotatedY;
+            switch (rotation)
+            {
+                case WorldRotation.TopRight:
+                    rotatedX = 63 - tileY;
+                    rotatedY = tileX;
+                    break;
+                case WorldRotation.BottomRight:
+                    rotatedX = 63 - tileX;
+                    rotatedY = 63 - tileY;
+                    break;
+                case WorldRotation.BottomLeft:
+                    rotatedX = tileY;
+                    rotatedY = 63 - tileX;
+                    break;
+                default:
+                    rotatedX = tileX;
+                    rotatedY = tileY;
+                    break;
+            }
+            return (short)-(rotatedX + rotatedY);
+        }
+
         public override VMPrimitiveExitCode Execute(VMStackFrame context, VMPrimitiveOperand args)
         {
             var operand = (VMGenericTS1CallOperand)args;
@@ -21,7 +53,9 @@ namespace FSO.SimAntics.Primitives
             var inventoryInd = 10;
             switch (operand.Call)
             {
-                // 0. HOUSE TUTORIAL COMPLETE
+                case VMGenericTS1CallMode.HouseTutorialComplete: //0
+                    TutorialCompleted(context.VM, 0);
+                    return VMPrimitiveExitCode.GOTO_TRUE;
                 case VMGenericTS1CallMode.SwapMyAndStackObjectsSlots: //1
                     var cont1 = context.Caller.Container;
                     var cont2 = context.StackObject.Container;
@@ -71,9 +105,14 @@ namespace FSO.SimAntics.Primitives
                     TryDeleteFamily(context.VM.TS1State.CurrentFamily);
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 /*
-               MakeNewNeighbor = 7, //this one is "depracated". there's a dedicated primitive for this.
-               FamilyTutorialComplete = 8,
-               ArchitectureTutorialComplete = 9, */
+               MakeNewNeighbor = 7, //this one is "depracated". there's a dedicated primitive for this. */
+
+                case VMGenericTS1CallMode.FamilyTutorialComplete: //8
+                    TutorialCompleted(context.VM, 1);
+                    return VMPrimitiveExitCode.GOTO_TRUE;
+                case VMGenericTS1CallMode.ArchitectureTutorialComplete: //9
+                    TutorialCompleted(context.VM, 2);
+                    return VMPrimitiveExitCode.GOTO_TRUE;
 
                 case VMGenericTS1CallMode.DisableBuildBuy: //10
                     context.VM.Context.Architecture.BuildBuyEnabled = false;
@@ -83,11 +122,76 @@ namespace FSO.SimAntics.Primitives
                     context.VM.Context.Architecture.BuildBuyEnabled = true;
                     context.VM.SignalGenericVMEvt(VMEventType.TS1BuildBuyChange, 1);
                     break;
-                /*
-                 GetDistanceToCameraInTemp0 = 12,
-                 AbortInteractions = 13, //abort all interactions associated with the stack object
-               **/
+                case VMGenericTS1CallMode.GetDistanceToCameraInTemp0: //12
+                    var position = context.StackObject.Position;
+                    var rotation = (VM.UseWorld && context.VM.Context.World != null)
+                        ? context.VM.Context.World.State.Rotation
+                        : WorldRotation.TopLeft;
+                    context.Thread.TempRegisters[0] = GetDistanceToCamera(
+                        position.TileX, position.TileY, rotation);
+                    return VMPrimitiveExitCode.GOTO_TRUE;
+                case VMGenericTS1CallMode.AbortInteractions: //13
+                    // TS1 ObjectModule::CleanupPeople calls cXPerson::Cleanup on
+                    // every person except the target. Its saved Interaction
+                    // TargetID/Icon fields map to Callee/IconOwner in this VM.
+                    var abortTarget = context.StackObject;
+                    if (abortTarget == null)
+                    {
+                        // SIM-13 (native law, SIM-12 decode): an unresolved Stack
+                        // Object ID reports error code 10 through the original's
+                        // non-fatal reporter (PPC 0x590720, returns), then runs
+                        // ObjectModule::CleanupPeople(module, null): every person
+                        // flushes its ENTIRE action queue, routing each removal
+                        // through CancelAction (the existing Queue Skipped /
+                        // entry-point-4 contract). No person self-teardown, and
+                        // the BHAV continues on the TRUE branch.
+                        // Documented divergence (SIM-12 Option A): the base-object
+                        // self-teardown half (entry-point-3 tree, slot/array
+                        // deregistration, sound quieting, tutorial-pointer clear)
+                        // is NOT reproduced, to avoid mid-tick mass entity removal
+                        // (netplay/state-corruption risk for behavior the owned
+                        // corpus never reaches).
+                        System.Console.WriteLine(
+                            "[GenericCall13] error 10: unresolved Stack Object ID.");
+                        foreach (VMAvatar person in context.VM.Context.ObjectQueries.Avatars.ToList())
+                        {
+                            if (person.Dead || person.Thread == null) continue;
+                            var personThread = person.Thread;
+                            var active = personThread.ActiveAction;
+                            if (active != null) personThread.CancelAction(active.UID);
+                            foreach (var action in personThread.Queue.ToList())
+                                personThread.CancelAction(action.UID);
+                        }
+                        return VMPrimitiveExitCode.GOTO_TRUE;
+                    }
+                    foreach (VMAvatar person in context.VM.Context.ObjectQueries.Avatars.ToList())
+                    {
+                        if (person == abortTarget || person.Dead || person.Thread == null) continue;
+
+                        var personThread = person.Thread;
+                        var active = personThread.ActiveAction;
+                        var activeMatches = active != null
+                            && (active.Callee == abortTarget
+                                || active.IconOwner == abortTarget
+                                || personThread.Stack.Any(frame =>
+                                    frame.Callee == abortTarget
+                                    || frame.StackObject == abortTarget));
+
+                        // Match the original ordering: inspect current object-use
+                        // and stack state before Queue Skipped callbacks can mutate it.
+                        if (activeMatches) personThread.CancelAction(active.UID);
+
+                        foreach (var action in personThread.Queue.ToList())
+                        {
+                            if (activeMatches && action == active) continue;
+                            if (action.Callee == abortTarget || action.IconOwner == abortTarget)
+                                personThread.CancelAction(action.UID);
+                        }
+                    }
+                    return VMPrimitiveExitCode.GOTO_TRUE;
                 case VMGenericTS1CallMode.HouseRadioStationEqualsTemp0: //14
+                    // Original name says "equals", but the PPC case calls
+                    // cSimulator::SetGlobal(31, signed Temp0) unconditionally.
                     context.VM.SetGlobalValue(31, context.Thread.TempRegisters[0]);
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 case VMGenericTS1CallMode.MyRoutingFootprintEqualsTemp0: //15
@@ -98,10 +202,22 @@ namespace FSO.SimAntics.Primitives
                     //-1 is this family's home lot
                     var switchLotId = (uint)context.Thread.TempRegisters[0];
                     var vacation = switchLotId >= 40 && switchLotId < 50;
+                    // TRV-02: an invalid destination must refuse travel rather
+                    // than signal a lot switch into a missing house file.
+                    if (switchLotId != 0xFFFFFFFFu)
+                    {
+                        var destPath = Content.Content.Get().Neighborhood.GetHousePath((short)switchLotId);
+                        if (string.IsNullOrEmpty(destPath) || !File.Exists(destPath))
+                            return VMPrimitiveExitCode.GOTO_FALSE;
+                    }
                     var crossData = Content.Content.Get().Neighborhood.GameState;
                     crossData.ActiveFamily = context.VM.TS1State.CurrentFamily;
                     crossData.DowntownSimGUID = context.Caller.Object.OBJ.GUID;
                     crossData.LotTransitInfo = (vacation) ? (short)1 : context.VM.GetGlobalValue(34);
+                    // TRV-02: mirror the transit state so a save taken on the
+                    // destination lot reloads with the return path intact.
+                    context.VM.TS1State.LotTransitInfo = crossData.LotTransitInfo;
+                    context.VM.TS1State.DowntownSimGUID = crossData.DowntownSimGUID;
                     var people = new List<VMAvatar>();
 
                     people.Add((VMAvatar)context.Caller);
@@ -206,14 +322,24 @@ namespace FSO.SimAntics.Primitives
                     eInv.RemoveAll(x => x.Type == 2 && x.GUID < 7 && x.GUID >= 0);
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 case VMGenericTS1CallMode.SelectDowntownLot: //22
-                    //TODO: this is a pre-unleashed system I believe. likely need to add this if we want to support older TS1 versions (need testers)
+                    // TRV-02/TRV-01: mode 22 is dead in the reference build — the
+                    // compiler folded it with deprecated mode 7 and the body only
+                    // raises native error 42 before returning true. Kept as a
+                    // no-op; the old downtown lot picker is an obsolete dialect.
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 case VMGenericTS1CallMode.GetDowntownTimeFromSOInventory: //23
-                    //eperson = (VMAvatar)context.StackObject;
-                    //eInv = InitInventory(eperson.GetPersonData(VMPersonDataVariable.NeighborId));
-                    //context.Thread.TempRegisters[0] = GetIData(eInv, 7);
-                    //context.Thread.TempRegisters[1] = GetIData(eInv, 8);
-                    return VMPrimitiveExitCode.GOTO_TRUE; //UNUSED?
+                    {
+                        // TRV-02 (TRV-01 decode, native case 23): read the
+                        // departure hours/minutes (tokens 7/8 of inventory type 2
+                        // on the stack object's neighbour inventory) into
+                        // Temp0/Temp1 and CONSUME the tokens.
+                        var sperson = context.StackObject as VMAvatar;
+                        if (sperson == null) return VMPrimitiveExitCode.GOTO_FALSE;
+                        var sInv = InitInventory(sperson.GetPersonData(VMPersonDataVariable.NeighborId));
+                        context.Thread.TempRegisters[0] = TakeIData(sInv, 7);
+                        context.Thread.TempRegisters[1] = TakeIData(sInv, 8);
+                        return VMPrimitiveExitCode.GOTO_TRUE;
+                    }
                 case VMGenericTS1CallMode.HotDateChangeSuitsPermanentlyCall:
                     //temp 0: outfit type
                     //temp 1: outfit index
@@ -258,9 +384,16 @@ namespace FSO.SimAntics.Primitives
                     context.Thread.TempRegisters[1] = (short)((crossData2.LotTransitInfo >= 1) ? 1 : 0);
                     break;
                 case VMGenericTS1CallMode.ReturnNumberOfAvaiableVacationLotsInTemp0: //27
-                    //TODO: vacation lots are disabled when other people have saved the game there! that's what this primitive checks.
-                    context.Thread.TempRegisters[0] = 9;
-                    break;
+                    {
+                        // TRV-02 (TRV-01 decode, native case 27): nine rentals
+                        // (40..48); one is unavailable while a neighborhood family
+                        // references it as its house. Native writes the remainder
+                        // to Temp0.
+                        var occupied = CountOccupiedVacationLots(
+                            Content.Content.Get().Neighborhood.MainResource?.List<FAMI>());
+                        context.Thread.TempRegisters[0] = (short)Math.Max(0, 9 - occupied);
+                        break;
+                    }
                 case VMGenericTS1CallMode.ReturnZoningTypeOfLotInTemp0: //28
                     var zones = Content.Content.Get().Neighborhood.ZoningDictionary;
                     short result = 1;
@@ -330,9 +463,84 @@ namespace FSO.SimAntics.Primitives
             return VMPrimitiveExitCode.GOTO_TRUE;
         }
 
+        /// <summary>
+        /// Port of Neighborhood::TutorialCompleted (0xad9e0; r247 decode.md §C,
+        /// skeptic correction 2), the target of generic sim calls 0/8/9 with
+        /// arg = 0/1/2. Writes arg+1 to the neighborhood tutorial state (+0x12a)
+        /// and clears the tutorial house latch (+0x12c), both live and in the
+        /// neighborhood file's NGBH record, persisted by an immediate save. arg 0
+        /// additionally clears the "tutorial session active" latch — simulator
+        /// global 26 — both on the live simulator and in the current house file's
+        /// SIMI chunk (a targeted two-byte patch; a whole-file IffFile.Write
+        /// cannot round-trip a lazily opened house). The original opens
+        /// Houses/House%02d.iff (house = the neighborhood's current house) for
+        /// every arg FIRST and aborts all writes when it cannot, so a missing
+        /// house file means nothing is written; for arg 0 the house-file
+        /// open+reconstitute+write IS the SIMI patch, so a failed patch (its
+        /// bool result) aborts everything too — no NGBH arg+1, no TutorialHouse
+        /// clear, no live global-26 clear, no save. The script's primitive exit
+        /// code does not depend on this succeeding.
+        /// </summary>
+        private static void TutorialCompleted(VM vm, int arg)
+        {
+            if (!vm.TS1) return;
+            var nbhd = Content.Content.Get().Neighborhood;
+            if (nbhd?.Neighborhood == null) return;
+
+            // House file handled FIRST for every arg (decode.md §C: both opens
+            // precede any write; failure destructs both and returns).
+            var house = vm.TS1State.CurrentHouse;
+            if (house <= 0) return; //no current house: the native's house-file open fails first
+            if (!File.Exists(nbhd.GetHousePath(house))) return; //IFFResFile2::Open failure: the original writes nothing
+
+            if (arg == 0)
+            {
+                // The arg-0 SIMI patch subsumes the native's house-file
+                // reconstitute+save: it runs FIRST and its bool result gates
+                // every other write (r247 repair F2 — the result was ignored,
+                // letting the NGBH/live writes land on a failed house patch).
+                if (!nbhd.PatchHouseSimiGlobal(house, 26, 0))
+                {
+                    System.Console.WriteLine("R247 TutorialCompleted: house " + house
+                        + " SIMI global-26 patch failed; no completion writes performed");
+                    return;
+                }
+            }
+
+            nbhd.TutorialState = arg + 1;  //Neighborhood+0x12a (NGBH word 1), live and persisted
+            nbhd.TutorialHouse = 0;        //Neighborhood+0x12c (NGBH word 2)
+            if (arg == 0) vm.SetGlobalValue(26, 0); //live simulator global 26
+            nbhd.SaveNeighbourhood(false); //the NGBH patch reaches the file immediately
+        }
+
         private short GetIData(List<InventoryItem> inventory, uint guid)
         {
             return (short)(inventory.FirstOrDefault(x => x.Type == 2 && x.GUID == guid)?.Count ?? 0);
+        }
+
+        /// <summary>
+        /// TRV-02 (native GetTokenAtIndex + RemoveTokenByIndex): read a type-2
+        /// inventory token's value and consume the token in the same step.
+        /// Returns 0 when the token is absent.
+        /// </summary>
+        public static short TakeIData(List<InventoryItem> inventory, uint guid)
+        {
+            var token = inventory.FirstOrDefault(x => x.Type == 2 && x.GUID == guid);
+            if (token == null) return 0;
+            var value = (short)token.Count;
+            inventory.RemoveAll(x => x.Type == 2 && x.GUID == guid);
+            return value;
+        }
+
+        /// <summary>
+        /// TRV-02 (native case 27): vacation rentals 40..48 are unavailable while
+        /// a neighborhood family's house reference equals them; the remainder of
+        /// nine is the bookable count.
+        /// </summary>
+        public static int CountOccupiedVacationLots(IEnumerable<FAMI> families)
+        {
+            if (families == null) return 0;
+            return families.Count(f => f != null && f.HouseNumber >= 40 && f.HouseNumber <= 48);
         }
 
         private void SaveIData(List<InventoryItem> inventory, uint guid, short data)

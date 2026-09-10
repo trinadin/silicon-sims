@@ -58,6 +58,10 @@ namespace FSO.Vitaboy
         public DGRP3DMesh HeadObject;
         public float HeadObjectRotation;
         public float HeadObjectSpeedyVel;
+        public bool TS1PlumbBobVisible;
+        public int TS1PlumbBobMood;
+        public double TS1PlumbBobSeconds;
+        private TS1PlumbBob NativePlumbBob;
         public bool HideHead;
         protected Matrix[] SkelBones;
 
@@ -476,6 +480,18 @@ namespace FSO.Vitaboy
                 if (showCensorBlur)
                 {
                     DrawCensoredMeshesPixelated(device, effect, censorshipFlags);
+                }
+            }
+
+            // The original selected-Sim marker has its own light. It must also draw
+            // when room/advanced lighting is off, but never into the picking pass.
+            if (TS1PlumbBobVisible && effect.CurrentTechnique != effect.Techniques[1])
+            {
+                var head = Skeleton.GetBone("HEAD");
+                if (head != null)
+                {
+                    NativePlumbBob ??= new TS1PlumbBob();
+                    NativePlumbBob.Draw(device, effect, head.AbsolutePosition, TS1PlumbBobMood, TS1PlumbBobSeconds);
                 }
             }
 

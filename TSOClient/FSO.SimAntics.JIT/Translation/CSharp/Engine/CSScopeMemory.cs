@@ -65,8 +65,7 @@ namespace FSO.SimAntics.JIT.Translation.CSharp.Engine
                     return Exp($"temps[temps[{data}]]");
 
                 case VMVariableScope.TreeAdRange: //12
-                    return Exp($"0");
-                //throw new VMSimanticsException("Not implemented...", context);
+                    return Exp($"VMMemory.GetTreeAd(context, 1, {(ushort)data})");
 
                 case VMVariableScope.StackObjectTemp: //13
                     return Exp($"context.StackObject.Thread.TempRegisters[{data}]");
@@ -111,10 +110,10 @@ namespace FSO.SimAntics.JIT.Translation.CSharp.Engine
                     return Exp($"(context.StackObject.IsDynamicSpriteFlagSet((ushort)temps[{data}]) ? (short)1 : (short)0)");
 
                 case VMVariableScope.TreeAdPersonalityVar: //28
-                    throw new Exception("Not implemented...");
+                    return Exp($"VMMemory.GetTreeAd(context, 2, {(ushort)data})");
 
                 case VMVariableScope.TreeAdMin: //29
-                    throw new Exception("Not implemented...");
+                    return Exp($"VMMemory.GetTreeAd(context, 0, {(ushort)data})");
 
                 case VMVariableScope.MyPersonDataByTemp: //30
                     return Exp($"((VMAvatar)context.Caller).GetPersonData((VMPersonDataVariable)(temps[{data}]))");
@@ -131,7 +130,10 @@ namespace FSO.SimAntics.JIT.Translation.CSharp.Engine
                     return Exp($"Content.Content.Get().Jobs.GetJobData((ushort)temps[0], temps[1], {data})");
 
                 case VMVariableScope.NeighborhoodData: //34
-                    return Exp($"0"); //tutorial values only
+                    if (!context.TS1) throw new Exception("Only valid in TS1.");
+                    // Keep compiled trees on the interpreter's original-engine bounds and
+                    // NGBH read path rather than baking the former tutorial-only zero.
+                    return Exp($"VMMemory.GetVariable(context, VMVariableScope.NeighborhoodData, {data})");
 
                 case VMVariableScope.StackObjectFunction: //35
                     return Exp($"(short)context.StackObject.EntryPoints[{data}].ActionFunction");
@@ -352,7 +354,7 @@ namespace FSO.SimAntics.JIT.Translation.CSharp.Engine
                         /** Huh? **/
                         return $"";
                     case VMVariableScope.TreeAdRange: //12
-                        return $""; //can't set this!
+                        return $"VMMemory.SetTreeAd(context, 1, {(ushort)data}, {value});";
                     case VMVariableScope.StackObjectTemp: //13
                         break;
 
@@ -394,10 +396,10 @@ namespace FSO.SimAntics.JIT.Translation.CSharp.Engine
                         return $"context.StackObject.SetDynamicSpriteFlag((ushort)temps[{data}], {value} > 0);";
 
                     case VMVariableScope.TreeAdPersonalityVar: //28
-                        return $""; //you can't set this!
+                        return $"VMMemory.SetTreeAd(context, 2, {(ushort)data}, {value});";
 
                     case VMVariableScope.TreeAdMin: //29
-                        return $""; //you can't set this!
+                        return $"VMMemory.SetTreeAd(context, 0, {(ushort)data}, {value});";
 
                     case VMVariableScope.MyPersonDataByTemp: //30
                         return $"((VMAvatar)context.Caller).SetPersonData((VMPersonDataVariable)temps[{data}], {value});";

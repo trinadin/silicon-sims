@@ -26,7 +26,6 @@ namespace FSO.SimAntics.Primitives
 
         public static VMPrimitiveExitCode ExecuteGeneric(VMStackFrame context, VMPrimitiveOperand args, STR table)
         {
-            //TODO: indexed dialog icons from ID 5000-5255 (inclusive)
             var operand = (VMDialogOperand)args;
             var curDialog = context.Thread.BlockingState as VMDialogResult;
             if (curDialog == null)
@@ -34,7 +33,24 @@ namespace FSO.SimAntics.Primitives
                 //in ts1, it's possible for a lot of blocking dialogs to come in one frame. due to the way our engine works,
                 //we cannot pause the rest of the tick as soon as we hit a blocking dialog, and we cannot show more than one blocking dialog.
                 //so additional blocking dialogs must wait.
-                if (context.VM.TS1 && context.VM.GlobalBlockingDialog != null) return VMPrimitiveExitCode.CONTINUE_NEXT_TICK;
+                if (context.VM.TS1 && context.VM.GlobalBlockingDialog != null)
+                {
+                    // r157: mark this dialog QUEUED (HasDisplayed = false) so the shared
+                    // DIALOG_MAX_WAITTIME applies — WaitTime accrues every VMThread.Tick.
+                    // This wait used to be STATELESS, and GlobalBlockingDialog is released
+                    // only by VMNetDialogResponseCmd (the player's click): any latch
+                    // orphaned without a click (e.g. the game unpaused by outside code
+                    // while the help dialog was up) froze EVERY subsequent TS1 blocking
+                    // dialog's tree forever. Observed as the CarPortal 'process' (4125
+                    // ins15) hang: no bookmark, no carpool, in every soak — the tree
+                    // re-entered this branch each tick without any timeout path.
+                    context.Thread.BlockingState = new VMDialogResult
+                    {
+                        Type = operand.Type,
+                        HasDisplayed = false
+                    };
+                    return VMPrimitiveExitCode.CONTINUE_NEXT_TICK;
+                }
                 VMDialogHandler.ShowDialog(context, operand, table);
 
                 if ((operand.Flags & VMDialogFlags.Continue) == 0)
@@ -59,6 +75,16 @@ namespace FSO.SimAntics.Primitives
                 if (curDialog.Responded || curDialog.WaitTime > DIALOG_MAX_WAITTIME)
                 {
                     context.Thread.BlockingState = null;
+                    // r157: if THIS dialog owned the global slot, release it here too —
+                    // VMNetDialogResponseCmd's release law, applied to the timeout path
+                    // as well. Previously a dialog that timed out (player never clicked,
+                    // pause lifted elsewhere) leaked GlobalBlockingDialog forever.
+                    if (context.VM.TS1 && context.VM.GlobalBlockingDialog == context.Caller)
+                    {
+                        context.VM.GlobalBlockingDialog = null;
+                        if (context.VM.SpeedMultiplier < 0)
+                            context.VM.SpeedMultiplier = (context.VM.LastSpeedMultiplier > 0) ? context.VM.LastSpeedMultiplier : 1;
+                    }
                     if (context.VM.MyUID == context.Caller.PersistID) context.VM.SignalDialog(null);
                     switch (curDialog.Type)
                     {
@@ -126,8 +152,26 @@ namespace FSO.SimAntics.Primitives
                 {
                     if (!curDialog.HasDisplayed)
                     {
+                        if (context.VM.TS1 && context.VM.GlobalBlockingDialog != null && context.VM.GlobalBlockingDialog != context.Caller)
+                        {
+                            // r157: still queued behind another entity's global dialog —
+                            // wait for the slot; the shared timeout above bounds the wait
+                            // (this state was previously unreachable: queued dialogs had
+                            // no BlockingState at all).
+                            return VMPrimitiveExitCode.CONTINUE_NEXT_TICK;
+                        }
                         VMDialogHandler.ShowDialog(context, operand, table);
                         curDialog.HasDisplayed = true;
+                        if (context.VM.TS1 && context.VM.GlobalBlockingDialog == null)
+                        {
+                            // r157: taking the freed slot — take the latch and pause with it,
+                            // exactly like a first-run dialog (a queued dialog that shows
+                            // after a timeout-release must own the slot or the release law
+                            // above can never apply to it).
+                            context.VM.GlobalBlockingDialog = context.Caller;
+                            context.VM.LastSpeedMultiplier = context.VM.SpeedMultiplier;
+                            context.VM.SpeedMultiplier = -2;
+                        }
                     }
                     return VMPrimitiveExitCode.CONTINUE_NEXT_TICK;
                 }
@@ -147,6 +191,11 @@ namespace FSO.SimAntics.Primitives
         public VMDialogType Type { get; set; }
         public byte TitleStringID { get; set; }
         public VMDialogFlags Flags; 
+
+        public VMDialogIconMode IconMode
+        {
+            get { return (VMDialogIconMode)(((byte)Flags >> 1) & 0x7); }
+        }
 
         public bool Continue
         {
@@ -237,6 +286,18 @@ namespace FSO.SimAntics.Primitives
         UseTemp1 = 32,
         FilterProfanity = 64,
         NewEngageContinue = 128
+    }
+
+    public enum VMDialogIconMode : byte
+    {
+        Automatic = 0,
+        None = 1,
+        Neighbor = 2,
+        Indexed = 3,
+        Named = 4,
+        Reserved5 = 5,
+        Reserved6 = 6,
+        Reserved7 = 7
     }
 
     public enum VMDialogType : byte

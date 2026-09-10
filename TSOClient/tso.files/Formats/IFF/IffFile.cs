@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -40,6 +40,12 @@ namespace FSO.Files.Formats.IFF
             {"TPRP", typeof(TPRP)},
             {"SLOT", typeof(SLOT)},
             {"GLOB", typeof(GLOB)},
+            // TS1 data ships some NPC globs with a lowercase chunk type (e.g.
+            // NPC_Vacation_Director.iff, NPC_Superstar_PA.iff carry "glob" ->
+            // "VacationDirectorGlobals"). IffFile.AddChunk SKIPS unregistered types,
+            // silently dropping them and breaking VMEntity.UseTreeTableOf's semi-global
+            // module binding for those objects. Register the lowercase variant too.
+            {"glob", typeof(GLOB)},
             {"BCON", typeof(BCON)},
             {"TTAB", typeof(TTAB)},
             {"OBJf", typeof(OBJf)},
@@ -64,7 +70,18 @@ namespace FSO.Files.Formats.IFF
             {"SIMI", typeof(SIMI) },
             {"TATT", typeof(TATT) },
             {"HOUS", typeof(HOUS) },
-            //todo: FAMh (family motives ("family house"?)) field encoded.
+            // R248: the exported-family chunk set (r247-fam-import decode §0/§3).
+            // EXPi (famId + member ids) is consumed by the neighborhood import;
+            // uChr (per-member bodystrings, STR format -3) drives the recreated
+            // characters; FINV carries the positional member inventories; Gtab is
+            // the GUID old->new translation the import persists into the moved
+            // FAM-as-house file. FAMh (family header) stays an IffUnknownChunk
+            // below: no port consumer needs any of its fields and raw retention
+            // round-trips it.
+            {"EXPi", typeof(EXPi) },
+            {"uChr", typeof(uChr) },
+            {"FINV", typeof(FINV) },
+            {"Gtab", typeof(Gtab) },
 
             {"TREE", typeof(TREE) },
             {"FCNS", typeof(FCNS) },
@@ -73,7 +90,19 @@ namespace FSO.Files.Formats.IFF
             {"FSOM", typeof(FSOM) },
             {"MTEX", typeof(MTEX) },
             {"FSOV", typeof(FSOV) },
-            {"PNG_", typeof(PNG) }
+            {"PNG_", typeof(PNG) },
+            // Preserved-but-uninterpreted chunk types that the original game carries. Without
+            // these entries IffFile.AddChunk SKIPS them entirely (data discarded). They are
+            // kept as IffUnknownChunk payloads so nothing is lost; semantic readers can be
+            // added later per type (see PARITY read-vs-skip audit).
+            {"XXXX", typeof(IffUnknownChunk)},
+            {"POSI", typeof(IffUnknownChunk)},
+            {"TMPL", typeof(IffUnknownChunk)},
+            {"pers", typeof(IffUnknownChunk)},
+            {"FAMh", typeof(IffUnknownChunk)},
+            {"CATS", typeof(IffUnknownChunk)},
+            {"Optn", typeof(IffUnknownChunk)},
+            {"rsmp", typeof(IffUnknownChunk)}
         };
 
         public IffRuntimeInfo RuntimeInfo = new IffRuntimeInfo();
@@ -182,7 +211,13 @@ namespace FSO.Files.Formats.IFF
                 hash.Init();
                 foreach (IffChunk chunk in executableTypes)
                 {
-                    hash.Update(chunk.ChunkData ?? chunk.OriginalData, chunk.ChunkData.Length);
+                    // R122: hash the buffer we actually pass — ChunkData is null for
+                    // lazily-loaded chunks, and the old `chunk.ChunkData.Length`
+                    // length argument crashed InitHash; some registered chunks carry
+                    // NEITHER buffer, and contribute nothing to the digest.
+                    var data = chunk.ChunkData ?? chunk.OriginalData;
+                    if (data == null) continue;
+                    hash.Update(data, data.Length);
                 }
                 ExecutableHash = hash.Digest();
             }
@@ -328,7 +363,17 @@ namespace FSO.Files.Formats.IFF
             {
                 foreach (var chunk in type)
                 {
-                    result.Add(this.prepare<IffChunk>(chunk));
+                    try
+                    {
+                        result.Add(this.prepare<IffChunk>(chunk));
+                    }
+                    catch (Exception ex)
+                    {
+                        // A single chunk whose body Read throws must not abort the whole file's
+                        // chunk inventory - each chunk is still IFF data. Try to re-prepare so the
+                        // chunk remains enumerated; if it cannot be read, still report it once.
+                        try { result.Add((IffChunk)chunk); } catch (Exception) { }
+                    }
                 }
             }
             return result;

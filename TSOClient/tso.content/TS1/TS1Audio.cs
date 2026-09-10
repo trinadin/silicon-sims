@@ -1,4 +1,4 @@
-﻿using FSO.Content.Interfaces;
+using FSO.Content.Interfaces;
 using FSO.Files.HIT;
 using System;
 using System.Collections.Generic;
@@ -25,6 +25,11 @@ namespace FSO.Content.TS1
         private TS1SubProvider<DecodedSFX> MP3Sounds;
         private TS1SubProvider<DecodedSFX> XASounds;
         private TS1SubProvider<DecodedSFX> UTKSounds;
+
+        /// <summary>Round 54 - IFF-literal sound-corpus census: mounted distinct IFF member count per
+        /// engine sound extension (IFF data from the original packs - no invention). Pinned by Autotest.</summary>
+        public static readonly Dictionary<string, int> MountedSoundCounts = new Dictionary<string, int>();
+        public static readonly Dictionary<string, List<string>> MountedSoundNames = new Dictionary<string, List<string>>();
 
         /** Audio Cache **/
         public Dictionary<Patch, SoundEffect> SFXCache = new Dictionary<Patch, SoundEffect>();
@@ -144,6 +149,13 @@ namespace FSO.Content.TS1
             MP3Sounds.Init();
             XASounds.Init();
             UTKSounds.Init();
+
+            // Round 54 - IFF-literal sound-corpus census (IFF data; pinned by Autotest 'snd').
+            MountedSoundCounts[".wav"] = WAVSounds.ListGeneric().Count;
+            MountedSoundCounts[".mp3"] = MP3Sounds.ListGeneric().Count;
+            MountedSoundCounts[".xa"] = XASounds.ListGeneric().Count;
+            MountedSoundCounts[".utk"] = UTKSounds.ListGeneric().Count;
+            MountedSoundNames[".xa"] = XASounds.ListGeneric().Select(x => x.ToString()).ToList();
 
             var FilePattern = new Regex(@".*\.hot");
 

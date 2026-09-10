@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.IO;
 using FSO.Files.Utils;
@@ -395,7 +395,14 @@ namespace FSO.Files.Formats.IFF.Chunks
                 var numFields = 80;
                 if (Version == 138)
                 {
-                    numFields = 95;
+                    // IFF-literal: the staged Complete-Collection corpus carries 106 fields for EVERY
+                    // v138 OBJD (all 5123 v138 OBJDs, 0 exceptions - tools/probe93.py + iff_objd_canon.py
+                    // census, Round 47). FSO's old 95-field mapping froze DTSubsort(@93)/KeepBuying(@94)/
+                    // VacationSubsort(@95)/CommunitySubsort(@97)/STSubsort(@101)/MTSubsort(@102) at 0, so
+                    // served Downtown/Vacation/Community/Studiotown/Magictown sort bytes were NOT
+                    // IFF-literal (the original reads the full v138 struct). Mirror the real 106 fields
+                    // so every named field through MTSubsort(@102) parses from the file.
+                    numFields = 106;
                 }
                 else if (Version == 139)
                 {

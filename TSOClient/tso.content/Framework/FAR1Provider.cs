@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -22,6 +22,10 @@ namespace FSO.Content.Framework
 
         protected IContentCodec<T> Codec;
         protected TimedReferenceCache<string, T> Cache;
+        /// <summary>Round 55 - IFF-LITERAL resource census: per-extension IFF member-count the mount
+        /// table exposes (IFF data from the original packs, EntriesOfType rows - no invention).
+        /// Pinned by Autotest 'iff'.</summary>
+        public static readonly Dictionary<string, int> MountedResourceCounts = new Dictionary<string, int>();
         private string[] FarFiles;
         private Regex FarFilePattern;
 
@@ -155,7 +159,8 @@ namespace FSO.Content.Framework
         public List<Far1ProviderEntry<T>> GetEntriesForExtension(string ext)
         {
             List<Far1ProviderEntry<T>> result = null;
-            if (EntriesOfType.TryGetValue(ext, out result)) return result;
+            // Loading-screen consumers can query before Init publishes the index.
+            if (EntriesOfType != null && EntriesOfType.TryGetValue(ext, out result)) return result;
             return null;
         }
 
@@ -178,6 +183,10 @@ namespace FSO.Content.Framework
                         farFiles.Add(file);
                     }
                 }
+                // IFF-literal corpus order (Round 53): the ORIGINAL game reads its IFF packs in IFF path
+                // order. IFF-literally the served enumeration (buy-catalog order, mounts) must be deterministic
+                // IFF order, not OS-enumeration order - OS directory ordering is not IFF data.
+                farFiles.Sort(StringComparer.Ordinal);
                 FarFiles = farFiles.ToArray();
             }
             
@@ -205,6 +214,16 @@ namespace FSO.Content.Framework
                         group.Add(referenceItem);
                     }
                 }
+            }
+
+            // Round 55 - IFF-LITERAL resource census (IFF data; pinned by Autotest 'iff'):
+            // per-extension IFF member-count exposed by the mount table (EntriesOfType rows - each IFF
+            // member table row, no dedup). IFF-literally the IFF resource surface must mount 1:1.
+            if (TS1)
+            {
+                MountedResourceCounts.Clear();
+                foreach (var kv in EntriesOfType)
+                    MountedResourceCounts[kv.Key] = kv.Value.Count;
             }
         }
 

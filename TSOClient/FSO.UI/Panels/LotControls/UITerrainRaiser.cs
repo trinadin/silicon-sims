@@ -31,12 +31,18 @@ namespace FSO.Client.UI.Panels.LotControls
 
         private VMArchitectureCommand LastCmd;
         private bool WasDown;
+        // R127 (Simitone): the original build panel has SEPARATE raise/lower
+        // tools (distinct kBldSbTl art per direction). parameters[0]==1 marks
+        // the lower variant: drag deltas invert and the down cursor shows.
+        // TSO callers pass an empty list, so default behavior is unchanged.
+        private bool LowerMode;
 
         public UITerrainRaiser(VM vm, LotView.World world, ILotControl parent, List<int> parameters)
         {
             this.vm = vm;
             World = parent.World;
             Parent = parent;
+            LowerMode = (parameters != null && parameters.Count > 0 && parameters[0] == 1);
             WallCursor = vm.Context.CreateObjectInstance(0x2F39B7A6, LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH, true);
 
             ((ObjectComponent)WallCursor.Objects[0].WorldUI).ForceDynamic = true;
@@ -79,6 +85,7 @@ namespace FSO.Client.UI.Panels.LotControls
                 var mpos = (int)(MousePosition.Y - World.State.WorldSpace.GetScreenOffset().Y);
                 var mod = ((StartMousePosition - mpos)*10) / (15 / (1 << (3 - (int)World.State.Zoom)));
                 if (!Modifiers.IsSet(UILotControlModifiers.SHIFT)) mod = (int)Math.Round(mod / 10f) * 10;
+                if (LowerMode) mod = -mod;
 
                 if (mod != 0 || Modifiers.IsSet(UILotControlModifiers.CTRL))
                 {
@@ -123,6 +130,7 @@ namespace FSO.Client.UI.Panels.LotControls
                 var mpos = (int)(MousePosition.Y - World.State.WorldSpace.GetScreenOffset().Y);
                 mod = ((StartMousePosition - mpos)*10) / (15 / (1 << (3 - (int)World.State.Zoom)));
                 if (!Modifiers.IsSet(UILotControlModifiers.SHIFT)) mod = (int)Math.Round(mod / 10f) * 10;
+                if (LowerMode) mod = -mod;
                 var newHeight = StartTerrainHeight + mod;
 
                 cmds.Add(new VMArchitectureCommand
@@ -147,11 +155,18 @@ namespace FSO.Client.UI.Panels.LotControls
                 if (cost != 0)
                 {
                     var disallowed = Parent.ActiveEntity != null && cost > Parent.Budget;
+                    // R203 dirt-tool law: every dirt-tool message rides the shared
+                    // tooltip window and never recolors (BLACK). An unaffordable drag
+                    // is STR# 149[5] 'Insufficient funds'; a normal drag is the
+                    // engine's plain "$N"/"-$N" cost readout. The old DarkRed cost
+                    // tooltip had no engine counterpart (tso.client copy carries the
+                    // same law; see tools/iff-dump/r203/r203-dirt-tool-law.md).
                     state.UIState.TooltipProperties.Show = true;
-                    state.UIState.TooltipProperties.Color = disallowed ? Color.DarkRed : Color.Black;
+                    state.UIState.TooltipProperties.Color = Color.Black;
                     state.UIState.TooltipProperties.Opacity = 1;
                     state.UIState.TooltipProperties.Position = new Vector2(MousePosition.X, MousePosition.Y);
-                    state.UIState.Tooltip = (cost < 0) ? ("-$" + (-cost)) : ("$" + cost);
+                    state.UIState.Tooltip = disallowed ? TerrainToolErrors.Text(TerrainToolErrors.CodeInsufficientFunds)
+                        : TerrainToolErrors.CostText(cost);
                     state.UIState.TooltipProperties.UpdateDead = false;
 
                     if (!cmds[0].Equals(LastCmd) && disallowed)
@@ -180,7 +195,7 @@ namespace FSO.Client.UI.Panels.LotControls
 
             WallCursor.SetVisualPosition(new Vector3(cursor.X, cursor.Y, (World.State.Level - 1) * 2.95f + mod * vm.Context.Blueprint.TerrainFactor), Direction.NORTH, vm.Context);
 
-            if (Modifiers.IsSet(UILotControlModifiers.CTRL)) SetCursorGraphic(1);
+            if (LowerMode || Modifiers.IsSet(UILotControlModifiers.CTRL)) SetCursorGraphic(1);
             else SetCursorGraphic(0);
         }
 

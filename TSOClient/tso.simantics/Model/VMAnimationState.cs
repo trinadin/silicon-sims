@@ -48,8 +48,9 @@ namespace FSO.SimAntics.Model
             }
 
             /** Sort time property lists by time **/
-            //stable sort
-            TimePropertyLists.OrderBy(x => x.ID); //.Sort(new TimePropertyListItemSorter());
+            //stable sort — CC-03: the OrderBy result was discarded, so events
+            //fired in file order rather than time order.
+            TimePropertyLists = TimePropertyLists.OrderBy(x => x.ID).ToList();
         }
 
         #region VM Marshalling Functions

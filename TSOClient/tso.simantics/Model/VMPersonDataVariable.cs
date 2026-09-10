@@ -15,21 +15,39 @@
         CookingSkill = 10,
         CharismaSkill = 11,
         MechanicalSkill = 12,
+        // R151 decode (tools/iff-dump/r151/r151-expansion-interest-decode.md):
+        // person word N = cXPerson + 0x58c + 2N, bounds 0..255 — ONE array.
+        // The five Hot-Date-era interest topics live at LOW indices, aliased
+        // here onto the TSO-era names (which are dead code in the TS1 port —
+        // zero readers/writers outside the enum): Exercise 13, Food 14,
+        // Parties 16, Style 20, Hollywood 26. Every character file's
+        // 'init traits' tree writes MyPersonData[20] = 5 (Style = 5 for every
+        // tree-initialized sim); no corpus script writes 13/14/16/26 and
+        // nothing anywhere writes >= 56. ChatBaloonOn (26) is the only live
+        // TSO-era user; its two writers are TS1-gated so Hollywood stays
+        // clean. Technology/Romance = 54/55, the word-run continuation
+        // (+0x5f8/+0x5fa) = the init-traits tree's rolls #9/#10; word 54
+        // doubles as the TSO direct-control sentinel (32767).
         NetworkID = 13,
+        Interest_Exercise = 13,
         OnlineStatus = 14,
+        Interest_Food = 14,
         CreativitySkill = 15,
         CustomOutfitIndex = 16,
+        Interest_Parties = 16,
         BodySkill = 17,
         LogicSkill = 18,
         /** This is actually used ¬_¬, open fridge no food uses it in fridges **/
         UnusedAndDoNotUse = 19,
         AllowedSocialAndPuppeteering = 20,
+        Interest_Style = 20,
         IsHousemate = 21,
         HandGestureLeft = 22,
         HandGestureRight = 23,
         JobData = 24,
         TreeUseDataField = 25,
         ChatBaloonOn = 26,
+        Interest_Hollywood = 26,
         TickCounter = 27,
         TreeUseDataField2 = 28,
         Cheats = 29,
@@ -58,7 +76,9 @@
         Interest_Music = 52,
         Interest_Outdoors = 53,
         UnusedAndDoNotUse2 = 54,
+        Interest_Technology = 54,
         UnusedAndDoNotUse3 = 55,
+        Interest_Romance = 55,
         JobType = 56,
         JobPromotionLevel = 57,
         PersonsAge = 58,

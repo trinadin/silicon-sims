@@ -37,7 +37,10 @@ namespace FSO.Files.Formats.IFF.Chunks
                 string magic = io.ReadCString(4);
                 var items = (Version > 0x3F) ? 0x40 : 0x20;
 
-                GlobalData = new short[38];
+                //0x40 words: Hot Date and later saves carry globals 32..63. The
+                //tutorial house flag (global 58) and its companions (53/54/69)
+                //live in that range (r247 GetHouseFileInfo law).
+                GlobalData = new short[64];
 
                 for (int i=0; i<items; i++)
                 {
@@ -86,7 +89,7 @@ namespace FSO.Files.Formats.IFF.Chunks
                 io.WriteCString("IMIS", 4);
                 var items = (Version > 0x3E) ? 0x40 : 0x20;
 
-                GlobalData = new short[38];
+                if (GlobalData == null) GlobalData = new short[64];
 
                 for (int i = 0; i < items; i++)
                 {
@@ -156,7 +159,9 @@ namespace FSO.Files.Formats.IFF.Chunks
                 io.WriteInt32(ServiceExpense);
                 io.WriteInt32(FoodExpense);
                 io.WriteInt32(BillsExpense);
-                io.WriteInt32(MiscIncome);
+                // SIM-09: the FreeSO writer duplicated MiscIncome here; the native
+                // day record (and this class's own reader) puts MiscExpense 6th.
+                io.WriteInt32(MiscExpense);
                 io.WriteInt32(HouseholdExpense);
                 io.WriteInt32(ArchitectureExpense);
             }

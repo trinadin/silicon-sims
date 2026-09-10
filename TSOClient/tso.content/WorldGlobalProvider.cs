@@ -25,6 +25,24 @@ namespace FSO.Content
         public TS1Curve[] InteractionScoreChild;
         public TS1Curve[] HouseScore;
 
+        /// <summary>
+        /// The twelve autonomy constants from global.iff FCNS id 2 (FloatConstants),
+        /// which the native AutonomyConstantsClient::UpdateConstants (0x112750) loads
+        /// over the compiled literal-pool defaults at boot (r249-freewill-cfg §1).
+        /// Live values: family/visitor min score 1e-7, sitting cutoff 1e-6,
+        /// random selection count 4, attenuation {0.1,0.3,0.6}/{0.01,0.02,0.03},
+        /// friendship 50, functional distance 3.0.
+        /// </summary>
+        public Dictionary<string, float> AutonomyFCNS = new Dictionary<string, float>();
+
+        /// <summary>Native-style named-constant read: FCNS value or the compiled default.</summary>
+        public float GetAutonomyConstant(string name, float compiledDefault)
+        {
+            float value;
+            if (AutonomyFCNS.TryGetValue(name, out value)) return value;
+            return compiledDefault;
+        }
+
         public WorldGlobalProvider(Content contentManager)
         {
             this.ContentManager = contentManager;
@@ -50,6 +68,18 @@ namespace FSO.Content
             InteractionScoreChild = CurveFromSTR(global.Resource.Get<STR>(503), true);
             HappyWeightChild = CurveFromSTR(global.Resource.Get<STR>(504), true);
             HouseScore = CurveFromSTR(global.Resource.Get<STR>(505), false);
+
+            // AutonomyConstants FCNS overrides (native reads the same names from the
+            // FloatConstants resource in the person GLOB at boot).
+            var autonomy = global.Resource.Get<FCNS>(2);
+            if (autonomy != null)
+            {
+                AutonomyFCNS.Clear();
+                for (int i = 0; i < autonomy.ConstantNames.Count && i < autonomy.ConstantValues.Count; i++)
+                {
+                    AutonomyFCNS[autonomy.ConstantNames[i]] = autonomy.ConstantValues[i];
+                }
+            }
 
             /*
             PermutationTest(HappyWeight, new float[] { 98.5f, 97.92f, 98.325f, 99.32f, 98.674f, 80.268f, 99.479f, 99f }, 30f);

@@ -134,24 +134,7 @@ namespace FSO.Client.UI.Controls
             {
                 string buttonText = "";
                 if (button.Text != null) buttonText = button.Text;
-                else
-                {
-                    switch (button.Type)
-                    {
-                        case UIAlertButtonType.OK:
-                            buttonText = GameFacade.Strings.GetString("142", "ok button");
-                            break;
-                        case UIAlertButtonType.Yes:
-                            buttonText = GameFacade.Strings.GetString("142", "yes button");
-                            break;
-                        case UIAlertButtonType.No:
-                            buttonText = GameFacade.Strings.GetString("142", "no button");
-                            break;
-                        case UIAlertButtonType.Cancel:
-                            buttonText = GameFacade.Strings.GetString("142", "cancel button");
-                            break;
-                    }
-                }
+                else buttonText = DefaultButtonCaption(button.Type);
                 var btnElem = AddButton(buttonText, button.Type, button.Handler == null);
                 Buttons.Add(btnElem);
                 if (button.Handler != null) btnElem.OnButtonClick += button.Handler;
@@ -369,6 +352,23 @@ namespace FSO.Client.UI.Controls
             {
                 Message = message
             }, resultBox);
+        }
+
+        // R204 (mac-port): system dialog buttons read STR# 152
+        // 'DefaultDialogButtons' ([0] OK, [1] Cancel, [2] Yes, [3] No). The
+        // old named keys into 142 could never resolve in the TS1 format −3
+        // table (index-only), and 142 'ObjDialogs' belongs to the object
+        // dialogs; see tools/iff-dump/r204/r204-str-family-law.md.
+        public static string DefaultButtonCaption(UIAlertButtonType type)
+        {
+            switch (type)
+            {
+                case UIAlertButtonType.OK: return GameFacade.Strings.GetString("152", "0");
+                case UIAlertButtonType.Yes: return GameFacade.Strings.GetString("152", "2");
+                case UIAlertButtonType.No: return GameFacade.Strings.GetString("152", "3");
+                case UIAlertButtonType.Cancel: return GameFacade.Strings.GetString("152", "1");
+                default: return "";
+            }
         }
 
         #endregion

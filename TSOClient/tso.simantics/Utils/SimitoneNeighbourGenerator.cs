@@ -1,4 +1,4 @@
-﻿using FSO.Files.Formats.IFF.Chunks;
+using FSO.Files.Formats.IFF.Chunks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +28,11 @@ namespace FSO.SimAntics.Utils
             var neigh = Content.Content.Get().Neighborhood;
             //userid
             var userid = neigh.NextSim;
+            // R252: the NBRS record Name is the lowercase character-file stem
+            // ("user" + userid zero-padded to 5). SaveNewNeighbour writes
+            // "User"+(NextSim++).iff from the same userid, so capture the lowercase
+            // stem here (before NextSim++ in SaveNewNeighbour) for the caller.
+            info.CharStem = "user" + userid.ToString().PadLeft(5, '0');
 
             var tempObj = Content.Content.Get().WorldObjects.Get(info.CustomGUID ?? TEMPLATE_GUID);
             tempObj.OBJ.ChunkParent.RetainChunkData = true;
@@ -74,7 +79,7 @@ namespace FSO.SimAntics.Utils
                 var info = infos[i];
                 info.FamilyID = (short)fami.ChunkID;
                 PrepareTemplatePerson(guid, info);
-                AddNeighbor(guid, 9, info.MakePersonData());
+                AddNeighbor(guid, NbrsFormat.PERSON_MODE, info.MakePersonData(), info.CharStem);
             }
             Content.Content.Get().Neighborhood.SaveNeighbourhood(true);
             return fami;
@@ -83,7 +88,7 @@ namespace FSO.SimAntics.Utils
         public static Neighbour CreateNeighbor(uint guid, SimTemplateCreateInfo info)
         {
             PrepareTemplatePerson(guid, info);
-            return AddNeighbor(guid, 9, info.MakePersonData());
+            return AddNeighbor(guid, NbrsFormat.PERSON_MODE, info.MakePersonData(), info.CharStem);
         }
 
         public static FAMI CreateFamily(string name, int count)
@@ -115,7 +120,10 @@ namespace FSO.SimAntics.Utils
 
                 FamilyGUIDs = guids,
                 FamilyNumber = families.Max(x => x.FamilyNumber) + 1,
-                Unknown = 24,
+                // SAV-02: the original writes 1 for a created+moved-in family
+                // (r252 decode.md §3 "0 for bin, 1/17 for moved-in"; round.md:69
+                // pins "original 1" against the old port-chosen 24).
+                Unknown = 1,
                 Budget = 20000,
             };
             neigh.MainResource.AddChunk(newFam);
@@ -152,7 +160,7 @@ namespace FSO.SimAntics.Utils
             }
         }
 
-        public static Neighbour AddNeighbor(uint guid, int personMode, short[] personData)
+        public static Neighbour AddNeighbor(uint guid, int personMode, short[] personData, string name)
         {
             var neigh = Content.Content.Get().Neighborhood;
             var ns = neigh.Neighbors.Entries;
@@ -167,7 +175,12 @@ namespace FSO.SimAntics.Utils
 
             var newN = new Neighbour()
             {
-                Name = "iffname",
+                // R252: write the original record shape — Version 0x4 (80-short
+                // PersonData, no Unknown3) and the lowercase character-file stem as
+                // Name. The port previously left Version at its 0xA class default
+                // and wrote the literal "iffname".
+                Version = NbrsFormat.RECORD_VERSION,
+                Name = name,
                 NeighbourID = newID,
                 GUID = guid,
                 Relationships = new Dictionary<int, List<short>>(),
@@ -187,7 +200,13 @@ namespace FSO.SimAntics.Utils
         public short SkinTone;
         public bool Child;
         public short FamilyID;
-        public short[] PersonalityPoints = new short[5];
+        // R252: the lowercase character-file stem (e.g. "user00024") captured in
+        // PrepareTemplatePerson from neigh.NextSim; used as the NBRS record Name.
+        public string CharStem;
+        // six base personality slots in IFF order: pd[2..7] = Nice, Active, Generous, Playful, Outgoing, Neat
+        // (VMPersonDataVariable 2..7). IFF 8298 'init NPC' writes ALL SIX = 1000; make_new_character
+        // NPCs mirror that (was 5 slots - Generous/4 was never written).
+        public short[] PersonalityPoints = new short[6];
         public uint? CustomGUID;
 
         public Dictionary<int, string> BodyStringReplace;
@@ -253,53 +272,80 @@ namespace FSO.SimAntics.Utils
 
             pd[2] = PersonalityPoints[0];
             pd[3] = PersonalityPoints[1];
-            pd[5] = PersonalityPoints[2];
-            pd[6] = PersonalityPoints[3];
-            pd[7] = PersonalityPoints[4];
+            pd[4] = PersonalityPoints[2]; // Generous - IFF 8298 writes it, engine never did
+            pd[5] = PersonalityPoints[3];
+            pd[6] = PersonalityPoints[4];
+            pd[7] = PersonalityPoints[5];
 
-            pd[13] = (short)(500+rand.Next(5)*100);
-            pd[14] = (short)(500 + rand.Next(5) * 100);
+            // IFF 'Init person' (8192, reached only via init-NPC 8298, engine-driven in the
+            // original - 0 IFF callers corpus-wide) also writes the new-sim job/autonomy/priority
+            // PersonData canon. Mirror each write IFF-literally, in IFF chain execution order
+            // (Init person 36/56/57/63 first, then init-NPC 33):
+            //   pd[36] AutonomyLevel        = 50
+            //   pd[56] JobType               = -1 ONLY if currently 0 (exact IFF Equals conditional)
+            //   pd[57] JobPromotionLevel     = IFF Tuning[17412] which resolves to 4 at runtime
+            //                                 (global BCON 264 'Children Grades' key 4)
+            //   pd[63] JobPerformance        = 0
+            //   pd[33] Priority              = 25  (init-NPC ins1)
+            // The original save corroborates: Goth Cassandra carries jobType=-1/jobLevel=4/perf=0.
+            pd[36] = 50;                       // AutonomyLevel (VMPersonDataVariable.AutonomyLevel)
+            if (pd[56] == 0) pd[56] = -1;      // JobType: IFF Equals(56,0) true-branch -> -1 (unemployed)
+            pd[57] = 4;                        // JobPromotionLevel: IFF Tuning[17412] -> global BCON 264 key 4
+            pd[63] = 0;                        // JobPerformance
 
-            pd[16] = 600;
+            // IFF 'Init person' (8192) opcode-8 random writes: pd[9..12,15,17,18] =
+            // NextRandom(1000) (VMRandomNumber: DestinationScope MyPersonData, RangeData
+            // 1000 Literal -> IFF range literal 1000; NextRandom gives [0,1000)). These map
+            // to VMPersonDataVariable SkillEfficiency/Cooking/Charisma/Mechanical/Creativity/
+            // Body/Logic. Engine previously left all seven at 0. IFF-literal mirror.
+            pd[9]  = (short)rand.Next(1000);   // SkillEfficiency
+            pd[10] = (short)rand.Next(1000);   // CookingSkill
+            pd[11] = (short)rand.Next(1000);   // CharismaSkill
+            pd[12] = (short)rand.Next(1000);   // MechanicalSkill
+            pd[15] = (short)rand.Next(1000);   // CreativitySkill
+            pd[17] = (short)rand.Next(1000);   // BodySkill
+            pd[18] = (short)rand.Next(1000);   // LogicSkill
 
-            pd[26] = 600;
+            pd[33] = 25;                       // Priority (VMPersonDataVariable.Priority; init-NPC ins1)
 
-            //personality init
-            //same as init traits on avatar
-            var need = new int[] { 1, 3, 3, 3 };
-            //none 0
-            //low <4
-            //med <7
-            //hi otherwise
-            for (int i=46; i<56; i++)
-            {
-                var pers = rand.Next(10);
+            // IFF 'init NPC' (8298) trailing writes: pd[29]=1 (Cheats), pd[32]=
+            // Tuning[16898] (PersonType -> global BCON 260 'Person Types' key 2 = 2).
+            pd[29] = 1;                        // Cheats
+            pd[32] = 2;                        // PersonType (IFF Tuning[16898] -> BCON 260 key 2)
 
-                int nindex;
-                if (pers == 0)
-                    nindex = 0;
-                else if (pers < 4)
-                    nindex = 1;
-                else if (pers < 7)
-                    nindex = 2;
-                else
-                    nindex = 3;
-
-                bool good = need[nindex] > 0;
-                if (!good) i--; //try again
-                else
-                {
-                    need[nindex]--;
-                    pd[i] = (short)(pers * 100);
-                }
-            }
+            // R152: interests = the ENGINE'S OWN creation law, replacing the
+            // pre-decode guesses (pd[13]/[14]=500..800, pd[16]=pd[26]=600)
+            // and the R150 tree-dialect mirror. The original creates CAS/
+            // townie sims through cXPerson::Initialize -> RandomizeAllInterests
+            // (x100 dialect): loop 1 words 46..55 with counters {4,3,3}, loop
+            // 2 words 13/14/16/20/26 with {1,2,2}, ranges {0..3,4..6,7..10}
+            // x100 (VMInterestRandomizer, decoded r151 sec 2.1 + r152 verify).
+            // Character-FILE sims keep the trees' raw dialect; the Interest
+            // panel bridges both.
+            VMInterestRandomizer.ApplyTo(pd, rand);
 
             pd[58] = (short)(Child ? 9 : 27);
-            pd[60] = SkinTone;
+            pd[60] = SkinToDisk(SkinTone);
             pd[61] = FamilyID;
             pd[65] = Gender;
 
             return pd;
+        }
+
+        /// <summary>
+        /// R252: map the logical SkinTone (AppearanceType 0=Light, 1=Medium, 2=Dark)
+        /// to the original TS1 disk encoding on pd[60]: lgt=1, drk=2, med=3
+        /// (non-monotonic). The port previously wrote the logical 0/1/2 straight
+        /// into pd[60], which a native engine reads as 0=invalid/1=light/2=dark.
+        /// </summary>
+        public static short SkinToDisk(short logical)
+        {
+            switch (logical)
+            {
+                case 1: return 3; // Medium -> med=3
+                case 2: return 2; // Dark   -> drk=2
+                default: return 1; // Light (0) -> lgt=1
+            }
         }
     }
 }

@@ -639,6 +639,28 @@ namespace FSO.SimAntics.Utils
             return floorsCovered;
         }
 
+        /// <summary>
+        /// R216 engine law, TOOL layer: cNewFloorTool::TileIsFloorable @0x17a6f0
+        /// rejects the lot's rim tiles (the per-tile unfloorable flag) BEFORE a
+        /// floor command exists — the architecture primitives themselves are
+        /// unrestricted (the TS1 terrain restore writes full-lot strips through
+        /// FloorPatternRect). The port approximates the flag rim with the
+        /// terrain limit, the same 1-tile inset the terrain tools decode to.
+        /// Returns null when the rect lies entirely on the rim. Rect convention
+        /// matches the FLOOR_RECT command (Width = inclusive span).
+        /// </summary>
+        public static Rectangle? ClipFloorRectToFloorable(VMArchitecture target, Rectangle rect)
+        {
+            if (!target.DisableClip) return rect;
+            var tl = target.TerrainLimit;
+            int x = Math.Max(rect.X, tl.X);
+            int y = Math.Max(rect.Y, tl.Y);
+            int x2 = Math.Min(rect.X + rect.Width, tl.Right - 1);
+            int y2 = Math.Min(rect.Y + rect.Height, tl.Bottom - 1);
+            if (x2 < x || y2 < y) return null;
+            return new Rectangle(x, y, x2 - x, y2 - y);
+        }
+
         //==== TERRAIN ====
 
         public static int DotTerrain(VMArchitecture target, Point pos, short mod)

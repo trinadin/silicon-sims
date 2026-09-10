@@ -202,7 +202,7 @@ namespace FSO.Client.Utils
                 if (m_fade > 1) m_fade = 1;
 
                 state.UIState.TooltipProperties.Show = true;
-                state.UIState.TooltipProperties.Color = Color.Black;
+                state.UIState.TooltipProperties.Color = new Color(31, 124, 31);   // TS1 tooltip text green (cWinCatalog Init 0x26b458)
                 state.UIState.TooltipProperties.UpdateDead = false;
                 state.UIState.TooltipProperties.Position = m_position;
                 state.UIState.TooltipProperties.Opacity = m_fade;
@@ -222,7 +222,7 @@ namespace FSO.Client.Utils
                 {
                     m_active = true;
                     state.UIState.TooltipProperties.Show = true;
-                    state.UIState.TooltipProperties.Color = Color.Black;
+                    state.UIState.TooltipProperties.Color = new Color(31, 124, 31);   // TS1 tooltip text green
                     state.UIState.TooltipProperties.Opacity = 0;
                     state.UIState.TooltipProperties.UpdateDead = false;
                     state.UIState.Tooltip = Target.Tooltip;

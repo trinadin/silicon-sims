@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FSO.HIT.Model;
@@ -31,6 +31,11 @@ namespace FSO.HIT
         private Dictionary<string, HITSound> ActiveEvents; //events that are active are reused for all objects calling that event.
         private List<HITSound> Sounds;
         private int[] Globals; //SimSpeed 0x64 to CampfireSize 0x87.
+        // AUD-06 native ducking law: per-player duck registry (sound -> announced
+        // main_duckpri). Index in Globals of the republished global main_duckpri
+        // (VM reg 123 -> WriteGlobal(123 - 0x64) = Globals[23]).
+        private const int GLOBAL_MAIN_DUCK_PRI = 23;
+        private Dictionary<HITSound, int> DuckMap;
         private HITTVOn TVEvent;
         private HITTVOn MusicEvent;
         private HITTVOn NextMusic;
@@ -53,6 +58,7 @@ namespace FSO.HIT
             ActiveEvents = new Dictionary<string, HITSound>();
             FSCPlayers = new List<FSCPlayer>();
             AmbLoops = new List<SoundEffectInstance>();
+            DuckMap = new Dictionary<HITSound, int>();
         }
 
         public void SetMasterVolume(HITVolumeGroup group, float volume)
@@ -83,6 +89,64 @@ namespace FSO.HIT
         {
             return Globals[num];
         }
+
+        // ---- AUD-06 native ducking law -------------------------------------
+        // A sound that executes `set main_duckpri, X` (X!=0) announces X and is
+        // registered in the duck map; `set main_duckpri, 0` or Kill/dispose
+        // deregisters. Every mutation re-publishes max(map) into the global
+        // main_duckpri register (Globals[23]) and re-sprays all live volumes.
+        public void DuckAnnounce(HITSound s, int level)
+        {
+            if (level == 0) DuckMap.Remove(s);
+            else DuckMap[s] = level;
+            RepublishDuck();
+            DuckRespay();
+        }
+
+        public void DuckRemove(HITSound s)
+        {
+            if (DuckMap.Remove(s))
+            {
+                s.MainDuckPri = 0; // no longer announcing
+                RepublishDuck();
+                DuckRespay();
+            }
+        }
+
+        public void DuckReset()
+        {
+            if (DuckMap.Count == 0 && Globals[GLOBAL_MAIN_DUCK_PRI] == 0) return;
+            DuckMap.Clear();
+            Globals[GLOBAL_MAIN_DUCK_PRI] = 0;
+            DuckRespay();
+        }
+
+        private void RepublishDuck()
+        {
+            int max = 0;
+            foreach (var v in DuckMap.Values) if (v > max) max = v;
+            Globals[GLOBAL_MAIN_DUCK_PRI] = max;
+        }
+
+        private void DuckRespay()
+        {
+            foreach (var s in Sounds) s.RecalculateVolume();
+        }
+
+        /// <summary>Current announced main_duckpri for a sound (or 0).</summary>
+        public int GetMainDuckPri(HITSound s)
+        {
+            return DuckMap.TryGetValue(s, out int v) ? v : 0;
+        }
+
+        /// <summary>Current republished global main_duckpri (max of the map).</summary>
+        public int GetGlobalMainDuckPri()
+        {
+            return Globals[GLOBAL_MAIN_DUCK_PRI];
+        }
+
+        /// <summary>Active duck-registry size (for the runtime check).</summary>
+        public int DuckCount { get { return DuckMap.Count; } }
 
         public void QueuePlay(HITNoteEntry note)
         {
@@ -120,6 +184,10 @@ namespace FSO.HIT
 
             foreach (var item in PlayQueue)
             {
+                // AUD-07 integration hardening: a queued note's thread can be
+                // disposed between QueuePlay and this tick — skip, don't play
+                // a disposed SoundEffectInstance.
+                if (item.instance == null || item.instance.IsDisposed) continue;
                 item.started = true;
                 item.instance.Play();
             }
@@ -154,6 +222,26 @@ namespace FSO.HIT
             FSCPlayers.Add(player);
 
             return player;
+        }
+
+        /// <summary>
+        /// AUD-03 (D1): TS1 volume-group routing comes from the track's DECLARED
+        /// control group ([Track] column 6; the original reads it in cTrackPlayer::
+        /// UpdateVolPan 0x30F900), not the sample content sniff. Undefined groups
+        /// and the whole TSO path fall back to the caller's historic default.
+        /// </summary>
+        private HITVolumeGroup GroupForTrack(FSO.Content.Model.HITEventRegistration evtent, HITVolumeGroup fallback)
+        {
+            if (!FSO.Content.Content.Get().TS1) return fallback;
+            var audio = FSO.Content.Content.Get().Audio;
+            var track = evtent?.ResGroup == null ? null : audio.GetTrack(evtent.TrackID, evtent.TrackID, evtent.ResGroup);
+            switch (track?.ControlGroup ?? 0)
+            {
+                case HITControlGroups.kGroupSFX: return HITVolumeGroup.FX;
+                case HITControlGroups.kGroupMusic: return HITVolumeGroup.MUSIC;
+                case HITControlGroups.kGroupVox: return HITVolumeGroup.VOX;
+                default: return fallback;
+            }
         }
 
         public HITSound PlaySoundEvent(string evt)
@@ -231,7 +319,11 @@ namespace FSO.HIT
                 if (evtent.EventType == HITEvents.kTurnOnTV)
                 {
                     var thread = new HITTVOn(evtent.TrackID, this);
-                    thread.VolGroup = HITVolumeGroup.FX;
+                    // AUD-03 (D1): in TS1 the radio/TV thread follows the event
+                    // track's DECLARED control group (stereo tracks carry
+                    // kGroupMusic) instead of the TSO-era forced FX. TSO keeps
+                    // the historic FX forcing.
+                    thread.VolGroup = GroupForTrack(evtent, HITVolumeGroup.FX);
                     Sounds.Add(thread);
                     ActiveEvents.Add(evt, thread);
                     return thread;

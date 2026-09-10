@@ -14,7 +14,8 @@ namespace FSO.SimAntics.JIT.Translation.CSharp
     public class CSTranslator
     {
         public CSTranslationContext Context;
-        public static uint JITVersion = 1;
+        // Version 4 restores primitive 35's yielding user-event lifecycle.
+        public static uint JITVersion = 4;
         public CSTranslator()
         {
             Context = new CSTranslationContext();

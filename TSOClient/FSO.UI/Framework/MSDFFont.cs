@@ -29,6 +29,24 @@ namespace FSO.UI.Framework
             Info = new MSDFInfo(font);
         }
 
+        /// <summary>
+        /// R119: subclass hook. Base MSDFFont has no FieldFont of its own (the
+        /// original-font family in Simitone.Client renders .ffn bitmaps instead),
+        /// and overrides every member that would touch these fields.
+        /// </summary>
+        protected MSDFFont() { }
+
+        /// <summary>
+        /// R119: opportunity for a font implementation to swap itself for a
+        /// better-fitting instance when a TextStyle picks a pixel size (mirrors
+        /// the SpriteFont Font.GetNearest branch below it). Base behavior is
+        /// identity, so MSDF rendering is unchanged.
+        /// </summary>
+        public virtual MSDFFont SelectForSize(int pxSize)
+        {
+            return this;
+        }
+
         public void AddFallback(FieldFont font, string name, float scale)
         {
             var msdf = new MSDFFont(font);
@@ -36,7 +54,7 @@ namespace FSO.UI.Framework
             Fallbacks.Add(msdf);
         }
 
-        public Texture2D GetAtlas(GraphicsDevice gd)
+        public virtual Texture2D GetAtlas(GraphicsDevice gd)
         {
             if (Atlas == null)
             {
@@ -67,7 +85,7 @@ namespace FSO.UI.Framework
             return new MSDFGlyph(Font.GetGlyph(Fallback), this);
         }
 
-        public void Draw(GraphicsDevice gd, string text, Vector2 pos, Color color, Vector2 scale, Matrix? mat)
+        public virtual void Draw(GraphicsDevice gd, string text, Vector2 pos, Color color, Vector2 scale, Matrix? mat)
         {
             if (string.IsNullOrEmpty(text))
                 return;
@@ -240,7 +258,7 @@ namespace FSO.UI.Framework
             indices.Add(b);
         }
 
-        public Vector2 MeasureString(string text)
+        public virtual Vector2 MeasureString(string text)
         {
             var pairs = Font.StringToPair;
             var activeFont = this;

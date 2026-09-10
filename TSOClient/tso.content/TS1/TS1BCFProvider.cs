@@ -187,10 +187,11 @@ namespace FSO.Content.TS1
                     if (anim == null) return null;
                     if (anim.Translations == null)
                     {
-                        //enrich animation with CFP
+                        //enrich animation with CFP. CC-03: a missing CFP serves
+                        //the animation untranslated (CC-01 matrix §5 law) — the
+                        //previous null return dropped whole BCF animations.
                         var cfp = CFPProvider.Get((anim.XSkillName + ".cfp").ToLowerInvariant());
-                        if (cfp == null) return null;
-                        cfp.EnrichAnim(anim);
+                        if (cfp != null) cfp.EnrichAnim(anim);
                     }
                     return anim;
                 }

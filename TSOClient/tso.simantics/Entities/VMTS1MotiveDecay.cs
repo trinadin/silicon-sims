@@ -1,10 +1,47 @@
 ﻿using FSO.SimAntics.Model;
+using FSO.Content;
 using System.IO;
 
 namespace FSO.SimAntics.Entities
 {
     public class VMTS1MotiveDecay : VMIMotiveDecay
     {
+        // ============================================================================
+        // R251 mood law (tools/iff-dump/r251-mood-cadence/implementation.md):
+        // mood = Sum(w_i * m_i + w_room * room) / Sum(w_i + w_room), summed over the
+        // 8 mood participants in the native CalcHappy order (Hunger, Energy, Comfort,
+        // Fun, Hygiene, Social, Bladder, Room). The w_i are the piecewise STR#502 /
+        // STR#504 weight curves (the "Happy Weight" curves), looked up per motive value.
+        // There is NO smoothing — the port already recomputes on its 2-game-minute
+        // cadence; only the aggregation is changed (the old law was an equal-weight
+        // (sum of 7 + room) / 8 average).
+        //
+        // The native CalcHappy table order (rodata 0x5a45b8) is (7,5,6,15,8,14,9,13)
+        // and the STR#502/504 curves fill entries 0..6 in that same order, i.e.
+        //   curve[0]=Hunger  curve[1]=Energy  curve[2]=Comfort curve[3]=Fun
+        //   curve[4]=Hygiene curve[5]=Social  curve[6]=Bladder
+        // (verified against the extracted Global.iff STR# 502 / STR# 504 resources).
+        // Room is the 8th participant. STR#502/504 contain exactly 7 curves, so the
+        // Room weight is NOT a curve — it is a scalar. I could NOT pin the native room
+        // weight from the static binary (the TOC pointer slots are unrelocated
+        // placeholders and the saved moods are state-dependent, per R251), so this is a
+        // DOCUMENTED BEST-SUPPORTED DEFAULT: RoomWeight = 1 makes Room contribute
+        // comparably to a weight-1 motive. R223's least-squares fit of 8 (and a
+        // state-dependent-derived ~57) are both NON-authoritative and are not used.
+        private static readonly VMMotive[] MoodOrderMotives = new VMMotive[]
+        {
+            VMMotive.Hunger, VMMotive.Energy, VMMotive.Comfort, VMMotive.Fun,
+            VMMotive.Hygiene, VMMotive.Social, VMMotive.Bladder
+        };
+        private const float RoomWeight = 1f;
+
+        // Table split (person+1536, CalcHappy 0x10b9c8-0x10b9e8, reconciled from raw
+        // hex in implementation.md): r5=1 (child table) only when person[1536] is in
+        // [1,17]; r5=0 (adult table) when person[1536]==0 or >=18. The port exposes the
+        // same field as VMPersonDataVariable.PersonsAge (attr 58), and VMFindBestAction
+        // already uses the identical "age>0 && age<0x12" test for isChild.
+        private const int ChildAgeMin = 1;
+        private const int ChildAgeMax = 0x12; // exclusive; ages 1..17 are children
         public static float[] Constants = new float[]
         {
             180, //energy span 0
@@ -49,7 +86,6 @@ namespace FSO.SimAntics.Entities
             var hours = context.Clock.Hours;
             LastMinute = minutes/2;
             var sleeping = (avatar.GetMotiveData(VMMotive.SleepState) != 0);
-            int moodSum = 0;
 
             for (int i = 0; i < 7; i++)
             {
@@ -122,11 +158,45 @@ namespace FSO.SimAntics.Entities
                     MotiveFractions[i] += (short)((1 - MotiveFractions[i]/1000) * 1000);
                     avatar.SetMotiveData(DecrementMotives[i], motive);
                 }
-                moodSum += motive;
             }
-            moodSum += roomScore;
 
-            avatar.SetMotiveData(VMMotive.Mood, (short)(moodSum / 8));
+            // R251: recompute mood as the curve-weighted average (no smoothing; the
+            // 2-game-minute cadence gate above is unchanged). Decay is untouched.
+            avatar.SetMotiveData(VMMotive.Mood, ComputeMood(avatar, roomScore));
+        }
+
+        /// <summary>
+        /// Computes the R251 mood target from the current motives:
+        /// mood = (Sum_i w_i(m_i)·m_i + RoomWeight·room) / (Sum_i w_i(m_i) + RoomWeight)
+        /// over the 8 participants, with w_i from the STR#502 (adult) or STR#504 (child)
+        /// Happy Weight curves. The Room enters with a constant weight (see the class
+        /// doc for the RoomWeight disclosure). Mirrors the native CalcHappy pure-recompute
+        /// law; no smoothing is applied.
+        /// </summary>
+        private short ComputeMood(VMAvatar avatar, int roomScore)
+        {
+            // Table split: age in [1,17] -> child curves (STR#504), else adult (STR#502).
+            var global = Content.Content.Get().WorldObjectGlobals;
+            if (global == null) return 0;
+            var age = avatar.GetPersonData(VMPersonDataVariable.PersonsAge);
+            var child = (age >= ChildAgeMin && age < ChildAgeMax);
+            var curves = child ? global.HappyWeightChild : global.HappyWeight;
+
+            double num = 0, den = 0;
+            for (int i = 0; i < MoodOrderMotives.Length; i++)
+            {
+                var m = (double)avatar.GetMotiveData(MoodOrderMotives[i]);
+                double w = 1.0;
+                if (curves != null && i < curves.Length)
+                    w = curves[i].GetPoint((float)m);
+                num += w * m;
+                den += w;
+            }
+            var room = (double)Math.Max(-100, Math.Min(100, roomScore));
+            num += RoomWeight * room;
+            den += RoomWeight;
+            if (den <= 0) return 0;
+            return (short)(num / den);
         }
 
         public int ToFixed1000(float input)

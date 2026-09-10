@@ -72,6 +72,12 @@ namespace FSO.Common.Rendering.Framework.IO
 			result.NumLockDown = state.KeyboardState.NumLock;
             // Right alt aka AltGr is treated as Ctrl+Alt. It is used to type accented letters and other unusual characters so pressing that key cannot cause special actions.
             result.CtrlDown = (PressedKeys.Contains(Keys.LeftControl) && !PressedKeys.Contains(Keys.RightAlt)) || PressedKeys.Contains(Keys.RightControl);
+            // Desktop macOS uses Command for clipboard/select-all. Keep this
+            // separate from CtrlDown so arrows/deletion and other shortcuts
+            // retain their existing behavior.
+            var clipboardCommand = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) &&
+                (PressedKeys.Contains(Keys.LeftWindows) || PressedKeys.Contains(Keys.RightWindows));
+            HashSet<char> commandTextToSuppress = clipboardCommand && charCount > 0 ? new HashSet<char>() : null;
 
             for (int j = 0; j < state.NewKeys.Count + charCount; j++)
             {
@@ -191,8 +197,12 @@ namespace FSO.Common.Rendering.Framework.IO
                     {
                         result.TabPressed = true;
                     }
-                    else if (result.CtrlDown)
+                    else if (result.CtrlDown || (clipboardCommand &&
+                        (key == Keys.A || key == Keys.C || key == Keys.X || key == Keys.V)))
                     {
+                        if (commandTextToSuppress != null &&
+                            (key == Keys.A || key == Keys.C || key == Keys.X || key == Keys.V))
+                            commandTextToSuppress.Add(char.ToLowerInvariant((char)key));
                         switch (key)
                         {
                             case Keys.A:
@@ -205,7 +215,7 @@ namespace FSO.Common.Rendering.Framework.IO
                             case Keys.C:
                             case Keys.X:
                                 /** Copy text to clipboard **/
-                                if (cursorEndIndex > 0)
+                                if (cursorEndIndex >= 0 && cursorEndIndex != cursorIndex)
                                 {
                                     var selectionStart = Math.Max(0, cursorIndex);
                                     var selectionEnd = cursorEndIndex;
@@ -263,6 +273,11 @@ namespace FSO.Common.Rendering.Framework.IO
                     if (j >= state.NewKeys.Count) value = state.FrameTextInput[j - state.NewKeys.Count];
                     else if (state.FrameTextInput != null) continue;
                     else value = TranslateChar(key, result.ShiftDown, result.CapsDown, result.NumLockDown);
+                    // Some SDL hosts also emit the shortcut letter as text.
+                    // Consume one paired ASCII letter, preserving other text
+                    // in this frame (including Option/Unicode composition).
+                    if (j >= state.NewKeys.Count && commandTextToSuppress != null &&
+                        commandTextToSuppress.Remove(char.ToLowerInvariant(value))) continue;
                     /** For now we dont support tabs in text **/
                     
                     if (!char.IsControl(value) && value != '\0' && value != '\t' && value != '\b' && value != '\r')

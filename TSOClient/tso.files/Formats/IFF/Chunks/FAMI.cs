@@ -10,7 +10,7 @@ namespace FSO.Files.Formats.IFF.Chunks
     /// </summary>
     public class FAMI : IffChunk
     {
-        public uint Version = 0x9;
+        public uint Version = 0x7;
 
         public int HouseNumber;
         //this is not a typical family number - it is unique between user created families, but -1 for townies.
@@ -81,7 +81,7 @@ namespace FSO.Files.Formats.IFF.Chunks
             using (var io = IoWriter.FromStream(stream, ByteOrder.LITTLE_ENDIAN))
             {
                 io.WriteInt32(0);
-                io.WriteUInt32(9);
+                io.WriteUInt32(Version); // honour the loaded version (7 original; a 9 legacy port FAMI round-trips as 9); was hardcoded 9 (R252)
                 io.WriteCString("IMAF", 4);
                 io.WriteInt32(HouseNumber);
                 io.WriteInt32(FamilyNumber);
@@ -93,8 +93,9 @@ namespace FSO.Files.Formats.IFF.Chunks
                 foreach (var guid in FamilyGUIDs)
                     io.WriteUInt32(guid);
 
-                for (int i = 0; i < 4; i++)
-                    io.WriteInt32(0);
+                // R252: the original FAMI chunk has NO trailing zero int32s (data
+                // size is exactly 40 + 4*guidCount). The port previously wrote 4
+                // trailing zero int32s (16 bytes); that has been removed.
             }
             return true;
         }

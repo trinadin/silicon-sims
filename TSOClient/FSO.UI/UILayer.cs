@@ -348,18 +348,32 @@ namespace FSO.Client.UI
             TextStyle style = TextStyle.DefaultLabel.Clone();
             var toolScale = FSOEnvironment.DPIScaleFactor; //*zoom scale?
             style.Color = color;
-            style.Size = (int)(8 * toolScale);
+            // TS1 cDefaultTTWindow::Init asks the font factory for face 1 at
+            // size 7 (0x3b9884-0x3b98a0). SetToolTip then sizes the window to
+            // textWidth + 6 by charHeight + 2 and paints at x=3, y=1
+            // (0x3b9428-0x3b9448, 0x3b9634-0x3b964c). The shipped _07 FFN's
+            // cached glyph sheet normalizes its -2 top bearing; the shared
+            // FFN renderer now applies the same normalization to destinations.
+            const int tooltipFontSize = 7;
+            const int tooltipLineHeight = 13;
+            const int tooltipXInset = 3;
+            const int tooltipYInset = 1;
+            // Select the original native face first, then apply runtime DPI
+            // uniformly to its glyphs and measured tooltip geometry.
+            style.Size = tooltipFontSize;
 
-            var scale = new Vector2(1, 1);
+            var scale = new Vector2(toolScale, toolScale);
             if (style.Scale != 1.0f)
             {
                 scale = new Vector2(scale.X * style.Scale, scale.Y * style.Scale);
             }
 
-            var wrapped = UIUtils.WordWrap(Tooltip, (int)(290*toolScale), style); //tooltip max width should be 300. There is a 5px margin on each side.
+            // SetToolTipLong can still need the port's 300px safety wrap. Keep
+            // that behavior, but give its content the original 3px sides.
+            var wrapped = UIUtils.WordWrap(Tooltip, 294, style);
 
-            int width = (int)(wrapped.MaxWidth + 10*toolScale);
-            int height = (int)(toolScale * 13 * wrapped.Lines.Count + 4); //13 per line + 4.
+            int width = (int)((wrapped.MaxWidth + 6) * toolScale);
+            int height = (int)(toolScale * tooltipLineHeight * wrapped.Lines.Count + 2 * toolScale);
 
             position.X = Math.Min(position.X, GlobalSettings.Default.GraphicsWidth*FSOEnvironment.DPIScaleFactor - width);
             position.Y = Math.Max(position.Y, height);
@@ -375,11 +389,11 @@ namespace FSO.Client.UI
             batch.Draw(whiteRectangle, new Rectangle((int)position.X, (int)position.Y, width, 1), color * opacity);
 
             position.Y -= height;
+            position.Y += tooltipYInset * toolScale;
 
             for (int i = 0; i < wrapped.Lines.Count; i++)
             {
-                int thisWidth = (int)(style.MeasureString(wrapped.Lines[i]).X);
-                var pos = position + new Vector2((width - thisWidth) / 2, 0);
+                var pos = position + new Vector2(tooltipXInset * toolScale, 0);
                 if (style.VFont != null)
                 {
                     batch.End();
@@ -388,11 +402,12 @@ namespace FSO.Client.UI
                 }
                 else
                     batch.DrawString(style.SpriteFont, wrapped.Lines[i], pos, color * opacity, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
-                position.Y += 13 * FSOEnvironment.DPIScaleFactor;
+                position.Y += tooltipLineHeight * toolScale;
             }
         }
 
         private List<DialogReference> Dialogs = new List<DialogReference>();
+        public UIElement TopVisibleDialog => Dialogs.LastOrDefault(x => x.Dialog.Visible)?.Dialog;
         public void AddDialog(DialogReference dialog)
         {
             //dialogContainer.Add(dialog.Dialog);

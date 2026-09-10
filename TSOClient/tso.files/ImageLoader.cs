@@ -306,7 +306,16 @@ namespace FSO.Files
             {
                 try
                 {
-                    //it's a bitmap. 
+                    // R143: BI_RLE8 BMPs (the entire TS1 UIGraphics.far screen-art
+                    // family) fail in both stb_image and GDI+ - decode them exactly
+                    // here before the generic bitmap path.
+                    var rle = BmpRLE8.TryDecode(str);
+                    if (rle != null)
+                    {
+                        return new ImageDataOrTextureProducer(rle.Value);
+                    }
+
+                    //it's a bitmap.
                     if (ImageLoaderHelpers.BitmapFunction != null)
                     {
                         var bmp = ImageLoaderHelpers.BitmapFunction(str);

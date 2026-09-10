@@ -61,44 +61,47 @@ namespace FSO.SimAntics.Engine.TSOTransaction
             PerformTransaction(vm, testOnly, uid1, uid2, amount, 0, 0, callback);
         }
 
+        /// <summary>
+        /// NBR-04: on community/downtown lots the port does not activate the
+        /// visiting family (InitializeLot skips ActivateFamily when Downtown),
+        /// so CurrentFamily can be null while a family is visiting. The native
+        /// law is that the VISITING FAMILY pays — fall back to the travel
+        /// context's active family before conceding infinite money.
+        /// </summary>
+        private FSO.Files.Formats.IFF.Chunks.FAMI FamilyForTransaction(VM vm, VMEntity ent)
+        {
+            if (ent == null || !(ent is VMAvatar)) return null;
+            return vm.TS1State?.CurrentFamily
+                ?? FSO.Content.Content.Get().Neighborhood?.GameState?.ActiveFamily;
+        }
+
         public uint GetBudgetForFamily(VM vm, VMEntity ent)
         {
-            if (ent != null && ent is VMAvatar)
-            {
-                //todo: make this get the appropriate family
-                //if multiple families are playable in the same lot
-                return (uint?)vm.TS1State.CurrentFamily?.Budget ?? uint.MaxValue;
-            }
-            return uint.MaxValue; //maxis has infinite money
+            var family = FamilyForTransaction(vm, ent);
+            if (family == null) return uint.MaxValue; //maxis has infinite money
+            return (uint)family.Budget;
         }
 
         public bool TransactBudgetForFamily(VM vm, VMEntity ent, int delta)
         {
-            if (ent != null && ent is VMAvatar)
+            var family = FamilyForTransaction(vm, ent);
+            if (family != null)
             {
-                //todo: make this get the appropriate family
-                //if multiple families are playable in the same lot
-                if (vm.TS1State.CurrentFamily != null)
-                {
-                    if (vm.TS1State.CurrentFamily.Budget + delta < 0) return false;
-                    vm.TS1State.CurrentFamily.Budget += delta;
-                }
-                return true;
+                if (family.Budget + delta < 0) return false;
+                family.Budget += delta;
+                // SIM-09: client-driven transactions (buy/sell/lot/cheat) are
+                // sign-attributed to the Miscellaneous rows by default.
+                vm.TS1State?.RecordTransaction(delta, FSO.SimAntics.Primitives.VMTransferFundsExpenseType.NONE);
             }
             return true; //maxis has infinite money
         }
 
         public bool CanTransactBudgetForFamily(VM vm, VMEntity ent, int delta)
         {
-            if (ent != null && ent is VMAvatar)
+            var family = FamilyForTransaction(vm, ent);
+            if (family != null)
             {
-                //todo: make this get the appropriate family
-                //if multiple families are playable in the same lot
-                if (vm.TS1State.CurrentFamily != null)
-                {
-                    if (vm.TS1State.CurrentFamily.Budget + delta < 0) return false;
-                }
-                return true;
+                if (family.Budget + delta < 0) return false;
             }
             return true; //maxis has infinite money
         }
