@@ -84,10 +84,18 @@ namespace FSO.Files.Formats.IFF.Chunks
         {
             using (var io = IoWriter.FromStream(stream, ByteOrder.LITTLE_ENDIAN))
             {
+                // SAV-12: always emit the Hot Date dialect (version 0x40, 64 globals).
+                // The old writer hardcoded version 0x3E but sized the globals from the
+                // file's OLD Version field: UpdateSIMI-driven saves truncated globals
+                // 32..63 (VM state 32..37 included — the live VM carries 38), and any
+                // non-UpdateSIMI path with Version > 0x3E wrote 64 words under a 0x3E
+                // header, which this class's own reader (0x3E -> 32 items) would decode
+                // with every following field shifted. 0x40 is the dialect the reader
+                // already accepts for >0x3F and is the native Hot Date save dialect.
                 io.WriteInt32(0);
-                io.WriteInt32(0x3E);
+                io.WriteInt32(0x40);
                 io.WriteCString("IMIS", 4);
-                var items = (Version > 0x3E) ? 0x40 : 0x20;
+                var items = 0x40;
 
                 if (GlobalData == null) GlobalData = new short[64];
 
