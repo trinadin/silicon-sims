@@ -65,14 +65,9 @@ namespace FSO.Files.Formats.IFF.Chunks
                 {
                     FamilyGUIDs[i] = io.ReadUInt32();
                 }
-                try
-                {
-                    for (int i = 0; i < 4; i++)
-                        io.ReadInt32();
-                } catch
-                {
-                    //for some reason FAMI "Default" only has 3 zeroes after it, but only if saved by base game.
-                }
+                // no trailing ints: the original FAMI chunk ends after the GUID list
+                // (R252), and this reader also runs on shared lot-marshal streams where
+                // an over-read consumes the following payload (SAV-10).
             }
         }
 

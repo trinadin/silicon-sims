@@ -163,6 +163,10 @@ namespace FSO.SimAntics.Marshals
             {
                 writer.Write(val);
             }
+            // live lot states are built with the parameterless ctor (Version 0); pin the
+            // serialization schema to what this stream declares, or the reader (which
+            // reconstructs from the written version) desyncs (SAV-10)
+            PlatformState.Version = LATEST_VERSION;
             PlatformState.SerializeInto(writer);
 
             //Console.WriteLine("== SERIAL: Globals done... " + timer.ElapsedMilliseconds + " ms ==");
