@@ -313,6 +313,7 @@ namespace Simitone.Client
                 // internally, and Finish must never print PASS for a timed-out run.
                 _failed++;
                 if (CheckEnabled("ghosttrace")) GhostTraceEvaluate("timeout");
+                else if (CheckEnabled("deathrel")) DeathRelEvaluate("timeout");
                 else if (CheckEnabled("deathtrace")) DeathTraceEvaluate("timeout");
                 Finish();
                 return;
@@ -683,6 +684,8 @@ namespace Simitone.Client
                 || CheckEnabled("carreturn") || CheckEnabled("schoolreturn")
                 || CheckEnabled("schoolmiss")
                 || CheckEnabled("chancetrace") || CheckEnabled("carskip")
+                || CheckEnabled("simjrn")
+                || CheckEnabled("deathrel")
                 || CheckEnabled("deathtrace") || CheckEnabled("ghosttrace")
                 || CheckEnabled("freewillwin") || CheckEnabled("moodlaw"))
             {
@@ -2304,7 +2307,7 @@ namespace Simitone.Client
             // 8299 gate is < -98 — the R77 +3 collapse never crossed it), then hand the soak
             // to the dedicated death-state sampler. Only Hunger: a single-variable starvation
             // trace keeps the energy/bladder handlers out of the timeline.
-            if ((CheckEnabled("deathtrace") || CheckEnabled("ghosttrace")) && !_deathTraceStarted && minute - _motiveStartMinute >= 2)
+            if ((CheckEnabled("deathtrace") || CheckEnabled("ghosttrace") || CheckEnabled("deathrel")) && !_deathTraceStarted && minute - _motiveStartMinute >= 2)
             {
                 _deathTraceStarted = true;
                 try
@@ -2383,7 +2386,8 @@ namespace Simitone.Client
             // VMNetSetTimeCmd) and sample for IFF-factual live dispatch of the loop.
             if (CheckEnabled("carseek") || CheckEnabled("carreturn") || CheckEnabled("schoolreturn")
                 || CheckEnabled("schoolmiss")
-                || CheckEnabled("chancetrace") || CheckEnabled("carskip"))
+                || CheckEnabled("chancetrace") || CheckEnabled("carskip")
+                || CheckEnabled("simjrn"))
             {
                 Log("AUTOTEST carseek: entering career soak after pins minute=" +
                     (_vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00")) +
@@ -2917,6 +2921,11 @@ namespace Simitone.Client
                 if (deadNow)
                 {
                     var since = (nowMin - _deathTraceDeathSimMinute + 1440) % 1440;
+                    if (CheckEnabled("deathrel"))
+                    {
+                        DeathRelTick(nowMin, since, realElapsed);
+                        return;
+                    }
                     if (CheckEnabled("ghosttrace"))
                     {
                         GhostTraceTick(nowMin, since, realElapsed);
@@ -2942,6 +2951,30 @@ namespace Simitone.Client
         private static int _deathTraceDeathSimMinute = -1;
         private static short _deathDlgLastObj;
         private static DateTime _deathDlgLastRelease;
+
+        // (SIM-06) 'deathrel' battery state: death -> ghost night -> REAL user save
+        // (TS1GameScreen.Save: vm marshal -> FSOV -> SaveHouse + SaveNeighbourhood(true))
+        // -> lot reload (PlayHouse) -> assert the death/ghost/aftermath state on the
+        // reloaded lot. The night phase reuses R220's urn law verbatim (21:55 arm,
+        // natural 22:00 gate, disclosed 4109 Force-Ghost fallback).
+        private static int _deathRelPhase;
+        private static bool _deathRelDone;
+        private static DateTime _deathRelPhaseStart = DateTime.UtcNow;
+        private static VM _deathRelOldVm;
+        private static short _deathRelHouseId = -1;
+        private static bool _deathRelClockArmed, _deathRelGhostSpawned, _deathRelForceUsed;
+        private static bool _deathRelTombstonePre, _deathRelTombstonePost, _deathRelGhostAvatarPost;
+        private static bool _deathRelDeadPreserved, _deathRelControlIntact;
+        private static bool _deathRelControlCaptured;
+        private static short _deathRelDeadNeighborId = -1;
+        private static short _deathRelControlNeighborId = -1;
+        private static uint _deathRelDeadGuid, _deathRelControlGuid;
+        private static int _deathRelDeadPd68Pre = int.MinValue, _deathRelDeadPd87Pre = int.MinValue, _deathRelDeadPd32Pre = int.MinValue;
+        private static int _deathRelStore68Pre = int.MinValue, _deathRelStore68Post = int.MinValue;
+        private static bool _deathRelLateNight;
+        private static int _deathRelSpawnNightMin = -1, _deathRelForceNightMin = -1;
+        private static string _deathRelReloadException;
+        private static bool _deathRelRetriedFromTemplate;
 
         // (Round 219) PASS law (never weaker than observed, never invented): the failure
         // HANDLER ran (8198/8197/8199/8309 — these only execute past the < -98 gate), the
@@ -3093,6 +3126,410 @@ namespace Simitone.Client
             {
                 Log("AUTOTEST ghosttrace evaluate EXC " + ee.GetType().Name + " " + ee.Message);
                 Fail("ghosttrace");
+            }
+            Finish();
+        }
+
+        // (SIM-06) the deathrel phase machine. Dispatched from StateDeathTrace's dead
+        // branch instead of the deathtrace/ghosttrace evaluators; reuses their evidence
+        // fields (_deathFlagSeen/_deathDeadFlagSeen/_deathEntityGone/_deathTraceCreates/
+        // _ghostUrn/_ghostIds) plus R220's urn night law for the ghost-spawn leg.
+        private static void DeathRelTick(int nowMin, int sinceDeath, double realElapsed)
+        {
+            try
+            {
+                // run-1 defect: _ghostIds stayed empty because WalkDeathWatchStack only
+                // samples ghost ids once _ghostPhaseStarted is set (GhostTraceTick's flag).
+                // Arm it at battery entry so the whole deathrel window is sampled.
+                if (!_ghostPhaseStarted)
+                {
+                    _ghostPhaseStarted = true;
+                    _ghostIds.Clear();
+                }
+                if (_screen != null && !_screen.InLot && _deathRelPhase < 3)
+                {
+                    // like ghosttrace: the lot can unload under the battery (e.g. the
+                    // commute takes the last living sim). Honest end, no reload leg.
+                    DeathRelEvaluate("lot-unloaded");
+                    return;
+                }
+                switch (_deathRelPhase)
+                {
+                    case 0: DeathRelAftermath(nowMin, sinceDeath); break;
+                    case 1: DeathRelNightWatch(nowMin, realElapsed); break;
+                    case 2: DeathRelSave(); break;
+                    case 3: DeathRelReloadDispatch(); break;
+                    case 4: DeathRelWaitReload(); break;
+                    case 5: DeathRelAssert(); break;
+                }
+            }
+            catch (Exception dre)
+            {
+                Log("AUTOTEST deathrel EXC phase=" + _deathRelPhase + " " + dre.GetType().Name + " " + dre.Message);
+                DeathRelEvaluate("exception");
+            }
+        }
+
+        // p0: settle window after the death landed — capture the dead sim's identity
+        // (NeighbourId/GUID + person-data words 68/87/32), a living control sim, the
+        // tombstone, and the STORE-side death record baseline (what a family re-activation
+        // would resurrect from), then hand to the night watch.
+        private static void DeathRelAftermath(int nowMin, int sinceDeath)
+        {
+            var neigh = Content.Get().Neighborhood;
+            if (_deathRelDeadNeighborId < 0)
+            {
+                var a0 = (_avatars != null && _avatars.Count > 0) ? _avatars[0] : null;
+                if (a0 != null)
+                {
+                    try { _deathRelDeadNeighborId = a0.GetPersonData(VMPersonDataVariable.NeighborId); } catch { }
+                    try { _deathRelDeadGuid = a0.Object?.OBJ?.GUID ?? 0; } catch { }
+                    try { _deathRelDeadPd68Pre = a0.GetPersonData((VMPersonDataVariable)68); } catch { }
+                    try { _deathRelDeadPd87Pre = a0.GetPersonData((VMPersonDataVariable)87); } catch { }
+                    try { _deathRelDeadPd32Pre = a0.GetPersonData((VMPersonDataVariable)32); } catch { }
+                }
+                foreach (var a in _avatars ?? new List<VMAvatar>())
+                {
+                    if (a == null || ReferenceEquals(a, a0)) continue;
+                    try
+                    {
+                        _deathRelControlNeighborId = a.GetPersonData(VMPersonDataVariable.NeighborId);
+                        _deathRelControlGuid = a.Object?.OBJ?.GUID ?? 0;
+                        _deathRelControlCaptured = _deathRelControlNeighborId > 0;
+                        if (_deathRelControlCaptured) break;
+                    }
+                    catch { }
+                }
+                try
+                {
+                    var rec = neigh.GetNeighborByID(_deathRelDeadNeighborId);
+                    _deathRelStore68Pre = (rec != null && rec.PersonData != null && rec.PersonData.Length > 68)
+                        ? rec.PersonData[68] : int.MinValue;
+                }
+                catch { }
+                _deathRelTombstonePre = _ghostUrn != null;
+                Log("AUTOTEST deathrel captured dead nid=" + _deathRelDeadNeighborId + " guid=0x" + _deathRelDeadGuid.ToString("X8")
+                    + " pd68=" + _deathRelDeadPd68Pre + " pd87=" + _deathRelDeadPd87Pre + " pd32=" + _deathRelDeadPd32Pre
+                    + " store68=" + (_deathRelStore68Pre == int.MinValue ? "n/a" : _deathRelStore68Pre.ToString())
+                    + " tombstone=" + _deathRelTombstonePre
+                    + " control nid=" + _deathRelControlNeighborId + " guid=0x" + _deathRelControlGuid.ToString("X8"));
+            }
+            if (sinceDeath < 5) return; // settle window, mirrors ghosttrace
+            _deathRelPhase = 1;
+            _deathRelPhaseStart = DateTime.UtcNow;
+        }
+
+        // p1: R220's urn night law. Run-1 defect fix: the reaper sequence races the clock
+        // (6:40 -> ~23:00), so the phase can START deep inside the night — thresholds keyed
+        // to "minutes since 22:00" then fire their exit on the first tick. Now: if already
+        // night at arm, give the natural roll a short 8-night-min window before the
+        // disclosed 4109 Force-Ghost fallback; exits are phase-relative, not night-absolute.
+        private static void DeathRelNightWatch(int nowMin, double realElapsed)
+        {
+            int nightMin = (nowMin >= 22 * 60) ? nowMin - 22 * 60
+                : (nowMin < 6 * 60 ? nowMin + 1440 - 22 * 60 : -1);
+            if (!_deathRelClockArmed)
+            {
+                _deathRelClockArmed = true;
+                _deathRelLateNight = nightMin >= 0;
+                if (!_deathRelLateNight)
+                {
+                    try
+                    {
+                        _vm.Context.Clock.Hours = 21;
+                        _vm.Context.Clock.Minutes = 55;
+                        _vm.Context.Clock.MinuteFractions = 0;
+                    }
+                    catch (Exception je) { Log("AUTOTEST deathrel clock-set EXC " + je.GetType().Name); }
+                }
+                Log("AUTOTEST deathrel: night phase armed at " + (_vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00"))
+                    + " (lateNight=" + _deathRelLateNight + (_deathRelLateNight ? ", already past the 22:00 urn gate" : " — clock set to 21:55") + "); urn=" +
+                    (_ghostUrn == null ? "NOT FOUND" : "obj" + _ghostUrn.ObjectID));
+                return;
+            }
+            var ghostLoopSeen = _ghostIds.Contains(8641) || _ghostIds.Contains(8638)
+                || _ghostIds.Contains(8640) || _ghostIds.Contains(8642);
+            if (!_deathRelGhostSpawned && (_ghostIds.Contains(4100) || ghostLoopSeen
+                || _ghostIds.Contains(4103) || _ghostIds.Contains(4111)))
+            {
+                _deathRelGhostSpawned = true;
+                _deathRelSpawnNightMin = nightMin;
+                var gh = _vm.Entities.OfType<VMAvatar>().FirstOrDefault(a =>
+                {
+                    try { return a.GetPersonData(VMPersonDataVariable.NeighborId) == _deathRelDeadNeighborId; }
+                    catch { return false; }
+                });
+                Log("AUTOTEST deathrel: GHOST SPAWNED (4100/ghost-loop ids seen; natural=" + _ghostNaturalSpawn
+                    + ") ghostAvatar=" + (gh == null ? "not-yet-bound" : "obj" + gh.ObjectID));
+            }
+            if (nightMin < 0)
+            {
+                if ((DateTime.UtcNow - _deathRelPhaseStart).TotalMinutes > 6) { DeathRelEvaluate("clock-miss"); }
+                return;
+            }
+            if (_deathRelGhostSpawned && _deathRelSpawnNightMin >= 0 && nightMin >= _deathRelSpawnNightMin + 5)
+            {
+                // give any ghost-side walk/scare a short live window, then freeze the
+                // state into a REAL user save while the ghost is in the lot
+                _deathRelPhase = 2;
+                _deathRelPhaseStart = DateTime.UtcNow;
+                return;
+            }
+            var naturalWindow = _deathRelLateNight ? 8 : 45;
+            if (!_deathRelGhostSpawned && !_ghostForcePushed && _ghostUrn != null && nightMin >= naturalWindow)
+            {
+                _deathRelForceUsed = true;
+                _deathRelForceNightMin = nightMin;
+                PushUrnForceGhost();
+            }
+            if (!_deathRelGhostSpawned && _ghostForcePushed && _deathRelForceNightMin >= 0
+                && nightMin >= _deathRelForceNightMin + 150)
+            {
+                // run-2 defect: 15 night-min starved the 4109 debug tree (its own idles
+                // precede the 4100 spawn); R220's law allowed the fallback up to night+240.
+                DeathRelEvaluate("no-ghost");
+                return;
+            }
+            if ((DateTime.UtcNow - _deathRelPhaseStart).TotalMinutes > 10)
+            {
+                DeathRelEvaluate(_deathRelGhostSpawned ? "night-complete" : "no-ghost");
+            }
+        }
+
+        // p2: the REAL user save path — TS1GameScreen.Save() serializes the whole VM
+        // marshal into the house file's FSOV chunk and calls SaveNeighbourhood(true).
+        private static void DeathRelSave()
+        {
+            _deathRelPhase = 3;
+            _deathRelPhaseStart = DateTime.UtcNow;
+            GameThread.NextUpdate(x =>
+            {
+                try
+                {
+                    _screen.Save();
+                    Log("AUTOTEST deathrel: user save path executed (TS1GameScreen.Save -> FSOV + SaveHouse + SaveNeighbourhood(true))");
+                }
+                catch (Exception se)
+                {
+                    Log("AUTOTEST deathrel save EXC " + se.GetType().Name + " " + se.Message);
+                }
+            });
+        }
+
+        // p3: boot the SAME house back through the harness's own public choke point.
+        private static void DeathRelReloadDispatch()
+        {
+            if ((DateTime.UtcNow - _deathRelPhaseStart).TotalSeconds < 5) return; // let the save land first
+            _deathRelOldVm = _vm;
+            try { short.TryParse(_houses[Math.Min(_houseIdx, _houses.Length - 1)], out _deathRelHouseId); } catch { }
+            if (_deathRelHouseId <= 0) { DeathRelEvaluate("no-house-id"); return; }
+            _deathRelPhase = 4;
+            _deathRelPhaseStart = DateTime.UtcNow;
+            GameThread.NextUpdate(x =>
+            {
+                try
+                {
+                    _screen.PlayHouse(_deathRelHouseId, null);
+                    Log("AUTOTEST deathrel: PlayHouse(" + _deathRelHouseId + ") dispatched (reload from the just-saved file)");
+                }
+                catch (Exception pe)
+                {
+                    _deathRelReloadException = pe.GetType().Name + ": " + pe.Message;
+                    var st = (pe.StackTrace ?? "").Split('\n');
+                    Log("AUTOTEST deathrel PlayHouse EXC " + _deathRelReloadException
+                        + " stack=[" + string.Join(" | ", st.Take(6)).Trim() + "]");
+                }
+            });
+        }
+
+        // p4: wait for the re-mounted lot and re-bind like StateWaitLot (new VM instance
+        // proves the old one was torn down), then assert. Run-3 defect fix: a reload that
+        // threw (EndOfStreamException inside the port's own save->load path) still flips
+        // InLot with an EMPTY vm — require a non-empty entity list, and if the reloaded
+        // lot is broken, move the saved user house file aside and retry from the template
+        // so the assert separates "save file unloadable" from "restored but state lost".
+        private static void DeathRelWaitReload()
+        {
+            if (_screen.InLot && _screen.vm != null && !ReferenceEquals(_screen.vm, _deathRelOldVm)
+                && _screen.vm.Entities.Count > 0)
+            {
+                _vm = _screen.vm;
+                _avatars = _vm.Entities.Where(e => e is VMAvatar).Cast<VMAvatar>().ToList();
+                if (_vm.SpeedMultiplier <= 0)
+                {
+                    _vm.SpeedMultiplier = 1;
+                    _vm.GlobalBlockingDialog = null;
+                }
+                Log("AUTOTEST deathrel: LOT-RELOADED house=" + _deathRelHouseId + " entities=" + _vm.Entities.Count
+                    + " avatars=" + _avatars.Count + " loadErrors=" + _vm.LoadErrors.Count
+                    + " fromTemplate=" + _deathRelRetriedFromTemplate
+                    + " reloadException=" + (_deathRelReloadException ?? "none"));
+                _deathRelPhase = 5;
+                _deathRelPhaseStart = DateTime.UtcNow;
+                return;
+            }
+            var waited = (DateTime.UtcNow - _deathRelPhaseStart).TotalSeconds;
+            if (!_deathRelRetriedFromTemplate && waited > 25)
+            {
+                // the just-saved user house file did not produce a live lot (run 3: the
+                // restore path threw EndOfStreamException and left an empty vm). Move it
+                // aside and boot from the template instead: the assert then measures the
+                // RESURRECTION law (family re-activation from a death-blind store).
+                _deathRelRetriedFromTemplate = true;
+                try
+                {
+                    var userHouse = Content.Get().Neighborhood.GetHousePath(_deathRelHouseId);
+                    if (File.Exists(userHouse))
+                    {
+                        var len = new FileInfo(userHouse).Length; // stat BEFORE the move (run-4 defect: FileInfo.Length re-stats post-move and threw)
+                        var aside = userHouse + ".deathrel-unloadable";
+                        File.Move(userHouse, aside, true);
+                        Log("AUTOTEST deathrel: reload produced no live lot (waited " + Math.Round(waited) + "s"
+                            + ", exception=" + (_deathRelReloadException ?? "none") + "); moved the saved user file aside: "
+                            + Path.GetFileName(userHouse) + " len=" + len + " -> template retry");
+                    }
+                    _deathRelOldVm = _vm;
+                    _deathRelPhaseStart = DateTime.UtcNow;
+                    // GetHousePath is unconditional on the user path (run-5 finding: with
+                    // the user file moved aside, PlayHouse has nothing to read). The
+                    // template is ContentManager.TS1BasePath/<neigh dir>/Houses/<name>;
+                    // the autotest boots the shipped UserData neighborhood.
+                    try
+                    {
+                        var template = Path.Combine(Content.Get().TS1BasePath,
+                            "UserData", "Houses", Path.GetFileName(userHouse));
+                        if (!File.Exists(userHouse) && File.Exists(template))
+                        {
+                            File.Copy(template, userHouse, true);
+                            Log("AUTOTEST deathrel: template house restored for the retry (len=" + new FileInfo(template).Length + ")");
+                        }
+                    }
+                    catch (Exception te) { Log("AUTOTEST deathrel template-copy EXC " + te.GetType().Name + " " + te.Message); }
+                    GameThread.NextUpdate(x =>
+                    {
+                        try { _screen.PlayHouse(_deathRelHouseId, null); }
+                        catch (Exception pe2)
+                        {
+                            _deathRelReloadException += " | template-retry: " + pe2.GetType().Name + ": " + pe2.Message;
+                            Log("AUTOTEST deathrel template-retry EXC " + pe2.GetType().Name + " " + pe2.Message);
+                        }
+                    });
+                    return;
+                }
+                catch (Exception re) { Log("AUTOTEST deathrel remediation EXC " + re.GetType().Name + " " + re.Message); }
+            }
+            if (waited > 90)
+            {
+                DeathRelEvaluate("reload-timeout inlot=" + (_screen?.InLot ?? false));
+            }
+        }
+
+        // p5: the preservation assert on the reloaded lot. Preservation law (acceptance:
+        // "preserve death and ghost-wander behavior through save/reload"): the death is
+        // still EFFECTIVE iff the dead sim is present with the dead flag (68=1), OR the
+        // ghost avatar carries it forward, OR (entity removed at death, the R219 norm)
+        // the tombstone survived AND the store record now carries the death for the
+        // night respawn. Anything else = the reload resurrects the sim (fix card).
+        private static void DeathRelAssert()
+        {
+            var tombstone = _vm.Entities.FirstOrDefault(e =>
+            {
+                try { return (e?.Object?.OBJ?.GUID ?? 0) == DeathTombstoneGuid; }
+                catch { return false; }
+            });
+            _deathRelTombstonePost = tombstone != null;
+            VMAvatar dead = null, control = null;
+            foreach (var a in _vm.Entities.OfType<VMAvatar>())
+            {
+                short nid = -1;
+                try { nid = a.GetPersonData(VMPersonDataVariable.NeighborId); } catch { }
+                if (nid == _deathRelDeadNeighborId && _deathRelDeadNeighborId > 0) dead = a;
+                else if (nid == _deathRelControlNeighborId && _deathRelControlNeighborId > 0) control = a;
+            }
+            int pd68 = int.MinValue, pd87 = int.MinValue, pd32 = int.MinValue;
+            if (dead != null)
+            {
+                try { pd68 = dead.GetPersonData((VMPersonDataVariable)68); } catch { }
+                try { pd87 = dead.GetPersonData((VMPersonDataVariable)87); } catch { }
+                try { pd32 = dead.GetPersonData((VMPersonDataVariable)32); } catch { }
+            }
+            // read the store BEFORE computing the verdict — run-2 measured a stale
+            // _deathRelStore68Post (0) here and mis-rejected a correct store record.
+            try
+            {
+                var rec = Content.Get().Neighborhood.GetNeighborByID(_deathRelDeadNeighborId);
+                _deathRelStore68Post = (rec != null && rec.PersonData != null && rec.PersonData.Length > 68)
+                    ? rec.PersonData[68] : int.MinValue;
+            }
+            catch { }
+            _deathRelGhostAvatarPost = _ghostIds.Contains(4100) && dead != null; // the 4100-bound ghost avatar restored with the dead identity
+            _deathRelDeadPreserved = (dead != null && pd68 == 1) || _deathRelGhostAvatarPost
+                || (_deathRelTombstonePost && dead == null && _deathRelStore68Post == 1);
+            if (control != null)
+            {
+                bool cDead = false, cFlag = false;
+                try { cDead = control.Dead; } catch { }
+                try { cFlag = control.GetPersonData((VMPersonDataVariable)68) == 1; } catch { }
+                _deathRelControlIntact = !cDead && !cFlag;
+            }
+            Log("AUTOTEST deathrel assert: tombstone=" + _deathRelTombstonePost
+                + " deadEntity=" + (dead != null ? "obj" + dead.ObjectID + " pd68=" + pd68 + " pd87=" + pd87 + " pd32=" + pd32 : "ABSENT")
+                + " controlIntact=" + _deathRelControlIntact
+                + " store68=" + (_deathRelStore68Post == int.MinValue ? "n/a" : _deathRelStore68Post.ToString())
+                + " (pre-save store68=" + (_deathRelStore68Pre == int.MinValue ? "n/a" : _deathRelStore68Pre.ToString()) + ")");
+            DeathRelEvaluate("asserted");
+        }
+
+        private static void DeathRelEvaluate(string why)
+        {
+            if (_deathRelDone) return;
+            _deathRelDone = true;
+            StopDeathTraceObservation();
+            try
+            {
+                var deathConfirmed = _deathFlagSeen || _deathDeadFlagSeen || _deathEntityGone;
+                var killed = _deathTraceIds.Contains(393) || _deathTraceIds.Contains(316) || _deathTraceCreates.Count > 0;
+                var reloaded = _deathRelPhase >= 5;
+                Log("AUTOTEST deathrel RESULT why=" + why
+                    + " deathConfirmed=" + deathConfirmed + " killed=" + killed
+                    + " ghostSpawned=" + _deathRelGhostSpawned + " naturalSpawn=" + _ghostNaturalSpawn + " forceUsed=" + _deathRelForceUsed
+                    + " tombstonePre=" + _deathRelTombstonePre
+                    + " tombstonePost=" + (reloaded ? _deathRelTombstonePost.ToString() : "n/a")
+                    + " deadPreserved=" + (reloaded ? _deathRelDeadPreserved.ToString() : "n/a")
+                    + " controlIntact=" + (reloaded ? (_deathRelControlCaptured ? _deathRelControlIntact.ToString() : "no-control") : "n/a")
+                    + " reloaded=" + reloaded + " templateFallback=" + _deathRelRetriedFromTemplate
+                    + " reloadException=" + (_deathRelReloadException ?? "none")
+                    + " store68 pre/post=" + (_deathRelStore68Pre == int.MinValue ? "n/a" : _deathRelStore68Pre.ToString())
+                    + "/" + (_deathRelStore68Post == int.MinValue ? "n/a" : _deathRelStore68Post.ToString())
+                    + " ghostIds=[" + string.Join(",", _ghostIds.OrderBy(x => x)) + "]"
+                    + " creates=[" + string.Join(" | ", _deathTraceCreates) + "]");
+                var ok = deathConfirmed && killed && _deathRelGhostSpawned && reloaded
+                    && !_deathRelRetriedFromTemplate
+                    && _deathRelTombstonePost && _deathRelDeadPreserved
+                    && (!_deathRelControlCaptured || _deathRelControlIntact);
+                if (ok)
+                {
+                    Pass("deathrel");
+                    Log("AUTOTEST deathrel verdict: death, ghost night-spawn and aftermath state survived a REAL user save + lot reload");
+                }
+                else
+                {
+                    Fail("deathrel");
+                    if (_deathRelRetriedFromTemplate)
+                        Log("AUTOTEST deathrel fix-card: the user save (TS1GameScreen.Save) produced a house file the port itself cannot reload"
+                            + " (reload exception: " + (_deathRelReloadException ?? "empty lot") + ")"
+                            + " — the FSOV lot round-trip is broken; the template retry then resurrects the dead sim (store68="
+                            + (_deathRelStore68Post == int.MinValue ? "n/a" : _deathRelStore68Post.ToString()) + "), so death does not survive any reload");
+                    else if (deathConfirmed && killed && reloaded && !_deathRelDeadPreserved)
+                        Log("AUTOTEST deathrel fix-card: the reloaded lot lost the death state (dead entity absent/alive again, tombstone="
+                            + _deathRelTombstonePost + ", store68=" + (_deathRelStore68Post == int.MinValue ? "n/a" : _deathRelStore68Post.ToString())
+                            + ") — the port does not carry the dead flag across the save/reload cycle; native preserves it");
+                }
+            }
+            catch (Exception re)
+            {
+                Log("AUTOTEST deathrel evaluate EXC " + re.GetType().Name + " " + re.Message);
+                Fail("deathrel");
             }
             Finish();
         }
@@ -3563,6 +4000,8 @@ namespace Simitone.Client
                     // (SIM-04) carskip: soak 2 extra full workday cycles (+2h margin) so the
                     // missed-work warn/fire ladder (4126) can walk its countdown naturally.
                     if (CheckEnabled("carskip")) _careerTargetElapsed += 2 * 24 * 60 + 120;
+                    // (SIM-02) simjrn: give the journey battery a comfortable window
+                    if (CheckEnabled("simjrn")) _careerTargetElapsed += 12 * 60;
                     if ((CheckEnabled("schoolreturn") || CheckEnabled("schoolmiss")) && _schoolEndHour >= 0)
                     {
                         var schoolEndClock = _schoolEndHour * 60;
@@ -4508,6 +4947,7 @@ namespace Simitone.Client
                         " jobPerfLvlChanged=" + _careerJobChanged + attrInfo);
                     if (CheckEnabled("carskip")) CareerSkipTick();
                     if (CheckEnabled("career5day") || CheckEnabled("career5level")) CareerProtocolTick();
+                    if (CheckEnabled("simjrn")) AutotestSimJourney.Tick(_vm, _avatars?.FirstOrDefault(), Log);
 
                     // R157 GATE-REPLICA (once per hour, minute 0): evaluates the tree's OWN
                     // data path per avatar — JobData[12] read at the sim's level (w56/w57) via
@@ -4569,9 +5009,9 @@ namespace Simitone.Client
                 }
 
                 bool careerTargetReached;
-                if (CheckEnabled("carreturn") || CheckEnabled("schoolreturn") || CheckEnabled("schoolmiss") || CheckEnabled("chancetrace") || CheckEnabled("carskip"))
+                if (CheckEnabled("carreturn") || CheckEnabled("schoolreturn") || CheckEnabled("schoolmiss") || CheckEnabled("chancetrace") || CheckEnabled("carskip") || CheckEnabled("simjrn"))
                 {
-                    var carTargetReached = !(CheckEnabled("carreturn") || CheckEnabled("chancetrace") || CheckEnabled("carskip"))
+                    var carTargetReached = !(CheckEnabled("carreturn") || CheckEnabled("chancetrace") || CheckEnabled("carskip") || CheckEnabled("simjrn"))
                         || (_careerTargetElapsed >= 0
                             && _careerElapsedMinutes >= _careerTargetElapsed);
                     var schoolLifecycleComplete = _schoolReturnEndElapsed >= 0
@@ -4677,6 +5117,12 @@ namespace Simitone.Client
                         " fixture=" + _careerReturnFixtureValid +
                         " (natural CarPortal.iff At Work/Get paid/Test promotion path)");
                     if (returnLive) Pass("carreturn"); else Fail("carreturn");
+                }
+                if (CheckEnabled("simjrn"))
+                {
+                    // SIM-02: live object-use journey battery (use/interrupt/route-fail)
+                    var ok = AutotestSimJourney.Verdict(Log);
+                    if (ok) Pass("simjrn"); else Fail("simjrn");
                 }
                 if (CheckEnabled("carskip"))
                 {
