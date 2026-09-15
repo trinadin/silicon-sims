@@ -430,6 +430,22 @@ namespace FSO.SimAntics.Utils
             };
         }
 
+        // SAV-11: true when the person's Neighbour store record (looked up by the
+        // record's own NeighbourId) carries the death flag (person data word 68).
+        private static bool IsDeadStoreRecord(OBJMPerson person, NBRS neighbors)
+        {
+            var pd = person.PersonData;
+            if (pd == null || pd.Length <= (int)VMPersonDataVariable.NeighborId) return false;
+            try
+            {
+                if (!neighbors.NeighbourByID.TryGetValue(pd[(int)VMPersonDataVariable.NeighborId], out var rec)) return false;
+                var rpd = rec.PersonData;
+                return rpd != null && rpd.Length > (int)VMPersonDataVariable.IsGhost
+                    && rpd[(int)VMPersonDataVariable.IsGhost] > 0;
+            }
+            catch { return false; }
+        }
+
         private VMAvatarMarshal ConvertAvatar(OBJMInstance inst, NBRS neighbors)
         {
             var person = inst.PersonData.Value;
@@ -669,6 +685,10 @@ namespace FSO.SimAntics.Utils
                         continue;
                     }
                 }
+
+                // SAV-11: a person whose Neighbour store record carries the death flag is
+                // dead — re-activating the family must not resurrect them.
+                if (inst.PersonData.HasValue && IsDeadStoreRecord(inst.PersonData.Value, neighbors)) continue;
 
                 var master = inst.MultitileData.HasValue ? GetMasterOBJD(inst.OBJD) : null;
 

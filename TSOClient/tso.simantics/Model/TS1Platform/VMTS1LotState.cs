@@ -161,6 +161,8 @@ namespace FSO.SimAntics.Model.TS1Platform
 
             foreach (var member in missingMembers)
             {
+                // SAV-11: a dead family member must not re-spawn; the tombstone stands.
+                if (IsDeadInStore(member)) continue;
                 var sim = vm.Context.CreateObjectInstance(member, LotView.Model.LotTilePos.OUT_OF_WORLD, LotView.Model.Direction.NORTH).Objects[0];
                 ((VMAvatar)sim).SetPersonData(VMPersonDataVariable.TS1FamilyNumber, (short)CurrentFamily.ChunkID);
                 var mailbox = vm.Entities.FirstOrDefault(x => (x.Object.OBJ.GUID == 0xEF121974 || x.Object.OBJ.GUID == 0x1D95C9B0));
@@ -296,6 +298,22 @@ namespace FSO.SimAntics.Model.TS1Platform
                 days[i].HouseholdExpense = src[(int)BudgetCat.HouseholdExpense];
                 days[i].ArchitectureExpense = src[(int)BudgetCat.ArchitectureExpense];
             }
+        }
+
+        // SAV-11: true when the member's Neighbour store record carries the death flag
+        // (person data word 68, mirrored there by VMAvatar.MirrorDeadFlagToStore).
+        private static bool IsDeadInStore(uint guid)
+        {
+            try
+            {
+                var neigh = FSO.Content.Content.Get().Neighborhood;
+                var nid = neigh?.GetNeighborIDForGUID(guid);
+                if (nid == null) return false;
+                var rec = neigh.GetNeighborByID(nid.Value);
+                var pd = rec?.PersonData;
+                return pd != null && pd.Length > 68 && pd[68] > 0;
+            }
+            catch { return false; }
         }
 
         public void UpdateSIMI(VM vm)

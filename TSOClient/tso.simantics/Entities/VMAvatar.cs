@@ -977,6 +977,10 @@ namespace FSO.SimAntics
                     return true;
                 case VMPersonDataVariable.IsGhost:
                     if (WorldUI != null) ((AvatarComponent)WorldUI).IsDead = value > 0;
+                    // SAV-11: the death flag must reach the Neighbour store — the kill
+                    // sequence removes the avatar before any lot save, so the store record
+                    // is the only surface family re-activation reads.
+                    if (value > 0 && Thread?.Context?.VM?.TS1 == true) MirrorDeadFlagToStore();
                     break;
                 case VMPersonDataVariable.BodySkill:
                 case VMPersonDataVariable.CharismaSkill:
@@ -1020,6 +1024,21 @@ namespace FSO.SimAntics
             }
             PersonData[(ushort)variable] = value;
             return true;
+        }
+
+        // SAV-11: mirror the death flag (person data word 68) into the sim's Neighbour
+        // store record — the record family activation reads back via InheritNeighbor.
+        // Best-effort: a store hiccup must never break the death tree.
+        private void MirrorDeadFlagToStore()
+        {
+            try
+            {
+                var neigh = FSO.Content.Content.Get().Neighborhood;
+                var rec = neigh?.GetNeighborByID(GetPersonData(VMPersonDataVariable.NeighborId));
+                if (rec?.PersonData == null || rec.PersonData.Length <= (int)VMPersonDataVariable.IsGhost) return;
+                rec.PersonData[(int)VMPersonDataVariable.IsGhost] = 1;
+            }
+            catch { }
         }
 
         public void InheritNeighbor(Neighbour neigh, FAMI current)
