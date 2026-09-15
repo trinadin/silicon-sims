@@ -15,6 +15,10 @@ Branch decode (R129 CORRECTION of the R91/R92 "byte-delta" rule):
     0x103870-0x1041b0; the old rule mis-addressed them +0x80000 into
     unrelated bodies (R128's "outlined fragments" were these mis-decodes).
     Validated: bl word 0x4BF7EF61 -> LI -0x20428 -> target 0x1041b0.
+  2026-09-14 (UI-QUEUE spotcheck round 4): XO31 key fixes — cntlzw is XO 26
+    (was mis-keyed 100, so `cntlzw r0,r0` 0x7C000034 printed .long and hid
+    ConvertAction 0x241b04's normalized-boolean flag law), adde (138) added,
+    lhax re-keyed 341→343.
 
 Usage:
   python3 ppc_decode.py <binary> 0xSTART 0xEND
@@ -29,12 +33,12 @@ def s16(v):
 
 XO31 = {
     266: "add", 40: "subf", 10: "addc", 8: "subfc", 235: "mullw",
-    75: "mulhw", 11: "mulhwu", 491: "divw", 100: "cntlzw",
+    75: "mulhw", 11: "mulhwu", 491: "divw", 26: "cntlzw", 138: "adde",
     24: "slw", 536: "srw", 792: "sraw", 824: "srawi",
     28: "and", 444: "or", 390: "xor", 124: "nor", 476: "nand",
     284: "eqv", 60: "andc", 202: "orc",
     23: "lwzx", 55: "lwzux", 87: "lbzx", 119: "lbzux", 151: "stwx",
-    183: "stwux", 215: "stbx", 279: "lhzx", 341: "lhax", 407: "sthx",
+    183: "stwux", 215: "stbx", 279: "lhzx", 343: "lhax", 407: "sthx",
     20: "lwarx", 150: "stwcx.", 0: "cmp", 32: "cmpl",
     954: "extsb", 922: "extsh", 19: "mfcr", 339: "mfspr", 467: "mtspr",
     310: "eieio", 598: "sync", 854: "eieio",
@@ -174,9 +178,11 @@ def decode(w, addr):
             return f"cmp cr{rD}, r{rA}, r{rB}"
         if name == "cmpl":
             return f"cmpl cr{rD}, r{rA}, r{rB}"
+        if name == "cntlzw":
+            return f"cntlzw{'.' if (w & 1) else ''} r{rD}, r{rA}"
         if name in ("add", "subf", "mullw", "mulhw", "mulhwu", "divw", "and", "or",
                     "xor", "nor", "slw", "srw", "sraw", "andc", "orc", "eqv",
-                    "addc", "subfc", "extsb", "extsh", "cntlzw"):
+                    "addc", "adde", "subfc", "extsb", "extsh"):
             dot = "." if (w & 1) and name[-1] != "." else ""
             return f"{name}{dot} r{rD}, r{rA}, r{rB}"  # rD = rA <op> rB
         # loads/stores X-form: op rD, off(rA) with index rB
