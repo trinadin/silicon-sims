@@ -706,15 +706,24 @@ namespace Simitone.Client
                 _samples.Clear();
                 _motiveStartMinute = -1;
             }
-            else if (CheckEnabled("socexec") || CheckEnabled("saveresume"))
+            else if (CheckEnabled("socexec") || CheckEnabled("saveresume")
+                || CheckEnabled("svccycle") || CheckEnabled("billtxn")
+                || CheckEnabled("marrytrace") || CheckEnabled("birthtrace"))
             {
                 // (SIM-03) socexec: keep the lot alive so a pushed social can run to
                 // completion; pair pick is lazy (first ticks) so restore-time queues drain.
                 // (SIM-05/SIM-06) saveresume: real save->remount persistence cycle.
+                // (SIM-03 tranches 2-5) svccycle/billtxn/marrytrace/birthtrace: the same
+                // opt-in focused-run pattern for the remaining lifecycle rows.
                 _state = 2;
                 _samples.Clear();
                 _motiveStartMinute = -1;
-                if (CheckEnabled("saveresume")) SaveResumeSetup(); else SocExecSetup();
+                if (CheckEnabled("saveresume")) SaveResumeSetup();
+                else if (CheckEnabled("socexec")) SocExecSetup();
+                else if (CheckEnabled("svccycle")) SvcCycleSetup();
+                else if (CheckEnabled("billtxn")) BillTxnSetup();
+                else if (CheckEnabled("marrytrace")) MarryTraceSetup();
+                else if (CheckEnabled("birthtrace")) BirthTraceSetup();
             }
             else
             {
@@ -1940,6 +1949,11 @@ namespace Simitone.Client
             if (_vm == null) { Finish(); return; }
             if (CheckEnabled("socexec") && !_socExecDone) { SocExecTick(); return; }
             if (CheckEnabled("saveresume") && !_srDone) { SaveResumeTick(); return; }
+            // (SIM-03 tranches 2-5) focused lifecycle probes; same short-circuit pattern.
+            if (CheckEnabled("svccycle") && !_sim3Done) { SvcCycleTick(); return; }
+            if (CheckEnabled("billtxn") && !_sim3Done) { BillTxnTick(); return; }
+            if (CheckEnabled("marrytrace") && !_sim3Done) { MarryTraceTick(); return; }
+            if (CheckEnabled("birthtrace") && !_sim3Done) { BirthTraceTick(); return; }
             // R139: loud lot-unload detector. When the carpool takes the
             // last family sim at the ~8:00 window the game returns to the
             // neighborhood; the stale _vm's clock freezes and the carseek
@@ -5475,6 +5489,1088 @@ namespace Simitone.Client
                 Fail("saveresume");
             }
             Finish();
+        }
+
+        // ==================================================================
+        // (SIM-03 tranches 2-5) svccycle / billtxn / marrytrace / birthtrace.
+        // Opt-in focused probes for the remaining acceptance rows: service-NPC
+        // cycle, bill transaction, propose->family-merge, kiss->baby chain.
+        // They follow the socexec v4 law: the asserted STATE WRITE (budget
+        // debit, family-record change, new household NID) is the verdict;
+        // push/queue/dialog transport is logged as diagnostics. All pushes go
+        // through the engine's own acceptance path (GetAction + EnqueueAction
+        // / PushUserInteraction) and every state-set is disclosed in the log.
+        // Budgets are honest: an unobserved stage FAILs the probe.
+        // ==================================================================
+        // NOTE: the _sim3* state below is SHARED by the svccycle/billtxn/
+        // marrytrace/birthtrace probes — run one SIM-3 probe per process.
+        private static bool _sim3Done;
+        private static int _sim3Phase;
+        private static string _sim3Probe = "";
+        private static DateTime _sim3RealStart;
+        private static int _sim3PushSimMinute = -1;
+        private static VMAvatar _sim3Actor;
+        private static VMEntity _sim3PushTarget;
+        private static VMQueuedAction _sim3PushAction;
+        private static ushort _sim3PushUid;
+        private static bool _sim3EnqueuedSeen;
+        private static string _sim3PushName = "?";
+        private static bool _sim3CensusLogged;
+        private static bool _sim3PieMissLogged;
+        private static int _sim3DialogResponses;
+        private static readonly List<string> _sim3BudgetEvents = new List<string>();
+        private static readonly List<string> _sim3CreateEvents = new List<string>();
+        private static Action<FSO.SimAntics.Engine.VMStackFrame, int, int> _sim3BudgetObserver;
+        private static Action<FSO.SimAntics.Engine.VMStackFrame, VMMultitileGroup, uint> _sim3CreateObserver;
+        // avatar-person create events (baseId, ownerIff, createdIff) for arrival attribution
+        private static readonly List<string> _sim3AvatarCreates = new List<string>();
+        private static readonly List<short> _sim3AvatarCreateIds = new List<short>();
+        // baseline avatar NIDs at arm time; anything new is an arrival
+        private static readonly HashSet<short> _sim3BaselineNids = new HashSet<short>();
+        private static short _sim3ArrivalNid = -1;
+        private static int _sim3ArrivalSimMinute = -1;
+        // svccycle
+        private static bool _svcArrivalSeen, _svcPaymentSeen, _svcExitSeen;
+        private static VMEntity _svcPhone;
+        private static short _svcArrivalObjId = -1;
+        private static int _svcLedgerServiceExpense = -1;
+
+        // v3 arrival law (run1+run2 lessons): the hired service NPC is identified
+        // by the avatar-create event's created-iff NAME (People\maid.iff etc.).
+        // The walk-in portal (PedPortal.iff) spawns maids/gardeners/pizza on the
+        // service schedule but ALSO the daily paper carrier, and load-time NPC
+        // controllers spawn strays (the Traveling Salesman), so neither
+        // owner-attribution nor "fresh NID" alone identifies the visit
+        // (run2 receipt: maid.iff spawned 10:00 by PedPortal.iff:4104).
+        private static readonly string[] Sim3ServiceNpcIffs = { "maid", "gardener", "repairman", "pizza", "butler" };
+        // service-fee debits: NPCController bills the family (observed -10 at
+        // NPCController.iff:4110 during run2's maid visit); the SIM-09
+        // ServiceExpense ledger increment is the corroborating signal.
+        private static readonly string[] Sim3ServiceFeeOwnerIffs = { "Scheduler.iff", "phones.iff", "PhoneGlobals.iff", "NPCController.iff" };
+
+        private static short Sim3ServiceAvatarCreate()
+        {
+            for (int i = _sim3AvatarCreates.Count - 1; i >= 0; i--)
+            {
+                var line = _sim3AvatarCreates[i];
+                var ci = line.IndexOf(" created ", StringComparison.Ordinal);
+                if (ci < 0) continue;
+                var created = line.Substring(ci + 9);
+                var end = created.IndexOf(' ');
+                if (end >= 0) created = created.Substring(0, end);
+                foreach (var s in Sim3ServiceNpcIffs)
+                {
+                    if (created.IndexOf(s, StringComparison.OrdinalIgnoreCase) >= 0)
+                        return _sim3AvatarCreateIds[i];
+                }
+            }
+            return -1;
+        }
+
+        private static void Sim3ResetPush()
+        {
+            _sim3PushAction = null;
+            _sim3PushUid = 0;
+            _sim3EnqueuedSeen = false;
+        }
+
+        private static bool Sim3InLotByObjId(short objId)
+        {
+            foreach (var a in Sim3InLot())
+            {
+                try { if (a.ObjectID == objId) return true; } catch { }
+            }
+            return false;
+        }
+
+        // fixture override (disclosed): resolve an interaction by its TTAs name in
+        // the entity's own TTAB and enqueue it WITHOUT the pie availability gate.
+        // Used when the content gates the entry behind debug/cheat state the
+        // focused probe legitimately needs (billtxn 'Force Bill Delivery').
+        private static bool Sim3PushDirectByTTAsName(VMEntity target, VMAvatar actor, string want, string why)
+        {
+            try
+            {
+                var ttab = target.TreeTable;
+                var ttas = target.TreeTableStrings;
+                if (ttab?.Interactions == null || ttas == null) return false;
+                foreach (var ia in ttab.Interactions)
+                {
+                    var name = ttas.GetString((int)ia.TTAIndex);
+                    if (name == null || !name.Trim().Equals(want, StringComparison.OrdinalIgnoreCase)) continue;
+                    var action = target.GetAction((int)ia.TTAIndex, actor, _vm.Context, false);
+                    if (action == null)
+                    {
+                        Log("AUTOTEST " + _sim3Probe + ": direct push '" + want + "' (tta=" + ia.TTAIndex + ") unresolvable");
+                        return false;
+                    }
+                    _sim3PushTarget = target;
+                    _sim3Actor = actor;
+                    _sim3PushAction = action;
+                    _sim3PushName = want;
+                    _sim3EnqueuedSeen = false;
+                    actor.Thread.EnqueueAction(action);
+                    _sim3PushUid = action.UID;
+                    _sim3PushSimMinute = Sim3ClockMinute();
+                    _sim3PieMissLogged = false;
+                    Log("AUTOTEST " + _sim3Probe + " pushed DIRECT (pie availability gate bypassed; " + why
+                        + ") '" + want + "' tta=" + ia.TTAIndex + " actor=obj" + actor.ObjectID
+                        + " target=obj" + target.ObjectID + " uid=" + _sim3PushUid + " at " + Sim3Clock());
+                    return true;
+                }
+                Log("AUTOTEST " + _sim3Probe + ": direct push '" + want + "' not found in ttabs of obj" + target.ObjectID);
+            }
+            catch (Exception de)
+            {
+                Log("AUTOTEST " + _sim3Probe + " direct-push EXC " + de.GetType().Name + " " + de.Message);
+            }
+            return false;
+        }
+        // billtxn
+        private static bool _billSeen, _billPaidSeen, _billGoneSeen, _billForced, _billSeeded;
+        private static VMEntity _billBox, _billObj;
+        private static int _billLedgerBillsExpense = -1;
+        // marrytrace
+        private static short _mtMaidNid = -1;
+        private static short _mtResidentNid = -1;
+        private static uint _mtMaidGuid;
+        private static int _mtFamGuidsBefore = -1;
+        private static bool _mtPushed;
+        // birthtrace
+        private static int _btKissCount;
+        private static short _btTargetNid = -1;
+
+        private const int Sim3BudgetSimMinutes = 600; // one full sim day covers mail/service windows
+        private const int Sim3BudgetRealMinutes = 13;
+
+        private static int Sim3ClockMinute()
+        {
+            return _vm.Context.Clock.Hours * 60 + _vm.Context.Clock.Minutes;
+        }
+        private static string Sim3Clock()
+        {
+            return _vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00");
+        }
+        private static bool Sim3BudgetExceeded()
+        {
+            return (Sim3ClockMinute() - _sim3PushSimMinute) > Sim3BudgetSimMinutes
+                || (DateTime.UtcNow - _sim3RealStart).TotalMinutes > Sim3BudgetRealMinutes;
+        }
+
+        private static void Sim3Setup(string probe)
+        {
+            _sim3Probe = probe;
+            _sim3RealStart = DateTime.UtcNow;
+            _sim3PushSimMinute = Sim3ClockMinute();
+            _sim3BaselineNids.Clear();
+            foreach (var a in (_avatars ?? new List<VMAvatar>()))
+            {
+                try { _sim3BaselineNids.Add(a.GetPersonData(VMPersonDataVariable.NeighborId)); } catch { }
+            }
+            Sim3ArmObservers();
+            Log("AUTOTEST " + probe + " armed (opt-in SIM-03 tranche; budget " + Sim3BudgetSimMinutes
+                + " sim-min / " + Sim3BudgetRealMinutes + " real min; baseline nids=[" + string.Join(",", _sim3BaselineNids) + "])");
+        }
+
+        private static void Sim3ArmObservers()
+        {
+            Sim3DisarmObservers();
+            _sim3BudgetEvents.Clear();
+            _sim3CreateEvents.Clear();
+            _sim3BudgetObserver = (frame, before, after) =>
+            {
+                try
+                {
+                    var iff = frame?.ScopeResource?.MainIff?.Filename ?? "?";
+                    var routine = frame?.Routine?.Chunk?.ChunkID ?? 0;
+                    var ip = frame?.InstructionPointer ?? 0;
+                    var entry = iff + ":" + routine + ":" + ip + "=" + (after - before) + " (" + before + "->" + after + ")";
+                    _sim3BudgetEvents.Add(entry);
+                    Log("AUTOTEST " + _sim3Probe + " budget-event " + entry);
+                }
+                catch (Exception be) { Log("AUTOTEST " + _sim3Probe + " budget-event EXC " + be.GetType().Name); }
+            };
+            FSO.SimAntics.Primitives.VMTS1Budget.BudgetMutated += _sim3BudgetObserver;
+            _sim3CreateObserver = (frame, group, guid) =>
+            {
+                try
+                {
+                    var createdIff = group?.BaseObject?.Object?.Resource?.MainIff?.Filename ?? "?";
+                    var ownerIff = frame?.ScopeResource?.MainIff?.Filename ?? "?";
+                    var routine = frame?.Routine?.Chunk?.ChunkID ?? 0;
+                    var baseId = (short)(group?.BaseObject?.ObjectID ?? 0);
+                    var isAvatar = group?.BaseObject is VMAvatar;
+                    var entry = ownerIff + ":" + routine + ":" + frame?.InstructionPointer
+                        + " created " + createdIff + " guid=0x" + guid.ToString("X8")
+                        + " base=" + baseId;
+                    _sim3CreateEvents.Add(entry);
+                    if (isAvatar)
+                    {
+                        _sim3AvatarCreateIds.Add(baseId);
+                        _sim3AvatarCreates.Add(entry + " at " + Sim3Clock());
+                        Log("AUTOTEST " + _sim3Probe + " avatar-create " + entry + " at " + Sim3Clock());
+                    }
+                    else Log("AUTOTEST " + _sim3Probe + " create-event " + entry);
+                }
+                catch (Exception ce) { Log("AUTOTEST " + _sim3Probe + " create-event EXC " + ce.GetType().Name); }
+            };
+            FSO.SimAntics.Engine.Primitives.VMCreateObjectInstance.ObjectCreated += _sim3CreateObserver;
+        }
+
+        private static void Sim3DisarmObservers()
+        {
+            if (_sim3BudgetObserver != null)
+            {
+                FSO.SimAntics.Primitives.VMTS1Budget.BudgetMutated -= _sim3BudgetObserver;
+                _sim3BudgetObserver = null;
+            }
+            if (_sim3CreateObserver != null)
+            {
+                FSO.SimAntics.Engine.Primitives.VMCreateObjectInstance.ObjectCreated -= _sim3CreateObserver;
+                _sim3CreateObserver = null;
+            }
+        }
+
+        private static List<VMAvatar> Sim3InLot()
+        {
+            var list = new List<VMAvatar>();
+            foreach (var e in _vm.Entities)
+            {
+                var a = e as VMAvatar;
+                if (a == null) continue;
+                try
+                {
+                    if (a.Dead || a.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                        || a.GetValue(VMStackObjectVariable.Hidden) != 0) continue;
+                }
+                catch { continue; }
+                list.Add(a);
+            }
+            return list;
+        }
+
+        private static void Sim3LogCensus(string tag)
+        {
+            var parts = new List<string>();
+            foreach (var a in Sim3InLot())
+            {
+                try
+                {
+                    parts.Add("obj" + a.ObjectID + "/nid" + a.GetPersonData(VMPersonDataVariable.NeighborId)
+                        + "/age" + a.GetPersonData(VMPersonDataVariable.PersonsAge)
+                        + "/type" + a.GetPersonData(VMPersonDataVariable.PersonType)
+                        + "/fam" + a.GetPersonData(VMPersonDataVariable.TS1FamilyNumber));
+                }
+                catch (Exception ve) { parts.Add("EXC " + ve.Message); }
+            }
+            Log("AUTOTEST " + _sim3Probe + " census[" + tag + "] inLot=" + parts.Count + " [" + string.Join(" | ", parts) + "]");
+        }
+
+        private static void Sim3LogCensusOnce()
+        {
+            if (_sim3CensusLogged) return;
+            _sim3CensusLogged = true;
+            Sim3LogCensus("initial");
+        }
+
+        private static VMAvatar Sim3PickActor()
+        {
+            // prefer a resident family adult (the probe's state-set target); any adult is legal
+            VMAvatar resident = null, anyAdult = null;
+            foreach (var a in Sim3InLot())
+            {
+                short nid;
+                short fam;
+                short age;
+                try
+                {
+                    nid = a.GetPersonData(VMPersonDataVariable.NeighborId);
+                    fam = a.GetPersonData(VMPersonDataVariable.TS1FamilyNumber);
+                    age = a.GetPersonData(VMPersonDataVariable.PersonsAge);
+                }
+                catch { continue; }
+                if (age < 18) continue;
+                if (anyAdult == null) anyAdult = a;
+                if (resident == null && fam != 0) resident = a;
+            }
+            return resident ?? anyAdult;
+        }
+
+        private static VMEntity Sim3FindEntity(Func<VMEntity, bool> pred, string tag)
+        {
+            foreach (var e in _vm.Entities)
+            {
+                try { if (e != null && pred(e)) return e; }
+                catch { }
+            }
+            return null;
+        }
+
+        private static VMEntity Sim3FindPhone()
+        {
+            // phones.iff object, or any object whose semi-global is PhoneGlobals
+            return Sim3FindEntity(e =>
+            {
+                var main = e.Object?.Resource?.MainIff?.Filename;
+                if (main != null && main.Equals("phones.iff", StringComparison.OrdinalIgnoreCase)) return true;
+                var sg = e.Object?.Resource?.SemiGlobal?.Iff?.Filename;
+                return sg != null && sg.Equals("PhoneGlobals.iff", StringComparison.OrdinalIgnoreCase);
+            }, "phone");
+        }
+
+        private static VMPieMenuInteraction Sim3PickPie(VMEntity target, VMAvatar actor, string[] names, bool exactFirst)
+        {
+            List<VMPieMenuInteraction> pies = null;
+            try { pies = target.GetPieMenu(_vm, actor, true, true); }
+            catch (Exception pe) { Log("AUTOTEST " + _sim3Probe + " GetPieMenu EXC " + pe.GetType().Name + " " + pe.Message); }
+            if (pies == null || pies.Count == 0)
+            {
+                if (!_sim3PieMissLogged)
+                {
+                    _sim3PieMissLogged = true;
+                    Log("AUTOTEST " + _sim3Probe + ": pie empty on obj" + target.ObjectID + " (hidden/availability gates)");
+                }
+                return null;
+            }
+            foreach (var want in names)
+            {
+                foreach (var p in pies)
+                {
+                    if ((p.Name ?? "").Trim().Equals(want, StringComparison.OrdinalIgnoreCase)) return p;
+                }
+            }
+            foreach (var want in names)
+            {
+                foreach (var p in pies)
+                {
+                    if ((p.Name ?? "").IndexOf(want, StringComparison.OrdinalIgnoreCase) >= 0) return p;
+                }
+            }
+            if (!_sim3PieMissLogged)
+            {
+                _sim3PieMissLogged = true;
+                var cand = new List<string>();
+                foreach (var p in pies) cand.Add((p.Name ?? "?") + "(id=" + p.ID + ")");
+                Log("AUTOTEST " + _sim3Probe + ": no candidate matching [" + string.Join("|", names)
+                    + "]; candidates=[" + string.Join(" | ", cand) + "]");
+            }
+            return null;
+        }
+
+        private static bool Sim3Push(VMEntity target, VMAvatar actor, VMPieMenuInteraction pick)
+        {
+            try
+            {
+                var action = target.GetAction((int)pick.ID, actor, _vm.Context, pick.Global);
+                if (action == null)
+                {
+                    Log("AUTOTEST " + _sim3Probe + ": GetAction null for '" + pick.Name + "'");
+                    return false;
+                }
+                _sim3PushTarget = target;
+                _sim3Actor = actor;
+                _sim3PushAction = action;
+                _sim3PushName = pick.Name;
+                _sim3EnqueuedSeen = false;
+                actor.Thread.EnqueueAction(action);
+                _sim3PushUid = action.UID;
+                _sim3PushSimMinute = Sim3ClockMinute();
+                _sim3PieMissLogged = false;
+                Log("AUTOTEST " + _sim3Probe + " pushed '" + _sim3PushName + "' (id=" + pick.ID + " global=" + pick.Global
+                    + ") actor=obj" + actor.ObjectID + " target=obj" + target.ObjectID + " uid=" + _sim3PushUid
+                    + " at " + Sim3Clock());
+                return true;
+            }
+            catch (Exception pue)
+            {
+                Log("AUTOTEST " + _sim3Probe + " push EXC " + pue.GetType().Name + " " + pue.Message);
+                return false;
+            }
+        }
+
+        // socexec v2 law: UserDriven enqueue preempts Idle-mode autonomy, so push
+        // without waiting for a fully quiescent queue; completion = the pushed UID
+        // left the queue after having been seen in it.
+        private static int Sim3PushState()
+        {
+            if (_sim3PushAction == null) return 0; // not pushed
+            var q = _sim3Actor?.Thread?.Queue;
+            var inQueue = q != null && q.Any(x => x.UID == _sim3PushUid);
+            if (inQueue) _sim3EnqueuedSeen = true;
+            if (_sim3EnqueuedSeen && !inQueue) return 2; // completed
+            return 1; // in flight (or queue window missed)
+        }
+
+        // focused-probe disclosure: service confirmations, bill dialogs, move-in
+        // prompts and notices are answered with the first choice; every answer is
+        // logged with its owning stack.
+        private static void Sim3RespondDialogs()
+        {
+            try
+            {
+                var dlg = _vm.GlobalBlockingDialog;
+                if (dlg == null) return;
+                var th = dlg.Thread;
+                var bs = th?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                if (bs == null || bs.Responded) return;
+                bs.Responded = true;
+                bs.ResponseCode = 0;
+                bs.ResponseText = "0";
+                if (_vm.LastSpeedMultiplier > 0)
+                {
+                    _vm.SpeedMultiplier = _vm.LastSpeedMultiplier;
+                    _vm.LastSpeedMultiplier = 0;
+                }
+                else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+                _vm.GlobalBlockingDialog = null;
+                _sim3DialogResponses++;
+                var chain = "";
+                if (th?.Stack != null)
+                {
+                    foreach (var fr in th.Stack)
+                    {
+                        string owner = null;
+                        try { owner = fr?.ScopeResource?.MainIff?.Filename; } catch { }
+                        chain += (fr?.Routine?.Chunk?.ChunkID ?? 0) + ":" + (fr?.InstructionPointer ?? -1)
+                            + "@" + (owner ?? "?") + ",";
+                    }
+                }
+                Log("AUTOTEST " + _sim3Probe + " dialog #" + _sim3DialogResponses + " ANSWERED (code=0) owner=obj"
+                    + dlg.ObjectID + " stack=[" + chain + "] at " + Sim3Clock());
+            }
+            catch (Exception de) { Log("AUTOTEST " + _sim3Probe + " dialog EXC " + de.GetType().Name + " " + de.Message); }
+        }
+
+        // NBRS state-set: write relationship slots both directions, exactly the
+        // store VMRelationship.Execute reads/writes (socexec's snapshot mechanism).
+        private static void Sim3RelSet(short fromNid, short toNid, int slot, int value)
+        {
+            try
+            {
+                var entry = Content.Get().Neighborhood?.Neighbors?.Entries
+                    ?.FirstOrDefault(e => e != null && e.NeighbourID == fromNid);
+                if (entry?.Relationships == null) { Log("AUTOTEST " + _sim3Probe + " relset: no NBRS record for " + fromNid); return; }
+                if (!entry.Relationships.TryGetValue(toNid, out var list) || list == null)
+                {
+                    list = new List<short>(new short[8]);
+                    entry.Relationships[toNid] = list;
+                }
+                while (list.Count <= slot) list.Add(0);
+                var before = list[slot];
+                list[slot] = (short)Math.Max(-100, Math.Min(100, value));
+                Log("AUTOTEST " + _sim3Probe + " state-set rel " + fromNid + "->" + toNid + "[" + slot + "] "
+                    + before + "->" + list[slot] + " (probe fixture, disclosed)");
+            }
+            catch (Exception re) { Log("AUTOTEST " + _sim3Probe + " relset EXC " + re.GetType().Name + " " + re.Message); }
+        }
+
+        private static void Sim3Evaluate(bool pass, string detail)
+        {
+            if (_sim3Done) return;
+            _sim3Done = true;
+            Sim3DisarmObservers();
+            Log("AUTOTEST " + _sim3Probe + " RESULT outcome=" + detail
+                + " budgetEvents=" + _sim3BudgetEvents.Count + " createEvents=" + _sim3CreateEvents.Count
+                + " dialogs=" + _sim3DialogResponses);
+            if (pass) { Pass(_sim3Probe); Log("AUTOTEST " + _sim3Probe + " verdict: " + detail); }
+            else Fail(_sim3Probe);
+            Finish();
+        }
+
+        // ---------------- tranche 2: svccycle ----------------
+        // Phone service call (original IFF trees): push a Services.../X pie entry,
+        // then observe the content-driven chain — dispatch -> NPC arrival (a new
+        // avatar NID on the lot) -> work -> payment (VMTS1Budget debit after
+        // arrival) -> NPC exit. PASS = arrival + payment + exit all observed.
+        private static void SvcCycleSetup() { Sim3Setup("svccycle"); }
+
+        private static void SvcCycleTick()
+        {
+            try
+            {
+                if (_sim3Phase == 0)
+                {
+                    Sim3LogCensusOnce();
+                    _sim3Phase = 1;
+                    return;
+                }
+                Sim3RespondDialogs();
+                if (_sim3Phase == 1)
+                {
+                    if (_svcPhone == null)
+                    {
+                        _svcPhone = Sim3FindPhone();
+                        if (_svcPhone == null)
+                        {
+                            if (!_sim3PieMissLogged) { _sim3PieMissLogged = true; Log("AUTOTEST svccycle: no phone entity on lot"); }
+                        }
+                    }
+                    var actor = Sim3PickActor();
+                    if (_svcPhone != null && actor != null)
+                    {
+                        var pick = Sim3PickPie(_svcPhone, actor, new[] { "Services.../Maid", "Services.../Gardener", "Services.../Repairman", "Services.../Pizza" }, true);
+                        if (pick != null && Sim3Push(_svcPhone, actor, pick)) _sim3Phase = 2;
+                    }
+                    if (Sim3BudgetExceeded()) Sim3Evaluate(false, "no-push-budget (phone=" + (_svcPhone != null) + ")");
+                    return;
+                }
+                if (_sim3Phase == 2)
+                {
+                    // call in flight; on completion, start watching for the NPC arrival
+                    if (Sim3PushState() == 2 || Sim3ClockMinute() - _sim3PushSimMinute > 60)
+                    {
+                        Log("AUTOTEST svccycle call dispatched at " + Sim3Clock() + "; watching for service NPC arrival");
+                        _sim3Phase = 3;
+                    }
+                }
+                if (_sim3Phase == 3)
+                {
+                    // v2 arrival law: the avatar the service chain itself created
+                    // (Scheduler/phones/PhoneGlobals-owned create) entering the lot
+                    var svcObj = Sim3ServiceAvatarCreate();
+                    if (svcObj >= 0 && Sim3InLotByObjId(svcObj))
+                    {
+                        _svcArrivalObjId = svcObj;
+                        _svcArrivalSeen = true;
+                        try
+                        {
+                            var av = Sim3InLot().FirstOrDefault(a => a.ObjectID == svcObj);
+                            _sim3ArrivalNid = av != null ? av.GetPersonData(VMPersonDataVariable.NeighborId) : (short)-1;
+                        }
+                        catch { _sim3ArrivalNid = -1; }
+                        _sim3ArrivalSimMinute = Sim3ClockMinute();
+                        Log("AUTOTEST svccycle ARRIVAL service-NPC obj=" + svcObj + " nid=" + _sim3ArrivalNid
+                            + " at " + Sim3Clock());
+                        Sim3LogCensus("post-arrival");
+                        try { _svcLedgerServiceExpense = _vm.TS1State.TodayReport[(int)FSO.SimAntics.Model.TS1Platform.VMTS1LotState.BudgetCat.ServiceExpense]; } catch { }
+                        _sim3Phase = 4;
+                        _sim3PushSimMinute = Sim3ClockMinute(); // re-base the budget on the visit window
+                    }
+                    else if (Sim3BudgetExceeded())
+                        Sim3Evaluate(false, "arrival-budget (call pushed at +" + (Sim3ClockMinute() - _sim3PushSimMinute)
+                            + " sim-min; service-owned avatar creates=" + _sim3AvatarCreates.Count + ")");
+                }
+                if (_sim3Phase == 4)
+                {
+                    // v2 payment law: a service-scope debit (budget mutation authored
+                    // inside the service chain or the NPC biller) or a ServiceExpense
+                    // ledger increment after arrival. Unrelated household spending
+                    // (e.g. Fridges.iff) does not satisfy it (run1 lesson).
+                    if (!_svcPaymentSeen)
+                    {
+                        var svcDebit = false;
+                        foreach (var ev in _sim3BudgetEvents)
+                        {
+                            bool svcOwned = false;
+                            foreach (var s in Sim3ServiceFeeOwnerIffs)
+                            {
+                                if (ev.StartsWith(s + ":", StringComparison.OrdinalIgnoreCase)) { svcOwned = true; break; }
+                            }
+                            if (!svcOwned) continue;
+                            var tail = ev.Substring(ev.IndexOf('(') + 1);
+                            var parts = tail.TrimEnd(')').Split(new[] { "->" }, StringSplitOptions.None);
+                            if (parts.Length == 2 && long.TryParse(parts[1], out var af) && long.TryParse(parts[0], out var be) && af < be)
+                            {
+                                svcDebit = true;
+                                Log("AUTOTEST svccycle PAYMENT(service debit) " + ev);
+                                break;
+                            }
+                        }
+                        var ledgerNow = _svcLedgerServiceExpense;
+                        try { ledgerNow = _vm.TS1State.TodayReport[(int)FSO.SimAntics.Model.TS1Platform.VMTS1LotState.BudgetCat.ServiceExpense]; } catch { }
+                        if (ledgerNow > _svcLedgerServiceExpense)
+                        {
+                            Log("AUTOTEST svccycle PAYMENT(ServiceExpense ledger " + _svcLedgerServiceExpense + "->" + ledgerNow + ")");
+                            svcDebit = true;
+                        }
+                        _svcPaymentSeen = svcDebit;
+                    }
+                    // exit: the service NPC back out of the lot
+                    if (_svcArrivalObjId >= 0 && !Sim3InLotByObjId(_svcArrivalObjId))
+                    {
+                        _svcExitSeen = true;
+                        Log("AUTOTEST svccycle EXIT obj=" + _svcArrivalObjId + " at " + Sim3Clock());
+                    }
+                    if (_svcPaymentSeen && _svcExitSeen)
+                        Sim3Evaluate(true, "service cycle complete: arrival obj=" + _svcArrivalObjId + " nid=" + _sim3ArrivalNid
+                            + " + payment + exit (debit events=[" + string.Join("; ", _sim3BudgetEvents) + "])");
+                    else if (Sim3BudgetExceeded())
+                        Sim3Evaluate(false, "cycle-budget arrival=" + _svcArrivalSeen + " payment=" + _svcPaymentSeen + " exit=" + _svcExitSeen
+                            + " ledgerServiceExpense=" + _svcLedgerServiceExpense);
+                }
+            }
+            catch (Exception te)
+            {
+                Log("AUTOTEST svccycle tick EXC " + te.GetType().Name + " " + te.Message);
+                Sim3Evaluate(false, "exception");
+            }
+        }
+
+        // ---------------- tranche 3: billtxn ----------------
+        // Bills are original IFF content: the mail carrier delivers bill objects
+        // (Bills.iff), whose 'Pay Bills' pie entry debits the family budget
+        // (MailBox.iff 'CT - Pay Bills' 4113 writes the person-data bill word).
+        // Wait for natural delivery; the mailbox's own debug 'Force Bill Delivery'
+        // is the disclosed one-shot fallback after 10:30 sim-time. PASS = bill on
+        // lot + budget debit attributed to the paying content + bill gone.
+        private static void BillTxnSetup() { Sim3Setup("billtxn"); }
+
+        private static void BillTxnTick()
+        {
+            try
+            {
+                if (_sim3Phase == 0) { Sim3LogCensusOnce(); _sim3Phase = 1; return; }
+                Sim3RespondDialogs();
+                // track bill presence + removal
+                if (_billObj == null)
+                {
+                    _billObj = Sim3FindEntity(e =>
+                        e.Object?.Resource?.MainIff?.Filename?.Equals("Bills.iff", StringComparison.OrdinalIgnoreCase) == true, "bill");
+                    if (_billObj != null && !_billSeen)
+                    {
+                        _billSeen = true;
+                        try { _billLedgerBillsExpense = _vm.TS1State.TodayReport[(int)FSO.SimAntics.Model.TS1Platform.VMTS1LotState.BudgetCat.BillsExpense]; } catch { }
+                        Log("AUTOTEST billtxn BILL on lot obj=" + _billObj.ObjectID + " at " + Sim3Clock()
+                            + " (create events=[" + string.Join("; ", _sim3CreateEvents.Take(4)) + "])");
+                        Sim3ResetPush(); // the force/seed phase's push must not masquerade as the pay push
+                        _sim3Phase = 2;
+                    }
+                }
+                else if (_billSeen && !_billGoneSeen)
+                {
+                    var still = false;
+                    foreach (var e in _vm.Entities)
+                    {
+                        if (e == _billObj) { still = true; break; }
+                    }
+                    if (!still)
+                    {
+                        _billGoneSeen = true;
+                        Log("AUTOTEST billtxn BILL GONE at " + Sim3Clock());
+                    }
+                }
+                if (_sim3Phase == 1)
+                {
+                    // natural delivery window; force-fallback after 10:30 sim-time;
+                    // seed fallback after 12:30 (the original generation is a
+                    // midnight-rollover, outside a single-day window: run1/2 showed
+                    // no mail carrier when the shipped save has no pending bills)
+                    if (!_billForced && _vm.Context.Clock.Hours >= 10 && _vm.Context.Clock.Minutes >= 30)
+                    {
+                        _billForced = true;
+                        var actor = Sim3PickActor();
+                        VMEntity box = null;
+                        VMPieMenuInteraction pick = null;
+                        // v2: the GUID hit may be a non-interactive multitile tile;
+                        // try every mailbox-GUID entity, then any entity that offers
+                        // the debug entry, logging full resolution diagnostics.
+                        foreach (var e in _vm.Entities)
+                        {
+                            try
+                            {
+                                var g = e?.Object?.OBJ?.GUID;
+                                if (e == null || (g != 0xEF121974 && g != 0x1D95C9B0)) continue;
+                                var tt = e.TreeTable?.Interactions?.Length ?? 0;
+                                List<VMPieMenuInteraction> pies = null;
+                                try { pies = e.GetPieMenu(_vm, actor, true, true); } catch { }
+                                Log("AUTOTEST billtxn mailbox diag obj=" + e.ObjectID + " guid=0x" + g?.ToString("X8")
+                                    + " mainIff=" + (e.Object?.Resource?.MainIff?.Filename ?? "?")
+                                    + " ttabs=" + tt + " pie=" + (pies?.Count ?? -1)
+                                    + " sg=" + (e.Object?.Resource?.SemiGlobal?.Iff?.Filename ?? "none")
+                                    + " names=[" + string.Join(" | ", (pies ?? new List<VMPieMenuInteraction>()).Select(p => p.Name ?? "?")) + "]");
+                                if (pick == null && actor != null)
+                                {
+                                    pick = Sim3PickPie(e, actor, new[] { "Force Bill Delivery" }, true);
+                                    if (pick != null) box = e;
+                                }
+                            }
+                            catch (Exception me) { Log("AUTOTEST billtxn mailbox diag EXC " + me.GetType().Name); }
+                        }
+                        if (pick != null && box != null)
+                        {
+                            Log("AUTOTEST billtxn: no natural bill by 10:30; pushing mailbox debug 'Force Bill Delivery' on obj"
+                                + box.ObjectID + " (disclosed fallback)");
+                            Sim3Push(box, actor, pick);
+                        }
+                        else if (actor != null)
+                        {
+                            // v3: the debug entries are pie-gated (diag: ttabs=11,
+                            // pie=0 on every mailbox entity; the shipped gate tree
+                            // 4102 'Force TEST' is a deliberate always-false). Resolve
+                            // the tree directly from the TTAB (disclosed fixture
+                            // override) and let the real content run.
+                            var box2 = _vm.Entities.FirstOrDefault(e2 =>
+                            {
+                                var g = e2?.Object?.OBJ?.GUID;
+                                return g == 0xEF121974 || g == 0x1D95C9B0;
+                            });
+                            if (box2 != null)
+                                Sim3PushDirectByTTAsName(box2, actor, "Force Bill Delivery", "no bill delivery this day");
+                            else Log("AUTOTEST billtxn: force-fallback unavailable (no mailbox entity)");
+                        }
+                        else Log("AUTOTEST billtxn: force-fallback unavailable (no in-lot adult)");
+                    }
+                    // v4 seed fallback: create the bill object with the engine's own
+                    // create primitive and place it at the mailbox (disclosed fixture);
+                    // the 'Pay Bills' tree that then runs is the ORIGINAL content.
+                    if (!_billSeeded && _billObj == null && _vm.Context.Clock.Hours >= 12 && _vm.Context.Clock.Minutes >= 30)
+                    {
+                        _billSeeded = true;
+                        Sim3SeedBill();
+                    }
+                    if (Sim3BudgetExceeded()) Sim3Evaluate(false, "delivery-budget (forced=" + _billForced + " seeded=" + _billSeeded + " creates=" + _sim3CreateEvents.Count + ")");
+                    return;
+                }
+                if (_sim3Phase == 2)
+                {
+                    if (Sim3PushState() == 0)
+                    {
+                        var actor = Sim3PickActor();
+                        if (actor != null && _billObj != null)
+                        {
+                            var pick = Sim3PickPie(_billObj, actor, new[] { "Pay Bills" }, true);
+                            if (pick != null && Sim3Push(_billObj, actor, pick)) _sim3Phase = 3;
+                            else if (Sim3PushDirectByTTAsName(_billObj, actor, "Pay Bills", "bill pie availability-gated"))
+                                _sim3Phase = 3;
+                        }
+                        if (Sim3BudgetExceeded()) Sim3Evaluate(false, "no-pay-push (bill present, no interaction resolved)");
+                        return;
+                    }
+                    _sim3Phase = 3;
+                    return;
+                }
+                if (_sim3Phase == 3)
+                {
+                    // payment debit: a bill-scope mutation (Bills.iff/MailBox.iff-authored)
+                    // or a BillsExpense ledger increment since the bill appeared
+                    if (!_billPaidSeen)
+                    {
+                        foreach (var ev in _sim3BudgetEvents)
+                        {
+                            var owned = ev.StartsWith("Bills.iff:", StringComparison.OrdinalIgnoreCase)
+                                || ev.StartsWith("MailBox.iff:", StringComparison.OrdinalIgnoreCase);
+                            if (!owned) continue;
+                            var tail = ev.Substring(ev.IndexOf('(') + 1);
+                            var parts = tail.TrimEnd(')').Split(new[] { "->" }, StringSplitOptions.None);
+                            if (parts.Length == 2 && long.TryParse(parts[1], out var after) && long.TryParse(parts[0], out var before)
+                                && after < before)
+                            {
+                                _billPaidSeen = true;
+                                Log("AUTOTEST billtxn DEBIT " + ev);
+                                break;
+                            }
+                        }
+                        if (!_billPaidSeen)
+                        {
+                            try
+                            {
+                                var ledNow = _vm.TS1State.TodayReport[(int)FSO.SimAntics.Model.TS1Platform.VMTS1LotState.BudgetCat.BillsExpense];
+                                if (ledNow > _billLedgerBillsExpense)
+                                {
+                                    _billPaidSeen = true;
+                                    Log("AUTOTEST billtxn DEBIT(BillsExpense ledger " + _billLedgerBillsExpense + "->" + ledNow + ")");
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                    if (_billPaidSeen && _billGoneSeen)
+                        Sim3Evaluate(true, "bill transaction complete: bill present -> paid (budget debit attributed to the paying content) -> bill object removed (events=[" + string.Join("; ", _sim3BudgetEvents) + "])");
+                    else if (Sim3BudgetExceeded())
+                        Sim3Evaluate(false, "pay-budget bill=" + _billSeen + " debit=" + _billPaidSeen + " gone=" + _billGoneSeen);
+                }
+            }
+            catch (Exception te)
+            {
+                Log("AUTOTEST billtxn tick EXC " + te.GetType().Name + " " + te.Message);
+                Sim3Evaluate(false, "exception");
+            }
+        }
+
+        // v4 bill seeding (disclosed fixture): the original bill GENERATION runs at
+        // the midnight rollover and delivery needs a pending-bill state the shipped
+        // save lacks (run1/run3: no mail carrier, always-false debug gate). Create
+        // the bill with the engine's own create primitive, place it at the mailbox,
+        // and set its amount attribute (the field 'Pay Bills' 4099 reads as
+        // StkObjAttr[0]). The payment tree that then executes is the ORIGINAL
+        // content — only the bill's existence/amount is fixture-seeded.
+        private static void Sim3SeedBill()
+        {
+            try
+            {
+                var objd = FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID?.Values
+                    ?.FirstOrDefault(o => o != null && (o.ChunkLabel ?? "").Trim().Equals("Bills", StringComparison.OrdinalIgnoreCase));
+                if (objd == null)
+                {
+                    Log("AUTOTEST billtxn seed: no OBJD labelled 'Bills' registered");
+                    return;
+                }
+                var box = _vm.Entities.FirstOrDefault(e2 =>
+                {
+                    var g = e2?.Object?.OBJ?.GUID;
+                    return g == 0xEF121974 || g == 0x1D95C9B0;
+                });
+                var group = _vm.Context.CreateObjectInstance(objd.GUID,
+                    FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                var ent = group?.Objects?.FirstOrDefault();
+                if (ent == null)
+                {
+                    Log("AUTOTEST billtxn seed: CreateObjectInstance returned nothing for 0x" + objd.GUID.ToString("X8"));
+                    return;
+                }
+                var placed = box != null
+                    && FSO.SimAntics.Primitives.VMFindLocationFor.FindLocationFor(ent, box, _vm.Context, VMPlaceRequestFlags.Default);
+                ent.SetAttribute(0, 50); // 'Pay Bills' transfers StkObjAttr[0] (the amount)
+                Log("AUTOTEST billtxn SEED bill obj=" + ent.ObjectID + " guid=0x" + objd.GUID.ToString("X8")
+                    + " placed=" + placed + " amount(attr0)=50 at " + Sim3Clock() + " (disclosed fixture; pay tree is original)");
+            }
+            catch (Exception se)
+            {
+                Log("AUTOTEST billtxn seed EXC " + se.GetType().Name + " " + se.Message);
+            }
+        }
+
+        // ---------------- tranche 4: marrytrace ----------------
+        // Classic TS1 NPC marriage: state-set the resident adult's relationship
+        // with the maid (NBRS slots 0-2 both directions, disclosed), call the maid
+        // via the phone, then push 'Propose' from the maid's pie. The content
+        // chain (move-in accept) must land generic TS1 call 4 AddToFamily: the
+        // maid's family word joins the played family and the FAMI record grows.
+        // PASS = that family write. Budget merge (call 5) is logged, not gated.
+        private static void MarryTraceSetup()
+        {
+            Sim3Setup("marrytrace");
+            _sim3Phase = 0;
+        }
+
+        private static void MarryTraceTick()
+        {
+            try
+            {
+                if (_sim3Phase == 0)
+                {
+                    Sim3LogCensusOnce();
+                    var actor = Sim3PickActor();
+                    if (actor == null) { if (Sim3BudgetExceeded()) Sim3Evaluate(false, "no-adult"); return; }
+                    short nid;
+                    try { nid = actor.GetPersonData(VMPersonDataVariable.NeighborId); }
+                    catch { nid = 0; }
+                    if (nid == 0) { if (Sim3BudgetExceeded()) Sim3Evaluate(false, "actor-nid-0"); return; }
+                    _mtResidentNid = nid;
+                    // the maid's default NBRS record ships with every neighborhood (nid 11, fam 0)
+                    _mtMaidNid = 11;
+                    try
+                    {
+                        var rec = Content.Get().Neighborhood?.Neighbors?.Entries
+                            ?.FirstOrDefault(e => e != null && e.NeighbourID == _mtMaidNid);
+                        _mtMaidGuid = rec?.GUID ?? 0;
+                        if (rec == null) { Log("AUTOTEST marrytrace: maid NBRS record missing"); }
+                    }
+                    catch { }
+                    if (_mtMaidGuid == 0) { Sim3Evaluate(false, "maid-record-missing"); return; }
+                    // the merge assert baseline
+                    try { _mtFamGuidsBefore = _vm.TS1State?.CurrentFamily?.FamilyGUIDs?.Length ?? -1; } catch { }
+                    for (int slot = 0; slot <= 2; slot++)
+                    {
+                        Sim3RelSet(_mtResidentNid, _mtMaidNid, slot, 100);
+                        Sim3RelSet(_mtMaidNid, _mtResidentNid, slot, 100);
+                    }
+                    Log("AUTOTEST marrytrace fixture: actor=obj" + actor.ObjectID + "/nid" + _mtResidentNid
+                        + " target=maid nid" + _mtMaidNid + "/guid=0x" + _mtMaidGuid.ToString("X8")
+                        + " famGuidsBefore=" + _mtFamGuidsBefore);
+                    _sim3Phase = 1;
+                    return;
+                }
+                Sim3RespondDialogs();
+                if (_sim3Phase == 1)
+                {
+                    // call the maid
+                    if (_svcPhone == null) _svcPhone = Sim3FindPhone();
+                    var actor = Sim3PickActor();
+                    if (_svcPhone != null && actor != null)
+                    {
+                        var pick = Sim3PickPie(_svcPhone, actor, new[] { "Services.../Maid" }, true);
+                        if (pick != null && Sim3Push(_svcPhone, actor, pick)) _sim3Phase = 2;
+                    }
+                    if (Sim3BudgetExceeded()) Sim3Evaluate(false, "no-call (phone=" + (_svcPhone != null) + ")");
+                    return;
+                }
+                if (_sim3Phase == 2)
+                {
+                    // wait for the maid's arrival (v2 law: the avatar the service
+                    // chain itself created; the runtime NPC gets a fresh NID)
+                    var maidObj = Sim3ServiceAvatarCreate();
+                    if (maidObj >= 0 && Sim3InLotByObjId(maidObj))
+                    {
+                        Log("AUTOTEST marrytrace maid on lot obj=" + maidObj + " at " + Sim3Clock());
+                        _svcArrivalObjId = maidObj;
+                        _sim3Phase = 3;
+                    }
+                    else if (Sim3PushState() == 2 && Sim3ClockMinute() - _sim3PushSimMinute > 240)
+                    {
+                        Sim3Evaluate(false, "maid-arrival-budget (service avatar creates=" + _sim3AvatarCreates.Count + ")");
+                        return;
+                    }
+                    else if (Sim3BudgetExceeded()) Sim3Evaluate(false, "maid-arrival-budget");
+                    return;
+                }
+                if (_sim3Phase == 3)
+                {
+                    // push Propose from the maid's pie (actor = resident adult)
+                    var actor = Sim3PickActor();
+                    var maid = Sim3InLot().FirstOrDefault(a =>
+                    {
+                        try { return a.ObjectID == _svcArrivalObjId; }
+                        catch { return false; }
+                    });
+                    if (actor == null || maid == null)
+                    {
+                        Sim3Evaluate(false, "pair-lost actor=" + (actor != null) + " maid=" + (maid != null));
+                        return;
+                    }
+                    var pick = Sim3PickPie(maid, actor, new[] { "Propose" }, true);
+                    if (pick != null && Sim3Push(maid, actor, pick))
+                    {
+                        _mtPushed = true;
+                        _sim3Phase = 4;
+                        _sim3PushSimMinute = Sim3ClockMinute(); // re-base on the merge window
+                    }
+                    else if (Sim3BudgetExceeded()) Sim3Evaluate(false, "no-propose-pie");
+                    return;
+                }
+                if (_sim3Phase == 4)
+                {
+                    // settle: family record + maid family word
+                    var fam = _vm.TS1State?.CurrentFamily;
+                    var inFam = false;
+                    try { inFam = fam?.FamilyGUIDs?.Contains(_mtMaidGuid) == true; } catch { }
+                    var rec = Content.Get().Neighborhood?.Neighbors?.Entries
+                        ?.FirstOrDefault(e => e != null && e.NeighbourID == _mtMaidNid);
+                    var pdFam = rec?.PersonData != null && rec.PersonData.Length > 61 ? rec.PersonData[61] : (short)-1;
+                    var runtimeFam = (short)-2;
+                    var maidAv = Sim3InLot().FirstOrDefault(a =>
+                    {
+                        try { return a.GetPersonData(VMPersonDataVariable.NeighborId) == _mtMaidNid; }
+                        catch { return false; }
+                    });
+                    try { runtimeFam = maidAv?.GetPersonData(VMPersonDataVariable.TS1FamilyNumber) ?? (short)-2; } catch { }
+                    var merged = inFam && pdFam == (fam?.ChunkID ?? -3);
+                    if (merged)
+                    {
+                        Sim3Evaluate(true, "marriage merge landed: maid nid" + _mtMaidNid + " family word " + pdFam
+                            + "==FAMI " + fam.ChunkID + ", famGuids " + _mtFamGuidsBefore + "->" + (fam.FamilyGUIDs?.Length ?? -1)
+                            + " (budget events=[" + string.Join("; ", _sim3BudgetEvents) + "])");
+                        return;
+                    }
+                    if (_mtPushed && Sim3ClockMinute() - _sim3PushSimMinute > 120)
+                    {
+                        Sim3Evaluate(false, "merge-budget pushed='" + _sim3PushName + "' inFam=" + inFam
+                            + " pd61=" + pdFam + " famId=" + (fam?.ChunkID ?? -3) + " runtimeFam=" + runtimeFam);
+                        return;
+                    }
+                    if (Sim3BudgetExceeded()) Sim3Evaluate(false, "merge-budget (no push window)");
+                }
+            }
+            catch (Exception te)
+            {
+                Log("AUTOTEST marrytrace tick EXC " + te.GetType().Name + " " + te.Message);
+                Sim3Evaluate(false, "exception");
+            }
+        }
+
+        // ---------------- tranche 5: birthtrace ----------------
+        // Kiss-driven baby creation via the original chain (VMTS1MakeNewCharacter,
+        // opcode 19): state-set the spouses' motives and mutual relationship
+        // (disclosed), then push 'Kiss' repeatedly. The full law is a new household
+        // NID appearing; the original arc is content-chanced and can span multiple
+        // sim days, so a budget timeout FAILs honestly with the push telemetry a
+        // reviewer needs to split this tranche further.
+        private static void BirthTraceSetup() { Sim3Setup("birthtrace"); }
+
+        private static void BirthTraceTick()
+        {
+            try
+            {
+                if (_sim3Phase == 0)
+                {
+                    Sim3LogCensusOnce();
+                    var adults = Sim3InLot().Where(a => { try { return a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18; } catch { return false; } }).ToList();
+                    if (adults.Count < 2) { if (Sim3BudgetExceeded()) Sim3Evaluate(false, "need-two-adults"); return; }
+                    short a1 = 0, a2 = 0;
+                    try
+                    {
+                        a1 = adults[0].GetPersonData(VMPersonDataVariable.NeighborId);
+                        a2 = adults[1].GetPersonData(VMPersonDataVariable.NeighborId);
+                    }
+                    catch { }
+                    if (a1 == 0 || a2 == 0) { if (Sim3BudgetExceeded()) Sim3Evaluate(false, "adult-nids"); return; }
+                    _sim3Actor = adults[0];
+                    _btTargetNid = a2;
+                    // disclosed fixture: max motives + high mutual relationship
+                    foreach (var a in adults)
+                    {
+                        foreach (var m in new[] { VMMotive.Hunger, VMMotive.Comfort, VMMotive.Hygiene, VMMotive.Bladder, VMMotive.Energy, VMMotive.Fun, VMMotive.Social, VMMotive.Room })
+                        {
+                            try { a.SetMotiveData(m, 90); } catch { }
+                        }
+                    }
+                    for (int slot = 0; slot <= 2; slot++)
+                    {
+                        Sim3RelSet(a1, a2, slot, 100);
+                        Sim3RelSet(a2, a1, slot, 100);
+                    }
+                    Log("AUTOTEST birthtrace fixture: adults obj" + adults[0].ObjectID + "/nid" + a1
+                        + " + obj" + adults[1].ObjectID + "/nid" + a2 + " motives=90 rel[0..2]=100");
+                    _sim3Phase = 1;
+                    return;
+                }
+                if (_sim3Phase == 1)
+                {
+                    // new household member?
+                    foreach (var a in Sim3InLot())
+                    {
+                        short nid;
+                        try { nid = a.GetPersonData(VMPersonDataVariable.NeighborId); } catch { continue; }
+                        if (nid == 0 || _sim3BaselineNids.Contains(nid)) continue;
+                        Log("AUTOTEST birthtrace NEW HOUSEHOLD MEMBER nid=" + nid + " obj=" + a.ObjectID + " at " + Sim3Clock()
+                            + " after " + _btKissCount + " kisses");
+                        Sim3Evaluate(true, "baby chain landed: new nid=" + nid + " after " + _btKissCount + " pushed kisses (creates=["
+                            + string.Join("; ", _sim3CreateEvents.Take(6)) + "])");
+                        return;
+                    }
+                    var state = Sim3PushState();
+                    if (state != 1) // idle or last push completed -> push the next kiss
+                    {
+                        var target = Sim3InLot().FirstOrDefault(a =>
+                        {
+                            try { return a.GetPersonData(VMPersonDataVariable.NeighborId) == _btTargetNid; }
+                            catch { return false; }
+                        });
+                        var actor = _sim3Actor;
+                        try { if (actor != null && (actor.Dead || actor.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)) actor = null; } catch { actor = null; }
+                        if (actor == null || target == null)
+                        {
+                            Sim3Evaluate(false, "pair-lost kisses=" + _btKissCount);
+                            return;
+                        }
+                        var pick = Sim3PickPie(target, actor, new[] { "Kiss" }, true);
+                        if (pick != null && Sim3Push(target, actor, pick)) _btKissCount++;
+                        else if (_sim3PieMissLogged && _btKissCount == 0 && Sim3BudgetExceeded())
+                        {
+                            Sim3Evaluate(false, "no-kiss-pie");
+                            return;
+                        }
+                    }
+                    if (Sim3BudgetExceeded())
+                        Sim3Evaluate(false, "birth-budget kisses=" + _btKissCount
+                            + " (the original kiss->baby arc may span multiple sim days; push telemetry above)");
+                }
+            }
+            catch (Exception te)
+            {
+                Log("AUTOTEST birthtrace tick EXC " + te.GetType().Name + " " + te.Message);
+                Sim3Evaluate(false, "exception");
+            }
         }
 
         private static void CheckRelation()
