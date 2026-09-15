@@ -6085,6 +6085,7 @@ namespace Simitone.Client
         // birthtrace
         private static int _btKissCount;
         private static short _btTargetNid = -1;
+        private static int _btFixtureSimMinute = -1; // SIM-17: minute-of-day anchor for the hourly motive re-top
 
         private const int Sim3BudgetSimMinutes = 600; // one full sim day covers mail/service windows
         private const int Sim3BudgetRealMinutes = 13;
@@ -6099,6 +6100,12 @@ namespace Simitone.Client
         }
         private static bool Sim3BudgetExceeded()
         {
+            // SIM-17: the kiss→baby arc spans ~3 sim-days, which minute-of-day deltas
+            // cannot measure (they wrap at midnight), so birthtrace binds on real time
+            // alone at 140 min — under the runner's 150-min SIMTONE_TIMEOUT_MS deadline
+            // so the designed telemetry FAIL prints before the generic timeout.
+            if (_sim3Probe == "birthtrace")
+                return (DateTime.UtcNow - _sim3RealStart).TotalMinutes > 140;
             return (Sim3ClockMinute() - _sim3PushSimMinute) > Sim3BudgetSimMinutes
                 || (DateTime.UtcNow - _sim3RealStart).TotalMinutes > Sim3BudgetRealMinutes;
         }
@@ -6114,8 +6121,11 @@ namespace Simitone.Client
                 try { _sim3BaselineNids.Add(a.GetPersonData(VMPersonDataVariable.NeighborId)); } catch { }
             }
             Sim3ArmObservers();
-            Log("AUTOTEST " + probe + " armed (opt-in SIM-03 tranche; budget " + Sim3BudgetSimMinutes
-                + " sim-min / " + Sim3BudgetRealMinutes + " real min; baseline nids=[" + string.Join(",", _sim3BaselineNids) + "])");
+            // disclose the EFFECTIVE budget (birthtrace binds on real time; the others 600/13)
+            var budSim = _sim3Probe == "birthtrace" ? "n/a (real-min bound)" : Sim3BudgetSimMinutes.ToString();
+            var budReal = _sim3Probe == "birthtrace" ? "140" : Sim3BudgetRealMinutes.ToString();
+            Log("AUTOTEST " + probe + " armed (opt-in SIM-03 tranche; budget " + budSim
+                + " sim-min / " + budReal + " real min; baseline nids=[" + string.Join(",", _sim3BaselineNids) + "])");
         }
 
         private static void Sim3ArmObservers()
@@ -6984,7 +6994,47 @@ namespace Simitone.Client
                             + string.Join("; ", _sim3CreateEvents.Take(6)) + "])");
                         return;
                     }
+                    // SIM-17 soak: a social popup can zero the speed and freeze the world
+                    // (the R157 stale-dialog law — soak-run1 stalled 140 min this way:
+                    // clock frozen, queue latched, zero world events). Unpause + release,
+                    // disclosed, so the multi-day soak keeps its clock.
+                    if (_vm.SpeedMultiplier <= 0)
+                    {
+                        var latched = _vm.GlobalBlockingDialog;
+                        _vm.SpeedMultiplier = 1;
+                        _vm.GlobalBlockingDialog = null;
+                        Log("AUTOTEST birthtrace soak: unpause (stale-dialog-latch "
+                            + (latched == null ? "none" : "obj" + latched.ObjectID)
+                            + " released) at " + Sim3Clock() + " kisses=" + _btKissCount);
+                    }
+                    // SIM-17 soak fixture: keep the disclosed motive top-up alive across
+                    // the multi-day arc (decay would otherwise stall the social chain).
+                    // Ticks are per-FRAME, so gate on sim clock delta — re-top hourly.
+                    if (_btFixtureSimMinute < 0) _btFixtureSimMinute = Sim3ClockMinute();
+                    if ((Sim3ClockMinute() - _btFixtureSimMinute + 1440) % 1440 >= 60)
+                    {
+                        _btFixtureSimMinute = Sim3ClockMinute();
+                        foreach (var a in Sim3InLot())
+                        {
+                            foreach (var m in new[] { VMMotive.Hunger, VMMotive.Comfort, VMMotive.Hygiene, VMMotive.Bladder, VMMotive.Energy, VMMotive.Fun, VMMotive.Social, VMMotive.Room })
+                            {
+                                try { a.SetMotiveData(m, 90); } catch { }
+                            }
+                        }
+                        Log("AUTOTEST birthtrace soak fixture: motives re-topped at " + Sim3Clock() + " (kisses=" + _btKissCount + ")");
+                    }
                     var state = Sim3PushState();
+                    // SIM-17 watchdog (review fix): ticks are per-FRAME, so measure the
+                    // in-flight latch in sim-minutes — a wrap-aware delta from the last
+                    // push's own anchor. The queue-window latch can miss a same-tick
+                    // start and hold state 1 forever; re-arm after 30 sim-min without
+                    // a new kiss (a legit routed kiss completes in a few sim-min).
+                    if (state == 1 && (Sim3ClockMinute() - _sim3PushSimMinute + 1440) % 1440 > 30)
+                    {
+                        Log("AUTOTEST birthtrace watchdog: in-flight latch held past 30 sim-min"
+                            + "; re-arming push (kisses=" + _btKissCount + ")");
+                        state = 0;
+                    }
                     if (state != 1) // idle or last push completed -> push the next kiss
                     {
                         var target = Sim3InLot().FirstOrDefault(a =>
@@ -7000,7 +7050,7 @@ namespace Simitone.Client
                             return;
                         }
                         var pick = Sim3PickPie(target, actor, new[] { "Kiss" }, true);
-                        if (pick != null && Sim3Push(target, actor, pick)) _btKissCount++;
+                        if (pick != null && Sim3Push(target, actor, pick)) _btKissCount++; // Sim3Push re-anchors _sim3PushSimMinute (the watchdog's clock base)
                         else if (_sim3PieMissLogged && _btKissCount == 0 && Sim3BudgetExceeded())
                         {
                             Sim3Evaluate(false, "no-kiss-pie");
