@@ -36,6 +36,7 @@ namespace FSO.Content
             }
             // Clear any previously recorded failed files
             FailedContentFiles.Clear();
+            _failureOverflow = 0;
             INSTANCE = new Content(basepath, ContentMode.CLIENT, device, true);
         }
 
@@ -96,6 +97,48 @@ namespace FSO.Content
         /// Used to display warnings to users about problematic custom content.
         /// </summary>
         public static List<TS1BCFProvider.FailedFileInfo> FailedContentFiles { get; private set; } = new List<TS1BCFProvider.FailedFileInfo>();
+
+        /// <summary>
+        /// Record a content-level failure (unmountable archive, missing global
+        /// dependency, unreadable file) into the single bounded failure channel
+        /// surfaced to users and the autotest log. CC-02: archive-level and
+        /// dependency-level failures join object/BCF file failures here so one
+        /// bad download can neither abort boot nor fail silently.
+        /// </summary>
+        public static void RecordContentFailure(string filename, string errorType, string errorMessage)
+        {
+            lock (FailedContentFiles)
+            {
+                // bounded: dedupe identical failures (objects can be constructed
+                // repeatedly) and cap the list so a corrupt corpus cannot balloon it
+                foreach (var existing in FailedContentFiles)
+                {
+                    if (existing.Filename == filename && existing.ErrorType == errorType
+                        && existing.ErrorMessage == errorMessage) return;
+                }
+                if (FailedContentFiles.Count >= 1000)
+                {
+                    if (_failureOverflow++ == 0)
+                    {
+                        FailedContentFiles.Add(new TS1BCFProvider.FailedFileInfo
+                        {
+                            Filename = "<overflow>",
+                            ErrorMessage = "more than 1000 content failures; further entries suppressed",
+                            ErrorType = "Overflow"
+                        });
+                    }
+                    else _failureOverflow++;
+                    return;
+                }
+                FailedContentFiles.Add(new TS1BCFProvider.FailedFileInfo
+                {
+                    Filename = filename,
+                    ErrorMessage = errorMessage,
+                    ErrorType = errorType
+                });
+            }
+        }
+        private static int _failureOverflow;
 
         /// <summary>
         /// Creates a new instance of Content.

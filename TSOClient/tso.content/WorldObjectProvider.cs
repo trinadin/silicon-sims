@@ -316,14 +316,27 @@ namespace FSO.Content
             if (GLOBChunks != null && GLOBChunks[0].Name != "")
             {
                 GameGlobal sg = null;
+                bool globFailed = false;
                 try
                 {
                     sg = content.WorldObjectGlobals.Get(GLOBChunks[0].Name);
                 } catch (Exception)
                 {
-
+                    globFailed = true;
                 }
                 if (sg != null) SemiGlobal = sg.Resource; //used for tuning constant fetching.
+                else if (globFailed || sg == null)
+                {
+                    // CC-02: a GLOB edge that does not resolve means the object's
+                    // semi-global BHAVs/tuning cannot load - previously this failed
+                    // silently and the object broke at interaction time. Surface a
+                    // bounded, actionable failure naming the missing dependency.
+                    Content.RecordContentFailure(
+                        iff.Filename ?? iname,
+                        "MissingGlobal",
+                        $"Object depends on global '{GLOBChunks[0].Name}' which is not mounted; "
+                        + "its semi-global behaviors are unavailable.");
+                }
             }
 
             Recache();

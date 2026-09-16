@@ -141,7 +141,14 @@ namespace FSO.Content.Framework
             for (int i=1; i<Extensions.Length; i++)
             {
                 var ents = BaseProvider.BuildDictionary(Extensions[i], "globals");
-                foreach (var item in ents) Entries.Add(item.Key, item.Value);
+                foreach (var item in ents)
+                {
+                    // CC-02: equivalent basenames across the provider's extensions
+                    // (e.g. a .bmp and a .tga of the same name) previously threw
+                    // ArgumentException here and aborted content init. Follow the
+                    // corpus-wide last-write-wins rule instead.
+                    Entries[item.Key] = item.Value;
+                }
             }
         }
 

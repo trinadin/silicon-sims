@@ -191,28 +191,42 @@ namespace FSO.Content.Framework
             }
             
             foreach (var farPath in FarFiles){
-                var archive = new FAR1Archive((TS1)?Path.Combine(ContentManager.TS1BasePath, farPath):ContentManager.GetPath(farPath), !TS1);
-                var entries = archive.GetAllFarEntries();
-
-                foreach (var entry in entries)
+                // CC-02: a malformed or foreign-format archive under the tree
+                // (e.g. a FAR1b pack in TS1 mode, or a truncated download) must
+                // not abort the whole content init. Skip it with a bounded,
+                // surfaced failure and keep mounting the rest of the corpus.
+                try
                 {
-                    var referenceItem = new Far1ProviderEntry<T>(this)
+                    var archive = new FAR1Archive((TS1)?Path.Combine(ContentManager.TS1BasePath, farPath):ContentManager.GetPath(farPath), !TS1);
+                    var entries = archive.GetAllFarEntries();
+
+                    foreach (var entry in entries)
                     {
-                        Archive = archive,
-                        FarEntry = entry
-                    };
-                    if (entry.Filename != null)
-                    {
-                        EntriesByName[entry.Filename] = referenceItem;
-                        var ext = Path.GetExtension(entry.Filename).ToLowerInvariant();
-                        List<Far1ProviderEntry<T>> group = null;
-                        if (!EntriesOfType.TryGetValue(ext, out group))
+                        var referenceItem = new Far1ProviderEntry<T>(this)
                         {
-                            group = new List<Far1ProviderEntry<T>>();
-                            EntriesOfType[ext] = group;
+                            Archive = archive,
+                            FarEntry = entry
+                        };
+                        if (entry.Filename != null)
+                        {
+                            EntriesByName[entry.Filename] = referenceItem;
+                            var ext = Path.GetExtension(entry.Filename).ToLowerInvariant();
+                            List<Far1ProviderEntry<T>> group = null;
+                            if (!EntriesOfType.TryGetValue(ext, out group))
+                            {
+                                group = new List<Far1ProviderEntry<T>>();
+                                EntriesOfType[ext] = group;
+                            }
+                            group.Add(referenceItem);
                         }
-                        group.Add(referenceItem);
                     }
+                }
+                catch (Exception ex)
+                {
+                    FSO.Content.Content.RecordContentFailure(
+                        farPath.Replace('\\', '/'),
+                        ex.GetType().Name,
+                        $"Archive failed to mount (skipped): {ex.Message}");
                 }
             }
 
