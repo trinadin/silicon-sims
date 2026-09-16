@@ -290,6 +290,11 @@ namespace Simitone.Client
             // redirected UserDir). Opt-in only — inert unless the checks
             // string names it.
             AutotestSaveFault.BeginIsolation(c);
+            // SAV-05 'impexport': same isolation idiom (the battery stages FAMs
+            // into the redirected UserDir's UserData/Import and drives the
+            // production import poll; game-data is SHA-pinned read-only).
+            // Opt-in only — inert unless the checks string names it.
+            AutotestImpexport.BeginIsolation(c);
             if (timeoutMs > 0) Config.TimeoutMs = timeoutMs;
             Config.ExitOnDone = exitOnDone;
 
@@ -334,6 +339,7 @@ namespace Simitone.Client
                     case 7: StateCutaway244(); break;
                     case 8: StateCASFlow(); break;
                     case 9: StateTutorialLifecycle247(); break;
+                    case 10: StateImpexport(); break;
                 }
             }
             catch (Exception e)
@@ -377,6 +383,18 @@ namespace Simitone.Client
                 Log("AUTOTEST uitutorial-lifecycle neighborhood-screen ready; entering lifecycle battery");
                 _lifecycle247 = new AutotestTutorialLifecycle247(Log);
                 _state = 9;
+                return;
+            }
+            // SAV-05 'impexport' opt-in (additive): takes over at the neighborhood
+            // screen like the lifecycle battery — the fixture drives the production
+            // import poll itself. Only reachable when the configured Checks string
+            // contains it (the default string never lists it).
+            if (CheckEnabled("impexport"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST impexport neighborhood-screen ready; entering import battery");
+                _impexport = new AutotestImpexport(Log);
+                _state = 10;
                 return;
             }
             // Only the visual survey needs a settled neighborhood frame. Do
@@ -631,8 +649,24 @@ namespace Simitone.Client
             Finish();
         }
 
-        private static AutotestCutaway244 _cutaway244;
-        private static bool _cutawayFinished244;
+        // SAV-05 'impexport' (opt-in, additive): the generic-import runtime
+        // acceptance fixture — see AutotestImpexport.cs. Reached only through
+        // the StateWaitNeigh entry branch when the configured Checks string
+        // contains "impexport".
+        private static AutotestImpexport _impexport;
+
+        private static void StateImpexport()
+        {
+            if (_impexport == null) { Finish(); return; }
+            if (!_impexport.Tick()) return;
+            if (_impexport.Passed) Pass("impexport"); else Fail("impexport");
+            Log("AUTOTEST impexport " + _impexport.Diagnostics);
+            if (!_impexport.Passed) Log("AUTOTEST impexport FAILURES " + _impexport.Failures);
+            _impexport = null;
+            Finish();
+        }
+
+        private static AutotestCutaway244 _cutaway244;        private static bool _cutawayFinished244;
         private static void StateCutaway244()
         {
             if (!_cutaway244.Ready) return;
