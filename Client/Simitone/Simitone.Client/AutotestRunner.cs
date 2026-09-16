@@ -144,6 +144,8 @@ namespace Simitone.Client
         private static bool _fwVarFocusedDispatched; // (R249) freewillwin focused gate: one-shot freewillvar dispatch when corpus is absent
         private static bool _freewillwinArmed;    // (R249) freewillwin battery armed this run
         private static bool _freewillwinVerdicted; // (R249) freewillwin verdict emitted (never double-count)
+        private static bool _cc02e2eArmed;        // (CC-02 e2e) cc02e2e chain armed this run
+        private static bool _cc02e2eDone;         // (CC-02 e2e) chain finished (verdict recorded)
 
         // (Round 219) DEATHTRACE — the natural relationship->death runtime trace, opt-in like
         // carreturn/schoolreturn. Static law decoded from the staged PersonGlobals.iff +
@@ -687,7 +689,8 @@ namespace Simitone.Client
                 || CheckEnabled("simjrn")
                 || CheckEnabled("deathrel")
                 || CheckEnabled("deathtrace") || CheckEnabled("ghosttrace")
-                || CheckEnabled("freewillwin") || CheckEnabled("moodlaw"))
+                || CheckEnabled("freewillwin") || CheckEnabled("moodlaw")
+                || CheckEnabled("cc02e2e"))
             {
                 // (R249) focused-gate dispatch: freewill/freewillvar live inside RunCorpus
                 // (corpus-gated). When a focused opts string names them WITHOUT corpus,
@@ -1963,7 +1966,8 @@ namespace Simitone.Client
             // soak would otherwise wait silently until the 30-min timeout
             // (r139p1: ticks stopped at 7:29, no SUMMARY, ~10-min exit
             // stall). Fail the soak honestly and let the summary print.
-            if (_screen != null && !_screen.InLot)
+            if (_screen != null && !_screen.InLot
+                && !(CheckEnabled("cc02e2e") && _cc02e2eArmed && !_cc02e2eDone))
             {
                 Log("AUTOTEST SAMPLE-ABORT lot unloaded mid-soak (carpool/sim exit) at minute="
                     + _vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00")
@@ -1982,6 +1986,27 @@ namespace Simitone.Client
                 _vm.SpeedMultiplier = 1;
                 _vm.GlobalBlockingDialog = null;
                 Log("AUTOTEST forced speed 1 (stale-dialog-latch " + (staleDlg2 == null ? "none" : "obj" + staleDlg2.ObjectID) + " released)");
+            }
+            // (CC-02 e2e) per-frame drive of the custom-content chain; the battery
+            // stays open until the chain verdicts (tail gate below).
+            if (CheckEnabled("cc02e2e") && !_cc02e2eDone)
+            {
+                if (!_cc02e2eArmed)
+                {
+                    if (_vm == null || _avatars == null || _avatars.Count == 0) return; // lot not ready yet
+                    _cc02e2eArmed = true;
+                    var scr = _screen;
+                    AutotestCC02E2E.Begin(() => _vm, () => _avatars,
+                        () => { scr.Save(); return true; },
+                        () => scr.PlayHouse(5, null), Log);
+                    Log("AUTOTEST cc02e2e: Begin (chain armed post-battery, freeplay world)");
+                }
+                if (AutotestCC02E2E.SampleTick())
+                {
+                    _cc02e2eDone = true;
+                    if (AutotestCC02E2E.AllPassed) Pass("cc02e2e");
+                    else Fail("cc02e2e");
+                }
             }
             var minute = _vm.Context.Clock.Minutes;
             if (_motiveStartMinute < 0) _motiveStartMinute = minute;
@@ -2384,6 +2409,8 @@ namespace Simitone.Client
             // soak (no clock jump - VM clock runs ~1 sim-min/sec at speed 1, so waiting ~2.5 real
             // min to cross StartTime is cheaper and avoids IFF-timing desync from an abrupt
             // VMNetSetTimeCmd) and sample for IFF-factual live dispatch of the loop.
+            if (CheckEnabled("cc02e2e") && _cc02e2eArmed && !_cc02e2eDone)
+                return; // (CC-02 e2e) chain still driving per-frame; battery finishes after its verdict
             if (CheckEnabled("carseek") || CheckEnabled("carreturn") || CheckEnabled("schoolreturn")
                 || CheckEnabled("schoolmiss")
                 || CheckEnabled("chancetrace") || CheckEnabled("carskip")
