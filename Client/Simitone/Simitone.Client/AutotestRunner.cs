@@ -295,6 +295,11 @@ namespace Simitone.Client
             // production import poll; game-data is SHA-pinned read-only).
             // Opt-in only — inert unless the checks string names it.
             AutotestImpexport.BeginIsolation(c);
+            // SAV-07 'sav07live'/'sav07live2': same isolation idiom but with a
+            // DETERMINISTIC isolation dir — run 1 resets it (fresh clone) and
+            // run 2 mounts it as-is, so run 2 is a genuine fresh-process reload
+            // of run 1's saved state. Opt-in only — inert unless named.
+            AutotestSav07.BeginIsolation(c);
             if (timeoutMs > 0) Config.TimeoutMs = timeoutMs;
             Config.ExitOnDone = exitOnDone;
 
@@ -340,6 +345,7 @@ namespace Simitone.Client
                     case 8: StateCASFlow(); break;
                     case 9: StateTutorialLifecycle247(); break;
                     case 10: StateImpexport(); break;
+                    case 11: StateSav07(); break;
                 }
             }
             catch (Exception e)
@@ -395,6 +401,19 @@ namespace Simitone.Client
                 Log("AUTOTEST impexport neighborhood-screen ready; entering import battery");
                 _impexport = new AutotestImpexport(Log);
                 _state = 10;
+                return;
+            }
+            // SAV-07 'sav07live'/'sav07live2' opt-in (additive): the live
+            // export→import→save→fresh-load round-trip the impexport battery
+            // excluded. Run 1 resets the deterministic isolation dir and does
+            // export+import+save; run 2 remounts it in a fresh process.
+            if (CheckEnabled("sav07live") || CheckEnabled("sav07live2"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST sav07 neighborhood-screen ready; entering round-trip probe (run2="
+                    + CheckEnabled("sav07live2") + ")");
+                _sav07 = new AutotestSav07(Log, CheckEnabled("sav07live2"));
+                _state = 11;
                 return;
             }
             // Only the visual survey needs a settled neighborhood frame. Do
@@ -666,6 +685,23 @@ namespace Simitone.Client
             Finish();
         }
 
+        // SAV-07 'sav07live'/'sav07live2' (opt-in, additive): the live
+        // export→import→save→fresh-load round-trip probe — see
+        // AutotestSav07.cs. Reached only through the StateWaitNeigh entry
+        // branch when the configured Checks string names it.
+        private static AutotestSav07 _sav07;
+
+        private static void StateSav07()
+        {
+            if (_sav07 == null) { Finish(); return; }
+            if (!_sav07.Tick()) return;
+            if (_sav07.Passed) Pass("sav07"); else Fail("sav07");
+            Log("AUTOTEST sav07 " + _sav07.Diagnostics);
+            if (!_sav07.Passed) Log("AUTOTEST sav07 FAILURES " + _sav07.Failures);
+            _sav07 = null;
+            Finish();
+        }
+
         private static AutotestCutaway244 _cutaway244;        private static bool _cutawayFinished244;
         private static void StateCutaway244()
         {
@@ -749,7 +785,8 @@ namespace Simitone.Client
             }
             else if (CheckEnabled("socexec") || CheckEnabled("saveresume")
                 || CheckEnabled("svccycle") || CheckEnabled("billtxn")
-                || CheckEnabled("marrytrace") || CheckEnabled("birthtrace"))
+                || CheckEnabled("marrytrace") || CheckEnabled("birthtrace")
+                || CheckEnabled("familymerge"))
             {
                 // (SIM-03) socexec: keep the lot alive so a pushed social can run to
                 // completion; pair pick is lazy (first ticks) so restore-time queues drain.
@@ -765,6 +802,7 @@ namespace Simitone.Client
                 else if (CheckEnabled("billtxn")) BillTxnSetup();
                 else if (CheckEnabled("marrytrace")) MarryTraceSetup();
                 else if (CheckEnabled("birthtrace")) BirthTraceSetup();
+                else if (CheckEnabled("familymerge")) FamilyMergeSetup();
             }
             else
             {
@@ -1995,6 +2033,7 @@ namespace Simitone.Client
             if (CheckEnabled("billtxn") && !_sim3Done) { BillTxnTick(); return; }
             if (CheckEnabled("marrytrace") && !_sim3Done) { MarryTraceTick(); return; }
             if (CheckEnabled("birthtrace") && !_sim3Done) { BirthTraceTick(); return; }
+            if (CheckEnabled("familymerge") && !_sim3Done) { FamilyMergeTick(); return; }
             // R139: loud lot-unload detector. When the carpool takes the
             // last family sim at the ~8:00 window the game returns to the
             // neighborhood; the stale _vm's clock freezes and the carseek
@@ -7136,6 +7175,620 @@ namespace Simitone.Client
             catch (Exception te)
             {
                 Log("AUTOTEST birthtrace tick EXC " + te.GetType().Name + " " + te.Message);
+                Sim3Evaluate(false, "exception");
+            }
+        }
+
+        // ---------------- SIM-16: familymerge ----------------
+        // Cross-family merge law (generic TS1 calls 4 AddToFamily / 5 CombineAssets)
+        // through REAL content: the SocialInteractions.iff BHAV 4241 "do move in"
+        // chain (census: 53 call-4 / 16 call-5 / 22 call-6 / 3 call-33 sites; the
+        // proposal/move-in tree is the canonical caller — SIM-03 marrytrace refuted
+        // the service-NPC route, this probe uses a real second-family neighbor).
+        // Fixture (disclosed): house 5 boot; guest = an adult member of another
+        // PLACED family (a FAMI with HouseNumber != 0/this house) that has an NBRS
+        // record; rel[0..2]=100 both directions; the guest's NBRS family word
+        // (PersonData[61]) is set to their own FAMI id when it is 0 (mirroring a
+        // placed family member's store state). Arrival via the phone's real
+        // 'Invite...' tree; the social is pushed from the guest's pie (with the
+        // billtxn-style direct TTAs push as the disclosed fallback). Verdict law
+        // (socexec v4: the asserted STATE WRITE is the verdict):
+        //   merge  = guest GUID joins CurrentFamily.FamilyGUIDs (call 4) AND the
+        //            NBRS family word + runtime TS1FamilyNumber mirror land
+        //            AND a budget write attributable to the move-in tree fires (call 5)
+        //   persist= after the REAL user save (_screen.Save -> FSOV) and a
+        //            PlayHouse reload (deathrel pattern), the remounted store still
+        //            carries the merged FAMI + family word and the budget held.
+        // Old-family cleanup (the guest's source FAMI losing members) is logged as
+        // bonus evidence, not gated. Any gap FAILs honestly with diagnostics.
+        private static int _fmPhase;
+        private static short _fmHouse = 5;
+        private static short _fmGuestNid = -1;
+        private static uint _fmGuestGuid;
+        private static short _fmGuestFamId = -1;
+        private static short _fmGuestFamWordBefore = -1;
+        private static int _fmBudgetBefore = int.MinValue;
+        private static int _fmBudgetAtMerge = int.MinValue;
+        private static int _fmFamGuidsBefore = -1;
+        private static bool _fmPushedSocial;
+        private static bool _fmArrived;
+        private static DateTime _fmPhaseStart;
+        private static short _fmReloadHouse;
+        private static VM _fmOldVm;
+        private static string _fmReloadException;
+        private static uint _fmMergedGuids; // count captured at merge
+        private static string _fmOldFamilyState = "?";
+        private static bool _fmSeededArrival;
+        private static bool _fmPieLoggedP3;
+        private static int _fmArrivalSimMinute = -1;
+        private static bool _fmGreeted;
+        private static int _fmFixtureSimMin = -1;
+        private static bool _fmStallLogged;
+        private static int _fmStallLogMin = -60;
+        private static bool _fmSocialDumped;
+        private static int _fmDirectTta = -1;
+        private static bool _fmDirectGlobal;
+
+        private static void FamilyMergeSetup()
+        {
+            Sim3Setup("familymerge");
+            _fmPhase = 0;
+            _fmPhaseStart = DateTime.UtcNow;
+            try { short.TryParse(_houses[Math.Min(_houseIdx, _houses.Length - 1)], out _fmHouse); } catch { }
+            Log("AUTOTEST familymerge armed (SIM-16; phone invite -> propose/move-in -> merge -> user save -> reload; budget 600 sim-min / 13 real min to merge)");
+        }
+
+        private static Neighbour FmGuestRecord()
+        {
+            return Content.Get().Neighborhood?.Neighbors?.Entries
+                ?.FirstOrDefault(e => e != null && e.NeighbourID == _fmGuestNid);
+        }
+
+        private static VMAvatar FmGuestAvatar()
+        {
+            return Sim3InLot().FirstOrDefault(a =>
+            {
+                try { return a.GetPersonData(VMPersonDataVariable.NeighborId) == _fmGuestNid; }
+                catch { return false; }
+            });
+        }
+
+        // familymerge dialog responder: the 'Call Neighbor' picker is a
+        // TS1PhoneBook dialog whose contract (UIOriginalPhoneBookDialog.Call ->
+        // VMNetDialogResponseCmd) is ResponseText = the SELECTED NEIGHBOUR ID and
+        // ResponseCode = 1 iff a selection was made. The shared helper's flat
+        // "0" answer parses as 0 -> the tree hangs up without calling anyone
+        // (run-2/run-3 law). Phonebook dialogs get the guest's nid; all other
+        // dialogs keep the established first-choice answer.
+        private static void FmRespondDialogs()
+        {
+            try
+            {
+                var dlg = _vm.GlobalBlockingDialog;
+                if (dlg == null) return;
+                var th = dlg.Thread;
+                var bs = th?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                if (bs == null || bs.Responded) return;
+                var phonebook = bs.Type == FSO.SimAntics.Primitives.VMDialogType.TS1PhoneBook;
+                bs.Responded = true;
+                bs.ResponseCode = phonebook ? (byte)1 : (byte)0;
+                bs.ResponseText = phonebook ? _fmGuestNid.ToString() : "0";
+                if (_vm.LastSpeedMultiplier > 0)
+                {
+                    _vm.SpeedMultiplier = _vm.LastSpeedMultiplier;
+                    _vm.LastSpeedMultiplier = 0;
+                }
+                else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+                _vm.GlobalBlockingDialog = null;
+                _sim3DialogResponses++;
+                var chain = "";
+                if (th?.Stack != null)
+                {
+                    foreach (var fr in th.Stack)
+                    {
+                        string owner = null;
+                        try { owner = fr?.ScopeResource?.MainIff?.Filename; } catch { }
+                        chain += (fr?.Routine?.Chunk?.ChunkID ?? 0) + ":" + (fr?.InstructionPointer ?? -1)
+                            + "@" + (owner ?? "?") + ",";
+                    }
+                }
+                Log("AUTOTEST " + _sim3Probe + " dialog #" + _sim3DialogResponses + " ANSWERED (code=" + bs.ResponseCode
+                    + (phonebook ? " PHONEBOOK nid=" + _fmGuestNid : "") + ") owner=obj"
+                    + dlg.ObjectID + " stack=[" + chain + "] at " + Sim3Clock());
+            }
+            catch (Exception de) { Log("AUTOTEST " + _sim3Probe + " dialog EXC " + de.GetType().Name + " " + de.Message); }
+        }
+
+        // run-5/8 law: the visitor's pie never opens past Greet/Shoo (stranger gate)
+        // and pushed greets are dropped before execution. This enumerates the
+        // guest's FULL TTAB chain (object's own + semiglobal) for propose/move-in
+        // entries so the reviewer sees exactly where the route breaks; a found
+        // semiglobal entry arms the disclosed direct push (GetAction with
+        // global=true — the pie's own resolution path).
+        private static void FmDumpSocialEntries(VMEntity guest)
+        {
+            try
+            {
+                var res = guest?.Object?.Resource;
+                if (res == null) return;
+                for (int scope = 0; scope < 2; scope++)
+                {
+                    FSO.Files.Formats.IFF.IffFile iff;
+                    string tag;
+                    if (scope == 0) { iff = res.MainIff; tag = "own"; }
+                    else
+                    {
+                        var sg = res.SemiGlobal;
+                        iff = sg?.Iff;
+                        tag = "semiglobal(" + (iff?.Filename ?? "null") + ")";
+                    }
+                    if (iff == null) continue;
+                    var ttabs = iff.List<FSO.Files.Formats.IFF.Chunks.TTAB>();
+                    foreach (var ttab in ttabs ?? new List<FSO.Files.Formats.IFF.Chunks.TTAB>())
+                    {
+                        if (ttab?.Interactions == null) continue;
+                    var ttas = iff.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(ttab.ChunkID);
+                    for (int i = 0; i < ttab.Interactions.Length; i++)
+                    {
+                        var ia = ttab.Interactions[i];
+                        var name = ttas?.GetString((int)ia.TTAIndex) ?? "";
+                            var isMoveIn = name.IndexOf("Propose", StringComparison.OrdinalIgnoreCase) >= 0
+                                || name.IndexOf("Move In", StringComparison.OrdinalIgnoreCase) >= 0;
+                            if (isMoveIn && _fmDirectTta < 0)
+                            {
+                                _fmDirectTta = (int)ia.TTAIndex; // GetAction resolves by TTAIndex (Sim3PushDirectByTTAsName law)
+                                // the person semiglobal (personglobals.iff) IS the avatar's
+                                // own TreeTable (the greets push with global=false), so the
+                                // semiglobal scope still resolves through the entity path
+                                _fmDirectGlobal = false;
+                            }
+                            if (isMoveIn
+                                || name.IndexOf("Greet", StringComparison.OrdinalIgnoreCase) >= 0)
+                                Log("AUTOTEST familymerge social-entry " + tag + " TTAB" + ttab.ChunkID
+                                    + " [" + i + "] tree=" + ia.ActionFunction + " testfn=" + ia.TestFunction
+                                    + " ttaIndex=" + ia.TTAIndex + " name='" + name.Trim() + "'");
+                        }
+                    }
+                }
+            }
+            catch (Exception de) { Log("AUTOTEST familymerge social-dump EXC " + de.GetType().Name + " " + de.Message); }
+        }
+
+        private static void FamilyMergeTick()
+        {
+            try
+            {
+                if (_fmPhase == 0)
+                {
+                    Sim3LogCensusOnce();
+                    var actor = Sim3PickActor();
+                    if (actor == null) { if (Sim3BudgetExceeded()) Sim3Evaluate(false, "no-adult"); return; }
+                    var neigh = Content.Get().Neighborhood;
+                    var fam = _vm.TS1State?.CurrentFamily;
+                    if (fam == null) { Sim3Evaluate(false, "no-current-family"); return; }
+                    // guest family: another PLACED family (HouseNumber != 0 and != this house)
+                    FSO.Files.Formats.IFF.Chunks.FAMI guestFam = null;
+                    var famis = neigh.MainResource?.List<FSO.Files.Formats.IFF.Chunks.FAMI>();
+                    foreach (var f in famis ?? new List<FSO.Files.Formats.IFF.Chunks.FAMI>())
+                    {
+                        if (f == null || f.ChunkID == fam.ChunkID) continue;
+                        if (f.HouseNumber == 0 || f.HouseNumber == _fmHouse) continue;
+                        guestFam = f; break;
+                    }
+                    if (guestFam == null)
+                    {
+                        var dump = string.Join("; ", (famis ?? new List<FSO.Files.Formats.IFF.Chunks.FAMI>())
+                            .Where(f => f != null).Select(f => "FAMI" + f.ChunkID + "@house" + f.HouseNumber));
+                        Sim3Evaluate(false, "no-second-family (" + dump + ")"); return;
+                    }
+                    _fmGuestFamId = (short)guestFam.ChunkID;
+                    // guest member: first GUID of that family with an NBRS record
+                    Neighbour guestRec = null;
+                    foreach (var g in guestFam.FamilyGUIDs)
+                    {
+                        var rec = neigh.Neighbors?.Entries?.FirstOrDefault(e => e != null && e.GUID == g);
+                        if (rec != null) { _fmGuestGuid = g; guestRec = rec; break; }
+                    }
+                    if (guestRec == null)
+                    {
+                        Sim3Evaluate(false, "guest-nbrs-record-missing (FAMI" + _fmGuestFamId
+                            + " guids=[" + string.Join(",", guestFam.FamilyGUIDs.Select(x => "0x" + x.ToString("X8"))) + "]"
+                            + " nbrsEntries=" + (neigh.Neighbors?.Entries?.Count ?? -1) + ")");
+                        return;
+                    }
+                    _fmGuestNid = guestRec.NeighbourID;
+                    // disclosed state-set: the guest's store family word mirrors a
+                    // placed family member (shipped NBRS records synthesized from
+                    // objects carry 0); rel slots both ways; motives on the actor.
+                    _fmGuestFamWordBefore = guestRec.PersonData != null && guestRec.PersonData.Length > 61
+                        ? guestRec.PersonData[61] : (short)-1;
+                    if (guestRec.PersonData != null && guestRec.PersonData.Length > 61)
+                        guestRec.PersonData[61] = _fmGuestFamId;
+                    for (int slot = 0; slot <= 2; slot++)
+                    {
+                        short actorNid;
+                        try { actorNid = actor.GetPersonData(VMPersonDataVariable.NeighborId); }
+                        catch { actorNid = 0; }
+                        Sim3RelSet(actorNid, _fmGuestNid, slot, 100);
+                        Sim3RelSet(_fmGuestNid, actorNid, slot, 100);
+                    }
+                    foreach (var m in new[] { VMMotive.Hunger, VMMotive.Comfort, VMMotive.Hygiene, VMMotive.Bladder, VMMotive.Energy, VMMotive.Fun, VMMotive.Social, VMMotive.Room })
+                    {
+                        try { actor.SetMotiveData(m, 90); } catch { }
+                    }
+                    _fmBudgetBefore = fam.Budget;
+                    _fmFamGuidsBefore = fam.FamilyGUIDs?.Length ?? -1;
+                    _fmOldFamilyState = "FAMI" + _fmGuestFamId + " guids=" + guestFam.FamilyGUIDs.Length
+                        + " budget=" + guestFam.Budget + " arch=" + guestFam.ValueInArch;
+                    Log("AUTOTEST familymerge fixture: actor=obj" + actor.ObjectID + " guest=nid" + _fmGuestNid
+                        + "/guid=0x" + _fmGuestGuid.ToString("X8") + " guestFam=FAMI" + _fmGuestFamId
+                        + " famWord " + _fmGuestFamWordBefore + "->" + _fmGuestFamId + " (disclosed)"
+                        + " curFam=FAMI" + fam.ChunkID + " budget=" + _fmBudgetBefore + " guids=" + _fmFamGuidsBefore
+                        + " oldFamily[" + _fmOldFamilyState + "]");
+                    _fmPhase = 1;
+                    _fmPhaseStart = DateTime.UtcNow;
+                    return;
+                }
+                FmRespondDialogs();
+                // R157 stale-dialog law: a modal popup zeroes the speed for the whole
+                // budget (SIM-17 soak run 1) — restore it, disclosed.
+                if (_vm.SpeedMultiplier <= 0 && _fmPhase >= 1 && _fmPhase <= 4)
+                {
+                    var latched = _vm.GlobalBlockingDialog;
+                    _vm.SpeedMultiplier = 1;
+                    _vm.GlobalBlockingDialog = null;
+                    Log("AUTOTEST familymerge: unpause (stale-dialog-latch "
+                        + (latched == null ? "none" : "obj" + latched.ObjectID) + ") at " + Sim3Clock());
+                }
+                if (_fmPhase == 1)
+                {
+                    // phone invite (real content). The phone's own pie offers the
+                    // invite; candidates are logged on miss.
+                    if (_svcPhone == null) _svcPhone = Sim3FindPhone();
+                    var actor = Sim3PickActor();
+                    if (_svcPhone != null && actor != null)
+                    {
+                        // run-1 calibration: this corpus's phone pie has no 'Invite'
+                        // entry — the neighbor-call route ships as 'Call Neighbor'.
+                        var pick = Sim3PickPie(_svcPhone, actor, new[] { "Call Neighbor", "Invite.../Over", "Invite Over", "Invite...", "Invite" }, true);
+                        if (pick != null && Sim3Push(_svcPhone, actor, pick)) { _fmPhase = 2; _fmPhaseStart = DateTime.UtcNow; }
+                        else if (Sim3BudgetExceeded()) Sim3Evaluate(false, "no-invite-pie (phone=" + (_svcPhone != null) + ")");
+                    }
+                    else if (Sim3BudgetExceeded()) Sim3Evaluate(false, "no-phone-or-actor");
+                    return;
+                }
+                if (_fmPhase == 2)
+                {
+                    // arrival: an in-lot avatar with the guest's NID (the spawn
+                    // assumes the neighbour's identity), or any fresh avatar-create
+                    // whose created iff names the guest's character stem.
+                    var guest = FmGuestAvatar();
+                    if (guest != null)
+                    {
+                        _fmArrived = true;
+                        if (_fmArrivalSimMinute < 0) _fmArrivalSimMinute = Sim3ClockMinute();
+                        Log("AUTOTEST familymerge guest on lot obj=" + guest.ObjectID + "/nid" + _fmGuestNid
+                            + " at " + Sim3Clock() + " (avatar-creates=[" + string.Join("; ", _sim3AvatarCreates.Take(4)) + "])");
+                        foreach (var m in new[] { VMMotive.Hunger, VMMotive.Comfort, VMMotive.Hygiene, VMMotive.Bladder, VMMotive.Energy, VMMotive.Fun, VMMotive.Social, VMMotive.Room })
+                        {
+                            try { guest.SetMotiveData(m, 90); } catch { }
+                        }
+                        _fmPhase = 3;
+                        _fmPhaseStart = DateTime.UtcNow;
+                        _sim3PieMissLogged = false; // let the picker dump the guest's pie candidates once for this phase
+                        return;
+                    }
+                    if (!_fmSeededArrival && Sim3PushState() == 2
+                        && Sim3ClockMinute() - _sim3PushSimMinute > 240)
+                    {
+                        // run-2 law: the real 'Call Neighbor' chain completed (phone
+                        // dialog answered) with no visitor spawn — seeded arrival per
+                        // the card's sanctioned route: engine CreateObjectInstance of
+                        // the guest's person GUID at the street edge, identity-bound
+                        // to the NBRS record (what the real spawn path does). The
+                        // MERGE itself still runs entirely through real content.
+                        _fmSeededArrival = true;
+                        try
+                        {
+                            var pos = FSO.LotView.Model.LotTilePos.FromBigTile(2, 61, 1);
+                            var created = _vm.Context.CreateObjectInstance(_fmGuestGuid, pos, FSO.LotView.Model.Direction.NORTH);
+                            var av = created?.BaseObject as VMAvatar;
+                            if (av != null)
+                            {
+                                av.SetPersonData(VMPersonDataVariable.NeighborId, _fmGuestNid);
+                                Log("AUTOTEST familymerge: SEEDED ARRIVAL (disclosed; real 'Call Neighbor' completed with no spawn)"
+                                    + " guest guid=0x" + _fmGuestGuid.ToString("X8") + " obj=" + av.ObjectID
+                                    + " bound nid=" + _fmGuestNid + " at tile (2,61,1) " + Sim3Clock());
+                            }
+                            else Log("AUTOTEST familymerge: seeded arrival create returned null");
+                        }
+                        catch (Exception ce)
+                        {
+                            Log("AUTOTEST familymerge seeded-arrival EXC " + ce.GetType().Name + " " + ce.Message);
+                        }
+                    }
+                    if ((Sim3PushState() == 2 && Sim3ClockMinute() - _sim3PushSimMinute > 360)
+                        || (DateTime.UtcNow - _fmPhaseStart).TotalMinutes > 12)
+                    {
+                        Sim3Evaluate(false, "guest-arrival-budget (pushState=" + Sim3PushState()
+                            + " avatar-creates=[" + string.Join("; ", _sim3AvatarCreates.Take(6)) + "])");
+                    }
+                    return;
+                }
+                if (_fmPhase == 3)
+                {
+                    // Poll loop (run-6 law): the visitor's stay is a fixed 2 sim-hours
+                    // and the greet social started (HDSI_Greet effect) but stalled
+                    // in-queue. Each tick: take whichever stage the pie currently
+                    // offers — the move-in entry once acquaintanceship opens it, else
+                    // the greet — and log queue telemetry on a 30-sim-min stall.
+                    var actor = Sim3PickActor();
+                    var guest = FmGuestAvatar();
+                    if (actor == null || guest == null)
+                    {
+                        if ((DateTime.UtcNow - _fmPhaseStart).TotalMinutes > 2)
+                            Sim3Evaluate(false, "pair-lost actor=" + (actor != null) + " guest=" + (guest != null)
+                                + " arrivedAt=" + _fmArrivalSimMinute + " now=" + Sim3ClockMinute());
+                        return;
+                    }
+                    var pick = Sim3PickPie(guest, actor, new[] { "Proposition.../Move In", "Propose.../Move In", "Move In", "Propose...", "Propose" }, true);
+                    if (pick != null && Sim3Push(guest, actor, pick))
+                    {
+                        _fmPushedSocial = true;
+                        _fmPhase = 4;
+                        _fmPhaseStart = DateTime.UtcNow;
+                        return;
+                    }
+                    if (!_fmSocialDumped)
+                    {
+                        _fmSocialDumped = true;
+                        FmDumpSocialEntries(guest);
+                    }
+                    if (_fmDirectTta >= 0 && !_fmPushedSocial)
+                    {
+                        // disclosed direct push through the found semiglobal entry
+                        // (the pie's own resolution path; availability gates bypassed)
+                        try
+                        {
+                            var action = guest.GetAction(_fmDirectTta, actor, _vm.Context, _fmDirectGlobal);
+                            if (action != null)
+                            {
+                                _sim3PushTarget = guest;
+                                _sim3Actor = actor;
+                                _sim3PushAction = action;
+                                _sim3PushName = "direct-movein";
+                                _sim3EnqueuedSeen = false;
+                                actor.Thread.EnqueueAction(action);
+                                _sim3PushUid = action.UID;
+                                _sim3PushSimMinute = Sim3ClockMinute();
+                                _fmPushedSocial = true;
+                                _fmPhase = 4;
+                                _fmPhaseStart = DateTime.UtcNow;
+                                Log("AUTOTEST familymerge pushed DIRECT move-in entry tta=" + _fmDirectTta
+                                    + " global=" + _fmDirectGlobal + " uid=" + _sim3PushUid
+                                    + " actor=obj" + actor.ObjectID + " guest=obj" + guest.ObjectID
+                                    + " at " + Sim3Clock() + " (disclosed; pie never offered the entry)");
+                                return;
+                            }
+                            Log("AUTOTEST familymerge: direct move-in GetAction null for tta=" + _fmDirectTta);
+                        }
+                        catch (Exception de)
+                        {
+                            Log("AUTOTEST familymerge direct-movein EXC " + de.GetType().Name + " " + de.Message);
+                        }
+                    }
+                    if (!_fmGreeted || Sim3PushState() == 2)
+                    {
+                        // no move-in entry yet: greet (first time) or re-greet once the
+                        // previous attempt left the queue
+                        var greet = Sim3PickPie(guest, actor, new[] { "Greet.../Shake Hands", "Greet.../Wave", "Greet.../Suave Kiss", "Greet" }, true);
+                        if (greet != null && Sim3Push(guest, actor, greet))
+                        {
+                            _fmStallLogged = false;
+                            if (!_fmGreeted)
+                            {
+                                _fmGreeted = true;
+                                Log("AUTOTEST familymerge: greet pushed '" + greet.Name + "' at " + Sim3Clock());
+                            }
+                            else Log("AUTOTEST familymerge: greet RE-pushed '" + greet.Name + "' at " + Sim3Clock());
+                        }
+                        else if (!_fmPieLoggedP3)
+                        {
+                            _fmPieLoggedP3 = true;
+                            Log("AUTOTEST familymerge: pie miss (move-in + greet) on guest obj" + guest.ObjectID
+                                + " at " + Sim3Clock());
+                        }
+                    }
+                    else if (Sim3PushState() == 1 && (Sim3ClockMinute() - _sim3PushSimMinute + 1440) % 1440 > 30)
+                    {
+                        // run-9 law: the greet social STARTS (effect objects) but loops
+                        // without completing (run 9: 8084 creates) — a stalled attempt
+                        // never recovers on its own. Cancel the whole actor queue
+                        // (including the stalled social) and re-arm a FRESH greet;
+                        // recurring every 30 sim-min of stall.
+                        bool logged = (Sim3ClockMinute() - _fmStallLogMin + 1440) % 1440 < 5;
+                        if (!logged) _fmStallLogMin = Sim3ClockMinute();
+                        if (!logged)
+                        {
+                            var q = _sim3Actor?.Thread?.Queue;
+                            var qlist = q == null ? "none" : string.Join(" | ", q.Select(a => "'" + a.Name + "'uid" + a.UID));
+                            Log("AUTOTEST familymerge: pushed '" + _sim3PushName + "' in-flight 30+ sim-min"
+                                + " actor=obj" + (_sim3Actor?.ObjectID ?? -1) + " queue=[" + qlist + "] at " + Sim3Clock()
+                                + " — cancelling stall and re-arming (disclosed)");
+                        }
+                        try
+                        {
+                            var q2 = _sim3Actor?.Thread?.Queue;
+                            if (q2 != null)
+                            {
+                                foreach (var a in q2.ToList()) _sim3Actor.Thread.CancelAction(a.UID);
+                            }
+                            var act = _sim3Actor?.Thread?.ActiveAction;
+                            if (act != null) _sim3Actor.Thread.CancelAction(act.UID);
+                        }
+                        catch (Exception ce) { Log("AUTOTEST familymerge: cancel-stall EXC " + ce.GetType().Name + " " + ce.Message); }
+                        Sim3ResetPush();
+                        _fmGreeted = false;
+                    }
+                    // fixture: keep the actor's motives topped so idle autonomy stays
+                    // quiet across the visit window (birthtrace disclosed-fixture law)
+                    if (_fmFixtureSimMin < 0) _fmFixtureSimMin = Sim3ClockMinute();
+                    if ((Sim3ClockMinute() - _fmFixtureSimMin + 1440) % 1440 >= 60)
+                    {
+                        _fmFixtureSimMin = Sim3ClockMinute();
+                        foreach (var m in new[] { VMMotive.Hunger, VMMotive.Comfort, VMMotive.Hygiene, VMMotive.Bladder, VMMotive.Energy, VMMotive.Fun, VMMotive.Social, VMMotive.Room })
+                        {
+                            try { actor.SetMotiveData(m, 90); } catch { }
+                        }
+                        Log("AUTOTEST familymerge fixture: actor motives re-topped at " + Sim3Clock());
+                    }
+                    if ((DateTime.UtcNow - _fmPhaseStart).TotalMinutes > 6)
+                        Sim3Evaluate(false, "no-movein-entry (pushed=false, greeted=" + _fmGreeted
+                            + ", pushState=" + Sim3PushState() + ", on-lot-min=" + (_fmArrivalSimMinute >= 0 ? ((Sim3ClockMinute() - _fmArrivalSimMinute + 1440) % 1440) : -1) + ")");
+                    return;
+                }
+                if (_fmPhase == 4)
+                {
+                    // merge wait: the call-4 family write + mirrors + a call-5 budget event
+                    var fam = _vm.TS1State?.CurrentFamily;
+                    var guestRec = FmGuestRecord();
+                    var inFam = false;
+                    try { inFam = fam?.FamilyGUIDs?.Contains(_fmGuestGuid) == true; } catch { }
+                    var pdFam = guestRec?.PersonData != null && guestRec.PersonData.Length > 61 ? guestRec.PersonData[61] : (short)-1;
+                    var runtimeFam = (short)-2;
+                    try { runtimeFam = FmGuestAvatar()?.GetPersonData(VMPersonDataVariable.TS1FamilyNumber) ?? (short)-2; } catch { }
+                    var budgetEvent = _sim3BudgetEvents.FirstOrDefault(e => e.IndexOf("4241", StringComparison.Ordinal) >= 0);
+                    if (inFam && pdFam == (fam?.ChunkID ?? -3) && runtimeFam == (fam?.ChunkID ?? -3))
+                    {
+                        _fmBudgetAtMerge = fam.Budget;
+                        _fmMergedGuids = (uint)(fam.FamilyGUIDs?.Length ?? 0);
+                        // bonus evidence: the guest's source family after the merge
+                        var oldFam = Content.Get().Neighborhood.MainResource?.List<FSO.Files.Formats.IFF.Chunks.FAMI>()
+                            ?.FirstOrDefault(f => f != null && f.ChunkID == _fmGuestFamId);
+                        Log("AUTOTEST familymerge MERGE LANDED: guid=0x" + _fmGuestGuid.ToString("X8")
+                            + " in FAMI" + fam.ChunkID + " guids " + _fmFamGuidsBefore + "->" + _fmMergedGuids
+                            + " pd61=" + pdFam + " runtimeFam=" + runtimeFam
+                            + " budget " + _fmBudgetBefore + "->" + _fmBudgetAtMerge
+                            + " moveInTreeBudgetEvent=" + (budgetEvent ?? "none")
+                            + " sourceFamilyNow=" + (oldFam == null ? "deleted" : "guids=" + oldFam.FamilyGUIDs.Length + " budget=" + oldFam.Budget)
+                            + " at " + Sim3Clock());
+                        _fmPhase = 5;
+                        _fmPhaseStart = DateTime.UtcNow;
+                        return;
+                    }
+                    if (_fmPushedSocial && ((Sim3ClockMinute() - _sim3PushSimMinute > 120)
+                        || (DateTime.UtcNow - _fmPhaseStart).TotalMinutes > 6))
+                    {
+                        Sim3Evaluate(false, "merge-budget pushed='" + _sim3PushName + "' inFam=" + inFam
+                            + " pd61=" + pdFam + " famId=" + (fam?.ChunkID ?? -3) + " runtimeFam=" + runtimeFam
+                            + " budgetEvents=" + _sim3BudgetEvents.Count + " dialogs=" + _sim3DialogResponses);
+                    }
+                    else if (!_fmPushedSocial && Sim3BudgetExceeded()) Sim3Evaluate(false, "merge-budget (no push window)");
+                    return;
+                }
+                if (_fmPhase == 5)
+                {
+                    // the REAL user save (deathrel p2 pattern)
+                    GameThread.NextUpdate(x =>
+                    {
+                        try
+                        {
+                            _screen.Save();
+                            Log("AUTOTEST familymerge: user save path executed (TS1GameScreen.Save -> FSOV + SaveHouse + SaveNeighbourhood(true))");
+                        }
+                        catch (Exception se)
+                        {
+                            Log("AUTOTEST familymerge save EXC " + se.GetType().Name + " " + se.Message);
+                        }
+                    });
+                    _fmPhase = 6;
+                    _fmPhaseStart = DateTime.UtcNow;
+                    return;
+                }
+                if (_fmPhase == 6)
+                {
+                    if ((DateTime.UtcNow - _fmPhaseStart).TotalSeconds < 5) return;
+                    _fmOldVm = _vm;
+                    try { short.TryParse(_houses[Math.Min(_houseIdx, _houses.Length - 1)], out _fmReloadHouse); } catch { }
+                    if (_fmReloadHouse <= 0) { Sim3Evaluate(false, "no-reload-house"); return; }
+                    _fmPhase = 7;
+                    _fmPhaseStart = DateTime.UtcNow;
+                    GameThread.NextUpdate(x =>
+                    {
+                        try
+                        {
+                            _screen.PlayHouse(_fmReloadHouse, null);
+                            Log("AUTOTEST familymerge: PlayHouse(" + _fmReloadHouse + ") dispatched (reload from the just-saved file)");
+                        }
+                        catch (Exception pe)
+                        {
+                            _fmReloadException = pe.GetType().Name + ": " + pe.Message;
+                            Log("AUTOTEST familymerge PlayHouse EXC " + _fmReloadException);
+                        }
+                    });
+                    return;
+                }
+                if (_fmPhase == 7)
+                {
+                    // wait for the remounted lot (new VM instance proves the old one tore down)
+                    if (_screen.InLot && _screen.vm != null && !ReferenceEquals(_screen.vm, _fmOldVm)
+                        && _screen.vm.Entities.Count > 0)
+                    {
+                        _vm = _screen.vm;
+                        _avatars = _vm.Entities.Where(e => e is VMAvatar).Cast<VMAvatar>().ToList();
+                        if (_vm.SpeedMultiplier <= 0)
+                        {
+                            _vm.SpeedMultiplier = 1;
+                            _vm.GlobalBlockingDialog = null;
+                        }
+                        Log("AUTOTEST familymerge LOT-RELOADED house=" + _fmReloadHouse + " entities=" + _vm.Entities.Count
+                            + " avatars=" + _avatars.Count + " loadErrors=" + _vm.LoadErrors.Count
+                            + " reloadException=" + (_fmReloadException ?? "none"));
+                        _fmPhase = 8;
+                        _fmPhaseStart = DateTime.UtcNow;
+                        return;
+                    }
+                    if ((DateTime.UtcNow - _fmPhaseStart).TotalSeconds > 30)
+                    {
+                        Sim3Evaluate(false, "reload-no-lot (exception=" + (_fmReloadException ?? "none") + ")");
+                    }
+                    return;
+                }
+                if (_fmPhase == 8)
+                {
+                    // persistence assert on the remounted store + reloaded lot
+                    var fam = _vm.TS1State?.CurrentFamily;
+                    var guestRec = FmGuestRecord();
+                    var inFam = false;
+                    try { inFam = fam?.FamilyGUIDs?.Contains(_fmGuestGuid) == true; } catch { }
+                    var pdFam = guestRec?.PersonData != null && guestRec.PersonData.Length > 61 ? guestRec.PersonData[61] : (short)-1;
+                    var runtimeFam = (short)-2;
+                    try { runtimeFam = FmGuestAvatar()?.GetPersonData(VMPersonDataVariable.TS1FamilyNumber) ?? (short)-2; } catch { }
+                    var budgetOk = _fmBudgetAtMerge >= 0 && fam != null && fam.Budget >= _fmBudgetAtMerge;
+                    Log("AUTOTEST familymerge RESULT outcome=reload-assert inFam=" + inFam + " pd61=" + pdFam
+                        + " famId=" + (fam?.ChunkID ?? -3) + " runtimeFam=" + runtimeFam
+                        + " budgetAtMerge=" + _fmBudgetAtMerge + " remounted=" + (fam?.Budget ?? int.MinValue)
+                        + " guidsAtMerge=" + _fmMergedGuids + " remounted=" + (fam?.FamilyGUIDs?.Length ?? -1)
+                        + " budgetEvents=" + _sim3BudgetEvents.Count + " dialogs=" + _sim3DialogResponses
+                        + " creates=" + _sim3CreateEvents.Count);
+                    if (inFam && pdFam == (fam?.ChunkID ?? -3) && budgetOk)
+                    {
+                        Sim3Evaluate(true, "family merge persisted: guest guid=0x" + _fmGuestGuid.ToString("X8")
+                            + " still in FAMI" + (fam?.ChunkID ?? -3) + " after a real user save + PlayHouse reload"
+                            + " (pd61=" + pdFam + ", runtime fam=" + runtimeFam + ", budget " + _fmBudgetAtMerge
+                            + "->" + (fam?.Budget ?? -1) + ", move-in tree budget event="
+                            + (_sim3BudgetEvents.FirstOrDefault(e => e.IndexOf("4241", StringComparison.Ordinal) >= 0) ?? "none") + ")");
+                    }
+                    else
+                    {
+                        Sim3Evaluate(false, "persistence-lost inFam=" + inFam + " pd61=" + pdFam
+                            + " runtimeFam=" + runtimeFam + " budgetOk=" + budgetOk);
+                    }
+                }
+            }
+            catch (Exception te)
+            {
+                Log("AUTOTEST familymerge tick EXC " + te.GetType().Name + " " + te.Message);
                 Sim3Evaluate(false, "exception");
             }
         }
