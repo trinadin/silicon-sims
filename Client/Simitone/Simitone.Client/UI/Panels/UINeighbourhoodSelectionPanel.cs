@@ -1444,14 +1444,33 @@ namespace Simitone.Client.UI.Panels
             if (houseNumber == 71) { }
             AlphaTime = 0;
             var house = Content.Get().Neighborhood.GetHouse(houseNumber);
-            HouseTex = house.Get<BMP>(513)?.GetTexture(GameFacade.GraphicsDevice);
+            // SAV-07: an imported family's FAM replaces Houses/HouseNN.iff whole
+            // (the 25-step import's file move) and carries no art chunks, so
+            // every art read can miss. Fall back to the install template's house
+            // art, then to a neutral placeholder, so the screen always builds.
+            var art = house;
+            HouseTex = art.Get<BMP>(513)?.GetTexture(GameFacade.GraphicsDevice);
+            if (HouseTex == null)
+            {
+                art = Content.Get().Neighborhood.GetHouseArtFallback(houseNumber);
+                if (art != null) HouseTex = art.Get<BMP>(513)?.GetTexture(GameFacade.GraphicsDevice);
+                if (HouseTex == null) art = house;
+            }
             if (HouseTex != null) {
-                HouseOpenTex = house.Get<BMP>(512).GetTexture(GameFacade.GraphicsDevice);
-                Offsets = house.Get<THMB>(512); //get offsets before scaling
+                HouseOpenTex = art.Get<BMP>(512)?.GetTexture(GameFacade.GraphicsDevice) ?? HouseTex;
+                Offsets = art.Get<THMB>(512) ?? new THMB() { Width = HouseTex.Width / 2, Height = HouseTex.Height / 2 }; //get offsets before scaling
             } else
             {
-                HouseTex = house.Get<PNG>(513).GetTexture(GameFacade.GraphicsDevice);
-                HouseOpenTex = house.Get<PNG>(512).GetTexture(GameFacade.GraphicsDevice);
+                HouseTex = art.Get<PNG>(513)?.GetTexture(GameFacade.GraphicsDevice)
+                    ?? house.Get<PNG>(513)?.GetTexture(GameFacade.GraphicsDevice);
+                HouseOpenTex = art.Get<PNG>(512)?.GetTexture(GameFacade.GraphicsDevice)
+                    ?? house.Get<PNG>(512)?.GetTexture(GameFacade.GraphicsDevice)
+                    ?? HouseTex;
+                if (HouseTex == null)
+                {
+                    HouseTex = new Texture2D(GameFacade.GraphicsDevice, 2, 2);
+                    HouseTex.SetData(new[] { new Microsoft.Xna.Framework.Color(32, 32, 32) });
+                }
                 Offsets = new THMB() { Width = HouseTex.Width / 2, Height = HouseTex.Height / 2 };
             }
 
