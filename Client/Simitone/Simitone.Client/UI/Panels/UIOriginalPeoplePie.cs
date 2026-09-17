@@ -136,6 +136,13 @@ namespace Simitone.Client.UI.Panels
                     Tooltip = (Family != null && k < Family.Length) ? Family[k].Name : null
                 };
                 b.SetAvatar(Family != null && k < Family.Length ? Family[k] : null);
+                // InputManager dispatches mouse events to the single topmost
+                // region and children outrank their container, so a click on
+                // the portrait face lands on the button's own ClickHandler —
+                // only this wiring (not the container-level CalcItem hit-test)
+                // can select it. Dropped once in the UI-14 rewrite; restored.
+                var idx = k;
+                b.OnButtonClick += (btn) => SelectSlot(idx);
                 Add(b);
                 SlotButtons[k] = b;
                 if (Family != null && k < Family.Length) SlotsMounted++;

@@ -299,6 +299,8 @@ namespace Simitone.Client.UI.Panels
                     but.Y = (float)((Math.Cos(dir) * -90) - but.Size.Y / 2);
                 }
 
+                this.Add(but);
+                m_PieButtons.Add(but);
                 // UI-11: the original pie disc frame — shared\sys\PieButt.bmp
                 // 17x17 (ctrl-mgr slot 15) 9-patched to the label rect and
                 // tinted with the engine's frame color; label colors follow
