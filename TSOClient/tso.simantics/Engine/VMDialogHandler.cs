@@ -371,7 +371,14 @@ namespace FSO.SimAntics.Engine
                     }
                 }
             }
-            if (context.Thread != null) output.Replace("\r\n", "\r\n\r\n");
+            // r253: the native text pipeline breaks lines on LF ONLY
+            // (cTSFont::IsCharReturnChar @0x4ace80 compares 0x0A; the whole
+            // code section has zero 0x0D compares) and game-data templates
+            // author one blank paragraph line as a single \r\n\r\n pair (CR
+            // is glyph-less filler). Doubling every \r\n turned that into
+            // three blank lines in every TS1 VM dialog. TSO keeps the
+            // upstream doubling (tools/iff-dump/r253-dialog-newline-law.md).
+            if (context.Thread != null && !context.VM.TS1) output.Replace("\r\n", "\r\n\r\n");
             return output.ToString();
         }
     }
