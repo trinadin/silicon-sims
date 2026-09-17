@@ -826,6 +826,22 @@ namespace FSO.Content.TS1
             return new IffFile(Path.Combine(UserPath, "Houses/House"+id.ToString().PadLeft(2, '0')+".iff"));
         }
 
+        /// <summary>
+        /// Install-template house file for the mounted neighborhood (the pristine
+        /// clone source InitSpecific used). Art fallback for imported houses: the
+        /// 25-step import's FAM-over-HouseNN.iff move (steps 21-23) replaces the
+        /// art-bearing house file with the family FAM, which carries no BMP_/PNG
+        /// 512/513, so the neighborhood house buttons read their art from here
+        /// (SAV-07 round-trip finding, 2026-09-17). Null when no template exists.
+        /// </summary>
+        public IffFile GetHouseArtFallback(int houseNumber)
+        {
+            var udName = NeighborhoodDirName(CurrentNeighborhoodID);
+            var path = Path.Combine(TemplateDirFor(udName), "Houses",
+                "House" + houseNumber.ToString("D2") + ".iff");
+            return File.Exists(path) ? new IffFile(path) : null;
+        }
+
         public string GetHousePath(int id)
         {
             return Path.Combine(UserPath, "Houses/House" + id.ToString().PadLeft(2, '0') + ".iff");
@@ -1576,9 +1592,19 @@ namespace FSO.Content.TS1
             // and in r252-record-format/review-fixes.md §residuals rather than
             // "fixed" blind. Do NOT touch Version/PersonMode here without first
             // auditing the import round-trip.
+            // SAV-07 round-trip finding (livetest run 2, 2026-09-17): the
+            // recreated record previously took a fresh userid-stem name, so an
+            // imported family's neighborhood identity survived only in the
+            // character files' CTSS@2000. Carry the FAM record's neighborhood
+            // name — the same identity the export writes into the NBRS subset —
+            // and keep the userid stem as the fallback for records without a
+            // usable name (mirroring the PersonData fallback below).
+            var restoredName = !string.IsNullOrEmpty(famRecord?.Name)
+                ? famRecord.Name
+                : "user" + userid.ToString().PadLeft(5, '0');
             var newN = new Neighbour()
             {
-                Name = "user" + userid.ToString().PadLeft(5, '0'),
+                Name = restoredName,
                 NeighbourID = newID,
                 GUID = guid,
                 PersonMode = 9,
