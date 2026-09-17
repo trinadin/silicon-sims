@@ -315,6 +315,30 @@ namespace Simitone.Client.UI.Panels
         private bool PairedProductIcon;
         public float Slide;   // engine slide-in ramp 0..1
 
+        // UI-13: BuildMyBuffer's rating block (0x26d448 loop) draws 14 rows
+        // under the description: GetCatalogRating(product, catalog, i) for
+        // i in 0..13 with the STR#160 labels cached at popup+272[0..13] —
+        // base index 0 (the i==7 special case is exactly the motive→skill
+        // boundary: [0..6] 'X: %d' formats, [7..13] '+ Skill' strings),
+        // matching the query panel's indexing; r145's "[1..14]" was off by
+        // one. STR#160 [14..19] (usage flags) have no corpus encoding (r124
+        // negative space) and are not ported.
+        private List<UIOriginalText> RatingLabels;
+
+        // UI-12 (tools/iff-dump/catalog-popup-slide-law.md): EnablePopup
+        // 0x26e000 anchors the popup, then a SetupConstantTimeRamp
+        // (start 0.0, target popupY−const, 250 ms) drives the DRAWN Y from
+        // the source row (engine field +0x80) up to the anchor, linear.
+        private long _slideStartTicks = -1;   // -1 = settled
+        private float _slideFromY;
+
+        public void BeginSlideIn(float fromY)
+        {
+            _slideFromY = fromY;
+            _slideStartTicks = System.Diagnostics.Stopwatch.GetTimestamp();
+            Slide = 0f;
+        }
+
         public UIOriginalCatalogPopup()
         {
             Size = new Vector2(POPUP_W, POPUP_H);
@@ -331,7 +355,7 @@ namespace Simitone.Client.UI.Panels
         }
 
         public void SetInfo(Texture2D icon, bool pairedProductIcon, string name, int price, string desc,
-            bool ownsIcon)
+            bool ownsIcon, bool affordable = true, IList<string> ratingLines = null)
         {
             ReplaceIcon(icon, ownsIcon);
             PairedProductIcon = pairedProductIcon;
@@ -345,10 +369,14 @@ namespace Simitone.Client.UI.Panels
             if (NameLabel != null) { Remove(NameLabel); NameLabel = null; }
             if (PriceLabel != null) { Remove(PriceLabel); PriceLabel = null; }
             if (Desc != null) { Remove(Desc); Desc = null; }
+            if (RatingLabels != null)
+            {
+                foreach (var rl in RatingLabels) if (rl != null) Remove(rl);
+                RatingLabels = null;
+            }
             if (f10 != null && name != null)
             {
                 NameLabel = new UIOriginalText(name, f10) { Position = new Vector2(ICON_PANE_W + 10, 12) };
-                Add(NameLabel);
                 if (price > 0)
                 {
                     // BuildMyBuffer advances exactly four pixels after the
@@ -357,9 +385,21 @@ namespace Simitone.Client.UI.Panels
                     {
                         Position = new Vector2(ICON_PANE_W + 10 + f10.Measure(name) + 4, 12)
                     };
-                    Add(PriceLabel);
                 }
+                // UI-12: BuildMyBuffer (0x26dccc-0x26dd94) tints the name and
+                // price strings with the engine error color when the family
+                // cannot afford the product (R198 SetColor(1)); the port had
+                // the color pinned with no live consumer.
+                if (!affordable)
+                {
+                    NameLabel.Color = UILotControl.TooltipErrorColor;
+                    if (PriceLabel != null) PriceLabel.Color = UILotControl.TooltipErrorColor;
+                }
+                Add(NameLabel);
+                if (PriceLabel != null) Add(PriceLabel);
             }
+            var contentBottom = 0f;
+            var haveText = false;
             if (f8 != null && desc != null)
             {
                 var descTop = 12 + (f10 != null ? f10.LineHeight : 19);
@@ -378,8 +418,30 @@ namespace Simitone.Client.UI.Panels
                 DescriptionLineCount = lines;
                 DescriptionTop = descTop;
                 DescriptionLineHeight = f8.LineHeight;
-                Size = new Vector2(POPUP_W,
-                    Math.Max(POPUP_H, descTop + lines * f8.LineHeight + 12));
+                contentBottom = descTop + lines * f8.LineHeight;
+                haveText = true;
+
+                // UI-13: the rating block follows the description in the same
+                // font (BuildMyBuffer composes both into one buffer).
+                if (f8 != null && ratingLines != null && ratingLines.Count > 0)
+                {
+                    RatingLabels = new List<UIOriginalText>();
+                    var ratingTop = contentBottom;
+                    foreach (var line in ratingLines)
+                    {
+                        var label = new UIOriginalText(line, f8)
+                        {
+                            Position = new Vector2(ICON_PANE_W + 10, ratingTop + RatingLabels.Count * f8.LineHeight)
+                        };
+                        RatingLabels.Add(label);
+                        Add(label);
+                    }
+                    contentBottom = ratingTop + ratingLines.Count * f8.LineHeight;
+                }
+            }
+            if (haveText)
+            {
+                Size = new Vector2(POPUP_W, Math.Max(POPUP_H, contentBottom + 12));
             }
         }
 
@@ -441,6 +503,18 @@ namespace Simitone.Client.UI.Panels
         public override void Draw(UISpriteBatch batch)
         {
             if (!Visible) return;
+            // UI-12: the decoded slide ramp shifts only the DRAWN Y;
+            // Position (the R148 anchor law) stays readable at the anchor
+            // between frames — restored after the children draw.
+            var anchor = Position;
+            if (_slideStartTicks >= 0)
+            {
+                var elapsed = (System.Diagnostics.Stopwatch.GetTimestamp() - _slideStartTicks)
+                    / (double)System.Diagnostics.Stopwatch.Frequency;
+                Slide = (float)Math.Min(elapsed / 0.25, 1.0);
+                if (Slide >= 1f) _slideStartTicks = -1;
+            }
+            Position = new Vector2(anchor.X, anchor.Y + (1f - Slide) * (_slideFromY - anchor.Y));
             // the engine composes into a private 16bpp surface; the port draws
             // the equivalent dark panel directly (surface chrome undecoded).
             DrawLocalTexture(batch, FSO.Common.Utils.TextureGenerator.GetPxWhite(GameFacade.GraphicsDevice), null,
@@ -467,6 +541,7 @@ namespace Simitone.Client.UI.Panels
                     iconPos, new Vector2(s));
             }
             base.Draw(batch);
+            Position = anchor;
         }
     }
 }

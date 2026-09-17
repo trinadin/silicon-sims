@@ -19,11 +19,14 @@ namespace Simitone.Client.UI.Panels
 {
     public class UIPieMenu : UIContainer
     {
-        // The bitmap glyph tables can have a final-glyph overhang beyond their
-        // layout advance. Four pixels per side (the old mobile value) left
-        // labels such as "Go Here" touching or crossing the PieButt caps.
-        // Keep one 4px safety inset in addition to that logical margin.
-        public const int OriginalButtonMargin = 8;
+        // UI-11: the original per-side frame inset, decoded from cTSPieMenu::
+        // Layout (0x5290c0) and DrawLabelFrame (0x528d10) — every bubble rect
+        // is the measured label bounding box + 3px on each side
+        // (tools/iff-dump/pie-label-paint-law.md). Supersedes the R142-era
+        // 8px safety margin; the glyph-overhang worry it covered belongs to
+        // the old mobile MSDF metrics, while the OriginalVectorFont advances
+        // are ink-exact (r140).
+        public const int OriginalButtonMargin = 3;
 
         // R142: exposed for the autotest gate (uidlgchrome) — the engine's exact
         // slice-count band law from cTSPieMenu::Layout @ 0x5292b8.
@@ -58,6 +61,13 @@ namespace Simitone.Client.UI.Panels
         private TextStyle ButtonStyle;
         private TextStyle HighlightStyle;
 
+        // UI-11: decoded pie label chrome (tools/iff-dump/pie-label-paint-law.md);
+        // color roles corrected in UI-15 against the raw TSPaint words.
+        public static readonly Color PieFrameTint = new Color(187, 187, 187);
+        public static readonly Color UntrackedLabelColor = new Color(185, 185, 208); // +208
+        public static readonly Color HoverLabelColor = new Color(0, 255, 255);       // +212
+        public UIPieBubble PressedBubble;
+
         public UIPieMenu(List<VMPieMenuInteraction> pie, VMEntity obj, VMEntity caller, UILotControl parent)
         {
             if (FSOEnvironment.UIZoomFactor > 1.33f) ScaleX = ScaleY = FSOEnvironment.UIZoomFactor * 0.75f;
@@ -66,22 +76,29 @@ namespace Simitone.Client.UI.Panels
             this.m_Obj = obj;
             this.m_Caller = caller;
             this.m_Parent = parent;
-            // R142: the ORIGINAL cTSPieMenu palette, decoded this round
-            // (dialog-chrome-law.md §5): interaction pie label color RGB(187,187,187),
-            // highlight RGB(0,255,255), selected RGB(255,255,255), lowlight
-            // RGB(185,185,208) — the old (165,195,214)/yellow pair was the TSO look.
+            // UI-11/15: the decoded TSPaint label state law (raw-verified
+            // 0x528a74-0x528aa0; word 0x4082001c = BNE): untracked bubbles
+            // draw the muted lavender RGB(185,185,208) (+208) regardless of
+            // press state; the tracked (hovered) bubble draws the highlight
+            // cyan RGB(0,255,255) (+212) and flips to WHITE (+216) while a
+            // press is held on it. RGB(187,187,187) is the engine's +100
+            // FRAME color (DrawLabelFrame tint), not the text color.
             this.ButtonStyle = new TextStyle
             {
                 Font = GameFacade.MainFont,
                 VFont = GameFacade.VectorFont,
                 Size = 12,
-                Color = new Color(187, 187, 187),
-                SelectedColor = new Color(0, 255, 255),
-                CursorColor = new Color(255, 255, 255)
+                Color = UntrackedLabelColor,
+                HighlightedColor = HoverLabelColor,
+                SelectedColor = Color.White,
+                CursorColor = Color.White
             };
 
             HighlightStyle = ButtonStyle.Clone();
-            HighlightStyle.Color = new Color(185, 185, 208);
+            // ColorMod items keep the dimmed-interaction lavender as their
+            // base color: data-driven, and TSPaint has no per-item color
+            // branch (its item flag +8 hides the row entirely).
+            HighlightStyle.Color = UntrackedLabelColor;
 
             lerpSpeed = 0.125f * (60.0f / FSOEnvironment.RefreshRate);
             // R142: the ORIGINAL interaction-pie background — SMCtrlMgrRes-adjacent
@@ -225,9 +242,12 @@ namespace Simitone.Client.UI.Panels
                 m_BgGrow += 1.0 / 30.0 * (60.0 / FSOEnvironment.RefreshRate);
                 HeadCamera.Zoom = (float)m_BgGrow * 5.12f;
 
-                m_Bg.SetSize((float)m_BgGrow * 200, (float)m_BgGrow * 200);
-                m_Bg.X = (float)m_BgGrow * (-100);
-                m_Bg.Y = (float)m_BgGrow * (-100);
+                // UI-12: the disc grows to 2×max radius = 180 (cDDDSimsView::
+                // Init vtable+488 arg 90; r142's own law text) — the code's
+                // 200 predated the radius pin.
+                m_Bg.SetSize((float)m_BgGrow * 180, (float)m_BgGrow * 180);
+                m_Bg.X = (float)m_BgGrow * (-90);
+                m_Bg.Y = (float)m_BgGrow * (-90);
             }
             RotateHeadCam(GlobalPoint(new Vector2(state.MouseState.X, state.MouseState.Y)));
             ShiftDown = state.ShiftDown;
@@ -235,6 +255,7 @@ namespace Simitone.Client.UI.Panels
 
         public void RenderMenu()
         {
+            PressedBubble = null;
             for (int i = 0; i < m_PieButtons.Count; i++) //remove previous buttons
             {
                 this.Remove(m_PieButtons[i]);
@@ -252,21 +273,10 @@ namespace Simitone.Client.UI.Panels
             {
                 if (i >= elems.Count) break;
                 var elem = elems.ElementAt(i);
-                var but = new UIButton()
-                {
-                    // TS1 does ellipsis on categories manually.
-                    Caption = elem.Name, // + ((elem.Category) ? "..." : ""),
-                    CaptionStyle = (elem.ColorMod > 0) ? HighlightStyle : ButtonStyle,
-                    ImageStates = 1,
-                    // R142: the ORIGINAL pie disc tile — shared\sys\PieButt.bmp
-                    // 17x17 (ctrl-mgr slot 15), stretched to the label rect by the
-                    // engine. TSO's generated pill replaced.
-                    Texture = PieButtonTexture()
-                };
+                var but = NewPieBubble(elem.Name, (elem.ColorMod > 0) ? HighlightStyle : ButtonStyle);
 
                 // R142: original interaction-pie radius 90 (was 60).
                 double dir = (((double)i) / dirConfig) * Math.PI * 2;
-                but.AutoMargins = OriginalButtonMargin;
 
                 if (i == 0)
                 { //top
@@ -289,25 +299,25 @@ namespace Simitone.Client.UI.Panels
                     but.Y = (float)((Math.Cos(dir) * -90) - but.Size.Y / 2);
                 }
 
-                this.Add(but);
-                m_PieButtons.Add(but);
+                // UI-11: the original pie disc frame — shared\sys\PieButt.bmp
+                // 17x17 (ctrl-mgr slot 15) 9-patched to the label rect and
+                // tinted with the engine's frame color; label colors follow
+                // TSPaint. R142's per-label 3-slice stretch (fixed 17px
+                // height) superseded.
                 but.OnButtonClick += new ButtonClickDelegate(PieButtonClick);
                 but.OnButtonHover += new ButtonClickDelegate(PieButtonHover);
                 but.OnButtonExit += new ButtonClickDelegate(PieButtonExit);
+                but.OnButtonDown += new ButtonClickDelegate(PieButtonPress);
             }
 
             bool top = true;
             for (int i = 8; i < elems.Count; i++)
             {
                 var elem = elems.ElementAt(i);
-                var but = new UIButton()
-                {
-                    Caption = elem.Name + ((elem.Category) ? "..." : ""),
-                    CaptionStyle = (elem.ColorMod > 0) ? HighlightStyle : ButtonStyle,
-                    ImageStates = 1,
-                    Texture = TextureGenerator.GetPieButtonImg(GameFacade.GraphicsDevice)
-                };
-                but.AutoMargins = OriginalButtonMargin;
+                // UI-11: overflow bubbles use the same decoded PieButt frame —
+                // the pre-R142 generated pill survived only in this loop.
+                var but = NewPieBubble(elem.Name + ((elem.Category) ? "..." : ""),
+                    (elem.ColorMod > 0) ? HighlightStyle : ButtonStyle);
 
                 but.X = (float)(-but.Width / 2);
                 if (top)
@@ -324,27 +334,43 @@ namespace Simitone.Client.UI.Panels
                 but.OnButtonClick += new ButtonClickDelegate(PieButtonClick);
                 but.OnButtonHover += new ButtonClickDelegate(PieButtonHover);
                 but.OnButtonExit += new ButtonClickDelegate(PieButtonExit);
+                but.OnButtonDown += new ButtonClickDelegate(PieButtonPress);
                 top = !top;
             }
 
             if (m_CurrentItem.Parent != null)
             {
-                var but = new UIButton()
-                {
-                    Caption = m_CurrentItem.Name,
-                    CaptionStyle = ButtonStyle.Clone(),
-                    ImageStates = 1,
-                    Texture = PieButtonTexture()
-                };
+                // UI-11: the title button draws in the selected/white family
+                // like any label (native title path passes +216); the old
+                // forced-cyan caption had no native counterpart.
+                var but = NewPieBubble(m_CurrentItem.Name, ButtonStyle);
 
-                but.CaptionStyle.Color = but.CaptionStyle.SelectedColor;
-                but.AutoMargins = OriginalButtonMargin;
                 but.X = (float)(-but.Width / 2);
                 but.Y = (float)(-but.Size.Y / 2);
                 this.Add(but);
                 m_PieButtons.Add(but);
                 but.OnButtonClick += new ButtonClickDelegate(BackButtonPress);
             }
+        }
+
+        private UIPieBubble NewPieBubble(string caption, TextStyle style)
+        {
+            var but = new UIPieBubble
+            {
+                Caption = caption,
+                CaptionStyle = style,
+                ImageStates = 1,
+                Texture = PieButtonTexture(),
+                AutoMargins = OriginalButtonMargin
+            };
+            but.Owner = this;
+            but.FitToCaption();
+            return but;
+        }
+
+        private void PieButtonPress(UIElement button)
+        {
+            PressedBubble = button as UIPieBubble;
         }
 
         void PieButtonHover(UIElement button)
@@ -358,6 +384,8 @@ namespace Simitone.Client.UI.Panels
         void PieButtonExit(UIElement button)
         {
             currentTarget = Vector2.Zero;
+            // a press that leaves its bubble ends the hold state
+            if (PressedBubble == button as UIPieBubble) PressedBubble = null;
         }
 
         void BackButtonPress(UIElement button)
@@ -370,6 +398,7 @@ namespace Simitone.Client.UI.Panels
 
         private void PieButtonClick(UIElement button)
         {
+            PressedBubble = null;
             int index = m_PieButtons.IndexOf((UIButton)button);
             if (index == -1) return; //bail! this isn't meant to happen!
             var action = m_CurrentItem.Children.ElementAt(index);
@@ -445,6 +474,116 @@ namespace Simitone.Client.UI.Panels
                 var invScale = new Vector2(1 / TrueScale, 1 / TrueScale);
                 DrawLocalTexture(batch, HeadScene.Target, null, new Vector2(-100, -100), invScale);
             } //if we're top level, draw head!
+        }
+    }
+
+    // UI-11: one interaction-pie bubble on the decoded cTSPieMenu law
+    // (tools/iff-dump/pie-label-paint-law.md). The frame is the 17x17
+    // PieButt disc 9-patched to the measured label rect + 3px per side
+    // (Layout 0x5290c0 / DrawLabelFrame 0x528d10) and tinted with the
+    // engine's +100 frame color; label text draws per the TSPaint state law
+    // (untracked lavender, hover cyan, press white). UIButton's 3-slice draw
+    // fixes the height at the tile's 17px, which crushed labels against the
+    // caps; input handling stays UIButton's.
+    public class UIPieBubble : UIButton
+    {
+        // cap width kept from the engine 3-slice (17/3); the native patch
+        // widths live behind the undecoded TOC-indirected DrawLabelFrame
+        // state, so the port keeps its established cap curvature.
+        public const int CornerSize = 5;
+
+        private TextStyle m_OwnedStyle;
+        private UIPieMenu m_Owner;
+
+        public UIPieMenu Owner
+        {
+            get { return m_Owner; }
+            set { m_Owner = value; }
+        }
+
+        // Rebuild the frame from the caption: width = advance + 2*margin
+        // (AutoMargins drives the same law inside UIButton), height =
+        // measured label height + 6. The base Size getter reports the
+        // texture height (17), which fed the old fixed-height law into the
+        // radius anchoring; report the real frame instead.
+        public void FitToCaption()
+        {
+            m_OwnedStyle = (CaptionStyle != null) ? CaptionStyle.Clone() : null;
+            var size = (m_OwnedStyle != null) ? m_OwnedStyle.MeasureString(Caption)
+                                              : new Vector2(17, 12);
+            int margin = UIPieMenu.OriginalButtonMargin;
+            int w = (int)size.X + margin * 2;
+            int h = (int)size.Y + margin * 2;
+
+            Width = Math.Max(w, CornerSize * 2);
+            if (ClickHandler != null)
+            {
+                ClickHandler.Region.Width = (int)Width;
+                ClickHandler.Region.Height = Math.Max(h, CornerSize * 2);
+            }
+        }
+
+        public override Vector2 Size
+        {
+            get
+            {
+                return new Vector2(Width, GetBounds().Height);
+            }
+        }
+
+        private Color CurrentLabelColor()
+        {
+            // TSPaint state law (UI-15, raw 0x528a74-0x528aa0): the tracked
+            // bubble draws +212 idle and +216 while pressed; every other
+            // bubble draws +208 regardless of press state.
+            var pressed = (m_Owner != null) ? m_Owner.PressedBubble : null;
+            if (pressed == this) return Color.White;
+            if (Hovered) return UIPieMenu.HoverLabelColor;
+            return UIPieMenu.UntrackedLabelColor;
+        }
+
+        public override void Draw(UISpriteBatch SBatch)
+        {
+            if (!Visible) return;
+            var tex = Texture;
+            if (tex == null)
+            {
+                base.Draw(SBatch);
+                return;
+            }
+
+            int w = (int)Width; if (w <= 0) w = 17;
+            int h = GetBounds().Height; if (h <= 0) h = 17;
+            int c = CornerSize;
+            if (w < c * 2) w = c * 2;
+            if (h < c * 2) h = c * 2;
+            float midW = w - c * 2, midH = h - c * 2;
+            int tw = tex.Width, th = tex.Height;
+            int srcMidW = tw - c * 2, srcMidH = th - c * 2;
+            var tint = UIPieMenu.PieFrameTint;
+
+            // corners, 1:1 so the disc arcs keep their curvature
+            DrawLocalTexture(SBatch, tex, new Rectangle(0, 0, c, c), Vector2.Zero, Vector2.One, tint);
+            DrawLocalTexture(SBatch, tex, new Rectangle(tw - c, 0, c, c), new Vector2(w - c, 0), Vector2.One, tint);
+            DrawLocalTexture(SBatch, tex, new Rectangle(0, th - c, c, c), new Vector2(0, h - c), Vector2.One, tint);
+            DrawLocalTexture(SBatch, tex, new Rectangle(tw - c, th - c, c, c), new Vector2(w - c, h - c), Vector2.One, tint);
+            // edges, stretched
+            DrawLocalTexture(SBatch, tex, new Rectangle(c, 0, srcMidW, c), new Vector2(c, 0), new Vector2(midW / srcMidW, 1f), tint);
+            DrawLocalTexture(SBatch, tex, new Rectangle(c, th - c, srcMidW, c), new Vector2(c, h - c), new Vector2(midW / srcMidW, 1f), tint);
+            DrawLocalTexture(SBatch, tex, new Rectangle(0, c, c, srcMidH), new Vector2(0, c), new Vector2(1f, midH / srcMidH), tint);
+            DrawLocalTexture(SBatch, tex, new Rectangle(tw - c, c, c, srcMidH), new Vector2(w - c, c), new Vector2(1f, midH / srcMidH), tint);
+            // center
+            DrawLocalTexture(SBatch, tex, new Rectangle(c, c, srcMidW, srcMidH), new Vector2(c, c), new Vector2(midW / srcMidW, midH / srcMidH), tint);
+
+            var caption = Caption;
+            if (caption != null && m_OwnedStyle != null)
+            {
+                m_OwnedStyle.Color = CurrentLabelColor();
+                var box = GetBounds();
+                box.Height -= 2;
+                this.DrawLocalString(SBatch, caption, Vector2.Zero, m_OwnedStyle, box,
+                    TextAlignment.Center | TextAlignment.Middle, Rectangle.Empty, UIElementState.Normal);
+            }
         }
     }
 

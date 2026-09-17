@@ -13962,14 +13962,21 @@ namespace Simitone.Client
             catch (Exception ce) { Log("AUTOTEST uibigbtn EXC " + ce.GetType().Name + " " + ce.Message); Fail("uibigbtn"); }
         }
 
-        // ROUND-191 'uipie': the PEOPLE PIE on the decoded cTSPieMenu law
-        // (evidence r191/ + r159 scout §4). (1) Art pin: pieFace1.bmp 201x201
-        // and byte-verified ALL-magenta (the pure chroma-key mask). (2) Law
-        // pins: MaxRadius 150 / InactiveRadius 35 / the four decoded colors /
-        // 8 slots / the 60,30 literal slots. (3) LIVE: pop through the real
-        // ctor — 8 compass slots at 45-degree steps from 12 o'clock at the
-        // portrait radius, family census shared with the webcam strip,
-        // selection writes vm.MyUID and closes, click-away closes.
+        // ROUND-251 'uipie': the PEOPLE PIE on the fully decoded
+        // cTSPieMenu law (evidence r251/; supersedes the r191 modeled
+        // ring). (1) Art pin: pieFace1.bmp 201x201 and byte-verified
+        // ALL-magenta (the pure chroma-key mask). (2) Law pins:
+        // MaxRadius 150 / InactiveRadius 35 (CalcItem hit-fallback
+        // bounds only), the four decoded colors, 8 slots, the 60/30
+        // anchor pads, the spoke-radius clamp margin 8, the 45-degree
+        // angle-grid convention, and the 8-case anchor table via SlotBox
+        // (Layout 0x529540-0x5295ec: N centered above at -(60+h), E at
+        // +60 vcentered, raw SE left edge 0, diagonals at the 30 pad,
+        // W left clamped at -(100+8)). (3) LIVE: pop through the real
+        // ctor — item boxes (measured name + 6) at the decoded anchors
+        // with portraits at the box centers (GetCurItemCenter law),
+        // family census shared with the webcam strip, selection writes
+        // vm.MyUID and closes, click-away closes.
         private static void CheckUIPeoplePie()
         {
             try
@@ -13986,14 +13993,16 @@ namespace Simitone.Client
 
                 bool law = Simitone.Client.UI.Panels.UIOriginalPeoplePie.MaxRadius == 150 && Simitone.Client.UI.Panels.UIOriginalPeoplePie.InactiveRadius == 35
                     && Simitone.Client.UI.Panels.UIOriginalPeoplePie.DiscSize == 201 && Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotCount == 8
-                    && Simitone.Client.UI.Panels.UIOriginalPeoplePie.LiteralSlotA == 60 && Simitone.Client.UI.Panels.UIOriginalPeoplePie.LiteralSlotB == 30
+                    && Simitone.Client.UI.Panels.UIOriginalPeoplePie.CardinalPad == 60 && Simitone.Client.UI.Panels.UIOriginalPeoplePie.DiagonalPad == 30
+                    && Simitone.Client.UI.Panels.UIOriginalPeoplePie.ClampMargin == 8
                     && Simitone.Client.UI.Panels.UIOriginalPeoplePie.BaseColor == new Microsoft.Xna.Framework.Color(0, 40, 140)
                     && Simitone.Client.UI.Panels.UIOriginalPeoplePie.SelectedColor == new Microsoft.Xna.Framework.Color(255, 255, 255)
                     && Simitone.Client.UI.Panels.UIOriginalPeoplePie.HighlightColor == new Microsoft.Xna.Framework.Color(165, 195, 214)
                     && Simitone.Client.UI.Panels.UIOriginalPeoplePie.LowlightColor == new Microsoft.Xna.Framework.Color(0, 255, 255);
 
-                // slot law: 45-degree compass from 12 o'clock (float compare
-                // with tolerance — trig constants are not exact)
+                // angle-grid convention (item+12): 45-degree compass from
+                // 12 o'clock (float compare with tolerance — trig constants
+                // are not exact)
                 Func<float, float, bool> near = (a, b) => Math.Abs(a - b) < 0.01f;
                 var d0 = Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotDirection(0);
                 var ne = Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotDirection(1);
@@ -14004,6 +14013,19 @@ namespace Simitone.Client
                     && near(d4.X, 0) && near(d4.Y, 1)
                     && d7.X < 0 && d7.Y < 0;
 
+                // the decoded 8-case anchor table, pinned on a 66x24 item
+                // (name+6): the W case demonstrates the -(100+8) left clamp
+                Func<Rectangle, Rectangle, bool> boxEq = (a, b) => a.X == b.X && a.Y == b.Y && a.Width == b.Width && a.Height == b.Height;
+                bool anchors =
+                    boxEq(Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotBox(0, 66, 24), new Rectangle(-33, -84, 66, 24))
+                    && boxEq(Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotBox(1, 66, 24), new Rectangle(30, -54, 66, 24))
+                    && boxEq(Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotBox(2, 66, 24), new Rectangle(60, -12, 66, 24))
+                    && boxEq(Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotBox(3, 66, 24), new Rectangle(0, 30, 66, 24))
+                    && boxEq(Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotBox(4, 66, 24), new Rectangle(-33, 60, 66, 24))
+                    && boxEq(Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotBox(5, 66, 24), new Rectangle(-96, 30, 66, 24))
+                    && boxEq(Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotBox(6, 66, 24), new Rectangle(-108, -12, 66, 24))
+                    && boxEq(Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotBox(7, 66, 24), new Rectangle(-96, -54, 66, 24));
+
                 var game = GameFacade.Screens.CurrentUIScreen as Simitone.Client.UI.Screens.TS1GameScreen;
                 bool live = false, sel = false, closeOk = false;
                 if (game != null && game.vm != null)
@@ -14012,17 +14034,21 @@ namespace Simitone.Client
                     var pie = new Simitone.Client.UI.Panels.UIOriginalPeoplePie(game,
                         new Microsoft.Xna.Framework.Vector2(400, 300));
                     game.Add(pie);
-                    // slot centers are pie-LOCAL: expected = pop point minus
-                    // the (screen-clamped) window origin plus the ring offset
+                    // item boxes sit at the decoded anchors around the
+                    // window-local disc center; portraits ride at the box
+                    // centers (GetCurItemCenterX/Y law)
                     var cx = 400 - (int)pie.Position.X;
                     var cy = 300 - (int)pie.Position.Y;
-                    var pr = Simitone.Client.UI.Panels.UIOriginalPeoplePie.PortraitRadius;
+                    var b0 = Simitone.Client.UI.Panels.UIOriginalPeoplePie.LastSlotBoxes[0];
+                    var b2 = Simitone.Client.UI.Panels.UIOriginalPeoplePie.LastSlotBoxes[2];
+                    var e0 = Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotBox(0, b0.Width, b0.Height);
+                    var e2 = Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotBox(2, b2.Width, b2.Height);
                     live = Simitone.Client.UI.Panels.UIOriginalPeoplePie.Pops == popsBefore + 1
                         && pie.SlotButtons.Length == 8
-                        && near(Simitone.Client.UI.Panels.UIOriginalPeoplePie.LastSlotCenters[0].X, cx)
-                        && near(Simitone.Client.UI.Panels.UIOriginalPeoplePie.LastSlotCenters[0].Y, cy - pr)
-                        && near(Simitone.Client.UI.Panels.UIOriginalPeoplePie.LastSlotCenters[2].X, cx + pr)
-                        && near(Simitone.Client.UI.Panels.UIOriginalPeoplePie.LastSlotCenters[2].Y, cy);
+                        && near(Simitone.Client.UI.Panels.UIOriginalPeoplePie.LastSlotCenters[0].X, cx + e0.X + e0.Width / 2f)
+                        && near(Simitone.Client.UI.Panels.UIOriginalPeoplePie.LastSlotCenters[0].Y, cy + e0.Y + e0.Height / 2f)
+                        && near(Simitone.Client.UI.Panels.UIOriginalPeoplePie.LastSlotCenters[2].X, cx + e2.X + e2.Width / 2f)
+                        && near(Simitone.Client.UI.Panels.UIOriginalPeoplePie.LastSlotCenters[2].Y, cy + e2.Y + e2.Height / 2f);
 
                     // selection law: an occupied slot writes vm.MyUID + closes
                     var famCount = pie.Family != null ? pie.Family.Length : 0;
@@ -14047,8 +14073,8 @@ namespace Simitone.Client
                     if (pie.Parent != null) pie.Parent.Remove(pie);
                 }
 
-                bool ok = art && law && slots && live && sel && closeOk;
-                Log("AUTOTEST uipie art=" + art + " law=" + law + " slots=" + slots
+                bool ok = art && law && slots && anchors && live && sel && closeOk;
+                Log("AUTOTEST uipie art=" + art + " law=" + law + " slots=" + slots + " anchors=" + anchors
                     + " live=" + live + " sel=" + sel + " close=" + closeOk);
                 if (ok) Pass("uipie"); else Fail("uipie");
             }
@@ -24978,10 +25004,13 @@ namespace Simitone.Client
                     multiStubTexture.Dispose();
                 }
 
-                // 5. pie canon: art resolves + the slice band law exact. The
-                // bitmap-font advance does not include every final-glyph edge,
-                // so the original-style label receives a real 8px inset on
-                // both sides. This is the concrete "Go Here" bounds regression.
+                // 5. pie canon: art resolves + the slice band law exact, on
+                // the decoded label frame law (UI-11;
+                // tools/iff-dump/pie-label-paint-law.md): every bubble is the
+                // measured label rect + 3px per side (cTSPieMenu::Layout
+                // 0x5290c0, DrawLabelFrame 0x528d10), height growing with the
+                // text. Supersedes the R142-era 8px inset / fixed 17px
+                // height model.
                 Microsoft.Xna.Framework.Graphics.Texture2D pieButtonArt = null;
                 try
                 {
@@ -24999,8 +25028,8 @@ namespace Simitone.Client
                     var got = Simitone.Client.UI.Panels.UIPieMenu.SliceCount(input[i]);
                     if (got != law[i]) { ok = false; info += " slices(" + input[i] + ")=" + got + " want " + law[i] + ";"; }
                 }
-                if (Simitone.Client.UI.Panels.UIPieMenu.OriginalButtonMargin != 8)
-                { ok = false; info += " pieMargin=" + Simitone.Client.UI.Panels.UIPieMenu.OriginalButtonMargin + "!=8;"; }
+                if (Simitone.Client.UI.Panels.UIPieMenu.OriginalButtonMargin != 3)
+                { ok = false; info += " pieMargin=" + Simitone.Client.UI.Panels.UIPieMenu.OriginalButtonMargin + "!=3;"; }
                 if (pieButtonArt != null)
                 {
                     const string caption = "Go Here";
@@ -25009,9 +25038,9 @@ namespace Simitone.Client
                         Font = GameFacade.MainFont,
                         VFont = GameFacade.VectorFont,
                         Size = 12,
-                        Color = new Color(187, 187, 187)
+                        Color = Color.White
                     };
-                    var pieProbe = new FSO.Client.UI.Controls.UIButton
+                    var pieProbe = new Simitone.Client.UI.Panels.UIPieBubble
                     {
                         Caption = caption,
                         CaptionStyle = style,
@@ -25019,10 +25048,15 @@ namespace Simitone.Client
                         Texture = pieButtonArt
                     };
                     pieProbe.AutoMargins = Simitone.Client.UI.Panels.UIPieMenu.OriginalButtonMargin;
+                    pieProbe.FitToCaption();
                     int textAdvance = (int)style.MeasureString(caption).X;
+                    int textHeight = (int)style.MeasureString(caption).Y;
                     int wantedWidth = textAdvance + 2 * Simitone.Client.UI.Panels.UIPieMenu.OriginalButtonMargin;
-                    if ((int)pieProbe.Width != wantedWidth || pieProbe.GetBounds().Width != wantedWidth)
-                    { ok = false; info += " goHere=" + (int)pieProbe.Width + "/hit" + pieProbe.GetBounds().Width + " want " + wantedWidth + ";"; }
+                    int wantedHeight = textHeight + 2 * Simitone.Client.UI.Panels.UIPieMenu.OriginalButtonMargin;
+                    if ((int)pieProbe.Width != wantedWidth || pieProbe.GetBounds().Width != wantedWidth
+                        || pieProbe.GetBounds().Height != wantedHeight)
+                    { ok = false; info += " goHere=" + (int)pieProbe.Width + "x" + pieProbe.GetBounds().Height
+                        + " want " + wantedWidth + "x" + wantedHeight + ";"; }
                 }
 
                 Log("AUTOTEST uidlgchrome original-dialog+pie canon" + (ok ? ": OK " : ": FAIL ") + info);

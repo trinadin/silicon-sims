@@ -267,12 +267,15 @@ namespace Simitone.Client.UI.Panels
 
             if (!UIInteraction.OriginalStyle || UI.X != realPos.X || UI.Y != realPos.Y)
             {
-                // Original StartAnimating uses 500ms. Its RampGenerator curve is
-                // not decoded yet; EaseOut remains the port's disclosed easing.
+                // UI-05/UI-12: the original StartAnimating uses 500ms and its
+                // RampGenerator is LINEAR (SetupConstantTimeRamp 0x14e890 /
+                // GetVal 0x14e930: target − (endTime−now)×slope;
+                // r243-fade/contract.md). The old TweenQuad.EaseOut was the
+                // port's superseded guess.
                 GameFacade.Screens.Tween.To(UI,
                     UIInteraction.OriginalStyle ? UIInteractionQueue.OriginalRepositionSeconds : 0.5f,
                     new Dictionary<string, float>() { { "X", realPos.X }, { "Y", realPos.Y } },
-                    TweenQuad.EaseOut);
+                    TweenLinear.EaseNone);
             }
             QueuePosition = pos;
             /*

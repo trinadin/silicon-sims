@@ -1846,6 +1846,7 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             string name = elem.DisplayName ?? elem.Item.Name;
             string desc = null;
             int price = (int)elem.Item.Price;
+            List<string> ratingLines = null;
             try
             {
                 if (elem.Special?.Res != null)
@@ -1858,6 +1859,7 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                 {
                     var worldObj = FSO.Content.Content.Get().WorldObjects.Get(elem.Item.GUID);
                     desc = worldObj?.Resource?.Get<CTSS>(worldObj.OBJ.CatalogStringsID)?.GetString(1);
+                    if (worldObj != null) ratingLines = BuildPopupRatingLines(worldObj.OBJ);
                 }
             }
             catch { }
@@ -1898,7 +1900,13 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                 // the grid cell and must never be used as the popup preview.
                 popupIcon = GetBandObjectThumb(elem.Item.GUID);
             }
-            BandPopup.SetInfo(popupIcon, pairedProductIcon, name, price, desc, ownsPopupIcon);
+            // UI-12: BuildMyBuffer tints the name/price with the engine error
+            // red when the family funds (VM global 0) are under the price.
+            // The purchase-path budget gate itself stays undecoded (the todo
+            // below remains).
+            bool affordable = true;
+            try { affordable = Game.LotControl.vm.GetGlobalValue(0) >= price; } catch { }
+            BandPopup.SetInfo(popupIcon, pairedProductIcon, name, price, desc, ownsPopupIcon, affordable, ratingLines);
             // R148 anchor law (BuildMyBuffer 0x26dd98-0x26dea4): the popup's
             // top-right sits at the button's top-left — x = btnX - 559,
             // y = btnY - the measured popup height (127px minimum). The engine
@@ -1918,6 +1926,38 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             // without invoking Removed() or disturbing texture ownership.
             ((UIMainPanel)Game.Frontend.MainPanel)?.Add(BandPopup);
             BandPopup.Visible = true;
+            // UI-12: the decoded 250 ms slide-up from the source row (the
+            // hovered cell's row stands in for engine field +0x80); drawn-Y
+            // only, the anchor Position above is untouched.
+            BandPopup.BeginSlideIn(abs.Y);
+        }
+
+        // UI-13: the BuildMyBuffer rating block, on the query panel's
+        // data-validated law (r124): STR#160 [0..6] 'X: %d' with the signed
+        // OBJD rating when nonzero; [7..13] '+ Skill' when the
+        // RatingSkillFlags bit is set. The i==7 special case in the engine
+        // loop is exactly this motive→skill boundary, which pins the popup's
+        // label indexing to STR#160 [0..13] (r145's "[1..14]" was off by
+        // one). [14..19] usage flags: no OBJD encoding (r124 negative
+        // space) — not rendered, as in the query panel.
+        private static List<string> BuildPopupRatingLines(FSO.Files.Formats.IFF.Chunks.OBJD def)
+        {
+            if (def == null) return null;
+            var lines = new List<string>();
+            var ratings = new short[] { def.RatingHunger, def.RatingComfort, def.RatingHygiene,
+                                        def.RatingBladder, def.RatingEnergy, def.RatingFun, def.RatingRoom };
+            for (int i = 0; i < 7; i++)
+            {
+                if (ratings[i] != 0)
+                    lines.Add(GameFacade.Strings.GetString("160", i.ToString()).Replace("%d", ratings[i].ToString()));
+            }
+            var sFlags = def.RatingSkillFlags;
+            for (int i = 0; i < 7; i++)
+            {
+                if ((sFlags & (1 << i)) > 0)
+                    lines.Add(GameFacade.Strings.GetString("160", (i + 7).ToString()));
+            }
+            return lines.Count > 0 ? lines : null;
         }
 
         public void SyncBandSelection()
