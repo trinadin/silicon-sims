@@ -30,9 +30,42 @@ namespace FSO.HIT
             return HITResult.CONTINUE;
         }
 
+        /// <summary>
+        /// AUD-14: native CheckedRegId (0x312D40) validates a HIT operand as a
+        /// REGISTER ID — 0x01..0x7f pass; id 0 and >0x7f reject (error-report via
+        /// the global object's vtbl+0xd0, result discarded) and the handler branches
+        /// to the shared CONTINUE tail (0x312A98) with the operand byte already
+        /// consumed by the cursor. Two-operand handlers below fetch BOTH operand
+        /// bytes before validating, so a first-operand rejection cannot desync the
+        /// bytecode cursor.
+        /// </summary>
+        private static bool IsValidRegId(int id)
+        {
+            return id >= 1 && id <= 0x7f;
+        }
+
+        /// <summary>
+        /// AUD-14 (native decode: cTrackPlayer dispatch[0x01]): TWO register-id
+        /// operands, each CheckedRegId-validated — NOT immediates, and NOT a NoteOn
+        /// call (note_on 0x02 is the playback op; AUD-09's NoteOn semantics were
+        /// the integration-crash cause). The historic 0-operand no-op desynced the
+        /// bytecode cursor at every one of the 361 corpus sites
+        /// (SoundData/simsgeneratedhitsource.hit); this handler now consumes and
+        /// validates both operands natively. Action side, decoded but bounded out
+        /// of this tranche: reg[a] routes to the guarded channel (vtbl+0x9c on
+        /// self+0x1e8); reg[b] OVERWRITES the thread volume with the active
+        /// track's base volume + reg[b] (self+0x194 := [[r30]+0x58] + reg[b]) then
+        /// UpdateVolPan; instance pitch = pitchBase + reg[0x15] − 0xe10 (vtbl+0x4c).
+        /// Porting those writes needs the vtbl-slot semantics and the native
+        /// volume-scale decode — documented bounded subset until then; in the
+        /// bounded subset a rejected id pair and a valid pair both CONTINUE, exactly
+        /// like the native rejection tail.
+        /// </summary>
         public static HITResult Note(HITThread thread)
         {
-            return HITResult.CONTINUE; //unused in the sims
+            var a = thread.ReadByte();
+            var b = thread.ReadByte();
+            return HITResult.CONTINUE;
         }
 
         /// <summary>
@@ -495,19 +528,40 @@ namespace FSO.HIT
 
         /// <summary>
         /// Play a track, whose ID resides in the specified variable.
+        /// AUD-14 (native decode, dispatch[0x32]): ONE CheckedRegId-validated
+        /// register-id operand; the register's value goes through a SoundId hash
+        /// lookup and starts that track, then RegisterVal(self+0x178, 3). Arity was
+        /// already right (1 byte); the action side is a documented bounded subset —
+        /// the SoundId-hash table is not decoded and HITVM's sound registry is not
+        /// reachable from the interpreter — so the operand is consumed and validated
+        /// (bytecode alignment + the native long-gate law) and the start is skipped.
+        /// Corpus: 2 sites, both in simsgeneratedhitsource.hit (TS1 content).
         /// </summary>
         public static HITResult PlayTrack(HITThread thread)
         {
-            var dest = thread.ReadByte();
-            return HITResult.CONTINUE; //Not used in TSO.
+            var id = thread.ReadByte();
+            if (IsValidRegId(id))
+            {
+                _ = thread.ReadVar(id); // native: SoundId-hash lookup -> track start (bounded out)
+            }
+            return HITResult.CONTINUE;
         }
 
         /// <summary>
         /// Kill a track, whose ID resides in the specified variable.
+        /// AUD-14 (native decode, dispatch[0x33]): ONE CheckedRegId-validated
+        /// register-id operand; the register's value goes through the SoundId hash
+        /// lookup and kills that track. Bounded subset as with play_trk (lookup
+        /// table + registry not reachable): consume, validate, skip the kill.
+        /// Corpus: 8 sites, simsgeneratedhitsource.hit.
         /// </summary>
         public static HITResult KillTrack(HITThread thread)
         {
-            var src = thread.ReadByte();
+            var id = thread.ReadByte();
+            if (IsValidRegId(id))
+            {
+                _ = thread.ReadVar(id); // native: SoundId-hash lookup -> kill (bounded out)
+            }
             return HITResult.CONTINUE;
         }
 
@@ -541,9 +595,17 @@ namespace FSO.HIT
             return HITResult.CONTINUE; //unused in the sims
         }
 
+        /// <summary>
+        /// AUD-14 (native decode): test1-4 (0x3A-0x3D) take ZERO operands — the
+        /// port's consumption is already bytecode-correct, only semantics are
+        /// missing. test1: guarded SoundId-hash predicate whose bool lands in the
+        /// context slot [r27] (vtbl+0xa8 on the result). test2: writes the 3600
+        /// (0xe10) pitch-base constant via vtbl+0x4c on [r28]. test3/test4:
+        /// 0x24-byte fixed-context handlers. Corpus: 1 site each; bounded no-ops
+        /// pending the vtbl-slot decode.
+        /// </summary>
         public static HITResult Test1(HITThread thread)
         {
-            //no idea what these do. examples?
             return HITResult.CONTINUE;
         }
 
@@ -670,10 +732,19 @@ namespace FSO.HIT
 
         /// <summary>
         /// Kill a sequence group with the return value specified by a constant.
+        /// AUD-14 (native decode, dispatch[0x47]): ONE CheckedRegId-validated
+        /// register-id operand; the register's value drives the seqgroup return
+        /// logic (likely the write side of the waiteq sync vars). Arity already
+        /// correct; the return plumbing is not decoded — bounded subset: consume,
+        /// validate, skip. Corpus: 8 sites, simsgeneratedhitsource.hit.
         /// </summary>
         public static HITResult SeqGroupReturn(HITThread thread)
         {
-            var src = thread.ReadByte();
+            var id = thread.ReadByte();
+            if (IsValidRegId(id))
+            {
+                _ = thread.ReadVar(id); // native: seqgroup return on the value (bounded out)
+            }
             return HITResult.CONTINUE;
         }
 
@@ -712,9 +783,14 @@ namespace FSO.HIT
 
         public static HITResult SetLT(HITThread thread)
         {
-            //set local... to... t... yeah i don't know either
-            //might be object vars
-
+            // AUD-14 (native decode, dispatch[0x4B]): TWO CheckedRegId-validated
+            // register-id operands — consumption below already matches. Native
+            // performs a single store keyed by operand 1:
+            // vtbl+0x8c(self, id1, vtbl+0xa0(self), 0); operand 2 is validated but
+            // its VALUE is never read (AUD-08's ">127 long-variable routing" reading
+            // is superseded — that was CheckedRegId's rejection path). The stored
+            // value's source (vtbl+0xa0 getter on self) is not decoded — bounded
+            // subset: keep the 2-byte consumption, skip the store. Corpus: 1 site.
             var dest = thread.ReadByte();
             var src = thread.ReadByte();
 
@@ -731,13 +807,23 @@ namespace FSO.HIT
 
         /// <summary>
         /// Wait until two variables are equal.
+        /// AUD-14 (native decode, dispatch[0x4D]): TWO CheckedRegId-validated
+        /// register-id operands, DEST then SRC; compare ReadVar(dest) vs
+        /// ReadVar(src) and retry while unequal — the native retry is cursor −3 +
+        /// halt-until-equal (0x310A0C: cmpw r28,r3 / beq tail), matching the port's
+        /// PC -= 3 HALT shape. AUD-09's one-line fix re-landed: the historic
+        /// self-compare (ReadVar(dest) != ReadVar(dest)) was always false, so the
+        /// sync wait NEVER fired. A rejected id (0 or >0x7f) skips the wait — the
+        /// native CheckedRegId rejection branches to the CONTINUE tail with nothing
+        /// read or compared.
         /// </summary>
         public static HITResult WaitEqual(HITThread thread)
         {
             var dest = thread.ReadByte();
             var src = thread.ReadByte();
 
-            if (thread.ReadVar(dest) != thread.ReadVar(dest))
+            if (IsValidRegId(dest) && IsValidRegId(src)
+                && thread.ReadVar(dest) != thread.ReadVar(src))
             {
                 thread.PC -= 3;
                 return HITResult.HALT;
