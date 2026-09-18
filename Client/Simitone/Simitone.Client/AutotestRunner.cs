@@ -19829,19 +19829,32 @@ namespace Simitone.Client
 
 
 
-        // EXP-01 llinteract v3 (opt-in "llinteract"): the Livin' Large genie wish
-        // chain, content-derived (GenieLantern.iff decode 2026-09-16): the lamp's
-        // pie carries Clean/View plus ten "Force Good|Bad/..." debug rows (TTAs 129)
-        // and there is NO Rub row — the wish flow is CLEAN the lamp, which surfaces
-        // the genie NPC (OBJD 'NPC Genie', GUID 505322445) and the STR# 301 blocking
-        // dialog offering the six wishes (Money, Love, Friends, Family, Fire, Water).
-        // v2 failed because it pushed View and the chain never walked; v3 is a
-        // leg-based state machine driven per-frame from StateSample (focused-gate
-        // entry below keeps the run open):
-        //   A  Clean -> dialog choice 0 (Money): genie appears + budget delta
-        //   B  Clean again -> choice 4 (Fire): repeat-use row + the fire/water row
-        //   C  "Force Bad/Money Love" direct row push (FSOSkipPermissions): the
-        //      negatives row — the tree must run and move observable state
+        // EXP-01 llinteract v4 (opt-in "llinteract"): the Livin' Large genie wish
+        // chain, driven per the initiation/outcomes decode (2026-09-16). The wish
+        // dialog is the LAMP's own 'offer option' (#4113, dialog_private → STR# 301);
+        // the genie NPC 505322445 is an animation puppet spawned into the lamp's
+        // slot 0, and a live non-ghost puppet parks the rub tree. v3's honest FAILs
+        // decomposed into: same-tick push inside the boot-dialog latch, the
+        // once-per-day test #4098 (attr[5] vs global[1]), and the slot-0 puppet.
+        // v4 laws implemented here:
+        //   - placement/push only after the boot latch clears + a settle window;
+        //   - every push is deferred to LL2Drive (30-frame in-leg settle, avatar
+        //     queue drained, slot-0 puppet cleared first);
+        //   - guard defeat: lamp.attr[5] = global[1] - 1 before every push
+        //     (test #4098 refuses while attr[5] == global[1]);
+        //   - dialog responses follow the ENGINE law (VMDialogPrivateStrings case
+        //     YesNo: ResponseCode == 0 → TRUE/yes, non-zero → FALSE/no — button
+        //     index; the earlier decode note "yes=#2" was a STR# 301 string id);
+        //   - every outcome adds one announcement dialog after the wish dialog,
+        //     so each leg auto-responds a chain of exactly TWO blocking dialogs.
+        // Legs (assertion targets from genie-outcomes-decode-20260916.md):
+        //   A  "Force Good/Money Love" (TTAs row 10 → attr[2]=4, attr[4]=0) →
+        //      yes (0) → wish dialog + 'POT OF GOLD' #29 → 'good money' #4133:
+        //      assert a NEW entity GUID ∈ {Gold Pile 0xA76F6A5E, Train Set-Exp
+        //      0xB499EC29, TV-Exp 0xFC8D548B, Pool Table 0x47F39F51}
+        //   B  same row again (repeat use on the live slot, guard re-defeated)
+        //   C  "Force Bad/Earth Air" (TTAs row 2 → attr[2]=3, attr[4]=1) →
+        //      no (1) → announcement → 9× Roach controllers 0x4415A98E
         //   D  save -> reload: the lamp persists (restart persistence row)
         // Verdict: explicit llinteract PASS only when every leg's assertions hold.
 
@@ -19849,11 +19862,20 @@ namespace Simitone.Client
         private static int _ll2Leg;         // A=0 B=1 C=2 D=3
         private static int _ll2Frame;       // frames in the current leg
         private static int _ll2LegDialogs;  // dialog count when the leg started
-        private static int _ll2RowClean = -1;
-        private static int _ll2RowForceBad = -1;
+        private static int _ll2RowForceGood = -1;
+        private static int _ll2RowBadAir = -1;
         private static FSO.Files.Formats.IFF.Chunks.FAMI _ll2Fam;
-        private static int _ll2BudgetLegStart;
         private static int _ll2EntitiesLegStart;
+        private static bool _ll2PendingPush;   // leg armed; the push is deferred to LL2Drive
+        private static int _ll2GenieClearFrame;
+        private static int _ll2Settle;         // latch-clear ticks before the first placement/push
+        private static int _ll2GoodLegStart;
+        private static int _ll2RoachLegStart;
+        private static bool _ll2LastQueueClear;
+        private static bool _ll2SawChain;
+        // 'good money' #4133 randomly summons one of these (outcomes decode);
+        // bad air #4130 spawns exactly Tuning[12]=9 roach controllers 0x4415A98E.
+        private static readonly uint[] LL2GoodSummonGuids = { 0xA76F6A5Eu, 0xB499EC29u, 0xFC8D548Bu, 0x47F39F51u };
         private static VMEntity _ll2Lamp;
         private static uint _ll2LampGuid;
         private static uint _ll2ActionUID;
@@ -19889,10 +19911,19 @@ namespace Simitone.Client
 
         private static void LL2Init()
         {
+            // v4 prescription step 1: never place or push inside the boot-dialog
+            // latch window, and let the lot settle first — v3 pushed Clean 1 ms
+            // after lampSpawned and the rub tree parked inside the latch.
+            if (_vm?.GlobalBlockingDialog != null) return;
+            if (++_ll2Settle < 90) return;
+
             var avatars = _vm?.Context?.ObjectQueries?.Avatars?.OfType<VMAvatar>()
                 .Where(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD).ToList();
             if (avatars == null || avatars.Count == 0) { Log("AUTOTEST llinteract: no in-world avatar"); Fail("llinteract"); _ll2State = 2; return; }
-            _ll2Av = avatars[0];
+            // prefer an adult: the 9:00 school flow (run-4 pin) pulls child avatars
+            // out of the legs with an unstoppable 'At School' queue entry.
+            _ll2Av = avatars.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? avatars[0];
+            Log("AUTOTEST llinteract avatar obj=" + _ll2Av.ObjectID + " age=" + _ll2Av.GetPersonData(VMPersonDataVariable.PersonsAge));
 
             foreach (var kv in FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID)
             {
@@ -19944,7 +19975,10 @@ namespace Simitone.Client
             Log("AUTOTEST llinteract lampSpawned guid=0x" + _ll2LampGuid.ToString("X") + " obj=" + _ll2Lamp.ObjectID + " at " + _ll2Lamp.Position);
 
             // resolve the wish-chain rows from the lamp's own IFF (TTAs 129 labels
-            // line up with TTAB 129 row indices): Clean + one Force Bad row.
+            // line up with TTAB 129 row indices). The Force rows are the
+            // deterministic dialog paths: 'Force Good/Money Love' (row 10) sets
+            // attr[2]=4 + attr[4]=0, 'Force Bad/Earth Air' (row 2) sets attr[2]=3 +
+            // attr[4]=1. Plain Clean is a 60% bad coin ('Select Good/Bad' #4147).
             var lampIff = _ll2Lamp.Object?.Resource?.Iff;
             var ttas = lampIff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
             var ttab = lampIff?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
@@ -19952,14 +19986,22 @@ namespace Simitone.Client
             for (int i = 0; i < ttas.Length && i < ttab.Interactions.Length; i++)
             {
                 var lbl = (ttas.GetString(i) ?? "").Trim();
-                if (_ll2RowClean < 0 && lbl == "Clean") _ll2RowClean = i;
-                if (_ll2RowForceBad < 0 && lbl == "Force Bad/Money Love") _ll2RowForceBad = i;
+                if (_ll2RowForceGood < 0 && lbl == "Force Good/Money Love") _ll2RowForceGood = i;
+                if (_ll2RowBadAir < 0 && lbl == "Force Bad/Earth Air") _ll2RowBadAir = i;
             }
-            if (_ll2RowClean < 0 || _ll2RowForceBad < 0)
-            { Log("AUTOTEST llinteract: wish rows not resolved (clean=" + _ll2RowClean + " forceBad=" + _ll2RowForceBad + ")"); Fail("llinteract"); _ll2State = 2; return; }
+            if (_ll2RowForceGood < 0 || _ll2RowBadAir < 0)
+            { Log("AUTOTEST llinteract: wish rows not resolved (forceGood=" + _ll2RowForceGood + " badAir=" + _ll2RowBadAir + ")"); Fail("llinteract"); _ll2State = 2; return; }
 
             _ll2SawGenie = false;
             for (int i = 0; i < _ll2LegOk.Length; i++) _ll2LegOk[i] = false;
+            // diagnostic: the wish-code map — 'offer option' writes attr[3] =
+            // Chosen[attr[2]-pair index]; the dispatcher switches on attr[3].
+            var chosen = lampIff.Get<FSO.Files.Formats.IFF.Chunks.BCON>(4100);
+            if (chosen != null)
+                Log("AUTOTEST llinteract Chosen BCON 4100 = [" + string.Join(",", chosen.Constants) + "]");
+            var opts = lampIff.Get<FSO.Files.Formats.IFF.Chunks.BCON>(4099);
+            if (opts != null)
+                Log("AUTOTEST llinteract Options BCON 4099 = [" + string.Join(",", opts.Constants) + "]");
             StartLeg(0);
             _ll2State = 1;
         }
@@ -19969,6 +20011,16 @@ namespace Simitone.Client
             var action = _ll2Lamp.GetAction(row, _ll2Av, _vm.Context, false, new short[] { (short)param0, 0, 0, 0 });
             if (action == null) { Log("AUTOTEST llinteract: GetAction null for " + what + " row=" + row); return false; }
             action.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+            // v4 (run-1 root cause): the Force rows are DEBUG rows whose TTAB check
+            // tree (#4161, 'my.attr[0] > my.attr[0]') is always false. The port
+            // evaluates that check when the action reaches the queue front
+            // (CheckTS1Action runs the check routine REGARDLESS of
+            // FSOSkipPermissions) and VMThread.AttemptPush then silently drops the
+            // queued action (RemoveAt) — the tree never runs (the SIM-19 drop
+            // mechanism). Native debug interactions skip the check entirely
+            // ('do not bother running check'); the harness push replicates that
+            // debug-enabled law by clearing the check routine.
+            action.CheckRoutine = null;
             _ll2Av.Thread.EnqueueAction(action);
             _ll2ActionUID = action.UID;
             Log("AUTOTEST llinteract pushed " + what + " row=" + row + " uid=" + action.UID);
@@ -19979,21 +20031,39 @@ namespace Simitone.Client
         {
             _ll2Leg = leg;
             _ll2Frame = 0;
+            _ll2GenieClearFrame = 0;
+            _ll2SawChain = false;
+            _ll2LastQueueClear = false;
             _ll2LegDialogs = _ll2Dialogs;
-            _ll2BudgetLegStart = _ll2Fam?.Budget ?? 0;
             _ll2EntitiesLegStart = _vm.Entities.Count;
+            _ll2GoodLegStart = LL2CountGuids(LL2GoodSummonGuids);
+            _ll2RoachLegStart = LL2CountGuids(new[] { 0x4415A98Eu });
+            // v4: the push is deferred to LL2Drive (settle + slot-0 genie clear +
+            // guard defeat first). Wish responses follow the engine YesNo law:
+            // 0 = yes/TRUE ('Money'), 1 = no/FALSE ('Air').
             switch (leg)
             {
-                case 0: _ll2WishChoice = 0; if (!LL2PushRow(_ll2RowClean, 0, "Clean (wish Money)")) FinishLeg(false, "push failed"); break;
-                case 1: _ll2WishChoice = 4; if (!LL2PushRow(_ll2RowClean, 0, "Clean (wish Fire)")) FinishLeg(false, "push failed"); break;
-                case 2: _ll2WishChoice = 0; if (!LL2PushRow(_ll2RowForceBad, 0, "Force Bad/Money Love")) FinishLeg(false, "push failed"); break;
-                case 3: _ll2WishChoice = 0; _ll2SaveDone = false; Log("AUTOTEST llinteract leg D: saving lot"); break;
+                case 0: _ll2WishChoice = 0; _ll2PendingPush = true; break;
+                case 1: _ll2WishChoice = 0; _ll2PendingPush = true; break;
+                case 2: _ll2WishChoice = 1; _ll2PendingPush = true; break;
+                case 3: _ll2WishChoice = 0; _ll2PendingPush = false; _ll2SaveDone = false; Log("AUTOTEST llinteract leg D: saving lot"); break;
             }
         }
 
         private static void LL2Drive()
         {
             _ll2Frame++;
+
+            // content-level chain-progress signal: the Force row tree stamps
+            // attr[2] with the pair selector (4 = Money/Love, 3 = Earth/Air) and
+            // the chain tail resets it to 0 — used for completion below (the
+            // avatar's queue is NOT usable: ambient pushes like the 9:00 'At
+            // School' flow refill it forever — run-4 leg-1 pin).
+            if (_ll2Leg < 3 && _ll2Lamp != null)
+            {
+                var pair = (_ll2Leg == 2) ? 3 : 4;
+                if (_ll2Lamp.GetAttribute(2) == pair) _ll2SawChain = true;
+            }
 
             var genie = _vm.Context.ObjectQueries.Avatars.Any(a => a.Object?.OBJ?.GUID == 505322445u);
             if (genie && !_ll2SawGenie)
@@ -20002,7 +20072,14 @@ namespace Simitone.Client
                 Log("AUTOTEST llinteract genie NPC 505322445 appeared leg=" + _ll2Leg + " frame=" + _ll2Frame);
             }
 
-            // auto-respond the blocking dialog with the leg's chosen wish (R222 law)
+            // auto-respond the leg's dialog chain (R222 law), extended for the
+            // r157 queue law (run-2 pin): a TS1 dialog parks QUEUED as the
+            // interacting thread's BlockingState (HasDisplayed=false) while any
+            // other entity holds GlobalBlockingDialog — it never reaches the
+            // global slot, and after 1800 ticks it TIMES OUT taking the default
+            // ResponseCode 0 (= the yes branch). Respond the displayed global
+            // dialog first, then the avatar thread's queued dialog directly.
+            var responded = false;
             var dlgEnt = _vm.GlobalBlockingDialog;
             if (dlgEnt != null)
             {
@@ -20013,11 +20090,80 @@ namespace Simitone.Client
                     bs.ResponseCode = (byte)_ll2WishChoice;
                     bs.ResponseText = _ll2WishChoice.ToString();
                     _ll2Dialogs++;
-                    Log("AUTOTEST llinteract dialog#" + _ll2Dialogs + " responded (choice " + _ll2WishChoice + ") leg=" + _ll2Leg + " frame=" + _ll2Frame);
+                    responded = true;
+                    Log("AUTOTEST llinteract dialog#" + _ll2Dialogs + " responded-global (choice " + _ll2WishChoice + ") leg=" + _ll2Leg + " frame=" + _ll2Frame);
                     _vm.GlobalBlockingDialog = null;
                     if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
                     else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
                 }
+            }
+            if (!responded && _ll2Leg < 3 && !_ll2PendingPush)
+            {
+                var qbs = _ll2Av?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                if (qbs != null && !qbs.Responded)
+                {
+                    qbs.Responded = true;
+                    qbs.ResponseCode = (byte)_ll2WishChoice;
+                    qbs.ResponseText = _ll2WishChoice.ToString();
+                    _ll2Dialogs++;
+                    Log("AUTOTEST llinteract dialog#" + _ll2Dialogs + " responded-queued (choice " + _ll2WishChoice
+                        + " type=" + qbs.Type + " wait=" + qbs.WaitTime
+                        + ") leg=" + _ll2Leg + " frame=" + _ll2Frame
+                        + " hasDisplayed=" + qbs.HasDisplayed
+                        + " latchObj=" + (_vm.GlobalBlockingDialog?.ObjectID ?? -1));
+                }
+            }
+
+            // v4 deferred push: settle, clear the autonomous slot-0 genie puppet,
+            // then defeat the once-per-day guard and push. A live non-ghost genie
+            // in the lamp's slot 0 parks the rub tree at [21]/[22] (initiation
+            // decode); the ghost 0xC772A09E is the same puppet's first form.
+            if (_ll2PendingPush)
+            {
+                if (_vm.GlobalBlockingDialog != null) return; // never queue world edits under a latch
+                var puppet = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null
+                    && (e.Object.OBJ.GUID == 505322445u || e.Object.OBJ.GUID == 0xC772A09Eu));
+                if (puppet != null)
+                {
+                    if (_ll2GenieClearFrame == 0)
+                    {
+                        _ll2GenieClearFrame = _ll2Frame;
+                        Log("AUTOTEST llinteract clearing slot-0 genie puppet guid=0x" + puppet.Object.OBJ.GUID.ToString("X")
+                            + " obj=" + puppet.ObjectID + " leg=" + _ll2Leg + " frame=" + _ll2Frame);
+                        try { puppet.Delete(false, _vm.Context); }
+                        catch (Exception de) { Log("AUTOTEST llinteract genie clear EXC " + de.GetType().Name + " " + de.Message); }
+                    }
+                    else if (_ll2Frame - _ll2GenieClearFrame > 600)
+                    {
+                        FinishLeg(false, "genie puppet would not clear");
+                    }
+                    return;
+                }
+                if (_ll2Frame < 30) return;                    // in-leg settle before pushing
+                if (_ll2Av?.Thread?.Queue?.Count > 0) return;  // avatar queue drained first
+                if (_ll2Frame > 3600) { FinishLeg(false, "pre-push wait exceeded (queue/lantern busy)"); return; }
+                // prescription step 2: test #4098 refuses the rub while
+                // lamp.attr[5] == global[1] (once-per-day guard).
+                _ll2Lamp.SetAttribute(5, (short)(_vm.GetGlobalValue(1) - 1));
+                var row = (_ll2Leg == 2) ? _ll2RowBadAir : _ll2RowForceGood;
+                if (!LL2PushRow(row, 0, (_ll2Leg == 2) ? "Force Bad/Earth Air" : "Force Good/Money Love"))
+                    FinishLeg(false, "push failed");
+                else
+                {
+                    _ll2PendingPush = false;
+                    _ll2Frame = 0; // the leg's stall budget measures from the push,
+                                   // not from StartLeg (run-3 leg-2 pin: a long
+                                   // pre-push wait consumed the 7200 window)
+                    // diagnostic: lamp attribute ground truth right after the push
+                    // (attr[2] is written by the Force row tree before its rub gosub;
+                    // attr[5] is re-stamped by 'actual rub' [47] after routing).
+                    Log("AUTOTEST llinteract postPush leg=" + _ll2Leg
+                        + " lampAttr0=" + _ll2Lamp.GetAttribute(0) + " attr2=" + _ll2Lamp.GetAttribute(2)
+                        + " attr3=" + _ll2Lamp.GetAttribute(3) + " attr5=" + _ll2Lamp.GetAttribute(5)
+                        + " global1=" + _vm.GetGlobalValue(1)
+                        + " avQueue=" + (_ll2Av?.Thread?.Queue?.Count ?? -1));
+                }
+                return;
             }
 
             // leg D second half: after PlayHouse the runner re-captures its own _vm;
@@ -20058,42 +20204,115 @@ namespace Simitone.Client
             var queueClear = _ll2Av?.Thread?.Queue?.Count == 0
                 && (_ll2Av.Thread.ActiveAction == null || _ll2Av.Thread.ActiveAction.UID != _ll2ActionUID);
 
-            if (_ll2Frame == 300 || _ll2Frame == 900 || _ll2Frame == 1800 || _ll2Frame == 2700)
+            if (_ll2Frame == 300 || _ll2Frame == 900 || _ll2Frame == 1800 || _ll2Frame == 2700
+                || _ll2Frame == 3600 || _ll2Frame == 4500 || _ll2Frame == 5400 || _ll2Frame == 6300)
             {
                 Log("AUTOTEST llinteract leg=" + _ll2Leg + " frame=" + _ll2Frame + " queueClear=" + queueClear
                     + " dialogs=" + _ll2Dialogs + " geniePresent=" + genie
                     + " entitiesNow=" + _vm.Entities.Count + " (legStart " + _ll2EntitiesLegStart + ")"
                     + " budget=" + (_ll2Fam?.Budget ?? -1));
+                // diagnostic: rub-tree progress ground truth (attr[2] row selector,
+                // attr[3] wish code, attr[5] day stamp, attr[0] main state)
+                Log("AUTOTEST llinteract attrs leg=" + _ll2Leg + " frame=" + _ll2Frame
+                    + " attr0=" + _ll2Lamp.GetAttribute(0) + " attr2=" + _ll2Lamp.GetAttribute(2)
+                    + " attr3=" + _ll2Lamp.GetAttribute(3) + " attr5=" + _ll2Lamp.GetAttribute(5)
+                    + " latchObj=" + (_vm.GlobalBlockingDialog?.ObjectID ?? -1));
+                LL2LogStack("av", _ll2Av?.Thread?.Stack);
+                LL2LogStack("lamp", _ll2Lamp?.Thread?.Stack);
             }
 
-            // legs A-C complete when their dialog cycle (if any) is done and the
-            // pushed interaction left the queue
+            // diagnostic: first frame the queue drains after a push — dump tree state
+            if (_ll2Leg < 3 && queueClear && !_ll2LastQueueClear && _ll2Dialogs == _ll2LegDialogs)
+            {
+                Log("AUTOTEST llinteract queueDrainedNoDialog leg=" + _ll2Leg + " frame=" + _ll2Frame
+                    + " attr0=" + _ll2Lamp.GetAttribute(0) + " attr2=" + _ll2Lamp.GetAttribute(2)
+                    + " attr3=" + _ll2Lamp.GetAttribute(3) + " attr5=" + _ll2Lamp.GetAttribute(5)
+                    + " active=" + (_ll2Av?.Thread?.ActiveAction?.UID ?? -1));
+                LL2LogStack("drain-av", _ll2Av?.Thread?.Stack);
+            }
+            _ll2LastQueueClear = queueClear;
+
+            // legs A-C: the decoded chain is exactly TWO blocking dialogs (the
+            // wish yes/no + the outcome announcement); completion needs both plus
+            // a drained queue. A missing dialog stalls to an honest FAIL.
             var legDialogs = _ll2Dialogs - _ll2LegDialogs;
-            if (_ll2Leg < 3 && legDialogs > 0 && queueClear) EvaluateLeg();
-            else if (_ll2Leg == 2 && legDialogs == 0 && queueClear && _ll2Frame > 150) EvaluateLeg(); // Force rows may skip the dialog
-            else if (_ll2Frame >= 7200) FinishLeg(false, "leg stalled (queueClear=" + queueClear + " dialogs=" + legDialogs + ")");
+            // completion = content signals: both dialogs responded, the row tree
+            // stamped its pair selector (sawChain) and the chain tail has ADVANCED
+            // the selector off the pair value (run-5 pin: the tail ROTATES attr[2]
+            // — after the Earth/Air pair it becomes 4, never 0), and the pushed
+            // interaction is no longer the avatar's active action.
+            if (_ll2Leg < 3 && legDialogs >= 2 && _ll2SawChain
+                && _ll2Lamp.GetAttribute(2) != ((_ll2Leg == 2) ? 3 : 4)
+                && !genie
+                && (_ll2Av?.Thread?.ActiveAction?.UID ?? -1) != _ll2ActionUID)
+                EvaluateLeg();
+            else if (_ll2Frame >= 7200)
+            {
+                LL2DumpStallState("leg window expired");
+                FinishLeg(false, "leg stalled (queueClear=" + queueClear + " dialogs=" + legDialogs + ")");
+            }
+        }
+
+        private static int LL2CountGuids(uint[] guids)
+        {
+            return _vm.Entities.Count(e => e.Object?.OBJ != null && guids.Contains(e.Object.OBJ.GUID));
+        }
+
+        private static void LL2LogStack(string tag, System.Collections.Generic.List<VMStackFrame> stack)
+        {
+            if (stack == null || stack.Count == 0) { Log("AUTOTEST llinteract stack " + tag + ": <empty>"); return; }
+            var parts = new System.Collections.Generic.List<string>();
+            foreach (var fr in stack)
+                parts.Add("#" + (fr.Routine?.ID ?? 0) + "@" + fr.InstructionPointer);
+            Log("AUTOTEST llinteract stack " + tag + ": " + string.Join(" <- ", parts));
+        }
+
+        private static void LL2DumpStallState(string why)
+        {
+            try
+            {
+                Log("AUTOTEST llinteract STALL-DUMP (" + why + ") leg=" + _ll2Leg + " frame=" + _ll2Frame
+                    + " attr0=" + _ll2Lamp.GetAttribute(0) + " attr2=" + _ll2Lamp.GetAttribute(2)
+                    + " attr3=" + _ll2Lamp.GetAttribute(3) + " attr5=" + _ll2Lamp.GetAttribute(5)
+                    + " latchObj=" + (_vm.GlobalBlockingDialog?.ObjectID ?? -1)
+                    + " speed=" + _vm.SpeedMultiplier
+                    + " goodDelta=" + (LL2CountGuids(LL2GoodSummonGuids) - _ll2GoodLegStart)
+                    + " roachDelta=" + (LL2CountGuids(new[] { 0x4415A98Eu }) - _ll2RoachLegStart));
+                LL2LogStack("stall-av", _ll2Av?.Thread?.Stack);
+                var bs = _ll2Av?.Thread?.BlockingState;
+                Log("AUTOTEST llinteract stall-av BlockingState=" + (bs == null ? "<null>" : bs.GetType().Name)
+                    + (bs is FSO.SimAntics.Primitives.VMDialogResult qd
+                        ? " dialogType=" + qd.Type + " responded=" + qd.Responded + " hasDisplayed=" + qd.HasDisplayed + " wait=" + qd.WaitTime
+                        : ""));
+                var aa = _ll2Av?.Thread?.ActiveAction;
+                Log("AUTOTEST llinteract stall-av ActiveAction=" + (aa == null ? "<null>" : "uid=" + aa.UID + " '" + aa.Name + "'")
+                    + " queue=[" + string.Join(",", (_ll2Av?.Thread?.Queue ?? new System.Collections.Generic.List<VMQueuedAction>()).Select(q => q.UID + "'" + q.Name + "'")) + "]");
+                LL2LogStack("stall-lamp", _ll2Lamp?.Thread?.Stack);
+            }
+            catch (Exception se) { Log("AUTOTEST llinteract STALL-DUMP EXC " + se.GetType().Name + " " + se.Message); }
         }
 
         private static void EvaluateLeg()
         {
-            var budgetDelta = (_ll2Fam?.Budget ?? _ll2BudgetLegStart) - _ll2BudgetLegStart;
+            var goodDelta = LL2CountGuids(LL2GoodSummonGuids) - _ll2GoodLegStart;
+            var roachDelta = LL2CountGuids(new[] { 0x4415A98Eu }) - _ll2RoachLegStart;
             var entitiesDelta = _vm.Entities.Count - _ll2EntitiesLegStart;
+            var legDialogs = _ll2Dialogs - _ll2LegDialogs;
             switch (_ll2Leg)
             {
-                case 0: // A: Clean -> Money — genie row + budget row
-                    FinishLeg(_ll2SawGenie && budgetDelta > 0,
-                        "genie=" + _ll2SawGenie + " budgetDelta=" + budgetDelta);
+                case 0: // A: Force Good/Money Love → yes → wish dialog + 'POT OF GOLD'
+                        // → 'good money' #4133 random summon (GUID-scoped delta)
+                    FinishLeg(legDialogs == 2 && goodDelta > 0,
+                        "dialogs=" + legDialogs + " goodSummonDelta=" + goodDelta + " entitiesDelta=" + entitiesDelta);
                     break;
-                case 1: // B: repeat Clean -> Fire — a second dialog cycle of its own
-                    FinishLeg((_ll2Dialogs - _ll2LegDialogs) > 0,
-                        "dialogCycle=" + (_ll2Dialogs - _ll2LegDialogs) + " genie=" + _ll2SawGenie + " entitiesDelta=" + entitiesDelta);
+                case 1: // B: repeat use — the full chain again on the live slot
+                    FinishLeg(legDialogs == 2 && goodDelta > 0,
+                        "dialogs=" + legDialogs + " goodSummonDelta=" + goodDelta + " entitiesDelta=" + entitiesDelta);
                     break;
-                case 2: // C: Force Bad — the negatives row: the interaction completes
-                    // cleanly (observation only: budgetDelta/entitiesDelta are logged
-                    // but ambient NPC churn makes them non-probative — review note
-                    // 2026-09-16; the semantic bad-outcome row stays with the
-                    // wish-dialog follow-up)
-                    FinishLeg(true, "row executed; budgetDelta=" + budgetDelta + " entitiesDelta=" + entitiesDelta + " (observation)");
+                case 2: // C: Force Bad/Earth Air → no ('Air') → announcement →
+                        // exactly Tuning[12]=9 roach controllers 0x4415A98E
+                    FinishLeg(legDialogs == 2 && roachDelta == 9,
+                        "dialogs=" + legDialogs + " roachDelta=" + roachDelta + " (expected 9) entitiesDelta=" + entitiesDelta);
                     break;
             }
         }
