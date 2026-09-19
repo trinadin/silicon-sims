@@ -761,7 +761,8 @@ namespace Simitone.Client
                 || CheckEnabled("deathtrace") || CheckEnabled("ghosttrace")
                 || CheckEnabled("freewillwin") || CheckEnabled("moodlaw")
                 || CheckEnabled("cc02e2e")
-                || CheckEnabled("llinteract"))
+                || CheckEnabled("llinteract")
+                || CheckEnabled("llfire"))
             {
                 // (R249) focused-gate dispatch: freewill/freewillvar live inside RunCorpus
                 // (corpus-gated). When a focused opts string names them WITHOUT corpus,
@@ -1529,6 +1530,7 @@ namespace Simitone.Client
             // attribution on community/downtown lots.
             if (CheckEnabled("nbrcommerce")) CheckNbrCommerce();
             if (CheckEnabled("llinteract")) CheckLLInteract();
+            if (CheckEnabled("llfire")) CheckLLFire();
 
             // UICHROME (Round 85): IFF-LITERAL original live-toolbar chrome mount - the 5 category
             // buttons (Mood/Job/Personality/Relationship/people) + the Greenbars/Redbars motive fills
@@ -2089,6 +2091,12 @@ namespace Simitone.Client
             {
                 CheckLLInteract();
             }
+            // (EXP-01 llfire) per-frame drive of the fire/rocket census legs; the
+            // run stays open until the four legs verdict.
+            if (CheckEnabled("llfire") && _ll3State != 2)
+            {
+                CheckLLFire();
+            }
             var minute = _vm.Context.Clock.Minutes;
             if (_motiveStartMinute < 0) _motiveStartMinute = minute;
 
@@ -2494,6 +2502,8 @@ namespace Simitone.Client
                 return; // (CC-02 e2e) chain still driving per-frame; battery finishes after its verdict
             if (CheckEnabled("llinteract") && _ll2State != 2)
                 return; // (EXP-01 llinteract v3) wish-chain legs still driving; battery finishes after the verdict
+            if (CheckEnabled("llfire") && _ll3State != 2)
+                return; // (EXP-01 llfire) fire/rocket legs still driving; battery finishes after the verdict
             if (CheckEnabled("carseek") || CheckEnabled("carreturn") || CheckEnabled("schoolreturn")
                 || CheckEnabled("schoolmiss")
                 || CheckEnabled("chancetrace") || CheckEnabled("carskip")
@@ -20334,6 +20344,561 @@ namespace Simitone.Client
             if (_ll2LegOk.All(x => x)) Pass("llinteract");
             else Fail("llinteract");
             _ll2State = 2;
+        }
+
+        // EXP-01 llfire (opt-in "llfire"): the FIRE + ROCKET census rows,
+        // content-derived from fire-loop-decode-20260916.md and
+        // rocket-loop-decode-20260916.md. The rocket is the deterministic entry:
+        // Launch (TTAB 129 row 'Launch', user path always passes) spawns the
+        // Down/Explosion twin 0xDE9C3FEA while the standing rocket 0x405046FF
+        // stays; its explosion phase attempts a burn EVERY cycle while the
+        // launcher is INSIDE (outdoors ~3% rolls), and 'burn something' #4107
+        // drops a bare Fire even with no flammable candidate indoors. Legs:
+        //   R  launch -> twin seen -> Fire 0x24C95F99 entities on the lot (+ a
+        //      Burns-flagged host gaining VMEntityFlags.Burning when present).
+        //   P  ecosystem while burning: a room sim carries a queued 'Fire!'
+        //      panic interaction AND BuildBuyEnabled == false (generic TS1 call
+        //      10, set by Fire set-up #4100 each cycle).
+        //   A  burn-out: room-burn attr[0] > Tuning[135]=75 -> destroy #4105
+        //      leaves Ash 0x63416BA1. Household extinguish autonomy is cancelled
+        //      for this leg (disclosed guard) so the burn can outrun the sims;
+        //      the NPC firefighter can still win the race -> honest FAIL.
+        //   E  extinguish chain: fresh ignition (second rocket), push the Fire's
+        //      own Extinguish row on the adult -> flame attr[2] drains, fires
+        //      reach 0, Burning hosts clear, BuildBuyEnabled returns true
+        //      (generic 11 on the douse path).
+        // Verdict: explicit llfire PASS only when every leg's assertions hold.
+
+        private static int _ll3State;      // 0 init, 1 drive, 2 done
+        private static int _ll3Leg;        // 0=R 1=P 2=A 3=E
+        private static int _ll3Frame;
+        private static int _ll3Settle;
+        private static VMAvatar _ll3Av;
+        private static VMEntity _ll3Rocket;
+        private static int _ll3RowLaunch = -1;
+        private static int _ll3RowExtinguish = -1;
+        private static bool[] _ll3LegOk = new bool[4];
+        private static bool _ll3SawTwin, _ll3SawFire, _ll3SawBurning, _ll3SawPanic,
+            _ll3SawBuildLock, _ll3SawUnlock, _ll3Ash;
+        private static bool _ll3Guard;     // cancel extinguish autonomy (leg A)
+        private static int _ll3GuardCancels;
+        private static uint _ll3ActionUID;
+        private static bool _ll3PendingPush;
+        private static bool _ll3LaunchedThisLeg;
+        private static int _ll3LaunchTries;      // run-8: outdoor landings are native variance — bounded disclosed retries
+        private static bool _ll3EDrainSeen;      // run-8: extinguish completion = drain + unlock (not total drain)
+        private static int _ll3EMaxFires;        // run-10: any decrease from peak = a douse (spread can outpace the sim)
+        private static int _ll3FiresLegStart;
+        private static VMEntity _ll3Anchor; // enclosed Burns-flagged furniture (launch anchor)
+        private static readonly System.Collections.Generic.List<VMEntity> _ll3Anchors =
+            new System.Collections.Generic.List<VMEntity>(); // all enclosed Burns candidates (run-5 law: one anchor's rings can all be blocked)
+        private static int _ll3TwinDiagTick;   // run-3 diagnostics: twin telemetry
+        private static int _ll3TwinLastData0 = -1;
+        private static FSO.LotView.Model.LotTilePos _ll3TwinLastPos;
+
+        // run-1..4 law: the burn gate keys on the launcher's room — an outdoor
+        // launch only gets ~3% rolls and NO fallback fire. ROOM IDS: 1 = the
+        // OUTSIDE room (RoomData[1].IsOutside; the map inits to 1); enclosed
+        // rooms are 2+. GetRoomAt returns 0 only for out-of-bounds tiles, so
+        // the enclosed test is room >= 2. Runs 1-4 all launched OUTDOORS (the
+        // run-4 telemetry: countdown base 0 = the outside branch, storedRoom 0
+        // = room id 1) and the no-ignition outcome was native-correct.
+        private static bool LL3Enclosed(FSO.LotView.Model.LotTilePos pos)
+        {
+            return _vm.Context.GetRoomAt(pos) >= 2;
+        }
+
+        private static bool LL3Burns(VMEntity e)
+        {
+            // same read as VMBurn.cs: FlagField2 & VMEntityFlags2.Burns
+            return (((FSO.SimAntics.VMEntityFlags2)e.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.FlagField2))
+                & FSO.SimAntics.VMEntityFlags2.Burns) > 0;
+        }
+
+        private static int LL3CountGuid(uint guid)
+        {
+            return _vm.Entities.Count(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == guid);
+        }
+
+        private static VMEntity LL3FirstGuid(uint guid)
+        {
+            return _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == guid);
+        }
+
+        private static int LL3FireCount() { return LL3CountGuid(0x24C95F99u); }
+
+        private static bool LL3AnyBurningHost()
+        {
+            // a Burns-flagged object currently carrying the Burning flag (data[8] bit 9)
+            return _vm.Entities.Any(e => e.Object?.OBJ != null
+                && e.Object.OBJ.GUID != 0x24C95F99u
+                && e.GetFlag(FSO.SimAntics.VMEntityFlags.Burning));
+        }
+
+        private static bool LL3PanicQueued()
+        {
+            foreach (var av in _vm.Context.ObjectQueries.Avatars)
+            {
+                var q = av.Thread?.Queue;
+                if (q != null)
+                {
+                    foreach (var item in q)
+                        if ((item.Name ?? "").IndexOf("Fire", System.StringComparison.OrdinalIgnoreCase) >= 0) return true;
+                }
+                var act = av.Thread?.ActiveAction;
+                if (act != null && (act.Name ?? "").IndexOf("Fire", System.StringComparison.OrdinalIgnoreCase) >= 0) return true;
+            }
+            return false;
+        }
+
+        private static void LL3AutonomyGuard()
+        {
+            // leg A guard: cancel every avatar's 'Extinguish' actions (household
+            // autonomy + any on-lot NPC) so the burn-out can win the race.
+            // Disclosed diagnostic, leg-scoped.
+            foreach (var av in _vm.Context.ObjectQueries.Avatars)
+            {
+                var th = av.Thread;
+                if (th == null) continue;
+                for (int i = th.Queue.Count - 1; i >= 0; i--)
+                {
+                    if ((th.Queue[i].Name ?? "").IndexOf("Extinguish", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        var uid = th.Queue[i].UID;
+                        th.Queue.RemoveAt(i);
+                        _ll3GuardCancels++;
+                        Log("AUTOTEST llfire autonomy-guard: cancelled 'Extinguish' uid=" + uid
+                            + " on obj=" + av.ObjectID + " leg=" + _ll3Leg + " frame=" + _ll3Frame + " (disclosed)");
+                    }
+                }
+                var act = th.ActiveAction;
+                if (act != null && (act.Name ?? "").IndexOf("Extinguish", System.StringComparison.OrdinalIgnoreCase) >= 0
+                    && act.UID != _ll3ActionUID)
+                {
+                    // leave the active one to the tree's own exit — cancelling the
+                    // ACTIVE action mid-tree is not supported from outside; log it.
+                    Log("AUTOTEST llfire autonomy-guard: active 'Extinguish' uid=" + act.UID
+                        + " on obj=" + av.ObjectID + " still running (cannot cancel active; disclosed)");
+                }
+            }
+        }
+
+        private static void CheckLLFire()
+        {
+            try
+            {
+                switch (_ll3State)
+                {
+                    case 0: LL3Init(); break;
+                    case 1: LL3Drive(); break;
+                    case 2: return; // verdict recorded
+                }
+            }
+            catch (Exception le)
+            {
+                Log("AUTOTEST llfire EXC state=" + _ll3State + " leg=" + _ll3Leg + " frame=" + _ll3Frame + " "
+                    + le.GetType().Name + " " + le.Message + " AT " + (le.StackTrace ?? "").Replace("\n", " | "));
+                Fail("llfire");
+                _ll3State = 2;
+            }
+        }
+
+        private static bool LL3PlaceRocket()
+        {
+            // run-1 law: launch from an ENCLOSED tile beside flammable furniture.
+            // Ring around the anchor (enclosed Burns-flagged object) when present,
+            // else the avatar. Every candidate tile must itself be enclosed.
+            var anchorList = _ll3Anchors.Count > 0 ? _ll3Anchors : new System.Collections.Generic.List<VMEntity> { _ll3Av };
+            foreach (var anchorEnt in anchorList)
+            for (int ring = 1; ring <= 3; ring++)
+            {
+                var basePos = anchorEnt.Position;
+                // run-6 law: LotTilePos.TileX/TileY are TILE units (the setter does
+                // x = value << 4) — the earlier 16*ring offsets were 16-48 TILES out
+                // (every launch landed outdoors; runs 5-6's enclosed filter then
+                // rejected every candidate). Ring offsets are ±ring TILES.
+                var candidates = new[]
+                {
+                    new { dx = (short)(ring), dy = (short)0 },
+                    new { dx = (short)(-ring), dy = (short)0 },
+                    new { dx = (short)0, dy = (short)(ring) },
+                    new { dx = (short)0, dy = (short)(-ring) },
+                    new { dx = (short)(ring), dy = (short)(ring) },
+                    new { dx = (short)(-ring), dy = (short)(-ring) },
+                };
+                foreach (var cand in candidates)
+                {
+                    var pos = basePos;
+                    pos.TileX += cand.dx;
+                    pos.TileY += cand.dy;
+                    if (!LL3Enclosed(pos)) continue;
+                    try
+                    {
+                        var grp = _vm.Context.CreateObjectInstance(0x405046FFu, pos, FSO.LotView.Model.Direction.NORTH);
+                        if (grp != null && grp.BaseObject != null && grp.BaseObject.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)
+                        {
+                            _ll3Rocket = grp.BaseObject;
+                            return true;
+                        }
+                    }
+                    catch (Exception ce) { Log("AUTOTEST llfire rocket ring=" + ring + " EXC " + ce.GetType().Name + " " + ce.Message); }
+                }
+            }
+            return false;
+        }
+
+        private static bool LL3PushLaunch()
+        {
+            var action = _ll3Rocket.GetAction(_ll3RowLaunch, _ll3Av, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+            if (action == null) { Log("AUTOTEST llfire: GetAction null for Launch row=" + _ll3RowLaunch); return false; }
+            action.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+            action.CheckRoutine = null; // same harness law as llinteract v4: CheckTS1Action
+                                        // runs the TTAB check at queue front regardless of
+                                        // FSOSkipPermissions; the user path (param0=0) passes
+                                        // the autonomy test natively, but the debug-row
+                                        // drop mechanism is defeated uniformly here.
+            _ll3Av.Thread.EnqueueAction(action);
+            _ll3ActionUID = action.UID;
+            Log("AUTOTEST llfire pushed Launch row=" + _ll3RowLaunch + " uid=" + action.UID + " rocket=" + _ll3Rocket.ObjectID);
+            return true;
+        }
+
+        private static bool LL3PushExtinguish(VMEntity fire)
+        {
+            var action = fire.GetAction(_ll3RowExtinguish, _ll3Av, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+            if (action == null) { Log("AUTOTEST llfire: GetAction null for Extinguish row=" + _ll3RowExtinguish); return false; }
+            action.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+            action.CheckRoutine = null;
+            _ll3Av.Thread.EnqueueAction(action);
+            _ll3ActionUID = action.UID;
+            Log("AUTOTEST llfire pushed Extinguish row=" + _ll3RowExtinguish + " uid=" + action.UID + " fire=" + fire.ObjectID
+                + " flame attr2=" + fire.GetAttribute(2));
+            return true;
+        }
+
+        private static void LL3Init()
+        {
+            // same latch discipline as llinteract v4: no placement/push inside the
+            // boot-dialog latch window; let the lot settle first.
+            if (_vm?.GlobalBlockingDialog != null) return;
+            if (++_ll3Settle < 90) return;
+
+            var avatars = _vm?.Context?.ObjectQueries?.Avatars?.OfType<VMAvatar>()
+                .Where(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD).ToList();
+            if (avatars == null || avatars.Count == 0) { Log("AUTOTEST llfire: no in-world avatar"); Fail("llfire"); _ll3State = 2; return; }
+            _ll3Av = avatars.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? avatars[0];
+            Log("AUTOTEST llfire avatar obj=" + _ll3Av.ObjectID + " age=" + _ll3Av.GetPersonData(VMPersonDataVariable.PersonsAge)
+                + " at " + _ll3Av.Position + " room=" + _vm.Context.GetRoomAt(_ll3Av.Position) + (LL3Enclosed(_ll3Av.Position) ? " (enclosed)" : " (OUTSIDE)"));
+
+            // anchor: the first ENCLOSED Burns-flagged object (indoor furniture) —
+            // the launch happens beside it, so the crash cone is full of
+            // flammables and the launcher's room is enclosed.
+            foreach (var e in _vm.Entities)
+            {
+                if (e.Object?.OBJ == null || e is VMAvatar) continue;
+                if (e.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD) continue;
+                var g = e.Object.OBJ.GUID;
+                if (g == 0x24C95F99u || g == 0x405046FFu || g == 0xDE9C3FEAu) continue;
+                if (!LL3Burns(e)) continue;
+                if (_vm.Context.GetRoomAt(e.Position) < 2) continue; // 1 = outside room
+                _ll3Anchors.Add(e);
+            }
+            _ll3Anchor = _ll3Anchors.Count > 0 ? _ll3Anchors[0] : null;
+            Log(_ll3Anchors.Count > 0
+                ? "AUTOTEST llfire anchors=" + _ll3Anchors.Count + " first obj=" + _ll3Anchors[0].ObjectID
+                    + " guid=0x" + _ll3Anchors[0].Object.OBJ.GUID.ToString("X")
+                    + " '" + (_ll3Anchors[0].Object.OBJ.ChunkLabel ?? "?") + "' at " + _ll3Anchors[0].Position
+                    + " room=" + _vm.Context.GetRoomAt(_ll3Anchors[0].Position)
+                : "AUTOTEST llfire: no enclosed Burns-flagged anchor found (fallback: avatar ring)");
+
+            if (!LL3PlaceRocket() || _ll3Rocket == null)
+            { Log("AUTOTEST llfire: rocket placement failed"); Fail("llfire"); _ll3State = 2; return; }
+
+            // resolve the Launch row from the rocket's own IFF (TTAs 129 labels
+            // line up with TTAB 129 row indices)
+            var rokIff = _ll3Rocket.Object?.Resource?.Iff;
+            var rokas = rokIff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+            var roktab = rokIff?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+            if (rokas == null || roktab == null) { Log("AUTOTEST llfire: rocket TTAs/TTAB 129 not found"); Fail("llfire"); _ll3State = 2; return; }
+            for (int i = 0; i < rokas.Length && i < roktab.Interactions.Length; i++)
+                if (_ll3RowLaunch < 0 && (rokas.GetString(i) ?? "").Trim() == "Launch") _ll3RowLaunch = i;
+            if (_ll3RowLaunch < 0)
+            { Log("AUTOTEST llfire: Launch row not resolved"); Fail("llfire"); _ll3State = 2; return; }
+            Log("AUTOTEST llfire rocketSpawned obj=" + _ll3Rocket.ObjectID + " at " + _ll3Rocket.Position
+                + " LaunchRow=" + _ll3RowLaunch + " prePushFires=" + LL3FireCount());
+
+            _ll3Leg = 0; _ll3Frame = 0; _ll3PendingPush = true;
+            for (int i = 0; i < _ll3LegOk.Length; i++) _ll3LegOk[i] = false;
+            _ll3State = 1;
+        }
+
+        private static void LL3StartLeg(int leg)
+        {
+            _ll3Leg = leg;
+            _ll3Frame = 0;
+            _ll3PendingPush = false;
+            _ll3LaunchedThisLeg = false;
+            _ll3LaunchTries = 0;
+            _ll3EDrainSeen = false;
+            _ll3EMaxFires = 0;
+            switch (leg)
+            {
+                case 0: _ll3PendingPush = true; break; // R: launch after settle
+                case 1: break;                          // P: observe panic + build lock
+                case 2: _ll3Guard = true; _ll3GuardCancels = 0; break; // A: burn-out under guard
+                case 3: _ll3Guard = false; _ll3PendingPush = true; break; // E: fresh ignition + extinguish
+            }
+            Log("AUTOTEST llfire leg " + leg + " start fires=" + LL3FireCount()
+                + " buildBuy=" + (_vm.Context.Architecture.BuildBuyEnabled));
+        }
+
+        private static void LL3Drive()
+        {
+            _ll3Frame++;
+
+            // content signals, sampled every frame
+            if (!_ll3SawTwin && LL3CountGuid(0xDE9C3FEAu) > 0)
+            {
+                _ll3SawTwin = true;
+                Log("AUTOTEST llfire twin 0xDE9C3FEA appeared leg=" + _ll3Leg + " frame=" + _ll3Frame);
+            }
+            if (!_ll3SawFire && LL3FireCount() > 0)
+            {
+                _ll3SawFire = true;
+                Log("AUTOTEST llfire first Fire entity leg=" + _ll3Leg + " frame=" + _ll3Frame);
+            }
+            if (!_ll3SawBurning && LL3AnyBurningHost())
+            {
+                _ll3SawBurning = true;
+                Log("AUTOTEST llfire Burning host appeared leg=" + _ll3Leg + " frame=" + _ll3Frame);
+            }
+            if (!_ll3SawPanic && LL3PanicQueued())
+            {
+                _ll3SawPanic = true;
+                Log("AUTOTEST llfire panic queued leg=" + _ll3Leg + " frame=" + _ll3Frame);
+            }
+            if (!_ll3SawBuildLock && !_vm.Context.Architecture.BuildBuyEnabled)
+            {
+                _ll3SawBuildLock = true;
+                Log("AUTOTEST llfire BuildBuyEnabled=false (generic 10) leg=" + _ll3Leg + " frame=" + _ll3Frame);
+            }
+            if (!_ll3SawUnlock && _ll3SawBuildLock && _vm.Context.Architecture.BuildBuyEnabled)
+            {
+                _ll3SawUnlock = true;
+                Log("AUTOTEST llfire BuildBuyEnabled back true (generic 11) leg=" + _ll3Leg + " frame=" + _ll3Frame);
+            }
+            if (!_ll3Ash && LL3CountGuid(0x63416BA1u) > 0)
+            {
+                _ll3Ash = true;
+                Log("AUTOTEST llfire Ash 0x63416BA1 appeared leg=" + _ll3Leg + " frame=" + _ll3Frame);
+            }
+
+            if (_ll3Guard) LL3AutonomyGuard();
+
+            // run-3 diagnostics: while a twin is alive, dump its countdown (data[0],
+            // explosion phase at 12..20), its resolved position (OOW = placement
+            // failed), the launcher's room (rocket data[11]) and the burn-candidate
+            // cone population near the twin.
+            var twinEnt = LL3FirstGuid(0xDE9C3FEAu);
+            if (twinEnt != null && (_ll3Leg == 0 || _ll3Leg == 3))
+            {
+                if (++_ll3TwinDiagTick % 30 == 0 || twinEnt.Position != _ll3TwinLastPos)
+                {
+                    var d0 = twinEnt.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.Graphic);
+                    _ll3TwinLastData0 = d0;
+                    _ll3TwinLastPos = twinEnt.Position;
+                    int launcherId = _ll3Rocket?.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.ObjectId) ?? -1;
+                    var launcher = _vm.GetObjectById((short)launcherId);
+                    int candNear = 0;
+                    foreach (var e2 in _vm.Entities)
+                    {
+                        if (e2.Object?.OBJ == null || e2 is VMAvatar) continue;
+                        if (e2.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                            || twinEnt.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD) continue;
+                        var dx = e2.Position.TileX - twinEnt.Position.TileX;
+                        var dy = e2.Position.TileY - twinEnt.Position.TileY;
+                        if (dx * dx + dy * dy > (16 * 5) * (16 * 5)) continue;
+                        if (LL3Burns(e2)) candNear++;
+                    }
+                    Log("AUTOTEST llfire twinDiag leg=" + _ll3Leg + " frame=" + _ll3Frame
+                        + " data0=" + d0 + " pos=" + twinEnt.Position
+                        + " room=" + _vm.Context.GetRoomAt(twinEnt.Position)
+                        + " storedRoom=" + twinEnt.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.Room)
+                        + " twinData11=" + twinEnt.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.ObjectId)
+                        + " twinId=" + twinEnt.ObjectID
+                        + " launcher=" + launcherId + (launcher != null ? (" room=" + _vm.Context.GetRoomAt(launcher.Position)
+                            + " pos=" + launcher.Position) : " <missing>")
+                        + " burnCandNear=" + candNear);
+                }
+            }
+
+            // heartbeat
+            if (_ll3Frame == 300 || _ll3Frame == 900 || _ll3Frame == 1800 || _ll3Frame == 2700
+                || _ll3Frame == 3600 || _ll3Frame == 4500 || _ll3Frame == 5400 || _ll3Frame == 6300)
+            {
+                Log("AUTOTEST llfire leg=" + _ll3Leg + " frame=" + _ll3Frame + " fires=" + LL3FireCount()
+                    + " twin=" + LL3CountGuid(0xDE9C3FEAu) + " ash=" + LL3CountGuid(0x63416BA1u)
+                    + " burningHost=" + LL3AnyBurningHost() + " panic=" + LL3PanicQueued()
+                    + " buildBuy=" + _vm.Context.Architecture.BuildBuyEnabled
+                    + " guardCancels=" + _ll3GuardCancels
+                    + " avQueue=" + (_ll3Av?.Thread?.Queue?.Count ?? -1));
+            }
+
+            // defensive: answer any blocking dialog with the first choice (R222 law)
+            var dlgEnt = _vm.GlobalBlockingDialog;
+            if (dlgEnt != null)
+            {
+                var bs = _ll3Av?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                var gbs = dlgEnt.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult
+                    ?? bs;
+                if (gbs != null && !gbs.Responded)
+                {
+                    gbs.Responded = true;
+                    gbs.ResponseCode = 0;
+                    gbs.ResponseText = "0";
+                    _vm.GlobalBlockingDialog = null;
+                    if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
+                    else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+                    Log("AUTOTEST llfire dialog auto-responded leg=" + _ll3Leg + " frame=" + _ll3Frame + " (defensive)");
+                }
+            }
+
+            // deferred pushes: settle, then launch / extinguish
+            if (_ll3PendingPush)
+            {
+                if (_vm.GlobalBlockingDialog != null) return;
+                if (_ll3Frame < 30) return;
+                if (_ll3Leg == 0)
+                {
+                    // run-14 law: the avatar's queue can carry an ambient entry at
+                    // settle (autonomy) — the queue is not a usable gate (the
+                    // llinteract run-4 law); push after the settle window directly.
+                    if (_ll3Frame > 3600) { LL3FinishLeg(false, "pre-push wait exceeded"); return; }
+                    if (!LL3PushLaunch()) { LL3FinishLeg(false, "push failed"); return; }
+                    _ll3PendingPush = false;
+                    _ll3Frame = 0; // stall budget measures from the push
+                }
+                else if (_ll3Leg == 3)
+                {
+                    // run-12 law: with leg A's leftover fires STILL burning, the
+                    // extinguish chain is exercisable directly (run 11 passed amid
+                    // a 20-fire inferno: douse-from-peak + unlock) — no re-ignition
+                    // needed. Re-ignite ONLY when nothing burns (fires can outpace
+                    // the drain-wait; burning tiles also block placement).
+                    if (!_ll3LaunchedThisLeg && LL3FireCount() == 0)
+                    {
+                        if (!LL3PlaceRocket())
+                        { LL3FinishLeg(false, "re-ignition rocket placement failed"); return; }
+                    }
+                    if (!_ll3LaunchedThisLeg) // not launched yet this leg
+                    {
+                        // run-13 law: a burning lot keeps the sim's queue forever
+                        // full (panic 'Fire!' re-propagation 4115@26) — the same
+                        // trap llinteract run-4 pinned; push WITHOUT a queue wait.
+                        if (_ll3Frame > 3600) { LL3FinishLeg(false, "re-launch wait exceeded"); return; }
+                        if (!LL3PushLaunch()) { LL3FinishLeg(false, "re-launch push failed"); return; }
+                        _ll3LaunchedThisLeg = true;
+                        _ll3Frame = 0;
+                        return;
+                    }
+                    if (LL3FireCount() == 0)
+                    {
+                        if (_ll3Frame > 7200) { LL3FinishLeg(false, "re-ignition did not produce a fire"); return; }
+                        return; // wait for ignition
+                    }
+                    // resolve the Extinguish row from a live fire's own IFF
+                    var fire = LL3FirstGuid(0x24C95F99u);
+                    var firIff = fire.Object?.Resource?.Iff;
+                    var fias = firIff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                    var fitab = firIff?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                    if (_ll3RowExtinguish < 0)
+                    {
+                        if (fias == null || fitab == null) { LL3FinishLeg(false, "fire TTAs/TTAB 129 not found"); return; }
+                        for (int i = 0; i < fias.Length && i < fitab.Interactions.Length; i++)
+                            if (_ll3RowExtinguish < 0 && (fias.GetString(i) ?? "").Trim() == "Extinguish") _ll3RowExtinguish = i;
+                        if (_ll3RowExtinguish < 0) { LL3FinishLeg(false, "Extinguish row not resolved"); return; }
+                    }
+                    if (!LL3PushExtinguish(fire)) { LL3FinishLeg(false, "extinguish push failed"); return; } // run-13: no queue wait (panic fills it)
+                    _ll3PendingPush = false;
+                    _ll3FiresLegStart = LL3FireCount();
+                    _ll3Frame = 0;
+                }
+                return;
+            }
+
+            // leg completion laws (content signals; a missing signal stalls to an
+            // honest FAIL at the budget)
+            switch (_ll3Leg)
+            {
+                case 0: // R: twin + ignition. The Burning host is OR by law: the
+                    // no-candidate indoor path drops a BARE fire (#4107 fallback),
+                    // so a missing Burning host is logged, not failed.
+                    // The twin's landing is content-chosen (#4106): an outdoor
+                    // landing is NATIVE variance (3% rolls, no fallback fire) and a
+                    // twin can park alive — a no-fire stall retries the launch
+                    // (<= 2, disclosed) instead of failing.
+                    if (_ll3SawTwin && _ll3SawFire)
+                        LL3FinishLeg(true,
+                            "twin=" + _ll3SawTwin + " fires=" + LL3FireCount() + " burningHost=" + _ll3SawBurning
+                            + " tries=" + (_ll3LaunchTries + 1));
+                    else if (_ll3SawTwin && LL3FireCount() == 0 && _ll3Frame >= 3000 && _ll3LaunchTries < 2)
+                    {
+                        _ll3LaunchTries++;
+                        Log("AUTOTEST llfire leg=0 no ignition (twinAlive=" + (LL3CountGuid(0xDE9C3FEAu) > 0)
+                            + ") — disclosed retry #" + _ll3LaunchTries);
+                        _ll3SawTwin = false;
+                        _ll3PendingPush = true;
+                        _ll3Frame = 0;
+                    }
+                    else if (_ll3Frame >= 7200) LL3FinishLeg(false, "ignition stalled (twin=" + _ll3SawTwin + " fires=" + LL3FireCount()
+                        + " tries=" + (_ll3LaunchTries + 1) + ")");
+                    break;
+                case 1: // P: panic + build lock
+                    if (_ll3SawPanic && _ll3SawBuildLock)
+                        LL3FinishLeg(true, "panic=" + _ll3SawPanic + " buildLock=" + _ll3SawBuildLock + " fires=" + LL3FireCount());
+                    else if (_ll3Frame >= 3600)
+                        LL3FinishLeg(false, "ecosystem stalled (panic=" + _ll3SawPanic + " buildLock=" + _ll3SawBuildLock + ")");
+                    break;
+                case 2: // A: burn-out -> Ash
+                    if (_ll3Ash)
+                        LL3FinishLeg(true, "ash=1 guardCancels=" + _ll3GuardCancels + " fires=" + LL3FireCount());
+                    else if (_ll3Frame >= 7200)
+                        LL3FinishLeg(false, "burn-out stalled (ash=0 fires=" + LL3FireCount() + " guardCancels=" + _ll3GuardCancels + ")");
+                    break;
+                case 3: // E: extinguish chain. run-8 law: spread (1-in-8 per
+                    // eligible tick once room-burn > 45) can outpace one sim —
+                    // completion is the CHAIN semantics: the fire count drained
+                    // below its push-time level AND the douse path unlocked
+                    // build mode (generic 11), not a total drain.
+                    var fires = LL3FireCount();
+                    if (fires > _ll3EMaxFires) _ll3EMaxFires = fires;
+                    if (_ll3EMaxFires > 0 && fires < _ll3EMaxFires) _ll3EDrainSeen = true;
+                    if (_ll3EDrainSeen && _ll3SawUnlock)
+                        LL3FinishLeg(true, "chainDrained fires=" + fires + " firesStart=" + _ll3FiresLegStart
+                            + " unlock=" + _ll3SawUnlock);
+                    else if (_ll3Frame >= 7200)
+                        LL3FinishLeg(false, "extinguish stalled (fires=" + fires + " firesStart=" + _ll3FiresLegStart
+                            + " drainSeen=" + _ll3EDrainSeen + " unlock=" + _ll3SawUnlock + ")");
+                    break;
+            }
+        }
+
+        private static void LL3FinishLeg(bool ok, string detail)
+        {
+            _ll3LegOk[_ll3Leg] = ok;
+            Log("AUTOTEST llfire leg " + _ll3Leg + (ok ? " PASS " : " FAIL ") + detail);
+            _ll3Leg++;
+            if (_ll3Leg <= 3) LL3StartLeg(_ll3Leg);
+            else LL3Verdict();
+        }
+
+        private static void LL3Verdict()
+        {
+            Log("AUTOTEST llfire verdict legs R/P/A/E = "
+                + string.Join("/", _ll3LegOk.Select(x => x ? "ok" : "FAIL")));
+            if (_ll3LegOk.All(x => x)) Pass("llfire");
+            else Fail("llfire");
+            _ll3State = 2;
         }
 
         private static void CheckObjectTooltips()
