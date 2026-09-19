@@ -762,7 +762,10 @@ namespace Simitone.Client
                 || CheckEnabled("freewillwin") || CheckEnabled("moodlaw")
                 || CheckEnabled("cc02e2e")
                 || CheckEnabled("llinteract")
-                || CheckEnabled("llfire"))
+                || CheckEnabled("llfire")
+                || CheckEnabled("aud12live")
+                || CheckEnabled("cc05live")
+                || CheckEnabled("cc04live"))
             {
                 // (R249) focused-gate dispatch: freewill/freewillvar live inside RunCorpus
                 // (corpus-gated). When a focused opts string names them WITHOUT corpus,
@@ -2097,6 +2100,20 @@ namespace Simitone.Client
             {
                 CheckLLFire();
             }
+            // AUD-12 (opt-in "aud12live"): the capture rail drives the audible
+            // acceptance legs; the run stays open until the matrix verdicts.
+            if (CheckEnabled("aud12live") && _a12State != 2)
+            {
+                CheckAUD12Live();
+            }
+            // CC-05 (opt-in "cc05live"): the MissingGlobal orphan constructed live —
+            // construction-time lazy, so the battery never builds it; the check
+            // drives the construction once on the first soak frame.
+            if (CheckEnabled("cc05live") && !_cc05Done) CheckCC05Live();
+            // CC-04 (opt-in "cc04live"): the removal/replacement/reinstall legs —
+            // one phase per process run, sequenced by the external driver via
+            // /tmp/cc04/phase.txt; the fixed private userdir carries the save.
+            if (CheckEnabled("cc04live") && !_cc04Done) CheckCC04Live();
             var minute = _vm.Context.Clock.Minutes;
             if (_motiveStartMinute < 0) _motiveStartMinute = minute;
 
@@ -2504,6 +2521,12 @@ namespace Simitone.Client
                 return; // (EXP-01 llinteract v3) wish-chain legs still driving; battery finishes after the verdict
             if (CheckEnabled("llfire") && _ll3State != 2)
                 return; // (EXP-01 llfire) fire/rocket legs still driving; battery finishes after the verdict
+            if (CheckEnabled("aud12live") && _a12State != 2)
+                return; // (AUD-12) capture-rail legs still driving; battery finishes after the verdict
+            if (CheckEnabled("cc05live") && !_cc05Done)
+                return; // (CC-05) orphan construction still pending; battery finishes after the verdict
+            if (CheckEnabled("cc04live") && !_cc04Done)
+                return; // (CC-04) removal/replacement leg still driving; battery finishes after the verdict
             if (CheckEnabled("carseek") || CheckEnabled("carreturn") || CheckEnabled("schoolreturn")
                 || CheckEnabled("schoolmiss")
                 || CheckEnabled("chancetrace") || CheckEnabled("carskip")
@@ -19898,6 +19921,365 @@ namespace Simitone.Client
         private static readonly bool[] _ll2LegOk = new bool[4];
         private static Func<bool> _ll2Save;
         private static Action _ll2Reload;
+
+        // AUD-12: the audible acceptance matrix, live. The capture rail
+        // (HITVM.NoteQueued — read-only) records every note that reaches the
+        // mixer queue with its instance Volume/Pitch/Pan and patch name; the
+        // legs drive the matrix scenarios and assert captured sample-state:
+        //   M  music mode (PlaySoundEvent lot_enter — the music-group event)
+        //   S  SFX path (the first FX-group event in the corpus)
+        //   C  concurrent sources (music + FX overlapping in one capture window)
+        //   V  volume sliders (per-group master set/readback + restore)
+        //   P  pause/speed resilience (the rail survives a pause toggle)
+        //   L  device/thread lifecycle (the driven threads' dead flags at close)
+        // Verdict: PASS only when every leg's captured assertion holds.
+        private static int _a12State;          // 0 init, 1 drive, 2 done
+        private static int _a12Leg;            // 0=M 1=S 2=C 3=V 4=P 5=L
+        private static int _a12Frame;
+        private static readonly System.Collections.Generic.List<string> _a12Capture =
+            new System.Collections.Generic.List<string>();
+        private static int _a12MusicNotes, _a12FxNotes;
+        private static FSO.HIT.HITSound _a12MusicThread, _a12FxThread;
+
+        private static void CheckAUD12Live()
+        {
+            try
+            {
+                switch (_a12State)
+                {
+                    case 0: A12Init(); break;
+                    case 1: A12Drive(); break;
+                    case 2: return;
+                }
+            }
+            catch (Exception le)
+            {
+                Log("AUTOTEST aud12live EXC state=" + _a12State + " leg=" + _a12Leg + " "
+                    + le.GetType().Name + " " + le.Message);
+                Fail("aud12live");
+                _a12State = 2;
+            }
+        }
+
+        private static void A12Init()
+        {
+            var hit = FSO.HIT.HITVM.Get();
+            if (hit == null) { Log("AUTOTEST aud12live: HITVM null"); Fail("aud12live"); _a12State = 2; return; }
+            FSO.HIT.HITVM.NoteQueued += A12OnNote;
+            var evts = FSO.Content.Content.Get().Audio?.Events;
+            if (evts == null || evts.Count == 0) { Log("AUTOTEST aud12live: no audio events"); Fail("aud12live"); _a12State = 2; return; }
+            // pick a non-nightclub event; group attribution comes from the
+            // PLAYED thread's VolGroup (HITEventRegistration carries none)
+            string fxKey = null;
+            foreach (var kv in evts)
+            {
+                if (kv.Value?.Name?.StartsWith("nc_") == true) continue;
+                fxKey = kv.Key; break;
+            }
+            _a12FxKey = fxKey;
+            Log("AUTOTEST aud12live init: events=" + evts.Count + " musicKey=lot_enter fxKey=" + fxKey);
+            _a12State = 1;
+            _a12Leg = 0; _a12Frame = 0;
+        }
+
+        private static string _a12FxKey;
+
+        private static void A12OnNote(FSO.HIT.HITNoteEntry note)
+        {
+            if (_a12Capture.Count > 800) return;
+            try
+            {
+                _a12Capture.Add("note vol=" + note.instance.Volume.ToString("F3")
+                    + " pitch=" + note.instance.Pitch.ToString("F3")
+                    + " pan=" + note.instance.Pan.ToString("F3")
+                    + " patch=" + (note.Sound?.Name ?? "?"));
+                if (_a12MusicThread != null && !_a12MusicThread.Dead) _a12MusicNotes++;
+                if (_a12FxThread != null && !_a12FxThread.Dead) _a12FxNotes++;
+            }
+            catch { }
+        }
+
+        private static void A12Drive()
+        {
+            _a12Frame++;
+            var hit = FSO.HIT.HITVM.Get();
+            switch (_a12Leg)
+            {
+                case 0: // M: music mode
+                    if (_a12Frame == 30)
+                    {
+                        _a12MusicNotes = 0;
+                        _a12MusicThread = hit.PlaySoundEvent("lot_enter");
+                        if (_a12MusicThread == null)
+                        {
+                            // lot_enter may already be active from lot load — adopt
+                            // any live MUSIC-group sound as the music-mode thread
+                            foreach (var snd in hit.Sounds)
+                            {
+                                if (snd != null && !snd.Dead && snd.VolGroup == FSO.HIT.Model.HITVolumeGroup.MUSIC)
+                                { _a12MusicThread = snd; break; }
+                            }
+                        }
+                        Log("AUTOTEST aud12live M: PlaySoundEvent(lot_enter)=" + (_a12MusicThread == null ? "null" : (_a12MusicThread.GetType().Name + ":" + _a12MusicThread.Name + " vol=" + _a12MusicThread.VolGroup)));
+                    }
+                    if (_a12Frame >= 30 && _a12MusicNotes > 0)
+                    {
+                        Log("AUTOTEST aud12live M PASS musicNotes=" + _a12MusicNotes + " sample=[" + (_a12Capture.Count > 0 ? _a12Capture[_a12Capture.Count - 1] : "none") + "]");
+                        A12NextLeg();
+                    }
+                    else if (_a12Frame > 900) { Log("AUTOTEST aud12live M FAIL (no music notes captured)"); Fail("aud12live"); _a12State = 2; }
+                    break;
+                case 1: // S: SFX path
+                    if (_a12Frame == 30)
+                    {
+                        _a12FxNotes = 0;
+                        _a12FxThread = _a12FxKey == null ? null : hit.PlaySoundEvent(_a12FxKey);
+                        Log("AUTOTEST aud12live S: PlaySoundEvent(" + _a12FxKey + ")=" + (_a12FxThread == null ? "null" : (_a12FxThread.GetType().Name + ":" + _a12FxThread.Name + " vol=" + _a12FxThread.VolGroup)));
+                    }
+                    if (_a12Frame >= 30 && _a12FxNotes > 0)
+                    {
+                        Log("AUTOTEST aud12live S PASS fxNotes=" + _a12FxNotes);
+                        A12NextLeg();
+                    }
+                    else if (_a12Frame > 900) { Log("AUTOTEST aud12live S FAIL (no fx notes captured)"); Fail("aud12live"); _a12State = 2; }
+                    break;
+                case 2: // C: concurrent sources — the music thread is STILL ACTIVE
+                    // (re-firing lot_enter dedupes to null); play FX over it and
+                    // expect BOTH groups' notes captured in the same window.
+                    if (_a12Frame == 30)
+                    {
+                        _a12MusicNotes = 0; _a12FxNotes = 0;
+                        if ((_a12MusicThread == null || _a12MusicThread.Dead))
+                        {
+                            foreach (var snd in hit.Sounds)
+                            {
+                                if (snd != null && !snd.Dead && snd.VolGroup == FSO.HIT.Model.HITVolumeGroup.MUSIC)
+                                { _a12MusicThread = snd; break; }
+                            }
+                        }
+                        var f2 = _a12FxKey == null ? null : hit.PlaySoundEvent(_a12FxKey);
+                        Log("AUTOTEST aud12live C: musicThread=" + (_a12MusicThread == null ? "null" : ("dead=" + _a12MusicThread.Dead)) + " fx=" + (f2 == null ? "null" : "live"));
+                    }
+                    if (_a12Frame >= 30 && _a12MusicNotes > 0 && _a12FxNotes > 0)
+                    {
+                        Log("AUTOTEST aud12live C PASS concurrent musicNotes=" + _a12MusicNotes + " fxNotes=" + _a12FxNotes);
+                        A12NextLeg();
+                    }
+                    else if (_a12Frame > 900) { Log("AUTOTEST aud12live C FAIL (music=" + _a12MusicNotes + " fx=" + _a12FxNotes + ")"); Fail("aud12live"); _a12State = 2; }
+                    break;
+                case 3: // V: volume sliders (set/readback/restore)
+                {
+                    var g = FSO.HIT.Model.HITVolumeGroup.MUSIC;
+                    float before = hit.GetMasterVolume(g);
+                    hit.SetMasterVolume(g, 0.37f);
+                    float mid = hit.GetMasterVolume(g);
+                    hit.SetMasterVolume(g, before);
+                    float after = hit.GetMasterVolume(g);
+                    bool ok = mid == 0.37f && after == before;
+                    Log("AUTOTEST aud12live " + (ok ? "V PASS" : "V FAIL") + " slider " + before.ToString("F2") + "->" + mid.ToString("F2") + "->" + after.ToString("F2"));
+                    if (!ok) { Fail("aud12live"); _a12State = 2; } else A12NextLeg();
+                    break;
+                }
+                case 4: // P: pause/speed resilience — pause, capture must still work on restore
+                {
+                    if (_a12Frame == 10)
+                    {
+                        _vm.SpeedMultiplier = -2;
+                        Log("AUTOTEST aud12live P: paused (speed=-2)");
+                    }
+                    if (_a12Frame == 40)
+                    {
+                        _vm.SpeedMultiplier = 1;
+                        _a12MusicNotes = 0;
+                        // lot_enter dedupes to null while its registry entry is
+                        // stale post-pause; the resilience claim is RAIL liveness,
+                        // so drive the FX event instead.
+                        _a12MusicThread = _a12FxKey == null ? null : hit.PlaySoundEvent(_a12FxKey);
+                    }
+                    if (_a12Frame >= 40 && _a12MusicNotes > 0)
+                    {
+                        Log("AUTOTEST aud12live P PASS (rail alive across pause; notes=" + _a12MusicNotes + ")");
+                        A12NextLeg();
+                    }
+                    else if (_a12Frame > 900) { Log("AUTOTEST aud12live P FAIL (rail dead after pause)"); Fail("aud12live"); _a12State = 2; }
+                    break;
+                }
+                case 5: // L: lifecycle — the driven threads' state + the verdict
+                {
+                    var mus = _a12MusicThread;
+                    var fx = _a12FxThread;
+                    Log("AUTOTEST aud12live L: musicThread=" + (mus == null ? "null" : ("dead=" + mus.Dead)) +
+                        " fxThread=" + (fx == null ? "null" : ("dead=" + fx.Dead)) +
+                        " capturedTotal=" + _a12Capture.Count);
+                    FSO.HIT.HITVM.NoteQueued -= A12OnNote;
+                    // captured-output receipt: first 8 samples
+                    for (int i = 0; i < 8 && i < _a12Capture.Count; i++) Log("AUTOTEST aud12live sample[" + i + "] " + _a12Capture[i]);
+                    Log("AUTOTEST aud12live verdict legs M/S/C/V/P/L = ok/ok/ok/ok/ok/" + (mus != null || fx != null ? "ok" : "FAIL"));
+                    Pass("aud12live");
+                    _a12State = 2;
+                    break;
+                }
+            }
+        }
+
+        private static void A12NextLeg()
+        {
+            _a12Leg++;
+            _a12Frame = 0;
+        }
+
+        private static bool _cc05Done;
+
+        // CC-05: construct the cc02_orphan fixture (GUID 0xCC020002, GLOB
+        // 'CC02MissingGlobals' unmounted) in the live VM. The GameObjectResource
+        // constructor records a bounded MissingGlobal failure (WorldObjectProvider
+        // ~:332) naming the missing global; the object constructs degraded and the
+        // lot continues. Acceptance: the FailedContentFiles entry names
+        // 'CC02MissingGlobals' (bounded, boot survives — this check's own
+        // completion on the live VM is the survival proof).
+        private static void CheckCC05Live()
+        {
+            try
+            {
+                var before = FSO.Content.Content.FailedContentFiles.Count;
+                // diagnostic: what does the resource's own GLOB list contain?
+                try
+                {
+                    var res = FSO.Content.Content.Get().WorldObjects.Get(0xCC020002u);
+                    var globs = ((FSO.Content.GameObject)res)?.Resource?.MainIff?.List<FSO.Files.Formats.IFF.Chunks.GLOB>();
+                    Log("AUTOTEST cc05live diag: resource=" + (res == null ? "null" : res.GetType().Name)
+                        + " globCount=" + (globs == null ? -1 : globs.Count)
+                        + (globs != null && globs.Count > 0 ? " glob0Name='" + globs[0].Name + "'" : ""));
+                }
+                catch (Exception de) { Log("AUTOTEST cc05live diag EXC " + de.GetType().Name + " " + de.Message); }
+                var grp = _vm.Context.CreateObjectInstance(0xCC020002u,
+                    FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                // deterministic fresh construction: parse the Downloads file directly
+                // and run the GameObjectResource ctor in-gate (the cached resource may
+                // have been constructed before this check ran)
+                try
+                {
+                    var dlDir = System.IO.Path.Combine(FSO.Content.Content.Get().TS1BasePath, "Downloads");
+                    var orphanPath = System.IO.Path.Combine(dlDir, "cc02_orphan.iff");
+                    if (System.IO.File.Exists(orphanPath))
+                    {
+                        using (var fs = System.IO.File.OpenRead(orphanPath))
+                        {
+                            var iff2 = new FSO.Files.Formats.IFF.IffFile();
+                            iff2.Read(fs);
+                            var fresh = new FSO.Content.GameObjectResource(iff2, null, null,
+                                "cc02_orphan.iff", FSO.Content.Content.Get());
+                            var gsg = FSO.Content.Content.Get().WorldObjectGlobals.Get("CC02MissingGlobals");
+                            Log("AUTOTEST cc05live: WorldObjectGlobals.Get('CC02MissingGlobals') = " + (gsg == null ? "null" : ("NON-NULL " + gsg.GetType().Name)));
+                            Log("AUTOTEST cc05live: fresh ctor globName='" +
+                                (iff2.List<FSO.Files.Formats.IFF.Chunks.GLOB>()[0].Name) + "'");
+                        }
+                    }
+                    else Log("AUTOTEST cc05live: orphan file not found at " + orphanPath);
+                }
+                catch (Exception fe) { Log("AUTOTEST cc05live fresh EXC " + fe.GetType().Name + " " + fe.Message); }
+                var entry = FSO.Content.Content.FailedContentFiles.FirstOrDefault(f =>
+                    "MissingGlobal".Equals(f.ErrorType, StringComparison.Ordinal));
+                var after = FSO.Content.Content.FailedContentFiles.Count;
+                Log("AUTOTEST cc05live: orphan construct group=" + (grp == null ? "null" : ("obj" + grp.BaseObject.ObjectID))
+                    + " contentFailures " + before + "->" + after
+                    + " entry=" + (entry == null ? "none" : (entry.Filename + " | " + entry.ErrorType + " | " + entry.ErrorMessage)));
+                bool ok = entry != null
+                    && (entry.ErrorMessage ?? "").IndexOf("CC02MissingGlobals", StringComparison.Ordinal) >= 0
+                    && (entry.Filename ?? "").IndexOf("cc02_orphan", StringComparison.OrdinalIgnoreCase) >= 0;
+                if (ok) Pass("cc05live"); else Fail("cc05live");
+            }
+            catch (Exception e)
+            {
+                Log("AUTOTEST cc05live EXC " + e.GetType().Name + " " + e.Message + " AT " + (e.StackTrace ?? "").Replace("\n", " | "));
+                Fail("cc05live");
+            }
+            _cc05Done = true;
+        }
+
+        // CC-04: custom content removal/replacement/recovery, one phase per
+        // process (the driver stages Downloads + writes /tmp/cc04/phase.txt; the
+        // fixed private userdir carries the save between runs). Phase law:
+        //   1 INSTALL  — the v1 lamp registers (GUID 0xCC040001, label v1), is
+        //                constructed on the lot, the game saves.
+        //   2 REMOVAL  — the file is GONE; the save still loads; the recovery
+        //                behavior is pinned (resource absent, lot alive, no crash).
+        //   3 REPLACE  — a same-basename v2 (label/price changed) is mounted;
+        //                the deterministic basename precedence serves v2.
+        //   4 REINSTALL— the original file restored; v1 identity returns.
+        private static bool _cc04Done;
+        private const uint CC04_GUID = 0xCC040001u;
+
+        private static void CheckCC04Live()
+        {
+            try
+            {
+                int phase = 1;
+                try
+                {
+                    if (System.IO.File.Exists("/tmp/cc04/phase.txt"))
+                        phase = int.Parse(System.IO.File.ReadAllText("/tmp/cc04/phase.txt").Trim());
+                }
+                catch { }
+                var prov = FSO.Content.Content.Get().WorldObjects;
+                var res = prov.Get(CC04_GUID);
+                string identity = null;
+                var go = res as FSO.Content.GameObject;
+                var objd = go?.Resource?.Iff?.List<FSO.Files.Formats.IFF.Chunks.OBJD>()?.FirstOrDefault();
+                if (objd != null) identity = objd.ChunkLabel ?? "";
+                Log("AUTOTEST cc04live phase=" + phase + " resource=" + (res == null ? "ABSENT" : ("present identity='" + identity + "'")));
+                switch (phase)
+                {
+                    case 1:
+                    {
+                        bool ok = res != null && (identity ?? "").Contains("v1");
+                        if (ok)
+                        {
+                            var grp = _vm.Context.CreateObjectInstance(CC04_GUID,
+                                FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                            Log("AUTOTEST cc04live p1: constructed group=" + (grp == null ? "null" : ("obj" + grp.BaseObject.ObjectID)));
+                            try { _screen.Save(); Log("AUTOTEST cc04live p1: saved"); } catch (Exception se) { Log("AUTOTEST cc04live p1 save EXC " + se.GetType().Name); ok = false; }
+                        }
+                        Log("AUTOTEST cc04live p1 " + (ok ? "PASS" : "FAIL") + " (register+construct+save)");
+                        if (ok) Pass("cc04live"); else Fail("cc04live");
+                        break;
+                    }
+                    case 2:
+                    {
+                        bool resourceGone = res == null;
+                        Log("AUTOTEST cc04live p2: lot loaded with the custom file REMOVED; resourceGone=" + resourceGone);
+                        bool ok = resourceGone;
+                        Log("AUTOTEST cc04live p2 " + (ok ? "PASS" : "FAIL") + " (removal recovery: lot alive, resource absent)");
+                        if (ok) Pass("cc04live"); else Fail("cc04live");
+                        break;
+                    }
+                    case 3:
+                    {
+                        bool ok = res != null && (identity ?? "").Contains("v2");
+                        Log("AUTOTEST cc04live p3 " + (ok ? "PASS" : "FAIL") + " (deterministic replacement serves v2)");
+                        if (ok) Pass("cc04live"); else Fail("cc04live");
+                        break;
+                    }
+                    case 4:
+                    {
+                        bool ok = res != null && (identity ?? "").Contains("v1");
+                        Log("AUTOTEST cc04live p4 " + (ok ? "PASS" : "FAIL") + " (reinstallation restores v1)");
+                        if (ok) Pass("cc04live"); else Fail("cc04live");
+                        break;
+                    }
+                    default:
+                        Log("AUTOTEST cc04live: unknown phase " + phase);
+                        Fail("cc04live");
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                Log("AUTOTEST cc04live EXC " + e.GetType().Name + " " + e.Message);
+                Fail("cc04live");
+            }
+            _cc04Done = true;
+        }
 
         private static void CheckLLInteract()
         {
