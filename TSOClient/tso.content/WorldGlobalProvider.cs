@@ -244,6 +244,13 @@ namespace FSO.Content
                     resource = new GameGlobalResource(iff, otf);
                 }
 
+                // CC-05: a global that does not resolve is a MISS. Returning a
+                // non-null GameGlobal with a null Resource here made the CC-02
+                // MissingGlobal channel unreachable in TS1 mode (the ctor's
+                // sg != null check short-circuited and the object broke silently
+                // at interaction time — exactly what CC-02 set out to surface).
+                if (resource == null) return null;
+
                 var item = new GameGlobal
                 {
                     Resource = resource
