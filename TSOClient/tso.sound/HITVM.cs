@@ -29,7 +29,9 @@ namespace FSO.HIT
         //non static stuff
 
         private Dictionary<string, HITSound> ActiveEvents; //events that are active are reused for all objects calling that event.
-        private List<HITSound> Sounds;
+        // AUD-12: widened for the capture-rail gate's live-source enumeration
+        // (read-only adoption of an active MUSIC-group thread).
+        public List<HITSound> Sounds;
         private int[] Globals; //SimSpeed 0x64 to CampfireSize 0x87.
         // AUD-06 native ducking law: per-player duck registry (sound -> announced
         // main_duckpri). Index in Globals of the republished global main_duckpri
@@ -148,9 +150,25 @@ namespace FSO.HIT
         /// <summary>Active duck-registry size (for the runtime check).</summary>
         public int DuckCount { get { return DuckMap.Count; } }
 
+        /// <summary>
+        /// AUD-12 capture rail: fired for every note that reaches the mixer queue
+        /// (the audible truth before output). Read-only observation; subscribers
+        /// must not alter the entry. Null-subscriber fast path.
+        /// </summary>
+        public static event Action<HITNoteEntry> NoteQueued;
+
         public void QueuePlay(HITNoteEntry note)
         {
             PlayQueue.Add(note);
+            var observers = NoteQueued;
+            if (observers != null)
+            {
+                foreach (Action<HITNoteEntry> observer in observers.GetInvocationList())
+                {
+                    try { observer(note); }
+                    catch { }
+                }
+            }
         }
 
         public bool NightclubMode;
