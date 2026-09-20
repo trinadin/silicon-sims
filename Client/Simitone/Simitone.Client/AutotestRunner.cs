@@ -300,6 +300,11 @@ namespace Simitone.Client
             // run 2 mounts it as-is, so run 2 is a genuine fresh-process reload
             // of run 1's saved state. Opt-in only — inert unless named.
             AutotestSav07.BeginIsolation(c);
+            // UI-21 'importui': same isolation idiom (the battery stages a FAM
+            // copy into the redirected UserDir's UserData/Import and drives the
+            // production import dialog + consumer; game-data is never written).
+            // Opt-in only — inert unless the checks string names it.
+            AutotestImportUI.BeginIsolation(c);
             if (timeoutMs > 0) Config.TimeoutMs = timeoutMs;
             Config.ExitOnDone = exitOnDone;
 
@@ -346,6 +351,7 @@ namespace Simitone.Client
                     case 9: StateTutorialLifecycle247(); break;
                     case 10: StateImpexport(); break;
                     case 11: StateSav07(); break;
+                    case 12: StateImportUI(); break;
                 }
             }
             catch (Exception e)
@@ -414,6 +420,18 @@ namespace Simitone.Client
                     + CheckEnabled("sav07live2") + ")");
                 _sav07 = new AutotestSav07(Log, CheckEnabled("sav07live2"));
                 _state = 11;
+                return;
+            }
+            // UI-21 'importui' opt-in (additive): takes over at the neighborhood
+            // screen like the other batteries — the fixture drives the REAL
+            // Import button, dialog and confirmed import itself. Only reachable
+            // when the configured Checks string names it.
+            if (CheckEnabled("importui"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST importui neighborhood-screen ready; entering import-UI battery");
+                _importui = new AutotestImportUI(Log);
+                _state = 12;
                 return;
             }
             // Only the visual survey needs a settled neighborhood frame. Do
@@ -682,6 +700,23 @@ namespace Simitone.Client
             Log("AUTOTEST impexport " + _impexport.Diagnostics);
             if (!_impexport.Passed) Log("AUTOTEST impexport FAILURES " + _impexport.Failures);
             _impexport = null;
+            Finish();
+        }
+
+        // UI-21 'importui' (opt-in, additive): the USER-FACING import-flow
+        // acceptance fixture — see AutotestImportUI.cs. Reached only through
+        // the StateWaitNeigh entry branch when the configured Checks string
+        // contains "importui".
+        private static AutotestImportUI _importui;
+
+        private static void StateImportUI()
+        {
+            if (_importui == null) { Finish(); return; }
+            if (!_importui.Tick()) return;
+            if (_importui.Passed) Pass("importui"); else Fail("importui");
+            Log("AUTOTEST importui " + _importui.Diagnostics);
+            if (!_importui.Passed) Log("AUTOTEST importui FAILURES " + _importui.Failures);
+            _importui = null;
             Finish();
         }
 
