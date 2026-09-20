@@ -4,6 +4,40 @@ namespace FSO.SimAntics.Engine
 {
     public class VMScheduler
     {
+        // DEFECT-2 (ENG-01, run-13): the HD-window freeze spins the MAIN thread
+        // outside the interpreter's instruction paths (the NextInstruction
+        // watchdog was silent). Breadcrumb + stall-dump: the main thread marks
+        // each risky region and pulses a heartbeat; a background timer writes
+        // the crumb to stdout when the heartbeat stalls, so a NEVER-RETURNING
+        // call still names its region + entity in the gate log (NSUnbufferedIO).
+        public static volatile string Defect2Crumb = "init";
+        private static long _defect2HB;
+        private static System.Threading.Timer _defect2Timer;
+        public static void Defect2Pulse() { System.Threading.Interlocked.Increment(ref _defect2HB); }
+        public static void Defect2Mark(string s) { Defect2Crumb = s; }
+        private static void Defect2Init()
+        {
+            if (_defect2Timer != null) return;
+            long last = -1; int stalled = 0;
+            _defect2Timer = new System.Threading.Timer(_ =>
+            {
+                long h = System.Threading.Interlocked.Read(ref _defect2HB);
+                if (h == last)
+                {
+                    if (++stalled >= 3)
+                    {
+                        try
+                        {
+                            Console.Out.WriteLine("[DEFECT-2 stall] crumb='" + Defect2Crumb + "' hb=" + h
+                                + " at " + System.DateTime.UtcNow.ToString("o"));
+                            Console.Out.Flush();
+                        } catch { }
+                    }
+                }
+                else { stalled = 0; last = h; }
+            }, null, 5000, 5000);
+        }
+
         private VM vm;
         private Dictionary<uint, List<VMEntity>> TickSchedule = new Dictionary<uint, List<VMEntity>>();
         private List<VMEntity> TickThisFrame;
@@ -79,6 +113,9 @@ namespace FSO.SimAntics.Engine
         public void RunTick()
         {
             if (vm.Aborting) return;
+            Defect2Init();
+            Defect2Mark("sched pass begin");
+            Defect2Pulse();
             RunningNow = true;
             if (TickSchedule.TryGetValue(CurrentTickID, out TickThisFrame))
             {
@@ -87,7 +124,9 @@ namespace FSO.SimAntics.Engine
                 {
                     var ent = TickThisFrame[i];
                     CurrentObjectID = ent.ObjectID;
+                    Defect2Mark("sched ent=" + ent.ObjectID + " " + (ent.Object?.Resource?.MainIff?.Filename ?? "?"));
                     ent.Tick();
+                    Defect2Pulse();
                 }
                 TickSchedule.Remove(CurrentTickID);
             }

@@ -296,11 +296,16 @@ namespace FSO.SimAntics
 
         public virtual void Tick()
         {
+            // DEFECT-2 final isolation (ENG-01, run-27): the hang is inside this
+            // call with every VM-side loop statically bounded and the exception
+            // path refuted — mark Thread.Tick() and the headline block separately
             if (Thread != null)
             {
+                Engine.VMScheduler.Defect2Mark("entity-thread ent=" + ObjectID);
                 Thread.ScheduleIdleEnd = 0;
                 Thread.TicksThisFrame = 0;
                 Thread.Tick();
+                Engine.VMScheduler.Defect2Pulse();
                 if (Thread.ScheduleIdleEnd == 0 && !Dead)
                 {
                     Thread.Context.VM.Scheduler.ScheduleTickIn(this, 1);
@@ -308,6 +313,7 @@ namespace FSO.SimAntics
             }
             if (Headline != null)
             {
+                Engine.VMScheduler.Defect2Mark("entity-headline ent=" + ObjectID + " type=" + Headline.GetType().Name);
                 var over = HeadlineRenderer?.Update() ?? true;
                 if (over)
                 {
@@ -319,6 +325,7 @@ namespace FSO.SimAntics
                 {
                     WorldUI.Headline = HeadlineRenderer.DrawFrame(Thread.Context.World);
                 }
+                Engine.VMScheduler.Defect2Pulse();
             }
             if (UseWorld && Headline == null && WorldUI.Headline != null)
             {

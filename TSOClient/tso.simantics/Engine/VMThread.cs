@@ -85,6 +85,28 @@ namespace FSO.SimAntics.Engine
 
         public static readonly int MAX_LOOP_COUNT = 500000;
 
+        // WEDGE-1 (EntertainerFemale decode, 2026-09-19): native TS1 time-slices
+        // thread execution per tick; the port runs a thread to its next yield with
+        // only the MAX_LOOP_COUNT kill. Content that legitimately cycles on
+        // plain-CONTINUE edges (DanceFloor.iff 4122's dance-marathon re-pick when
+        // 'go to available tile' cannot place the dancer) therefore wedges the
+        // whole VM instead of running at native intensity. Forced-yield tier:
+        // after SOFT_LOOP_COUNT instructions without a yield, defer the thread one
+        // tick (resume the same instruction) unless it is a CHECK tree (checks must
+        // complete synchronously). A streak of consecutive forced yields without
+        // genuine progress escalates to the original hard kill.
+        public static readonly int SOFT_LOOP_COUNT = 10000;
+        public static readonly int FORCED_YIELD_MAX = 200;
+        public int ForcedYieldStreak;
+        public int CatchReentries; // DEFECT-2: suppressed-catch re-entry counter (REVIEW F2: no reset — monotonic per thread lifetime, by design)
+
+        // DEFECT-2 probe (ENG-01): the WEDGE-1 counters only increment BETWEEN
+        // instructions — a single Tick()/Execute() that never returns spins the
+        // main thread at 100% CPU with no guard firing (runs 9/2/3 froze at the
+        // HD cab window with and without the patch). Wall-clock watchdog: one
+        // instruction exceeding WDOG_MS names its owner before the throw.
+        public static readonly int WDOG_MS = 1000;
+
         public static VMPrimitiveExitCode EvaluateCheck(VMContext context, VMEntity entity, VMStackFrame initFrame)
         {
             return EvaluateCheck(context, entity, initFrame, null, null);
@@ -247,6 +269,27 @@ namespace FSO.SimAntics.Engine
                         TicksThisFrame = 0;
                         throw new Exception("Thread entered infinite loop! ( >" + MAX_LOOP_COUNT + " primitives)");
                     }
+                    if (ContinueExecution && TicksThisFrame > SOFT_LOOP_COUNT && !IsCheck)
+                    {
+                        // REVIEW F1 (indep-review-eng01-20260920): UNREACHABLE in
+                        // this method — IsCheck is forced true by every RunInMyStack
+                        // caller before this loop, so !IsCheck never holds. Kept
+                        // annotated, NOT enabled: enabling would need the child-frame
+                        // restore path audited first (a break here can discard the
+                        // sub-stack). The operative tier is Tick()'s main loop below.
+                        // WEDGE-1 forced yield (see field notes): resume this exact
+                        // instruction next tick; kill only after a progress-free streak.
+                        TicksThisFrame = 0;
+                        if (++ForcedYieldStreak < FORCED_YIELD_MAX)
+                        {
+                            Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
+                            ContinueExecution = false;
+                            YieldedThisTick = true;
+                            break; // exit via the loop condition — the R249 deferred-child path
+                        }
+                        ForcedYieldStreak = 0;
+                        throw new Exception("Thread entered infinite loop! (forced-yield streak)!");
+                    }
                     ContinueExecution = false;
                     NextInstruction();
                 }
@@ -394,9 +437,11 @@ namespace FSO.SimAntics.Engine
                 {
                     if (QueueDirty)
                     {
+                        Engine.VMScheduler.Defect2Mark("queueEval ent=" + Entity.ObjectID + " " + (Entity.Object?.Resource?.MainIff?.Filename ?? "?"));
                         EvaluateQueuePriorities();
                         TryRunImmediately();
                         QueueDirty = false;
+                        Engine.VMScheduler.Defect2Pulse();
                     }
                     if (Stack.Count == 0)
                     {
@@ -430,13 +475,35 @@ namespace FSO.SimAntics.Engine
                                 TicksThisFrame = 0;
                                 throw new Exception("Thread entered infinite loop! ( >" + MAX_LOOP_COUNT + " primitives)");
                             }
+                            if (TicksThisFrame > SOFT_LOOP_COUNT && !IsCheck)
+                            {
+                                // WEDGE-1 forced yield (see field notes). Exit via
+                                // the loop condition like a CONTINUE_NEXT_TICK
+                                // primitive. (REVIEW NOTE: the original v1 `return` was
+                                // NOT the freeze cause — return/break are equivalent
+                                // here, no tail code exists to skip; runs 2 and 3 froze
+                                // identically on defect #2. Comment corrected per
+                                // indep-review-eng01-20260920.)
+                                TicksThisFrame = 0;
+                                if (++ForcedYieldStreak < FORCED_YIELD_MAX)
+                                {
+                                    Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
+                                    ContinueExecution = false;
+                                    YieldedThisTick = true;
+                                    break;
+                                }
+                                ForcedYieldStreak = 0;
+                                throw new Exception("Thread entered infinite loop! (forced-yield streak)!");
+                            }
                             ContinueExecution = false;
                             NextInstruction();
                         }
                     }
                     else //interaction owner is dead, rip
                     {
+                        Engine.VMScheduler.Defect2Mark("reset ent=" + Entity.ObjectID + " " + (Entity.Object?.Resource?.MainIff?.Filename ?? "?"));
                         Entity.Reset(Context);
+                        Engine.VMScheduler.Defect2Pulse();
                     }
                 }
 
@@ -454,13 +521,34 @@ namespace FSO.SimAntics.Engine
 #endif
 
                 if (e is ThreadAbortException) throw e;
+                // DEFECT-2 catch-crumb (ENG-01, run-22/23 law): if the freeze
+                // is a SUPPRESSED-EXCEPTION RETRY CYCLE (this catch swallowing
+                // the watchdog's throw and Tick re-entering the same
+                // instruction), this counter explodes — logging the entity +
+                // count + the current instruction names the culprit primitive.
+                CatchReentries++;
+                if (CatchReentries % 100 == 1)
+                {
+                    try
+                    {
+                        var cf = Stack[Stack.Count - 1];
+                        var ci = cf.GetCurrentInstruction();
+                        Console.Out.WriteLine("[DEFECT-2 catch] ent=" + (Entity?.ObjectID ?? 0) + " iff="
+                            + (Entity?.Object?.Resource?.MainIff?.Filename ?? "?") + " reentries=" + CatchReentries
+                            + " routine=" + (cf.Routine?.Chunk?.ChunkID ?? -1) + " '" + (cf.Routine?.Chunk?.ChunkLabel ?? "?")
+                            + "' ip=" + ((int)cf.InstructionPointer) + " opcode=" + (ci?.Opcode ?? -1));
+                        Console.Out.Flush();
+                    } catch { }
+                }
                 if (Stack.Count == 0) return;
                 var context = Stack[Stack.Count - 1];
                 bool Delete = ((Entity is VMGameObject) && (DialogCooldown > 30 * 20 - 10));
                 if (DialogCooldown == 0)
                 {
 
+                    Engine.VMScheduler.Defect2Mark("thread-exception-path ent=" + (Entity?.ObjectID ?? 0) + " " + (Entity?.Object?.Resource?.MainIff?.Filename ?? "?"));
                     var simExcept = new VMSimanticsException(e.Message + StackTraceSimplify(e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(".cs")) ?? ""), context);
+                    Engine.VMScheduler.Defect2Pulse();
                     string exceptionStr = "A SimAntics Exception has occurred, and has been suppressed: \r\n\r\n" + simExcept.ToString() + "\r\n\r\nThe object will be reset. Please report this!";
                     // IFF-literalism: mirror the literal suppressed-exception alert text to the gate log (throttled to every 600 ticks).
                     // r157: the mirror now carries the failing ENTITY (callee id + owning IFF) and the one-lined VM
@@ -548,12 +636,33 @@ namespace FSO.SimAntics.Engine
             var currentFrame = Stack.LastOrDefault();
             if (currentFrame == null) return;
 
-            if (currentFrame is VMRoutingFrame) HandleResult(currentFrame, null, ((VMRoutingFrame)currentFrame).Tick());
-            else if (currentFrame is VMDirectControlFrame) HandleResult(currentFrame, null, ((VMDirectControlFrame)currentFrame).Tick());
+            var wdog0 = Environment.TickCount; // DEFECT-2 probe (ENG-01)
+            if (currentFrame is VMRoutingFrame)
+            {
+                HandleResult(currentFrame, null, ((VMRoutingFrame)currentFrame).Tick());
+                if (Environment.TickCount - wdog0 > WDOG_MS)
+                    throw new Exception("DEFECT-2 watchdog: ROUTING frame tick ran " + (Environment.TickCount - wdog0)
+                        + "ms (callee=obj" + (currentFrame.Callee?.ObjectID ?? 0) + " iff="
+                        + (currentFrame.Callee?.Object?.Resource?.MainIff?.Filename ?? "?") + ")");
+            }
+            else if (currentFrame is VMDirectControlFrame)
+            {
+                HandleResult(currentFrame, null, ((VMDirectControlFrame)currentFrame).Tick());
+                if (Environment.TickCount - wdog0 > WDOG_MS)
+                    throw new Exception("DEFECT-2 watchdog: DIRECT-CONTROL frame tick ran " + (Environment.TickCount - wdog0) + "ms");
+            }
             else
             {
                 VMInstruction instruction;
                 VMPrimitiveExitCode result = currentFrame.Routine.Execute(currentFrame, out instruction);
+                var wdog1 = Environment.TickCount - wdog0;
+                if (wdog1 > WDOG_MS)
+                    throw new Exception("DEFECT-2 watchdog: routine " + (currentFrame.Routine?.Chunk?.ChunkID ?? -1)
+                        + " (" + (currentFrame.Routine?.Chunk?.ChunkLabel ?? "?") + ") ip=" + ((int)currentFrame.InstructionPointer)
+                        + " opcode=" + (instruction?.Opcode ?? -1)
+                        + " operand=" + (instruction?.Operand?.ToString() ?? "?")
+                        + " ran " + wdog1 + "ms (callee=obj" + (currentFrame.Callee?.ObjectID ?? 0) + " iff="
+                        + (currentFrame.Callee?.Object?.Resource?.MainIff?.Filename ?? "?") + ")");
                 HandleResult(currentFrame, instruction, result);
             }
         }
@@ -728,10 +837,12 @@ namespace FSO.SimAntics.Engine
                     Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
                     ContinueExecution = false;
                     YieldedThisTick = true; //R249: the primitive deferred — visible to check evaluation
+                    ForcedYieldStreak = 0; //WEDGE-1: genuine progress resets the forced-yield streak
                     break;
                 case VMPrimitiveExitCode.CONTINUE_FUTURE_TICK:
                     ContinueExecution = false;
                     YieldedThisTick = true;
+                    ForcedYieldStreak = 0; //WEDGE-1
                     break;
                 case VMPrimitiveExitCode.ERROR:
                     ContinueExecution = false;

@@ -555,7 +555,10 @@ namespace FSO.SimAntics
             Velocity = new Vector3(0, 0, 0);
             TurnVelocity = 0;
             VisualPositionStart = null;
+            Engine.VMScheduler.Defect2Mark("avatar-base ent=" + ObjectID);
             base.Tick();
+            Engine.VMScheduler.Defect2Pulse();
+            Engine.VMScheduler.Defect2Mark("avatar-post-base ent=" + ObjectID);
 
             if (Message != "")
             {
@@ -577,7 +580,9 @@ namespace FSO.SimAntics
                 PersonData[(int)VMPersonDataVariable.OnlineJobStatusFlags] = 1;
             if (Thread != null)
             {
+                Engine.VMScheduler.Defect2Mark("avatar-motive ent=" + ObjectID);
                 MotiveDecay.Tick(this, Thread.Context);
+                Engine.VMScheduler.Defect2Pulse();
                 if (Position == LotTilePos.OUT_OF_WORLD && (PersistID > 0 || IsPet) && (Container == null || Container.Position == LotTilePos.OUT_OF_WORLD) && !Content.Content.Get().TS1)
                 {
                     //uh oh!
@@ -586,6 +591,7 @@ namespace FSO.SimAntics
                 }
             }
 
+            Engine.VMScheduler.Defect2Mark("avatar-anim ent=" + ObjectID);
             //animation update for avatars
             VMAvatar avatar = this;
             float totalWeight = 0f;
@@ -651,6 +657,8 @@ namespace FSO.SimAntics
                         state.EndReached = true;
                 }
             }
+            Engine.VMScheduler.Defect2Pulse();
+            Engine.VMScheduler.Defect2Mark("avatar-headseek ent=" + ObjectID);
             UpdateHeadSeek();
 
             if (avatar.CarryAnimationState != null && avatar.CarryAnimationState.Anim != null)
@@ -660,10 +668,13 @@ namespace FSO.SimAntics
                     Animator.SilentFrameProgress(avatar.Avatar, avatar.CarryAnimationState.Anim, (int)avatar.CarryAnimationState.CurrentFrame); //currently don't advance frames... I don't think any of them are animated anyways.
             }
 
+            Engine.VMScheduler.Defect2Pulse();
+            Engine.VMScheduler.Defect2Mark("avatar-motivechg ent=" + ObjectID);
             for (int i = 0; i < 16; i++)
             {
                 MotiveChanges[i].Tick(this); //tick over motive changes
             }
+            Engine.VMScheduler.Defect2Pulse();
 
             PersonData[(int)VMPersonDataVariable.TickCounter]++;
             if (KillTimeout > -1)
