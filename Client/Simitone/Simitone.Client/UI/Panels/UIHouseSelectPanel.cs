@@ -331,7 +331,7 @@ namespace Simitone.Client.UI.Panels
             {
                 (family==null)?null:(ButtonClickDelegate)((btn) => Evict(family)),
                 null,
-                null,
+                (family==null)?null:(ButtonClickDelegate)((btn) => ExportToDisk(family)),
                 (btn) => ShowMore(false)
             };
             var optionNames = new string[]
@@ -427,6 +427,32 @@ namespace Simitone.Client.UI.Panels
                     )
             });
             UIScreen.GlobalShowDialog(evictDialog, true);
+        }
+
+        /// <summary>
+        /// UI-21: the lot-query Export button (native option row's Export slot —
+        /// decoded-but-unimplemented per the R253 audit, ported here as a disabled
+        /// button until now). Serializes the selected bin family to
+        /// &lt;UserData&gt;Export/ via the production engine path
+        /// (TS1NeighborhoodProvider.ExportFamily through the 247 seam) and shows
+        /// the receipt on the existing R142 GenDlg alert. The native confirmation
+        /// string is undecoded, so the port uses plain literals (disclosed).
+        /// Family-only: the eviction path above is untouched.
+        /// </summary>
+        public void ExportToDisk(FAMI family)
+        {
+            if (family == null) return;
+            var path = Simitone.Client.Utils.TutorialEngine247.ExportFamily(family.ChunkID);
+            UIMobileAlert exportDialog = null;
+            exportDialog = new UIMobileAlert(new UIAlertOptions()
+            {
+                Title = "Export",
+                Message = (path != null)
+                    ? string.Format("Family exported to {0}", path)
+                    : "Couldn't export the family",
+                Buttons = UIAlertButton.Ok((b) => exportDialog.Close())
+            });
+            UIScreen.GlobalShowDialog(exportDialog, true);
         }
 
         public void ShowMore(bool more)

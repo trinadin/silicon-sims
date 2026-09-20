@@ -6,6 +6,9 @@ http://mozilla.org/MPL/2.0/.
 using FSO.Content;
 using FSO.SimAntics;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -44,10 +47,13 @@ namespace Simitone.Client.Utils
         private static PropertyInfo _tutorialState;
         private static PropertyInfo _tutorialHouse;
         private static PropertyInfo _lastImportHouse;
+        private static PropertyInfo _userPath;
         private static MethodInfo _stageReset;
         private static MethodInfo _isTutorialHouse;
         private static MethodInfo _checkImports;
         private static MethodInfo _requestCancel;
+        private static MethodInfo _describeImports;
+        private static MethodInfo _exportFamily;
 
         /// <summary>StageTutorialReset dispatches since the process started
         /// (battery evidence that the row command reached the engine).</summary>
@@ -76,6 +82,13 @@ namespace Simitone.Client.Utils
                     BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
                 _requestCancel = typeof(VMContext).GetMethod("RequestTutorialCancel",
                     BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
+                _userPath = nbhdType.GetProperty("UserPath",
+                    BindingFlags.Public | BindingFlags.Instance);
+                _describeImports = nbhdType.GetMethod("DescribeImports",
+                    BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
+                _exportFamily = nbhdType.GetMethod("ExportFamily",
+                    BindingFlags.Public | BindingFlags.Instance, null,
+                    new Type[] { typeof(ushort) }, null);
             }
             catch
             {
@@ -87,6 +100,9 @@ namespace Simitone.Client.Utils
                 _isTutorialHouse = null;
                 _checkImports = null;
                 _requestCancel = null;
+                _userPath = null;
+                _describeImports = null;
+                _exportFamily = null;
             }
         }
 
@@ -106,6 +122,116 @@ namespace Simitone.Client.Utils
         public static bool HasTutorialHouse { get { Probe(); return _tutorialHouse != null; } }
         public static bool HasLastImportHouse { get { Probe(); return _lastImportHouse != null; } }
         public static bool HasRequestCancel { get { Probe(); return _requestCancel != null; } }
+        public static bool HasDescribeImports { get { Probe(); return _describeImports != null; } }
+        public static bool HasExportFamily { get { Probe(); return _exportFamily != null; } }
+
+        /// <summary>
+        /// UI-21: the client-side DTO the import DIALOG renders (r247-fam-import
+        /// decode §2.1 ImportInfo's observable fields, mapped from the engine's
+        /// TS1NeighborhoodProvider.TS1ImportInfo through the seam). Null when the
+        /// engine API is missing or nothing valid is staged.
+        /// </summary>
+        public sealed class ImportFileDto
+        {
+            public string Path;
+            public string FamilyName;
+            public int House;
+            public bool HouseFileExists;
+            public string OccupantName;
+            public string[] MemberNames;
+            public int NetWorth;
+        }
+
+        /// <summary>
+        /// Describe the *.FAM files staged in &lt;UserData&gt;Import/ (scan order,
+        /// the same order PollImports consumes them). Empty list when the API is
+        /// missing or nothing importable is staged (the native import UI is
+        /// presence-gated, model+0x160).
+        /// </summary>
+        public static List<ImportFileDto> DescribeImports()
+        {
+            var result = new List<ImportFileDto>();
+            Probe();
+            if (_describeImports == null) return result;
+            var provider = Provider;
+            if (provider == null) return result;
+            try
+            {
+                if (!(_describeImports.Invoke(provider, null) is System.Collections.IEnumerable raw)) return result;
+                foreach (var item in raw)
+                {
+                    if (item == null) continue;
+                    var type = item.GetType();
+                    result.Add(new ImportFileDto
+                    {
+                        Path = type.GetField("Path")?.GetValue(item) as string,
+                        FamilyName = type.GetField("FamilyName")?.GetValue(item) as string,
+                        House = Convert.ToInt32(type.GetField("House")?.GetValue(item)),
+                        HouseFileExists = Convert.ToBoolean(type.GetField("HouseFileExists")?.GetValue(item)),
+                        OccupantName = type.GetField("OccupantName")?.GetValue(item) as string,
+                        MemberNames = (type.GetField("MemberNames")?.GetValue(item) as string[]) ?? new string[0],
+                        NetWorth = Convert.ToInt32(type.GetField("NetWorth")?.GetValue(item)),
+                    });
+                }
+            }
+            catch
+            {
+                //describe failure = nothing staged (the dialog degrades to no-op)
+            }
+            return result;
+        }
+
+        /// <summary>The first valid staged FAM in scan order — the one a confirmed
+        /// import will consume (PollImports takes the same first-valid).</summary>
+        public static ImportFileDto DescribeFirstImport()
+        {
+            return DescribeImports().FirstOrDefault();
+        }
+
+        /// <summary>
+        /// UI-21 export path: serialize a bin family to &lt;UserData&gt;Export/.
+        /// Returns the written path, or null on failure/missing API.
+        /// </summary>
+        public static string ExportFamily(int familyId)
+        {
+            Probe();
+            if (_exportFamily == null) return null;
+            var provider = Provider;
+            if (provider == null) return null;
+            try
+            {
+                return _exportFamily.Invoke(provider, new object[] { (ushort)familyId }) as string;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// The native auto-import's FILE fact (decode §1.2: pathB =
+        /// FindDataDirectory + GetString(0x58) + 'Tutorial.FAM'; FileExists gate).
+        /// The client's 1 s cadence only auto-polls while this ONE file is staged;
+        /// every other staged FAM waits for the explicit Import-button dialog.
+        /// False when the API/provider is missing (wired-but-inert cadence).
+        /// </summary>
+        public static bool TutorialFamStaged()
+        {
+            Probe();
+            if (_userPath == null) return false;
+            var provider = Provider;
+            if (provider == null) return false;
+            try
+            {
+                var userPath = _userPath.GetValue(provider) as string;
+                if (string.IsNullOrEmpty(userPath)) return false;
+                return File.Exists(Path.Combine(userPath, "Import", "Tutorial.FAM"));
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         /// <summary>
         /// The reset row's engine half: confirm/save-gate live client-side, then

@@ -112,6 +112,14 @@ namespace Simitone.Client.UI.Panels
         public UINeighborhoodSelectionPanel Panel;
         private ushort Mode;
         public bool MoveInMode;
+
+        // UI-21 probe seams: the mounted Import button (home + destination
+        // strips — the last mount wins) and how many times its production
+        // handler dispatched. The 'importui' battery presses the REAL button
+        // through these and asserts the dialog opens.
+        public UIOriginalNavbarButton ImportButtonForProbe;
+        public int ImportClicksForProbe;
+
         private UIOriginalNavbarButton Banner;
         private UIOriginalText CurrentNumber;
         private Vector2 CurrentNumberInset;
@@ -333,6 +341,22 @@ namespace Simitone.Client.UI.Panels
         {
             switch (slot.DebugName)
             {
+                case "Import":
+                    // UI-21 (native RegularModeBtnHandler 0x4711d0 → the import-UI
+                    // button is CycleThroughImports' only caller, decode §1.1): the
+                    // button opens the staged-FAM confirmation dialog (STR# 143
+                    // law) on the game screen. Destination strips carry their own
+                    // Import art and reach the same flow (this case is mode-
+                    // independent; the member swap above is art-only).
+                    ImportButtonForProbe = btn;
+                    btn.OnButtonClick += (b) =>
+                    {
+                        ImportClicksForProbe++;
+                        var gs = UIScreen.Current as Screens.TS1GameScreen;
+                        if (gs != null) gs.ShowImportDialog();
+                        else GameLog.Write("uinav: Import click (no TS1GameScreen)");
+                    };
+                    break;
                 case "MoveIn":
                     btn.OnButtonClick += (b) =>
                     {

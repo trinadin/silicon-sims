@@ -1335,6 +1335,14 @@ namespace Simitone.Client.UI.Screens
             if ((now - _lastTutorialImportPoll).TotalMilliseconds < 1000) return;
             _lastTutorialImportPoll = now;
             TutorialImportPollAutoCount++;
+            // UI-21 (native §1.2 FileExists gate): the 1 s cadence auto-imports
+            // ONLY while Import/Tutorial.FAM is staged — the one file the native's
+            // CheckForNewImports auto-imports. Any other staged FAM waits for the
+            // explicit Import-button dialog (the CycleThroughImports flow), so the
+            // user is never asked about a file the poll already consumed. The
+            // ENGINE CheckForNewImports contract stays generic (SAV-05); the
+            // batteries drive it directly and are unaffected by this client gate.
+            if (!Simitone.Client.Utils.TutorialEngine247.TutorialFamStaged()) return;
             PollNeighborhoodImports();
         }
 
@@ -1379,20 +1387,172 @@ namespace Simitone.Client.UI.Screens
             return result;
         }
 
-        /// <summary>The native DoNbhdScreen(true) equivalence: a full rebuild
-        /// of the neighborhood screen on the current mode (in-lot this is the
-        /// ExitLot production teardown).</summary>
-        public void RefreshNeighborhoodScreen()
+    /// <summary>The native DoNbhdScreen(true) equivalence: a full rebuild
+    /// of the neighborhood screen on the current mode (in-lot this is the
+    /// ExitLot production teardown).</summary>
+    public void RefreshNeighborhoodScreen()
+    {
+        if (InLot) { ExitLot(); return; }
+        var mode = CurrentNeighborhoodMode;
+        if (TS1NeighPanel != null) Remove(TS1NeighPanel);
+        if (TS1NeighSwitcher != null) Remove(TS1NeighSwitcher);
+        TS1NeighPanel = null;
+        TS1NeighSwitcher = null;
+        NeighSelection(mode);
+    }
+
+    // ---- UI-21: the generic FAM import dialog (native CycleThroughImports flow)
+    // r247-fam-import decode §1.3: the neighborhood import-UI button opens the
+    // staged-FAM flow; the dialog presents the FAM's ImportInfo read set and the
+    // confirmed action drives the SAME import consumer the poll uses
+    // (TutorialEngine247.PollImports → CheckForNewImports → ImportFamFile).
+    // All presentation strings are UIText.iff STR# 143 'ImportStrs' (9 English
+    // entries, decoded byte-verbatim from game-data — tools/iff-dump/
+    // r254-import-ui/uitext-143-168.txt) with the native $family/$lot
+    // placeholders substituted literally. Chrome: the existing R142 GenDlg
+    // UIMobileAlert (cTSWinMsgBox law) — no new visual language. A failure after
+    // confirmation surfaces the native "Couldn't import the family"/"Error"
+    // literals (blob 0x6d1c0+0xaf/+0xca) EVERY time — the poll's once-per-session
+    // debounce is an auto-poll law (a persistent background failure must not
+    // stack dialogs); a user confirming an import is waiting on THIS action.
+    internal int ImportDialogOpensForProbe;  // battery evidence: ShowImportDialog calls
+    internal int ImportConfirmYesForProbe;   // battery evidence: Yes dispatched the import
+    internal int ImportUserErrorDialogsForProbe;
+    private UIMobileAlert _importDialog;
+
+    /// <summary>The neighborhood Import button's flow: describe the first valid
+    /// staged FAM (scan order == the poll's first-valid), show the STR# 143
+    /// confirmation on the GenDlg chrome. With nothing importable staged this is
+    /// a logged no-op — the native import UI is presence-gated (model+0x160).
+    /// The auto-poll cannot race the confirmation: since UI-21 the 1 s cadence
+    /// only auto-imports a literally-named Tutorial.FAM (decode §1.2 gate).</summary>
+    public void ShowImportDialog()
+    {
+        ImportDialogOpensForProbe++;
+        var staged = Simitone.Client.Utils.TutorialEngine247.DescribeImports();
+        if (staged.Count == 0)
         {
-            if (InLot) { ExitLot(); return; }
-            var mode = CurrentNeighborhoodMode;
-            if (TS1NeighPanel != null) Remove(TS1NeighPanel);
-            if (TS1NeighSwitcher != null) Remove(TS1NeighSwitcher);
-            TS1NeighPanel = null;
-            TS1NeighSwitcher = null;
-            NeighSelection(mode);
+            GameLog.Write("import: no importable *.FAM staged (import UI presence-gated)");
+            return;
+        }
+        var desc = staged[0];
+        CloseImportDialog();
+
+        var msg = ImportStr(0).Replace("$family", desc.FamilyName ?? "");
+        msg += "\n\n" + ImportScenarioLine(desc);
+        if (desc.MemberNames.Length > 0)
+        {
+            msg += "\n\n" + ImportStr(5);
+            foreach (var name in desc.MemberNames) msg += "\n" + name;
+        }
+
+        UIMobileAlert dialog = null;
+        dialog = new UIMobileAlert(new FSO.Client.UI.Controls.UIAlertOptions
+        {
+            Title = ImportStr(8),
+            Message = msg,
+            Buttons = new FSO.Client.UI.Controls.UIAlertButton[]
+            {
+                new FSO.Client.UI.Controls.UIAlertButton(FSO.Client.UI.Controls.UIAlertButtonType.Yes)
+                {
+                    Text = ImportStr(6),
+                    Handler = (b) =>
+                    {
+                        ImportConfirmYesForProbe++;
+                        CloseImportDialog();
+                        ImportConfirmed();
+                    }
+                },
+                new FSO.Client.UI.Controls.UIAlertButton(FSO.Client.UI.Controls.UIAlertButtonType.No)
+                {
+                    Text = ImportStr(7),
+                    Handler = (b) => CloseImportDialog()
+                }
+            }
+        });
+        _importDialog = dialog;
+        GlobalShowDialog(dialog, true);
+    }
+
+    /// <summary>STR# 143[1]-[4]: the occupancy scenario line, with the native
+    /// $family/$lot placeholders substituted. house==0 → bin line [1]; an
+    /// occupied lot → the displacement line [2]; a house file with no occupant
+    /// → the vacant-house line [4]; otherwise the empty-lot line [3] (which the
+    /// import's structural guard will then refuse, surfacing the error dialog).
+    /// </summary>
+    private static string ImportScenarioLine(Simitone.Client.Utils.TutorialEngine247.ImportFileDto desc)
+    {
+        string line;
+        if (desc.House == 0) line = ImportStr(1);
+        else if (desc.OccupantName != null) line = ImportStr(2);
+        else if (desc.HouseFileExists) line = ImportStr(4);
+        else line = ImportStr(3);
+        return line.Replace("$family", desc.OccupantName ?? desc.FamilyName ?? "")
+                   .Replace("$lot", desc.House.ToString());
+    }
+
+    /// <summary>The confirmed half: run the production import consumer and
+    /// apply the same post-import laws as the poll (house import rebuilds the
+    /// neighborhood screen; a refusal shows the native literals).</summary>
+    private void ImportConfirmed()
+    {
+        var result = Simitone.Client.Utils.TutorialEngine247.PollImports();
+        switch (result)
+        {
+            case Simitone.Client.Utils.TutorialEngine247.ImportPollResult.Imported:
+                if (Simitone.Client.Utils.TutorialEngine247.GetLastImportHouse() != 0)
+                {
+                    RefreshNeighborhoodScreen(); // native DoNbhdScreen(true)
+                }
+                break;
+            case Simitone.Client.Utils.TutorialEngine247.ImportPollResult.Error:
+                ImportUserErrorDialogsForProbe++;
+                UIMobileAlert fail = null;
+                fail = new UIMobileAlert(new FSO.Client.UI.Controls.UIAlertOptions
+                {
+                    Title = "Error",
+                    Message = "Couldn't import the family",
+                    Buttons = FSO.Client.UI.Controls.UIAlertButton.Ok((b) => fail.Close())
+                });
+                GlobalShowDialog(fail, true);
+                break;
         }
     }
+
+    private void CloseImportDialog()
+    {
+        if (_importDialog != null)
+        {
+            _importDialog.Close();
+            _importDialog = null;
+        }
+    }
+
+    // STR# 143 'ImportStrs' — the 9 English (lang-1) entries, decoded byte-
+    // verbatim from game-data UIText.iff this round (r254-import-ui). Literal
+    // fallback per the R159 Tip151 idiom: the table should always be present
+    // (ContentStrings.LoadTS1 reads every UIText STR chunk), the literals keep
+    // the dialog law-true even if the table ever fails to load.
+    private static readonly string[] ImportStrsFallback =
+    {
+        "A family was found. Do you want to import the $family family into your neighborhood?",
+        "They will show up in the family selection screen.",
+        "They will displace the $family family in lot number $lot. The old family will show up in the family selection screen.",
+        "They will be placed in empty lot number $lot.",
+        "They will displace the vacant house on lot number $lot.",
+        "The members of the new family are:",
+        "Yes",
+        "No",
+        "Import Family",
+    };
+
+    private static string ImportStr(int idx)
+    {
+        var t = GameFacade.Strings.GetString("143", idx.ToString());
+        if (string.IsNullOrEmpty(t) || t.Contains("MISSING")) return ImportStrsFallback[idx];
+        return t;
+    }
+}
 
     public enum NeighSelectionMode
     {
