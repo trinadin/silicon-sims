@@ -24,6 +24,54 @@ namespace FSO.SimAntics.Engine
     {
         public static int MAX_USER_ACTIONS = 20;
 
+        /// <summary>
+        /// SIM-19 read-only observation point: fired when AttemptPush silently
+        /// removes a queued action because CheckAction returned null (the queue
+        /// re-validation drop). Autotests use this to attribute dropped socials;
+        /// no subscriber may alter primitive success or failure.
+        /// </summary>
+        public static event Action<VMEntity, VMQueuedAction> QueueDrop;
+
+        /// <summary>
+        /// SIM-19 read-only observation: any other queue removal, with a reason tag
+        /// (dead-callee cleanup / interrupt / cancel / parent-idle). Read-only.
+        /// </summary>
+        public static event Action<string, VMEntity, VMQueuedAction> QueueRemoveAny;
+
+        /// <summary>
+        /// SIM-19 read-only observation point: fired per instruction just before
+        /// execution (plain stack frames only — routing/direct-control frames are
+        /// not reported). Autotests subscribe to trace whitelisted trees through
+        /// the greet window. Read-only: exceptions are swallowed so a probe can
+        /// never kill the VM tick, and no subscriber may alter execution.
+        /// </summary>
+        public static event Action<VMStackFrame> InstructionTrace;
+
+        private static void NotifyRemoveAny(string reason, VMEntity entity, VMQueuedAction action)
+        {
+            var observers = QueueRemoveAny;
+            if (observers == null) return;
+            foreach (Action<string, VMEntity, VMQueuedAction> observer in observers.GetInvocationList())
+            {
+                try { observer(reason, entity, action); }
+                catch { }
+            }
+        }
+
+        private static void NotifyQueueDrop(VMEntity entity, VMQueuedAction action)
+        {
+            var observers = QueueDrop;
+            if (observers == null) return;
+            foreach (Action<VMEntity, VMQueuedAction> observer in observers.GetInvocationList())
+            {
+                try { observer(entity, action); }
+                catch (Exception error)
+                {
+                    Console.WriteLine("[QueueDropObserver] " + error.GetType().Name + " " + error.Message);
+                }
+            }
+        }
+
         public VMContext Context;
         private VMEntity Entity;
 
@@ -401,6 +449,7 @@ namespace FSO.SimAntics.Engine
                 }
                 else
                 {
+                    NotifyQueueDrop(Entity, item);
                     Queue.RemoveAt(ActiveQueueBlock + 1); //keep going.
                 }
             }
@@ -428,6 +477,13 @@ namespace FSO.SimAntics.Engine
                         ActiveQueueBlock++; //both the run immediately interaction and the active interaction must be protected.
                         break;
                     }
+                    else
+                    {
+                        //SIM-19: this was the one unobserved removal site (flagged by the
+                        //indep review) — a RunImmediately action whose check fails is
+                        //dropped from the queue with no event. Read-only observation.
+                        NotifyRemoveAny("tryrunimmediately-checknull", Entity, temp);
+                    }
                 } else
                 {
                     break;
@@ -442,7 +498,11 @@ namespace FSO.SimAntics.Engine
             //clear "interaction cancelled" since we are leaving the interaction
             if (interaction.Mode != VMQueueMode.ParentIdle) Entity.SetFlag(VMEntityFlags.InteractionCanceled, false);
             if (interaction.Callback != null) interaction.Callback.Run(Entity);
-            if (Queue.Count > 0) Queue.RemoveAt(ActiveQueueBlock);
+            if (Queue.Count > 0)
+            {
+                NotifyRemoveAny("end-interaction", Entity, Queue[ActiveQueueBlock]);
+                Queue.RemoveAt(ActiveQueueBlock);
+            }
             if (Entity is VMAvatar && !IsCheck && ActiveQueueBlock == 0)
             {
                 //some things are reset when an interaction ends
@@ -680,6 +740,7 @@ namespace FSO.SimAntics.Engine
             {
                 if (Queue[i].Callee == null || Queue[i].Callee.Dead)
                 {
+                    NotifyRemoveAny(Queue[i].Callee == null ? "dead-callee(null)" : "dead-callee(obj" + Queue[i].Callee.ObjectID + ")", Entity, Queue[i]);
                     Queue.RemoveAt(i--); //remove interactions to dead objects (not within active queue block)
                     continue;
                 }
@@ -714,6 +775,11 @@ namespace FSO.SimAntics.Engine
             }
             else
             {
+                var trace = InstructionTrace;
+                if (trace != null)
+                {
+                    try { trace(currentFrame); } catch { } //SIM-19 read-only per-instruction observation
+                }
                 VMInstruction instruction;
                 VMPrimitiveExitCode result = currentFrame.Routine.Execute(currentFrame, out instruction);
                 var wdog1 = Environment.TickCount - wdog0;
@@ -946,7 +1012,11 @@ namespace FSO.SimAntics.Engine
                 case VMPrimitiveExitCode.INTERRUPT:
                     Stack.Clear();
                     QueueDirty = true;
-                    if (Queue.Count > 0) Queue.RemoveAt(0);
+                    if (Queue.Count > 0)
+                    {
+                        NotifyRemoveAny("interrupt", Entity, Queue[0]);
+                        Queue.RemoveAt(0);
+                    }
                     LastStackExitCode = result;
                     break;
             }
@@ -1138,6 +1208,7 @@ namespace FSO.SimAntics.Engine
             var interaction = Queue.FirstOrDefault(x => x.UID == actionUID);
             if (interaction != null)
             {
+                NotifyRemoveAny("cancel", Entity, interaction);
                 if (Entity is VMAvatar && interaction == Queue[0] && Context.VM.EODHost != null) Context.VM.EODHost.ForceDisconnect((VMAvatar)Entity);
                 QueueDirty = true;
                 interaction.NotifyIdle = true;
@@ -1208,7 +1279,16 @@ namespace FSO.SimAntics.Engine
                 }
                 else if (avatar.IsPet) return null; //not allowed
 
-                var isVisitor = avatar.GetPersonData(VMPersonDataVariable.PersonType) == 1 && avatar.GetPersonData(VMPersonDataVariable.GreetStatus) < 2;
+                // SIM-19 review reconciliation (2026-09-20): native Global.iff BCON 260
+                // 'Person Types' makes INVITED VISITORS type 2 ('person main' 8193 ins3
+                // routes every non-0 person into begin-visiting 8286, whose ins57 gate
+                // MyPD[32]==PersonTypes[2]==2 selects the visit path; type 1 runs the
+                // leave path). The former == 1 here locked type-2 visitors out of
+                // AllowVisitors interactions (their own greet). != 0 matches the
+                // skeptic-confirmed visitor reading already used in
+                // VMFindBestAction.cs:543 and still admits type-1 strays; gs < 2 keeps
+                // the awaiting-greet window.
+                var isVisitor = avatar.GetPersonData(VMPersonDataVariable.PersonType) != 0 && avatar.GetPersonData(VMPersonDataVariable.GreetStatus) < 2;
                 //avatar.ObjectID != Context.VM.GetGlobalValue(3);
                 var debugTrees = false;
 

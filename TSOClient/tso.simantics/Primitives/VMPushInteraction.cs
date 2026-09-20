@@ -7,7 +7,27 @@ namespace FSO.SimAntics.Engine.Primitives
 {
     public class VMPushInteraction : VMPrimitiveHandler
     {
+        /// <summary>
+        /// SIM-19 read-only observation point: fired after every tree-driven push
+        /// attempt with the outcome — enqueued (target entity + interaction) or
+        /// refused (GetAction returned null). Autotests use this to attribute
+        /// social-chain pushes; no subscriber may alter the outcome.
+        /// </summary>
+        public static event Action<VMStackFrame, VMEntity, int, bool> PushOutcome;
 
+        private static void NotifyPushOutcome(VMStackFrame context, VMEntity target, int interaction, bool enqueued)
+        {
+            var observers = PushOutcome;
+            if (observers == null) return;
+            foreach (Action<VMStackFrame, VMEntity, int, bool> observer in observers.GetInvocationList())
+            {
+                try { observer(context, target, interaction, enqueued); }
+                catch (Exception error)
+                {
+                    Console.WriteLine("[PushOutcomeObserver] " + error.GetType().Name + " " + error.Message);
+                }
+            }
+        }
 
         public override VMPrimitiveExitCode Execute(VMStackFrame context, VMPrimitiveOperand args)
         {
@@ -40,7 +60,11 @@ namespace FSO.SimAntics.Engine.Primitives
             }
 
             var action = interactionSource.GetAction(operand.Interaction, context.StackObject, context.VM.Context, false);
-            if (action == null) return VMPrimitiveExitCode.GOTO_FALSE;
+            if (action == null)
+            {
+                NotifyPushOutcome(context, context.StackObject, operand.Interaction, false);
+                return VMPrimitiveExitCode.GOTO_FALSE;
+            }
             if (operand.UseCustomIcon) action.IconOwner = context.VM.GetObjectById((short)context.Locals[operand.IconLocation]);
             action.Mode = mode;
             action.Priority = priority;
@@ -57,6 +81,7 @@ namespace FSO.SimAntics.Engine.Primitives
                 action.InteractionResult = 0;
             }
 
+            NotifyPushOutcome(context, context.StackObject, operand.Interaction, true);
             return VMPrimitiveExitCode.GOTO_TRUE;
         }
     }

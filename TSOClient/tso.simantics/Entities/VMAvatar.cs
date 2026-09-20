@@ -1060,7 +1060,14 @@ namespace FSO.SimAntics
             if (neigh.PersonData != null) PersonData = NormalizePersonData(neigh.PersonData.ToArray());
             SetPersonData(VMPersonDataVariable.Gender, lastGender); //fixes cats switching to children suddenly
             SetPersonData(VMPersonDataVariable.NeighborId, neigh.NeighbourID);
-            if (lastPersonType == 0) SetPersonData(VMPersonDataVariable.PersonType, (short)((GetPersonData(VMPersonDataVariable.TS1FamilyNumber) == current?.ChunkID) ? 0 : 1));
+            // SIM-19 experiment: PersonTypes tuning (Global.iff BCON 260 'Person Types'
+            // = [0,1,2,...]): 'person main' (PG 8193 ins3) sends every non-type-0 person
+            // into 'begin visiting' (8286), whose ins57 gate (MyPD[32] ==
+            // Tuning[16898] = PersonTypes[2] = 2) selects the real visit path — the
+            // leave path runs for type 1 ('Cheat - Ungreet' also sets 1). The port's
+            // former `: 1` made every spawned neighbor a non-visiting type, so invited
+            // visitors left immediately. Visitors are type 2.
+            if (lastPersonType == 0) SetPersonData(VMPersonDataVariable.PersonType, (short)((GetPersonData(VMPersonDataVariable.TS1FamilyNumber) == current?.ChunkID) ? 0 : 2));
             else SetPersonData(VMPersonDataVariable.PersonType, lastPersonType);
             SetPersonData(VMPersonDataVariable.VisitorSchedule, sched);
             SetPersonData(VMPersonDataVariable.GreetStatus, 0);

@@ -13,6 +13,23 @@ namespace FSO.SimAntics.Engine.Utils
     public class VMMemory
     {
         /// <summary>
+        /// SIM-19 read-only observation: fired on every expression write to
+        /// personData[34] (GreetStatus) with the writing frame. Read-only.
+        /// </summary>
+        public static event Action<VMStackFrame, bool, short, short> GreetStatusWrite;
+
+        private static void NotifyGreetStatus(VMStackFrame context, bool stackObj, short oldVal, short newVal)
+        {
+            var observers = GreetStatusWrite;
+            if (observers == null) return;
+            foreach (Action<VMStackFrame, bool, short, short> observer in observers.GetInvocationList())
+            {
+                try { observer(context, stackObj, oldVal, newVal); }
+                catch { }
+            }
+        }
+
+        /// <summary>
         /// Get a variable
         /// </summary>
         /// <param name="context"></param>
@@ -538,9 +555,13 @@ namespace FSO.SimAntics.Engine.Utils
                     return ((VMAvatar)context.StackObject).SetMotiveData((VMMotive)context.Thread.TempRegisters[data], value);
 
                 case VMVariableScope.MyPersonData: //18
+                    if (data == 34 && context.Caller is VMAvatar)
+                        NotifyGreetStatus(context, false, ((VMAvatar)context.Caller).GetPersonData(VMPersonDataVariable.GreetStatus), value);
                     return ((VMAvatar)context.Caller).SetPersonData((VMPersonDataVariable)data, value);
 
                 case VMVariableScope.StackObjectPersonData: //19
+                    if (data == 34 && context.StackObject is VMAvatar)
+                        NotifyGreetStatus(context, true, ((VMAvatar)context.StackObject).GetPersonData(VMPersonDataVariable.GreetStatus), value);
                     return ((VMAvatar)context.StackObject).SetPersonData((VMPersonDataVariable)data, value);
 
                 case VMVariableScope.MySlot: //20
