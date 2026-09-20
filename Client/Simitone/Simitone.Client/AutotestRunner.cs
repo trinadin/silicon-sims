@@ -1007,6 +1007,7 @@ namespace Simitone.Client
                 || CheckEnabled("llinteract")
                 || CheckEnabled("llfire")
                 || CheckEnabled("aud12live")
+                || CheckEnabled("aud13vox")
                 || CheckEnabled("cc05live")
                 || CheckEnabled("cc04live")
                 || CheckEnabled("ss-book")
@@ -5177,6 +5178,11 @@ namespace Simitone.Client
             {
                 CheckAUD12Live();
             }
+            // AUD-13 (opt-in "aud13vox"): the demographic voice law, driven live.
+            if (CheckEnabled("aud13vox") && _a13State != 2)
+            {
+                CheckAUD13Vox();
+            }
             // CC-05 (opt-in "cc05live"): the MissingGlobal orphan constructed live —
             // construction-time lazy, so the battery never builds it; the check
             // drives the construction once on the first soak frame.
@@ -5749,6 +5755,8 @@ namespace Simitone.Client
                 return; // (EXP-01 llfire) fire/rocket legs still driving; battery finishes after the verdict
             if (CheckEnabled("aud12live") && _a12State != 2)
                 return; // (AUD-12) capture-rail legs still driving; battery finishes after the verdict
+            if (CheckEnabled("aud13vox") && _a13State != 2)
+                return; // (AUD-13) voice-law phases still driving; battery finishes after the verdict
             if (CheckEnabled("cc05live") && !_cc05Done)
                 return; // (CC-05) orphan construction still pending; battery finishes after the verdict
             if (CheckEnabled("cc04live") && !_cc04Done)
@@ -23819,6 +23827,273 @@ namespace Simitone.Client
         private static readonly bool[] _ll2LegOk = new bool[4];
         private static Func<bool> _ll2Save;
         private static Action _ll2Reload;
+
+        // AUD-13 (opt-in "aud13vox"): the demographic voice-selection law, live.
+        // The decode (coordination/evidence/AUD-13/voice-law-decode.md) is
+        // byte-verified from the corpus AND re-verified against interpreter
+        // source: GetSrcDataField reads ObjectVar[field] (LoadB v0b,v00 makes
+        // field 0) and SetFlags sets ZeroFlag=(value==0), so IfNotEqual jumps
+        // only for gender!=0. Native law per stem: LoadL default list (male,
+        // also taken by child=2), gender 0 falls through to LoadL female list,
+        // then smart_setlist/smart_choose (random take) -> patch -> note_on.
+        // The events table reaches exactly one gender-driven stem in the
+        // corpus — vox_flirter -> the 0x17f ahhhh template (lists 167/168, one
+        // take per gender: f1 vs m1 files, disjoint) — so the gate accepts
+        // single-take stems when the two lists resolve to DISJOINT filesets:
+        // if the engine ignored gender, the female fire would observe the
+        // male-default file and the verdict fails. The gate drives one event
+        // with ObjectVar[0] fed per fire (0=female 1=male 2=child; child takes
+        // the male default — that IS the two-branch native law) and asserts
+        // every played patch filename lands in the fired thread's stamped
+        // gender's list. Notes are attributed by a probe marker stamped on the
+        // fired thread (ObjectVar[1]=0xA13): NoteQueued dispatches at PLAY
+        // time, so notes from retired threads can arrive after the next fire
+        // replaced the driven handle — thread-stamped bucketing is immune to
+        // that latency. Filenames come from note.Sound (public Patch on
+        // HITNoteEntry); HITThread.Patch reflection stays as fallback.
+        // VolGroup is recorded per note for the AUD-01 D1 (vox bus)
+        // disposition, not asserted here.
+        private class A13VoiceEvent
+        {
+            public string Key;
+            public HashSet<string> MalePatches = new HashSet<string>();
+            public HashSet<string> FemalePatches = new HashSet<string>();
+        }
+        private static int _a13State;          // 0 init, 1 drive, 2 done
+        private static int _a13Frame, _a13Phase, _a13Notes, _a13Vox, _a13OtherVol;
+        private static readonly List<string> _a13Candidates = new List<string>();
+        private static readonly Dictionary<string, A13VoiceEvent> _a13Voice =
+            new Dictionary<string, A13VoiceEvent>();
+        private static string _a13Key;
+        private static FSO.HIT.HITThread _a13Thread;
+        private static readonly List<string>[] _a13ByGender =
+            new List<string>[] { new List<string>(), new List<string>(), new List<string>() };
+        private static System.Reflection.FieldInfo _a13PatchField;
+        private static int _a13RawNotes, _a13Fires;
+        private const int A13Marker = 0xA13; // ObjectVar[1] stamp: attributes notes to probe fires
+
+        private static void CheckAUD13Vox()
+        {
+            try
+            {
+                switch (_a13State)
+                {
+                    case 0: A13Init(); break;
+                    case 1: A13Drive(); break;
+                    case 2: return;
+                }
+            }
+            catch (Exception le)
+            {
+                Log("AUTOTEST aud13vox EXC phase=" + _a13Phase + " "
+                    + le.GetType().Name + " " + le.Message);
+                Fail("aud13vox");
+                _a13State = 2;
+                FSO.HIT.HITVM.NoteQueued -= A13OnNote;
+            }
+        }
+
+        private static void A13Init()
+        {
+            var hit = FSO.HIT.HITVM.Get();
+            if (hit == null) { Log("AUTOTEST aud13vox: HITVM null"); Fail("aud13vox"); _a13State = 2; return; }
+            FSO.HIT.HITVM.NoteQueued += A13OnNote;
+            _a13PatchField = typeof(FSO.HIT.HITThread).GetField("Patch",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var evts = FSO.Content.Content.Get().Audio?.Events;
+            if (evts == null || evts.Count == 0) { Log("AUTOTEST aud13vox: no audio events"); Fail("aud13vox"); _a13State = 2; return; }
+            foreach (var kv in evts)
+            {
+                var reg = kv.Value;
+                var group = reg?.ResGroup;
+                if (group?.hot == null || group.hit == null) continue;
+                FSO.Files.HIT.Track tr;
+                if (!group.hot.Tracks.TryGetValue(reg.TrackID, out tr) || tr == null || tr.SubroutineID == 0) continue;
+                uint off;
+                if (!group.hot.TrackData.TryGetValue(tr.SubroutineID, out off)) continue;
+                long end = group.hit.Data.Length;
+                foreach (var o2 in group.hot.TrackData.Values) { if (o2 > off && o2 < end) end = o2; }
+                var b = group.hit.Data;
+                if (off + 12 > end || b[off] != 0x45) continue; // SeqGroupKill-led stem block
+                var genderDriven = false;
+                for (int i = (int)off; i < end; i++) if (b[i] == 0x48) { genderDriven = true; break; } // GetSrcDataField
+                if (!genderDriven) continue;
+                // instruction-aligned walk (opcode operand sizes byte-verified
+                // against the corpus); LoadL v05 constants = male default then
+                // female hitlist ids. The old raw `05 05 <i32>` pattern scan was
+                // NOT wrong here but is unsafe in general — walk, don't grep.
+                var vals = new List<int>();
+                var opSizes = new Dictionary<byte, int>
+                {
+                    { 0x02, 1 }, { 0x04, 2 }, { 0x05, 5 }, { 0x06, 2 }, { 0x07, 4 },
+                    { 0x0A, 4 }, { 0x0B, 0 }, { 0x0C, 0 }, { 0x0D, 4 }, { 0x0E, 1 },
+                    { 0x12, 1 }, { 0x14, 2 }, { 0x18, 3 }, { 0x27, 1 }, { 0x3E, 4 },
+                    { 0x3F, 4 }, { 0x44, 1 }, { 0x45, 1 }, { 0x47, 1 }, { 0x48, 3 }, { 0x4B, 2 }
+                };
+                var aligned = true;
+                for (int i = (int)off; i < end; )
+                {
+                    int n;
+                    if (!opSizes.TryGetValue(b[i], out n)) { aligned = false; break; }
+                    if (b[i] == 0x05 && i + 6 <= end && b[i + 1] == 0x05)
+                        vals.Add(BitConverter.ToInt32(b, i + 2));
+                    if (b[i] == 0x0C) break;
+                    i += 1 + n;
+                }
+                if (!aligned || vals.Count < 2) continue;
+                FSO.Files.HIT.Hitlist ml, fl;
+                if (!group.hot.Hitlists.TryGetValue((uint)vals[0], out ml) ||
+                    !group.hot.Hitlists.TryGetValue((uint)vals[1], out fl) ||
+                    ml == null || fl == null || ml.IDs.Count == 0 || fl.IDs.Count == 0) continue;
+                var ve = new A13VoiceEvent();
+                foreach (var pid in ml.IDs) { FSO.Files.HIT.Patch p; if (group.hot.Patches.TryGetValue(pid, out p) && p?.Filename != null) ve.MalePatches.Add(p.Filename); }
+                foreach (var pid in fl.IDs) { FSO.Files.HIT.Patch p; if (group.hot.Patches.TryGetValue(pid, out p) && p?.Filename != null) ve.FemalePatches.Add(p.Filename); }
+                if (ve.MalePatches.Count == 0 || ve.FemalePatches.Count == 0) continue;
+                _a13Voice[kv.Key] = ve; _a13Candidates.Add(kv.Key);
+            }
+            Log("AUTOTEST aud13vox init: genderEvents=" + _a13Candidates.Count);
+            if (_a13Candidates.Count == 0) { Log("AUTOTEST aud13vox: no gender-driven voice events"); Fail("aud13vox"); _a13State = 2; return; }
+            // Drive the richest candidate, but do NOT require >=2 takes: the
+            // events table reaches a single gender-driven stem in the corpus
+            // (vox_flirter -> the 0x17f ahhhh template, one take per gender),
+            // and a stem still discriminates when its male/female filesets are
+            // non-empty and DISJOINT — ignoring gender would play the
+            // male-default file in the female fire and fail the verdict.
+            string best = null; var bestScore = -1;
+            foreach (var k in _a13Candidates)
+            {
+                var v = _a13Voice[k];
+                var score = Math.Min(v.MalePatches.Count, v.FemalePatches.Count);
+                if (score > bestScore) { bestScore = score; best = k; }
+            }
+            Log("AUTOTEST aud13vox candidates: " + string.Join(" | ", _a13Candidates
+                .Select(k => k + "(m" + _a13Voice[k].MalePatches.Count + "/f" + _a13Voice[k].FemalePatches.Count + ")")));
+            _a13Key = best;
+            var v0 = _a13Voice[_a13Key];
+            if (v0.MalePatches.Any(p => v0.FemalePatches.Contains(p)))
+            {
+                Log("AUTOTEST aud13vox: chosen male/female filesets overlap — cannot discriminate gender");
+                Fail("aud13vox"); _a13State = 2; FSO.HIT.HITVM.NoteQueued -= A13OnNote; return;
+            }
+            Log("AUTOTEST aud13vox chosen=" + _a13Key + " minTakes=" + bestScore
+                + " male=[" + string.Join(",", v0.MalePatches) + "] female=["
+                + string.Join(",", v0.FemalePatches) + "]");
+            _a13State = 1; _a13Phase = 0; _a13Frame = 0;
+        }
+
+        private static void A13Drive()
+        {
+            var hit = FSO.HIT.HITVM.Get();
+            if (hit == null) { Fail("aud13vox"); _a13State = 2; FSO.HIT.HITVM.NoteQueued -= A13OnNote; return; }
+            if (_a13Frame == 0)
+            {
+                _a13Notes = 0; _a13RawNotes = 0; _a13Fires = 0; _a13Vox = 0; _a13OtherVol = 0;
+                _a13ByGender[0].Clear(); _a13ByGender[1].Clear(); _a13ByGender[2].Clear();
+            }
+            if (_a13Frame % 60 == 0 || (_a13Thread != null && _a13Thread.Dead))
+            {
+                // retire-and-refire: one utterance spends its note and the thread
+                // dies (AUD-12 runs 4-6 law); keep notes flowing on a 60f cadence,
+                // cycling the stamped gender so all three buckets fill together.
+                Fire13(hit);
+            }
+            if (_a13Frame > 0 && _a13Frame % 600 == 0)
+                Log("AUTOTEST aud13vox hb: frame=" + _a13Frame + " fires=" + _a13Fires
+                    + " notes=" + _a13Notes + " raw=" + _a13RawNotes
+                    + " g0=" + _a13ByGender[0].Count + " g1=" + _a13ByGender[1].Count
+                    + " g2=" + _a13ByGender[2].Count);
+            if (_a13ByGender[0].Count >= 3 && _a13ByGender[1].Count >= 3 && _a13ByGender[2].Count >= 3)
+            {
+                var ve = _a13Voice[_a13Key];
+                var ok = true;
+                for (int g = 0; g < 3 && ok; g++)
+                {
+                    var want = g == 0 ? ve.FemalePatches : ve.MalePatches; // child(2) takes the male default
+                    if (_a13ByGender[g].Any(p => !want.Contains(p))) ok = false;
+                }
+                Log("AUTOTEST aud13vox verdict " + (ok ? "PASS" : "FAIL")
+                    + " fires=" + _a13Fires + " notes=" + _a13Notes + " raw=" + _a13RawNotes
+                    + " volVox=" + _a13Vox + " volOther=" + _a13OtherVol
+                    + " g0(female)=[" + string.Join(",", _a13ByGender[0].Distinct()) + "]"
+                    + " g1(male)=[" + string.Join(",", _a13ByGender[1].Distinct()) + "]"
+                    + " g2(child->default)=[" + string.Join(",", _a13ByGender[2].Distinct()) + "]");
+                if (!ok) Fail("aud13vox");
+                else
+                {
+                    Log("AUTOTEST aud13vox: PASS gender->hitlist law live (female=female list; male and child=male default), filenames read off the played notes");
+                    Pass("aud13vox");
+                }
+                _a13State = 2;
+                FSO.HIT.HITVM.NoteQueued -= A13OnNote;
+                return;
+            }
+            if (_a13Frame > 2400)
+            {
+                Log("AUTOTEST aud13vox FAIL (starved: notes=" + _a13Notes + " raw=" + _a13RawNotes
+                    + " g0=" + _a13ByGender[0].Count + " g1=" + _a13ByGender[1].Count
+                    + " g2=" + _a13ByGender[2].Count + ")");
+                Fail("aud13vox");
+                _a13State = 2;
+                FSO.HIT.HITVM.NoteQueued -= A13OnNote;
+                return;
+            }
+            _a13Frame++;
+        }
+
+        private static void Fire13(FSO.HIT.HITVM hit)
+        {
+            if (_a13Thread != null && !_a13Thread.Dead) _a13Thread.Dead = true;
+            var t = hit.PlaySoundEvent(_a13Key) as FSO.HIT.HITThread;
+            if (t == null)
+            {
+                if (_a13Frame % 60 == 0)
+                    Log("AUTOTEST aud13vox fire: PlaySoundEvent null/non-thread frame=" + _a13Frame);
+                return;
+            }
+            _a13Thread = t;
+            var gender = _a13Fires % 3; // 0=female 1=male 2=child (child takes the male default)
+            if (t.ObjectVar == null) t.ObjectVar = new int[29];
+            t.ObjectVar[0] = gender;    // source data field 0 (ReadVar(10010+0) -> ObjectVar[0])
+            t.ObjectVar[1] = A13Marker; // bytecode never writes ObjectVar[1]; stamp survives to note time
+            _a13Fires++;
+            _a13Phase = gender;
+            Log("AUTOTEST aud13vox fire: name=" + t.Name + " id=#" + t.GetHashCode().ToString("x")
+                + " gender=" + gender + " vol=" + t.VolGroup + " entryPC=0x" + t.PC.ToString("x"));
+        }
+
+        private static void A13OnNote(FSO.HIT.HITNoteEntry note)
+        {
+            try
+            {
+                _a13RawNotes++;
+                var t = note.Source as FSO.HIT.HITThread;
+                if (_a13RawNotes <= 5)
+                    Log("AUTOTEST aud13vox rawNote " + _a13RawNotes + ": src="
+                        + (note.Source == null ? "null" : note.Source.GetType().Name + ":"
+                        + note.Source.Name + "#" + note.Source.GetHashCode().ToString("x"))
+                        + " mine=" + ReferenceEquals(t, _a13Thread)
+                        + " drive=" + (_a13Thread == null ? "null" : "#" + _a13Thread.GetHashCode().ToString("x"))
+                        + " snd=" + (note.Sound?.Name ?? "?") + "/" + (note.Sound?.Filename ?? "?"));
+                // Attribute by the thread stamp, not by handle identity: the
+                // stamp survives queue latency (the note plays after the next
+                // fire replaced the driven handle) and game-created threads
+                // never carry it.
+                if (t == null || t.ObjectVar == null || t.ObjectVar.Length < 2
+                    || t.ObjectVar[1] != A13Marker) return;
+                var g = t.ObjectVar[0];
+                if (g < 0 || g > 2) return;
+                var fn = note.Sound?.Filename;
+                if (string.IsNullOrEmpty(fn) && _a13PatchField != null)
+                {
+                    var p = _a13PatchField.GetValue(t) as FSO.Files.HIT.Patch;
+                    fn = p?.Filename;
+                }
+                _a13ByGender[g].Add(fn ?? "?");
+                _a13Notes++;
+                if (t.VolGroup == FSO.HIT.Model.HITVolumeGroup.VOX) _a13Vox++; else _a13OtherVol++;
+            }
+            catch { }
+        }
 
         // AUD-12: the audible acceptance matrix, live. The capture rail
         // (HITVM.NoteQueued — read-only) records every note that reaches the
