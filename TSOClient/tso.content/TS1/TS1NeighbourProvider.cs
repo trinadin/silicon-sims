@@ -666,6 +666,135 @@ namespace FSO.Content.TS1
             return name + "_" + familyId + ".FAM";
         }
 
+        /// <summary>
+        /// UI-21: GetImportInfoForFile's observable read set (r247-fam-import
+        /// decode §2.1/§2.2) reduced to what the generic import DIALOG presents
+        /// (UIText.iff STR# 143 'ImportStrs', 9 English entries): family display
+        /// name ($family), house number ($lot) with its occupancy scenario, and
+        /// the member name list (STR# 143[5] "The members of the new family
+        /// are:"). Net worth (ImportInfo+0x140) is carried for a future browser.
+        /// A describe NEVER mutates anything — it is the dialog's read-only
+        /// half of the import flow, mirroring the poll's ValidateImportFile
+        /// gate (same EXPi+FAMI presence law, same silent failure).
+        /// </summary>
+        public class TS1ImportInfo
+        {
+            public string Path;
+            /// <summary>FAMs string 0 with the CTSS-1000 override applied
+            /// (import law step 4); null when the file is not importable.</summary>
+            public string FamilyName;
+            /// <summary>The FAMI house number (0 = family-only import).</summary>
+            public int House;
+            /// <summary>House != 0 and Houses/HouseNN.iff exists (STR# 143[4]
+            /// "vacant house" line); false means the "empty lot" line [3] —
+            /// which the import's structural guard will then refuse.</summary>
+            public bool HouseFileExists;
+            /// <summary>The FAMs name of the family currently occupying the
+            /// house (STR# 143[2] "displace the $family family" line); null
+            /// when the lot is not occupied.</summary>
+            public string OccupantName;
+            /// <summary>Per-member display names (EXPi order; CTSS pid+2000 →
+            /// CTSS pid → NBRS record name, the import law's own name chain).</summary>
+            public string[] MemberNames;
+            /// <summary>The FAMI money pair sum (ImportInfo+0x140 net worth).</summary>
+            public int NetWorth;
+        }
+
+        /// <summary>
+        /// The *.FAM files staged in &lt;UserPath&gt;Import/ in scan order
+        /// (the same order CheckForNewImports consumes them), described. Files
+        /// that fail the EXPi+FAMI gate are omitted (native GetImportInfoForFile
+        /// failure is a silent skip, decode §1.2). Empty when nothing valid is
+        /// staged — the client's Import button then behaves like the native's
+        /// presence-gated disabled import UI (model+0x160).
+        /// </summary>
+        public List<TS1ImportInfo> DescribeImports()
+        {
+            var result = new List<TS1ImportInfo>();
+            string[] fams;
+            try
+            {
+                fams = Directory.GetFiles(Path.Combine(UserPath, "Import"), "*.FAM");
+            }
+            catch (Exception)
+            {
+                return result; //no Import/ directory is simply "nothing staged"
+            }
+            foreach (var famPath in fams)
+            {
+                var info = DescribeImportFile(famPath);
+                if (info != null) result.Add(info);
+            }
+            return result;
+        }
+
+        /// <summary>Describe one staged FAM; null when it fails the import
+        /// gate (not an IFF, no EXPi, or the EXPi names no FAMI).</summary>
+        public TS1ImportInfo DescribeImportFile(string famPath)
+        {
+            try
+            {
+                var famIff = new IffFile(famPath);
+                var expi = famIff.List<EXPi>()?.FirstOrDefault();
+                if (expi == null) return null;
+                var importFami = famIff.Get<FAMI>((ushort)expi.FamilyID);
+                if (importFami == null) return null;
+
+                //import law step 4: FAMs string 0 with the CTSS-1000 override.
+                var famName = famIff.Get<FAMs>((ushort)expi.FamilyID)?.GetString(0);
+                var nameOverride = famIff.Get<CTSS>(1000)?.GetString(0);
+                if (nameOverride != null) famName = nameOverride;
+                if (famName == null) return null;
+
+                var famNbrs = famIff.List<NBRS>()?.FirstOrDefault();
+                var info = new TS1ImportInfo
+                {
+                    Path = famPath,
+                    FamilyName = famName,
+                    House = Math.Max(0, importFami.HouseNumber),
+                    NetWorth = importFami.Budget + importFami.ValueInArch,
+                };
+
+                //member names: the import law's own chain (PrepareImportTemplate
+                //Person reads CTSS pid+2000 then CTSS pid); NBRS record name is
+                //the last display fallback for the dialog.
+                var names = new List<string>();
+                foreach (var pid in expi.ActiveMemberIDs)
+                {
+                    var ctss = famIff.Get<CTSS>((ushort)(pid + 2000))
+                        ?? famIff.Get<CTSS>((ushort)pid);
+                    var name = ctss?.GetString(0);
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        Neighbour rec = null;
+                        famNbrs?.NeighbourByID.TryGetValue(pid, out rec);
+                        name = rec?.Name;
+                    }
+                    if (string.IsNullOrEmpty(name)) name = "Person " + (names.Count + 1);
+                    names.Add(name);
+                }
+                info.MemberNames = names.ToArray();
+
+                if (info.House != 0)
+                {
+                    info.HouseFileExists = File.Exists(GetHousePath(info.House));
+                    FAMI occupant = null;
+                    FamilyForHouse.TryGetValue((short)info.House, out occupant);
+                    if (occupant != null)
+                    {
+                        var occName = GetFamilyString(occupant.ChunkID)?.GetString(0);
+                        info.OccupantName = string.IsNullOrEmpty(occName)
+                            ? ("family " + occupant.ChunkID) : occName;
+                    }
+                }
+                return info;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         /// <summary>Clone a source STR's default-language string set into a fresh STR.</summary>
         private static void CopyStrings(STR dst, STR src)
         {
@@ -1419,11 +1548,34 @@ namespace FSO.Content.TS1
 
             // --- step 25: portrait regeneration — N/A (ADAPT): the port renders
             //neighborhood cards from live data; there is no PersonFinder::
-            //GenerateBitmaps bitmap cache to refresh. The Export/ mirror refresh of
-            //the free wrapper (imported + evicted families, skip id 4000) is
-            //UNIMPLEMENTED: nothing in the port writes or reads Export/ — a
-            //divergence on disk, disclosed at CheckForNewImports.
+            //GenerateBitmaps bitmap cache to refresh.
             LastImportHouse = house; //reloadScreen gate for the client (decode §1.2)
+
+            // --- free-wrapper tail (r247-fam-import decode §2.3, 0x231df0): the
+            //Export/ mirror refresh. After a SUCCESSFUL import the affected bin
+            //families are re-exported to <UserPath>Export/ — the imported family
+            //(skipping the reserved Strays id 4000/0xfa0, which also suppresses the
+            //native out-id write) and, when the import evicted one, the evicted
+            //family (native guard C7: GetFamily(famB_id) non-null AND its id != 0;
+            //the 4000 skip applies to both). This is the "export the affected
+            //families after every import" half of the FAM-in/FAM-out loop — the
+            //eviction is deliberately soft (the old family survives in Export/).
+            //The native free wrapper ignores ExportFamily's rc, so a mirror failure
+            //never changes the import result. (Was disclosed UNIMPLEMENTED at the
+            //R253 audit; SAV-06's ExportFamily is the writer used here.) ---
+            try
+            {
+                if (newId != 4000 && GetFamily(newId) != null) ExportFamily(newId);
+                if (evicted != null && evicted.ChunkID != 0 && evicted.ChunkID != 4000
+                    && GetFamily(evicted.ChunkID) != null)
+                {
+                    ExportFamily(evicted.ChunkID);
+                }
+            }
+            catch (Exception)
+            {
+                //mirror-only failure: the import itself already committed + saved.
+            }
             return IMPORT_OK;
         }
 
