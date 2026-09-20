@@ -47,7 +47,7 @@ namespace Simitone.Client.Utils
         private static PropertyInfo _tutorialState;
         private static PropertyInfo _tutorialHouse;
         private static PropertyInfo _lastImportHouse;
-        private static PropertyInfo _userPath;
+        private static MemberInfo _userPath; //provider UserPath is a public FIELD
         private static MethodInfo _stageReset;
         private static MethodInfo _isTutorialHouse;
         private static MethodInfo _checkImports;
@@ -83,7 +83,9 @@ namespace Simitone.Client.Utils
                 _requestCancel = typeof(VMContext).GetMethod("RequestTutorialCancel",
                     BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
                 _userPath = nbhdType.GetProperty("UserPath",
-                    BindingFlags.Public | BindingFlags.Instance);
+                    BindingFlags.Public | BindingFlags.Instance)
+                    ?? (MemberInfo)nbhdType.GetField("UserPath",
+                        BindingFlags.Public | BindingFlags.Instance);
                 _describeImports = nbhdType.GetMethod("DescribeImports",
                     BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
                 _exportFamily = nbhdType.GetMethod("ExportFamily",
@@ -223,7 +225,10 @@ namespace Simitone.Client.Utils
             if (provider == null) return false;
             try
             {
-                var userPath = _userPath.GetValue(provider) as string;
+                string userPath = null;
+                var asField = _userPath as FieldInfo;
+                if (asField != null) userPath = asField.GetValue(provider) as string;
+                else userPath = (_userPath as PropertyInfo)?.GetValue(provider) as string;
                 if (string.IsNullOrEmpty(userPath)) return false;
                 return File.Exists(Path.Combine(userPath, "Import", "Tutorial.FAM"));
             }

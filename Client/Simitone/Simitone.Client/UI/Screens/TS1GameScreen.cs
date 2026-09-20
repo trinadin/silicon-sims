@@ -1418,7 +1418,7 @@ namespace Simitone.Client.UI.Screens
     internal int ImportDialogOpensForProbe;  // battery evidence: ShowImportDialog calls
     internal int ImportConfirmYesForProbe;   // battery evidence: Yes dispatched the import
     internal int ImportUserErrorDialogsForProbe;
-    private UIMobileAlert _importDialog;
+    internal UIMobileAlert _importDialog;    // probe seam: the mounted import dialog
 
     /// <summary>The neighborhood Import button's flow: describe the first valid
     /// staged FAM (scan order == the poll's first-valid), show the STR# 143
