@@ -1,0 +1,63 @@
+R254 (UI-21) — UIText.iff import-flow STR tables, decoded from game-data
+(GameData/UIText.iff, IFF FILE 2.5, linear chunk walk from 0x40, BE headers,
+STR# fmt -3 {u8 lang, cstring value, cstring comment}; game string index ==
+position among lang-1 (English US) entries — the r121 canon, and the exact
+indexing FSO's STR.GetString(index) + ContentStrings.LoadTS1 produce).
+
+Method: python chunk walk (same idioms as tools/iff-dump/r121/
+make_r121_optionstrs_canon.py). Game-data read-only; nothing written back.
+
+=== STR# 143 'ImportStrs' (chunk id 143, 162 raw entries = 18 languages x 9) ===
+English (lang 1) entries, game indices 0-8 — THE generic import dialog law:
+
+  [0] "A family was found. Do you want to import the $family family into your neighborhood?"
+  [1] "They will show up in the family selection screen."
+  [2] "They will displace the $family family in lot number $lot. The old family will show up in the family selection screen."
+  [3] "They will be placed in empty lot number $lot."
+  [4] "They will displace the vacant house on lot number $lot."
+  [5] "The members of the new family are:"
+  [6] "Yes"
+  [7] "No"
+  [8] "Import Family"
+
+Placeholders are the Maxis $-style ($family, $lot) — NOT the %s/%d form
+FSO's ContentStrings.GetString(table,id,args) substitutes, so the port
+replaces them literally (string.Replace). Scenario-line semantics, derived
+against the r247-fam-import import law:
+
+  house == 0                         -> [1] (bin-only import)
+  house != 0, occupied               -> [2] ($family = occupant, $lot = house)
+  house != 0, unoccupied, house file -> [4] (vacant house)
+  house != 0, no house file          -> [3] (empty lot — the import's
+                                        structural guard then refuses)
+
+Languages present: 1,2,3,4,5,6,7,8,9,10,11,14,15,16,17,18,19,20 (2=UK..20=Korean),
+each with the same 9-entry block (entries 9n..9n+8).
+
+=== STR# 168 'TranslateImport' (chunk id 168, 119 raw entries) ===
+English (lang 1) entries 0-6 — the cross-language import rename flow (the
+EXPi flag-byte vs app+0x64 mismatch path, r247 decode §1.3):
+
+  [0] "Importing International Family"
+  [1] "This import file was created in a different language."
+  [2] "Enter a new name for this family:"
+  [3] "Enter a new name for this person:"
+  [4] "Enter a new bio for this person:"
+  [5] "Person "    (default person-name prefix, "Person01"..)
+  [6] "Family "    (default family-name prefix)
+
+OUT OF SCOPE for the UI-21 tranche (the port's import is single-language;
+the rename flow is a follow-up). Decoded here so the table law is on record.
+
+=== NghUI import art ===
+The import button art is already mounted by UINeighbourhoodSwitcher per the
+r143/uinav engine law: NghUI\Import.bmp (4-state strip, slot (250,0), tip
+STR# 151[6] "Import Family") on home strips, plus per-destination Import.bmp
+members (Downtown\VIsland\Studiotown\Magicland). No new art is needed; UI-21
+only rewires the click.
+
+=== Consumer ===
+- STR# 143 → TS1GameScreen.ShowImportDialog (ImportStr()/ImportStrsFallback,
+  R159 literal-fallback idiom) + ImportScenarioLine (the mapping above).
+- The dialog chrome is the existing R142 GenDlg law (UIMobileAlert /
+  cTSWinMsgBox): no new visual language.
