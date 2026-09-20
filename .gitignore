@@ -262,3 +262,6 @@ build/NativeIcon.icns.iconset/
 # REL-09 F1: original Maxis IFF files are proprietary — never track them
 # (evidence copies stay on local disk only)
 tools/iff-dump/**/*.iff
+
+# SIM-19/SIM-16 familymerge run artifacts (2026-09-20 review P2-2)
+user-fm*/

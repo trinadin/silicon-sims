@@ -10418,6 +10418,7 @@ namespace Simitone.Client
                         + " created " + createdIff + " guid=0x" + guid.ToString("X8")
                         + " base=" + baseId;
                     _sim3CreateEvents.Add(entry);
+                    if (guid == 0x9F4B8924u) _fmBrokerId = (short)(group?.BaseObject?.ObjectID ?? 0); // SIM-19: HDSI_Greet broker
                     if (isAvatar)
                     {
                         _sim3AvatarCreateIds.Add(baseId);
@@ -11367,7 +11368,8 @@ namespace Simitone.Client
         private static uint _fmMergedGuids; // count captured at merge
         private static string _fmOldFamilyState = "?";
         private static bool _fmSeededArrival;
-        private static bool _fmPieLoggedP3;
+        private static int _fmPieMissDumps; // revival8: dump pie candidates + guest gs/pt on the first misses (move-in window diagnosis)
+        private static int _fmRelGateDumps; // revival9: dump actor->guest STR/LTR on the first maturity-gate blocks
         private static int _fmArrivalSimMinute = -1;
         private static bool _fmGreeted;
         private static int _fmFixtureSimMin = -1;
@@ -11376,14 +11378,168 @@ namespace Simitone.Client
         private static bool _fmSocialDumped;
         private static int _fmDirectTta = -1;
         private static bool _fmDirectGlobal;
+        private static int _fmGreetTta = -1; // SIM-19 diagnostic: Shake Hands TTAIndex
+        private static DateTime _fmDiagLast = DateTime.MinValue;
+        private static int _fmDiagDumps;
+        private static short _fmBrokerId = -1; // SIM-19: last HDSI_Greet broker object id
+        private static bool _fmMoveInRetried; // SIM-19: one post-greet move-in re-push
+        private static int _fmGreetUid = -1; // SIM-19: pushed greet uid (vanish watch; -1 = none)
+        private static int _fmGreetPushMin = -1; // SIM-19: sim-minute of the push
+        private static int _fmGreetPushes; // SIM-19: bounded pairing attempts (x3)
+        private static int _fmTraceLogs; // SIM-19: per-instruction trace budget
+        private static readonly HashSet<ushort> _fmTraceTrees = new HashSet<ushort> {
+            // SIM-19 tracer whitelist (fm-fix31: 8294/8293/8295 added — the push-wrapper walk)
+            19, 355, 365, 4096, 4127, 4141, 4145, 4158, 4178, 8193, 8217, 8221, 8222,
+            8225, 8230, 8277, 8284, 8285, 8286, 8293, 8294, 8295, 8301, 8317, 8353,
+            8371, 8390, 8451, 8473
+        };
+        private static int _fmPushLogs;
+        private static int _fmDropLogs;
 
         private static void FamilyMergeSetup()
         {
             Sim3Setup("familymerge");
+            // SIM-19 diagnostics: read-only observers (engine events; no behavior change)
+            FSO.SimAntics.Engine.Primitives.VMPushInteraction.PushOutcome -= FmPushObserver;
+            FSO.SimAntics.Engine.Primitives.VMPushInteraction.PushOutcome += FmPushObserver;
+            FSO.SimAntics.Engine.VMThread.QueueDrop -= FmDropObserver;
+            FSO.SimAntics.Engine.VMThread.QueueDrop += FmDropObserver;
+            FSO.SimAntics.Engine.VMThread.QueueRemoveAny -= FmRemoveObserver;
+            FSO.SimAntics.Engine.VMThread.QueueRemoveAny += FmRemoveObserver;
+            FSO.SimAntics.Engine.Utils.VMMemory.GreetStatusWrite -= FmGreetStatusObserver;
+            FSO.SimAntics.Engine.Utils.VMMemory.GreetStatusWrite += FmGreetStatusObserver;
+            FSO.SimAntics.Engine.VMThread.InstructionTrace -= FmTraceObserver;
+            FSO.SimAntics.Engine.VMThread.InstructionTrace += FmTraceObserver;
+            _fmPushLogs = 0;
+            _fmDropLogs = 0;
+            _fmTraceLogs = 0;
+            _fmGreetUid = -1;
+            _fmGreetPushMin = -1;
+            _fmGreetPushes = 0;
             _fmPhase = 0;
             _fmPhaseStart = DateTime.UtcNow;
             try { short.TryParse(_houses[Math.Min(_houseIdx, _houses.Length - 1)], out _fmHouse); } catch { }
             Log("AUTOTEST familymerge armed (SIM-16; phone invite -> propose/move-in -> merge -> user save -> reload; budget 600 sim-min / 13 real min to merge)");
+        }
+
+        // SIM-19: log tree-driven push outcomes + queue-validation drops during the
+        // greet window (bounded to 400 lines each). Read-only observers.
+        private static void FmPushObserver(FSO.SimAntics.Engine.VMStackFrame frame, FSO.SimAntics.VMEntity target, int interaction, bool enqueued)
+        {
+            if (_fmPushLogs >= 400) return;
+            _fmPushLogs++;
+            try
+            {
+                var routine = frame?.Routine != null ? (frame.Routine.ID.ToString()) : "?";
+                var callee = frame?.Callee != null ? ("obj" + frame.Callee.ObjectID) : "?";
+                Log("AUTOTEST familymerge push tree=" + routine + " callee=" + callee
+                    + " target=obj" + (target != null ? target.ObjectID.ToString() : "?")
+                    + " interaction=" + interaction + (enqueued ? " ENQUEUED" : " REFUSED(GetAction=null)"));
+            }
+            catch { }
+        }
+
+        private static void FmRemoveObserver(string reason, FSO.SimAntics.VMEntity entity, FSO.SimAntics.Engine.VMQueuedAction action)
+        {
+            if (_fmDropLogs >= 400) return;
+            _fmDropLogs++;
+            try
+            {
+                Log("AUTOTEST familymerge queue-remove reason=" + reason + " entity=obj" + (entity != null ? entity.ObjectID.ToString() : "?")
+                    + " name='" + (action != null ? action.Name : "?") + "' interaction=" + (action != null ? action.InteractionNumber.ToString() : "?")
+                    + " uid=" + (action != null ? action.UID.ToString() : "?") + " at " + Sim3Clock());
+            }
+            catch { }
+        }
+
+        private static void FmGreetStatusObserver(FSO.SimAntics.Engine.VMStackFrame frame, bool stackObj, short oldVal, short newVal)
+        {
+            if (_fmDropLogs >= 400) return;
+            _fmDropLogs++;
+            try
+            {
+                var who = stackObj ? ("StackObj(obj" + (frame?.StackObject?.ObjectID ?? 0) + ")") : ("Caller(obj" + (frame?.Caller?.ObjectID ?? 0) + ")");
+                var stack = frame?.Thread?.Stack;
+                var trail = stack == null ? "?" : string.Join(",", stack.TakeLast(4).Select(f => (f.Routine != null ? f.Routine.ID.ToString() : "?") + "@" + f.InstructionPointer));
+                Log("AUTOTEST familymerge greet-status " + who + " " + oldVal + "->" + newVal
+                    + " by tree=" + (frame?.Routine?.ID.ToString() ?? "?") + "@" + frame?.InstructionPointer
+                    + " trail=[" + trail + "] at " + Sim3Clock());
+            }
+            catch { }
+        }
+
+        // SIM-19: per-instruction trace of whitelisted trees (bounded 4000 lines;
+        // gs = GreetStatus PD[34], pt = PersonType PD[32] of the callee). Read-only.
+        private static void FmTraceObserver(FSO.SimAntics.Engine.VMStackFrame frame)
+        {
+            if (_fmTraceLogs >= 4000) return;
+            try
+            {
+                var routine = frame?.Routine;
+                if (routine == null || !_fmTraceTrees.Contains(routine.ID)) return;
+                var who = frame.Callee as VMAvatar;
+                short gs = -9, pt = -9;
+                try { if (who != null) gs = who.GetPersonData(VMPersonDataVariable.GreetStatus); } catch { }
+                try { if (who != null) pt = who.GetPersonData(VMPersonDataVariable.PersonType); } catch { }
+                _fmTraceLogs++;
+                Log("AUTOTEST familymerge SIM19-trace " + routine.ID + "@" + frame.InstructionPointer
+                    + " who=obj" + (who != null ? who.ObjectID.ToString() : "?")
+                    + " gs=" + gs + " pt=" + pt + " at " + Sim3Clock());
+            }
+            catch { }
+        }
+
+        // SIM-19 fm-fix30 discriminator: both queues + stacks + the HDSI_Greet
+        // broker's attrs and its data[11] at the vanish moment. Read-only.
+        private static void FmPairDump(VMEntity host, VMEntity guest)
+        {
+            try
+            {
+                foreach (var pair in new[] { Tuple.Create("host", host), Tuple.Create("guest", guest) })
+                {
+                    var ent = pair.Item2;
+                    if (ent == null) continue;
+                    var th = ent.Thread;
+                    var queue = th != null && th.Queue != null
+                        ? string.Join(",", th.Queue.Select(a => "'" + a.Name + "'uid" + a.UID)) : "";
+                    var active = "none";
+                    try
+                    {
+                        if (th != null && th.ActiveQueueBlock >= 0 && th.ActiveQueueBlock < th.Queue.Count)
+                            active = "'" + th.Queue[th.ActiveQueueBlock].Name + "'";
+                    }
+                    catch { }
+                    var stack = th != null && th.Stack != null
+                        ? string.Join(",", th.Stack.Select(f => (f.Routine != null ? f.Routine.ID.ToString() : "?") + "@" + f.InstructionPointer)) : "";
+                    Log("AUTOTEST familymerge PAIR-DUMP " + pair.Item1 + " obj=" + ent.ObjectID
+                        + " queue=[" + queue + "] active=" + active + " stack=[" + stack + ",]");
+                }
+                VMEntity broker = null;
+                try { broker = _vm.Entities.FirstOrDefault(e => e != null && e.Object != null && e.Object.GUID == 0x9F4B8924u); } catch { }
+                if (broker != null)
+                {
+                    var attrs = "";
+                    for (int i = 0; i < 14; i++) { try { attrs += i + "=" + broker.GetAttribute(i) + ","; } catch { } }
+                    var d11 = broker.ObjectData != null && broker.ObjectData.Length > 11 ? broker.ObjectData[11].ToString() : "?";
+                    Log("AUTOTEST familymerge PAIR-DUMP broker obj=" + broker.ObjectID + " guid=0x9F4B8924"
+                        + " attrs=[" + attrs + "] data11=" + d11);
+                }
+                else Log("AUTOTEST familymerge PAIR-DUMP broker none-live (guid=0x9F4B8924)");
+            }
+            catch (Exception de) { Log("AUTOTEST familymerge PAIR-DUMP EXC " + de.GetType().Name + " " + de.Message); }
+        }
+
+        private static void FmDropObserver(FSO.SimAntics.VMEntity entity, FSO.SimAntics.Engine.VMQueuedAction action)
+        {
+            if (_fmDropLogs >= 400) return;
+            _fmDropLogs++;
+            try
+            {
+                Log("AUTOTEST familymerge queue-drop entity=obj" + (entity != null ? entity.ObjectID.ToString() : "?")
+                    + " name='" + (action != null ? action.Name : "?") + "' interaction=" + (action != null ? action.InteractionNumber.ToString() : "?")
+                    + " mode=" + (action != null ? action.Mode.ToString() : "?") + " uid=" + (action != null ? action.UID.ToString() : "?"));
+            }
+            catch { }
         }
 
         private static Neighbour FmGuestRecord()
@@ -11482,6 +11638,10 @@ namespace Simitone.Client
                         var name = ttas?.GetString((int)ia.TTAIndex) ?? "";
                             var isMoveIn = name.IndexOf("Propose", StringComparison.OrdinalIgnoreCase) >= 0
                                 || name.IndexOf("Move In", StringComparison.OrdinalIgnoreCase) >= 0;
+                            if (name.IndexOf("Greet.../Shake Hands", StringComparison.OrdinalIgnoreCase) >= 0 && _fmGreetTta < 0)
+                            {
+                                _fmGreetTta = (int)ia.TTAIndex; // SIM-19 diagnostic target (run-9 reproduction)
+                            }
                             if (isMoveIn && _fmDirectTta < 0)
                             {
                                 _fmDirectTta = (int)ia.TTAIndex; // GetAction resolves by TTAIndex (Sim3PushDirectByTTAsName law)
@@ -11530,12 +11690,31 @@ namespace Simitone.Client
                         Sim3Evaluate(false, "no-second-family (" + dump + ")"); return;
                     }
                     _fmGuestFamId = (short)guestFam.ChunkID;
-                    // guest member: first GUID of that family with an NBRS record
+                    // guest member: prefer an NBRS member whose PersonData[65] (GENDER)
+                    // matches the actor's — 'Proposition Move In' (8390 ins4/ins13) tests
+                    // PD[65] equality before the family/motive gates, so a mismatched
+                    // pair never gets the pie row (fm-fix32/33 law). Both logged per
+                    // candidate; actor gender from the LOCAL actor (fm-fix32: the
+                    // _sim3Actor read returned the null-avatar -9).
+                    short fmActorGender = -9;
+                    try { fmActorGender = actor.GetPersonData(VMPersonDataVariable.Gender); } catch { }
                     Neighbour guestRec = null;
+                    Neighbour fmFallbackRec = null; uint fmFallbackGuid = 0;
                     foreach (var g in guestFam.FamilyGUIDs)
                     {
                         var rec = neigh.Neighbors?.Entries?.FirstOrDefault(e => e != null && e.GUID == g);
-                        if (rec != null) { _fmGuestGuid = g; guestRec = rec; break; }
+                        if (rec == null) continue;
+                        short gGender = -9;
+                        if (rec.PersonData != null && rec.PersonData.Length > 65) gGender = rec.PersonData[65];
+                        Log("AUTOTEST familymerge guest-cand guid=0x" + g.ToString("X8") + " gender=" + gGender
+                            + " (actor gender=" + fmActorGender + ")");
+                        if (guestRec == null && gGender == fmActorGender) { _fmGuestGuid = g; guestRec = rec; break; }
+                        if (fmFallbackRec == null) { fmFallbackRec = rec; fmFallbackGuid = g; }
+                    }
+                    if (guestRec == null && fmFallbackRec != null)
+                    {
+                        guestRec = fmFallbackRec; _fmGuestGuid = fmFallbackGuid;
+                        Log("AUTOTEST familymerge: no gender-matched candidate — falling back to the first NBRS-recorded member (8390 PD[65]-gate mismatch risk, disclosed)");
                     }
                     if (guestRec == null)
                     {
@@ -11550,8 +11729,19 @@ namespace Simitone.Client
                     // objects carry 0); rel slots both ways; motives on the actor.
                     _fmGuestFamWordBefore = guestRec.PersonData != null && guestRec.PersonData.Length > 61
                         ? guestRec.PersonData[61] : (short)-1;
+                    // SIM-19 experiment (disclosed): DO NOT seed the runtime family word.
+                    // 'begin visiting' (PG 8286 ins20) gates the whole visit flow on
+                    // MyPD[61]==0 — the seeded word routed the visit into the
+                    // 'leave neighbor' branch. The merge law does not need the seed:
+                    // generic call 4 writes the family word itself when the move-in
+                    // lands (assertions read it AFTER the merge).
                     if (guestRec.PersonData != null && guestRec.PersonData.Length > 61)
-                        guestRec.PersonData[61] = _fmGuestFamId;
+                        guestRec.PersonData[61] = 0;
+                    // NOTE (SIM-19 type law, fm-revival4/5): do NOT stamp PersonType
+                    // here or at arrival — person main must route the visit on the
+                    // native pt=2 (8286 ins57's real-visit path); the corrected type-1
+                    // stamp is applied at the POLL WINDOW (phase 3), where the greet
+                    // check's target must read type-1.
                     for (int slot = 0; slot <= 2; slot++)
                     {
                         short actorNid;
@@ -11679,9 +11869,36 @@ namespace Simitone.Client
                                 + " arrivedAt=" + _fmArrivalSimMinute + " now=" + Sim3ClockMinute());
                         return;
                     }
+                    // SIM-19 fm-fix30 vanish watch: the pushed greet uid leaving the
+                    // actor queue → PAIR-DUMP + re-arm. BOUNDED (fm-revival6 law: the
+                    // outer greet ALWAYS runs to exit after pushing the 8294 halves —
+                    // "8451's pushes always run to exit" — so every completion looks
+                    // like a vanish; unbounded re-arming spawned 8389 brokers in one
+                    // run. Three pairing attempts, then let the halves do their work.)
+                    if (_fmGreetUid >= 0 && actor.Thread != null
+                        && !actor.Thread.Queue.Any(a => a.UID == (ushort)_fmGreetUid))
+                    {
+                        Log("AUTOTEST familymerge: pushed greet uid=" + _fmGreetUid + " left the actor queue ("
+                            + (Sim3ClockMinute() - _fmGreetPushMin) + " sim-min after push) at " + Sim3Clock()
+                            + (_fmGreetPushes < 3 ? " — re-arming greet (disclosed, bounded x3)" : " — pairing budget spent; the 8294 halves carry the greet"));
+                        FmPairDump(actor, guest);
+                        _fmGreetUid = -1;
+                        if (_fmGreetPushes < 3)
+                        {
+                            _fmGreetPushes++;
+                            _fmGreeted = false; // re-arm: the pairing window is still open
+                        }
+                    }
                     var pick = Sim3PickPie(guest, actor, new[] { "Proposition.../Move In", "Propose.../Move In", "Move In", "Propose...", "Propose" }, true);
                     if (pick != null && Sim3Push(guest, actor, pick))
                     {
+                        if (pick.Name != null && pick.Name.IndexOf("Move In", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            short fmGsPie = -9;
+                            try { fmGsPie = guest.GetPersonData(VMPersonDataVariable.GreetStatus); } catch { }
+                            Log("AUTOTEST familymerge: post-greet PIE move-in push at " + Sim3Clock()
+                                + " (greetStatus=" + fmGsPie + "; rel slots seeded 100 both ways by the fixture)");
+                        }
                         _fmPushedSocial = true;
                         _fmPhase = 4;
                         _fmPhaseStart = DateTime.UtcNow;
@@ -11692,10 +11909,116 @@ namespace Simitone.Client
                         _fmSocialDumped = true;
                         FmDumpSocialEntries(guest);
                     }
-                    if (_fmDirectTta >= 0 && !_fmPushedSocial)
+                    if (_fmGreetTta >= 0 && !_fmGreeted && !_fmPushedSocial)
+                    {
+                        // SIM-19 fm-fix29 law: push ONLY at the post-knock visit poll —
+                        // the guest's TOP stack frame must be the visit loop (8286); a
+                        // gs=0 guest can still be MID-KNOCK-ROUTE (fm-fix28 pushed at
+                        // 8:00 and the halves idled unexamined through the whole walk).
+                        var gStack = guest.Thread != null && guest.Thread.Stack != null ? guest.Thread.Stack : null;
+                        var atVisitPoll = gStack != null && gStack.Count > 0
+                            && gStack[gStack.Count - 1].Routine != null
+                            && gStack[gStack.Count - 1].Routine.ID == 8286;
+                        if (atVisitPoll && _fmGreetUid < 0)
+                        {
+                            var gActive = "none";
+                            var gQueue = "";
+                            try
+                            {
+                                if (guest.Thread.ActiveQueueBlock >= 0 && guest.Thread.ActiveQueueBlock < guest.Thread.Queue.Count)
+                                    gActive = "'" + guest.Thread.Queue[guest.Thread.ActiveQueueBlock].Name + "'";
+                                gQueue = string.Join(",", guest.Thread.Queue.Select(a => "'" + a.Name + "'uid" + a.UID));
+                            }
+                            catch { }
+                            Log("AUTOTEST familymerge: PUSH-TIME guest stack (gs=0 via direct-tta) frames=["
+                                + string.Join(",", gStack.Select(f => (f.Routine != null ? f.Routine.ID.ToString() : "?") + "@" + f.InstructionPointer)) + ",]"
+                                + " active=[" + gActive + "] queue=[" + gQueue + "] (read-only)");
+                        }
+                        if (atVisitPoll)
+                        {
+                            // SIM-19 corrected type-1 stamp, POLL-WINDOW form: person
+                            // main must route the visit on the NATIVE pt=2 (8286 ins57
+                            // selects the real visit path — knock → poll; an
+                            // arrival-time pt=1 routes the 8317 instant-leave,
+                            // fm-revival4), but the greet's check tree fails type-2
+                            // TARGETS (fm-revival3/5: tryrunimmediately-checknull).
+                            // fm-fix31's guest was pt=2-routed and pt=1 at the poll
+                            // (traced) — stamp the target type HERE, at the push
+                            // window, after routing has committed to the poll.
+                            try
+                            {
+                                var ptPoll = guest.GetPersonData(VMPersonDataVariable.PersonType);
+                                if (ptPoll != 1)
+                                {
+                                    guest.SetPersonData(VMPersonDataVariable.PersonType, 1);
+                                    Log("AUTOTEST familymerge: TYPE-1 STAMP (poll-window) guest obj" + guest.ObjectID
+                                        + " pt " + ptPoll + "->1 (disclosed; target eligibility for the greet check)");
+                                }
+                            }
+                            catch { }
+                            // SIM-19 diagnostic: one direct push; the engine observers
+                            // capture the full chain outcome (fm-fix31 whitelist traces
+                            // the 8294-family walk; the vanish watch PAIR-DUMPs).
+                            try
+                            {
+                                var gact = guest.GetAction(_fmGreetTta, actor, _vm.Context, false);
+                                if (gact != null)
+                                {
+                                    actor.Thread.EnqueueAction(gact);
+                                    Log("AUTOTEST familymerge pushed DIRECT greet (SIM-19 diag) tta=" + _fmGreetTta
+                                        + " uid=" + gact.UID + " actor=obj" + actor.ObjectID
+                                        + " guest=obj" + guest.ObjectID + " at " + Sim3Clock() + " (disclosed diagnostic)"
+                                        + " qcount=" + actor.Thread.Queue.Count + " flags=" + (int)gact.Flags);
+                                    _fmGreetUid = gact.UID;
+                                    _fmGreetPushMin = Sim3ClockMinute();
+                                    _fmGreeted = true; // one-shot until a vanish re-arms it; the observers do the tracking
+                                }
+                                else Log("AUTOTEST familymerge: greet GetAction null for tta=" + _fmGreetTta);
+                            }
+                            catch (Exception ge) { Log("AUTOTEST familymerge: greet push EXC " + ge.GetType().Name + " " + ge.Message); }
+                        }
+                    }
+                    // fm-fix31/33 ordering law: the move-in must WAIT for the greet pair
+                    // to complete — 8353 gates on the relationship the greet writes, and
+                    // an ungated early direct push at 8:0x closes phase 3 before the
+                    // visit-poll greet can land (fm-revival1's honest FAIL: merge-budget
+                    // with gs=0 throughout, guest left ungreeted at 9:39).
+                    short fmGuestGsForMoveIn = -9;
+                    try { fmGuestGsForMoveIn = guest.GetPersonData(VMPersonDataVariable.GreetStatus); } catch { }
+                    // 8353 maturity gate (revival8 diagnosis): the move-in tree
+                    // gates on the greet-written relationship (STR/LTR both >= 50 —
+                    // fm-fix31: "STR=100 LTR=100 (8353 gate: both >= 50)"). Pushing
+                    // on gs>=1 alone fired the entry before the relationship
+                    // matured, so the family write never landed (revival8:
+                    // inFam=False pd61=0 runtimeFam=0). Read the actor->guest
+                    // neighbour-matrix STR (slot 0) / LTR (slot 1).
+                    int fmStr = -999, fmLtr = -999;
+                    try
+                    {
+                        var myNid = actor.GetPersonData(VMPersonDataVariable.NeighborId);
+                        var tgtNid = guest.GetPersonData(VMPersonDataVariable.NeighborId);
+                        var rels = FSO.Content.Content.Get().Neighborhood.GetNeighborByID(myNid)?.Relationships;
+                        if (rels != null && rels.ContainsKey(tgtNid))
+                        {
+                            var rv = rels[tgtNid];
+                            if (rv.Count > 0) fmStr = rv[0];
+                            if (rv.Count > 1) fmLtr = rv[1];
+                        }
+                    }
+                    catch { }
+                    if (_fmDirectTta >= 0 && !_fmPushedSocial && fmGuestGsForMoveIn >= 1 && (fmStr < 50 || fmLtr < 50))
+                    {
+                        _fmRelGateDumps++;
+                        if (_fmRelGateDumps <= 3)
+                            Log("AUTOTEST familymerge: move-in push HELD by 8353 maturity gate"
+                                + " (STR=" + fmStr + " LTR=" + fmLtr + " want both>=50"
+                                + " guestGs=" + fmGuestGsForMoveIn + ") at " + Sim3Clock());
+                    }
+                    if (_fmDirectTta >= 0 && !_fmPushedSocial && fmGuestGsForMoveIn >= 1 && fmStr >= 50 && fmLtr >= 50)
                     {
                         // disclosed direct push through the found semiglobal entry
-                        // (the pie's own resolution path; availability gates bypassed)
+                        // (the pie's own resolution path; availability gates bypassed;
+                        // POST-GREET only — the pie route is preferred, this is the fallback)
                         try
                         {
                             var action = guest.GetAction(_fmDirectTta, actor, _vm.Context, _fmDirectGlobal);
@@ -11740,11 +12063,34 @@ namespace Simitone.Client
                             }
                             else Log("AUTOTEST familymerge: greet RE-pushed '" + greet.Name + "' at " + Sim3Clock());
                         }
-                        else if (!_fmPieLoggedP3)
+                        else
                         {
-                            _fmPieLoggedP3 = true;
-                            Log("AUTOTEST familymerge: pie miss (move-in + greet) on guest obj" + guest.ObjectID
-                                + " at " + Sim3Clock());
+                            // revival8 instrumentation (2026-09-20 diagnosis): pie
+                            // candidates + guest gs/pt dumped on the first three
+                            // misses, then a heartbeat every 300th miss — the
+                            // availability-gate refusal becomes visible without
+                            // per-tick spam.
+                            _fmPieMissDumps++;
+                            bool dump = _fmPieMissDumps <= 3;
+                            if (dump || _fmPieMissDumps % 300 == 0)
+                            {
+                                string pieDump = "";
+                                if (dump)
+                                {
+                                    try
+                                    {
+                                        var pies = guest.GetPieMenu(_vm, actor, true, true);
+                                        var cand = new List<string>();
+                                        if (pies != null) foreach (var p in pies) cand.Add((p.Name ?? "?") + "(id=" + p.ID + ")");
+                                        pieDump = " candidates=[" + (pies == null ? "GetPieMenu null" : string.Join(" | ", cand)) + "]";
+                                    }
+                                    catch (Exception pe2) { pieDump = " pieDumpEXC " + pe2.GetType().Name; }
+                                }
+                                Log("AUTOTEST familymerge: pie miss (move-in + greet) on guest obj" + guest.ObjectID
+                                    + " gs=" + guest.GetPersonData(VMPersonDataVariable.GreetStatus)
+                                    + " pt=" + guest.GetPersonData(VMPersonDataVariable.PersonType)
+                                    + " at " + Sim3Clock() + pieDump);
+                            }
                         }
                     }
                     else if (Sim3PushState() == 1 && (Sim3ClockMinute() - _sim3PushSimMinute + 1440) % 1440 > 30)
@@ -11760,8 +12106,17 @@ namespace Simitone.Client
                         {
                             var q = _sim3Actor?.Thread?.Queue;
                             var qlist = q == null ? "none" : string.Join(" | ", q.Select(a => "'" + a.Name + "'uid" + a.UID));
+                            var guestQAv = FmGuestAvatar();
+                            var gq = guestQAv?.Thread?.Queue;
+                            var glist = gq == null ? "none" : string.Join(" | ", gq.Select(a => "'" + a.Name + "'uid" + a.UID));
+                            var aActive = _sim3Actor?.Thread?.ActiveAction;
+                            var gActive = guestQAv?.Thread?.ActiveAction;
                             Log("AUTOTEST familymerge: pushed '" + _sim3PushName + "' in-flight 30+ sim-min"
-                                + " actor=obj" + (_sim3Actor?.ObjectID ?? -1) + " queue=[" + qlist + "] at " + Sim3Clock()
+                                + " actor=obj" + (_sim3Actor?.ObjectID ?? -1) + " queue=[" + qlist + "]"
+                                + " actorActive=[" + (aActive != null ? ("'" + aActive.Name + "'uid" + aActive.UID) : "none") + "]"
+                                + " guest=obj" + (guestQAv?.ObjectID ?? -1) + " queue=[" + glist + "]"
+                                + " guestActive=[" + (gActive != null ? ("'" + gActive.Name + "'uid" + gActive.UID) : "none") + "]"
+                                + " at " + Sim3Clock()
                                 + " — cancelling stall and re-arming (disclosed)");
                         }
                         try
@@ -11797,6 +12152,75 @@ namespace Simitone.Client
                 }
                 if (_fmPhase == 4)
                 {
+                    // SIM-19 diagnostic: every 30 real seconds dump both sims' active
+                    // actions + queues + greet/relationship state (bounded to 20 dumps).
+                    if ((DateTime.UtcNow - _fmDiagLast).TotalSeconds >= 30 && _fmDiagDumps < 20)
+                    {
+                        _fmDiagLast = DateTime.UtcNow; _fmDiagDumps++;
+                        try
+                        {
+                            var a4 = _sim3Actor;
+                            var g4 = FmGuestAvatar();
+                            var aQ = a4?.Thread?.Queue; var gQ = g4?.Thread?.Queue;
+                            var aAct = a4?.Thread?.ActiveAction; var gAct = g4?.Thread?.ActiveAction;
+                            short greetSt = -9, guestGreetSt = -9; short relV = -9;
+                            try { greetSt = g4?.GetPersonData(VMPersonDataVariable.GreetStatus) ?? (short)-9; } catch { }
+                            try { guestGreetSt = a4?.GetPersonData(VMPersonDataVariable.GreetStatus) ?? (short)-9; } catch { }
+                            try { relV = (short)(_vm.TS1State?.CurrentFamily != null ? -8 : -8); } catch { }
+                            var broker = _fmBrokerId >= 0 ? _vm?.GetObjectById(_fmBrokerId) : null;
+                            Func<VMEntity, string> StackOf = (e2) =>
+                            {
+                                try
+                                {
+                                    var st = e2?.Thread?.Stack;
+                                    if (st == null || st.Count == 0) return "empty";
+                                    return string.Join(",", st.Take(4).Select(f => (f.Routine != null ? f.Routine.ID.ToString() : "?") + "@" + f.InstructionPointer));
+                                }
+                                catch { return "?"; }
+                            };
+                            Log("AUTOTEST familymerge SIM19-state t=" + Sim3Clock()
+                                + " actor[obj" + (a4?.ObjectID ?? -1) + "] active=[" + (aAct != null ? ("'" + aAct.Name + "'uid" + aAct.UID) : "none") + "] stack=[" + StackOf(a4) + "] queue=[" + (aQ == null ? "none" : string.Join(" | ", aQ.Take(6).Select(x => "'" + x.Name + "'uid" + x.UID))) + "]"
+                                + " guest[obj" + (g4?.ObjectID ?? -1) + "] active=[" + (gAct != null ? ("'" + gAct.Name + "'uid" + gAct.UID) : "none") + "] stack=[" + StackOf(g4) + "] queue=[" + (gQ == null ? "none" : string.Join(" | ", gQ.Take(6).Select(x => "'" + x.Name + "'uid" + x.UID))) + "]"
+                                + " guestGreetStatus=" + greetSt + " actorGreetStatus=" + guestGreetSt
+                                + " broker[obj" + _fmBrokerId + " exists=" + (broker != null) + " dead=" + (broker != null && broker.Dead) + "]");
+                        }
+                        catch (Exception de) { Log("AUTOTEST familymerge SIM19-state EXC " + de.GetType().Name); }
+                    }
+                    // SIM-19: once the visit reports the guest GREETED (>=2), re-push
+                    // the move-in entry — the original direct push was stranger-gated
+                    // at 8:00 BEFORE the greet state landed (native order: greet, then
+                    // propose). One retry, pie-first then the direct TTA fallback.
+                    if (!_fmMoveInRetried && _fmPhase == 4)
+                    {
+                        var g5 = FmGuestAvatar();
+                        short gs = -9;
+                        try { gs = g5?.GetPersonData(VMPersonDataVariable.GreetStatus) ?? (short)-9; } catch { }
+                        if (gs >= 2 && g5 != null && _sim3Actor != null)
+                        {
+                            _fmMoveInRetried = true;
+                            var pick2 = Sim3PickPie(g5, _sim3Actor, new[] { "Proposition.../Move In", "Propose.../Move In", "Move In", "Propose...", "Propose" }, true);
+                            if (pick2 != null && Sim3Push(g5, _sim3Actor, pick2))
+                            {
+                                Log("AUTOTEST familymerge: post-greet PIE move-in push at " + Sim3Clock() + " (greetStatus=" + gs + ")");
+                            }
+                            else if (_fmDirectTta >= 0)
+                            {
+                                try
+                                {
+                                    var mact = g5.GetAction(_fmDirectTta, _sim3Actor, _vm.Context, _fmDirectGlobal);
+                                    if (mact != null)
+                                    {
+                                        _sim3Actor.Thread.EnqueueAction(mact);
+                                        Log("AUTOTEST familymerge: post-greet DIRECT move-in re-push tta=" + _fmDirectTta
+                                            + " uid=" + mact.UID + " at " + Sim3Clock() + " (greetStatus=" + gs + "; disclosed)");
+                                    }
+                                    else Log("AUTOTEST familymerge: post-greet move-in GetAction null (greetStatus=" + gs + ")");
+                                }
+                                catch (Exception me) { Log("AUTOTEST familymerge: post-greet move-in EXC " + me.GetType().Name); }
+                            }
+                            else Log("AUTOTEST familymerge: greeted (gs=" + gs + ") but no move-in TTA captured");
+                        }
+                    }
                     // merge wait: the call-4 family write + mirrors + a call-5 budget event
                     var fam = _vm.TS1State?.CurrentFamily;
                     var guestRec = FmGuestRecord();
