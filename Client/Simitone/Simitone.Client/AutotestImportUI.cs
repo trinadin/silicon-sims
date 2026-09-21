@@ -121,9 +121,8 @@ namespace Simitone.Client
                     case 1: PhaseStringsLaw(); break;
                     case 2: PhaseStageAndGate(); break;
                     case 3: PhaseButtonOpensDialog(); break;
-                    case 4: PhaseNoPath(); break;
-                    case 5: PhaseYesPathImport(); break;
-                    case 6: PhaseExportBridge(); break;
+                    case 4: PhaseYesPathImport(); break;
+                    case 5: PhaseExportBridge(); break;
                     default:
                         _done = true;
                         break;
