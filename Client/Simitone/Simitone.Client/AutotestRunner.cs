@@ -613,7 +613,10 @@ namespace Simitone.Client
                 // only reachable when the configured checks string names it.
                 if (CheckEnabled("archundo"))
                 {
-                    _archundo = new AutotestArchUndo(Log, _screen);
+                    // UI-22 discriminator: 'archundo-probe' in the checks string
+                    // runs the identical scenario with the undo/redo SENDS
+                    // disabled (ambient-lottery control).
+                    _archundo = new AutotestArchUndo(Log, _screen, CheckEnabled("archundo-probe"));
                     _state = 15;
                     return;
                 }

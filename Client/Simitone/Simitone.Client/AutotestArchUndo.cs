@@ -55,6 +55,16 @@ namespace Simitone.Client
         private readonly List<string> _notes = new List<string>();
         private readonly List<string> _fails = new List<string>();
 
+        /// <summary>
+        /// Discriminator mode (runs 3/3b froze identically at the undo):
+        /// 'archundo-probe' in the checks string runs the IDENTICAL scenario
+        /// (same lot, wall batch, wall-clock window) with the UNDO/REDO SENDS
+        /// disabled — phases 3/4 become pure observation windows. If the
+        /// DEFECT-2 freeze still hits here, it is the ambient ENG-01 lottery;
+        /// if this window is clean, the undo path is causal.
+        /// </summary>
+        private readonly bool _probe;
+
         private readonly TS1GameScreen _screen;
         private VM _vm;
         private UIMainPanel _panel;
@@ -70,15 +80,18 @@ namespace Simitone.Client
         private const int SettleTicks = 30;
         private const int PhaseTimeout = 900; // ~15s at 60fps
         private const int MaxSends = 3;
+        /// <summary>Probe observation window (~40s): 2x the runs-3/3b freeze point.</summary>
+        private const int ProbeWindowTicks = 2400;
 
         public bool Passed { get { return _fails.Count == 0; } }
         public string Diagnostics { get { return string.Join("; ", _notes); } }
         public string Failures { get { return string.Join("; ", _fails); } }
 
-        public AutotestArchUndo(Action<string> log, TS1GameScreen screen)
+        public AutotestArchUndo(Action<string> log, TS1GameScreen screen, bool probe = false)
         {
             _log = log;
             _screen = screen;
+            _probe = probe;
         }
 
         private void Note(string s) { _notes.Add(s); _log("AUTOTEST archundo " + s); }
@@ -260,8 +273,21 @@ namespace Simitone.Client
                     }
                     break;
 
-                case 3: // undo through the production command
+                case 3: // undo through the production command (probe: skip, observe)
                     {
+                        if (_probe)
+                        {
+                            if (_phaseTicks == 0)
+                                Note("probe: undo send SKIPPED; observing " + ProbeWindowTicks + " ticks");
+                            if (++_phaseTicks >= ProbeWindowTicks)
+                            {
+                                if (WallTiles(_arch) != _walls1) Fail("probe: walls drifted during observation");
+                                if (!_arch.UndoStack.CanUndo) Fail("probe: undo entry vanished during observation");
+                                Note("probe: observation window 1 clean (walls=" + WallTiles(_arch) + ")");
+                                _phase = 4; _phaseTicks = 0;
+                            }
+                            return;
+                        }
                         if (_phaseTicks == 0)
                         {
                             _vm.SendCommand(new VMNetArchUndoCmd { Redo = false });
@@ -282,8 +308,17 @@ namespace Simitone.Client
                     }
                     break;
 
-                case 4: // redo through the production command
+                case 4: // redo through the production command (probe: skip, observe)
                     {
+                        if (_probe)
+                        {
+                            if (++_phaseTicks >= ProbeWindowTicks / 4)
+                            {
+                                Note("probe: observation window 2 clean");
+                                _phase = 5; _phaseTicks = 0;
+                            }
+                            return;
+                        }
                         if (_phaseTicks == 0)
                         {
                             _vm.SendCommand(new VMNetArchUndoCmd { Redo = true });
