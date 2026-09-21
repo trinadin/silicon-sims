@@ -239,12 +239,10 @@ namespace Simitone.Client.UI.Panels
             new UICategory() { ID = 2, IconName = "cat_build_objs.png" },
         };
 
-        // Construction trigger only. Desktop cWinOptions has no category plaque;
-        // ApplyMode hides the switcher's visual after Select creates the panel.
-        private List<UICategory> OptionsCategories = new List<UICategory>()
-        {
-            new UICategory() { ID = 0, IconName = "cat_build_arch.png" },
-        };
+        // UI-26 decode §1: the OPTIONS dummy category (mobile-era construction
+        // trigger) is DELETED — ApplyMode mounts the options panel directly and
+        // hides the switcher plaque on every platform. Switcher_OnCategorySelect's
+        // OPTIONS case remains for its direct callers (autotests).
 
         public UIMainPanel(TS1GameScreen game) : base()
         {
@@ -630,8 +628,18 @@ namespace Simitone.Client.UI.Panels
                     Game.LotControl.World.State.BuildMode = 2;
                     break;
                 case UIMainPanelMode.OPTIONS:
-                    Switcher.InitCategories(OptionsCategories);
-                    Switcher.MainButton.OriginalStyle = Switcher.OriginalChrome;
+                    // UI-26 decode §1 (r260-options-readiness): native
+                    // cWinCPanel::SetPanel mounts cWinOptions as an ordinary mode
+                    // child owning the full 804px band — NO category plaque
+                    // exists in OPTIONS. The mobile-era OptionsCategories dummy
+                    // was only ever the Select(0) construction trigger for
+                    // Switcher_OnCategorySelect; mount the panel directly and
+                    // hide the switcher plaque on EVERY platform (the old hiding
+                    // branch sat inside `if (Game.Desktop)`, so touch kept the
+                    // dummy plaque visible). Switcher_OnCategorySelect's OPTIONS
+                    // case stays (autotests drive it directly).
+                    Switcher.MainButton.Visible = false;
+                    SetSubpanel(new UIOriginalOptionsPanel(Game));
                     break;
                 case UIMainPanelMode.CAMERA:
                     // Camera has its own complete cWinCamPanel child; there is

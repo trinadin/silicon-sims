@@ -64,6 +64,13 @@ namespace Simitone.Client
     ///     Checks string: hard asserts track the R247 engine contract, which may land after
     ///     the client round (stub tiers + pending-engine disclosures until it does); enable
     ///     alone with -autotest-opts uitutorial-lifecycle.
+    ///   uioptswire (opt-in, focused): UI-26 engine wires for the options rows (r260
+    ///     readiness map) — boot+toggle Lighting→LightingMode/ChangedWorldConfig,
+    ///     Shadows→WorldConfig.ObjShadows, CharacterDetail→Avatar.DefaultTechnique,
+    ///     SimInBackground→RelayFocus/VM.ApplyFocus focus suspend, OPTIONS-mode direct
+    ///     SetSubpanel identity, row-closure wiring + config.ini round-trip
+    ///     (AutotestUI26Wire.cs). Not in the default Checks string; enable alone with
+    ///     -autotest-opts uioptswire.
     /// </summary>
     public static class AutotestRunner
     {
@@ -1722,6 +1729,18 @@ namespace Simitone.Client
             // R121 'uiopts' runs post-uidump on the same live screen: it SWITCHES the main
             // panel into OPTIONS mode (and restores LIVE after) to gate the mounted screen.
             if (CheckEnabled("uiopts")) CheckUIOptions();
+            // UI-26 'uioptswire' (opt-in, focused): engine wires for the options rows;
+            // body in AutotestUI26Wire.cs (r260-options-readiness WIRE rows).
+            if (CheckEnabled("uioptswire"))
+            {
+                try
+                {
+                    bool wired = AutotestUI26Wire.Check(_screen, out string wire26);
+                    Log("AUTOTEST uioptswire " + wire26);
+                    if (wired) Pass("uioptswire"); else Fail("uioptswire");
+                }
+                catch (Exception ex) { Log("AUTOTEST uioptswire EXC " + ex); Fail("uioptswire"); }
+            }
             if (CheckEnabled("uibuy")) CheckUIBuyCatalog();
             if (CheckEnabled("uiexpband")) CheckUIExpBand();
             // R148 'uibandlaw': the buy-band interaction chrome — click regions,

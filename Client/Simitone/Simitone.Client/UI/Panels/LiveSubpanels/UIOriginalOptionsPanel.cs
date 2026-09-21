@@ -35,8 +35,19 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
     // Live engine effect exists for: Free Will (VM.FreeWillEnabled), Edge
     // Scrolling (UILotControl TestScroll gate), the three volume sliders (HITVM
     // master volumes, applied live exactly like boot does) and Anti-alias (new
-    // surfaces). The remaining canon options persist the player's choice to
-    // config.ini verbatim pending engine work (disclosed residual).
+    // surfaces). UI-26 wire round (r260-options-readiness WIRE rows) adds:
+    // Lighting (WorldConfig.LightingMode 0/1 + World.ChangedWorldConfig, boot
+    // + toggle), Shadows (WorldConfig.ObjShadows gating LMapBatch object-shadow
+    // generation), Character Detail (FSO.Vitaboy.Avatar.DefaultTechnique, read
+    // every Avatar.Draw) and Sim In Background (VM.ApplyFocus focus-suspend of
+    // SpeedMultiplier via SimitoneGame.RelayFocus). The remaining canon options
+    // persist the player's choice to config.ini verbatim pending engine work
+    // (disclosed residual): Terrain Detail (grass system = BUILD tranche),
+    // Quick Tips (presenter = BUILD tranche) and Export HTML (writer = BUILD
+    // tranche). Interface Effects is a DISCLOSED PARTIAL: natively the row is
+    // cOptionsMgr "BoboVision" (decode §3 — UI window effects gate), and this
+    // port binds it to the PIP fade only; the port has no decoded window-
+    // transition effect sites to widen onto.
     public class UIOriginalOptionsPanel : UISubpanel
     {
         public static string Table = "145";
@@ -50,6 +61,43 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             var m = Regex.Match(s.Trim(), @"^\((\d+);(\d+)\)$");
             if (!m.Success) return null;
             return new Point(int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value));
+        }
+
+        // ---- UI-26 engine wires (r260-options-readiness WIRE rows) ----------
+        // WIRE (b): 'Character Detail' Low/Med/High → Vitaboy.fx technique
+        // index — 0 NoSSAA, 2 AdvancedLighting, 3 SSAA (1/4/5 are the ObjID/
+        // shadow/directional variants the native row never selected; TSO
+        // precedent UISim.cs sets 0/3). Avatar.Draw reads DefaultTechnique
+        // every frame, so the technique swap is live on the next draw.
+        public static int CharacterDetailTechnique(int detail)
+        {
+            detail = Math.Max(0, Math.Min(2, detail));
+            return detail == 1 ? 2 : (detail == 2 ? 3 : 0);
+        }
+
+        public static void ApplyCharacterDetail(int detail)
+        {
+            FSO.Vitaboy.Avatar.DefaultTechnique = CharacterDetailTechnique(detail);
+        }
+
+        // WIRE (a): 'Lighting' — AdvancedLighting is LightingMode > 0, so the
+        // toggle maps straight to 0/1 and re-applies through the live-proven
+        // World.ChangedWorldConfig path (light batches rebuild from the
+        // ROOM/OUTDOORS changed flags). ForceAdvLight lots clamp the mode to 1
+        // inside ChangedWorldConfig (VMContext law); the choice still persists.
+        public static void ApplyLighting(FSO.SimAntics.VM vm, bool on)
+        {
+            FSO.LotView.WorldConfig.Current.LightingMode = on ? 1 : 0;
+            vm?.Context.World.ChangedWorldConfig(GameFacade.GraphicsDevice);
+        }
+
+        // WIRE (d): 'Shadows' — the shadows-only gate the native cOptionsMgr
+        // always had; LMapBatch.DrawObjShadows refuses to generate while the
+        // flag is off (wall shadows and the light itself are untouched).
+        public static void ApplyShadows(FSO.SimAntics.VM vm, bool on)
+        {
+            FSO.LotView.WorldConfig.Current.ObjShadows = on;
+            vm?.Context.World.ChangedWorldConfig(GameFacade.GraphicsDevice);
         }
 
         // ---- gate introspection -------------------------------------------
@@ -467,9 +515,9 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             AddCheckbox(14, 15, 16, "cpanel\\PopupOptAntiAlias.bmp",
                 () => set.AntiAlias > 0, (v) => set.AntiAlias = v ? 1 : 0, new Vector2(245, 7));
             AddCheckbox(17, 18, 19, "cpanel\\PopupOptShadows.bmp",
-                () => set.TS1Shadows, (v) => set.TS1Shadows = v, new Vector2(245, 27));
+                () => set.TS1Shadows, (v) => { set.TS1Shadows = v; ApplyShadows(Game?.vm, v); }, new Vector2(245, 27));
             AddCheckbox(20, 21, 22, "cpanel\\PopupOptLighting.bmp",
-                () => set.Lighting, (v) => set.Lighting = v, new Vector2(245, 47));
+                () => set.Lighting, (v) => { set.Lighting = v; ApplyLighting(Game?.vm, v); }, new Vector2(245, 47));
             AddCheckbox(23, 24, 25, "cpanel\\PopupOptTransUI.bmp",
                 () => set.TS1InterfaceFX, (v) => set.TS1InterfaceFX = v, new Vector2(245, 67));
             // Executable anchors: right-aligned labels to x480; the two logical
@@ -478,7 +526,7 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                 () => set.TS1TerrainDetail, (v) => set.TS1TerrainDetail = v,
                 new Vector2(480, 30), new Vector2(485, 30));
             AddRadioGroup(31, 32, 33, "cpanel\\PopupOptCharDetail.bmp", "character",
-                () => set.TS1CharacterDetail, (v) => set.TS1CharacterDetail = v,
+                () => set.TS1CharacterDetail, (v) => { set.TS1CharacterDetail = v; ApplyCharacterDetail(v); },
                 new Vector2(480, 56), new Vector2(485, 56));
         }
 
@@ -515,6 +563,10 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                 (v) => { FSO.SimAntics.VM.FreeWillEnabled = v; set.TS1FreeWill = v; }, new Vector2(245, 27));
             AddCheckbox(62, 63, 64, "cpanel\\PopupOptEdgeScroll.bmp",
                 () => set.EdgeScroll, (v) => set.EdgeScroll = v, new Vector2(245, 47));
+            // UI-26 WIRE (c): the law consumes TS1SimInBackground at the next
+            // focus transition (SimitoneGame.RelayFocus → VM.ApplyFocus — the
+            // native cSimulator +52 signed-speed law); 'on' keeps the simulator
+            // running while the window lacks focus.
             AddCheckbox(65, 66, 67, "cpanel\\PopupOptSimInBack.bmp",
                 () => set.TS1SimInBackground, (v) => set.TS1SimInBackground = v, new Vector2(245, 67));
 

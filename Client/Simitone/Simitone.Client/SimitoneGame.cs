@@ -244,9 +244,16 @@ namespace Simitone.Client
             GraphicsModeControl.ChangeMode(initialMode);
             GraphicsModeControl.ModeChanged += SaveGraphicsModePreference;
 
+            // UI-26 wire (r260-options-readiness WIRE row a, boot apply): the TS1
+            // 'Lighting' option is the light source of truth (native
+            // cOptionsMgr::Get/SetLighting; the TSOGame -1 auto-derive law is not
+            // compiled into Simitone), so the TSO-era LightingMode key is DERIVED
+            // 0/1 here and on every options toggle. TS1 'Shadows' rides the new
+            // WorldConfig.ObjShadows gate (LMapBatch.DrawObjShadows).
             FSO.LotView.WorldConfig.Current = new FSO.LotView.WorldConfig()
             {
-                LightingMode = settings.LightingMode,
+                LightingMode = settings.Lighting ? 1 : 0,
+                ObjShadows = settings.TS1Shadows,
                 SmoothZoom = settings.SmoothZoom,
                 SurroundingLots = settings.SurroundingLotMode,
                 AA = settings.AntiAlias,
@@ -267,7 +274,15 @@ namespace Simitone.Client
             
             // Initialize Free Will setting from config
             VM.FreeWillEnabled = GlobalSettings.Default.TS1FreeWill;
-            
+
+            // UI-26 wire (r260-options-readiness WIRE row b, boot apply): TS1
+            // 'Character Detail' selects the Vitaboy skin technique; Avatar.Draw
+            // reads DefaultTechnique every frame, so this is live for every sim
+            // drawn after boot (FSO.Vitaboy.Avatar.DefaultTechnique).
+            FSO.Vitaboy.Avatar.DefaultTechnique =
+                Simitone.Client.UI.Panels.LiveSubpanels.UIOriginalOptionsPanel.CharacterDetailTechnique(
+                    GlobalSettings.Default.TS1CharacterDetail);
+
             base.Initialize();
 
             GameFacade.GameThread = Thread.CurrentThread;
@@ -363,11 +378,33 @@ namespace Simitone.Client
         void RegainFocus(object sender, EventArgs e)
         {
             GameFacade.Focus = true;
+            RelayFocus(true);
         }
 
         void LostFocus(object sender, EventArgs e)
         {
             GameFacade.Focus = false;
+            RelayFocus(false);
+        }
+
+        // UI-26 wire (r260-options-readiness WIRE row c, 'Sim In Background'):
+        // the production focus→simulator relay over the native cSimulator +52
+        // signed-speed law (VM.ApplyFocus suspends SpeedMultiplier at 0 while
+        // the window lacks focus and restores the exact prior speed on regain;
+        // 'Sim In Background' on leaves the simulator running). The OS handlers
+        // above call this; the 'uioptswire' gate drives it directly and reads
+        // VM.SpeedMultiplier back.
+        internal static void RelayFocus(bool focused)
+        {
+            try
+            {
+                var screen = GameFacade.Screens?.CurrentUIScreen
+                    as Simitone.Client.UI.Screens.TS1GameScreen;
+                screen?.vm?.ApplyFocus(focused, GlobalSettings.Default.TS1SimInBackground);
+            }
+            catch (Exception)
+            {
+            }
         }
 
         /// <summary>
