@@ -18,22 +18,25 @@ namespace Simitone.Client.UI.Panels.CAS
     /// UpdateTransform 0x2dbef0 anchors the skeleton ROOT at the window's
     /// horizontal center, 20px above the bottom (X = l+(r-l)/2, Y = b-0x14;
     /// pets 0x32 — cWinVitaBtnSolo keeps the same law with a -20 x shift),
-    /// and VitaBoy::Render 0x38a6d0 clips to the window rect. The native
-    /// render scale chain is 5.33333 px/BMF-unit (scale table 0x59bbc4[0xb0])
-    /// over the 0.25 person record scale = 21⅓ px/BMU = 64 px per FreeSO
-    /// world unit. On the shared Near camera that is exactly PreciseZoom
-    /// 3/√2 (px/WU = 256·z/(6√2) = 64), and the root anchor at (50, 200)
-    /// makes the look tile height 90px/64/3 = 0.46875. All constants are
-    /// resolution-free: the surface renders 1:1 inside the 800x600 UI plane
-    /// at both 800x600 and 1024x768.
+    /// and VitaBoy::Render 0x38a6d0 clips to the window rect. The render
+    /// scale is the constant-table 45.0 px per Vitaboy unit (0x59bbc4[17];
+    /// the per-type multipliers behind it are CFM-glue-obscured, like r209's
+    /// sway amplitudes) — matching the uisurvey-calibrated PreciseZoom 1.5
+    /// on the shared Near camera (45.25 px/WU). The look tile height places
+    /// the root on (50, 200) through the 30-degree pitch projection
+    /// (world-up projects at cos 30 = 0.866, run-measured): 90px /
+    /// (45.25 * 0.866 * 3) = 0.7653 tiles. All constants are resolution-
+    /// free: the surface renders 1:1 inside the 800x600 UI plane at both
+    /// 800x600 and 1024x768.
     /// </summary>
     public sealed class UIOriginalVitaPreview : UIElement
     {
         // Decoded native framing constants (CAS-02 law, see class comment).
-        internal const float NativePxPerWorldUnit = 64f;
-        internal const float NativePreciseZoom = 3f / 1.4142135623730951f;
+        internal const float NativePxPerWorldUnit = 256f * 1.5f / (2f * 3f * 1.4142135623730951f);
+        internal const float NativePreciseZoom = 1.5f;
         internal const float NativeFeetRow = 200f;   // window bottom - 20 (0x2dbef0)
-        internal const float NativeLookTileZ = 0.46875f; // (220/2 - 200)/64/3
+        internal const float NativeLookTileZ =
+            (NativeFeetRow - 100f) / (NativePxPerWorldUnit * 0.8660254f * 3f); // ≈ 0.7653
 
         private static Texture2D Backdrop;
         private RenderTarget2D Target;
