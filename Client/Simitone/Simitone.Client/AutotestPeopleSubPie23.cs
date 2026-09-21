@@ -77,10 +77,22 @@ namespace Simitone.Client
                     && sub.BackBox.Y == blocal.Y + (int)sub.DiscCenter.Y
                     && sub.BackBox.Width == blocal.Width && sub.BackBox.Height == blocal.Height;
 
-                // (5) ring 1: no back affordance, no engagement on a ≤8 census
+                // (5) ring 1: no back affordance; engagement iff census > 8
+                // (the sanctioned condition — verified as a condition, not
+                // an assumed ≤8 environment)
                 var main = new Simitone.Client.UI.Panels.UIOriginalPeoplePie(game, center);
-                mainRing = !main.HasBack && main.PendingSub == null && main.Sub == null
-                    && main.Family != null && main.Family.Length <= 8;
+                int censusCount = 0;
+                try
+                {
+                    var fam = game.ActiveFamily;
+                    var guids = fam != null ? fam.FamilyGUIDs : null;
+                    censusCount = game.vm.Entities.OfType<VMAvatar>()
+                        .Where(a => a.PersistID != 0 && (guids == null || guids.Contains((uint)a.Object.GUID)))
+                        .Count();
+                }
+                catch { }
+                mainRing = !main.HasBack && main.Sub == null
+                    && (main.PendingSub == null) == (censusCount <= 8);
 
                 // (2) Back click = step-out: ring 2 closes, ring 1 probes untouched
                 sub.SelectSlot(0);
