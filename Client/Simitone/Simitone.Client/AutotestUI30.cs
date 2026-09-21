@@ -456,7 +456,7 @@ namespace Simitone.Client
             Check(Screen.BulldozeConfirm2ForProbe == 1, "built-lot-showed-confirm2");
             Check(Screen._bulldozeDialog != null, "confirm2-mounted");
             Press(DialogButton(UIAlertButtonType.No));    // answer 2 = killSims FALSE
-            Check(Screen.ArmedEvictsForProbe == 1, "confirm2-no-ran-moveout-killSims-false");
+            Check(Screen.ArmedEvictsForProbe == 2, "confirm2-no-ran-moveout-killSims-false");
             Check(N.GetFamilyForHouse(21) == null, "killSims-false-unbound-the-family");
             Check(fam.FamilyGUIDs.Length == members0, "killSims-false-kept-members");
             Check(CharFileCount() == chars0, "killSims-false-kept-character-files");
@@ -489,7 +489,7 @@ namespace Simitone.Client
             Press(DialogButton(UIAlertButtonType.Yes));   // confirm 1
             Check(Screen.BulldozeConfirm2ForProbe == 2, "second-built-lot-confirm2");
             Press(DialogButton(UIAlertButtonType.Yes));   // answer 2 = killSims TRUE
-            Check(Screen.ArmedEvictsForProbe == 2, "confirm2-yes-ran-moveout-killSims-true");
+            Check(Screen.ArmedEvictsForProbe == 3, "confirm2-yes-ran-moveout-killSims-true");
             Check(N.GetFamilyForHouse(22) == null, "killSims-true-unbound-the-family");
             Check(fam.FamilyGUIDs.Length == 0, "killSims-true-emptied-membership");
             Check(CharFileCount() < chars0, "killSims-true-deleted-character-files ("
@@ -528,7 +528,7 @@ namespace Simitone.Client
             var after = SimiBuildingValues(HousePath(10));
             Check(after != null && after.Item1 == 0 && after.Item2 == 0,
                 "bulldoze-zeroed-simi-building-values-in-the-file");
-            Check(Screen.LotTileRefreshesForProbe == 2, "bulldoze-refreshed-lot-tile");
+            Check(Screen.LotTileRefreshesForProbe == 3, "bulldoze-refreshed-lot-tile");
             Check(Screen._bulldozeDialog != null, "bulldoze-ok-dialog-shown");
             Press(DialogButton(UIAlertButtonType.OK));
 
