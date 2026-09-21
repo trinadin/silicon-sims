@@ -77,6 +77,7 @@ namespace Simitone.Client
         private List<VMArchitectureCommand> _batch;
         private int _sendAttempts;
         private int _dialogAnswers;
+        private int _p7Step; // phase-7 refusal-law sub-state (ENG-02/UI-22 P2)
 
         private const int SettleTicks = 30;
         private const int PhaseTimeout = 900; // ~15s at 60fps
@@ -181,7 +182,28 @@ namespace Simitone.Client
             if (_vm != null && _vm.GlobalBlockingDialog != null)
             {
                 _dialogAnswers++;
-                if (_dialogAnswers == 1) Note("blocking dialog latched; answering via VMNetDialogResponseCmd(0)");
+                if (_dialogAnswers == 1)
+                {
+                    // ENG-02 decode addendum: name the CONTENT caller of the
+                    // latch (the entity whose tree ran the blocking dialog
+                    // primitive) — the park mechanism is engine-explained, but
+                    // the content defect that fires it on this lot stays named.
+                    string caller = "";
+                    try
+                    {
+                        var gbd = _vm.GlobalBlockingDialog;
+                        var fr = gbd.Thread?.Stack;
+                        var top = (fr != null && fr.Count > 0) ? fr[fr.Count - 1] : null;
+                        var ci = top?.GetCurrentInstruction();
+                        caller = " caller=ent" + gbd.ObjectID + " iff="
+                            + (gbd.Object?.Resource?.MainIff?.Filename ?? "?")
+                            + " tree=" + (top?.Routine?.Rti?.Name ?? "?").TrimEnd('\0')
+                            + ":ip" + (top != null ? (int)top.InstructionPointer : -1)
+                            + " opcode=" + (ci?.Opcode ?? -1);
+                    }
+                    catch { caller = " caller=(read-failed)"; }
+                    Note("blocking dialog latched; answering via VMNetDialogResponseCmd(0)" + caller);
+                }
                 _vm.SendCommand(new FSO.SimAntics.NetPlay.Model.Commands.VMNetDialogResponseCmd
                 {
                     ResponseCode = 0,
@@ -396,6 +418,70 @@ namespace Simitone.Client
                         if (_phaseTicks < 5) return;
                         if (_arch.UndoStack.CanUndo || _arch.UndoStack.CanRedo) Fail("build-mode exit did not clear the stacks");
                         else Note("build-mode exit clears both stacks");
+                        if (_probe) _done = true; // probe validates observation only — no sends past here
+                        else { _phase = 7; _phaseTicks = 0; _batch = null; }
+                    }
+                    break;
+
+                case 7: // ENG-02/UI-22 P2 refusal law: a refused undo/redo money hook
+                        // must NOT replay the world. Fresh batch, undo (refund), then
+                        // force-insolvent budget; the redo re-charge must be refused
+                        // (walls unchanged, budget unchanged, chain dropped). Proves
+                        // ApplyMoney's PerformTransaction verdict propagates end-to-end.
+                    {
+                        var family = _vm.TS1State?.CurrentFamily;
+                        if (family == null)
+                        {
+                            Note("P2 refusal law skipped (no CurrentFamily on this lot)");
+                            _done = true;
+                            return;
+                        }
+                        switch (_p7Step)
+                        {
+                            case 0: // fresh batch (phase 6 cleared the stacks)
+                                {
+                                    var cmd = FindWallSpot();
+                                    if (cmd == null) { Fail("P2: no engine-valid wall run found"); _done = true; return; }
+                                    _batch = new List<VMArchitectureCommand> { cmd.Value };
+                                    _vm.SendCommand(new VMNetArchitectureCmd { Commands = new List<VMArchitectureCommand>(_batch) });
+                                    _p7Step = 1; _phaseTicks = 0;
+                                    return;
+                                }
+                            case 1: // wait for the batch to apply
+                                if (_arch.UndoStack.CanUndo) { _p7Step = 2; _phaseTicks = 0; return; }
+                                if (++_phaseTicks > PhaseTimeout) PhaseTimeoutFail("phase 7 (batch never applied)");
+                                return;
+                            case 2: // undo: the refund path (always affordable) — puts the
+                                    // world back to the _walls1 state and builds a redo entry
+                                _vm.SendCommand(new VMNetArchUndoCmd { Redo = false });
+                                _p7Step = 3; _phaseTicks = 0;
+                                return;
+                            case 3: // wait for the undo to apply
+                                if (!_arch.UndoStack.CanUndo && _arch.UndoStack.CanRedo) { _p7Step = 4; _phaseTicks = 0; return; }
+                                if (++_phaseTicks > PhaseTimeout) PhaseTimeoutFail("phase 7 (undo for refusal law)");
+                                return;
+                            case 4: // force insolvency, then send the doomed redo. Refused:
+                                    // walls stay at _walls1, budget stays 0, chain drops.
+                                    // (The pre-P2 bug would replay walls uncharged.)
+                                family.Budget = 0;
+                                _vm.SendCommand(new VMNetArchUndoCmd { Redo = true });
+                                _phase = 8; _phaseTicks = 0;
+                                return;
+                        }
+                    }
+                    break;
+
+                case 8: // refusal verdict checks (phase 7's redo was sent against a zero budget)
+                    {
+                        if (_phaseTicks++ < SettleTicks) return;
+                        var family = _vm.TS1State?.CurrentFamily;
+                        var wallsNow = WallTiles(_arch);
+                        if (wallsNow != _walls1) Fail("P2: refused redo replayed the world anyway (" + wallsNow + " != " + _walls1 + ")");
+                        else Note("P2: refused redo left walls untouched");
+                        if (family != null && family.Budget != 0) Fail("P2: refused redo still charged (budget=" + family.Budget + ")");
+                        else Note("P2: refused redo did not charge (budget=0)");
+                        if (_arch.UndoStack.CanRedo) Fail("P2: refused redo kept the redo chain");
+                        else Note("P2: refused redo dropped the redo chain (native failure law)");
                         _done = true;
                     }
                     break;
