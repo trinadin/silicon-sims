@@ -334,6 +334,10 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
         public OriginalGlyphFont Font;
         public Color Color = new Color(0xFF, 0xFF, 0xF0, 0xFF);
         public Action Activated;
+        // UI-27: visible phase of the native failing-grade flash, driven by
+        // UIJobSubpanel.GradeFlashVisible. Separate from Visible, which
+        // SetDesktopMode owns.
+        public bool FlashVisible = true;
         private Vector2 _size;
         private readonly UIMouseEventRef Mouse;
         private bool Down;
@@ -375,7 +379,7 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
 
         public override void Draw(UISpriteBatch batch)
         {
-            if (!Visible || Font == null || Font.Atlas == null || string.IsNullOrEmpty(Text)) return;
+            if (!Visible || !FlashVisible || Font == null || Font.Atlas == null || string.IsNullOrEmpty(Text)) return;
             float x = TextX;
             var color = Color * Opacity;
             foreach (var ch0 in Text)
@@ -459,6 +463,35 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
         // opens the shared live popup with Live.iff STR#139 [1]/[2] and row 11
         // of JobIconMultiPopup. It is not the old three-block port layout.
         public static bool IsChild(int personsAge) { return personsAge > 0 && personsAge < 18; }
+
+        // UI-27 (r261 §2.1): cWinSubpanelReportCard::TSPaint's cmpwi r30,10 is
+        // a blt around a FLASH branch — grade value >= 10 flashes the grade
+        // button (a failing-grade flash, not the retired "10 → A+" string
+        // rewrite). The show helper is armed with the engine literal
+        // (333, 333, 0): a 333 ms visible / 333 ms hidden blink. TSPaint also
+        // draws nothing at all when PersonFinder::GetCareer == 0.
+        public const int GradeFlashThreshold = 10;
+        public const int GradeFlashPeriodMs = 333;
+
+        public static bool GradeFlashes(int gradeIndex)
+        {
+            return gradeIndex >= GradeFlashThreshold;
+        }
+
+        /// <summary>
+        /// Visible phase of the flash blink at the engine's 333 ms tick: true
+        /// whenever not flashing (the value&lt;10 path clears the arm byte
+        /// through 0x51c160), alternating on/off on 333 ms boundaries when it
+        /// is. Pure so the gate can pin phase boundaries exactly.
+        /// </summary>
+        public static bool GradeFlashVisible(bool flash, double elapsedMs)
+        {
+            if (!flash) return true;
+            var phase = elapsedMs % (2.0 * GradeFlashPeriodMs);
+            if (phase < 0) phase += 2.0 * GradeFlashPeriodMs;
+            return phase < GradeFlashPeriodMs;
+        }
+
         public bool ReportCardMode;
         public static int ReportCardShown;
         public UIOriginalText ReportTitle;
@@ -784,6 +817,10 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
 
         public int LastPerformance;
 
+        // UI-27: engine clock snapshot (ms) driving the report-card flash
+        // blink phases.
+        private double LastFrameMs;
+
         public override void Update(UpdateState state)
         {
             base.Update(state);
@@ -869,6 +906,7 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
 
             var sel = Game.SelectedAvatar;
             if (sel == null) return;
+            if (state?.Time != null) LastFrameMs = state.Time.TotalGameTime.TotalMilliseconds;
 
             if (Game.Desktop)
             {
@@ -888,7 +926,13 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             if (ReportCardMode)
             {
                 var gradeIndex = sel.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.JobPromotionLevel);
-                var grade = GradeForIndex(gradeIndex);
+                // UI-27 (r261 §2.1): TSPaint draws nothing when GetCareer == 0
+                // and flashes failing grades. The port's job lookup is the
+                // career-exists state.
+                var childJob = Content.Get()?.Jobs?.GetJob(
+                    (ushort)sel.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.JobType));
+                var flash = childJob != null && GradeFlashes(gradeIndex);
+                var grade = ReportGradeText(childJob, gradeIndex);
                 if (Game.Desktop)
                 {
                     EnsureDesktopReportCard();
@@ -897,7 +941,9 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                 }
                 else if (ReportGrades != null)
                 {
-                    ReportGrades.Text = (OriginalLiveStrings.Entry(139, 1) ?? "Grades") + ": " + grade;
+                    ReportGrades.Text = string.IsNullOrEmpty(grade) ? ""
+                        : (OriginalLiveStrings.Entry(139, 1) ?? "Grades") + ": " + grade;
+                    ReportGrades.Visible = GradeFlashVisible(flash, LastFrameMs);
                 }
                 SetAdultControlsVisible(false);
                 return;
@@ -1026,12 +1072,22 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             switch (mode)
             {
                 case UIDesktopJobMode.ReportCard:
-                    EnsureDesktopReportCard();
-                    if (ReportGradeControl != null)
-                        ReportGradeControl.Text = GradeForIndex(
-                            sel.GetPersonData(VMPersonDataVariable.JobPromotionLevel));
-                    RefreshReportGeometry();
-                    return;
+                    {
+                        EnsureDesktopReportCard();
+                        var gradeIndex = sel.GetPersonData(VMPersonDataVariable.JobPromotionLevel);
+                        // UI-27 (r261 §2.1): native TSPaint skips the grade
+                        // entirely when PersonFinder::GetCareer == 0 (the
+                        // port's job==null lookup), and value >= 10 blinks the
+                        // grade button at the engine's 333 ms tick.
+                        if (ReportGradeControl != null)
+                        {
+                            ReportGradeControl.Text = ReportGradeText(job, gradeIndex);
+                            ReportGradeControl.FlashVisible = GradeFlashVisible(
+                                job != null && GradeFlashes(gradeIndex), LastFrameMs);
+                        }
+                        RefreshReportGeometry();
+                        return;
+                    }
                 case UIDesktopJobMode.DogSkills:
                 case UIDesktopJobMode.CatSkills:
                     UpdatePetSkills(sel, mode == UIDesktopJobMode.CatSkills);
@@ -1757,6 +1813,18 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             var value = new string(chars);
             cursor = Math.Min(end, finish + 1);
             return value;
+        }
+
+        /// <summary>
+        /// UI-27 (r261 §2.1): native TSPaint draws NOTHING when
+        /// PersonFinder::GetCareer == 0; the port's job lookup is the same
+        /// career-exists state, so a career-less child blanks the grade
+        /// control instead of showing a table letter. Pure so the gate can
+        /// pin the blank-at-career-0 row exactly.
+        /// </summary>
+        public static string ReportGradeText(CARR job, int gradeIndex)
+        {
+            return job == null ? "" : GradeForIndex(gradeIndex);
         }
 
         public static string GradeForIndex(int index)

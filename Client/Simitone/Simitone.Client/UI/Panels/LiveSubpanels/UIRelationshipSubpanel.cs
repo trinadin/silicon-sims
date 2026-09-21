@@ -170,33 +170,46 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                 ? Math.Max(-100, Math.Min(100, (int)values[slot])) : 0;
         }
 
+        // UI-27 (r261 §1.3): GetRelation 0x241ba0 computes its FRIEND byte as
+        // forward RelMatrix slot-0 >= G AND reverse slot-0 >= G, where G is
+        // the PersonFinder friend threshold the fork pins to 50 (VMMemory
+        // mutual-friend law + r184). The test uses the raw, pre-clamp values.
+        public const int FriendThreshold = 50;
+
         /// <summary>
-        /// Native PersonFinder::GetRelation returns a relation record whose
-        /// classification byte at +5 is the Friends-filter/smiley predicate.
-        /// This is deliberately not reconstructed from the two daily scores:
-        /// the executable reads the stored classification directly.
+        /// Native PersonFinder::GetRelation's classification byte at +5 (the
+        /// Friends-filter/smiley predicate) is COMPUTED, not stored: mutual
+        /// RelMatrix slot-0 (daily score) >= FriendThreshold in BOTH
+        /// directions. The former forward[5]==1 reading had no engine
+        /// meaning (r261 §1.5).
         /// </summary>
-        public static bool IsNativeFriend(IList<short> forward)
+        public static bool IsNativeFriend(IList<short> forward, IList<short> reverse)
         {
-            return forward != null && forward.Count > 5 && forward[5] == 1;
+            return forward != null && forward.Count > 0 && forward[0] >= FriendThreshold
+                && reverse != null && reverse.Count > 0 && reverse[0] >= FriendThreshold;
         }
 
-        // Kept for source compatibility with older probes. The reverse vector
-        // is not consulted by the native predicate.
+        // Kept for source compatibility with older probes: forwards to the
+        // mutual predicate (the native law is inherently mutual).
         public static bool IsMutualFriend(IList<short> forward, IList<short> reverse)
         {
-            return IsNativeFriend(forward);
+            return IsNativeFriend(forward, reverse);
         }
 
-        /// <summary>The Famous filter requires a resolved person and PD81.</summary>
-        public static bool IsNativeFamous(bool resolved, int fameStarPower)
+        /// <summary>
+        /// Native GetRelatedPeople mode 2 (Famous) accepts on the candidate
+        /// Neighbor's PERSISTED word 81 (TS1FameStarPower) != 0 — there is no
+        /// in-world avatar requirement, so out-of-lot Sims pass too
+        /// (r261 §1.2, 0x242be0).
+        /// </summary>
+        public static bool IsNativeFamous(int fameStarPower)
         {
-            return resolved && fameStarPower != 0;
+            return fameStarPower != 0;
         }
 
         public static int MarkerFlagsFor(IList<short> forward, IList<short> reverse)
         {
-            int result = IsNativeFriend(forward) ? 1 : 0;
+            int result = IsNativeFriend(forward, reverse) ? 1 : 0;
             if (forward != null && forward.Count > 1 && forward[1] != 0) result |= 2;
             if (forward != null && forward.Count > 3 && forward[3] != 0) result |= 4;
             return result;
@@ -241,20 +254,25 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             }
             if (RelSort == 1)
             {
+                // GetRelatedPeople mode 1 accepts on GetRelation's computed
+                // FRIEND byte: mutual RelMatrix slot-0 >= 50 in BOTH
+                // directions (r261 §1.2/§1.3).
                 List<short> forward = null;
+                List<short> reverse = null;
                 source.Relationships?.TryGetValue(target, out forward);
-                return IsNativeFriend(forward);
+                other.Relationships?.TryGetValue(from, out reverse);
+                return IsNativeFriend(forward, reverse);
             }
             if (RelSort == 2)
             {
                 try
                 {
-                    var live = Game.vm?.Context?.ObjectQueries?.Avatars?
-                        .OfType<VMAvatar>()
-                        .FirstOrDefault(x => x.Position != LotTilePos.OUT_OF_WORLD
-                            && x.GetPersonData(VMPersonDataVariable.NeighborId) == target);
-                    return IsNativeFamous(live != null,
-                        live?.GetPersonData(VMPersonDataVariable.TS1FameStarPower) ?? 0);
+                    // Mode 2 is the persisted neighbor word 81 test — no
+                    // in-world avatar requirement (r261 §1.2).
+                    var data = other.PersonData;
+                    int starWord = (int)VMPersonDataVariable.TS1FameStarPower;
+                    return IsNativeFamous(data != null && data.Length > starWord
+                        ? data[starWord] : 0);
                 }
                 catch { return false; }
             }

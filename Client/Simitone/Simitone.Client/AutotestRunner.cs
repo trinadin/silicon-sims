@@ -13458,6 +13458,9 @@ namespace Simitone.Client
                     && Simitone.Client.UI.Panels.LiveSubpanels.UIJobSubpanel.GradeForIndex(16) == ""
                     && Simitone.Client.UI.Panels.LiveSubpanels.UIJobSubpanel.IsChild(17)
                     && !Simitone.Client.UI.Panels.LiveSubpanels.UIJobSubpanel.IsChild(18);
+                // UI-27 (r261): flash law (value >= 10 blinks, 333 ms tick) +
+                // GetCareer==0 blank gate; body in AutotestRelGrade27.cs.
+                bool gradeLaw = Simitone.Client.Autotest.RelGrade27Gates.GradeLetterPins();
                 var font18 = Simitone.Client.UI.Controls.OriginalGlyphFont.LoadByIndex(18, GameFacade.GraphicsDevice);
                 bool font18Exact = font18 != null && object.ReferenceEquals(font18,
                     Simitone.Client.UI.Controls.OriginalGlyphFont.Load("Fonts\\variablesans_18.ffn", GameFacade.GraphicsDevice));
@@ -13555,14 +13558,14 @@ namespace Simitone.Client
                     + " desktopGeometry=" + desktopGeometry + geometryInfo
                     + " routerLaw=" + routerLaw + " petSurface=" + petSurface + " fameSurface=" + fameSurface
                     + " adultPopup=" + adultPopupInteractions + adultPopupInfo
-                    + " gradeCanon=" + gradeCanon + " font18=" + font18Exact
+                    + " gradeCanon=" + gradeCanon + " font18=" + font18Exact + " gradeLaw=" + gradeLaw
                     + " reportSurface=" + reportSurface + " reportPopup=" + reportPopup
                     + " adultRestored=" + adultRestored + reportInfo
                     + " valuesWired=" + valuesWired + " floaterTwinned=" + floaterTwinned);
                 if (labelCanon && popupCanon && popupLaw && twinned && textCanon && desktopGeometry
                     && routerLaw && petSurface && fameSurface
                     && adultPopupInteractions
-                    && gradeCanon && font18Exact && reportSurface && reportPopup && adultRestored
+                    && gradeCanon && font18Exact && gradeLaw && reportSurface && reportPopup && adultRestored
                     && valuesWired && floaterTwinned) { Pass("uijob"); return; }
                 Log("AUTOTEST uijob: Live.iff STR# JobSubpanelLabels (136, 187) + JobSubpanelPopupText (137, 544) must pin sha256-verbatim AND the job subpanel twins/values/floaters must carry the original data");
                 Fail("uijob");
@@ -13799,21 +13802,19 @@ namespace Simitone.Client
                     && compareRel(false, false, false, false, 50, 75, 1, 9) > 0
                     && compareRel(false, false, false, false, 50, 50, 1, 9) < 0
                     && compareRel(false, false, false, false, 50, 50, 9, 1) > 0;
-                // R185: friend is the stored GetRelation classification at
-                // vector slot +5, not a mutual >=50 score reconstruction.
+                // UI-27 (r261): the FRIEND class is GetRelation's COMPUTED
+                // mutual slot-0 >= 50 law (forward AND reverse), not a stored
+                // slot +5 classification; famous is the persisted PD81 test
+                // with no in-world requirement. Full truth table in
+                // AutotestRelGrade27.cs (RelGrade27Gates).
                 var forward = new List<short> { 75, 1, -25, 1, 0, 1 };
-                var reverse = new List<short> { -100 };
+                var reverse = new List<short> { 75 };
                 int markerFlags = Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.MarkerFlagsFor(forward, reverse);
-                bool markerLaw = markerFlags == 7
+                bool relTruthLaw = Simitone.Client.Autotest.RelGrade27Gates.RelFilterTruthRows();
+                bool markerLaw = relTruthLaw
+                    && markerFlags == 7
                     && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.MarkerFor(markerFlags).EndsWith("heartdeep.bmp")
-                    && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.MarkerFor(3).EndsWith("heart.bmp")
-                    && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(forward)
-                    && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsMutualFriend(forward, reverse)
-                    && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(
-                        new List<short> { 100, 0, 0, 0, 0, 0 })
-                    && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFamous(true, 1)
-                    && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFamous(true, 0)
-                    && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFamous(false, 10);
+                    && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.MarkerFor(3).EndsWith("heart.bmp");
                 bool scoreLaw = Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.RelationshipValue(forward, 0) == 75
                     && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.RelationshipValue(forward, 2) == -25
                     && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.RelationshipValue(forward, 8) == 0
@@ -13907,6 +13908,7 @@ namespace Simitone.Client
                     + " tipsCanon=" + tipsCanon + " art=" + art
                     + " sortsMounted=" + sortsMounted + " hostGeometry=" + hostGeometry
                     + " capacityLaw=" + capacityLaw + " filterLaw=" + filterLaw + " markerLaw=" + markerLaw
+                    + " relTruthLaw=" + relTruthLaw
                     + " orderLaw=" + orderLaw + " scoreLaw=" + scoreLaw
                     + " cardGeometry=" + cardGeometry + " cardTooltips=" + cardTooltips
                     + " popupLaw=" + popupLaw
