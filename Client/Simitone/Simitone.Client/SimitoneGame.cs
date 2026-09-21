@@ -245,14 +245,18 @@ namespace Simitone.Client
             GraphicsModeControl.ModeChanged += SaveGraphicsModePreference;
 
             // UI-26 wire (r260-options-readiness WIRE row a, boot apply): the TS1
-            // 'Lighting' option is the light source of truth (native
-            // cOptionsMgr::Get/SetLighting; the TSOGame -1 auto-derive law is not
-            // compiled into Simitone), so the TSO-era LightingMode key is DERIVED
-            // 0/1 here and on every options toggle. TS1 'Shadows' rides the new
-            // WorldConfig.ObjShadows gate (LMapBatch.DrawObjShadows).
+            // 'Lighting' option derives the runtime lighting mode ONLY when no
+            // explicit LightingMode is stored (-1 = auto — the TSOGame derive
+            // law, followed in its true direction). Explicit values are
+            // preserved — critically the LightingMode=3 ultra pin that
+            // Simitone.Windows/.Desktop Program.cs write+save EVERY launch
+            // (P1 review fix, indep-review-ui26-20260921: an unconditional
+            // derive silently downgraded every install to mode 1/0 with no UI
+            // to restore it). TS1 'Shadows' rides the new WorldConfig.ObjShadows
+            // gate (LMapBatch.DrawObjShadows).
             FSO.LotView.WorldConfig.Current = new FSO.LotView.WorldConfig()
             {
-                LightingMode = settings.Lighting ? 1 : 0,
+                LightingMode = DeriveBootLightingMode(settings.LightingMode, settings.Lighting),
                 ObjShadows = settings.TS1Shadows,
                 SmoothZoom = settings.SmoothZoom,
                 SurroundingLots = settings.SurroundingLotMode,
@@ -385,6 +389,18 @@ namespace Simitone.Client
         {
             GameFacade.Focus = false;
             RelayFocus(false);
+        }
+
+        // UI-26 wire (r260-options-readiness WIRE row a; P1 review fix): TS1
+        // 'Lighting' is the boot light source of truth ONLY when no explicit
+        // LightingMode is stored (-1 = auto, TSOGame's true derive law).
+        // Explicit values — incl. the ultra pin (3) that Simitone.Windows/
+        // .Desktop Program.cs write+save every launch — pass through untouched;
+        // the options row's toggle maps 0/1 on top of that afterwards
+        // (UIOriginalOptionsPanel.ApplyLighting). Driven by the 'uioptswire' gate.
+        internal static int DeriveBootLightingMode(int storedLightingMode, bool lighting)
+        {
+            return storedLightingMode == -1 ? (lighting ? 1 : 0) : storedLightingMode;
         }
 
         // UI-26 wire (r260-options-readiness WIRE row c, 'Sim In Background'):

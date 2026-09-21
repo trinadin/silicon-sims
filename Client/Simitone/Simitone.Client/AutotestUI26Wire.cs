@@ -70,16 +70,35 @@ namespace Simitone.Client
             bool s0Shadows = set.TS1Shadows;
             bool s0Bg = set.TS1SimInBackground;
             int s0Detail = set.TS1CharacterDetail;
+            int s0Mode = FSO.LotView.WorldConfig.Current.LightingMode; // exact runtime mode
 
             try
             {
+                // ---- (0a) BOOT APPLY LAW (P1 review fix): LightingMode derives
+                // from Lighting ONLY when stored == -1; explicit values (incl.
+                // the Program.cs ultra pin 3) pass through. Expected runtime mode
+                // = max(derive(stored), ForceAdvLight clamp).
+                need(SimitoneGame.DeriveBootLightingMode(3, false) == 3
+                    && SimitoneGame.DeriveBootLightingMode(3, true) == 3
+                    && SimitoneGame.DeriveBootLightingMode(2, true) == 2,
+                    "boot-law-explicit-preserved");
+                need(SimitoneGame.DeriveBootLightingMode(-1, true) == 1
+                    && SimitoneGame.DeriveBootLightingMode(-1, false) == 0,
+                    "boot-law-auto-derive");
+
                 // ---- (0) BOOT APPLY: engine state must equal the config-derived
                 // law; asserted before any mutation in this process.
                 int clamp = world.ForceAdvLight ? 1 : 0;
-                int expLight0 = Math.Max(s0Lighting ? 1 : 0, clamp);
+                int expLight0 = Math.Max(
+                    SimitoneGame.DeriveBootLightingMode(set.LightingMode, s0Lighting), clamp);
                 need(FSO.LotView.WorldConfig.Current.LightingMode == expLight0,
                     "boot-lighting(mode=" + FSO.LotView.WorldConfig.Current.LightingMode
-                    + ",exp=" + expLight0 + ",forceAdv=" + world.ForceAdvLight + ")");
+                    + ",stored=" + set.LightingMode + ",exp=" + expLight0
+                    + ",forceAdv=" + world.ForceAdvLight + ")");
+                // the stored key itself is untouched by the derive (the Program.cs
+                // ultra pin keeps surviving on disk; the gate never saves LightingMode)
+                need(ConfigValue("LightingMode") == set.LightingMode.ToString(),
+                    "ini-lightingmode(stored=" + set.LightingMode + ")");
                 need(FSO.LotView.WorldConfig.Current.ObjShadows == s0Shadows, "boot-objshadows");
                 need(FSO.Vitaboy.Avatar.DefaultTechnique ==
                     UIOriginalOptionsPanel.CharacterDetailTechnique(s0Detail),
@@ -93,12 +112,15 @@ namespace Simitone.Client
                     && fx.Techniques[3].Name == "SSAA", "fx-technique-names");
 
                 // ---- (a) Lighting toggle apply through the production helper
+                // (the TOGGLE law stays 0/1 — the TS1 row has no ultra tier; boot
+                // preserves explicit modes, the row maps on top of them).
                 UIOriginalOptionsPanel.ApplyLighting(vm, !s0Lighting);
                 need(FSO.LotView.WorldConfig.Current.LightingMode ==
                     Math.Max((!s0Lighting) ? 1 : 0, clamp), "lighting-toggle(mode="
                     + FSO.LotView.WorldConfig.Current.LightingMode + ")");
                 UIOriginalOptionsPanel.ApplyLighting(vm, s0Lighting);
-                need(FSO.LotView.WorldConfig.Current.LightingMode == expLight0, "lighting-restore");
+                need(FSO.LotView.WorldConfig.Current.LightingMode ==
+                    Math.Max(s0Lighting ? 1 : 0, clamp), "lighting-restore");
 
                 // ---- (d) Shadows gate round-trip
                 UIOriginalOptionsPanel.ApplyShadows(vm, false);
@@ -237,7 +259,10 @@ namespace Simitone.Client
                 set.Save();
                 try
                 {
-                    UIOriginalOptionsPanel.ApplyLighting(vm, s0Lighting);
+                    // exact runtime mode (not the toggle's 0/1 — boot may have
+                    // preserved an explicit mode, e.g. the Program.cs ultra pin)
+                    FSO.LotView.WorldConfig.Current.LightingMode = s0Mode;
+                    vm.Context.World.ChangedWorldConfig(GameFacade.GraphicsDevice);
                     UIOriginalOptionsPanel.ApplyShadows(vm, s0Shadows);
                 }
                 catch (Exception) { }
