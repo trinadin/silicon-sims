@@ -36,7 +36,7 @@ namespace Simitone.Client.UI.Panels.CAS
         internal const float NativePreciseZoom = 1f;
         internal const float NativeFeetRow = 200f;   // window bottom - 20 (0x2dbef0)
         internal const float NativeLookTileZ =
-            (NativeFeetRow - 100f) / (NativePxPerWorldUnit * 0.8660254f * 3f); // ≈ 1.1482
+            (NativeFeetRow - 110f) / (NativePxPerWorldUnit * 0.8660254f * 3f); // 90px/78.38 ≈ 1.1482 (110 = viewport center 220/2)
 
         private static Texture2D Backdrop;
         private RenderTarget2D Target;
@@ -125,10 +125,12 @@ namespace Simitone.Client.UI.Panels.CAS
         }
 
         /// <summary>
-        /// The native preview camera: Near zoom with PreciseZoom 3/√2 renders
-        /// at exactly 64 px/world unit, and the look point sits NativeLookTileZ
-        /// tiles above the skeleton root so the root lands on (50, 200) — the
-        /// window center, 20px above the bottom (UpdateTransform 0x2dbef0).
+        /// The native preview camera: the engine's standard Near scale
+        /// (PreciseZoom 1 = 30.17 px/world unit on the raw mesh), with the
+        /// look point at NativeLookTileZ tiles so the skeleton root lands on
+        /// (50, 200) — the window center, 20px above the bottom
+        /// (UpdateTransform 0x2dbef0), through the 30-degree pitch
+        /// projection (world-up at cos 30 = 0.866).
         /// </summary>
         internal static WorldCamera CreateNativeCamera(GraphicsDevice gd)
         {

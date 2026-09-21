@@ -5,9 +5,29 @@ Owned PPC executable `The Sims Complete`, SHA256
 Addresses are raw file offsets (code virtual + 0x8e90). Reproduce with
 `ppc_decode.py <binary> <start> <end>`; raw disasm in this directory
 (vitabtn-*.txt, vitasolo-ctor.txt, edit-*.txt, singleton-87eb0.txt,
-vitaboy-ctor.txt, cas-tsonkeydown.txt). TOC reads use the relocated data
-image from `pef_load.py` (`image[0x8000 + slot]`), validated against the
-r240 pair (slot -0x4358 -> code 0x59c3a8).
+vitaboy-ctor.txt, cas-tsonkeydown.txt, sanimator-*.txt). TOC reads use the
+relocated data image from `pef_load.py` (`image[0x8000 + slot]`), validated
+against the r240 pair (slot -0x4358 -> code 0x59c3a8).
+
+## 0. Tool erratum (UI-27, mandatory accounting)
+
+`ppc_decode.py` prints B-form branches keyed on BO alone, ignoring BI:
+printed→actual is bne(2)=beq, beq(2)=bne, bne(0)=blt, beq(0)=bge,
+bne(1)=bgt, beq(1)=ble (BO=12 = branch-if-true, BO=4 = branch-if-false;
+coordination/evidence/UI-27/result.md + tools/iff-dump/r258-pef-revisit/).
+Branch-sensitive readings in this decode:
+
+- The **anchor chain is branch-independent**: UpdateTransform 0x2dbef0's X/Y
+  laws are straight arithmetic (subf/rlwinm/srawi/addi at 0x2dbfe4-0x2dc004,
+  the `addi r0, r3, -20` at 0x2dc024) — no conditional branch is load-bearing
+  (the only branch in the translation block selects the pet variant, unused
+  here).
+- The **name-law chain IS branch-sensitive** (TSOnCharacter 0x5336f8-0x533744:
+  the CR->LF normalize compare, the linesAllowed==1 test, the 0x50 gate and
+  the control-char reject). Its LF law is corroborated by the r240-era
+  recovered listing `cas-editor-followup/native-editor.txt` ("Typed Return
+  and control-character rules"), independently produced, and by the live
+  ucasflow person-name passes. Per UI-27, re-audit before further reuse.
 
 ## 1. Which class the CAS uses
 

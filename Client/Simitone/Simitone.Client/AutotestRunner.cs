@@ -27441,9 +27441,12 @@ namespace Simitone.Client
                 //    the single-line person name-editor law.
                 //    Framing (cWinVitaBtn decode): UpdateTransform 0x2dbef0
                 //    anchors the skeleton root at (window center, bottom-20);
-                //    the VitaBoy render scale 5.33333/0.25 = 64 px/world unit
-                //    == Near PreciseZoom 3/√2; look tile height 0.46875 puts
-                //    the root on surface (50,200). Resolution-free surface.
+                //    the VitaBoy render scale is the engine's standard Near
+                //    scale on the raw mesh (PreciseZoom 1 = 30.17 px/WU, the
+                //    refuted 64 px/WU chain replaced per the run
+                //    reconciliation); look tile height 1.1482 puts the root
+                //    on surface (50,200) through the cos-30 pitch factor.
+                //    Resolution-free surface.
                 var surface = cas.VitaSurface;
                 if (surface == null) { ok = false; info += " vitaSurface=null;"; }
                 else
