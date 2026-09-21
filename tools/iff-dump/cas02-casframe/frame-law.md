@@ -42,33 +42,25 @@ r240 pair (slot -0x4358 -> code 0x59c3a8).
 
 ## 3. Scale
 
-- StartVitaBoy (SAnimator::StartVitaBoy 0x361970) writes the model-scale
-  fields 0x1f0..0x204 from the constant table TOC[-0x4bb8] -> code 0x59bbc4
-  (file 0x5a4a54): the recurring multiplier is **5.33333** (= 16/3) with a
-  **0.5** half-ratio on two axes (the 2:1 iso compression) and a 0.125
-  tertiary; per-type factors come from vtbl+0x128(0x13..0x17) — but the
-  SAnimator vtable is CFM-glued (r209's disclosed slot-mapping boundary) and
-  statically unrecoverable. The table ALSO carries **45.0** (idx 17), the
-  same table the 5.33333/0.5/0.125 scale chain comes from.
-- The port renders the raw Vitaboy mesh 1:1 in world units (AvatarComponent
-  World = translation only; head bone /3 -> tiles confirms ~3.4 WU sims).
-- The first implementation chained 5.33333/0.25 = 21.333 px/unit = 64
-  px/WU; the live run DISPROVED it (head clipped at row 0, bounds
-  8,0-91,207) and measured the mesh: feet row 188 with the look at
-  1.40625 WU means the world-up axis projects at **cos 30 = 0.866** through
-  the shared camera's RotX(30) — the derivation had omitted that factor.
-- Corrected scale: the constant-table **45.0 px/unit** (= the
-  uisurvey-calibrated PreciseZoom 1.5, 45.25 px/WU, the previously accepted
-  render size). Full idle cycle contained: clipping needs a >= 5.1 WU
-  pose reach (impossible for TS1 sims).
+- The sim renders RAW-MESH 1:1 at the engine's standard Near scale
+  (30.17 px/world unit, PreciseZoom 1.0): the shared camera's RotX(30)
+  pitch projects world-up at cos 30 = 0.866 (run-measured), the adult
+  pose reach is bounded by the pre-change PASS measurement (reach x 0.866
+  x 30.17 <= 188px), and the anchored render therefore contains the whole
+  idle cycle with the head >= 12px below the window top.
+- Run-measured reconciliation (first attempt, 64 px/WU + look 0.46875):
+  feet row 188 = 110 + 1.40625 x 0.866 x 64 (the derivation had omitted
+  the pitch factor), bottom 207 = feet + the ground shadow ellipse, top 0 =
+  the neutral head clipped. All three measured pixels are explained by the
+  corrected model; the 64 px/WU chain (5.33333/0.25 from the scale table
+  0x59bbc4 + a guessed 0.25 record divisor) is REFUTED by measurement.
 - View (WorldCamera.CalculateView): look point (CenterTile.X*3,
   CenterTile.Z*3, CenterTile.Y*3), RotY(rotation) * RotX(30deg) — the 30deg
   pitch matches CAS-01's decoded portrait camera pitch.
 - Root anchor law -> look point: the root must land on surface (50, 200);
-  90px of screen = 90/(45.25 x 0.866) = 2.297 world units -> CenterTile.Z =
-  2.297/3 = **0.7653** (derived; the run-measured 0.46875 put the feet on
-  row 188 exactly as this chain predicts, which is the reconciliation
-  receipt).
+  90px of screen = 90/(30.17 x 0.866) = 3.4445 world units -> CenterTile.Z =
+  3.4445/3 = **1.1482** (derived; the run-measured 0.46875 put the feet on
+  row 188 exactly as this chain predicts — the reconciliation receipt).
 
 ## 4. The framing law (what the port implements)
 
@@ -76,8 +68,10 @@ r240 pair (slot -0x4358 -> code 0x59c3a8).
    (r143 §3.2, unchanged); the sim is CLIPPED to it (TSPaint
    vtbl+0x48 SetRect + vtbl+0x2c Enable on this->0x5c->0x5c).
 2. Skeleton root at surface (50, 200) — window center-x, bottom - 20.
-3. Render scale 45.25 px/world unit (Near, PreciseZoom 1.5; the table's
-   45.0 within 0.6%).
+3. Render scale: the engine's standard Near scale on the raw mesh
+   (30.17 px/world unit, PreciseZoom 1.0) — the pre-change PASS bounds the
+   pose reach under exactly this scale, and the anchored sim fills the
+   window as the original CAS does.
 4. Facing: the model 45deg to the iso camera plus the ±0.25 rad sway
    (r209 canon; the port's reviewed pose path already produces the 45deg
    relative facing — untouched).
@@ -87,11 +81,12 @@ r240 pair (slot -0x4358 -> code 0x59c3a8).
    `preview-projection-independent-of-host-viewport` PASS (both runs).
 
 Port fix: `UIOriginalVitaPreview.CreateNativeCamera`. Run-measured
-reconciliation at the first constants (64 px/WU, look 0.46875): feet row
-188 = 110 + 1.40625 x 0.866 x 64 (the omitted cos 30), bottom 207 = feet +
-the ground shadow ellipse, top 0 = the neutral head clipped — all three
-measured pixels explained by the corrected model; at 45.25 px/WU and look
-0.7653 the feet land on 200 and the whole idle cycle is contained.
+reconciliation at the first attempt (64 px/WU, look 0.46875): feet row
+188 = 110 + 1.40625 x 0.866 x 64 (the omitted pitch factor), bottom 207 =
+feet + the ground shadow ellipse, top 0 = the neutral head clipped — all
+three measured pixels explained by the corrected model; at 30.17 px/WU and
+look 1.1482 the feet land on exactly (50, 200) and the bounded pose reach
+keeps the whole idle cycle contained (head >= 12px below the top).
 
 ## 5. The single-line name-editor law
 
