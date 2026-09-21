@@ -320,6 +320,41 @@ namespace FSO.SimAntics
             GameTickNum = GameTickRate-1;
         }
 
+        // UI-26 wire (r260-options-readiness WIRE row c, 'Sim In Background'):
+        // the native cSimulator keeps one +52 signed speed field where negative
+        // means suspended (GetSuspendedSpeed/IsSuspended @0x139170); the OS focus
+        // law is "don't pause on Alt-Tab" only when GetSimInBackground is on.
+        // Port analogue: while the window lacks focus SpeedMultiplier parks at 0
+        // (VM.Update then pauses sound threads and stops ticks) and the exact
+        // prior speed is restored on regain. SimInBackground=true leaves the
+        // simulator running in the background. This is consumed by the
+        // production relay SimitoneGame.RelayFocus (LostFocus/RegainFocus) and
+        // driven directly by the 'uioptswire' gate.
+        public bool FocusSuspended;
+        private int FocusSavedSpeed;
+
+        /// <summary>
+        /// UI-26: apply the focus suspend/restore law (native cSimulator +52
+        /// signed speed). Safe to call repeatedly with the same state.
+        /// </summary>
+        public void ApplyFocus(bool focused, bool simInBackground)
+        {
+            if (focused)
+            {
+                if (FocusSuspended)
+                {
+                    FocusSuspended = false;
+                    SpeedMultiplier = FocusSavedSpeed;
+                }
+            }
+            else if (!simInBackground && !FocusSuspended)
+            {
+                FocusSuspended = true;
+                FocusSavedSpeed = SpeedMultiplier;
+                SpeedMultiplier = 0;
+            }
+        }
+
         public void Update()
         {
             if (UseWorld)

@@ -10,6 +10,14 @@ namespace FSO.LotView
         //(off, advanced, +3d wall, ultra)
         public int LightingMode;
 
+        // UI-26 (r260-options-readiness WIRE row d): the TS1 'Shadows' option
+        // (config TS1Shadows; native cOptionsMgr::Get/SetShadows, About[19]
+        // "object drop shadows"). Shadows in the port ride the LightingMode>0
+        // LMapBatch path, so this flag is the shadows-only gate the native
+        // manager always had. LMapBatch.DrawObjShadows refuses to generate
+        // while it is off; applied live through World.ChangedWorldConfig.
+        public bool ObjShadows = true;
+
         public bool AdvancedLighting
         {
             get

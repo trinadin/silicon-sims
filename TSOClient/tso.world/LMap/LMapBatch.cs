@@ -924,6 +924,12 @@ namespace FSO.LotView.LMap
 
         public void DrawObjShadows(List<Rectangle> objects, LightData pointLight)
         {
+            // UI-26 (r260-options-readiness WIRE row d): the TS1 'Shadows'
+            // option. WorldConfig.ObjShadows gates object-drop-shadow
+            // generation for every light batch (outdoor sun + per-light),
+            // leaving wall shadows and the light itself untouched — the
+            // native cOptionsMgr::Get/SetShadows scope.
+            if (!WorldConfig.Current.ObjShadows) return;
             GD.SetRenderTarget(ObjShadowTarg);
             if (WorldConfig.Current.UltraLighting)
             {
