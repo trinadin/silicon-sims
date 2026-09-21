@@ -123,7 +123,6 @@ namespace Simitone.Client.UI.Panels
         // dialogs and the NBR-02/NBR-03 backends).
         public bool BulldozeArmed { get; private set; }
         public event Action<bool> BulldozeArmChanged;
-        public Func<int, bool> ArmedLotClick;
         // The native re-click semantics were not separately decoded (disclosed):
         // the port toggles — a second Bulldoze click disarms.
         public UIOriginalNavbarButton BulldozeButtonForProbe;

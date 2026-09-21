@@ -401,7 +401,7 @@ namespace Simitone.Client.UI.Screens
             Add(TS1NeighPanel);
             Add(switcher);
             TS1NeighSwitcher = switcher;
-            WireArmedLotClicks(switcher);   // UI-30: armed lot clicks -> the EvictMode branch law
+            WireArmedLotClicks(TS1NeighPanel, switcher);   // UI-30: armed lot clicks -> the EvictMode branch law
         }
 
         public static bool NativeDesktopEmptyLotRequiresDialog(bool desktop,
@@ -1620,11 +1620,13 @@ namespace Simitone.Client.UI.Screens
     internal const string EvictDoneMessage = "The family has moved out.";
     internal const string BulldozeDoneMessage = "The house has been bulldozed.";
 
-    /// <summary>Installs the armed lot-click hook on a mounted switcher (called
-    /// from NeighSelection where panel and switcher are both live).</summary>
-    internal void WireArmedLotClicks(UINeighbourhoodSwitcher switcher)
+    /// <summary>Installs the armed lot-click hook on the mounted neighborhood
+    /// panel + switcher (called from NeighSelection where both are live). The
+    /// PANEL owns the lot-click routing (SelectHouse), the SWITCHER owns the
+    /// armed state.</summary>
+    internal void WireArmedLotClicks(UINeighborhoodSelectionPanel panel, UINeighbourhoodSwitcher switcher)
     {
-        switcher.ArmedLotClick = (house) =>
+        panel.ArmedLotClick = (house) =>
         {
             if (!switcher.BulldozeArmed) return false;
             BulldozeLotClickFlow(house);
