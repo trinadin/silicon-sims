@@ -96,6 +96,43 @@ namespace Simitone.Client
         private static string[] _houses;
         private static TS1GameScreen _screen;
         private static VM _vm;
+
+        // ENG-02 diagnostics (2026-09-21, worktree-local): the archundo-probe stall
+        // showed the autotest hook ticking at 60fps THROUGH the frozen VM heartbeat,
+        // then going silent at phase 5 — while a full core showed NO thread spinning
+        // anywhere. Log hook liveness + the VM pause state every 300 frames and on
+        // every SpeedMultiplier transition, so the log itself names when and why the
+        // world stopped (UI-26 focus park / UIMainPanel non-LIVE park / blocking
+        // dialog) versus a real wedged tick.
+        private static int _eng02Frame;
+        private static int _eng02LastSpd = int.MinValue;
+        private static void Eng02Diag()
+        {
+            var vm = _vm ?? _screen?.vm;
+            if (vm == null) return;
+            var panel = _screen?.Frontend?.MainPanel;
+            int spd = vm.SpeedMultiplier;
+            if (spd != _eng02LastSpd)
+            {
+                Log("AUTOTEST eng02 spd " + _eng02LastSpd + " -> " + spd
+                    + " mode=" + (panel != null ? panel.Mode.ToString() : "?")
+                    + " gbd=" + (vm.GlobalBlockingDialog != null)
+                    + " focus=" + vm.FocusSuspended
+                    + " tick=" + vm.Scheduler.CurrentTickID
+                    + " clock=" + vm.Context.Clock.Hours + ":" + vm.Context.Clock.Minutes.ToString("D2")
+                    + " ready=" + vm.Ready);
+                _eng02LastSpd = spd;
+            }
+            _eng02Frame++;
+            if (_eng02Frame % 300 == 0)
+                Log("AUTOTEST eng02 alive f=" + _eng02Frame
+                    + " spd=" + spd
+                    + " mode=" + (panel != null ? panel.Mode.ToString() : "?")
+                    + " gbd=" + (vm.GlobalBlockingDialog != null)
+                    + " focus=" + vm.FocusSuspended
+                    + " tick=" + vm.Scheduler.CurrentTickID
+                    + " clock=" + vm.Context.Clock.Hours + ":" + vm.Context.Clock.Minutes.ToString("D2"));
+        }
         // Visual artifacts must describe the requested surface, not whichever
         // blocking ObjectDialog the loaded save happened to have open. Keep the
         // real dialog mounted and its VM primitive/latch untouched; only suppress
@@ -336,6 +373,7 @@ namespace Simitone.Client
         private static void Tick()
         {
             if (_finished) return;
+            try { Eng02Diag(); } catch { } // ENG-02 diagnostic; never gate-fatal
             if (DateTime.UtcNow > _deadline && _state > 0)
             {
                 Log("AUTOTEST TIMEOUT state=" + _state + " -> FAIL");
