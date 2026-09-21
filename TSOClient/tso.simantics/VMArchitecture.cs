@@ -46,6 +46,14 @@ namespace FSO.SimAntics
 
         public List<VMArchitectureCommand> Commands;
 
+        /// <summary>
+        /// UI-22 tranche 1: build-mode architecture undo/redo (native
+        /// UndoManager law, tools/iff-dump/r256-undo-decode/). Runtime-only:
+        /// not part of VMArchitectureMarshal, so it survives save and dies
+        /// with the lot — and is cleared on build-mode exit by the UI.
+        /// </summary>
+        public readonly VMArchitectureUndoStack UndoStack = new VMArchitectureUndoStack();
+
         public VMRoomMap[] Rooms;
         public List<VMRoom> RoomData;
         public event ArchitectureEvent WallsChanged;
@@ -486,6 +494,14 @@ namespace FSO.SimAntics
 
         public int RunCommands(List<VMArchitectureCommand> commands, bool transient)
         {
+            // UI-22 tranche 1: capture an undo step for real (non-preview),
+            // TS1, wall/floor batches — the native SubmitUndoable law
+            // (tools/iff-dump/r256-undo-decode/ §2). One applied batch (one
+            // drag) = one undo step. BeginCapture returns null for preview
+            // (!RealMode), transient, non-TS1 and terrain/grass batches.
+            var undoEntry = UndoStack.BeginCapture(this, commands, transient);
+            bool undoChanged = false;
+
             int cost = 0; //negative for sellback;
             int pdCount = 0;
             ushort pdVal = 0;
@@ -509,6 +525,7 @@ namespace FSO.SimAntics
                         var nwCount = VMArchitectureTools.DrawWall(this, new Point(com.x, com.y), com.x2, com.y2, com.pattern, com.style, com.level, false);
                         if (nwCount > 0)
                         {
+                            undoChanged = true;
                             cost += nwCount * lstyle.Price;
                             if (avatar != null)
                             Context.VM.SignalChatEvent(new VMChatEvent(avatar, VMChatEventType.Arch,
@@ -522,6 +539,7 @@ namespace FSO.SimAntics
                         var dwCount = VMArchitectureTools.EraseWall(this, new Point(com.x, com.y), com.x2, com.y2, com.pattern, com.style, com.level);
                         if (dwCount > 0)
                         {
+                            undoChanged = true;
                             cost -= 7 * dwCount;
                             if (avatar != null)
                             Context.VM.SignalChatEvent(new VMChatEvent(avatar, VMChatEventType.Arch,
@@ -537,6 +555,7 @@ namespace FSO.SimAntics
                         var rwCount = VMArchitectureTools.DrawWallRect(this, new Rectangle(com.x, com.y, com.x2, com.y2), com.pattern, com.style, com.level);
                         if (rwCount > 0)
                         {
+                            undoChanged = true;
                             cost += rwCount * rstyle.Price;
                             if (avatar != null)
                             Context.VM.SignalChatEvent(new VMChatEvent(avatar, VMChatEventType.Arch,
@@ -552,6 +571,7 @@ namespace FSO.SimAntics
                         var pfCount = VMArchitectureTools.WallPatternFill(this, new Point(com.x, com.y), com.pattern, com.level);
                         if (pfCount.Total > 0)
                         {
+                            undoChanged = true;
                             cost -= pfCount.Cost - pfCount.Cost / 5;
                             cost += (pattern == null) ? 0 : pattern.Price * pfCount.Total;
                             if (avatar != null)
@@ -569,6 +589,7 @@ namespace FSO.SimAntics
                         pdVal = com.pattern;
                         if (dot.Total > -1)
                         {
+                            undoChanged = true;
                             cost -= dot.Cost - dot.Cost / 5;
                             cost += (pdpattern == null) ? 0 : pdpattern.Price;
                             pdCount++;
@@ -581,6 +602,7 @@ namespace FSO.SimAntics
                         var ffCount = VMArchitectureTools.FloorPatternFill(this, new Point(com.x, com.y), com.pattern, com.level);
                         if (ffCount.Total > 0)
                         {
+                            undoChanged = true;
                             cost -= (ffCount.Cost - ffCount.Cost / 5)/2;
                             cost += (ffpattern == null) ? 0 : ffpattern.Price * ffCount.Total / 2;
 
@@ -598,6 +620,7 @@ namespace FSO.SimAntics
                         var frCount = VMArchitectureTools.FloorPatternRect(this, new Rectangle(com.x, com.y, com.x2, com.y2), com.style, com.pattern, com.level);
                         if (frCount.Total > 0)
                         {
+                            undoChanged = true;
                             cost -= (frCount.Cost - frCount.Cost / 5) / 2;
                             cost += (frpattern == null) ? 0 : frpattern.Price * frCount.Total / 2;
 
@@ -641,6 +664,15 @@ namespace FSO.SimAntics
                 Context.VM.GetUserIP(lastAvatar.PersistID),
                 "pattern dotted " + pdCount + " walls with pattern #" + pdVal
             ));
+
+            // UI-22: native SubmitUndoable tail — only batches that really
+            // changed the lot become undo steps; Submit clears the redo list
+            // (native law §2: every submit kills redo).
+            if (undoEntry != null && undoChanged)
+            {
+                undoEntry.Cost = cost;
+                UndoStack.Submit(undoEntry);
+            }
 
             return cost;
         }
