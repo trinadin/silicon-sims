@@ -459,7 +459,13 @@ namespace Simitone.Client.UI.Panels
             if (IsSub) return false;
             var acted = false;
             if (escDown && Sub == null && _pendingSub == null && !_subSteppedFrame)
-                acted = EscapeStep();
+            {
+                // any non-suppressed key frame acts: step-out (EscapeStep
+                // true) or full dismissal (EscapeStep false — its return
+                // means "main stays open", not "key handled")
+                EscapeStep();
+                acted = true;
+            }
             _subSteppedFrame = false;
             return acted;
         }
