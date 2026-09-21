@@ -338,7 +338,9 @@ namespace Simitone.Client
             if (_phaseTicks < 4 * 70) return; // ~4s of frames at 60Hz
             Check(File.Exists(_stagedPath), "gated-tick-left-staged-file");
 
-            //the REAL production button opens the dialog (UI-09 input idiom).
+            //the REAL production button opens the dialog (UI-09 input idiom —
+            //mount, assert and answer within ONE synthesized interaction, the
+            //same-tick shape AutotestTutorialLifecycle247 uses for its dialogs).
             Check(Switcher.ImportButtonForProbe != null, "import-button-mounted");
             var opens0 = Screen.ImportDialogOpensForProbe;
             if (Switcher.ImportButtonForProbe != null) Press(Switcher.ImportButtonForProbe);
@@ -358,18 +360,10 @@ namespace Simitone.Client
             Check(yes != null && yes.Caption == "Yes", "dialog-yes-button");
             Check(no != null && no.Caption == "No", "dialog-no-button");
             if (!_passed) { _done = true; return; }
-            Next();
-        }
 
-        private void PhaseNoPath()
-        {
-            var dlg = Screen._importDialog;
-            if (dlg == null) { Fail("dialog-gone-before-no"); _done = true; return; }
-            UIButton no;
-            dlg.ButtonMap.TryGetValue(UIAlertButtonType.No, out no);
-            if (no == null) { Fail("no-button-missing"); _done = true; return; }
+            //NO path, same tick: the staged file is untouched, no family added,
+            //the dialog closes synchronously.
             Press(no);
-            if (_phaseTicks < 40) return; //let the close tween retire the dialog
             Check(Screen._importDialog == null, "no-path-closes-dialog");
             Check(File.Exists(_stagedPath), "no-path-left-staged-file");
             var famiCount = N.MainResource.List<FAMI>().Count(x => x != null);
@@ -382,16 +376,16 @@ namespace Simitone.Client
         private void PhaseYesPathImport()
         {
             //reopen through the production entry point, then confirm through the
-            //real Yes button — the full user flow end-to-end.
+            //real Yes button — the full user flow end-to-end, same tick.
             Screen.ShowImportDialog();
             var dlg = Screen._importDialog;
             Check(dlg != null, "reopen-dialog-mounted");
             if (dlg == null) { _done = true; return; }
+            Check(dlg.MessageTextForProbe?.Contains("Charming") == true, "reopen-message-has-family-name");
             UIButton yes;
             dlg.ButtonMap.TryGetValue(UIAlertButtonType.Yes, out yes);
             if (yes == null) { Fail("yes-button-missing-on-reopen"); _done = true; return; }
-            Press(yes);
-            if (_phaseTicks < 20) return; //give the synchronous import a beat
+            Press(yes); //the confirmed import runs synchronously in the handler
 
             Check(Screen.ImportConfirmYesForProbe > 0, "yes-dispatched");
             Check(!File.Exists(_stagedPath), "yes-path-consumed-staged-file");
