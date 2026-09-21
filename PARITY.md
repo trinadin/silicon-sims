@@ -255,6 +255,16 @@ Scout synthesis (3 parallel agents; evidence `tools/iff-dump/r159/`): client cen
 
 # R237 UI assessment — visible parity gaps reopened (2026-09-04)
 
+> **SUPERSEDED IN PART (2026-09-21, UI-19 + coordinator):** the Budget, Help and
+> Phonebook composition failures named below were repaired by the R238-era
+> restorations (r238-budget / help layout laws, r238-phonebook corrected law + the
+> shared UIOriginalTextList consuming the decoded WinScrol scrollbar law) and are
+> CLOSED at the current tip — independently verified with a live gate PASS 9/0 and
+> per-dialog law re-derivation (coordination/tasks/UI-19.md;
+> coordination/evidence/COORD/ui19-closure-verify-20260921.md). The TALL BACKDROP
+> item is NOT stale: it remains user-gated (Lane U; scoped IsDoubleByteUI patch
+> authored, not applied).
+
 The user's new desktop UI review reproduces the tall Needs background and
 finds confirmed Budget/Help/Phonebook composition failures. The unchanged
 R236 package still passes 129/0: several checks assert the port's incorrect
