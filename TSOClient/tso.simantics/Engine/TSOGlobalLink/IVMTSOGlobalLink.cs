@@ -14,6 +14,13 @@ namespace FSO.SimAntics.Engine.TSOTransaction
         void PerformTransaction(VM vm, bool testOnly, uint uid1, uint uid2, int amount, short type, short thread, VMAsyncTransactionCallback callback);
         void PerformTransaction(VM vm, bool testOnly, uint uid1, uint uid2, int amount, short type, VMAsyncTransactionCallback callback);
         void PerformTransaction(VM vm, bool testOnly, uint uid1, uint uid2, int amount, VMAsyncTransactionCallback callback);
+        // ENG-02/UI-22 P2 (indep-review 20260921): synchronous, immediately-known
+        // transaction for the TS1 undo money hook. Both stub links already exposed
+        // this shape; promoting it to the interface lets VMArchitectureUndoStack.
+        // ApplyMoney take the refusal verdict instead of calling a void overload
+        // that discards it (and, on the TS1 stub, runs the NBR-04 ActiveFamily
+        // fallback family resolution).
+        bool PerformTransaction(VM vm, bool testOnly, uint uid1, uint uid2, int amount);
         void RequestRoommate(VM vm, uint pid, int mode, byte permissions);
         void RemoveRoommate(VM vm, VMAvatar avatar);
         void ObtainAvatarFromTicket(VM vm, string ticket, VMAsyncAvatarCallback callback);

@@ -93,6 +93,17 @@ namespace FSO.Server.Servers.Lot.Domain
             });
         }
 
+        // ENG-02/UI-22 P2 (indep-review 20260921): the interface's synchronous
+        // transaction surface. This link has no synchronous DB query, and the only
+        // caller is the TS1 undo money hook (VMArchitectureUndoStack.ApplyMoney),
+        // which never routes here — TSO lots carry no TS1 architecture undo stack.
+        // Disclosed permissive verdict; the async transaction above owns the
+        // authoritative result on this link.
+        public bool PerformTransaction(VM vm, bool testOnly, uint uid1, uint uid2, int amount)
+        {
+            return true;
+        }
+
         public void RequestRoommate(VM vm, uint avatarID, int mode, byte permissions)
         {
             //0 = initiate. 1 = accept. 2 = reject.

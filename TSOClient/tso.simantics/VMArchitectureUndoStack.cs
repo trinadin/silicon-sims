@@ -238,9 +238,14 @@ namespace FSO.SimAntics
         /// Money law (§4 floors: per-change Purchase/Refund hooks): undo
         /// applies -Cost (refund a purchase / take back a sellback), redo
         /// re-applies +Cost (re-charge a purchase / replay a sellback).
-        /// Routed through the same PerformTransaction path the live
-        /// architecture queue uses; no budget family (maxis infinite money)
-        /// is a no-op, exactly like purchases.
+        /// Routed through the synchronous bool PerformTransaction overload:
+        /// the link's own family resolution (VMTS1GlobalLinkStub.
+        /// FamilyForTransaction) carries the NBR-04 ActiveFamily fallback for
+        /// community/downtown lots, its CanTransactBudgetForFamily guard
+        /// refuses before mutating, and the refusal verdict now propagates to
+        /// the Undo/Redo chain-drop law.
+        /// No budget family (maxis infinite money) is a no-op, exactly like
+        /// purchases.
         /// </summary>
         private static bool ApplyMoney(VMArchitecture arch, VMArchitectureUndoEntry entry, bool undo)
         {
@@ -253,20 +258,19 @@ namespace FSO.SimAntics
             uint uid1 = toPlayer ? uint.MaxValue : entry.ActorUID;
             uint uid2 = toPlayer ? entry.ActorUID : uint.MaxValue;
 
-            if (!toPlayer)
-            {
-                // affordability pre-check, mirroring the stub's
-                // CanTransactBudgetForFamily guard (the interface PerformTransaction
-                // overloads are void, so refuse before mutating anything).
-                var payer = vm.GetObjectByPersist(entry.ActorUID) as VMAvatar;
-                var family = (payer != null) ? vm.TS1State?.CurrentFamily : null;
-                if (family != null && family.Budget - amount < 0) return false;
-            }
-
+            // UI-22 P2 (indep-review 20260921): the previous body ran a
+            // hand-rolled affordability pre-check that read only
+            // TS1State.CurrentFamily (missing the NBR-04 ActiveFamily fallback,
+            // so community-lot undo-of-sellback / redo-of-purchase skipped the
+            // guard) and then called the void PerformTransaction overload,
+            // discarding the stub's refusal verdict — a refused undo/redo
+            // silently replayed the world without charging or refunding.
+            // The bool overload carries both the fallback and the verdict.
             // null callback = purely synchronous transaction (the family budget
             // readouts read FAMI.Budget directly every frame).
-            vm.GlobalLink?.PerformTransaction(vm, false, uid1, uid2, amount, (short)0, null);
-            return true;
+            var link = vm.GlobalLink;
+            if (link == null) return true;
+            return link.PerformTransaction(vm, false, uid1, uid2, amount);
         }
     }
 }
