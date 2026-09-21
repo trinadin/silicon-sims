@@ -103,14 +103,12 @@ namespace Simitone.Client.UI.Panels.Desktop
         public static int FriendDialogsOpened = 0;
 
         private TS1GameScreen Game;
-        private bool HasVisitedSecondStory;
 
         public Func<UIMainPanelMode, bool> OnModeClick;
 
         public UIDesktopUCP(TS1GameScreen screen)
         {
             Game = screen;
-            HasVisitedSecondStory = Game.Level == 2;
             var ui = Content.Get().CustomUI;
             var gd = GameFacade.GraphicsDevice;
 
@@ -380,31 +378,61 @@ namespace Simitone.Client.UI.Panels.Desktop
 
         private bool CanUseSecondStory()
         {
-            // cWinViewControl::Update enables Lev2 before its first visit only in
-            // Build mode and only when Is2ndLevelFloorable(). VMArchitecture's first
-            // support map is the port's equivalent of that engine query.
-            var supported = Game.vm?.Context?.Architecture?.Supported;
-            bool floorable = false;
-            if (supported != null && supported.Length > 0 && supported[0] != null)
-                foreach (var tile in supported[0]) if (tile) { floorable = true; break; }
+            // R254/UI-18 ENGINE LAW (the r169 "writers not port-modeled" disclosure is
+            // now modeled): the two Lev2 gate bytes are WORLD state, not camera state.
+            // Is2ndLevelFloorable (0x20ce20) reads cFixedWorld+0x81 and
+            // HasBeenTo2ndLevel (0x20ce70) reads cFixedWorld+0x80, both reached
+            // through TOC-0x7354; they are cleared at world construction and at the
+            // head of every story-2 ComputeRooms pass (0x15f040) and set inside that
+            // pass from story-2 tile content (+0x81 in the tile-marking arms
+            // 0x160644/0x1607d8, +0x80 in the story-2 room scan 0x15f264) — i.e.
+            // "the lot HAS a second story", recomputed on load and on every edit.
+            // cWinViewControl::UpdateViewFromCPState 0x2b3f48 then enables Lev2:
+            //   enabled = story2Content(+0x80) || (mode==BUILD && floorable(+0x81))
+            // The old port latch (a per-UI camera-visit bit seeded from Level==2)
+            // could never arm on a two-story lot entered at story 1 — Lev2 and the
+            // PageUp key stayed dead in live mode.
+            var arch = Game.vm?.Context?.Architecture;
             return SecondStoryAvailableForState(
                 Game.InLot,
-                HasVisitedSecondStory,
+                HasSecondStoryContent(arch),
                 Game.Frontend?.MainPanel?.Mode == UIMainPanelMode.BUILD,
-                floorable);
+                AnySupported(arch));
+        }
+
+        /// cFixedWorld+0x80: any story-2 wall segment or floor pattern exists.
+        internal static bool HasSecondStoryContent(FSO.SimAntics.VMArchitecture arch)
+        {
+            if (arch == null) return false;
+            var floors = (arch.Floors != null && arch.Floors.Length > 1) ? arch.Floors[1] : null;
+            if (floors != null)
+                foreach (var t in floors) if (t.Pattern > 0) return true;
+            var walls = (arch.Walls != null && arch.Walls.Length > 1) ? arch.Walls[1] : null;
+            if (walls != null)
+                foreach (var t in walls) if (t.Segments != 0) return true;
+            return false;
+        }
+
+        /// cFixedWorld+0x81: any tile supports 2nd-story construction (the
+        /// r169-disclosed mapping of Is2ndLevelFloorable onto Supported[0]).
+        internal static bool AnySupported(FSO.SimAntics.VMArchitecture arch)
+        {
+            var supported = arch?.Supported;
+            if (supported == null || supported.Length == 0 || supported[0] == null) return false;
+            foreach (var tile in supported[0]) if (tile) return true;
+            return false;
         }
 
         internal static bool SecondStoryAvailableForState(
-            bool inLot, bool visited, bool buildMode, bool floorable)
+            bool inLot, bool story2Present, bool buildMode, bool floorable)
         {
-            return inLot && (visited || (buildMode && floorable));
+            return inLot && (story2Present || (buildMode && floorable));
         }
 
         private void SelectStory(sbyte story)
         {
             if (story == 2 && !CanUseSecondStory()) return;
             Game.Level = (sbyte)Math.Max(1, Math.Min(2, (int)story));
-            if (Game.Level == 2) HasVisitedSecondStory = true;
             if (Game.LotControl?.World?.State != null) Game.LotControl.World.State.ScrollAnchor = null;
         }
 

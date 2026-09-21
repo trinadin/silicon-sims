@@ -25829,6 +25829,22 @@ namespace Simitone.Client
                     && !Simitone.Client.UI.Panels.Desktop.UIDesktopUCP.SecondStoryAvailableForState(false, true, true, true);
                 if (!storyLaw) { ok = false; info += " lev2-enable-law;"; }
 
+                // R254/UI-18 live derivation pin: the gate's story-2 inputs come from
+                // the loaded lot's ARCHITECTURE (native cFixedWorld+0x80/+0x81 —
+                // story-2 wall/floor content and story-2 support, recomputed on every
+                // edit; the retired camera-visit latch could never arm on a two-story
+                // lot entered at story 1, leaving Lev2 and PageUp dead in live mode).
+                // FloorUpButton.Disabled must equal the law against the real world.
+                var archLev2 = scr.vm != null ? scr.vm.Context.Architecture : null;
+                bool lev2Story2 = Simitone.Client.UI.Panels.Desktop.UIDesktopUCP.HasSecondStoryContent(archLev2);
+                bool lev2Sup = Simitone.Client.UI.Panels.Desktop.UIDesktopUCP.AnySupported(archLev2);
+                bool lev2Expected = Simitone.Client.UI.Panels.Desktop.UIDesktopUCP.SecondStoryAvailableForState(
+                    scr.InLot, lev2Story2, mp.Mode == Simitone.Client.UI.Panels.UIMainPanelMode.BUILD, lev2Sup);
+                if (ucp.FloorUpButton.Disabled != !lev2Expected)
+                { ok = false; info += " lev2-live-derivation(disabled=" + ucp.FloorUpButton.Disabled + ",story2=" + lev2Story2 + ",sup=" + lev2Sup + ");"; }
+                else
+                { Log("AUTOTEST uicp lev2-live: story2Content=" + lev2Story2 + " supported=" + lev2Sup + " lev2Enabled=" + lev2Expected); }
+
                 // 5. removed port chrome on desktop: no hide button, no catalog search box
                 if (mp.HideButton != null) { ok = false; info += " hideButton-present;"; }
                 int searchBoxes = 0;
