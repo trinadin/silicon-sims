@@ -312,6 +312,12 @@ namespace Simitone.Client
             // production import dialog + consumer; game-data is never written).
             // Opt-in only — inert unless the checks string names it.
             AutotestImportUI.BeginIsolation(c);
+            // UI-30 'nghbtns': same isolation idiom, but the fresh dir is created
+            // INSIDE the launcher's private (in-worktree) userdir — never /tmp —
+            // so the neighborhood rematerializes from the pristine template and
+            // the credits+bulldoze battery's mutations land in run-local space.
+            // Opt-in only — inert unless the checks string names it.
+            AutotestUI30.BeginIsolation(c);
             if (timeoutMs > 0) Config.TimeoutMs = timeoutMs;
             Config.ExitOnDone = exitOnDone;
 
@@ -360,6 +366,7 @@ namespace Simitone.Client
                     case 11: StateSav07(); break;
                     case 12: StateImportUI(); break;
                     case 13: StateCutaway25(); break;
+                    case 14: StateUI30(); break;
                 }
             }
             catch (Exception e)
@@ -440,6 +447,19 @@ namespace Simitone.Client
                 Log("AUTOTEST importui neighborhood-screen ready; entering import-UI battery");
                 _importui = new AutotestImportUI(Log);
                 _state = 12;
+                return;
+            }
+            // UI-30 'nghbtns' opt-in (additive): takes over at the neighborhood
+            // screen — the credits timeline/entry/exit law + the armed bulldoze
+            // branch matrix through the REAL buttons and the NBR-02/NBR-03
+            // backends. Only reachable when the configured Checks string names
+            // it (the default string never lists it).
+            if (CheckEnabled("nghbtns"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST nghbtns neighborhood-screen ready; entering credits+bulldoze battery");
+                _ui30 = new AutotestUI30(Log);
+                _state = 14;
                 return;
             }
             // Only the visual survey needs a settled neighborhood frame. Do
@@ -725,6 +745,23 @@ namespace Simitone.Client
             Log("AUTOTEST importui " + _importui.Diagnostics);
             if (!_importui.Passed) Log("AUTOTEST importui FAILURES " + _importui.Failures);
             _importui = null;
+            Finish();
+        }
+
+        // UI-30 'nghbtns' (opt-in, additive): the neighborhood Credits screen +
+        // armed Bulldoze/Evict acceptance fixture — see AutotestUI30.cs. Reached
+        // only through the StateWaitNeigh entry branch when the configured
+        // Checks string names it.
+        private static AutotestUI30 _ui30;
+
+        private static void StateUI30()
+        {
+            if (_ui30 == null) { Finish(); return; }
+            if (!_ui30.Tick()) return;
+            if (_ui30.Passed) Pass("nghbtns"); else Fail("nghbtns");
+            Log("AUTOTEST nghbtns " + _ui30.Diagnostics);
+            if (!_ui30.Passed) Log("AUTOTEST nghbtns FAILURES " + _ui30.Failures);
+            _ui30 = null;
             Finish();
         }
 

@@ -36,12 +36,14 @@ namespace Simitone.Client.UI.Panels
     //     screens carry their own tables: 169 Downtown / 170 Vacation / 173 Studio
     //     Town / 174 Magicland, entry 0 = 'Return to Neighborhood View'.
     //
-    // Port wiring (disclosed where the port lacks the system): MoveIn = the port's
-    // CAS entry ('Select or Create Family'); Exit raises the same save/quit
-    // CloseAttempt dialog as the R121 options Quit; destination buttons PopMode;
-    // Bulldoze/Import/Inet/Previous/Next/Rezone/Credits mount engine-exact with
-    // tooltips and no-op clicks (evict/bulldoze already lives on the lot popup;
-    // the port has one neighborhood, no import/web/rezone/credits systems yet).
+// Port wiring (disclosed where the port lacks the system): MoveIn = the port's
+// CAS entry ('Select or Create Family'); Exit raises the same save/quit
+// CloseAttempt dialog as the R121 options Quit; destination buttons PopMode;
+// UI-30 ports the decoded laws' last dead buttons: Credits mounts the
+// cWinCredits overlay (navbar button + banner), Bulldoze arms the evict/
+// bulldoze mode (lot clicks follow the EvictModeLotHandler branch law on
+// TS1GameScreen); Import is UI-21's staged-FAM flow; Inet/Previous/Next/Rezone
+// remain mounted no-ops (UI-29 dispositions).
     // Destination modes mount the home grid minus home-only buttons plus a Return
     // button in the MoveIn slot — the engine's own DT/Vacation/Studio/Magic
     // toolbars (Return/Exchange/Credits/Import/Bulldoze per STR# 169/170/173/174,
@@ -113,6 +115,31 @@ namespace Simitone.Client.UI.Panels
         private ushort Mode;
         public bool MoveInMode;
 
+        // UI-30 (bulldoze-law §1): the Bulldoze button ARMS a modal evict/bulldoze
+        // mode; any other toolbar click disarms it before its own action (the
+        // native EvictModeBtnHandler jump-table first calls 0x46fd70(this,0)). While
+        // armed, lot clicks route to the EvictModeLotHandler branch law instead of
+        // the normal lot flow — TS1GameScreen installs ArmedLotClick (it owns the
+        // dialogs and the NBR-02/NBR-03 backends).
+        public bool BulldozeArmed { get; private set; }
+        public event Action<bool> BulldozeArmChanged;
+        public Func<int, bool> ArmedLotClick;
+        // The native re-click semantics were not separately decoded (disclosed):
+        // the port toggles — a second Bulldoze click disarms.
+        public UIOriginalNavbarButton BulldozeButtonForProbe;
+        public UIOriginalNavbarButton CreditsButtonForProbe;
+        public int BulldozeArmTogglesForProbe;
+
+        public void SetBulldozeArmed(bool armed)
+        {
+            if (BulldozeArmed == armed) return;
+            BulldozeArmed = armed;
+            BulldozeArmTogglesForProbe++;
+            if (BulldozeButtonForProbe != null) BulldozeButtonForProbe.Selected = armed;
+            BulldozeArmChanged?.Invoke(armed);
+            GameLog.Write("uinav: bulldoze mode " + (armed ? "ARMED" : "disarmed"));
+        }
+
         // UI-21 probe seams: the mounted Import button (home + destination
         // strips — the last mount wins) and how many times its production
         // handler dispatched. The 'importui' battery presses the REAL button
@@ -128,6 +155,7 @@ namespace Simitone.Client.UI.Panels
         public readonly List<UIOriginalNavbarButton> Buttons = new List<UIOriginalNavbarButton>();
 
         internal Vector2 BannerPositionForProbe { get { return Banner?.Position ?? Vector2.Zero; } }
+        internal UIOriginalNavbarButton BannerForProbe { get { return Banner; } }
         internal Vector2 CurrentPositionForProbe
         {
             get { return CurrentNumber == null ? Vector2.Zero : CurrentNumber.Position - CurrentNumberInset; }
@@ -200,6 +228,11 @@ namespace Simitone.Client.UI.Panels
             ArtboardAnchors.Clear();
             CurrentNumber = null;
             CurrentNumberInset = Vector2.Zero;
+            // A fresh strip mounts disarmed (the mode is a property of the armed
+            // session, not of the strip).
+            BulldozeArmed = false;
+            BulldozeButtonForProbe = null;
+            CreditsButtonForProbe = null;
 
             // Banner: kNghBarBkg (5420) on the neighborhood screens, kDTBarBkg (5422)
             // on Downtown; Vacation/Studio/Magic have no dedicated banner in
@@ -209,9 +242,14 @@ namespace Simitone.Client.UI.Panels
             RegisterAnchor(Banner, Vector2.Zero, true);
             Banner.OnButtonClick += (btn) =>
             {
-                // Engine: the full strip is clickable and opens the credits/picker
-                // (vt+0x98(0x400,0)); the port has no credits screen yet.
-                GameLog.Write("uinav: banner click (credits picker not ported)");
+                // UI-30: the full strip is clickable and opens the credits/picker
+                // (vt+0x98(0x400,0), RegularModeBtnHandler credits case) — the port
+                // mounts the cWinCredits overlay; the armed bulldoze mode disarms
+                // first (the banner rides the same button law).
+                SetBulldozeArmed(false);
+                var gs = UIScreen.Current as Screens.TS1GameScreen;
+                if (gs != null) gs.ShowCreditsScreen();
+                else GameLog.Write("uinav: banner click (no TS1GameScreen)");
             };
             Add(Banner);
             LastBannerMember = bannerMember;
@@ -284,6 +322,19 @@ namespace Simitone.Client.UI.Panels
                 // All entries ultimately share the banner/artboard origin.
                 RegisterAnchor(btn, new Vector2(slot.X, slot.Y), true);
                 if (slot.Cols == 1) btn.ForceState = 0;   // logo: SetImage(1,1), one state
+                // UI-30 EvictModeBtnHandler law: the Bulldoze click arms; EVERY
+                // other toolbar click disarms first. Subscribed BEFORE WireClick,
+                // so the disarm lands before the button's own action.
+                if (slot.DebugName == "Bulldoze")
+                {
+                    BulldozeButtonForProbe = btn;
+                    btn.OnButtonClick += (b) => SetBulldozeArmed(!BulldozeArmed);
+                }
+                else
+                {
+                    btn.OnButtonClick += (b) => SetBulldozeArmed(false);
+                }
+                if (slot.DebugName == "Credits") CreditsButtonForProbe = btn;
                 WireClick(btn, slot, mode, tipTable);
                 Add(btn);
                 Buttons.Add(btn);
@@ -298,7 +349,11 @@ namespace Simitone.Client.UI.Panels
                 {
                     var ret = new UIOriginalNavbarButton(retMember, 4, 1, DestTip(tipTable, 0, "Return to Neighborhood View"));
                     RegisterAnchor(ret, new Vector2(200, 0), true);
-                    ret.OnButtonClick += (btn) => PopMode(4);
+                    ret.OnButtonClick += (btn) =>
+                    {
+                        SetBulldozeArmed(false);   // UI-30: another toolbar click disarms first
+                        PopMode(4);
+                    };
                     Add(ret);
                     Buttons.Add(ret);
                     LastMembers.Add(retMember);
@@ -356,6 +411,22 @@ namespace Simitone.Client.UI.Panels
                         if (gs != null) gs.ShowImportDialog();
                         else GameLog.Write("uinav: Import click (no TS1GameScreen)");
                     };
+                    break;
+                case "Credits":
+                    // UI-30 (native RegularModeBtnHandler credits case @0x4715dc):
+                    // the button constructs the single cWinCredits overlay over
+                    // the neighborhood window (ShowCreditsScreen owns the latch).
+                    btn.OnButtonClick += (b) =>
+                    {
+                        var gs = UIScreen.Current as Screens.TS1GameScreen;
+                        if (gs != null) gs.ShowCreditsScreen();
+                        else GameLog.Write("uinav: Credits click (no TS1GameScreen)");
+                    };
+                    break;
+                case "Bulldoze":
+                    // Armed/disarmed by the pre-subscribed EvictModeBtnHandler
+                    // law hook above; nothing further (native jump-table case
+                    // ends in the mode switch itself).
                     break;
                 case "MoveIn":
                     btn.OnButtonClick += (b) =>

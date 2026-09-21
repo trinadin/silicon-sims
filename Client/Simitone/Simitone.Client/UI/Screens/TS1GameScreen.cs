@@ -401,6 +401,7 @@ namespace Simitone.Client.UI.Screens
             Add(TS1NeighPanel);
             Add(switcher);
             TS1NeighSwitcher = switcher;
+            WireArmedLotClicks(switcher);   // UI-30: armed lot clicks -> the EvictMode branch law
         }
 
         public static bool NativeDesktopEmptyLotRequiresDialog(bool desktop,
@@ -425,6 +426,10 @@ namespace Simitone.Client.UI.Screens
             var kids = GetChildren();
             if (kids != null)
                 foreach (var child in kids.Where(c => c is UINeighbourhoodSwitcher).ToList()) Remove(child);
+            // UI-30: the credits overlay and the armed mode belong to the
+            // neighborhood screen — neither survives a lot load.
+            CloseCreditsScreen();
+            if (switcher is UINeighbourhoodSwitcher nav) nav.SetBulldozeArmed(false);
         }
 
         public void MoveInAndPlay(short house, int family, UIElement switcher)
@@ -1551,6 +1556,212 @@ namespace Simitone.Client.UI.Screens
         var t = GameFacade.Strings.GetString("143", idx.ToString());
         if (string.IsNullOrEmpty(t) || t.Contains("MISSING")) return ImportStrsFallback[idx];
         return t;
+    }
+
+    // ---- UI-30: the neighborhood credits screen (cWinCredits law,
+    // coordination/evidence/UI-29/credits-law.md) ----
+    // Entry: the navbar Credits button AND the clickable banner (native
+    // RegularModeBtnHandler credits case @0x4715dc on every screen; the banner
+    // rides the same path via vt+0x98(0x400,0)). The native latches a TOC
+    // static so only ONE credits window exists; the overlay covers the whole
+    // neighborhood window, has no background art, one shared timeline
+    // (+1000 ms first line, +770 ms per line) and exits on ESC/Enter only.
+    internal UICreditsScreen _creditsScreen;   // probe seam: the mounted credits overlay
+    internal int CreditsOpensForProbe;         // battery evidence: ShowCreditsScreen calls
+
+    /// <summary>The Credits button/banner flow: mount the single cWinCredits
+    /// overlay. A second call while mounted is the native latch no-op.</summary>
+    public void ShowCreditsScreen()
+    {
+        CreditsOpensForProbe++;
+        if (_creditsScreen != null) return;   // native latch: only one credits window
+        var credits = new UICreditsScreen(CloseCreditsScreen);
+        _creditsScreen = credits;
+        Add(credits);
+    }
+
+    internal void CloseCreditsScreen()
+    {
+        if (_creditsScreen == null) return;
+        Remove(_creditsScreen);
+        _creditsScreen = null;
+    }
+
+    // ---- UI-30: the armed evict/bulldoze lot flow (EvictModeLotHandler
+    // 0x471980 law, coordination/evidence/UI-29/bulldoze-law.md) ----
+    // The navbar Bulldoze ARMS a mode (UINeighbourhoodSwitcher owns the arm/
+    // disarm law); armed lot clicks land here INSTEAD of the normal lot flow:
+    //   occupied → confirm 1 ("evict this family?", STR# 131 [2]/[3] chrome)
+    //     → if BUILT a second confirm whose ANSWER IS killSims
+    //     → MoveOut(houseID, killSims) — the EvictFamily entry calls MoveOut
+    //       FIRST (law §3); NBR-02's port MoveOut is the eviction executor.
+    //   vacant + built → confirm → BulldozeLot(lot) — NBR-03, the port's
+    //     demolition half (the port's MoveOut no-family arm does not demolish).
+    //   vacant + unbuilt → two status messages, NO dialog.
+    // Success refreshes the lot tile/thumbnail (the native per-item repaint
+    // law, vt+0x168) and shows the OK-only dialog. Dialog WORDING beyond the
+    // STR# 131 reuse is port literals — the native blob strings were not
+    // extracted (bulldoze-law §6 residual, disclosed). The native's busy-
+    // cursor/details-popup pre-checks have no port surface (disclosed).
+    internal UIMobileAlert _bulldozeDialog;        // probe seam: the mounted confirm
+    internal int BulldozeConfirm1ForProbe;         // occupied confirm shown
+    internal int BulldozeConfirm2ForProbe;         // occupied+built second confirm shown
+    internal int BulldozeVacantBuiltConfirmsForProbe; // vacant+built confirm shown
+    internal int BulldozeStatusOnlyForProbe;       // vacant+unbuilt status-only outcomes
+    internal int ArmedEvictsForProbe;              // MoveOut calls through the armed path
+    internal int ArmedBulldozesForProbe;           // BulldozeLot calls through the armed path
+    internal int LotTileRefreshesForProbe;         // post-success repaints
+
+    // Port literals (disclosed): confirm-2 and the OK wording are not in any
+    // decoded STR set; the eviction confirm reuses the user-approved STR# 131.
+    internal const string BulldozeTitle = "Bulldoze";
+    internal const string BulldozeConfirmMessage = "Bulldoze this house? The building will be demolished.";
+    internal const string BulldozeAlsoMessage = "Do you also want to bulldoze the house and delete the family members?";
+    internal const string EvictDoneMessage = "The family has moved out.";
+    internal const string BulldozeDoneMessage = "The house has been bulldozed.";
+
+    /// <summary>Installs the armed lot-click hook on a mounted switcher (called
+    /// from NeighSelection where panel and switcher are both live).</summary>
+    internal void WireArmedLotClicks(UINeighbourhoodSwitcher switcher)
+    {
+        switcher.ArmedLotClick = (house) =>
+        {
+            if (!switcher.BulldozeArmed) return false;
+            BulldozeLotClickFlow(house);
+            return true;
+        };
+    }
+
+    /// <summary>The EvictModeLotHandler branch decision, on the clicked lot.</summary>
+    private void BulldozeLotClickFlow(int house)
+    {
+        var neigh = Content.Get().Neighborhood;
+        var family = neigh.GetFamilyForHouse((short)house);
+        var simi = neigh.GetHouse(house)?.Get<SIMI>(1);
+        // HouseInfo+0x18 proxy: the port's built marker (same gate as move-in).
+        bool built = simi != null && (simi.ObjectsValue > 0 || simi.ArchitectureValue > 0);
+
+        if (family != null)
+        {
+            var familyName = neigh.MainResource.Get<FAMs>(family.ChunkID)?.GetString(0) ?? "selected";
+            BulldozeConfirm1ForProbe++;
+            UIMobileAlert confirm1 = null;
+            confirm1 = new UIMobileAlert(new UIAlertOptions
+            {
+                Title = GameFacade.Strings.GetString("131", "2"),
+                Message = GameFacade.Strings.GetString("131", "3", new string[]
+                {
+                    familyName,
+                    "§" + (family.ValueInArch + family.Budget).ToString("##,#0")
+                }),
+                Buttons = UIAlertButton.YesNo(
+                    (b) =>
+                    {
+                        confirm1.Close();
+                        _bulldozeDialog = null;
+                        if (built)
+                        {
+                            // Confirm 2: its answer IS the killSims flag (law §2).
+                            BulldozeConfirm2ForProbe++;
+                            UIMobileAlert confirm2 = null;
+                            confirm2 = new UIMobileAlert(new UIAlertOptions
+                            {
+                                Title = GameFacade.Strings.GetString("131", "2"),
+                                Message = BulldozeAlsoMessage,
+                                Buttons = UIAlertButton.YesNo(
+                                    (b2) => { confirm2.Close(); _bulldozeDialog = null; ArmedEvict(house, family, true); },
+                                    (b2) => { confirm2.Close(); _bulldozeDialog = null; ArmedEvict(house, family, false); })
+                            });
+                            _bulldozeDialog = confirm2;
+                            GlobalShowDialog(confirm2, true);
+                        }
+                        else
+                        {
+                            ArmedEvict(house, family, false);
+                        }
+                    },
+                    (b) => { confirm1.Close(); _bulldozeDialog = null; })
+            });
+            _bulldozeDialog = confirm1;
+            GlobalShowDialog(confirm1, true);
+            return;
+        }
+
+        if (built)
+        {
+            BulldozeVacantBuiltConfirmsForProbe++;
+            UIMobileAlert confirm = null;
+            confirm = new UIMobileAlert(new UIAlertOptions
+            {
+                Title = BulldozeTitle,
+                Message = BulldozeConfirmMessage,
+                Buttons = UIAlertButton.YesNo(
+                    (b) => { confirm.Close(); _bulldozeDialog = null; ArmedBulldoze(house); },
+                    (b) => { confirm.Close(); _bulldozeDialog = null; })
+            });
+            _bulldozeDialog = confirm;
+            GlobalShowDialog(confirm, true);
+            return;
+        }
+
+        // Vacant + unbuilt: two status messages, NO dialog (law §2).
+        BulldozeStatusOnlyForProbe++;
+        GameLog.Write("nghbtns: lot " + house + " has nothing to bulldoze");
+        GameLog.Write("nghbtns: lot " + house + " is already undeveloped");
+    }
+
+    /// <summary>The EvictFamily executor's occupied arm: MoveOut FIRST (law §3),
+    /// then the save, the per-item repaint and the OK dialog on success.</summary>
+    private void ArmedEvict(int house, FAMI family, bool killSims)
+    {
+        var neigh = Content.Get().Neighborhood;
+        ArmedEvictsForProbe++;
+        if (neigh.MoveOut((short)house, killSims) != 1) return;   // native nonzero = nothing happened
+        neigh.SaveNeighbourhood(false);   // the eviction confirm path owns the save
+        RefreshLotTile(house);
+        ShowBulldozeOk(EvictDoneMessage);
+    }
+
+    /// <summary>The vacant+built arm through NBR-03's BulldozeLot (1 bulldozed /
+    /// 0 nothing / -1 occupied-refusal — the refusal and no-op legs surface as
+    /// status only, matching the native's ticker messages).</summary>
+    private void ArmedBulldoze(int house)
+    {
+        var neigh = Content.Get().Neighborhood;
+        ArmedBulldozesForProbe++;
+        var result = neigh.BulldozeLot((short)house);
+        if (result == 1)
+        {
+            RefreshLotTile(house);
+            ShowBulldozeOk(BulldozeDoneMessage);
+        }
+        else if (result == 0)
+        {
+            GameLog.Write("nghbtns: lot " + house + " has nothing to bulldoze");
+        }
+        else
+        {
+            GameLog.Write("nghbtns: lot " + house + " is occupied; evict the family first");
+        }
+    }
+
+    private void RefreshLotTile(int house)
+    {
+        LotTileRefreshesForProbe++;
+        if (TS1NeighPanel != null) TS1NeighPanel.RefreshLotTile(house);
+    }
+
+    private void ShowBulldozeOk(string message)
+    {
+        UIMobileAlert ok = null;
+        ok = new UIMobileAlert(new UIAlertOptions
+        {
+            Title = BulldozeTitle,
+            Message = message,
+            Buttons = UIAlertButton.Ok((b) => { ok.Close(); _bulldozeDialog = null; })
+        });
+        _bulldozeDialog = ok;
+        GlobalShowDialog(ok, true);
     }
 }
 

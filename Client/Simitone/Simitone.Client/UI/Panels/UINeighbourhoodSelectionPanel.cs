@@ -173,6 +173,14 @@ namespace Simitone.Client.UI.Panels
         public event Action<int> OnHouseSelect;
         public HITSound BgSound;
         public Dictionary<int, Vector2> HousePositions;
+        // UI-30: armed evict/bulldoze lot-click routing. Set by TS1GameScreen
+        // (the EvictModeLotHandler branch law lives there); when it returns true
+        // the click was consumed and the normal lot flow must not run.
+        public Func<int, bool> ArmedLotClick;
+        // UI-30: the mounted lot buttons by house id — the post-operation
+        // tile/thumbnail refresh target (the native vt+0x168 repaint law).
+        private readonly Dictionary<int, UINeighborhoodHouseButton> LotButtonByHouse
+            = new Dictionary<int, UINeighborhoodHouseButton>();
         // R93: the engine nessie cheat layer (Community/UL config) + the cheat-bar
         // plumbing (engine: the screen's CheatCallback receives the typed command).
         public UINeighborhoodNessieLayer NessieLayer;
@@ -334,6 +342,7 @@ namespace Simitone.Client.UI.Panels
             });
 
             HousePositions = new Dictionary<int, Vector2>();
+            LotButtonByHouse.Clear();
             var locationIff = Content.Get().Neighborhood.LotLocations;
             var locations = locationIff.Get<STR>(mode);
             if (locations == null) return;
@@ -350,6 +359,7 @@ namespace Simitone.Client.UI.Panels
                 button.HoverNotify = (n, b, state) => ShowLotPopup(n, b, state);
                 button.HoverLeave = HideLotPopup;
                 HousePositions[num] = button.Position;
+                LotButtonByHouse[num] = button;
                 buttons.Add(button);
             }
 
@@ -460,8 +470,27 @@ namespace Simitone.Client.UI.Panels
             return true;
         }
 
+        /// <summary>
+        /// UI-30: re-reads one lot's art (BMP/PNG 512/513 + THMB offsets) after a
+        /// successful evict/bulldoze — the port's stand-in for the native's
+        /// post-EvictFamily per-item repaint loop (bulldoze-law §2). Returns
+        /// false when no button is mounted for the house (off-screen lot).
+        /// </summary>
+        public bool RefreshLotTile(int house)
+        {
+            UINeighborhoodHouseButton button;
+            if (!LotButtonByHouse.TryGetValue(house, out button) || button == null) return false;
+            button.ReloadArt();
+            return true;
+        }
+
         public void SelectHouse(int house)
         {
+            // UI-30: while the evict/bulldoze mode is armed, lot clicks route to
+            // the EvictModeLotHandler branch law INSTEAD of the normal flow
+            // (bulldoze-law §1). Not armed -> the click falls through unchanged.
+            if (ArmedLotClick != null && ArmedLotClick(house)) return;
+
             // Original desktop RegularModeLotHandler resolves the clicked lot and
             // calls cSimsApp::LoadGame directly; MoveInModeLotHandler (R197) runs
             // its own dialog guard chain on move-in clicks. The zoomed half-screen
@@ -1443,6 +1472,44 @@ namespace Simitone.Client.UI.Panels
         {
             if (houseNumber == 71) { }
             AlphaTime = 0;
+            HouseScale = scale;
+            LoadArt(houseNumber);
+
+            var w = (int)(HouseTex.Width / HouseScale);
+            var h = (int)(HouseTex.Height / HouseScale);
+            LocalWindowBounds = new Rectangle(-w / 2, -h / 2, w, h);
+            LocalHitBounds = new Rectangle(w / -2, w / -4, w, h / 2);
+            var clickHandler =
+                ListenForMouse(LocalHitBounds, (evt, state) =>
+                {
+                    switch (evt)
+                    {
+                        case UIMouseEventType.MouseUp:
+                            HITVM.Get().PlaySoundEvent(FSO.Client.UI.Model.UISounds.NeighborhoodClick);
+                            selectionCallback(houseNumber); break;
+                        case UIMouseEventType.MouseOver:
+                            HITVM.Get().PlaySoundEvent(FSO.Client.UI.Model.UISounds.NeighborhoodRollover);
+                            Hovered = true;
+                            HoverNotify?.Invoke(houseNumber, this, state); break;
+                        case UIMouseEventType.MouseOut:
+                            Hovered = false;
+                            HoverLeave?.Invoke(); break;
+                    }
+                });
+        }
+
+        // UI-30: art load split out of the ctor so a post-evict/bulldoze repaint
+        // (RefreshLotTile) can re-read the house file's art and offsets.
+        internal void ReloadArt()
+        {
+            LoadArt(HouseNumber);
+        }
+
+        internal int HouseNumber { get; private set; }
+
+        private void LoadArt(int houseNumber)
+        {
+            HouseNumber = houseNumber;
             var house = Content.Get().Neighborhood.GetHouse(houseNumber);
             // SAV-07: an imported family's FAM replaces Houses/HouseNN.iff whole
             // (the 25-step import's file move) and carries no art chunks, so
@@ -1473,30 +1540,6 @@ namespace Simitone.Client.UI.Panels
                 }
                 Offsets = new THMB() { Width = HouseTex.Width / 2, Height = HouseTex.Height / 2 };
             }
-
-            HouseScale = scale;
-
-            var w = (int)(HouseTex.Width / HouseScale);
-            var h = (int)(HouseTex.Height / HouseScale);
-            LocalWindowBounds = new Rectangle(-w / 2, -h / 2, w, h);
-            LocalHitBounds = new Rectangle(w / -2, w / -4, w, h / 2);
-            var clickHandler =
-                ListenForMouse(LocalHitBounds, (evt, state) =>
-                {
-                    switch (evt)
-                    {
-                        case UIMouseEventType.MouseUp:
-                            HITVM.Get().PlaySoundEvent(FSO.Client.UI.Model.UISounds.NeighborhoodClick);
-                            selectionCallback(houseNumber); break;
-                        case UIMouseEventType.MouseOver:
-                            HITVM.Get().PlaySoundEvent(FSO.Client.UI.Model.UISounds.NeighborhoodRollover);
-                            Hovered = true;
-                            HoverNotify?.Invoke(houseNumber, this, state); break;
-                        case UIMouseEventType.MouseOut:
-                            Hovered = false;
-                            HoverLeave?.Invoke(); break;
-                    }
-                });
         }
 
         public override void Update(UpdateState state)
