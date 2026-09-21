@@ -31,14 +31,15 @@ Product changes, by card:
   consumer; lot-query Export button + the Export/ re-export mirror; auto-import
   restricted to the native Tutorial.FAM-only law (`importui` 52-check gate +
   `impexport` PASS).
-- **UI-22 build-mode undo/redo, tranche 1** — walls/floors undo/redo wired to the
-  VMArchitectureUndoStack (cap 100, story snapshots, money hooks; ArchUndo=50;
-  UIOriginalArchChrome buttons un-disabled + refresh law). CONDITIONS: the four
-  remaining laws (undo-refund, redo-replay, button refresh, clear-on-exit) close
-  on the first post-ENG-02 `archundo` run; the P2 fast-follow lands with it
-  (ApplyMoney misses the NBR-04 ActiveFamily fallback and ignores the
-  PerformTransaction result — community-lot undo-of-sellback/redo-of-purchase can
-  silently not charge; home-lot correct). Terrain/objects are later tranches.
+- **UI-22 build-mode undo/redo, tranche 1 — CONDITIONS CLOSED 2026-09-22** —
+  walls/floors undo/redo wired to the VMArchitectureUndoStack (cap 100, story
+  snapshots, money hooks; ArchUndo=50; UIOriginalArchChrome buttons un-disabled +
+  refresh law). The four remaining laws (undo-refund, redo-replay, button refresh,
+  clear-on-exit) RE-PROVEN LIVE on the integrated tip (archundo phases 0-8 PASS,
+  evidence/ENG-02/archundo-integrated-20260922.log); the P2 landed (engine
+  ab6f665d: synchronous bool PerformTransaction on IVMTSOGlobalLink — ActiveFamily
+  fallback via the link's own resolution + refusal verdict propagates; phases 7/8
+  refusal law green). Terrain/objects are later tranches.
 - **UI-23 people sub-pie PORTED** — two-ring sub-pie on the r257 law (ring 2 =
   byte-identical second cTSPieMenu instance, item-0 Back affordance, ESC steps
   sub→main then the full CancelPieMenu dismissal; census split 8|overflow —
@@ -67,12 +68,17 @@ Product changes, by card:
   navbar Credits button AND the banner credits-picker; Bulldoze ARMS a mode with
   the decoded confirm/branch matrix through the real MoveOut/BulldozeLot backends
   (occupied killSims second confirm included).
-- **ENG-02 opened** — UI-22's `archundo-probe` discriminator turned ENG-01's
-  DEFECT-2 into a DETERMINISTIC repro (an entity thread parks inside ent.Tick
-  holding a lock ~19s after lot entry; the game thread hard-freezes at the next
-  world-mutating op — 4/4 identical with undo/redo sends disabled, so the undo
-  was a victim, not the cause). The engine fix + UI-22's remaining laws are
-  ENG-02's named work (coordination/tasks/ENG-02.md).
+- **ENG-02 RESOLVED AS NO-DEFECT (2026-09-22, review-confirmed)** — the "DEFECT-2
+  deterministic freeze" was a MISREAD SIGNAL: HelpSystem.iff's `main` tree
+  (ent=307, ip10, opcode 36 = dialog_private) latches GlobalBlockingDialog at
+  tick 3 -> SpeedMultiplier=-2 -> a legitimately PAUSED VM (zero entity ticks ->
+  frozen watchdog heartbeat), confirmed by lldb on the core (main thread healthy
+  in MonoGame pacing sleep; nothing in the VM; no lock waits). The old
+  "hard-freeze at SetMode" was the archundo gate's own frame-0 guard bug (fixed
+  09a626f). The watchdog now PRINTS VM PAUSE STATE (speed/gbd/focus/tick/clock,
+  engine bb5eaf13) so a parked VM can never again be misread as a stall; EXP-03's
+  real HD-window spin lineage stays open under its own evidence. UI-22's P2 landed
+  in the same round (see above).
 - **UI-19 / R237 supersession** — the R237 Budget/Help/Phonebook failure list was
   STALE (repaired by the R238-era restorations inside the squashed baseline);
   closure independently verified (live gate PASS 9/0 + receipts,
