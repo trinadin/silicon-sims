@@ -107,10 +107,13 @@ namespace FSO.LotView.Utils
         /// <summary>
         /// DEVIATION HOOK (native tool callback cTool slot 18
         /// AdjustCutawayForTool(corner, matrix), dispatched after the cursor
-        /// rectangle on the current build tool). No clean port equivalent
-        /// exists yet — VMArchitectureTools keeps the touch-path approximation
-        /// — so this stays null/unwired and the callback is skipped. Do not
-        /// approximate silently; wire the real tool state here when ported.
+        /// rectangle on the current build tool). UI-25 wiring: the main view
+        /// (UILotControl.BuildCutawayInputs) assigns it from the held object's
+        /// CursorTiles through <see cref="CutawayMatrix.AdjustForDrag"/> (the
+        /// cMoveTool leg); PIP inputs leave it null — native save-NULLs the
+        /// tool global around the secondary render (0x1c0e48/0x1c1714). The
+        /// base cTool grab-offset leg is native runtime drag state — WALL,
+        /// see AdjustForDrag.
         /// </summary>
         public Action<Point, bool[]> AdjustCutawayForTool;
 
@@ -205,12 +208,27 @@ namespace FSO.LotView.Utils
     /// - No 32-bit mirrored-bit matrix wart (skeptic C3): the port mask is a
     ///   bool[width*height] indexed y*Width+x in WORLD (unrotated) tile space,
     ///   so native's x/x+32 column aliasing cannot occur.
-    /// - The native rotation LUT generator is UNRESOLVED; the port defines its
-    ///   own consistent rotated frame (see <see cref="RotMap"/>) proven equal
-    ///   to WorldSpace.GetScreenFromTile at every rotation.
-    /// - The outside-person altitude-table remap (native BuildMaxAltsTable) is
-    ///   identity: the port has no max-alts table; the person tile is used
-    ///   directly.
+        /// - The native rotation LUT is DECODED (UI-25, tools/iff-dump/
+        ///   r259-cutaway-orphans): generator BuildRotationLookup__7CTilePtFv
+        ///   (file 0x60f20), called once per world build from
+        ///   cFixedWorld::SetSize (0x164910). It fills three 64x64 2-byte
+        ///   pages — page p is the map for world rotation p+1: rot1 (63-y,x),
+        ///   rot2 (63-x,63-y), rot3 (y,63-x), (0xFF,0xFF) out of domain — a
+        ///   pure function of its loop constants. Consumers index the ROTATED
+        ///   frame with the forward page rot-1 and the inverse page
+        ///   ((4-rot)&amp;3)-1. The port's world-space mask convention makes the
+        ///   LUT itself unnecessary: <see cref="RotMap"/> is the same rotation
+        ///   family modulo the [0..63] translation (native rot 1/2/3 =
+        ///   TopRight/BottomRight/BottomLeft), proven equal to
+        ///   WorldSpace.GetScreenFromTile at every rotation.
+        /// - The outside-person remap is identity: the native remap (0x1cf7bc)
+        ///   converts the person tile into the rotated frame through the same
+        ///   rotation LUT (its page term world+0x84 is the world ROTATION, not
+        ///   an altitude level count). Native BuildMaxAltsTable (0x1c6b70)
+        ///   builds per-diagonal max-corner-altitude arrays that NO cutaway
+        ///   path reads — r244-state's "altitude-table remap" wording was
+        ///   wrong; the port's world-space mask subsumes the rotation, so the
+        ///   person tile is used directly.
     /// </summary>
     public static class CutawayMatrix
     {
@@ -474,6 +492,32 @@ namespace FSO.LotView.Utils
             return result;
         }
 
+        /// <summary>
+        /// cMoveTool::AdjustCutawayForTool leg (native 0x174100), for callers of
+        /// the <see cref="CutawayViewInputs.AdjustCutawayForTool"/> hook: mark
+        /// the dragged multitile footprint into the mask, gated to the world
+        /// interior [1..Width-2]x[1..Height-2] (native bounds [1..size-2]).
+        /// The tiles are the dragged footprint — native iterates the
+        /// picked-object list {+0xf4&gt;&gt;4, +0xf8&gt;&gt;4}, replaced by the drag
+        /// object's +0xfc/+0xfd while dragging. WALL (UI-25): the base cTool
+        /// leg (0x191910) additionally clears grab-offset neighbors
+        /// (tool+0/+1/+6/+7) per corner wall flags — native runtime drag
+        /// state with no static values and no port equivalent field, so that
+        /// leg is NOT ported; every port grab flow carries a multitile group
+        /// (CursorTiles), which this leg covers. Native PIP save-NULLs the
+        /// tool global around the secondary render (0x1c0e48/0x1c1714), so
+        /// PIP inputs never wire the hook.
+        /// </summary>
+        public static void AdjustForDrag(Blueprint bp, bool[] mask, IEnumerable<Point> tiles)
+        {
+            if (bp == null || mask == null || tiles == null || mask.Length != bp.Width * bp.Height) return;
+            foreach (var tile in tiles)
+            {
+                if (tile.X < 1 || tile.X > bp.Width - 2 || tile.Y < 1 || tile.Y > bp.Height - 2) continue;
+                mask[tile.Y * bp.Width + tile.X] = true;
+            }
+        }
+
         /// <summary>True when the two cut arrays differ anywhere (native XOR + dirty law).</summary>
         public static bool Differs(bool[] a, bool[] b)
         {
@@ -517,9 +561,12 @@ namespace FSO.LotView.Utils
         /// Outside-person bounded rectangle (native 0x1CF7BC..0x1CF8B0): the
         /// person's tile gated to 1 &lt;= x,y &lt;= size-2, then the k=4..0
         /// first-inside probe and a [x, x+k) x [y, y+k) mark; k=0 degenerates to
-        /// nothing. DEVIATION: native remaps the tile through BuildMaxAltsTable
-        /// when the world carries altitude levels; the port has no max-alts
-        /// table, so the tile is used as-is.
+        /// nothing. DEVIATION (rationale corrected UI-25/r259): native first
+        /// remaps the tile through the ROTATION LUT (forward page rot-1; the
+        /// page term world+0x84 is the rotation) because the native matrix is
+        /// rotated-frame indexed — BuildMaxAltsTable is never read by cutaway.
+        /// The port's world-space mask subsumes that conversion, so the tile
+        /// is used as-is.
         /// </summary>
         private static void AddOutsidePersonRectangle(Blueprint bp, CutawayViewInputs view, bool[] result)
         {
@@ -555,9 +602,12 @@ namespace FSO.LotView.Utils
         /// projection px=(rx-ry)*WH, py=(rx+ry)*HH-zTerm applied to RotMap(x,y)
         /// equals the port's rotation-specific formula on (x,y) (TopLeft is the
         /// identity, TopRight (x,y)->(-y,x), BottomRight (x,y)->(-x,-y),
-        /// BottomLeft (x,y)->(y,-x)). The native LUT generator is UNRESOLVED
-        /// (r244-cutaway-geom UNRESOLVED 1); the port only needs a self-
-        /// consistent pair, which this is.
+        /// BottomLeft (x,y)->(y,-x)). Native LUT correspondence (UI-25 decode,
+        /// BuildRotationLookup 0x60f20): rot1=(63-y,x), rot2=(63-x,63-y),
+        /// rot3=(y,63-x) — native rot 1/2/3 = TopRight/BottomRight/BottomLeft,
+        /// each translated into [0..63] by (63,0)/(63,63)/(0,63); forward page
+        /// rot-1, inverse page ((4-rot)&amp;3)-1 — the exact inverse rotation,
+        /// which <see cref="InvRotMap"/> mirrors.
         /// </summary>
         private static Point RotMap(WorldRotation rot, int x, int y)
         {
