@@ -102,6 +102,7 @@ namespace Simitone.Client
                         && m9.PendingSub != null;
                     if (rebuild)
                     {
+                        game.Add(m9); // mount so the sub ring can attach (Update-time route; gate drives MountSub directly)
                         m9.MountSub();
                         var s9 = m9.Sub;
                         rebuild = s9 != null && s9.Owner == m9 && s9.Parent == m9.Parent
@@ -124,6 +125,7 @@ namespace Simitone.Client
 
                         // (3) ESC steps sub→main, then the second ESC dismisses
                         var m10 = new Simitone.Client.UI.Panels.UIOriginalPeoplePie(game, new Vector2(240, 260), false, full);
+                        game.Add(m10);
                         m10.MountSub();
                         var stB = Simitone.Client.UI.Panels.UIOriginalPeoplePie.SubSteps;
                         var scB = Simitone.Client.UI.Panels.UIOriginalPeoplePie.SubCloses;
