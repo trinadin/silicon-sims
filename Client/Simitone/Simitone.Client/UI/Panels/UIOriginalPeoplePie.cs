@@ -128,6 +128,15 @@ namespace Simitone.Client.UI.Panels
         public Rectangle BackBox;
         /// <summary>The window-local disc center (gate helper).</summary>
         public Vector2 DiscCenter { get { return Center; } }
+        /// <summary>Gate probe: set when the ring is detached from its
+        /// container. (Upstream UIContainer.Remove does NOT clear the
+        /// child's Parent field — the port probes detachment explicitly.)</summary>
+        public bool Detached { get; private set; }
+        public override void Removed()
+        {
+            base.Removed();
+            Detached = true;
+        }
         internal UIOriginalPeoplePie PendingSub { get { return _pendingSub; } }
         private UIOriginalPeoplePie _pendingSub;
         private int TrackedIndex = -1;               // sub-ring tracked slot (TSPaint color law)

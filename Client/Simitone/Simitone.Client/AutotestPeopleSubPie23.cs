@@ -68,11 +68,19 @@ namespace Simitone.Client
                 var closesMainB = Simitone.Client.UI.Panels.UIOriginalPeoplePie.Closes;
                 var selMainB = Simitone.Client.UI.Panels.UIOriginalPeoplePie.Selections;
 
-                // (1)+(2) ring 2 at the identical window constants, back item 0
+                // (1)+(2) ring 2 at the identical window constants, back item 0.
+                // NOTE: UIElement.Size is a no-op base virtual upstream — the
+                // identical-window law is pinned via the real Position property
+                // (same pop point → same clamped origin) + the WindowSize const
+                // in the law pin.
                 var sub = new Simitone.Client.UI.Panels.UIOriginalPeoplePie(game, center, true);
                 var blocal = Simitone.Client.UI.Panels.UIOriginalPeoplePie.SlotBox(0, sub.BackBox.Width, sub.BackBox.Height);
-                geom = sub.Size == new Vector2(Simitone.Client.UI.Panels.UIOriginalPeoplePie.WindowSize, Simitone.Client.UI.Panels.UIOriginalPeoplePie.WindowSize)
-                    && sub.HasBack;
+                var win = (float)Simitone.Client.UI.Panels.UIOriginalPeoplePie.WindowSize;
+                var sw = GameFacade.Screens.CurrentUIScreen.ScreenWidth;
+                var sh = GameFacade.Screens.CurrentUIScreen.ScreenHeight;
+                var expPos = new Vector2(Math.Max(0, Math.Min(sw - win, center.X - win / 2f)),
+                                         Math.Max(0, Math.Min(sh - win, center.Y - win / 2f)));
+                geom = sub.HasBack && sub.Position == expPos;
                 backBox = sub.BackBox.X == blocal.X + (int)sub.DiscCenter.X
                     && sub.BackBox.Y == blocal.Y + (int)sub.DiscCenter.Y
                     && sub.BackBox.Width == blocal.Width && sub.BackBox.Height == blocal.Height;
@@ -117,8 +125,10 @@ namespace Simitone.Client
                         game.Add(m9); // mount so the sub ring can attach (Update-time route; gate drives MountSub directly)
                         m9.MountSub();
                         var s9 = m9.Sub;
-                        rebuild = s9 != null && s9.Owner == m9 && s9.Parent == m9.Parent
-                            && s9.Position == m9.Position && s9.Size == m9.Size
+                        // Detached (not Parent) probes mount state: upstream
+                        // Remove never clears the child's Parent field
+                        rebuild = s9 != null && s9.Owner == m9 && !s9.Detached && !m9.Detached
+                            && s9.Position == m9.Position
                             && s9.HasBack && s9.Family[0] == null && s9.Family[1] == full[8]
                             && s9.Family.Skip(2).All(a => a == null)
                             && s9.SlotButtons[0] == null && s9.SlotButtons[1] != null;
@@ -131,7 +141,7 @@ namespace Simitone.Client
                         subsel = Simitone.Client.UI.Panels.UIOriginalPeoplePie.SubSelections == selsB + 1
                             && game.vm.MyUID == full[8].PersistID
                             && Simitone.Client.UI.Panels.UIOriginalPeoplePie.LastDismissal == "MS"
-                            && m9.Parent == null && s9.Parent == null
+                            && m9.Detached && s9.Detached
                             && Simitone.Client.UI.Panels.UIOriginalPeoplePie.Closes == cmB + 1
                             && Simitone.Client.UI.Panels.UIOriginalPeoplePie.SubCloses == cB2 + 1;
 
@@ -143,11 +153,11 @@ namespace Simitone.Client
                         var scB = Simitone.Client.UI.Panels.UIOriginalPeoplePie.SubCloses;
                         var cmB2 = Simitone.Client.UI.Panels.UIOriginalPeoplePie.Closes;
                         bool stepped = m10.EscapeStep();
-                        esc = stepped && m10.Sub == null && m10.Parent != null
+                        esc = stepped && m10.Sub == null && !m10.Detached
                             && Simitone.Client.UI.Panels.UIOriginalPeoplePie.SubSteps == stB + 1
                             && Simitone.Client.UI.Panels.UIOriginalPeoplePie.SubCloses == scB + 1;
                         bool fullClose = !m10.EscapeStep();
-                        esc = esc && fullClose && m10.Parent == null
+                        esc = esc && fullClose && m10.Detached
                             && Simitone.Client.UI.Panels.UIOriginalPeoplePie.Closes == cmB2 + 1;
                     }
                 }
