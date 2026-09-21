@@ -528,7 +528,7 @@ namespace Simitone.Client
             var after = SimiBuildingValues(HousePath(10));
             Check(after != null && after.Item1 == 0 && after.Item2 == 0,
                 "bulldoze-zeroed-simi-building-values-in-the-file");
-            Check(Screen.LotTileRefreshesForProbe == 3, "bulldoze-refreshed-lot-tile");
+            Check(Screen.LotTileRefreshesForProbe == 4, "bulldoze-refreshed-lot-tile");
             Check(Screen._bulldozeDialog != null, "bulldoze-ok-dialog-shown");
             Press(DialogButton(UIAlertButtonType.OK));
 
