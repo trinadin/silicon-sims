@@ -76,6 +76,7 @@ namespace Simitone.Client
         private ushort _wallStyle;
         private List<VMArchitectureCommand> _batch;
         private int _sendAttempts;
+        private int _dialogAnswers;
 
         private const int SettleTicks = 30;
         private const int PhaseTimeout = 900; // ~15s at 60fps
@@ -171,6 +172,22 @@ namespace Simitone.Client
         public bool Tick()
         {
             if (_done) return true;
+            // ENG-02 (run-3-diag law): a TS1 blocking dialog (GenDlg mount at
+            // 6:31, tick 3) parks the VM at SpeedMultiplier=-2 and latches
+            // GlobalBlockingDialog forever in a headless run — the world stops
+            // ticking and every later phase races a paused VM. Answer it through
+            // the production dismissal command (the OK-button law,
+            // UILotControl.DialogResponse(0)) so the VM keeps running.
+            if (_vm != null && _vm.GlobalBlockingDialog != null)
+            {
+                _dialogAnswers++;
+                if (_dialogAnswers == 1) Note("blocking dialog latched; answering via VMNetDialogResponseCmd(0)");
+                _vm.SendCommand(new FSO.SimAntics.NetPlay.Model.Commands.VMNetDialogResponseCmd
+                {
+                    ResponseCode = 0,
+                    ResponseText = ""
+                });
+            }
             try
             {
                 RunPhase();
@@ -288,7 +305,10 @@ namespace Simitone.Client
                             }
                             return;
                         }
-                        if (_phaseTicks == 0)
+                        // ENG-02 fix: the old `if (_phaseTicks == 0) { send; return; }`
+                        // never advanced _phaseTicks, so the send re-fired every frame
+                        // and the completion check below was unreachable.
+                        if (_phaseTicks++ == 0)
                         {
                             _vm.SendCommand(new VMNetArchUndoCmd { Redo = false });
                             return;
@@ -319,7 +339,8 @@ namespace Simitone.Client
                             }
                             return;
                         }
-                        if (_phaseTicks == 0)
+                        // ENG-02 fix: same frame-0 guard bug as case 3 (send-once).
+                        if (_phaseTicks++ == 0)
                         {
                             _vm.SendCommand(new VMNetArchUndoCmd { Redo = true });
                             return;
@@ -341,13 +362,16 @@ namespace Simitone.Client
 
                 case 5: // entering BUILD preserves the stack; button refresh law
                     {
-                        if (_phaseTicks == 0)
+                        // ENG-02 fix: the old frame-0 guard returned without ever
+                        // incrementing _phaseTicks, so the settle loop below was
+                        // unreachable and the gate sat in BUILD forever.
+                        if (_phaseTicks++ == 0)
                         {
                             if (!_arch.UndoStack.CanUndo) { Fail("stack empty before button law (undo lost?)"); _done = true; return; }
                             _panel.SetMode(UIMainPanelMode.BUILD);
                             return;
                         }
-                        if (++_phaseTicks < SettleTicks) return;
+                        if (_phaseTicks < SettleTicks) return;
                         if (!_arch.UndoStack.CanUndo) Fail("entering build mode cleared the stack (must only clear on exit)");
                         var chrome = _panel.ArchChrome;
                         if (chrome == null) { Note("arch chrome not mounted (mobile?); button law skipped"); }
@@ -363,12 +387,13 @@ namespace Simitone.Client
 
                 case 6: // leaving build mode clears both stacks (production SetMode path)
                     {
-                        if (_phaseTicks == 0)
+                        // ENG-02 fix: same frame-0 guard bug (increment after the act).
+                        if (_phaseTicks++ == 0)
                         {
                             _panel.SetMode(UIMainPanelMode.LIVE);
                             return;
                         }
-                        if (++_phaseTicks < 5) return;
+                        if (_phaseTicks < 5) return;
                         if (_arch.UndoStack.CanUndo || _arch.UndoStack.CanRedo) Fail("build-mode exit did not clear the stacks");
                         else Note("build-mode exit clears both stacks");
                         _done = true;
