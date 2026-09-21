@@ -85,22 +85,26 @@ namespace Simitone.Client.UI.Panels
         {
             Game = game;
 
-            // undo (11,21) / redo (11,53) — 30x24 cells. The port VM has no
-            // architecture-undo machinery, so both mount DISABLED (disclosed
-            // residual; the engine wires ArchUndo/ArchRedo @0x20ee60/0x20edc0).
+            // undo (11,21) / redo (11,53) — 30x24 cells. UI-22 tranche 1:
+            // wired to the VM architecture undo stack (native ArchUndo/
+            // ArchRedo @0x20ee60/0x20edc0 law); enable state follows the
+            // stack via RefreshUndoRedo (the native UpdateViewFromCPState
+            // dirty&4 refresh law, r145 §4).
             UndoBtn = new UIOriginalSheetButton("cpanel\\Buttons\\Undo.bmp")
             {
                 Position = new Vector2(11, 21),
                 Tooltip = GameFacade.Strings.GetString("139", "12"),
-                Disabled = true,
             };
+            UndoBtn.OnButtonClick += (b) =>
+                Game.vm?.SendCommand(new FSO.SimAntics.NetPlay.Model.Commands.VMNetArchUndoCmd { Redo = false });
             Add(UndoBtn);
             RedoBtn = new UIOriginalSheetButton("cpanel\\Buttons\\Redo.bmp")
             {
                 Position = new Vector2(11, 53),
                 Tooltip = GameFacade.Strings.GetString("139", "13"),
-                Disabled = true,
             };
+            RedoBtn.OnButtonClick += (b) =>
+                Game.vm?.SendCommand(new FSO.SimAntics.NetPlay.Model.Commands.VMNetArchUndoCmd { Redo = true });
             Add(RedoBtn);
 
             for (int i = 0; i < 12; i++)
@@ -128,6 +132,22 @@ namespace Simitone.Client.UI.Panels
             SelectedTool = i;
             for (int k = 0; k < 12; k++) Tools[k].State = (byte)((k == i) ? 1 : 0);
             OnToolSelect?.Invoke(i);
+            // native refreshes the undo/redo enable state on tool clicks too
+            RefreshUndoRedo();
+        }
+
+        /// <summary>
+        /// UI-22: the undo/redo buttons enable exactly with the architecture
+        /// stack (native ArchCanUndo/ArchCanRedo + UpdateViewFromCPState
+        /// dirty&4 refresh law, r145 §4 / r256 §4). Called on tool select and
+        /// every UIMainPanel build-mode frame, so a completed VM undo/redo
+        /// command reflects on the buttons the next frame.
+        /// </summary>
+        public void RefreshUndoRedo()
+        {
+            var stack = Game.vm?.Context?.Architecture?.UndoStack;
+            if (UndoBtn != null) UndoBtn.Disabled = !(stack?.CanUndo ?? false);
+            if (RedoBtn != null) RedoBtn.Disabled = !(stack?.CanRedo ?? false);
         }
 
         /// engine SetRoofMode @0x25f870: roof tool swaps the pattern row for

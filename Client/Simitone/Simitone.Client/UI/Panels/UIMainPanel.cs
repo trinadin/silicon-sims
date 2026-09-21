@@ -573,6 +573,11 @@ namespace Simitone.Client.UI.Panels
         public void SetMode(UIMainPanelMode mode)
         {
             if (mode == Mode) return;
+            // UI-22: native CPState::SetMode law (tools/iff-dump/r256-undo-decode/
+            // §5, old-mode==2 guard) — LEAVING BUILD MODE CLEARS the architecture
+            // undo/redo history. Saving does not (the stack is runtime-only).
+            if (Mode == UIMainPanelMode.BUILD)
+                Game.vm?.Context?.Architecture?.UndoStack?.Clear();
             Mode = mode;
 
             // The original cWinCPanel::SetPanel hides the previous mode child
@@ -1203,6 +1208,12 @@ namespace Simitone.Client.UI.Panels
         {
             base.Update(state);
             Visible = _CurWidth > 0;
+
+            // UI-22: keep the build-mode undo/redo buttons exactly on the
+            // architecture stack (native UpdateViewFromCPState dirty&4 refresh
+            // law) — undo/redo run as VM commands, so the result lands the
+            // frame after the click without any extra signalling.
+            if (Mode == UIMainPanelMode.BUILD && ArchChrome != null) ArchChrome.RefreshUndoRedo();
 
             // cWinPeople owns no content host without a selected person. Clear
             // an already-mounted panel as soon as control is lost so panels

@@ -367,6 +367,7 @@ namespace Simitone.Client
                     case 12: StateImportUI(); break;
                     case 13: StateCutaway25(); break;
                     case 14: StateUI30(); break;
+                    case 15: StateArchUndo(); break;
                 }
             }
             catch (Exception e)
@@ -606,6 +607,17 @@ namespace Simitone.Client
 
                 if (CheckEnabled("censorpixel")) CheckCensorPixel();
 
+                // UI-22 'archundo' opt-in (additive): the build-mode
+                // architecture undo/redo battery — see AutotestArchUndo.cs.
+                // Takes over in-lot exactly like the other focused batteries;
+                // only reachable when the configured checks string names it.
+                if (CheckEnabled("archundo"))
+                {
+                    _archundo = new AutotestArchUndo(Log, _screen);
+                    _state = 15;
+                    return;
+                }
+
                 if (CheckEnabled("corpus")) RunCorpus();
 
                 if (CheckEnabled("uicapture"))
@@ -779,6 +791,23 @@ namespace Simitone.Client
             Log("AUTOTEST sav07 " + _sav07.Diagnostics);
             if (!_sav07.Passed) Log("AUTOTEST sav07 FAILURES " + _sav07.Failures);
             _sav07 = null;
+            Finish();
+        }
+
+        // UI-22 'archundo' (opt-in, additive): the build-mode architecture
+        // undo/redo acceptance fixture — see AutotestArchUndo.cs. Reached only
+        // through the StateWaitLot entry branch when the configured checks
+        // string contains "archundo".
+        private static AutotestArchUndo _archundo;
+
+        private static void StateArchUndo()
+        {
+            if (_archundo == null) { Finish(); return; }
+            if (!_archundo.Tick()) return;
+            if (_archundo.Passed) Pass("archundo"); else Fail("archundo");
+            Log("AUTOTEST archundo " + _archundo.Diagnostics);
+            if (!_archundo.Passed) Log("AUTOTEST archundo FAILURES " + _archundo.Failures);
+            _archundo = null;
             Finish();
         }
 
