@@ -72,7 +72,7 @@ namespace Simitone.Client
     ///     (AutotestUI26Wire.cs). Not in the default Checks string; enable alone with
     ///     -autotest-opts uioptswire.
     /// </summary>
-    public static class AutotestRunner
+    public static partial class AutotestRunner
     {
         public static class Config
         {
@@ -80,7 +80,7 @@ namespace Simitone.Client
             // candidate house ids, tried in order until one loads with >=1 avatar
             public static string HouseCandidates =
                 "5,4,3,2,1,0,6,7,8,9,10,11,21,22,23,24,25,26,27,28,29,30,40,41,42,43,44,45,46,47,48";
-            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight";
+            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258";
             public static int TimeoutMs = 300000; // hard cap (real ms)
             public static bool ExitOnDone = true;
         }
@@ -1886,6 +1886,11 @@ namespace Simitone.Client
             // cycle law (sequential advance + wrap, reseed on SetPerson,
             // SetOutfit does not re-arm) driven on a real avatar.
             if (CheckEnabled("uivitaplay")) CheckUVitaPlay();
+            // UI-31 'uir258': ADDITIVE pins for the three r258 decoded
+            // presentation laws (Vita idle sway pools + cat&&dog gate; balloon
+            // m*sin(0.785m/180) doubles; Magicland cloud ladders
+            // record-for-record). Check body: AutotestR258Laws.cs.
+            if (CheckEnabled("uir258")) CheckUIR258Laws();
             // R213 'uicheathelp': the cheat bar's help window — the
             // registered-command autocomplete (engine roster + filter +
             // complete-then-submit Enter law).
@@ -19034,8 +19039,9 @@ namespace Simitone.Client
         // from the engine data section — r209/r209-vita-law.md): the four
         // cWinVitaBtnSolo list builders' ordered name lists (order = weight,
         // breathing dominant), the SetPerson gender split at person->0x60e,
-        // the 10000 ms idle-sway SineGenerator period (amplitude = BSS
-        // runtime floats, disclosed unrecoverable).
+        // the 10000 ms idle-sway SineGenerator period. R258 (UI-31): the
+        // amplitude is RECOVERED (static code pools, pi/4 / pi/2) — see the
+        // sway pin below.
         private static void CheckUIVitaIdle()
         {
             try
@@ -19059,8 +19065,14 @@ namespace Simitone.Client
                     && Simitone.Client.UI.Panels.UIOriginalVitaIdleLaw.DogList[0] == "d2o-sit-wag"
                     && Simitone.Client.UI.Panels.UIOriginalVitaIdleLaw.DogList[4] == "d2o-sit-bark"
                     && Simitone.Client.UI.Panels.UIOriginalVitaIdleLaw.DogList[17] == "d2o-sit-scratchears-l-stop";
+                // R258 (UI-31): the amplitude is RECOVERED — static code-pool
+                // floats (gA 0x5a4dc8 = pi, gB 0x5a4830 = 0.25/0.5), pi/4 Init
+                // and pi/2 ctor — no longer "BSS runtime-only".
                 bool sway = Simitone.Client.UI.Panels.UIOriginalVitaIdleLaw.SwayPeriodMs == 10000
-                    && Simitone.Client.UI.Panels.UIOriginalVitaIdleLaw.SwayAmplitudeIsRuntimeOnly;
+                    && !Simitone.Client.UI.Panels.UIOriginalVitaIdleLaw.SwayAmplitudeIsRuntimeOnly
+                    && Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.EnginePiF == 3.1415927410125732f
+                    && Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.InitAmplitudeRad == Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.EnginePiF * 0.25f
+                    && Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.CtorAmplitudeRad == Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.EnginePiF * 0.5f;
                 Log("AUTOTEST uivita idle canon: adult=" + adult + " child=" + child
                     + " cat=" + cat + " dog=" + dog + " sway=" + sway);
                 if (adult && child && cat && dog && sway) { Pass("uivita"); return; }
@@ -19081,7 +19093,9 @@ namespace Simitone.Client
         // with wrap at the list count (this+0x214). The cycle is SEQUENTIAL
         // (the repeated breathe entries are the engine's weights); SetPerson
         // 0x2db640 re-arms; SetOutfit 0x2daf32 does NOT. The idle sway is the
-        // 10000ms SineGenerator rotation (amplitude BSS, disclosed substitute).
+        // 10000ms SineGenerator rotation; R258 (UI-31) recovered the pi/4
+        // amplitude (static code pools) and the cat&&dog gate on the sine
+        // path (the normal preview is a plain copy).
         private static void CheckUVitaPlay()
         {
             try
@@ -19104,7 +19118,10 @@ namespace Simitone.Client
                     else childPlayable++;
                 }
 
-                // 2. PURE LAW: the builder's gender slot + the sway math.
+                // 2. PURE LAW: the builder's gender slot + the sway math
+                //    (R258: SineGenerator GetVal = pi/4 * sin(k*t) over the
+                //    10000ms period; pi/2 is the ctor's rotation amplitude —
+                //    exactly twice the Init amplitude, power-of-two scalings).
                 var maleList = Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.Build(false, true);
                 var femaleList = Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.Build(false, false);
                 bool buildLaw = maleList.Length == 10 && maleList[0] == "a2o-heyyou1"
@@ -19112,9 +19129,10 @@ namespace Simitone.Client
                     && femaleList.Length == 10 && femaleList[3] == "a2o-mirror-admire-self-loop1"
                     && maleList[7] == "a2o-celebrate-short";
                 bool swayLaw = Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.SwayOffset(0) == 0f
-                    && Math.Abs(Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.SwayOffset(2500) - Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.SwayAmplitudeRad) < 1e-4
+                    && Math.Abs(Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.SwayOffset(2500) - Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.InitAmplitudeRad) < 1e-4
                     && Math.Abs(Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.SwayOffset(5000)) < 1e-4
-                    && Math.Abs(Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.SwayOffset(7500) + Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.SwayAmplitudeRad) < 1e-4
+                    && Math.Abs(Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.SwayOffset(7500) + Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.InitAmplitudeRad) < 1e-4
+                    && Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.CtorAmplitudeRad == 2f * Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.InitAmplitudeRad
                     && Simitone.Client.UI.Panels.UIOriginalVitaIdleLaw.SwayPeriodMs == 10000;
 
                 // 3. LIVE: a real out-of-world avatar on the corpus vm (the
@@ -19192,8 +19210,18 @@ namespace Simitone.Client
                     // the vm's own animation list is untouched (the engine's
                     // channel lives in the window, not the simulator)
                     ownListLaw = av.Animations != null && av.Animations.Count == 0;
-                    swayLiveLaw = Math.Abs(av.RadianDirection - facing)
-                        <= Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.SwayAmplitudeRad + 1e-4;
+                    // R258 (UI-31): the solo sway branch is GATED cat&&dog —
+                    // ungated (the normal preview) is a PLAIN COPY (exact), the
+                    // gated path composes the pi/4 sine (bounded by amplitude).
+                    player.FlagCat = 1; player.FlagDog = 1;
+                    upd.Time = step16;
+                    player.Update(upd, facing);
+                    bool swayGatedLaw = Math.Abs(av.RadianDirection - facing)
+                        <= Simitone.Client.UI.Panels.UIOriginalVitaIdlePlayer.InitAmplitudeRad + 1e-4;
+                    player.FlagCat = 0; player.FlagDog = 0;
+                    upd.Time = step16;
+                    player.Update(upd, facing);
+                    swayLiveLaw = swayGatedLaw && av.RadianDirection == facing;
 
                     try { vm.RemoveEntity(av); } catch (Exception) { }
                 }
@@ -24364,23 +24392,40 @@ namespace Simitone.Client
                     for (int i = 0; i < 21 && cloudsOK; i++)
                     {
                         var c = cl.CloudsInfo[i];
-                        // loop 2 records 0..7 (y=60+16j); loop 3 records 10..15
-                        // (y=60+16k); loop 4 records 17..20 (y=60+10k); records
-                        // 8, 9, 16 keep the all-21 defaults (y=0).
-                        int expectY = (i <= 7) ? 60 + 16 * i : (i >= 10 && i <= 15) ? 60 + 16 * (i - 10) : (i >= 17) ? 60 + 10 * (i - 17) : 0;
+                        // R258 ENGINE-EXACT record map: loop 2 records 0..5 as
+                        // stored (loop 3 overwrites 6..7); loop 3 records 6..11
+                        // (k=i-6); loop 4 records 13..16 (k=i-13); defaults at
+                        // 12 and 17..20.
+                        int expectY = (i <= 5) ? 60 + 16 * i
+                            : (i <= 11) ? 60 + 16 * (i - 6)
+                            : (i >= 13 && i <= 16) ? 60 + 10 * (i - 13) : 0;
                         if (c.Y != expectY) { cloudsOK = false; clinfo += "c" + i + ":y=" + c.Y + "!=engine" + expectY + " "; }
                         if (c.Tick != 1 || c.Frame != -110) { cloudsOK = false; clinfo += "c" + i + ":defaults "; }
                         if (c.Slot < 0 || c.Slot > 2) { cloudsOK = false; clinfo += "c" + i + ":slot!=0..2 "; }
                         if (c.Interval < 2 || c.Interval > 3) { cloudsOK = false; clinfo += "c" + i + ":interval!=rand%2+2 "; }
-                        if (i >= 17)
+                        if (i <= 5)
                         {
-                            if (c.X < 142 || c.X > 154) { cloudsOK = false; clinfo += "c" + i + ":x!=142+k*rand%5 "; }
-                            if (c.WrapX < 262 || c.WrapX > 274) { cloudsOK = false; clinfo += "c" + i + ":wrapX!=262+k*rand%5 "; }
-                            if (c.Drift < 2 || c.Drift > 6) { cloudsOK = false; clinfo += "c" + i + ":drift!=rand%5+2 "; }
+                            if (c.WrapX != 462 - 32 * i) { cloudsOK = false; clinfo += "c" + i + ":wrapX!=462-32j "; }
+                            if (c.Drift != 2) { cloudsOK = false; clinfo += "c" + i + ":drift!=2 "; }
+                            if (c.X < 342 - 32 * i || c.X > 342 - 32 * i + 4 * i) { cloudsOK = false; clinfo += "c" + i + ":x!=342-32j+j*rand%5 "; }
                         }
-                        if (i == 8 || i == 9 || i == 16)
+                        else if (i <= 11)
+                        {
+                            int k = i - 6;
+                            if (c.WrapX != 462 - 48 * k) { cloudsOK = false; clinfo += "c" + i + ":wrapX!=462-48k "; }
+                            if (c.Drift != 3) { cloudsOK = false; clinfo += "c" + i + ":drift!=3 "; }
+                            if (c.X < 282 - 48 * k || c.X > 282 - 48 * k + 4 * (i + 4)) { cloudsOK = false; clinfo += "c" + i + ":x!=282-48k+c*rand%5 "; }
+                        }
+                        else if (i == 12 || i >= 17)
                         {
                             if (c.X != 0 || c.Drift != 0) { cloudsOK = false; clinfo += "c" + i + ":not-default "; }
+                        }
+                        else
+                        {
+                            int k = i - 13;
+                            if (c.X < 142 || c.X > 142 + 4 * k) { cloudsOK = false; clinfo += "c" + i + ":x!=142+k*rand%5 "; }
+                            if (c.WrapX < 262 || c.WrapX > 262 + 4 * k) { cloudsOK = false; clinfo += "c" + i + ":wrapX!=262+k*rand%5 "; }
+                            if (c.Drift != 2) { cloudsOK = false; clinfo += "c" + i + ":drift!=2 "; }
                         }
                     }
                     for (int s = 0; s < 3000; s++) cl.StepFrame();
@@ -24388,8 +24433,8 @@ namespace Simitone.Client
                     {
                         var c = cl.CloudsInfo[i];
                         // post-step invariant: X in [0, max possible init/wrap column]
-                        // (loop-3 init max = 262 + 15*(rand%5) = 322; wrap max = 274)
-                        if (c.X < 0 || c.X > 330) { cloudsOK = false; clinfo += "c" + i + ":x-out-of-range "; }
+                        // (loop-2 init max = 342 at j=0; wrapX max = 462 at j=0)
+                        if (c.X < 0 || c.X > 462) { cloudsOK = false; clinfo += "c" + i + ":x-out-of-range "; }
                         if (c.Slot < 0 || c.Slot > 2) { cloudsOK = false; clinfo += "c" + i + ":slot-rebad "; }
                         if (cl.Wrapped[i]) wrappedCount++;
                     }
@@ -24411,12 +24456,13 @@ namespace Simitone.Client
                     if (bl.Frames == null || bl.Frames.Length != 16) { balloonOK = false; binfo += "frames!=16 "; }
                     else foreach (var f in bl.Frames)
                         if (f == null || f.Width <= 0 || f.Height <= 0) { balloonOK = false; binfo += "badframe "; break; }
-                    // R104: the sway ANGLE constants recovered from the float
-                    // block (file 0x5a5348 via TOC sec1+0x3d64 -> code+0x59c4b8,
-                    // after the completed PEF unpack): 0.785/180.0 multiply-divide
-                    // and the wind-walk FLOAT gates {1.5,3.0,4.5,5.0,6.0}.
-                    if (Simitone.Client.UI.Panels.UINeighborhoodBalloonLayer.EnginePiOver4 != 0.785f ||
-                        Simitone.Client.UI.Panels.UINeighborhoodBalloonLayer.EngineDegrees != 180.0f)
+                    // R104/r258: the sway constants are lfd DOUBLES from the
+                    // float block (file 0x5a5348 via TOC sec1+0x3d64 ->
+                    // code+0x59c4b8): 0.785 / 180.0 multiply-divide, and the
+                    // wind-band pool doubles {1.5,3.0,4.5,5.0,6.0} (the r258
+                    // dump's double view of the same bytes).
+                    if (Simitone.Client.UI.Panels.UINeighborhoodBalloonLayer.EnginePiOver4 != 0.785 ||
+                        Simitone.Client.UI.Panels.UINeighborhoodBalloonLayer.EngineDegrees != 180.0)
                     { balloonOK = false; binfo += "angle-consts!=engine "; }
                     var gates = Simitone.Client.UI.Panels.UINeighborhoodBalloonLayer.EngineWindGates;
                     float[] expectGates = new float[] { 1.5f, 3.0f, 4.5f, 5.0f, 6.0f };
@@ -24437,9 +24483,27 @@ namespace Simitone.Client
                         // 69, ... — the engine's %35 wind reset to 2.
                         if (bl.Wind == 2 && s > 0 && (s + 1) % 35 == 0) sawReset2 = true;
                         if (bl.Wind >= 14) sawHigh = true;
-                        if (bl.DrawX < 300 - 8 || bl.DrawX > 300 + 8) { balloonOK = false; binfo += "step" + s + ":x!=300+-8 "; break; }
+                        // R258 engine-exact sway: the off-screen respawn resets the
+                        // seed every 599 steps (DrawY = s+2 >= 600 at s=598, seed
+                        // back to 1, no increment that step), so m = (s % 599) + 1
+                        // and DrawX = 300 + (int)(m*sin(0.785*m/180)) — asserted
+                        // against the law restated HERE (independent of the
+                        // layer's EngineSway), plus hard engine-exact anchors.
+                        int m = (s % 599) + 1;
+                        int expectX = 300 + (int)(m * Math.Sin(0.785 * m / 180.0));
+                        if (bl.DrawX != expectX) { balloonOK = false; binfo += "step" + s + ":x=" + bl.DrawX + "!=law" + expectX + " "; break; }
                         if (bl.DrawY < 2 || bl.DrawY > 600) { balloonOK = false; binfo += "step" + s + ":y-out "; break; }
                     }
+                    // hard anchors (desk-computed from the r258 law, double math):
+                    // m=1 -> 0; m=359 -> 358; m=360 -> 359 (phase exactly 1.57,
+                    // sin(1.57)<1); m=599 -> 302; m=1080 -> -1079; m=1439 -> -10.
+                    bool anchors = Simitone.Client.UI.Panels.UINeighborhoodBalloonLayer.EngineSway(1) == 0
+                        && Simitone.Client.UI.Panels.UINeighborhoodBalloonLayer.EngineSway(359) == 358
+                        && Simitone.Client.UI.Panels.UINeighborhoodBalloonLayer.EngineSway(360) == 359
+                        && Simitone.Client.UI.Panels.UINeighborhoodBalloonLayer.EngineSway(599) == 302
+                        && Simitone.Client.UI.Panels.UINeighborhoodBalloonLayer.EngineSway(1080) == -1079
+                        && Simitone.Client.UI.Panels.UINeighborhoodBalloonLayer.EngineSway(1439) == -10;
+                    if (!anchors) { balloonOK = false; binfo += "sway-anchors!=law "; }
                     if (!sawReset2) { balloonOK = false; binfo += "no-%35-wind-reset "; }
                     if (!sawHigh) { balloonOK = false; binfo += "wind-never-climbed "; }
                 }

@@ -24,12 +24,30 @@ namespace Simitone.Client.UI.Panels
     /// person change does (SetPerson semantics).
     public class UIOriginalVitaIdlePlayer
     {
-        /// Init 0x2dbc00: a SineGenerator (this+0x1e8) with a 10000 ms period
-        /// and infinite duration rotates the preview about its facing. The
-        /// amplitude is SetAmplitude(gA[0]×gB[0]) from two BSS float globals —
-        /// runtime-initialized, statically unrecoverable (R209 disclosure);
-        /// this small value is the port's disclosed substitute.
-        public const float SwayAmplitudeRad = 0.05f;
+        /// R258 (r258-law.md item 4; UI-31): the amplitude is SetAmplitude(
+        /// gA[0]×gB[0]) from two STATIC code-section float pools, not BSS —
+        /// gA file 0x5a4dc8 = 3.1415927410125732f (pi), gB file 0x5a4830 =
+        /// {0.25f, 32767.0f, 0.5f, ...}; the multiply is single-float
+        /// (lfs/fmuls @0x2dbc38..0x2dbc40, verified at Solo::Init 0x2DBC2C
+        /// and cWinVitaBtn::Init 0x2DC5BC). Init amplitude = pi/4; the ctor
+        /// sites (0x2DBD80/0x2DC700) compute gA[0]*gB[+8] = pi/2 for the
+        /// initial rotation matrix. The r209 "BSS, statically unrecoverable"
+        /// label and this port's old ±0.05 rad substitute are superseded.
+        public const float EnginePiF = 3.1415927410125732f;  // gA[0]
+        public const float EngineGB0 = 0.25f;                // gB[+0]
+        public const float EngineGB8 = 0.5f;                 // gB[+8]
+        public const float InitAmplitudeRad = EnginePiF * EngineGB0;  // pi/4 — SetAmplitude
+        public const float CtorAmplitudeRad = EnginePiF * EngineGB8;  // pi/2 — ctor rotation
+
+        /// Solo::UpdateTransform 0x2DB250: the sine path runs ONLY when
+        /// this[0x209] != 0 AND this[0x208] != 0 (the dog and cat window
+        /// flag bytes; lbz/cmplwi pair @0x2db26c..0x2db284). SetPerson
+        /// 0x2DB738 writes stb 1 / stb 0 pairs — sets one flag, clears the
+        /// other; the human child/adult branches leave both untouched — so
+        /// the normal solo preview has NO idle sway (the plain-copy path
+        /// uses the shared identity/base matrix). Both flags co-hold only
+        /// after a cat->dog SetPerson transition on the same window.
+        public byte FlagCat, FlagDog;   // engine this+0x208 / this+0x209
 
         public VMAvatar Avatar;      // for the CAS wiring + gate
         public bool Child, Male;
@@ -47,6 +65,7 @@ namespace Simitone.Client.UI.Panels
             get { return (Names != null && Cursor >= 0 && Cursor < Names.Length) ? Names[Cursor] : null; }
         }
         public VMAnimationState StateForProbe { get { return State; } }
+        public double ProbeSwayMs() { return SwayMs; }   // the SineGenerator clock, for the gate
 
         public UIOriginalVitaIdlePlayer(VMAvatar avatar, bool child, bool male)
         {
@@ -70,11 +89,12 @@ namespace Simitone.Client.UI.Panels
             return a;
         }
 
-        /// The engine's continuous idle sway, exposed for the gate: the sine
-        /// value UpdateTransform composes into the preview rotation.
+        /// SineGenerator::GetVal 0x14E4D0: amplitude * sin(k*(t-t0)) — the
+        /// pi/4 Init amplitude over the 10000 ms period (SetPeriod 10000
+        /// @0x2dbc4c). Exposed for the gate.
         public static float SwayOffset(double elapsedMs)
         {
-            return (float)Math.Sin(elapsedMs * 2.0 * Math.PI / UIOriginalVitaIdleLaw.SwayPeriodMs) * SwayAmplitudeRad;
+            return (float)(InitAmplitudeRad * Math.Sin(elapsedMs * 2.0 * Math.PI / UIOriginalVitaIdleLaw.SwayPeriodMs));
         }
 
         /// SetPerson 0x2db640 tail: pick, then cursor = -1 and the trigger
@@ -96,7 +116,12 @@ namespace Simitone.Client.UI.Panels
             if (Avatar == null) return;
             var ms = state.Time.ElapsedGameTime.TotalMilliseconds;
             SwayMs += ms;
-            Avatar.RadianDirection = baseFacing + SwayOffset(SwayMs);
+            // Solo::UpdateTransform 0x2DB250 branch: gated sine path vs the
+            // plain copy (the engine's shared identity/base matrix; the port
+            // copies the CAS's static preview facing).
+            Avatar.RadianDirection = (FlagCat != 0 && FlagDog != 0)
+                ? baseFacing + SwayOffset(SwayMs)
+                : baseFacing;
             Animate(ms);
         }
 

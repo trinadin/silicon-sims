@@ -1018,18 +1018,20 @@ namespace Simitone.Client.UI.Panels
     //   if (x <= 0) { x = wrapX; y = wrapY; frame = -255; slot = Random()%3; }
     //   if (x > 100) frame += 2; else if (x < 30) frame -= 3;
     //   tick++; DrawCloud(this, x, y, slot, frame)   // slot clamp 0..2, frame sentinels
-    // InitClouds (0x57c890) seeds them in four loops — the loop bases are
-    // CLOUD-ARRAY-relative (store offset 148(rBase) = record(field+4); loop bases
-    // this / this+360 / this+612 map to records 0 / 10 / 17): all-21 defaults
-    // {x=0, y=0, slot=rand%3, tick=1, frame=-110, interval=rand%2+2, wrapX=0,
-    // wrapY=0, drift=0}; records 0..7 y=60+16j drift=2; records 10..15 y=60+16k;
-    // records 17..20 y=60+10k with the literal columns x=142+k*(rand%5) and
-    // wrapX=262+k*(rand%5), drift=rand%5+2 (records 8, 9, 16 keep the defaults).
-    // Loops 2-3 read their x/wrapX/drift bases from static data tables via
-    // lwz 282/342/462(base) whose bases are PEF load-time relocations —
-    // DISCLOSED MODEL: those records use the engine's literal column family
-    // 142/262 instead (the loop-4 constants), keeping the rand%5 spreads and
-    // counter-scaled addends engine-literal.
+    // InitClouds (0x57c890) seeds them in four loops — R258 ENGINE-EXACT
+    // (r258-law.md item 3; the old "PEF-relocated table bases" were subfic
+    // immediates: op 8 was missing from ppc_decode.py; raw decode in
+    // tools/iff-dump/r258-pef-revisit/r258-initclouds-subfic.txt). Loop bases
+    // are CLOUD-ARRAY-relative (record base = this+144, 36 bytes each): loop 1
+    // all-21 defaults {x=0, y=0, slot=rand%3, tick=1, frame=-110,
+    // interval=rand%2+2, wrapX=0, wrapY=0, drift=0}; loop 2 @0x57c940 records
+    // 0..7 (j=0..7): y=60+16j, x=342-32j+j*(rand%5), wrapX=462-32j (no
+    // jitter), drift=2; loop 3 @0x57c9a8 base this+360 = records 6..11
+    // (c=10..15, k=c-10; 6..7 overwritten after loop 2 — loop 3 wins):
+    // y=60+16k, x=282-48k+c*(rand%5), wrapX=462-48k, drift=3; loop 4
+    // @0x57ca20 base this+612 = records 13..16 (k=0..3): y=60+10k,
+    // x=142+k*(rand%5), wrapX=262+k*(rand%5), drift=2. Records 12 and 17..20
+    // keep the defaults (r92's "8, 9, 16" was a misreading).
     public class UINeighborhoodCloudLayer : UIElement
     {
         public static int LayersMounted = 0;
@@ -1072,43 +1074,54 @@ namespace Simitone.Client.UI.Panels
                     WrapX = 0, WrapY = 0, Drift = 0,
                 };
             }
-            // Loop 2: records 0..7 — y ladder 60+16j, drift 2 (table x/wrapX modeled
-            // onto the 142/262 column family, DISCLOSED).
+            // R258 ENGINE-EXACT ladders (InitClouds 0x57C890..0x57CAB0; the
+            // r105 "relocated tables" were subfic immediates all along — see
+            // r258-pef-revisit/r258-initclouds-subfic.txt). ONE rand%5 draw
+            // per record in loops 2/3, TWO in loop 4 (x draw first).
+            // Loop 2 @0x57c940, records 0..7 (j = 0..7): y=60+16j;
+            // x=342-32j + j*(rand%5); wrapX=462-32j (NO jitter); wrapY=0;
+            // drift=2.
             for (int j = 0; j <= 7; j++)
             {
                 var c = CloudsInfo[j];
                 c.Y = 60 + 16 * j;
-                c.X = 142 + j * RNG.Next(SpreadModulus);
-                c.WrapX = 262 + j * RNG.Next(SpreadModulus);
+                c.X = 342 - 32 * j + j * RNG.Next(SpreadModulus);
+                c.WrapX = 462 - 32 * j;
                 c.WrapY = 0;
                 c.Drift = 2;
                 CloudsInfo[j] = c;
             }
-            // Loop 3: records 10..15 — y ladder 60+16k; x/wrap use counter(10..15)-scaled
-            // spreads (engine-literal addends) on a modeled column base (DISCLOSED).
-            for (int k = 0; k <= 5; k++)
+            // Loop 3 @0x57c9a8, base this+360 = record 6; counters c = 10..15,
+            // k = c-10 → records 6..11 (6..7 are written by BOTH loops; loop 3
+            // runs later and wins): y=60+16k; x=282-48k + c*(rand%5);
+            // wrapX=462-48k; wrapY=0; drift=3 (the literal 3 — r92's
+            // "drift=T462b[k]+3" was a misreading).
+            for (int c = 10; c <= 15; c++)
             {
-                var c = CloudsInfo[10 + k];
-                c.Y = 60 + 16 * k;
-                int spread = RNG.Next(SpreadModulus);
-                c.X = 262 + (k + 10) * spread;
-                c.WrapX = (k + 10) * spread;
-                c.WrapY = 0;
-                c.Drift = 2;
-                CloudsInfo[10 + k] = c;
+                int k = c - 10;
+                var w = CloudsInfo[6 + k];
+                w.Y = 60 + 16 * k;
+                w.X = 282 - 48 * k + c * RNG.Next(SpreadModulus);
+                w.WrapX = 462 - 48 * k;
+                w.WrapY = 0;
+                w.Drift = 3;
+                CloudsInfo[6 + k] = w;
             }
-            // Loop 4: records 17..20 — all ENGINE-LITERAL: y ladder 60+10k, columns
-            // 142 / 262 + k*(rand%5), drift rand%5+2 (@0x57ca10..0x57ca9c).
+            // Loop 4 @0x57ca20, base this+612 = record 13 ((612-144)/36; r92's
+            // "17..20" base arithmetic was wrong); counters 17..20, k = 0..3 →
+            // records 13..16: y=60+10k; x=142+k*(rand%5); wrapX=262+k*(rand%5);
+            // wrapY=0; drift=2.
             for (int k = 0; k <= 3; k++)
             {
-                var c = CloudsInfo[17 + k];
+                var c = CloudsInfo[13 + k];
                 c.Y = 60 + 10 * k;
                 c.X = 142 + k * RNG.Next(SpreadModulus);
                 c.WrapX = 262 + k * RNG.Next(SpreadModulus);
                 c.WrapY = 0;
-                c.Drift = RNG.Next(SpreadModulus) + 2;
-                CloudsInfo[17 + k] = c;
+                c.Drift = 2;
+                CloudsInfo[13 + k] = c;
             }
+            // Records keeping the loop-1 defaults: 12 and 17..20 (not "8, 9, 16").
             SubFrame = frameTime;
             FrameTime = frameTime;
             FrameTime *= GlobalSettings.Default.TargetRefreshRate;
@@ -1163,19 +1176,20 @@ namespace Simitone.Client.UI.Panels
     // f8:0, f12:300, f16:400, f20:1, f24:100, f28:1, f32:1}); the 16 balloon bitmaps
     // are the WIND-STATE frames: DrawBalloon (0x57c090) indexes this+36+frame*4 with
     // frame gated to 0..15. AnimateBalloon (0x57c330) per tick:
-    //   sway = (int)(trig(seed % 1440))  — 0xB60B60B7 = the /1440 magic; the MathLib
-    //        trig + amplitude live in a TOC float block: DISCLOSED MODEL
-    //        sway = (int)(8*sin((seed%1440) * PI/720)) — the angle argument is
-    //        engine-literal (seed%1440 normalized over a full turn), amplitude 8 and
-    //        the sin-vs-cos choice are modeled.
+    //   sway = (int)(m*sin(0.785*m/180)) — R258 ENGINE-EXACT (0x57C384..
+    //        0x57C45C): m = seed%1440; the constants are lfd DOUBLES (pool
+    //        file 0x5a5348); the amplitude envelope IS m — no amplitude
+    //        constant exists and r110's "64.0 float" never did. The old
+    //        amplitude-8 model was a disclosed approximation, now retired.
     //   wind walk (0x57c45c.., all integer literals engine-exact):
     //        if (seed % 35 == 0) wind = 2;            // 0xEA0FA0EB = /35 magic
     //        else if (wind < 16) wind++;              // ladder caps 6/10/14/16
     //        else { wind = 0; wind++; if (wind > 2) wind = 2; }   // init-only path (400)
     //        if (wind >= 15) wind = 15;               // clamp
-    //        (the float threshold bands that gate each ladder step live in the same
-    //        unresolved TOC block — modeled as open; the %35 cycle and every integer
-    //        cap are literal)
+    //        (r258 recovered the wind-band pool doubles {1.5, 3.0, 4.5, 5.0,
+    //        6.0} — fcmpu'd against the phase with counters 6/10/...; the
+    //        branch mapping stays modeled as open. The %35 cycle and every
+    //        integer cap are literal.)
     //   draw at (300 + sway, seed + 1) with bitmap #wind; then f0 = sway,
     //   f4 = seed+1+f8, f16 = wind, seed++.
     // The draw y walks down 1px/tick; the off-screen respawn bound was not in the
@@ -1191,16 +1205,31 @@ namespace Simitone.Client.UI.Panels
         public const int XAnchor = 300;            // f12 literal (InitBalloons)
         public const int InitWind = 400;           // f16 literal
         public const int InitSeed = 1;             // f28 literal
-        // R104: the sway ANGLE CONSTANTS recovered from the original float
-        // block (file 0x5a5348 in The Sims Complete, reached via the TOC entry
-        // at sec1+0x3d64 -> code+0x59c4b8 after the R104 PEF unpack): the
-        // engine multiplies by 0.785 (= pi/4) and divides by 180.0 — i.e.
-        // angle = wind * 0.785/180.0 = wind * pi/720 EXACTLY. The block also
-        // carries the wind-walk FLOAT GATES {1.5, 3.0, 4.5, 5.0, 6.0} (the
-        // R92 'float threshold bands', now values) and the int->double magic.
-        public const float EnginePiOver4 = 0.785f;
-        public const float EngineDegrees = 180.0f;
+        // R104/r258: the float block (file 0x5a5348 in The Sims Complete,
+        // reached via the TOC entry at sec1+0x3d64 -> code+0x59c4b8) is read
+        // with lfd — the constants are DOUBLES: 0.785 (phase scale, the
+        // engine's rounded pi/4 literal) and 180.0 (phase divisor); the same
+        // block carries the wind-band gates {1.5, 3.0, 4.5, 5.0, 6.0} (the
+        // r258 dump's double view; its doc table lists the float-view of the
+        // same bytes — see r258-pef-revisit/r258-balloon-float-block.txt) and
+        // the int->double magic 2^52+2^31. Imports resolve to MathLib sin
+        // (0x5a1bc0) and cos (0x5a1ba8).
+        public const double EnginePiOver4 = 0.785;
+        public const double EngineDegrees = 180.0;
         public static readonly float[] EngineWindGates = new float[] { 1.5f, 3.0f, 4.5f, 5.0f, 6.0f };
+
+        // R258 (r258-law.md item 2; UI-31) — AnimateBalloon 0x57C384..0x57C45C,
+        // instruction-exact: m = seed % 1440 (0xB60B60B7 magic); phase =
+        // 0.785*m/180.0 (fmul/fdiv on lfd doubles); sway = (int)(m*sin(phase))
+        // (fmul @0x57c404, fctiwz @0x57c40c — truncate-toward-zero). There is
+        // NO amplitude constant: the envelope IS m (one full sine period per
+        // seed%1440 cycle, linearly growing swing). The old port model
+        // 8*sin(...) and r110's "64.0 float" at pool +0x48 never existed (no
+        // code loads displacement 0x48 from the pool base anywhere).
+        public static int EngineSway(int m)
+        {
+            return (int)((double)m * Math.Sin(EnginePiOver4 * (double)m / EngineDegrees));
+        }
 
         public Texture2D[] Frames;
         public int Seed, Wind;
@@ -1222,11 +1251,10 @@ namespace Simitone.Client.UI.Panels
 
         public int Sway()
         {
-            // angle = (seed % 1440) * EnginePiOver4 / EngineDegrees — the R104
-            // float-block constants (engine-literal; equals wind * pi/720).
-            // Amplitude 8 remains a DISCLOSED model (the multiply chain past the
-            // MathLib sin call is not fully resolved).
-            return (int)(8.0 * Math.Sin((Seed % AngleModulus) * EnginePiOver4 / EngineDegrees));
+            // R258 engine-exact: sway = (int)(m * sin(0.785*m/180)), doubles,
+            // m = seed % 1440 — see EngineSway. The old amplitude-8 disclosed
+            // model is retired.
+            return EngineSway(Seed % AngleModulus);
         }
 
         // AnimateBalloon's wind machine — see class comment for provenance.

@@ -9,13 +9,20 @@ namespace Simitone.Client.UI.Panels
     /// this+0x218 — the order is the WEIGHT, breathing dominates). SetPerson
     /// 0x2db640 dispatches by creature type with a GENDER split at
     /// person->0x60e, then calls the vtable+0x170 pick and resets the cursor
-    /// (+0x210 = -1). The idle sway = a SineGenerator (this+0x1e8) with a
-    /// 10000 ms period, infinite duration, and a RUNTIME amplitude (BSS
-    /// globals — statically unrecoverable, disclosed).
+        /// (+0x210 = -1). The idle sway = a SineGenerator (this+0x1e8) with a
+        /// 10000 ms period and infinite duration; r258 recovered the amplitude
+        /// (static code pools, pi/4 — see SwayAmplitudeIsRuntimeOnly below).
     public static class UIOriginalVitaIdleLaw
     {
         public const int SwayPeriodMs = 10000;
-        public const bool SwayAmplitudeIsRuntimeOnly = true; // BSS 0x59bf38/0x59b9a0
+        /// R258 (r258-law.md item 4; UI-31): RECOVERED, superseding the r209
+        /// "runtime-only" disclosure — the amplitudes are STATIC code-section
+        /// float pools (gA file 0x5a4dc8 = pi, gB file 0x5a4830 = 0.25/0.5...),
+        /// pi/4 at the Init sites (SetAmplitude gA[0]*gB[0]) and pi/2 at the
+        /// ctors (gA[0]*gB[+8], initial rotation matrix). The values live on
+        /// UIOriginalVitaIdlePlayer (EnginePiF / InitAmplitudeRad /
+        /// CtorAmplitudeRad); the old ±0.05 rad port substitute is retired.
+        public const bool SwayAmplitudeIsRuntimeOnly = false;
 
         /// [3] is the gender slot: male (person->0x60e == 0) takes
         /// MaleName, else FemaleName.
