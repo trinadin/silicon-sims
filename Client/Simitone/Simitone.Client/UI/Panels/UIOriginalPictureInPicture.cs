@@ -204,6 +204,13 @@ namespace Simitone.Client.UI.Panels
         {
             var lot = Game.LotControl;
             if (lot == null || Game.vm?.Context?.Blueprint == null) return null;
+            // UI-25 item 4b: native DrawPictureInPicture's floor-diff branch
+            // (cmpw viewer+0x18,target 0x1c104c) clears the live hover history
+            // on ENTER (0x1c1068) AND AGAIN on RESTORE (0x1c161c) and recomposes
+            // the main mask without it — i.e. every cross-floor PIP render
+            // wipes the history. Same-floor renders never reach this builder
+            // (PreDraw passes null inputs there) and must not clear.
+            if (targetLevel != World.State.Level) lot.ClearCutHistory();
             var viewport = GameFacade.GraphicsDevice.Viewport;
             // logical pixels — the same units as CursorScreenPos (below), so
             // the cursor-in-buffer gate is DPI-independent (identical to the
@@ -220,9 +227,11 @@ namespace Simitone.Client.UI.Panels
                 CursorSuppressed = lot.RMBScroll || !lot.MouseIsOn,
                 HistoryRooms = EmptyCutHistory,
                 DynamicEnabled = lot.WallsMode == 1,
-                // native shares the global mouse: the cursor maps through the MAIN
-                // view's projection (BufferBounds is the main buffer)
-                ScreenToTile = pos => World.EstTileAtPosWithScroll(new Vector2(pos.X, pos.Y)),
+                // native shares the global mouse: the cursor tile resolves
+                // through the PIP-swapped viewer — the TARGET floor's picking
+                // level (UI-25 item 4c; World.EstTileAtPosWithScroll's level
+                // argument closes the R244 cursor-frame deviation)
+                ScreenToTile = pos => World.EstTileAtPosWithScroll(new Vector2(pos.X, pos.Y), targetLevel),
             };
             // native gates the person branch on CPState mode 2 (LIVE) — decode.md
             // §5; outside live mode the person inputs stay null.
@@ -364,8 +373,19 @@ namespace Simitone.Client.UI.Panels
                 Renderer ??= World.CreatePictureInPictureRenderer();
                 Texture2D texture;
                 batch.Pause();
-                try { texture = Renderer.Render(CenterPoint(), Target.Position.Level, (WorldZoom)Request.ZoomIndex, Pixels, ScreenVerticalOffset(),
-                    BuildPipCutawayInputs(Target.Position.Level, (WorldZoom)Request.ZoomIndex)); }
+                try
+                {
+                    // UI-25 item 4a: native same-floor PIP (floor-equal branch
+                    // 0x1c1050/0x1c1604) skips the whole floor-swap block — it
+                    // renders the STANDING main matrix untouched, hover history
+                    // included. Null inputs keep the renderer drawing the main
+                    // Blueprint.Cutaway unchanged, and nothing is cleared.
+                    var targetLevel = Target.Position.Level;
+                    var pipInputs = targetLevel == World.State.Level
+                        ? null
+                        : BuildPipCutawayInputs(targetLevel, (WorldZoom)Request.ZoomIndex);
+                    texture = Renderer.Render(CenterPoint(), targetLevel, (WorldZoom)Request.ZoomIndex, Pixels, ScreenVerticalOffset(), pipInputs);
+                }
                 finally { batch.Resume(); }
                 NeedsImage = false;
                 if (SnapshotPending)

@@ -1658,6 +1658,26 @@ namespace Simitone.Client.UI.Panels
                 DynamicEnabled = true,
             };
             AppendPersonInputs(view);
+            // UI-25 item 2: native slot-18 AdjustCutawayForTool, cMoveTool leg
+            // (0x174100): while an object is held (ObjectHolder.Holding = the
+            // native tool+0x24 grab gate; CursorTiles = the picked-object tile
+            // list), the dragged footprint is marked into the mask. The phantom
+            // tiles track the drag through VisualPosition (their VM Position
+            // freezes at pickup; MoveSelected only moves SetVisualPosition);
+            // native's +0xf4>>4 is the big tile, and the tool floor tracks the
+            // view floor (MoveSelected places at World.State.Level) — the
+            // domain the engine helper gates. The PIP builder passes its own
+            // inputs WITHOUT this hook: native save-NULLs the tool global
+            // around the secondary render (0x1c0e48/0x1c1714).
+            var holding = ObjectHolder?.Holding;
+            if (holding?.CursorTiles != null)
+            {
+                view.AdjustCutawayForTool = (corner, mask) =>
+                    FSO.LotView.Utils.CutawayMatrix.AdjustForDrag(vm.Context.Blueprint, mask,
+                        holding.CursorTiles.Select(t => new Point(
+                            (int)Math.Floor(t.VisualPosition.X),
+                            (int)Math.Floor(t.VisualPosition.Y))));
+            }
             return view;
         }
 
@@ -1806,6 +1826,16 @@ namespace Simitone.Client.UI.Panels
                 CutRooms.Clear();
             };
         }
+
+        /// <summary>
+        /// UI-25 item 4: native DrawPictureInPicture's cross-floor clear — the
+        /// live hover history is wiped on ENTER (0x1c1068) AND AGAIN on RESTORE
+        /// (0x1c161c) of every cross-floor PIP render, so the main mask
+        /// recomposes without it (person + cursor only). Same-floor PIP shares
+        /// the standing matrix untouched (floor-equal branch 0x1c1050/0x1c1604)
+        /// and must NOT clear.
+        /// </summary>
+        internal void ClearCutHistory() => CutRooms.Clear();
 
         //uicutaway autotest hooks (the battery drives the production path)
         internal IReadOnlyList<uint> CutawayHistory => CutRooms;

@@ -352,6 +352,7 @@ namespace Simitone.Client
                     case 10: StateImpexport(); break;
                     case 11: StateSav07(); break;
                     case 12: StateImportUI(); break;
+                    case 13: StateCutaway25(); break;
                 }
             }
             catch (Exception e)
@@ -752,8 +753,39 @@ namespace Simitone.Client
             _cutawayFinished244 = true;
             ContinueAfterCorpus239();
         }
+        // UI-25 'uicutaway25' (opt-in, additive): the cutaway-orphan pins —
+        // rotation-LUT law (64x64x4 reflection unit), the cMoveTool drag
+        // footprint leg, and the PIP history/picker parity fixes.
+        // AutotestCutawayUI25.cs is the whole check body. Not in the default
+        // Checks string; enable with -autotest-opts "corpus,lot,uicutaway25".
+        private static AutotestCutawayUI25 _cutaway25;        private static bool _cutawayFinished25;
+        private static void StateCutaway25()
+        {
+            if (!_cutaway25.Ready) return;
+            Log("AUTOTEST uicutaway25 " + _cutaway25.Diagnostics);
+            if (_cutaway25.Passed) Pass("uicutaway25"); else Fail("uicutaway25");
+            _screen.Remove(_cutaway25); _cutaway25.Dispose(); _cutaway25 = null;
+            _cutawayFinished25 = true;
+            ContinueAfterCorpus239();
+        }
         private static void ContinueAfterCorpus239()
         {
+            if (CheckEnabled("uicutaway25") && !_cutawayFinished25)
+            {
+                try
+                {
+                    _cutaway25 = new AutotestCutawayUI25(_screen);
+                    _screen.Add(_cutaway25);
+                    _state = 13;
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Log("AUTOTEST uicutaway25 begin EXC " + ex);
+                    Fail("uicutaway25");
+                    _cutawayFinished25 = true;
+                }
+            }
             if (CheckEnabled("uipip") && !_pipFinished240)
             {
                 bool caption=AutotestPIPCaption240.Check(out string captionDetails);
