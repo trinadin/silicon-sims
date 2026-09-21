@@ -445,10 +445,29 @@ namespace Simitone.Client.UI.Panels
             return false;
         }
 
+        /// <summary>Main-ring ESC handling for ONE frame (P2 fix, indep
+        /// review 2026-09-21): a live sub ring owns the keyboard path (sub
+        /// priority, vt+508 first), and the frame immediately after a sub
+        /// step-out is SUPPRESSED so key-repeat cannot collapse the
+        /// step-out into a full dismissal. The suppression flag is cleared
+        /// at end-of-frame: StepOut sets it from the sub's own Update,
+        /// which runs AFTER this ring's frame in add order, so the flag
+        /// set in frame N is first seen (and consumed) here in frame N+1.
+        /// Returns true when this frame acted on the key.</summary>
+        internal bool MainEscapeFrame(bool escDown)
+        {
+            if (IsSub) return false;
+            var acted = false;
+            if (escDown && Sub == null && _pendingSub == null && !_subSteppedFrame)
+                acted = EscapeStep();
+            _subSteppedFrame = false;
+            return acted;
+        }
+
         public override void Update(UpdateState state)
         {
             base.Update(state);
-            if (!IsSub) { _subSteppedFrame = false; MountSub(); }
+            if (!IsSub) MountSub();
             PressHeld = state.MouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed;
             var esc = state.KeyboardState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape);
             if (IsSub)
@@ -457,9 +476,7 @@ namespace Simitone.Client.UI.Panels
                 if (esc) StepOut();
                 return;
             }
-            // sub ring has key priority: only when no sub is engaged (and
-            // none stepped out this frame) does ESC reach the main ring
-            if (esc && Sub == null && _pendingSub == null && !_subSteppedFrame) EscapeStep();
+            MainEscapeFrame(esc);
         }
 
         public override void Draw(UISpriteBatch batch)

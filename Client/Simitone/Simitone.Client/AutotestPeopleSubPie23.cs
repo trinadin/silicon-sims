@@ -57,7 +57,7 @@ namespace Simitone.Client
 
             var game = GameFacade.Screens.CurrentUIScreen as Simitone.Client.UI.Screens.TS1GameScreen;
             bool live = false, geom = false, backBox = false, mainRing = false, backStep = false;
-            bool rebuild = false, subsel = false, esc = false;
+            bool rebuild = false, subsel = false, esc = false, escRepeat = false;
             if (game != null && game.vm != null)
             {
                 var center = new Vector2(400, 300);
@@ -159,15 +159,35 @@ namespace Simitone.Client
                         bool fullClose = !m10.EscapeStep();
                         esc = esc && fullClose && m10.Detached
                             && Simitone.Client.UI.Panels.UIOriginalPeoplePie.Closes == cmB2 + 1;
+
+                        // (3b) P2 key-repeat (indep review 2026-09-21): the
+                        // frame after a sub step-out must NOT collapse into a
+                        // full dismissal — three simulated Update frames
+                        // through the real MainEscapeFrame path
+                        var m11 = new Simitone.Client.UI.Panels.UIOriginalPeoplePie(game, new Vector2(160, 260), false, full);
+                        game.Add(m11);
+                        m11.MountSub();
+                        var stB2 = Simitone.Client.UI.Panels.UIOriginalPeoplePie.SubSteps;
+                        // frame N: the live sub owns the key — main does not act
+                        bool frameN = !m11.MainEscapeFrame(true) && m11.Sub != null && !m11.Detached;
+                        // the sub's own Update stepped out this frame (sets the suppression flag)
+                        m11.Sub.StepOut();
+                        // frame N+1: ESC still down — SUPPRESSED, main stays mounted
+                        bool frameN1 = !m11.MainEscapeFrame(true) && m11.Sub == null && !m11.Detached;
+                        // frame N+2: a later frame may dismiss (fresh key frame)
+                        bool frameN2 = m11.MainEscapeFrame(true) && m11.Detached;
+                        escRepeat = frameN && frameN1 && frameN2
+                            && Simitone.Client.UI.Panels.UIOriginalPeoplePie.SubSteps == stB2 + 1;
                     }
                 }
                 live = true;
             }
 
-            bool ok = law && live && geom && backBox && mainRing && backStep && rebuild && subsel && esc;
+            bool ok = law && live && geom && backBox && mainRing && backStep && rebuild && subsel && esc && escRepeat;
             details = "law=" + law + " live=" + live + " geom=" + geom + " backbox=" + backBox
                 + " mainring=" + mainRing + " backstep=" + backStep
-                + " rebuild=" + rebuild + " subsel=" + subsel + " esc=" + esc;
+                + " rebuild=" + rebuild + " subsel=" + subsel + " esc=" + esc
+                + " escrepeat=" + escRepeat;
             return ok;
         }
     }
