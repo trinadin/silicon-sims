@@ -267,10 +267,13 @@ namespace Simitone.Client
             // real composition (the shape UILotControl.BuildCutawayInputs
             // assigns from ObjectHolder.Holding.CursorTiles). A deep cursor is
             // required: the hook fires only with the corner (cursorTile-4) in
-            // world bounds, like the native dispatch gate.
+            // world bounds, like the native dispatch gate. The camera must be
+            // centered on the target tile first — the lot-load camera can
+            // leave tile (10,10) outside the pick window entirely.
+            CenterCamera(new Vector2(10, 10));
             if (!TryScreenForTile(new Vector2(10, 10), out var cursor))
             {
-                Require(false, "tool-hook-compose-marks", "no screen point maps to tile (10,10)");
+                Require(false, "tool-hook-compose-marks", "no screen point maps to tile (10,10) even camera-centered");
                 return;
             }
             var toolTiles = new[] { new Point(10, 10), new Point(11, 10), new Point(10, 11), new Point(11, 11) };
