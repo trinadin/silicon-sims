@@ -59,6 +59,7 @@ namespace FSO.SimAntics.NetPlay.Model
             { VMCommandType.SM64Event, typeof(VMNetSM64EventCmd) },
             { VMCommandType.SM64AnimData, typeof(VMNetSM64AnimDataCmd) },
             { VMCommandType.TS1TutorialInfo, typeof(VMNetTS1TutorialInfoCmd) },
+            { VMCommandType.ArchUndo, typeof(VMNetArchUndoCmd) },
         };
         public static Dictionary<Type, VMCommandType> ReverseMap = CmdMap.ToDictionary(x => x.Value, x => x.Key);
 
@@ -172,6 +173,9 @@ namespace FSO.SimAntics.NetPlay.Model
         SM64Position = 46,
         SM64Event = 47,
         SM64AnimData = 48,
-        TS1TutorialInfo = 49
+        TS1TutorialInfo = 49,
+
+        //ts1 build-mode architecture undo/redo (UI-22 tranche 1)
+        ArchUndo = 50
     }
 }
