@@ -15,6 +15,28 @@ namespace FSO.SimAntics.Engine
         private static System.Threading.Timer _defect2Timer;
         public static void Defect2Pulse() { System.Threading.Interlocked.Increment(ref _defect2HB); }
         public static void Defect2Mark(string s) { Defect2Crumb = s; }
+
+        // ENG-02 (2026-09-21): the archundo-probe "stall" (ent=307 hb=924, 5/5) has a
+        // candidate benign explanation — the VM is intentionally PARKED (SpeedMultiplier
+        // <= 0: UI-26 focus suspend, the UIMainPanel non-LIVE park, or a TS1 blocking
+        // dialog), which freezes the heartbeat forever without any thread being stuck.
+        // Snapshot the live VM state on every InternalTick (BeginTick runs before the
+        // speed gate) so the stall print can distinguish PAUSED from STUCK.
+        public static int Defect2SnapSpeed;
+        public static bool Defect2SnapReady;
+        public static bool Defect2SnapGbd;
+        public static bool Defect2SnapFocusSuspended;
+        public static uint Defect2SnapTickID;
+        public static int Defect2SnapClockMinutes;
+        public static void Defect2Snap(VM vm, uint tickID)
+        {
+            Defect2SnapSpeed = vm.SpeedMultiplier;
+            Defect2SnapReady = vm.Ready;
+            Defect2SnapGbd = vm.GlobalBlockingDialog != null;
+            Defect2SnapFocusSuspended = vm.FocusSuspended;
+            Defect2SnapTickID = tickID;
+            Defect2SnapClockMinutes = vm.Context.Clock.Hours * 60 + vm.Context.Clock.Minutes;
+        }
         private static void Defect2Init()
         {
             if (_defect2Timer != null) return;
@@ -28,8 +50,15 @@ namespace FSO.SimAntics.Engine
                     {
                         try
                         {
+                            string pause = (Defect2SnapSpeed <= 0)
+                                ? " VM-PAUSED(NOT-STUCK) speed=" + Defect2SnapSpeed : "";
                             Console.Out.WriteLine("[DEFECT-2 stall] crumb='" + Defect2Crumb + "' hb=" + h
-                                + " at " + System.DateTime.UtcNow.ToString("o"));
+                                + pause
+                                + " [spd=" + Defect2SnapSpeed
+                                + " ready=" + Defect2SnapReady + " gbd=" + Defect2SnapGbd
+                                + " focus=" + Defect2SnapFocusSuspended + " tick=" + Defect2SnapTickID
+                                + " clock=" + (Defect2SnapClockMinutes / 60) + ":" + (Defect2SnapClockMinutes % 60).ToString("D2")
+                                + "] at " + System.DateTime.UtcNow.ToString("o"));
                             Console.Out.Flush();
                         } catch { }
                     }
@@ -97,6 +126,7 @@ namespace FSO.SimAntics.Engine
 
         public void BeginTick(uint tickID)
         {
+            Defect2Snap(vm, tickID); // ENG-02: refresh the pause/stuck discriminator every InternalTick
             if (CurrentTickID == 0)
             {
                 //if we were on tick 0 it's likely we just resynced. Migrate ticks to the the correct tick id.
