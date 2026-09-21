@@ -71,6 +71,9 @@ namespace Simitone.Client
             bool s0Bg = set.TS1SimInBackground;
             int s0Detail = set.TS1CharacterDetail;
             int s0Mode = FSO.LotView.WorldConfig.Current.LightingMode; // exact runtime mode
+            // on-disk stored key at scenario start (may be unset on a cold userdir —
+            // Program.cs's ultra pin is in-memory until some save persists it)
+            string s0StoredLightingMode = ConfigValue("LightingMode");
 
             try
             {
@@ -97,8 +100,11 @@ namespace Simitone.Client
                     + ",forceAdv=" + world.ForceAdvLight + ")");
                 // the stored key itself is untouched by the derive (the Program.cs
                 // ultra pin keeps surviving on disk; the gate never saves LightingMode)
-                need(ConfigValue("LightingMode") == set.LightingMode.ToString(),
-                    "ini-lightingmode(stored=" + set.LightingMode + ")");
+                // disk law: the derive never rewrites the stored key (warm or cold
+                // userdir — the pin-survival claim is relative to scenario start)
+                need(ConfigValue("LightingMode") == s0StoredLightingMode,
+                    "ini-lightingmode(stored=" + set.LightingMode + ",disk="
+                    + (s0StoredLightingMode ?? "unset") + ")");
                 need(FSO.LotView.WorldConfig.Current.ObjShadows == s0Shadows, "boot-objshadows");
                 need(FSO.Vitaboy.Avatar.DefaultTechnique ==
                     UIOriginalOptionsPanel.CharacterDetailTechnique(s0Detail),
