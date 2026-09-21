@@ -27436,6 +27436,45 @@ namespace Simitone.Client
                 bool cas242 = AutotestCAS242.Check(cas, out string cas242Info);
                 Log("AUTOTEST uicasorig composite242=" + cas242 + " " + cas242Info);
                 ok &= cas242;
+
+                // 9. CAS-02 (additive): the native Vita preview framing law and
+                //    the single-line person name-editor law.
+                //    Framing (cWinVitaBtn decode): UpdateTransform 0x2dbef0
+                //    anchors the skeleton root at (window center, bottom-20);
+                //    the VitaBoy render scale 5.33333/0.25 = 64 px/world unit
+                //    == Near PreciseZoom 3/√2; look tile height 0.46875 puts
+                //    the root on surface (50,200). Resolution-free surface.
+                var surface = cas.VitaSurface;
+                if (surface == null) { ok = false; info += " vitaSurface=null;"; }
+                else
+                {
+                    surface.EnsureCameraForProbe();
+                    var cam = surface.CameraForProbe;
+                    if (cam == null || cam.Zoom != FSO.LotView.WorldZoom.Near
+                        || System.Math.Abs(cam.PreciseZoom - Simitone.Client.UI.Panels.CAS.UIOriginalVitaPreview.NativePreciseZoom) > 0.0001f
+                        || cam.CenterTile != new Vector3(0, 0, Simitone.Client.UI.Panels.CAS.UIOriginalVitaPreview.NativeLookTileZ)
+                        || cam.ViewDimensions != new Vector2(100, 220))
+                    { ok = false; info += " vitaCam=" + (cam != null ? cam.Zoom + "/" + cam.PreciseZoom + "/" + cam.CenterTile + "/" + cam.ViewDimensions : "null") + ";"; }
+                }
+                //    Name (cTSWinTextEdit2): SetLinesAllowed(1) at 0x2cf4a4;
+                //    TSOnCharacter 0x5336e8 normalizes CR to LF and never lets
+                //    a line break enter the buffer; Return routes as the dialog
+                //    default command (0x533728 -> 0x2cdffc cTSWinGenDlg) = Done.
+                int enterDone = 0;
+                cas.OnDone += () => enterDone++;
+                var nameInput = new FSO.Common.Rendering.Framework.Model.UpdateState { Time = new Microsoft.Xna.Framework.GameTime(), WindowFocused = true,
+                    InputManager = new FSO.Common.Rendering.Framework.IO.InputManager(), FrameTextInput = new List<char>() };
+                nameInput.InputManager.SetFocus(cas.NameBox);
+                cas.NameBox.CurrentText = "";
+                nameInput.FrameTextInput = new List<char> { 'a', '\n', 'b', '\r', 'c' };
+                cas.NameBox.Update(nameInput);
+                nameInput.FrameTextInput = null;
+                nameInput.NewKeys = new List<Microsoft.Xna.Framework.Input.Keys> { Microsoft.Xna.Framework.Input.Keys.Enter };
+                cas.NameBox.Update(nameInput);
+                nameInput.NewKeys = new List<Microsoft.Xna.Framework.Input.Keys>();
+                if (cas.NameBox.CurrentText != "abc" || enterDone != 1)
+                { ok = false; info += " nameSingleLine=" + cas.NameBox.CurrentText.Replace("\n", "\\n") + " enterDone=" + enterDone + " want abc/1;"; }
+
                 Log("AUTOTEST uicasorig original-cas-screens" + (ok ? ": OK" : ": FAIL") + (info.Length > 0 ? " " + info.Trim() : ""));
                 if (ok) Pass("uicasorig"); else Fail("uicasorig");
             }

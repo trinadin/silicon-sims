@@ -8,6 +8,7 @@ using FSO.Files.Formats.IFF.Chunks;
 using FSO.SimAntics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Simitone.Client.UI.Model;
 using System;
 using System.Collections.Generic;
@@ -567,7 +568,7 @@ namespace Simitone.Client.UI.Panels.CAS
         public UIOriginalSheetButton BodyPrevBtn, BodyNextBtn, HeadPrevBtn, HeadNextBtn;
         public UIOriginalSystemButton DoneBtn, CancelBtn;
 
-        public UITextBox NameBox;
+        public UIOriginalPersonNameBox NameBox;
         public Simitone.Client.UI.Controls.UIOriginalTextEdit BioEdit;
 
         public Simitone.Client.UI.Controls.UIOriginalText TitleText, PersonText, NameLabelText, BioLabelText;
@@ -683,16 +684,22 @@ namespace Simitone.Client.UI.Panels.CAS
             BioLabelText = new Simitone.Client.UI.Controls.UIOriginalText(GameFacade.Strings.GetString("130", "24"), font) { Y = 425 - 2 * font.LineHeight, X = 22, Color = Color.White };
             Add(BioLabelText);
 
-            // name field (275,52)-(530,77), white, capacity 25, transparent
-            NameBox = new UITextBox() { Position = new Vector2(275, 52) };
+            // name field (275,52)-(530,77), white, capacity 25 (16 when the
+            // language byte is 15 — r143 §3.3 0x2cf47c-0x2cf4a4), transparent.
+            // CAS-02: single-line native behavior lives in the box subclass.
+            NameBox = new UIOriginalPersonNameBox() { Position = new Vector2(275, 52) };
             NameBox.SetSize(255, 25);
-            NameBox.MaxChars = 25;
+            NameBox.MaxLines = 1;
+            NameBox.MaxChars = (int)STR.DefaultLangCode == 15 ? 16 : 25;
             NameBox.BackgroundTextureReference = null;
             NameBox.TextMargin = new Rectangle(2, 2, 2, 2);
             NameBox.TextStyle = NameBox.TextStyle.Clone();
             NameBox.TextStyle.Color = Color.White;
             // Original Init @0x2cf3f0 selects font-table slot 10.
             NameBox.TextStyle.Size = 10;
+            // Return routes as the dialog default command (cTSWinGenDlg law,
+            // 0x533728 + 0x2cdffc): Done, guarded by the disabled state.
+            NameBox.OnReturn += () => { if (!DoneBtn.Disabled) OnDone?.Invoke(); };
             Add(NameBox);
 
             // bio field (22,425)-(783,521), multiline, capacity 2048
@@ -853,12 +860,54 @@ namespace Simitone.Client.UI.Panels.CAS
         }
     }
 
+    /// <summary>
+    /// CAS-02: the native PERSON name field is a single-line cTSWinTextEdit2
+    /// (SetLinesAllowed(1) at 0x2cf4a4, capacity 25 / 16 for language 15,
+    /// r143 §3.3). cTSWinTextEdit2::TSOnCharacter 0x5336e8-0x533724 normalizes
+    /// CR to LF and, with linesAllowed==1, never inserts it: the LF is
+    /// swallowed (gate 0x50==0) or routed to the parent as command 3/0x17
+    /// (0x533728-0x533740). The CAS window forwards that command to
+    /// cTSWinGenDlg::TSOnCommand (0x2cdffc) — the dialog default action, i.e.
+    /// Done. The shared InputManager instead inserts a literal '\n' on Enter,
+    /// so this box suppresses the key before the shared mutation and raises
+    /// the base OnEnterPress event itself, and strips CR/LF from the frame
+    /// text stream so a pasted name cannot carry a line break. Horizontal
+    /// caret scrolling and initial focus are the base control's existing
+    /// (r239-era) mechanics; the empty/focused frame is transparent by the
+    /// R143 construction and Done-disable covers the native flash-on-empty.
+    /// </summary>
+    public class UIOriginalPersonNameBox : UITextBox
+    {
+        /// <summary>The native Return routing (dialog default command). The
+        /// base OnEnterPress event cannot be raised from a subclass, and the
+        /// shared Enter key is suppressed before it could fire, so this is the
+        /// equivalent native hook.</summary>
+        public event Action OnReturn;
+
+        public override void Update(UpdateState state)
+        {
+            if (state.InputManager?.GetFocus() != this) { base.Update(state); return; }
+            var text = state.FrameTextInput;
+            var keys = state.NewKeys;
+            var enter = keys.Contains(Keys.Enter);
+            try
+            {
+                // Native TSOnCharacter: CR normalizes to LF, LF never enters a
+                // linesAllowed==1 buffer (typed, pasted or frame-input stream).
+                if (text != null) state.FrameTextInput = text.Where(c => c != '\n' && c != '\r').ToList();
+                state.NewKeys = keys.Where(k => k != Keys.Enter).ToList();
+                base.Update(state);
+                if (enter) OnReturn?.Invoke();
+            }
+            finally { state.FrameTextInput = text; state.NewKeys = keys; }
+        }
+    }
+
     /// <summary>The native family-name editor rejects its fixed filename
     /// character table during typed input. Paste and SetText bypass that flag.
     /// Keep the rule local so other text fields retain their established input.</summary>
     public class UIOriginalFamilyNameBox : UITextBox
-    {
-        // TSOnCharacter scans exactly20 bytes at CODE59c3a8 (file5a5238).
+    {        // TSOnCharacter scans exactly20 bytes at CODE59c3a8 (file5a5238).
         internal const string ForbiddenTypedCharacters = "\\/|*?:<>\"'%()&;@!#,.";
         internal static bool AllowsTypedCharacter(char value) => ForbiddenTypedCharacters.IndexOf(value) < 0;
 
