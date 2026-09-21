@@ -55,6 +55,9 @@ namespace Simitone.Client
     /// vacant+built → confirm → BulldozeLot zeroes the SIMI building values
     /// in the house FILE (byte check) + tile refresh; a second armed click on
     /// the now-unbuilt lot takes the status-only branch (branch flip).
+    /// Occupied-unbuilt has no template state (the only template occupants,
+    /// lots 5 and 7, are BUILT — zero-padded House05/House07.iff), so that
+    /// arm is synthesized on lot 11 with bin FAMI 4 (disclosed).
     /// </summary>
     public class AutotestUI30
     {
@@ -381,17 +384,22 @@ namespace Simitone.Client
 
         private void PhaseOccupiedUnbuilt()
         {
-            // Template law: lot 7 is occupied+unbuilt (FAMI 1, no house file →
-            // built=false → NO second confirm; killSims stays false).
-            var fam = N.GetFamilyForHouse(7);
-            Check(fam != null, "lot7-occupied-on-template");
-            Check(!File.Exists(HousePath(7)), "lot7-unbuilt-on-template");
+            // Template law (zero-padded house files): the ONLY occupied lots,
+            // 5 and 7, are both BUILT (House05/House07.iff carry SIMI building
+            // values) — the native's occupied-UNBUILT arm (single confirm,
+            // killSims=false) has no template state. Synthesize it with the
+            // PRODUCTION move-in binding: bin FAMI 4 onto lot 11, which phase
+            // 4 just proved vacant+unbuilt. built=false → confirm 1 ONLY.
+            var fam = N.GetFamily(4);
+            Check(fam != null, "bin-family-4-found");
             if (fam == null) { _done = true; return; }
+            N.SetFamilyForHouse(11, fam, false);
+            Check(N.GetFamilyForHouse(11) == fam, "lot11-bound-for-unbuilt-evict");
             var members0 = fam.FamilyGUIDs.Length;
             var chars0 = CharFileCount();
 
             Arm();
-            Panel.SelectHouse(7);
+            Panel.SelectHouse(11);
             Check(Screen.BulldozeConfirm1ForProbe == 1, "occupied-confirm1-shown");
             var dlg = Screen._bulldozeDialog;
             Check(dlg != null, "confirm1-mounted");
@@ -405,16 +413,16 @@ namespace Simitone.Client
             Press(no);
             Check(Screen._bulldozeDialog == null, "confirm1-no-aborts");
             Check(Screen.ArmedEvictsForProbe == 0, "abort-made-no-backend-call");
-            Check(N.GetFamilyForHouse(7) == fam, "abort-left-family-bound");
+            Check(N.GetFamilyForHouse(11) == fam, "abort-left-family-bound");
 
             Arm();
-            Panel.SelectHouse(7);
+            Panel.SelectHouse(11);
             var yes = DialogButton(UIAlertButtonType.Yes);
             Check(yes != null, "confirm1-has-yes");
             Press(yes);
             Check(Screen.ArmedEvictsForProbe == 1, "yes-ran-moveout");
             Check(Screen.BulldozeConfirm2ForProbe == 0, "unbuilt-lot-skipped-confirm2");
-            Check(N.GetFamilyForHouse(7) == null, "evict-unbound-the-family");
+            Check(N.GetFamilyForHouse(11) == null, "evict-unbound-the-family");
             Check(fam.HouseNumber == 0, "evict-cleared-fami-house");
             Check(fam.FamilyGUIDs.Length == members0, "evict-kept-members (" + fam.FamilyGUIDs.Length
                 + " vs " + members0 + ")");
@@ -467,9 +475,10 @@ namespace Simitone.Client
 
         private void PhaseOccupiedBuiltKill()
         {
-            // FAMI 1 (the lot-7 family, real members) onto built lot 22; the
-            // second confirm's YES is the killSims=TRUE answer.
-            var fam = N.GetFamilyForHouse(7) ?? N.GetFamily(1);
+            // FAMI 1 (the lot-7 family, real members; lot 7 itself is left
+            // untouched this battery) onto built lot 22; the second confirm's
+            // YES is the killSims=TRUE answer.
+            var fam = N.GetFamily(1);
             Check(fam != null, "family-1-found");
             if (fam == null) { _done = true; return; }
             N.SetFamilyForHouse(22, fam, false);
