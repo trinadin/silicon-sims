@@ -2524,7 +2524,8 @@ namespace Simitone.Client
         private static readonly HashSet<string> _unlsTreesRun = new HashSet<string>();
         private static bool _unlsJudgeSeen, _unlsRewardSeen;
         private static short _unlsRowShow = -1, _unlsRowJudge = -1;
-        private static bool _unlsSoakHeld, _unlsPushJudge, _unlsPushPet, _unlsPushJudgeNative;
+        private static bool _unlsSoakHeld, _unlsPushJudge, _unlsPushPet, _unlsPushJudgeNative,
+            _unlsBridgeAttr4, _unlsPushTokens, _unlsPushPetShow;
 
         private static void UnlShowTick()
         {
@@ -3104,6 +3105,38 @@ namespace Simitone.Client
                     {
                         var pet = avatars.FirstOrDefault(a => UnlTravelPetGuids.Contains(a.Object.OBJ.GUID));
                         if (pet != null) { _unlsPushPet = true; UnlShowPush(pet, _unlsRowShow, "retry-pet"); }
+                    }
+                    // run-26 bridges: (1) the judge's 4098 wait loop polls the
+                    // scan-hit's attr[4] but 'Listen' writes the CONTROLLER's attr[4]
+                    // (GetAction StackObject=this law) — flip the host's attr[4]
+                    // while the poll is live so the loop exits into the route body;
+                    // (2) grant entry tokens via judge TTAB row 3 (af 4108 'CT -
+                    // Generate Pet Tokens'); (3) a pet performs judge row 0
+                    // (af 4102 'Do Pet Show') on the judge.
+                    if (!_unlsBridgeAttr4 && _unlsJudgeEnt != null
+                        && _unlsJudgeEnt.Thread.Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4098))
+                    {
+                        var hB = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == _unlsHumanGuid);
+                        if (hB != null)
+                        {
+                            _unlsBridgeAttr4 = true;
+                            hB.SetAttribute(4, 1);
+                            Log("AUTOTEST unl-show BRIDGE host.attr4=1 f=" + _unlsFrame);
+                        }
+                    }
+                    if (_unlsFrame == 900 && _unlsBridgeAttr4 && !_unlsPushTokens && _unlsJudgeEnt != null)
+                    {
+                        _unlsPushTokens = true;
+                        UnlShowPush((VMAvatar)_unlsJudgeEnt, 3, "judge-token-grant", _unlsCtr);
+                    }
+                    if (_unlsFrame == 960 && !_unlsPushPetShow && _unlsJudgeEnt != null)
+                    {
+                        var pet3 = avatars.FirstOrDefault(a => UnlTravelPetGuids.Contains(a.Object.OBJ.GUID));
+                        if (pet3 != null)
+                        {
+                            _unlsPushPetShow = true;
+                            UnlShowPush(pet3, 0, "pet-show-native", _unlsJudgeEnt);
+                        }
                     }
                     if (_unlsFrame >= 300 && _unlsFrame % 60 == 0 && !_unlsRewardSeen)
                     {
