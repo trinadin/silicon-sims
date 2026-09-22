@@ -3026,7 +3026,14 @@ namespace Simitone.Client
                         if (host2 != null && jtgt != null && jrow >= 0)
                         { _unlsPushJudge = true; UnlShowPush(host2, jrow, "judge-activation", jtgt); }
                         else if (host2 != null && _unlsRowJudge >= 0)
-                        { _unlsPushJudge = true; UnlShowPush(host2, _unlsRowJudge, "followup-judge"); }
+                        {
+                            // run-21: no judge TTAB carries 4098 (judge rows are
+                            // 4102/4104/4106/4108) — push the CONTROLLER's row 0 but
+                            // override the callee to the judge avatar; the route must
+                            // target a person (run-20 law).
+                            _unlsPushJudge = true;
+                            UnlShowPush(host2, _unlsRowJudge, "judge-activation-ovr", _unlsCtr, _unlsJudgeEnt);
+                        }
                         else
                             Log("AUTOTEST unl-show judge push skipped host=" + (host2 != null)
                                 + " jrow=" + jrow + " av=" + (_unlsJudgeEnt != null)
@@ -3122,7 +3129,7 @@ namespace Simitone.Client
         // rejects pet actors on non-pet rows). Mirror the engine's own ExecuteAction
         // (VMThread.cs:1205): person Priority = action priority, ToStackFrame,
         // SpecialResult=Interaction, Push — skipping queue and test entirely.
-        private static void UnlShowPush(VMAvatar actor, short row, string tag, VMEntity target = null)
+        private static void UnlShowPush(VMAvatar actor, short row, string tag, VMEntity target = null, VMEntity calleeOverride = null)
         {
             if (_unlsCtr == null || actor == null) { Log("AUTOTEST unl-show PUSH-" + tag + " skipped (no ctr/actor)"); return; }
             // run-18: optional push target — 4098 routes to StackObject's routing
@@ -3130,6 +3137,13 @@ namespace Simitone.Client
             var tgt = target ?? _unlsCtr;
             var act = tgt.GetAction(row, actor, _vm.Context, false, new short[] { 0, 0, 0, 0 });
             if (act == null) { Log("AUTOTEST unl-show PUSH-" + tag + " GetAction null row=" + row); return; }
+            // run-21: 4098's GotoRoutingSlot walks to the StackObject — the push
+            // Callee. The controller marker is unroutable (run-20 law: routing frame
+            // retries @0 51 ticks then tears down); override the callee to the judge
+            // avatar so the route targets a person. VMQueuedAction.Callee/StackObject
+            // are public and flow through CheckAction/ExecuteAction untouched
+            // (VMThread.cs:1282/1388).
+            if (calleeOverride != null) { act.Callee = calleeOverride; act.StackObject = calleeOverride; }
             // Run-6 law: a directly pushed frame lands on the stack ABOVE the brain's
             // suspended IdleForInput primitive, which owns the control point — the frame
             // is popped without executing a single instruction (ITRACE: no 4102/4098 on
