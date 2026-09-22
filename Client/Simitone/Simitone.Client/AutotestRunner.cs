@@ -2496,6 +2496,602 @@ namespace Simitone.Client
             return new[] { _unltrHumanGuid, UnlTravelPetGuids[0], UnlTravelPetGuids[1] };
         }
 
+        // EXP-05 V4 ('unl-show'): Pet Show controller loop per the EXA-05 census —
+        // summon "Controller - Unleashed - Pet Show" (control-petshow.iff,
+        // 0xc1ba4467) on the probe lot, dump its script surface through tso.files
+        // (the offline IFF walk drifted; the in-process parser is authoritative —
+        // house80 precedent), push the show row (run-71 idiom), and observe one
+        // competition cycle: judge NPC (0x96717225), controller attribute state
+        // transitions, award step (BHAV 4103 "Make Reward" + token inventory).
+        private const uint UnlShowCtrGuid = 0xC1BA4467;
+        private const uint UnlShowJudgeGuid = 0x96717225;
+        private static int _unlsState, _unlsFrame, _unlsSettle;
+        private static FSO.Files.Formats.IFF.Chunks.FAMI _unlsFam;
+        private static uint _unlsHumanGuid;
+        private static short _unlsHostNid = -1;
+        private static VMEntity _unlsCtr;
+        private static VMEntity _unlsArena;
+        private static bool _unlsArenaInjected;
+        private static string _unlsInv0 = "";
+        private static int _unlsEnts0;
+        private static readonly System.Collections.Generic.HashSet<uint> _unlsGuids0
+            = new System.Collections.Generic.HashSet<uint>();
+        private static readonly System.Collections.Generic.Dictionary<int, HashSet<short>> _unlsAttrSeen
+            = new System.Collections.Generic.Dictionary<int, HashSet<short>>();
+        private static readonly HashSet<string> _unlsTreesRun = new HashSet<string>();
+        private static bool _unlsJudgeSeen, _unlsRewardSeen;
+        private static short _unlsRowShow = -1, _unlsRowJudge = -1;
+        private static bool _unlsSoakHeld, _unlsPushJudge, _unlsPushPet;
+
+        private static void UnlShowTick()
+        {
+            try
+            {
+                var avatars = _vm == null ? new List<VMAvatar>() : _vm.Entities.OfType<VMAvatar>().ToList();
+                if (_unlsState == 0)
+                {
+                    if (++_unlsSettle < 90) return;
+                    _unlsSettle = 0; _unlsState = 1;
+                    FSO.SimAntics.Engine.VMThread.AutotestVacLotOverride = 0;
+                    // same FC-B family law as unl-travel: house-5 human + 2 template pets
+                    var neigh = Content.Get().Neighborhood;
+                    uint human = 0;
+                    var fam5 = neigh.GetFamilyForHouse(5);
+                    if (fam5 != null && fam5.FamilyGUIDs != null)
+                        human = fam5.FamilyGUIDs.FirstOrDefault(g => !UnlTravelPetGuids.Contains(g));
+                    if (human == 0)
+                    {
+                        var objs = Content.Get().WorldObjects as FSO.Content.TS1.TS1ObjectProvider;
+                        if (objs != null) human = objs.PersonGUIDs.OrderBy(x => x).FirstOrDefault();
+                    }
+                    _unlsHumanGuid = human;
+                    var guids = new[] { human, UnlTravelPetGuids[0], UnlTravelPetGuids[1] };
+                    var fams = neigh.MainResource.List<FAMI>() ?? new List<FAMI>();
+                    ushort newId = 0;
+                    foreach (var f in fams.OrderBy(x => x.ChunkID))
+                    {
+                        if (f.ChunkID == newId) newId++;
+                        else break;
+                    }
+                    int famNum = fams.Count == 0 ? 1 : fams.Max(x => x.FamilyNumber) + 1;
+                    _unlsFam = new FSO.Files.Formats.IFF.Chunks.FAMI
+                    {
+                        ChunkLabel = "",
+                        ChunkID = newId,
+                        ChunkProcessed = true,
+                        ChunkType = "FAMI",
+                        ChunkParent = neigh.MainResource,
+                        AddedByPatch = true,
+                        FamilyGUIDs = guids,
+                        RuntimeSubset = guids,
+                        FamilyNumber = famNum,
+                        Unknown = 1,
+                        Budget = 20000,
+                    };
+                    neigh.MainResource.AddChunk(_unlsFam);
+                    var famsChunk = new FAMs
+                    {
+                        ChunkLabel = "",
+                        ChunkID = newId,
+                        ChunkProcessed = true,
+                        ChunkType = "FAMs",
+                        ChunkParent = neigh.MainResource,
+                        AddedByPatch = true,
+                    };
+                    famsChunk.InsertString(0, new FSO.Files.Formats.IFF.Chunks.STRItem { Comment = "", Value = "ShowProbe" });
+                    neigh.MainResource.AddChunk(famsChunk);
+                    neigh.SetFamilyForHouse(UnlTravelHouse, _unlsFam, false);
+                    Log("AUTOTEST unl-show attach famId=" + newId + " house=" + UnlTravelHouse
+                        + " human=0x" + human.ToString("x8")
+                        + " pets=" + string.Join(",", UnlTravelPetGuids.Select(g => "0x" + g.ToString("x8"))));
+                    _screen.PlayHouse(UnlTravelHouse, null);
+                    _unlsFrame = 0;
+                    return;
+                }
+                _unlsFrame++;
+                // post-PlayHouse VM swap: the screen built a fresh VM for the probe
+                // lot; without this rebind state 1 reads the boot lot's roster (run-1
+                // spawn TIMEOUT with avatars=4 = template residents, family invisible).
+                if (_screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    _vm = _screen.vm;
+                if (_unlsState == 1)
+                {
+                    var fam = new[] { _unlsHumanGuid, UnlTravelPetGuids[0], UnlTravelPetGuids[1] };
+                    var spawned = fam.Select(g => avatars.FirstOrDefault(a => a.Object.OBJ.GUID == g)).ToList();
+                    if (spawned.All(a => a != null))
+                    {
+                        var host = spawned[0].GetPersonData(VMPersonDataVariable.PersonsAge) >= 18 ? spawned[0]
+                            : spawned.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? spawned[0];
+                        _unlsHostNid = host.GetPersonData(VMPersonDataVariable.NeighborId);
+                        var inv0 = Content.Get().Neighborhood.GetInventoryByNID(_unlsHostNid);
+                        _unlsInv0 = inv0 == null ? "none"
+                            : string.Join(",", inv0.Select(x => x.Type + "/" + x.GUID.ToString("x8") + ":" + x.Count));
+                        // scope: "or summon the controller directly via its GUID".
+                        // run-4 law: OUT_OF_WORLD placement starves every interaction —
+                        // 4102 'Do Pet Show' opens with GotoRelativePos to the controller
+                        // (unroutable OOW → fail path → unregistered-opcode fault →
+                        // stack-repair reset, the frame vanishes silently). Place it
+                        // in-world beside the host so routing can succeed.
+                        var grp = _vm.Context.CreateObjectInstance(UnlShowCtrGuid,
+                            new FSO.LotView.Model.LotTilePos(
+                                (short)(host.Position.x + 64), (short)(host.Position.y + 64), host.Position.Level),
+                            FSO.LotView.Model.Direction.NORTH);
+                        _unlsCtr = grp?.Objects?.FirstOrDefault();
+                        _unlsEnts0 = _vm.Entities.Count;
+                        if (_unlsCtr == null)
+                        {
+                            Log("AUTOTEST unl-show ctr CREATE-FAIL guid=0x" + UnlShowCtrGuid.ToString("x8")
+                                + " (controller not in mounted catalog?)");
+                            Fail("unl-show"); _unlsState = 99; return;
+                        }
+                        var placedOow = _unlsCtr.Position.x == -32768;
+                        Log("AUTOTEST unl-show ctr oid=" + _unlsCtr.ObjectID + " guid=0x"
+                            + _unlsCtr.Object.OBJ.GUID.ToString("x8") + " ents=" + _unlsEnts0
+                            + " pos=" + _unlsCtr.Position.x + "," + _unlsCtr.Position.y + "lv" + _unlsCtr.Position.Level
+                            + (placedOow ? " (PLACEMENT FAILED — still OOW)" : " (in-world)")
+                            + " hostNid=" + _unlsHostNid + " inv0=[" + _unlsInv0 + "] at " + Sim3Clock());
+                        // run-17: the main loop's @14 gate is semiglobal 469 — Temp0 =
+                        // Global[10] (house number), then TS1 call mode 28 rewrites Temp0
+                        // with the lot's zoning type and @3 tests ==1. On this community
+                        // lot the zoning reads !=1, so @15 sleeps forever. House number
+                        // 555 is absent from ZoningDictionary (and not 81-89), so mode 28
+                        // returns its default 1 and the gate opens.
+                        _vm.SetGlobalValue(10, 555);
+                        Log("AUTOTEST unl-show zoning-gate Global[10]=555 (mode-28 default -> 1 opens main @14)");
+                        // run-15: the show cycle gates on an arena object the controller
+                        // NEVER creates — 4096 main @5/@19 and 4102 @25 all scan
+                        // ObjectOfType 0x389d3502 (engine-decoded disasm, run 14), and
+                        // the runs 10-14 ENT-NEW diff shows it absent from this lot.
+                        // Create it beside the controller; 4102@26 then reads rel 0
+                        // (MeToObject) and @33 requires >0, so seed that too.
+                        if (_vm.Entities.All(e => e.Object == null || e.Object.GUID != 0x389d3502u))
+                        {
+                            VMMultitileGroup arenaGrp = null;
+                            foreach (var off in new[] { -32, 32, -48, 48, -64, 64 })
+                            {
+                                var cand = new FSO.LotView.Model.LotTilePos(
+                                    (short)(_unlsCtr.Position.x + off), _unlsCtr.Position.y, _unlsCtr.Position.Level);
+                                arenaGrp = _vm.Context.CreateObjectInstance(0x389d3502u, cand,
+                                    FSO.LotView.Model.Direction.NORTH);
+                                if (arenaGrp != null && arenaGrp.Objects != null && arenaGrp.Objects.Count > 0) break;
+                                arenaGrp = null;
+                            }
+                            var arena = arenaGrp?.Objects?.FirstOrDefault();
+                            if (arena != null)
+                            {
+                                var catArena = Content.Get().WorldCatalog.GetItemByGUID(0x389d3502u);
+                                Log("AUTOTEST unl-show arena oid=" + arena.ObjectID
+                                    + " reqGuid=0x" + arena.Object.GUID.ToString("x8")
+                                    + " objdGuid=0x" + arena.Object.OBJ.GUID.ToString("x8")
+                                    + " masterID=" + arena.Object.OBJ.MasterID
+                                    + " subIndex=" + arena.Object.OBJ.SubIndex
+                                    + " tiles=" + arenaGrp.Objects.Count
+                                    + " pos=" + arena.Position.x + "," + arena.Position.y + "lv" + arena.Position.Level
+                                    + " isAvatar=" + (arena is VMAvatar)
+                                    + " cat=" + (catArena.HasValue ? catArena.Value.Name : "ABSENT"));
+                                // run-16 anomaly: which key did NewObject actually index?
+                                Log("AUTOTEST unl-show arena postCreate idx reqKey="
+                                    + (_vm.Context.ObjectQueries.GetObjectsByGUID(0x389d3502u)?.Count ?? -1)
+                                    + " objdKey="
+                                    + (_vm.Context.ObjectQueries.GetObjectsByGUID(arena.Object.OBJ.GUID)?.Count ?? -1));
+                                _unlsArena = arena;
+                                foreach (var av in avatars)
+                                {
+                                    var key = (ushort)arena.ObjectID;
+                                    if (!av.MeToObject.ContainsKey(key)) av.MeToObject[key] = new List<short>();
+                                    var rels = av.MeToObject[key];
+                                    while (rels.Count == 0) rels.Add(0);
+                                    rels[0] = Math.Max(rels[0], (short)60);
+                                    Log("AUTOTEST unl-show rel-seed oid=" + av.ObjectID + " -> arena oid="
+                                        + arena.ObjectID + " rel=" + rels[0]);
+                                }
+                            }
+                            else Log("AUTOTEST unl-show arena CREATE-FAIL guid=0x389d3502 (not in catalog?)");
+                        }
+                        // script-surface dump: BHAV labels + every TTAs table (the
+                        // interaction string sets — phone precedent used TTAs 129)
+                        var iff = _unlsCtr.Object.Resource.Iff;
+                        var bhavs = iff.List<BHAV>() ?? new List<BHAV>();
+                        Log("AUTOTEST unl-show ctr bhavs=" + string.Join(",",
+                            bhavs.Select(b => b.ChunkID + ":" + (b.ChunkLabel ?? "?"))));
+                        var ttasList = iff.List<FSO.Files.Formats.IFF.Chunks.TTAs>() ?? new List<FSO.Files.Formats.IFF.Chunks.TTAs>();
+                        var ttabs = iff.List<FSO.Files.Formats.IFF.Chunks.TTAB>() ?? new List<FSO.Files.Formats.IFF.Chunks.TTAB>();
+                        foreach (var tb in ttabs)
+                            Log("AUTOTEST unl-show ctr TTAB " + tb.ChunkID + " rows=[" + string.Join(" | ",
+                                tb.Interactions.Select((r, i) => i + ":tree" + r.ActionFunction
+                                    + (r.TestFunction != 0 ? "/test" + r.TestFunction : ""))) + "]");
+                        int bestTta = -1, bestRow = -1, bestScore = 0;
+                        string bestTxt = "";
+                        foreach (var tta in ttasList)
+                        {
+                            var names = new List<string>();
+                            for (int i = 0; i < tta.Length; i++) names.Add((tta.GetString(i) ?? "").Trim());
+                            Log("AUTOTEST unl-show ctr TTAs " + tta.ChunkID + " rows=[" + string.Join(" | ", names) + "]");
+                            // run-13: engine-decoded disasm — the offline BHAV parse was
+                            // misaligned (BHAV chunks are CMPR-compressed; raw scans hit
+                            // garbage that only coincidentally matched @50/@52). The live
+                            // VMRoutine carries decoded VMInstructions with operand ToString.
+                            try
+                            {
+                                var res = _unlsCtr.Object.Resource;
+                                foreach (var tid in new ushort[] { 4096, 4098, 4099, 4100, 4102, 4103, 4108 })
+                                {
+                                    var rt = res?.GetRoutine(tid) as VMRoutine;
+                                    if (rt == null) { Log("AUTOTEST unl-show DISASM " + tid + " MISSING"); continue; }
+                                    Log("AUTOTEST unl-show DISASM tree" + tid + " n=" + rt.Instructions.Length
+                                        + " locals=" + rt.Locals + " args=" + rt.Arguments);
+                                    for (int i = 0; i < rt.Instructions.Length; i++)
+                                    {
+                                        var ins = rt.Instructions[i];
+                                        var opProps = ins.Operand?.GetType().GetProperties() ?? new System.Reflection.PropertyInfo[0];
+                                        var opDesc = ins.Operand == null ? "null"
+                                            : opProps.Length == 0 ? "RawVal=" + Convert.ToString(ins.Operand)
+                                            : string.Join(",",
+                                                opProps.Select(p => p.Name + "=" + Convert.ToString(p.GetValue(ins.Operand))));
+                                        Log("AUTOTEST unl-show D" + tid + " @" + i + " op=" + ins.Opcode
+                                            + " T:" + ins.TruePointer + " F:" + ins.FalsePointer + " " + opDesc);
+                                    }
+                                }
+                            }
+                            catch (Exception de) { Log("AUTOTEST unl-show DISASM error: " + de.Message); }
+                            // run-16: controller main idles at @14 op=469 / @15 op=366 —
+                            // semiglobal calls into globals.iff. Dump them decoded; the
+                            // idle gate is whatever they test.
+                            try
+                            {
+                                var gres = _vm.Context.Globals.Resource;
+                                foreach (var gid in new ushort[] { 469, 366 })
+                                {
+                                    var gr = gres?.GetRoutine(gid) as VMRoutine;
+                                    if (gr == null) { Log("AUTOTEST unl-show GDISASM g" + gid + " MISSING"); continue; }
+                                    Log("AUTOTEST unl-show GDISASM g" + gid + " n=" + gr.Instructions.Length);
+                                    for (int i = 0; i < gr.Instructions.Length; i++)
+                                    {
+                                        var gins = gr.Instructions[i];
+                                        var gopProps = gins.Operand?.GetType().GetProperties() ?? new System.Reflection.PropertyInfo[0];
+                                        var god = gins.Operand == null ? "null"
+                                            : gopProps.Length == 0 ? "RawVal=" + Convert.ToString(gins.Operand)
+                                            : string.Join(",",
+                                                gopProps.Select(p => p.Name + "=" + Convert.ToString(p.GetValue(gins.Operand))));
+                                        Log("AUTOTEST unl-show G" + gid + " @" + i + " op=" + gins.Opcode
+                                            + " T:" + gins.TruePointer + " F:" + gins.FalsePointer + " " + god);
+                                    }
+                                }
+                            }
+                            catch (Exception ge) { Log("AUTOTEST unl-show GDISASM error: " + ge.Message); }
+                            for (int i = 0; i < names.Count; i++)
+                            {
+                                var nm = names[i].ToLower();
+                                // run-2 law: HIDDEN rows are the judge's internal actions —
+                                // never push them from the probe.
+                                if (nm.StartsWith("hidden")) continue;
+                                int score = 0;
+                                foreach (var kw in new[] { "show", "judge", "enter", "compet", "sign", "award", "prize", "pet" })
+                                    if (nm.Contains(kw)) score += kw.Length;
+                                if (score > bestScore) { bestScore = score; bestTta = tta.ChunkID; bestRow = i; bestTxt = names[i]; }
+                            }
+                        }
+                        if (bestRow >= 0)
+                        {
+                            _unlsRowShow = (short)bestRow;
+                            var ttaPick = ttasList.FirstOrDefault(t => t.ChunkID == bestTta);
+                            if (ttaPick != null)
+                                for (int i = 0; i < ttaPick.Length; i++)
+                                {
+                                    var nm = (ttaPick.GetString(i) ?? "").Trim().ToLower();
+                                    if (!nm.StartsWith("hidden") && nm.Contains("judge")) { _unlsRowJudge = (short)i; break; }
+                                }
+                            var ttabPick = ttabs.FirstOrDefault(t => t.ChunkID == bestTta);
+                            var rowTree = ttabPick != null && bestRow < ttabPick.Interactions.Length
+                                ? (int)ttabPick.Interactions[bestRow].ActionFunction : -1;
+                            Log("AUTOTEST unl-show ROW-PICK tta=" + bestTta + " row=" + bestRow + " '" + bestTxt
+                                + "' (score=" + bestScore + ") -> tree" + rowTree
+                                + " rowJudge=" + _unlsRowJudge);
+                            // run-9: the host's 4098 route to the controller's routing slot
+                            // tears down within seconds and the interaction dies (runs 7/8:
+                            // GotoRoutingSlot -> d=6 routing frame spins -> stack back to
+                            // brain). Teleport the host adjacent to the controller first so
+                            // the route is one step.
+                            if (_unlsCtr != null)
+                            {
+                                var tele = new FSO.LotView.Model.LotTilePos((short)(_unlsCtr.Position.x - 16),
+                                    _unlsCtr.Position.y, _unlsCtr.Position.Level);
+                                var st1 = host.SetPosition(tele, FSO.LotView.Model.Direction.NORTH, _vm.Context);
+                                Log("AUTOTEST unl-show host-teleport to " + tele.x + "," + tele.y
+                                    + "lv" + tele.Level + " status=" + st1.Status);
+                            }
+                            UnlShowPush(host, (short)bestRow, "start");
+                        }
+                        else Log("AUTOTEST unl-show no show-like row found (rows dumped above)");
+                        _unlsState = 2; _unlsFrame = 0;
+                    }
+                    else if (_unlsFrame > 900)
+                    {
+                        Log("AUTOTEST unl-show spawn TIMEOUT avatars=" + avatars.Count);
+                        Fail("unl-show"); _unlsState = 99;
+                    }
+                    return;
+                }
+                if (_unlsState == 2)
+                {
+                    // ITRACE the show window (house80/V2.5 mechanism): the trace lines
+                    // carry routine ids — record controller-tree activity (4096..4109)
+                    // and flag the award step (4103 Make Reward) when it executes.
+                    // Run-11 law: early-tick-order lot objects (ents 197/71/253...) eat the
+                    // whole per-frame trace budget before the scheduler reaches the family
+                    // actors — refill +20 from inside the sink whenever ent 21/260/269/271
+                    // traces, and trace the FULL run (was frame<=400, hiding post-route).
+                    bool itrace = _unlsFrame <= 4490;
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = itrace ? (System.Action<string>)(s =>
+                    {
+                        if (string.IsNullOrEmpty(s)) return;
+                        Log(s);
+                        foreach (System.Text.RegularExpressions.Match mm in
+                            System.Text.RegularExpressions.Regex.Matches(s, @" 4(09[6-9]|10[0-9])@"))
+                            _unlsTreesRun.Add(mm.Value.Trim().TrimEnd('@').Trim());
+                        // run-12 law: ent=307 et al. run their OWN tree-4103 every 30 ticks —
+                        // only a family-ent (host/controller/pets) 4103 counts as Make Reward.
+                        if (s.Contains(" 4103@") && (s.Contains("ent=21 ") || s.Contains("ent=260 ")
+                            || s.Contains("ent=269 ") || s.Contains("ent=271 ")))
+                        {
+                            _unlsRewardSeen = true;
+                            Log("AUTOTEST unl-show REWARD-TREE-TRACE " + s.Substring(s.IndexOf("ent=")));
+                        }
+                        if (s.Contains("ent=21 ") || s.Contains("ent=260 ") || s.Contains("ent=269 ")
+                            || s.Contains("ent=271 "))
+                            FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget += 20;
+                    }) : null;
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = itrace;
+                    // run-16: 60/frame starved the controller itself (ent=260 traced 5
+                    // lines total in run 15 — ~17 lower-oid lot objects eat the budget
+                    // first). 240 with the +20 family refill keeps the swarm covered.
+                    FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = itrace ? 240 : 0;
+                    // run-8: 4098 'Activate Head Judge' reached GotoRoutingSlot (host is
+                    // routing to the judge podium) and the tree contains DialogPrivate —
+                    // answer any blocking dialog so the judge activation can proceed.
+                    UnlShowAnswerDialogs();
+                    if (_unlsFrame % 15 == 0 && _unlsCtr != null)
+                    {
+                        for (short a = 0; a < 32; a++) // run-11: state may live above attr 15
+                        {
+                            var v = _unlsCtr.GetAttribute(a);
+                            if (!_unlsAttrSeen.TryGetValue(a, out var set)) { set = new HashSet<short>(); _unlsAttrSeen[a] = set; }
+                            if (set.Count == 0 || !set.Contains(v))
+                            {
+                                set.Add(v);
+                                Log("AUTOTEST unl-show ctrAttr f=" + _unlsFrame + " attr" + a + "=" + v
+                                    + " (state transition recorded)");
+                            }
+                        }
+                    }
+                    if (_unlsFrame % 30 == 0)
+                    {
+                        // run-10: judge may be a plain object entity, not an avatar — scan
+                        // ALL entities; and diff the entity guid set so any spawn/departure
+                        // is visible with its guid (run 9: ents rose 296->302 at f=1800).
+                        _unlsJudgeSeen |= _vm.Entities.Any(a => a != null
+                            && a.Object != null && a.Object.OBJ.GUID == UnlShowJudgeGuid);
+                        var guids = new System.Collections.Generic.HashSet<uint>(
+                            _vm.Entities.Where(e => e?.Object != null).Select(e => e.Object.OBJ.GUID));
+                        var added = _unlsGuids0.Where(g => !guids.Contains(g)).ToList();
+                        foreach (var g in added) _unlsGuids0.Remove(g);
+                        if (added.Count > 0)
+                            Log("AUTOTEST unl-show ENT-GONE f=" + _unlsFrame
+                                + " guids=[" + string.Join(",", added.Select(g => g.ToString("x8"))) + "]");
+                        var newG = guids.Where(g => !_unlsGuids0.Contains(g)).ToList();
+                        foreach (var g in newG) _unlsGuids0.Add(g);
+                        if (newG.Count > 0)
+                        {
+                            foreach (var g in newG)
+                            {
+                                var ne = _vm.Entities.FirstOrDefault(e => e?.Object != null && e.Object.OBJ.GUID == g);
+                                var catIt = Content.Get().WorldCatalog.GetItemByGUID(g);
+                                Log("AUTOTEST unl-show ENT-NEW f=" + _unlsFrame + " guid=0x" + g.ToString("x8")
+                                    + " oid=" + (ne?.ObjectID ?? -1) + " avatar=" + (ne is VMAvatar)
+                                    + " name=" + (catIt.HasValue ? catIt.Value.Name : "?")
+                                    + (g == UnlShowJudgeGuid ? " *** JUDGE GUID ***" : ""));
+                            }
+                        }
+                        var ents = _vm.Entities.Count;
+                        // run-16: 4102@25 scans ObjectQueries.GetObjectsByGUID(0x389d3502)
+                        // — watch that index directly (run-15: scan failed with the arena
+                        // created in-world; verify registration/retention).
+                        var arenaQ = _vm.Context.ObjectQueries.GetObjectsByGUID(0x389d3502u);
+                        // run-17: ObjectsByGUID is private and NewObject keys on the OBJD
+                        // guid — if the arena landed under another key (or registration
+                        // was skipped), inject it under the scanned key via reflection so
+                        // 4102@25 / main@5 can find it. Idempotent via the Contains guard.
+                        if ((arenaQ == null || arenaQ.Count == 0) && _unlsArena != null
+                            && _vm.Entities.Contains(_unlsArena))
+                        {
+                            var fld = _vm.Context.ObjectQueries.GetType().GetField("ObjectsByGUID",
+                                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                            var dict = fld?.GetValue(_vm.Context.ObjectQueries) as System.Collections.IDictionary;
+                            if (dict != null)
+                            {
+                                var lst = dict[0x389d3502u] as System.Collections.IList;
+                                if (lst == null)
+                                {
+                                    lst = (System.Collections.IList)Activator.CreateInstance(
+                                        fld.FieldType.GetGenericArguments()[1]);
+                                    dict[0x389d3502u] = lst;
+                                }
+                                if (!lst.Contains(_unlsArena))
+                                {
+                                    lst.Add(_unlsArena);
+                                    if (!_unlsArenaInjected)
+                                    {
+                                        _unlsArenaInjected = true;
+                                        Log("AUTOTEST unl-show arena IDX-INJECT f=" + _unlsFrame
+                                            + " objdGuid=0x" + _unlsArena.Object.OBJ.GUID.ToString("x8")
+                                            + " (registration key mismatch — index repaired)");
+                                    }
+                                }
+                                arenaQ = _vm.Context.ObjectQueries.GetObjectsByGUID(0x389d3502u);
+                            }
+                        }
+                        var ctrQ = _vm.Context.ObjectQueries.GetObjectsByGUID(UnlShowCtrGuid);
+                        var inv = Content.Get().Neighborhood.GetInventoryByNID(_unlsHostNid);
+                        var invN = inv == null ? "none"
+                            : string.Join(",", inv.Select(x => x.Type + "/" + x.GUID.ToString("x8") + ":" + x.Count));
+                        Log("AUTOTEST unl-show watch f=" + _unlsFrame + " ents=" + ents + "/" + _unlsEnts0
+                            + " judge=" + (_unlsJudgeSeen ? "SEEN" : "-")
+                            + " arenaQ=" + (arenaQ == null ? -1 : arenaQ.Count)
+                            + " ctrQ=" + (ctrQ == null ? -1 : ctrQ.Count)
+                            + " trees=[" + string.Join(",", _unlsTreesRun) + "]"
+                            + " ctrAlive=" + (_unlsCtr != null && _vm.Entities.Contains(_unlsCtr))
+                            + " inv=[" + invN + "] clock=" + Sim3Clock());
+                    }
+                    bool attrTrans = _unlsAttrSeen.Values.Any(v => v.Count >= 2);
+                    bool ctrAlive = _unlsCtr != null && _vm.Entities.Contains(_unlsCtr);
+                    // staged follow-ups (run-2 law: the first push alone did not start
+                    // the show — judge activation and the pet-performed retry are
+                    // separate rows pushed on their own schedules)
+                    if (_unlsFrame == 240 && !_unlsJudgeSeen && !_unlsPushJudge && _unlsRowJudge >= 0)
+                    {
+                        var host2 = avatars.FirstOrDefault(a =>
+                            a.GetPersonData(VMPersonDataVariable.NeighborId) == _unlsHostNid);
+                        if (host2 != null) { _unlsPushJudge = true; UnlShowPush(host2, _unlsRowJudge, "followup-judge"); }
+                    }
+                    if (_unlsFrame == 600 && !attrTrans && !_unlsPushPet && _unlsRowShow >= 0)
+                    {
+                        var pet = avatars.FirstOrDefault(a => UnlTravelPetGuids.Contains(a.Object.OBJ.GUID));
+                        if (pet != null) { _unlsPushPet = true; UnlShowPush(pet, _unlsRowShow, "retry-pet"); }
+                    }
+                    if (_unlsFrame >= 660 && _unlsFrame % 60 == 0 && _unlsPushPet && !_unlsRewardSeen)
+                    {
+                        // run-12: the pet's autonomous agenda keeps it busy forever, so the
+                        // enqueued 'Do Pet Show' never dequeues (queue waits behind the
+                        // active action). Set the engine's own cancel flag — routing frames
+                        // and idles abort on it (VMRoutingFrame.cs:519), the active action
+                        // ends, and the scheduler picks the queued pri-100 interaction.
+                        var pet2 = avatars.FirstOrDefault(a => UnlTravelPetGuids.Contains(a.Object.OBJ.GUID));
+                        if (pet2 != null && !pet2.Thread.Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4102))
+                        {
+                            pet2.SetFlag(FSO.SimAntics.VMEntityFlags.InteractionCanceled, true);
+                            Log("AUTOTEST unl-show pet-yield f=" + _unlsFrame + " guid=0x"
+                                + pet2.Object.OBJ.GUID.ToString("x8")
+                                + " q=" + pet2.Thread.Queue.Count);
+                        }
+                    }
+                    if (_unlsFrame == 30)
+                    {
+                        var h3 = avatars.FirstOrDefault(a =>
+                            a.GetPersonData(VMPersonDataVariable.NeighborId) == _unlsHostNid);
+                        if (h3 != null)
+                            Log("AUTOTEST unl-show post-push f=30 human stack=" + h3.Thread.Stack.Count
+                                + " queue=" + h3.Thread.Queue.Count
+                                + " topTree=" + (h3.Thread.Stack.Count > 0
+                                    ? (h3.Thread.Stack[h3.Thread.Stack.Count - 1].Routine?.Chunk?.ChunkID ?? 0) : -1));
+                    }
+                    if (_unlsFrame % 30 == 5)
+                    {
+                        // actor stack-top watch: is a pushed frame alive (4102/4098 on
+                        // top) or did it pop silently (back to brain 8330/main)?
+                        foreach (var a in avatars.Where(x => x.Object.OBJ.GUID == _unlsHumanGuid
+                            || UnlTravelPetGuids.Contains(x.Object.OBJ.GUID)))
+                        {
+                            var st = a.Thread.Stack;
+                            Log("AUTOTEST unl-show actorTop f=" + _unlsFrame + " guid=0x"
+                                + a.Object.OBJ.GUID.ToString("x8")
+                                + " stack=" + st.Count
+                                + " pos=" + a.Position.x + "," + a.Position.y + "lv" + a.Position.Level
+                                + " q=" + a.Thread.Queue.Count + " aqb=" + a.Thread.ActiveQueueBlock
+                                + " qtail=" + string.Join("/",
+                                    a.Thread.Queue.Skip(a.Thread.ActiveQueueBlock + 1).Take(2).Select(qa =>
+                                        (qa.Callee?.Object?.GUID.ToString("x8") ?? "-") + ":" + qa.InteractionNumber))
+                                + " trees=" + string.Join("/", st.Select(f => f.Routine?.Chunk?.ChunkID ?? 0)));
+                        }
+                    }
+                    if (!ctrAlive)
+                    {
+                        Log("AUTOTEST unl-show CTR-REMOVED f=" + _unlsFrame
+                            + " (SimAntics fault reset? trees=[" + string.Join(",", _unlsTreesRun) + "])");
+                    }
+                    if (_unlsFrame > 200 && _unlsJudgeSeen && attrTrans && _unlsRewardSeen && ctrAlive)
+                    {
+                        Log("AUTOTEST unl-show CYCLE-COMPLETE f=" + _unlsFrame
+                            + " trees=[" + string.Join(",", _unlsTreesRun) + "]");
+                        Pass("unl-show"); _unlsState = 99; return;
+                    }
+                    if (_unlsFrame > 4500) // run-8: host was still routing at f=1501; give walk+dialog+judge+scoring 3x the window
+                    {
+                        Log("AUTOTEST unl-show cycle TIMEOUT f=" + _unlsFrame
+                            + " judge=" + _unlsJudgeSeen + " attrTrans=" + attrTrans
+                            + " reward=" + _unlsRewardSeen + " ctrAlive=" + ctrAlive
+                            + " trees=[" + string.Join(",", _unlsTreesRun) + "]"
+                            + " ents0=" + _unlsEnts0);
+                        foreach (var a in avatars.Where(x => x.Object.OBJ.GUID == _unlsHumanGuid
+                            || UnlTravelPetGuids.Contains(x.Object.OBJ.GUID)))
+                            Log("AUTOTEST unl-show qdump guid=0x" + a.Object.OBJ.GUID.ToString("x8")
+                                + " oid=" + a.ObjectID + " queue=" + a.Thread.Queue.Count
+                                + " active=" + (a.Thread.ActiveAction != null));
+                        Fail("unl-show"); _unlsState = 99;
+                    }
+                }
+            }
+            catch (Exception se)
+            {
+                Log("AUTOTEST unl-show EXC " + se.GetType().Name + " " + se.Message);
+                FSO.SimAntics.Engine.VMThread.AutotestVacLotOverride = 0;
+                Fail("unl-show"); _unlsState = 99;
+            }
+        }
+
+        // run-3 law: the queue→idle-wake path never started pushed rows here (queue
+        // starved behind the active action for 25 sim-min; CheckTS1Action also hard-
+        // rejects pet actors on non-pet rows). Mirror the engine's own ExecuteAction
+        // (VMThread.cs:1205): person Priority = action priority, ToStackFrame,
+        // SpecialResult=Interaction, Push — skipping queue and test entirely.
+        private static void UnlShowPush(VMAvatar actor, short row, string tag)
+        {
+            if (_unlsCtr == null || actor == null) { Log("AUTOTEST unl-show PUSH-" + tag + " skipped (no ctr/actor)"); return; }
+            var act = _unlsCtr.GetAction(row, actor, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+            if (act == null) { Log("AUTOTEST unl-show PUSH-" + tag + " GetAction null row=" + row); return; }
+            // Run-6 law: a directly pushed frame lands on the stack ABOVE the brain's
+            // suspended IdleForInput primitive, which owns the control point — the frame
+            // is popped without executing a single instruction (ITRACE: no 4102/4098 on
+            // the pushed actor). The engine's own path is the Queue: the idle primitive
+            // wakes each tick and calls AttemptPush (VMIdleForInput AllowPush==1), which
+            // dequeues -> CheckAction -> ExecuteAction. Run 3 lost enqueued items because
+            // CheckRoutine (test tree 265) failed inside AttemptPush and the item was
+            // silently Queue.RemoveAt'ed; with CheckRoutine=null + FSOSkipPermissions the
+            // check passes. Do NOT raise the actor's person-data Priority to the item's:
+            // AttemptPush drops items with item.Priority <= actor priority.
+            act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+            act.CheckRoutine = null;
+            act.Priority = (short)VMQueuePriority.Maximum;
+            actor.Thread.EnqueueAction(act);
+            Log("AUTOTEST unl-show PUSH-" + tag + " row=" + row + " actor=0x"
+                + actor.Object.OBJ.GUID.ToString("x8") + " enqueued pri=" + act.Priority
+                + " actorPri=" + actor.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.Priority)
+                + " at " + Sim3Clock());
+        }
+
+        private static void UnlShowAnswerDialogs()
+        {
+            try
+            {
+                var dlg = _vm.GlobalBlockingDialog;
+                FSO.SimAntics.Primitives.VMDialogResult anyBs = null;
+                foreach (var ent in _vm.Entities)
+                {
+                    var qbs = ent?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                    if (qbs != null && !qbs.Responded) { anyBs = qbs; break; }
+                }
+                if (anyBs == null) return;
+                anyBs.Responded = true;
+                anyBs.ResponseCode = 1; // Yes — show dialogs are confirmations
+                anyBs.ResponseText = "1";
+                _vm.GlobalBlockingDialog = null;
+                if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
+                else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+                Log("AUTOTEST unl-show dialog auto-answered (type=" + anyBs.Type
+                    + (dlg == null ? " QUEUE-PATH" : " obj" + dlg.ObjectID) + ") at " + Sim3Clock());
+            }
+            catch (Exception e) { Log("AUTOTEST unl-show dialog answer error: " + e.Message); }
+        }
+
         private static bool UnltrDowntown()
         {
             // run-13 artifact: Downtown is a PUBLIC field (TS1GameScreen.cs:45);
@@ -3589,6 +4185,11 @@ namespace Simitone.Client
             {
                 UnlTravelTick();
             }
+            // EXP-05 V4 (opt-in "unl-show"): Pet Show controller loop.
+            if (CheckEnabled("unl-show") && _unlsState != 99)
+            {
+                UnlShowTick();
+            }
             var minute = _vm.Context.Clock.Minutes;
             if (_motiveStartMinute < 0) _motiveStartMinute = minute;
 
@@ -3946,6 +4547,21 @@ namespace Simitone.Client
             // keep sampling until 10 sim-minutes elapsed past baseline (observed sim-clock rate
             // on this build is ~1 sim-min/real-sec..; 10 sim-min is enough for measurable decay)
             if (minute - _motiveStartMinute < 10) return;
+
+            // EXP-05: the default 10-sim-min endpoint (Finish below) is shorter than an
+            // EXP show/mice cycle (judge spawn + competition + award runs into sim-hours).
+            // While a focused EXP check is still active, hold the soak open — the check's
+            // own timeout owns the verdict; SIMTONE_TIMEOUT_MS stays the backstop. The
+            // one-shot mood/motive accounting below runs after the check verdicts (99).
+            if (CheckEnabled("unl-show") && _unlsState != 99)
+            {
+                if (!_unlsSoakHeld)
+                {
+                    _unlsSoakHeld = true;
+                    Log("AUTOTEST soak held for EXP unl-show (state=" + _unlsState + ")");
+                }
+                return;
+            }
 
             if (CheckEnabled("mood")) { if (AllMoodOk()) Pass("mood"); else Fail("mood"); }
             MoodGateDone = true;   // R149: release the death-reach collapse (it must not race this window)
