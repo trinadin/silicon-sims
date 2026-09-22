@@ -3409,6 +3409,41 @@ namespace Simitone.Client
                     // window; the spawn/despawn/chase logic stays 100% native.
                     _unlmCtr.SetAttribute(1, (short)_vm.GetGlobalValue(0));
                     Log("AUTOTEST unl-mice ctr.attr1 pinned to hour " + _vm.GetGlobalValue(0));
+                    // run-4 post-mortem: the [4104/366/280] park is one of TWO G366(2)
+                    // sleeps — @14 (person scan failed -> sleep 3600 -> re-scan) or @3
+                    // (scan passed but Global[1]==attr[0] -> sleep 3600 -> re-scan);
+                    // identical stack shapes. Both loops must break probe-side:
+                    // (1) teleport the controller next to the human — same-room is the
+                    //     scan's only contextual difference vs V4's working judge-avatar
+                    //     scan (identical SetToNext GUID=0 Flags=129 SearchType=Person);
+                    // (2) attr0=-1 so @2's Global[1]==attr[0] tie breaks and flow
+                    //     reaches @4/@5, where attr1 (pinned == clock-hour) passes.
+                    try
+                    {
+                        var hum = _vm.Entities.FirstOrDefault(e => e is VMAvatar
+                            && e.Object.OBJ.GUID == _unlmHumanGuid);
+                        if (hum != null)
+                        {
+                            var ctele = new FSO.LotView.Model.LotTilePos(
+                                (short)(hum.Position.x + 16), hum.Position.y, hum.Position.Level);
+                            var cst = _unlmCtr.SetPosition(ctele,
+                                FSO.LotView.Model.Direction.NORTH, _vm.Context);
+                            Log("AUTOTEST unl-mice CTR-TELEPORT to " + ctele.x + "," + ctele.y
+                                + "lv" + ctele.Level + " status=" + cst
+                                + " (human " + hum.Position.x + "," + hum.Position.y + "lv" + hum.Position.Level + ")");
+                        }
+                        _unlmCtr.SetAttribute(0, -1);
+                        var cat5 = _vm.Entities.OfType<VMAvatar>().FirstOrDefault(e
+                            => e.Object.OBJ.GUID == UnlTravelPetGuids[0]);
+                        if (cat5 != null)
+                            Log("AUTOTEST unl-mice scan-inputs g9=" + _vm.GetGlobalValue(9)
+                                + " g1=" + _vm.GetGlobalValue(1)
+                                + " attr0=" + _unlmCtr.GetAttribute(0)
+                                + " attr1=" + _unlmCtr.GetAttribute(1)
+                                + " cat d61=" + cat5.GetPersonData(VMPersonDataVariable.TS1FamilyNumber)
+                                + " cat d65=" + cat5.GetPersonData(VMPersonDataVariable.Gender));
+                    }
+                    catch (Exception te) { Log("AUTOTEST unl-mice run5-setup EXC " + te.GetType().Name + " " + te.Message); }
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
                         _unlmOids0.Add(e.ObjectID);
                     // run-2: live surface dump — mice.iff tree ids are per-file
