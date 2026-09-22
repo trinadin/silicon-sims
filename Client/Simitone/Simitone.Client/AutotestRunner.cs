@@ -3473,21 +3473,18 @@ namespace Simitone.Client
                                 + " cat d65=" + cat5.GetPersonData(VMPersonDataVariable.Gender));
                     }
                     catch (Exception te) { Log("AUTOTEST unl-mice run5-setup EXC " + te.GetType().Name + " " + te.Message); }
-                    // run-9/10/12 decode, corrected in run-13 by the 255=RETURN_FALSE
-                    // law (VMThread.cs MoveToInstruction: case 255 -> Pop(RETURN_FALSE),
-                    // case 254 -> Pop(RETURN_TRUE)): 4113 'try mouse here' is a
-                    // REJECT-list, not a whitelist — REJECT when data39
-                    // (=OBJD.CatalogStringsID, index 39) < 600 (@0 T:20 -> @20 rel-read
-                    // FailIfTooSmall GOTO_FALSE -> F:255) or when the candidate's
-                    // guid/master-guid is in this 19-guid list of spot types
-                    // (@1-@19 op=32 match -> T:255; tubs/beds/showers/flood/newspaper).
-                    // ACCEPT (@17/@19 F:254) requires data39 >= 600 AND guid outside
-                    // the reject list. ALL 296 native downtown-lot objects have
-                    // CatalogStringsID < 600 (run-12: 296 bypasses, 1 reject-list hit),
-                    // so nothing native is ever acceptable — run-13: scan the mounted
-                    // TS1 OBJDs for buyable spot objects (CTSS >= 600, MasterID==0 so
-                    // the entity keeps its own guid, Disabled==0, NumGraphics>0,
-                    // ObjectType==Normal) and place up to 3 near the controller.
+                    // run-9/10/12/13/14 decode: 255=RETURN_FALSE law (VMThread.cs
+                    // MoveToInstruction: case 255 -> Pop(RETURN_FALSE), case 254 ->
+                    // Pop(RETURN_TRUE)). 4113 'try mouse here' is a REJECT-list:
+                    // REJECT when data39 (VMStackObjectVariable.DirtyLevel) < 600
+                    // (@0 T:20 -> @20 rel-read FailIfTooSmall GOTO_FALSE -> F:255)
+                    // or when the candidate's guid/master-guid is in this 19-guid
+                    // list of spot types (@1-@19 op=32 match -> T:255;
+                    // tubs/beds/showers/flood/newspaper). ACCEPT (@17/@19 F:254)
+                    // requires DirtyLevel >= 600 AND guid outside the reject list —
+                    // mice spawn at FILTHY objects, never at those fixtures. No
+                    // native downtown-lot object is dirty enough at lot-load, so
+                    // the probe places catalog spot objects and dirties them.
                     var wlGuids = new uint[] { 1550318735u, 1047818486u, 2246060608u,
                         2197962150u, 2246052162u, 3829773478u, 3689637396u, 391616896u,
                         814340306u, 1704186513u, 1715384316u, 2195737691u, 243452227u,
@@ -3496,6 +3493,7 @@ namespace Simitone.Client
                     var objdByGuid = FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID;
                     var spotLog = new System.Text.StringBuilder();
                     int spotsPlaced = 0;
+                    var spotEnts = new List<VMEntity>();
                     foreach (var kv in objdByGuid)
                     {
                         if (spotsPlaced >= 3) break;
@@ -3521,6 +3519,7 @@ namespace Simitone.Client
                             if (sfirst != null && sfirst.Position.x != -32768)
                             {
                                 spotsPlaced++;
+                                spotEnts.Add(sfirst);
                                 // verify the entity kept the requested guid (op=32
                                 // compares obj.Object.GUID) — log the actual value.
                                 spotLog.Append(" oid=").Append(sfirst.ObjectID)
@@ -3530,6 +3529,22 @@ namespace Simitone.Client
                                 break;
                             }
                         }
+                    }
+                    // run-14: data39 = VMStackObjectVariable.DirtyLevel (enum index 39),
+                    // NOT CatalogStringsID — 4113@0 tests the candidate's DIRTY LEVEL:
+                    // DirtyLevel < 600 -> reject (clean spot), >= 600 + guid outside
+                    // the hide-spot reject-list (tubs/beds/showers/flood/newspaper)
+                    // -> ACCEPT (mice spawn at filth, never at those fixtures — TS1
+                    // Unleashed behavior). Freshly placed spots are clean; set
+                    // DirtyLevel on each so the tick-5 walk accepts.
+                    foreach (var sp in spotEnts)
+                    {
+                        var was = sp.GetValue(VMStackObjectVariable.DirtyLevel);
+                        sp.SetValue(VMStackObjectVariable.DirtyLevel, 1000);
+                        Log("AUTOTEST unl-mice SPOT-DIRTY oid=" + sp.ObjectID
+                            + " DirtyLevel " + was + " -> " + sp.GetValue(VMStackObjectVariable.DirtyLevel)
+                            + " guid=0x" + sp.Object.GUID.ToString("X")
+                            + " reject-list-miss=" + (!rejectGuids.Contains((uint)sp.Object.GUID)));
                     }
                     Log("AUTOTEST unl-mice SPOT-PLACED n=" + spotsPlaced + spotLog.ToString());
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
