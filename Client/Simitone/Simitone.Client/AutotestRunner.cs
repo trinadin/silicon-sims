@@ -2512,6 +2512,7 @@ namespace Simitone.Client
         private static VMEntity _unlsCtr;
         private static VMEntity _unlsArena;
         private static VMEntity _unlsJudgeEnt;
+        private static VMEntity _unlsJudgeNpc;
         private static bool _unlsUnbudgeted;
         private static bool _unlsArenaInjected;
         private static string _unlsInv0 = "";
@@ -2861,6 +2862,9 @@ namespace Simitone.Client
                     if (_unlsJudgeEnt == null)
                         _unlsJudgeEnt = _vm.Entities.FirstOrDefault(e => e is VMAvatar
                             && e.Object != null && e.Object.OBJ.GUID == 0x0c8144b4u);
+                    if (_unlsJudgeNpc == null)
+                        _unlsJudgeNpc = _vm.Entities.FirstOrDefault(e => e is VMAvatar
+                            && e.Object != null && e.Object.OBJ.GUID == 0x96717225u);
                     if (_unlsJudgeEnt != null && !_unlsUnbudgeted && _unlsCtr != null)
                     {
                         _unlsUnbudgeted = true;
@@ -2985,39 +2989,48 @@ namespace Simitone.Client
                     // staged follow-ups (run-2 law: the first push alone did not start
                     // the show — judge activation and the pet-performed retry are
                     // separate rows pushed on their own schedules)
-                    if (_unlsFrame == 240 && !_unlsJudgeSeen && !_unlsPushJudge)
+                    if (_unlsFrame == 240 && !_unlsPushJudge)
                     {
-                        // run-19: push 'Activate Head Judge' ON the engine-created judge
-                        // avatar — 4098 @38 routes to the push Callee; the controller as
-                        // Callee was unroutable (run-8 law), an avatar target walks and
-                        // completes the route into @50/@52/@53 (inline 4108 entry tokens).
+                        // run-19/20: push 'Activate Head Judge' ON a judge — 4098 @38
+                        // routes to the push Callee; the controller as Callee was
+                        // unroutable (run-8 law), an avatar target walks and completes
+                        // the route into @50/@52/@53 (inline 4108 entry tokens).
+                        // run-20: judge presence must NOT suppress the push — run-19's
+                        // engine spawned BOTH judges itself (avatar 0x0c8144b4 oid 252
+                        // tick 5, NPC 0x96717225 oid 254 tick 8), which silently skipped
+                        // the run-19 push via _unlsJudgeSeen. Dump both judges' TTABs,
+                        // push the 4098 row on the first judge that has one.
                         var host2 = avatars.FirstOrDefault(a =>
                             a.GetPersonData(VMPersonDataVariable.NeighborId) == _unlsHostNid);
                         short jrow = -1;
-                        if (_unlsJudgeEnt != null)
+                        VMEntity jtgt = null;
+                        foreach (var jcand in new[] { _unlsJudgeEnt, _unlsJudgeNpc })
                         {
+                            if (jcand == null || jrow >= 0) continue;
                             try
                             {
-                                var jtabs = _unlsJudgeEnt.Object.Resource.Iff.List<FSO.Files.Formats.IFF.Chunks.TTAB>()
+                                var jtabs = jcand.Object.Resource.Iff.List<FSO.Files.Formats.IFF.Chunks.TTAB>()
                                     ?? new List<FSO.Files.Formats.IFF.Chunks.TTAB>();
                                 foreach (var jtb in jtabs)
                                     for (int ji = 0; ji < jtb.Interactions.Length; ji++)
                                     {
                                         var jaf = jtb.Interactions[ji].ActionFunction;
-                                        if (jrow < 0 && (jaf & 0xFFFF) == 4098) jrow = (short)ji;
-                                        Log("AUTOTEST unl-show judgeTTAB " + jtb.ChunkID + " row=" + ji
-                                            + " af=" + jaf + " test=" + jtb.Interactions[ji].TestFunction);
+                                        if (jrow < 0 && (jaf & 0xFFFF) == 4098) { jrow = (short)ji; jtgt = jcand; }
+                                        Log("AUTOTEST unl-show judgeTTAB j=" + jcand.ObjectID + " "
+                                            + jtb.ChunkID + " row=" + ji + " af=" + jaf
+                                            + " test=" + jtb.Interactions[ji].TestFunction);
                                     }
                             }
                             catch (Exception jx) { Log("AUTOTEST unl-show judgeTTAB error: " + jx.Message); }
                         }
-                        if (host2 != null && _unlsJudgeEnt != null && jrow >= 0)
-                        { _unlsPushJudge = true; UnlShowPush(host2, jrow, "judge-activation", _unlsJudgeEnt); }
+                        if (host2 != null && jtgt != null && jrow >= 0)
+                        { _unlsPushJudge = true; UnlShowPush(host2, jrow, "judge-activation", jtgt); }
                         else if (host2 != null && _unlsRowJudge >= 0)
-                        { _unlsPushJudge = true; UnlShowPush(host2, _unlsRowJudge, "followup-judge", _unlsJudgeEnt); }
+                        { _unlsPushJudge = true; UnlShowPush(host2, _unlsRowJudge, "followup-judge"); }
                         else
                             Log("AUTOTEST unl-show judge push skipped host=" + (host2 != null)
-                                + " judge=" + (_unlsJudgeEnt != null) + " jrow=" + jrow);
+                                + " jrow=" + jrow + " av=" + (_unlsJudgeEnt != null)
+                                + " npc=" + (_unlsJudgeNpc != null));
                     }
                     if (_unlsFrame == 600 && !attrTrans && !_unlsPushPet && _unlsRowShow >= 0)
                     {
