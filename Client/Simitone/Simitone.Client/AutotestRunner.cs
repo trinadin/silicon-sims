@@ -3037,6 +3037,21 @@ namespace Simitone.Client
                             Log("AUTOTEST unl-show JUDGE-TELEPORT to " + jtele.x + "," + jtele.y
                                 + "lv" + jtele.Level + " status=" + jst);
                         }
+                        // run-23: the slot-8 route walk starts from the host's CURRENT
+                        // tile; run-22 left the host across the lot following its own
+                        // autonomy. Park the host one tile from the judge so the walk
+                        // is 0-1 tiles and finishes inside the routing frame's
+                        // WAIT_TIMEOUT (300 ticks / 10 sim-seconds).
+                        if (host2 != null && _unlsJudgeEnt != null)
+                        {
+                            var htele = new FSO.LotView.Model.LotTilePos(
+                                (short)(_unlsJudgeEnt.Position.x + 16), _unlsJudgeEnt.Position.y,
+                                _unlsJudgeEnt.Position.Level);
+                            var hst = host2.SetPosition(htele,
+                                FSO.LotView.Model.Direction.NORTH, _vm.Context);
+                            Log("AUTOTEST unl-show HOST-TELEPORT to " + htele.x + "," + htele.y
+                                + "lv" + htele.Level + " status=" + hst);
+                        }
                         if (host2 != null && jtgt != null && jrow >= 0)
                         { _unlsPushJudge = true; UnlShowPush(host2, jrow, "judge-activation", jtgt); }
                         else if (host2 != null && _unlsRowJudge >= 0)
@@ -3092,6 +3107,12 @@ namespace Simitone.Client
                             || UnlTravelPetGuids.Contains(x.Object.OBJ.GUID)))
                         {
                             var st = a.Thread.Stack;
+                            // run-23: the top routing frame prints as a stale
+                            // "<parent tree>@0" in ITRACE (PushNewRoutingFrame copies
+                            // Routine but leaves InstructionPointer 0) — surface its
+                            // real state machine progress here instead.
+                            var rfTop = st.Count > 0
+                                ? st[st.Count - 1] as FSO.SimAntics.Engine.VMRoutingFrame : null;
                             Log("AUTOTEST unl-show actorTop f=" + _unlsFrame + " guid=0x"
                                 + a.Object.OBJ.GUID.ToString("x8")
                                 + " stack=" + st.Count
@@ -3100,7 +3121,14 @@ namespace Simitone.Client
                                 + " qtail=" + string.Join("/",
                                     a.Thread.Queue.Skip(a.Thread.ActiveQueueBlock + 1).Take(2).Select(qa =>
                                         (qa.Callee?.Object?.GUID.ToString("x8") ?? "-") + ":" + qa.InteractionNumber))
-                                + " trees=" + string.Join("/", st.Select(f => f.Routine?.Chunk?.ChunkID ?? 0)));
+                                + " trees=" + string.Join("/", st.Select(f => f.Routine?.Chunk?.ChunkID ?? 0))
+                                + (rfTop != null
+                                    ? " rfState=" + rfTop.State
+                                      + " rfWalk=" + (rfTop.WalkTo?.Count.ToString() ?? "null")
+                                      + " rfWait=" + rfTop.WaitTime
+                                      + " rfTgt=oid" + (rfTop.StackObject?.ObjectID.ToString() ?? "-")
+                                      + "@0x" + (rfTop.StackObject?.Object?.GUID.ToString("x8") ?? "-")
+                                    : ""));
                         }
                     }
                     if (!ctrAlive)
