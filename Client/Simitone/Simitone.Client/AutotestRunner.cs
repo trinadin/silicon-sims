@@ -28533,8 +28533,15 @@ namespace Simitone.Client
         // Watch (~60 sim-min window, sample every 60f): avatar ActiveAction, plugin
         // attrs, cab 0x6477AB64 spawn (the EXP-04 V2.0 departure-machinery GUID),
         // GlobalBlockingDialog, TS1State.LotTransitInfo, InLot, entity count.
-        // Verdict: PASS iff a cab spawns AND (transit set OR a lot switch fires);
-        // otherwise FAIL naming the terminal state.
+        // Verdict: PASS on terminal=depTokens (the EXP-04 VACBOOK booking proof —
+        // banked departure tokens; the pickup machine keeps polling and transit
+        // needs the leg-4 clock lever) or cab seen AND (transit OR lot switch);
+        // otherwise FAIL naming the terminal state. The review note (2026-09-22):
+        // VMDialogResult codes are 0=yes/ok, 1=no, 2=cancel and YesNo maps 0->TRUE —
+        // the booking continuation here rides the FALSE branch of the obj307 YesNo,
+        // and the TS1StudioTown picker ignores the code byte entirely (its answer
+        // rides ResponseText). Blanket code=1 on Message/YesNo dialogs is not what a
+        // native click sends (empty text) — empirical chain identical runs 4-6.
         private static bool _ssBookDone;
         private static int _ssBookFrame;
         private static VMEntity _ssBookPlugin;
@@ -28557,7 +28564,7 @@ namespace Simitone.Client
                     if (_ssBookPlugin == null || _ssBookAv == null)
                     {
                         Log("AUTOTEST ss-book arm FAIL plugin=" + (_ssBookPlugin != null) + " av=" + (_ssBookAv != null));
-                        Fail("ss-book"); _ssBookDone = true; return;
+                        Fail("ss-book"); _ssBookDone = true; Finish(); return;
                     }
                     var attrs = new short[8];
                     for (short i = 0; i < 8; i++) attrs[i] = _ssBookPlugin.GetAttribute(i);
@@ -28566,7 +28573,7 @@ namespace Simitone.Client
                     Log("AUTOTEST ss-book attr[1] armed (probe-side; native arm is the phone dialog) -> "
                         + _ssBookPlugin.GetAttribute(1));
                     var action = _ssBookPlugin.GetAction(2, _ssBookAv, _vm.Context, false);
-                    if (action == null) { Log("AUTOTEST ss-book: row 2 GetAction null"); Fail("ss-book"); _ssBookDone = true; return; }
+                    if (action == null) { Log("AUTOTEST ss-book: row 2 GetAction null"); Fail("ss-book"); _ssBookDone = true; Finish(); return; }
                     action.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
                     _ssBookAv.Thread.EnqueueAction(action);
                     Log("AUTOTEST ss-book pushed row 2 'Go to Studio Town' uid=" + action.UID);
@@ -28593,7 +28600,10 @@ namespace Simitone.Client
                 if (target != null)
                 {
                     target.Responded = true;
-                    target.ResponseCode = 1;   // Yes/OK (the EXP-04 vacation booking answer law)
+                    // 0=yes/ok, 1=no, 2=cancel; YesNo maps 0->TRUE. The booking
+                    // continuation rides the YesNo FALSE branch, and the TS1StudioTown
+                    // picker parses only ResponseText ("81" -> temp0) — see the header note.
+                    target.ResponseCode = 1;
                     target.ResponseText = "81"; // -> temp0=81 -> mode-17 SignalLotSwitch(81)
                     if (ReferenceEquals(_vm.GlobalBlockingDialog, targetOwner) || targetOwner == gbd)
                         _vm.GlobalBlockingDialog = null;
@@ -28726,6 +28736,7 @@ namespace Simitone.Client
             {
                 Log("AUTOTEST ss-book EXC " + ex.GetType().Name + " " + ex.Message);
                 Fail("ss-book"); _ssBookDone = true;
+                Finish();
             }
         }
 
