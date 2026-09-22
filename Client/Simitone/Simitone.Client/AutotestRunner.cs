@@ -3496,20 +3496,27 @@ namespace Simitone.Client
                     var spotEnts = new List<VMEntity>();
                     foreach (var kv in objdByGuid)
                     {
-                        if (spotsPlaced >= 6) break;
+                        if (spotsPlaced >= 8) break;
                         var od = kv.Value;
                         if (od.CatalogStringsID < 600) continue;
                         if (od.MasterID != 0 || od.SubIndex != -1) continue;
                         if (od.Disabled != 0 || od.NumGraphics == 0) continue;
                         if ((int)od.ObjectType != 4) continue; // Normal buyable
                         if (rejectGuids.Contains(kv.Key)) continue;
-                        foreach (var off in new[] { -16, 16, -48, 48, -80, 80 })
+                        // run-16: two-axis fan — run-15's x-only offsets placed
+                        // just 1 of 6 candidates; diagonals give the picker room.
+                        foreach (var off in new[] {
+                            new[] { -16, 0 }, new[] { 16, 0 }, new[] { 0, -16 }, new[] { 0, 16 },
+                            new[] { -32, 0 }, new[] { 32, 0 }, new[] { 0, -32 }, new[] { 0, 32 },
+                            new[] { -48, -48 }, new[] { 48, 48 }, new[] { -48, 48 }, new[] { 48, -48 },
+                            new[] { -80, 0 }, new[] { 80, 0 }, new[] { 0, -80 }, new[] { 0, 80 } })
                         {
                             VMMultitileGroup sgrp = null;
                             try
                             {
                                 var cand = new FSO.LotView.Model.LotTilePos(
-                                    (short)(_unlmCtr.Position.x + off), _unlmCtr.Position.y,
+                                    (short)(_unlmCtr.Position.x + off[0]),
+                                    (short)(_unlmCtr.Position.y + off[1]),
                                     _unlmCtr.Position.Level);
                                 sgrp = _vm.Context.CreateObjectInstance(kv.Key, cand,
                                     FSO.LotView.Model.Direction.NORTH);
@@ -3541,23 +3548,45 @@ namespace Simitone.Client
                     {
                         var was = sp.GetValue(VMStackObjectVariable.DirtyLevel);
                         sp.SetValue(VMStackObjectVariable.DirtyLevel, 1000);
-                        // run-15: the create branch (4106@5 op=42) requires the
-                        // controller->spot relationship entry to EXIST with value 0
-                        // (@13 read GOTO_FALSE when missing -> @15 writes 1 -> walk
-                        // continues with no create; native saves persist this
-                        // matrix, a probe-created controller has none). Pre-create
-                        // zeroed lists — Count must exceed RelVar(4) for the
-                        // FailIfTooSmall read to pass.
+                        // run-16 correction: 4106@14 tests Temps[0] == LITERAL 1
+                        // (RhsData=1 — the run-15 "==0" reading was a misread), so
+                        // the create gate wants rel[4]==1 (armed), not 0. @15 writes
+                        // 1 on the @14-fail path — native objects arm on first sight
+                        // and spawn next cycle; the probe arms up front. Count must
+                        // still exceed RelVar(4) for the FailIfTooSmall read (@13).
                         if (_unlmCtr.MeToObject == null)
                             _unlmCtr.MeToObject = new Dictionary<ushort, List<short>>();
-                        _unlmCtr.MeToObject[(ushort)sp.ObjectID] = new List<short> { 0, 0, 0, 0, 0 };
+                        _unlmCtr.MeToObject[(ushort)sp.ObjectID] = new List<short> { 0, 0, 0, 0, 1 };
                         Log("AUTOTEST unl-mice SPOT-DIRTY oid=" + sp.ObjectID
                             + " DirtyLevel " + was + " -> " + sp.GetValue(VMStackObjectVariable.DirtyLevel)
                             + " guid=0x" + sp.Object.GUID.ToString("X")
                             + " reject-list-miss=" + (!rejectGuids.Contains((uint)sp.Object.GUID))
-                            + " rel0=armed");
+                            + " rel4=1-armed");
                     }
                     Log("AUTOTEST unl-mice SPOT-PLACED n=" + spotsPlaced + spotLog.ToString());
+                    // run-16: 4106@7 rolls rand(Tuning[2]) and @8 creates only on 0.
+                    // Tuning[2] resolves (tableID 0, keyID 2 -> targID 2) from the
+                    // controller's own GameIffResource.TuningCache — probe-writable.
+                    // NextRandom(max) = seed % max, so rand(1) is always 0 and the
+                    // create becomes deterministic for every accepted spot.
+                    var mresT = _unlmCtr.Object.Resource;
+                    if (mresT != null)
+                    {
+                        var hadT2 = mresT.TuningCache.TryGetValue(2, out var tv2);
+                        Log("AUTOTEST unl-mice TUN key2 " + (hadT2 ? tv2.ToString() : "MISSING(=0)")
+                            + " -> 1 (rand(1)=0 deterministic create)");
+                        mresT.TuningCache[2] = 1;
+                    }
+                    // run-16 readback: verify the armed matrix survived setup —
+                    // discriminates list-mutation from read-path divergence if @14
+                    // still fails.
+                    if (_unlmCtr.MeToObject != null)
+                        foreach (var rk in _unlmCtr.MeToObject.Keys.ToList())
+                        {
+                            var rl = _unlmCtr.MeToObject[rk];
+                            Log("AUTOTEST unl-mice REL-BACK oid=" + rk + " count=" + rl.Count
+                                + " vals=[" + string.Join(",", rl) + "]");
+                        }
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
                         _unlmOids0.Add(e.ObjectID);
                     // run-2: live surface dump — mice.iff tree ids are per-file
@@ -3618,6 +3647,13 @@ namespace Simitone.Client
                             + " -> " + nowHour + " f=" + _unlmFrame);
                         _unlmCtr.SetAttribute(1, nowHour);
                     }
+                    // run-16: the park gate is 4104@2 `g1 == attr0` and g1 is static
+                    // during a run — re-arm attr0 away from g1 each watch tick so
+                    // every wake re-runs the 4106 spawn walk (@4 rewrites attr0=g1
+                    // per burst, but the watch outruns the ~1800-tick wake cadence).
+                    var nextHour = (short)((nowHour + 1) % 24);
+                    if (_unlmCtr.GetAttribute(0) != nextHour)
+                        _unlmCtr.SetAttribute(0, nextHour);
                     // spawn/despawn diff by OID (mice share one template guid)
                     var cur = new Dictionary<short, uint>();
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
