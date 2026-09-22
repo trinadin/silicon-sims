@@ -664,6 +664,10 @@ namespace Simitone.Client
                 // string names it; the default suite is untouched.
                 if (CheckEnabled("ss-mount")) RunSSMount();
 
+                // EXP-06 V2 leg 1 'ss-plugin' opt-in (additive): the Go Studio
+                // phone-plugin observation leg — see RunSSPlugin.
+                if (CheckEnabled("ss-plugin")) RunSSPlugin();
+
                 if (CheckEnabled("corpus")) RunCorpus();
 
                 if (CheckEnabled("uicapture"))
@@ -951,7 +955,8 @@ namespace Simitone.Client
                 || CheckEnabled("llfire")
                 || CheckEnabled("aud12live")
                 || CheckEnabled("cc05live")
-                || CheckEnabled("cc04live"))
+                || CheckEnabled("cc04live")
+                || CheckEnabled("ss-book"))
             {
                 // (R249) focused-gate dispatch: freewill/freewillvar live inside RunCorpus
                 // (corpus-gated). When a focused opts string names them WITHOUT corpus,
@@ -2250,6 +2255,7 @@ namespace Simitone.Client
         {
             if (_zoomLivePhase > 0) { ZoomLiveTick(); return; }
             if (_vm == null) { Finish(); return; }
+            if (CheckEnabled("ss-book") && !_ssBookDone) { SSBookTick(); return; }
             if (CheckEnabled("socexec") && !_socExecDone) { SocExecTick(); return; }
             if (CheckEnabled("saveresume") && !_srDone) { SaveResumeTick(); return; }
             // (SIM-03 tranches 2-5) focused lifecycle probes; same short-circuit pattern.
@@ -28450,6 +28456,157 @@ namespace Simitone.Client
                 ok = false;
             }
             if (ok) Pass("ss-mount"); else Fail("ss-mount");
+        }
+
+        // EXP-06 V2 leg 1 ('ss-plugin', opt-in): the Studio Town phone plugin ON the
+        // played lot. The phone plugin object (PhonePluginStudioLots, 0xC61F8102) is
+        // how a live household reaches Studio Town: its TTAB 129 rows are the phone's
+        // studio interactions and its trees drive the Generate Cab -> Wait For Cab ->
+        // Send Downtown chain (the same 4108/4117 BHAV ids EXP-04 decoded on the
+        // Vacation plugin). This leg pins the departure point before any push:
+        //   1. the plugin object EXISTS as a live entity on house 5 (the original
+        //      bootstrap law — EXP-04 run 72 found its Vacation twin at obj267);
+        //   2. every TTAB row resolves through the engine's GetAction (a row with a
+        //      missing action or check tree is unofferable — the GetAction law);
+        //   3. each row's TTAs label + action/check tree ids are logged (the next
+        //      legs' push targets).
+        private static void RunSSPlugin()
+        {
+            const uint PluginGuid = 0xC61F8102u;
+            bool ok = true;
+            try
+            {
+                var plugins = _vm.Entities.Where(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == PluginGuid).ToList();
+                Log("AUTOTEST ss-plugin instances=" + plugins.Count
+                    + (plugins.Count > 0 ? " ids=[" + string.Join(",", plugins.Select(p => p.ObjectID)) + "]" : ""));
+                if (plugins.Count == 0) { Log("AUTOTEST ss-plugin: plugin NOT PRESENT on the lot"); Fail("ss-plugin"); return; }
+
+                var av = _avatars.Count > 0 ? _avatars[0] : null;
+                foreach (var plugin in plugins)
+                {
+                    var ttab = plugin.TreeTable;
+                    int rows = ttab?.Interactions?.Length ?? 0;
+                    Log("AUTOTEST ss-plugin obj=" + plugin.ObjectID + " ttabRows=" + rows);
+                    if (rows == 0) { Log("AUTOTEST ss-plugin obj=" + plugin.ObjectID + " NO TTAB ROWS"); ok = false; continue; }
+                    for (uint row = 0; row < rows; row++)
+                    {
+                        VMQueuedAction a = null;
+                        try { a = av != null ? plugin.GetAction((int)row, av, _vm.Context, false) : null; }
+                        catch (Exception re) { Log("AUTOTEST ss-plugin row " + row + " resolve EXC " + re.GetType().Name + " " + re.Message); }
+                        if (a == null)
+                        {
+                            Log("AUTOTEST ss-plugin row " + row + " UNRESOLVABLE (missing action/check tree)");
+                            ok = false;
+                            continue;
+                        }
+                        Log("AUTOTEST ss-plugin row " + row + " name=\"" + a.Name + "\" action=BHAV "
+                            + (a.ActionRoutine?.ID ?? 0) + " check=BHAV " + (a.CheckRoutine?.ID.ToString() ?? "none"));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST ss-plugin EXC " + ex.GetType().Name + " " + ex.Message);
+                ok = false;
+            }
+            if (ok) Pass("ss-plugin"); else Fail("ss-plugin");
+        }
+
+        // EXP-06 V2 leg 2 ('ss-book', opt-in): the Go Studio push leg. EXP-04's
+        // vacation law set, applied to the Studio plugin (0xC61F8102):
+        //   - 4100 ins25 gates on StackObject attr[1] == 0 -> the direct push never
+        //     activates until the booking-armed attribute is set (run-76 law); the
+        //     native dialogs arm it — this leg arms attr[1]=1 probe-side (disclosed)
+        //     and reads whether the push then walks the chain;
+        //   - 'Ask for Lot' (4103) raises a TS1Vacation-class dialog and the tree
+        //     parks on Wait-For-Notify until answered — without a responder the
+        //     expected terminal state is dialog-raised + parked, which is itself the
+        //     law that names leg 3 (the responder).
+        // Watch (~60 sim-min window, sample every 60f): avatar ActiveAction, plugin
+        // attrs, cab 0x6477AB64 spawn (the EXP-04 V2.0 departure-machinery GUID),
+        // GlobalBlockingDialog, TS1State.LotTransitInfo, InLot, entity count.
+        // Verdict: PASS iff transit set or a cab spawns and the push advances; a
+        // parked-with-dialog terminal names the parked frame/bhav in the verdict.
+        private static bool _ssBookDone;
+        private static int _ssBookFrame;
+        private static VMEntity _ssBookPlugin;
+        private static VMAvatar _ssBookAv;
+        private static string _ssBookTerminal;
+        private static void SSBookTick()
+        {
+            _ssBookFrame++;
+            try
+            {
+                if (_ssBookFrame == 1)
+                {
+                    _ssBookPlugin = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0xC61F8102);
+                    _ssBookAv = _avatars.Count > 0 ? _avatars[0] : null;
+                    if (_ssBookPlugin == null || _ssBookAv == null)
+                    {
+                        Log("AUTOTEST ss-book arm FAIL plugin=" + (_ssBookPlugin != null) + " av=" + (_ssBookAv != null));
+                        Fail("ss-book"); _ssBookDone = true; return;
+                    }
+                    var attrs = new short[8];
+                    for (short i = 0; i < 8; i++) attrs[i] = _ssBookPlugin.GetAttribute(i);
+                    Log("AUTOTEST ss-book obj=" + _ssBookPlugin.ObjectID + " attrs[0..7]=[" + string.Join(",", attrs) + "]");
+                    _ssBookPlugin.SetAttribute(1, 1);
+                    Log("AUTOTEST ss-book attr[1] armed (probe-side; native arm is the phone dialog) -> "
+                        + _ssBookPlugin.GetAttribute(1));
+                    var action = _ssBookPlugin.GetAction(2, _ssBookAv, _vm.Context, false);
+                    if (action == null) { Log("AUTOTEST ss-book: row 2 GetAction null"); Fail("ss-book"); _ssBookDone = true; return; }
+                    action.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                    _ssBookAv.Thread.EnqueueAction(action);
+                    Log("AUTOTEST ss-book pushed row 2 'Go to Studio Town' uid=" + action.UID);
+                    return;
+                }
+                if (_ssBookFrame % 60 == 0 || _ssBookFrame < 5)
+                {
+                    var cabs = _vm.Entities.Count(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0x6477AB64u);
+                    var aa = _ssBookAv.Thread.ActiveAction;
+                    var stack = aa?.ActionRoutine;
+                    Log("AUTOTEST ss-book f=" + _ssBookFrame
+                        + " active=" + (aa == null ? "-" : (aa.Name ?? "?") + "@" + (stack?.ID ?? 0) + ":" + (aa.Callee?.ObjectID ?? 0))
+                        + " cabs=" + cabs
+                        + " transit=" + _vm.TS1State.LotTransitInfo
+                        + " gbd=" + (_vm.GlobalBlockingDialog == null ? "-" : "obj" + _vm.GlobalBlockingDialog.ObjectID)
+                        + " inLot=" + (_screen != null && _screen.InLot)
+                        + " ents=" + _vm.Entities.Count);
+                }
+                var transit = _vm.TS1State.LotTransitInfo;
+                bool lotSwitch = _screen != null && !_screen.InLot;
+                if (transit > 0)
+                {
+                    Log("AUTOTEST ss-book transit=" + transit + " at f=" + _ssBookFrame);
+                    _ssBookTerminal = "transit";
+                }
+                else if (lotSwitch)
+                {
+                    Log("AUTOTEST ss-book lot switch at f=" + _ssBookFrame);
+                    _ssBookTerminal = "lot-switch";
+                }
+                if (_ssBookTerminal != null)
+                {
+                    Log("AUTOTEST ss-book verdict terminal=" + _ssBookTerminal);
+                    Pass("ss-book"); _ssBookDone = true; return;
+                }
+                if (_ssBookFrame >= 3600)
+                {
+                    var gbd = _vm.GlobalBlockingDialog;
+                    var aa2 = _ssBookAv.Thread.ActiveAction;
+                    Log("AUTOTEST ss-book window closed: active=" + (aa2 == null ? "-" : aa2.Name ?? "?")
+                        + " gbd=" + (gbd == null ? "-" : "obj" + gbd.ObjectID)
+                        + " transit=" + transit);
+                    Log("AUTOTEST ss-book verdict terminal=none (named state: "
+                        + (gbd != null ? "blocking dialog raised, push parked — responder is leg 3"
+                        : "no dialog, no transit — chain stalled at " + (aa2 == null ? "queue-head" : aa2.Name)) + ")");
+                    Fail("ss-book"); _ssBookDone = true; return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST ss-book EXC " + ex.GetType().Name + " " + ex.Message);
+                Fail("ss-book"); _ssBookDone = true;
+            }
         }
 
         private static void Pass(string check)
