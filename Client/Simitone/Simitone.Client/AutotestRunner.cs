@@ -3392,6 +3392,15 @@ namespace Simitone.Client
                     // 4104/366/280 shape — apply the same hack.
                     _vm.SetGlobalValue(10, 555);
                     Log("AUTOTEST unl-mice zoning-gate Global[10]=555");
+                    // run-3: 4104@1 gates the whole loop on IsFlagSet(Global[20], 6)
+                    // (F:10 → @10 remove_object_instance/return — the idle we saw).
+                    // TS1 lot-flags global — set bit 6 empirically and log context.
+                    Log("AUTOTEST unl-mice g0=" + _vm.GetGlobalValue(0)
+                        + " g1=" + _vm.GetGlobalValue(1)
+                        + " g9=" + _vm.GetGlobalValue(9)
+                        + " g20=" + _vm.GetGlobalValue(20));
+                    _vm.SetGlobalValue(20, (short)(_vm.GetGlobalValue(20) | 64));
+                    Log("AUTOTEST unl-mice g20 |= 64 -> " + _vm.GetGlobalValue(20));
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
                         _unlmOids0.Add(e.ObjectID);
                     // run-2: live surface dump — mice.iff tree ids are per-file
@@ -3408,7 +3417,7 @@ namespace Simitone.Client
                             for (int i = 0; i < tta.Length; i++) names.Add((tta.GetString(i) ?? "").Trim());
                             Log("AUTOTEST unl-mice ctr TTAs " + tta.ChunkID + " rows=[" + string.Join(" | ", names) + "]");
                         }
-                        foreach (var tid in new ushort[] { 4104, 3856, 1552, 4112, 784 })
+                        foreach (var tid in new ushort[] { 4104, 4105, 4106, 3856, 1552, 4112, 784 })
                         {
                             var rt = mres?.GetRoutine(tid) as VMRoutine;
                             if (rt == null) { Log("AUTOTEST unl-mice DISASM " + tid + " MISSING"); continue; }
