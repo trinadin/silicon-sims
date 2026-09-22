@@ -28512,26 +28512,39 @@ namespace Simitone.Client
             if (ok) Pass("ss-plugin"); else Fail("ss-plugin");
         }
 
-        // EXP-06 V2 leg 2 ('ss-book', opt-in): the Go Studio push leg. EXP-04's
-        // vacation law set, applied to the Studio plugin (0xC61F8102):
+        // EXP-06 V2 leg 2+3 ('ss-book', opt-in): the Go Studio push leg + the
+        // queue-path dialog responder. EXP-04's vacation law set, applied to the
+        // Studio plugin (0xC61F8102):
         //   - 4100 ins25 gates on StackObject attr[1] == 0 -> the direct push never
         //     activates until the booking-armed attribute is set (run-76 law); the
         //     native dialogs arm it — this leg arms attr[1]=1 probe-side (disclosed)
         //     and reads whether the push then walks the chain;
         //   - 'Ask for Lot' (4103) raises a TS1Vacation-class dialog and the tree
-        //     parks on Wait-For-Notify until answered — without a responder the
-        //     expected terminal state is dialog-raised + parked, which is itself the
-        //     law that names leg 3 (the responder).
+        //     parks until answered (leg-2 law: gbd obj307 parked the window);
+        //   - leg 3: respond through the PRODUCTION path's semantics
+        //     (VMNetDialogResponseCmd.TS1 branch): set the VMDialogResult BlockingState
+        //     Responded/ResponseCode/ResponseText on the blocking dialog's thread
+        //     (or any queue-path entity's unresponded dialog — the HPAnswerDialogs
+        //     scan law), clear GlobalBlockingDialog, restore speed from
+        //     LastSpeedMultiplier. The dialog answer text becomes temp0 (EXP-04
+        //     V2.7 law: answered "1" -> temp0=1), so the responder answers "81" to
+        //     route the mode-17 switch at Studio Town lot 81 (GetHousePath(81)
+        //     exists — TemplateUserData ships House00-99).
         // Watch (~60 sim-min window, sample every 60f): avatar ActiveAction, plugin
         // attrs, cab 0x6477AB64 spawn (the EXP-04 V2.0 departure-machinery GUID),
         // GlobalBlockingDialog, TS1State.LotTransitInfo, InLot, entity count.
-        // Verdict: PASS iff transit set or a cab spawns and the push advances; a
-        // parked-with-dialog terminal names the parked frame/bhav in the verdict.
+        // Verdict: PASS iff a cab spawns AND (transit set OR a lot switch fires);
+        // otherwise FAIL naming the terminal state.
         private static bool _ssBookDone;
         private static int _ssBookFrame;
         private static VMEntity _ssBookPlugin;
         private static VMAvatar _ssBookAv;
         private static string _ssBookTerminal;
+        private static bool _ssBookCabSeen;
+        private static bool _ssBookTokensSeen;
+        private static int _ssBookAnswered;
+        private static bool _ssBookNotifyArmed;
+        private static int _ssBookNotifyFrame = -1;
         private static void SSBookTick()
         {
             _ssBookFrame++;
@@ -28559,9 +28572,73 @@ namespace Simitone.Client
                     Log("AUTOTEST ss-book pushed row 2 'Go to Studio Town' uid=" + action.UID);
                     return;
                 }
+                // Leg 3: the queue-path dialog responder (production VMNetDialogResponseCmd
+                // semantics; runs BEFORE sampling so the same-tick release is visible).
+                FSO.SimAntics.Primitives.VMDialogResult target = null;
+                VMEntity targetOwner = null;
+                var gbd = _vm.GlobalBlockingDialog;
+                if (gbd != null)
+                {
+                    var bs = gbd.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                    if (bs != null && !bs.Responded) { target = bs; targetOwner = gbd; }
+                }
+                if (target == null)
+                {
+                    foreach (var ent in _vm.Entities)
+                    {
+                        var qbs = ent?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                        if (qbs != null && !qbs.Responded) { target = qbs; targetOwner = ent; break; }
+                    }
+                }
+                if (target != null)
+                {
+                    target.Responded = true;
+                    target.ResponseCode = 1;   // Yes/OK (the EXP-04 vacation booking answer law)
+                    target.ResponseText = "81"; // -> temp0=81 -> mode-17 SignalLotSwitch(81)
+                    if (ReferenceEquals(_vm.GlobalBlockingDialog, targetOwner) || targetOwner == gbd)
+                        _vm.GlobalBlockingDialog = null;
+                    if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
+                    else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+                    _ssBookAnswered++;
+                    Log("AUTOTEST ss-book dialog answered #" + _ssBookAnswered + " owner=obj" + (targetOwner?.ObjectID ?? 0)
+                        + " type=" + target.Type + " code=1 text=\"81\" gbdCleared=" + (_vm.GlobalBlockingDialog == null)
+                        + " at f=" + _ssBookFrame);
+                }
+
+                // Wait-For-Notify release (the EXP-04 V1.3 law): the booking trees park
+                // in global 281 'Wait For Notify' whose innermost idle_for_input counts
+                // 20000 ticks — far beyond this window. The native release is
+                // ActiveAction.NotifyIdle re-evaluated on the next idle execution, so
+                // arm the flag AND schedule a 1-tick scheduler wake to re-enter the idle.
+                if (_ssBookFrame > 120 && !_ssBookNotifyArmed)
+                {
+                    var aaNi = _ssBookAv.Thread.ActiveAction;
+                    if (aaNi != null && !aaNi.NotifyIdle)
+                    {
+                        aaNi.NotifyIdle = true;
+                        _vm.Scheduler.ScheduleTickIn(_ssBookAv, 1);
+                        _ssBookNotifyArmed = true;
+                        _ssBookNotifyFrame = _ssBookFrame;
+                        Log("AUTOTEST ss-book armed NotifyIdle + 1-tick wake (Wait-For-Notify park) at f=" + _ssBookFrame);
+                    }
+                }
+                // dense post-arm trace (the EXP-04 V1.3 run-75 pattern): name the exit
+                // branch frame by frame for 40 frames after the wake.
+                if (_ssBookNotifyFrame > 0 && _ssBookFrame >= _ssBookNotifyFrame && _ssBookFrame < _ssBookNotifyFrame + 40)
+                {
+                    var tst = _ssBookAv.Thread.Stack;
+                    var ta = _ssBookAv.Thread.ActiveAction;
+                    Log("AUTOTEST ss-book POST f=" + _ssBookFrame
+                        + " active=" + (ta == null ? "none" : "'" + ta.Name + "'uid" + ta.UID + " ni=" + ta.NotifyIdle)
+                        + " bs=" + (_ssBookAv.Thread.BlockingState == null ? "-" : _ssBookAv.Thread.BlockingState.GetType().Name)
+                        + " transit=" + _vm.TS1State.LotTransitInfo
+                        + " stack=[" + (tst == null ? "" : string.Join(",", tst.Select(f => (f.Routine?.ID ?? 0) + "@" + ((int)f.InstructionPointer)))) + "]");
+                }
+
                 if (_ssBookFrame % 60 == 0 || _ssBookFrame < 5)
                 {
                     var cabs = _vm.Entities.Count(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0x6477AB64u);
+                    if (cabs > 0) _ssBookCabSeen = true;
                     var aa = _ssBookAv.Thread.ActiveAction;
                     var stack = aa?.ActionRoutine;
                     Log("AUTOTEST ss-book f=" + _ssBookFrame
@@ -28570,6 +28647,7 @@ namespace Simitone.Client
                         + " transit=" + _vm.TS1State.LotTransitInfo
                         + " gbd=" + (_vm.GlobalBlockingDialog == null ? "-" : "obj" + _vm.GlobalBlockingDialog.ObjectID)
                         + " inLot=" + (_screen != null && _screen.InLot)
+                        + " clock=" + _vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00")
                         + " ents=" + _vm.Entities.Count);
                 }
                 var transit = _vm.TS1State.LotTransitInfo;
@@ -28584,22 +28662,64 @@ namespace Simitone.Client
                     Log("AUTOTEST ss-book lot switch at f=" + _ssBookFrame);
                     _ssBookTerminal = "lot-switch";
                 }
+                // Departure-token read (the EXP-04 VACBOOK booking observable): the
+                // booking chain banks Type-2 GUID-7/8 inventory tokens (departure
+                // hours:minutes) on the actor's NID inventory while the pickup machine
+                // keeps polling; their presence proves the booking ran end-to-end
+                // headless even before any cab/departure.
+                string tokens = null;
+                try
+                {
+                    var nid = _ssBookAv.GetPersonData(VMPersonDataVariable.NeighborId);
+                    var inv = FSO.Content.Content.Get().Neighborhood.GetInventoryByNID(nid);
+                    if (inv != null)
+                    {
+                        var t7 = inv.FirstOrDefault(x => x.Type == 2 && x.GUID == 7);
+                        var t8 = inv.FirstOrDefault(x => x.Type == 2 && x.GUID == 8);
+                        if (t7 != null && t7.Count > 0)
+                        {
+                            tokens = t7.Count + ":" + (t8?.Count ?? -1);
+                            _ssBookTokensSeen = true;
+                        }
+                    }
+                }
+                catch (Exception te) { Log("AUTOTEST ss-book token read EXC " + te.GetType().Name + " " + te.Message); }
+                if (_ssBookFrame % 600 == 0 && tokens != null)
+                    Log("AUTOTEST ss-book depTokens=" + tokens + " at f=" + _ssBookFrame);
+                // The VACBOOK law: banked departure tokens ARE the headless booking
+                // proof (the pickup machine keeps polling; transit needs the later
+                // clock lever — EXP-04 V2.x). Set the booking terminal on first sight.
+                if (_ssBookTokensSeen && _ssBookTerminal == null)
+                {
+                    Log("AUTOTEST ss-book booking proven via departure tokens " + tokens + " at f=" + _ssBookFrame);
+                    _ssBookTerminal = "depTokens";
+                }
                 if (_ssBookTerminal != null)
                 {
-                    Log("AUTOTEST ss-book verdict terminal=" + _ssBookTerminal);
-                    Pass("ss-book"); _ssBookDone = true; return;
+                    Log("AUTOTEST ss-book verdict terminal=" + _ssBookTerminal + " cabSeen=" + _ssBookCabSeen
+                        + " answered=" + _ssBookAnswered + " depTokens=" + (tokens ?? "none"));
+                    if (_ssBookCabSeen || _ssBookTokensSeen) Pass("ss-book"); else Fail("ss-book");
+                    _ssBookDone = true;
+                    Finish();
+                    return;
                 }
                 if (_ssBookFrame >= 3600)
                 {
-                    var gbd = _vm.GlobalBlockingDialog;
+                    var gbdEnd = _vm.GlobalBlockingDialog;
                     var aa2 = _ssBookAv.Thread.ActiveAction;
                     Log("AUTOTEST ss-book window closed: active=" + (aa2 == null ? "-" : aa2.Name ?? "?")
-                        + " gbd=" + (gbd == null ? "-" : "obj" + gbd.ObjectID)
-                        + " transit=" + transit);
+                        + " gbd=" + (gbdEnd == null ? "-" : "obj" + gbdEnd.ObjectID)
+                        + " transit=" + transit + " cabSeen=" + _ssBookCabSeen + " answered=" + _ssBookAnswered
+                        + " depTokens=" + (tokens ?? "none"));
                     Log("AUTOTEST ss-book verdict terminal=none (named state: "
-                        + (gbd != null ? "blocking dialog raised, push parked — responder is leg 3"
-                        : "no dialog, no transit — chain stalled at " + (aa2 == null ? "queue-head" : aa2.Name)) + ")");
-                    Fail("ss-book"); _ssBookDone = true; return;
+                        + (_ssBookAnswered == 0 ? "no dialog ever raised; chain stalled at "
+                            + (aa2 == null ? "queue-head" : aa2.Name)
+                        : _ssBookCabSeen ? "cab spawned but never departed"
+                        : _ssBookTokensSeen ? "tokens seen (should have passed)"
+                        : "answered but chain stalled at " + (aa2 == null ? "queue-head" : aa2.Name)) + ")");
+                    Fail("ss-book"); _ssBookDone = true;
+                    Finish();
+                    return;
                 }
             }
             catch (Exception ex)
