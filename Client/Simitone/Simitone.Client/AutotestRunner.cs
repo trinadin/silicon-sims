@@ -3507,43 +3507,50 @@ namespace Simitone.Client
                         if (od.Disabled != 0 || od.NumGraphics == 0) continue;
                         if ((int)od.ObjectType != 4) continue; // Normal buyable
                         if (rejectGuids.Contains(kv.Key)) continue;
-                        // run-18: lot-wide placement grid — the controller fan placed
-                        // only 1 of N candidates (furnished room); the walk scans ALL
-                        // lot objects and the mouse appears InFrontOfStackObject, so
-                        // spots anywhere on the lot work.
-                        bool placedThis = false;
+                        // run-19: controller-fan positions FIRST (run-17 known-good —
+                        // the tick-5 create targets InFrontOfStackObject and FAILED at
+                        // the lot corner the run-18 grid picked: 0 spawns in 16000f),
+                        // grid as filler. Multiple instances of the one placeable guid
+                        // multiply the burst's create targets (native burst caps 3/wake).
+                        var spotPos = new List<short[]>();
+                        short scx = _unlmCtr.Position.x, scy = _unlmCtr.Position.y;
+                        foreach (var off in new short[] { 16, -16, 48, -48, 80, -80, 112, -112 })
+                        {
+                            spotPos.Add(new short[] { (short)(scx + off), scy });
+                            spotPos.Add(new short[] { scx, (short)(scy + off) });
+                            spotPos.Add(new short[] { (short)(scx + off), (short)(scy + off) });
+                        }
                         foreach (var gx in new short[] { 96, 160, 224, 288, 352, 416,
                             480, 544, 608, 672, 736, 800, 864, 928 })
-                        {
-                            if (placedThis) break;
                             foreach (var gy in new short[] { 96, 160, 224, 288, 352, 416,
                                 480, 544, 608, 672, 736, 800, 864, 928 })
+                                spotPos.Add(new short[] { gx, gy });
+                        foreach (var pt in spotPos)
+                        {
+                            if (spotsPlaced >= 8) break;
+                            VMMultitileGroup sgrp = null;
+                            try
                             {
-                                VMMultitileGroup sgrp = null;
-                                try
-                                {
-                                    var cand = new FSO.LotView.Model.LotTilePos(gx, gy,
-                                        _unlmCtr.Position.Level);
-                                    sgrp = _vm.Context.CreateObjectInstance(kv.Key, cand,
-                                        FSO.LotView.Model.Direction.NORTH);
-                                }
-                                catch { }
-                                var sfirst = sgrp?.Objects?.FirstOrDefault();
-                                if (sfirst != null && sfirst.Position.x != -32768)
-                                {
-                                    spotsPlaced++;
-                                    spotEnts.Add(sfirst);
-                                    _unlmSpotOids.Add(sfirst.ObjectID);
-                                    placedThis = true;
-                                    // verify the entity kept the requested guid (op=32
-                                    // compares obj.Object.GUID) — log the actual value.
-                                    spotLog.Append(" oid=").Append(sfirst.ObjectID)
-                                        .Append("(0x").Append(sfirst.Object.GUID.ToString("X"))
-                                        .Append(" req0x").Append(kv.Key.ToString("X"))
-                                        .Append("/ctss=").Append(od.CatalogStringsID)
-                                        .Append("@").Append(gx).Append(",").Append(gy).Append(")");
-                                    break;
-                                }
+                                var cand = new FSO.LotView.Model.LotTilePos(pt[0], pt[1],
+                                    _unlmCtr.Position.Level);
+                                sgrp = _vm.Context.CreateObjectInstance(kv.Key, cand,
+                                    FSO.LotView.Model.Direction.NORTH);
+                            }
+                            catch { }
+                            var sfirst = sgrp?.Objects?.FirstOrDefault();
+                            if (sfirst != null && sfirst.Position.x != -32768)
+                            {
+                                spotsPlaced++;
+                                spotEnts.Add(sfirst);
+                                _unlmSpotOids.Add(sfirst.ObjectID);
+                                // verify the entity kept the requested guid (op=32
+                                // compares obj.Object.GUID) — log the actual value.
+                                spotLog.Append(" oid=").Append(sfirst.ObjectID)
+                                    .Append("(0x").Append(sfirst.Object.GUID.ToString("X"))
+                                    .Append(" req0x").Append(kv.Key.ToString("X"))
+                                    .Append("/ctss=").Append(od.CatalogStringsID)
+                                    .Append("@").Append(pt[0]).Append(",").Append(pt[1]).Append(")");
+                                if (spotsPlaced >= 8) break;
                             }
                         }
                     }
@@ -3728,6 +3735,21 @@ namespace Simitone.Client
                             _unlmDespawns++;
                         }
                     }
+                    // run-19: critter flee-state watch — the 4096 despawn law is
+                    // attr[2]==1 (cat-proximity flag, likely set by 4112) AND
+                    // MyObject data62 drained to 0 -> @17 REMOVE(CleanupAll=True).
+                    // Track both so a bridge/despawn is attributable.
+                    if (_unlmFrame % 150 == 0)
+                        foreach (var oid in _unlmCritterOids.Keys)
+                        {
+                            var me2 = _vm.GetObjectById(oid);
+                            if (me2 == null) continue;
+                            Log("AUTOTEST unl-mice CRIT-WATCH f=" + _unlmFrame + " oid=" + oid
+                                + " attr2=" + me2.GetAttribute(2)
+                                + " data62=" + me2.GetValue((VMStackObjectVariable)62)
+                                + " pos=" + me2.Position.x + "," + me2.Position.y
+                                + " dirty=" + me2.GetValue(VMStackObjectVariable.DirtyLevel));
+                        }
                     // run-17: spot lifecycle — the tick-3605 walk rejected every
                     // candidate incl. the armed spot; watch presence/dirty/rel4
                     // to see what changed after the tick-5 spawn.
@@ -3890,22 +3912,36 @@ namespace Simitone.Client
                     var mo = _unlmCritterOids.Keys.Select(o => _vm.GetObjectById(o)).FirstOrDefault(e => e != null);
                     if (catF != null && mo != null && _unlmCtr != null)
                     {
-                        // run-18: row 3 'Chase' built no action in run-17 (GetAction
-                        // null) — try every controller row and push the first that
-                        // builds; the callee override aims whatever engages at the
-                        // live mouse.
-                        foreach (var row in new short[] { 3, 1, 0, 2 })
+                        // run-19: 4097 (the cat-side chase main — route OnTopOf the
+                        // mouse + squeak anims) lives in mice.iff, so the 'Chase'
+                        // TTAs row is on the MOUSE's object, not the controller's
+                        // (run-17's controller-row GetAction was null for that
+                        // reason). Try the mouse's own TTAB rows first.
+                        foreach (var row in new short[] { 0, 1, 2, 3 })
                         {
-                            var act = _unlmCtr.GetAction(row, catF, _vm.Context, false, new short[] { 0, 0, 0, 0 });
-                            if (act == null) { Log("AUTOTEST unl-mice PUSH-chase GetAction null row=" + row); continue; }
+                            var act = mo.GetAction(row, catF, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                            if (act == null) { Log("AUTOTEST unl-mice PUSH-chase mouseTTAB GetAction null row=" + row); continue; }
                             act.Callee = mo; act.StackObject = mo;
                             act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
                             act.CheckRoutine = null;
                             act.Priority = (short)VMQueuePriority.Maximum;
                             catF.Thread.EnqueueAction(act);
-                            Log("AUTOTEST unl-mice PUSH-chase row=" + row + " actor=cat target=mouse oid=" + mo.ObjectID + " enqueued");
+                            Log("AUTOTEST unl-mice PUSH-chase mouseTTAB row=" + row + " actor=cat target=mouse oid=" + mo.ObjectID + " enqueued");
                             break;
                         }
+                        if (catF.Thread.Queue.Count == 0)
+                            foreach (var row in new short[] { 3, 1, 0, 2 })
+                            {
+                                var act = _unlmCtr.GetAction(row, catF, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                                if (act == null) { Log("AUTOTEST unl-mice PUSH-chase ctrTTAB GetAction null row=" + row); continue; }
+                                act.Callee = mo; act.StackObject = mo;
+                                act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                act.CheckRoutine = null;
+                                act.Priority = (short)VMQueuePriority.Maximum;
+                                catF.Thread.EnqueueAction(act);
+                                Log("AUTOTEST unl-mice PUSH-chase ctrTTAB row=" + row + " actor=cat target=mouse oid=" + mo.ObjectID + " enqueued");
+                                break;
+                            }
                     }
                     else Log("AUTOTEST unl-mice PUSH-chase skipped cat=" + (catF != null)
                         + " mouse=" + (mo != null) + " ctr=" + (_unlmCtr != null));
