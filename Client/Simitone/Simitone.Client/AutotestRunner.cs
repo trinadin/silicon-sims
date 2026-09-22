@@ -3525,9 +3525,20 @@ namespace Simitone.Client
                         if (wlObj != null) break;
                     }
                     if (wlObj != null)
+                    {
+                        // run-12: read back what op=32 will actually compare — the
+                        // GameObject wrapper GUID (VMTestObjectType uses obj.Object.GUID)
+                        // vs the OBJD literal — and evaluate the @1 comparison directly.
+                        var wle = _vm.GetObjectById((short)wlObj.ObjectID);
+                        Log("AUTOTEST unl-mice WL-CHECK oid=" + wle.ObjectID
+                            + " wrapGUID=0x" + wle.Object.GUID.ToString("x")
+                            + " objdGUID=0x" + wle.Object.OBJ.GUID.ToString("x")
+                            + " op32@1-match=" + (wle.Object.GUID == 1550318735u)
+                            + " pos=" + wle.Position.x + "," + wle.Position.y + "lv" + wle.Position.Level);
                         Log("AUTOTEST unl-mice WL-PLACED guid=" + wlUsed + " (0x" + wlUsed.ToString("X")
                             + ") oid=" + wlObj.ObjectID + " pos=" + wlObj.Position.x + "," + wlObj.Position.y
                             + "lv" + wlObj.Position.Level);
+                    }
                     else
                         Log("AUTOTEST unl-mice WL-PLACE-FAIL no whitelisted guid landed in-world");
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
