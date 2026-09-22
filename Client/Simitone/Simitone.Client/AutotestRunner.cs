@@ -3277,6 +3277,10 @@ namespace Simitone.Client
         private static HashSet<short> _unlmOids0 = new HashSet<short>();
         private static Dictionary<short, uint> _unlmCritterOids = new Dictionary<short, uint>();
         private static HashSet<uint> _unlmCritterGuids = new HashSet<uint>();
+        // run-17: engine create-observer + spot lifecycle tracking — the run-16
+        // tick-5 create returned TRUE but the mouse never surfaced in the diff.
+        private static short _unlmMouseOid = -1;
+        private static List<short> _unlmSpotOids = new List<short>();
 
         private static void UnlMiceTick()
         {
@@ -3527,6 +3531,7 @@ namespace Simitone.Client
                             {
                                 spotsPlaced++;
                                 spotEnts.Add(sfirst);
+                                _unlmSpotOids.Add(sfirst.ObjectID);
                                 // verify the entity kept the requested guid (op=32
                                 // compares obj.Object.GUID) — log the actual value.
                                 spotLog.Append(" oid=").Append(sfirst.ObjectID)
@@ -3587,6 +3592,33 @@ namespace Simitone.Client
                             Log("AUTOTEST unl-mice REL-BACK oid=" + rk + " count=" + rl.Count
                                 + " vals=[" + string.Join(",", rl) + "]");
                         }
+                    // run-17: the engine's own create observation point (read-only,
+                    // VMCreateObjectInstance.ObjectCreated) — attributes every
+                    // successful create to oid/guid/tree/ip. Mouse creates feed
+                    // _unlmCritterOids directly so the existing oid diff counts
+                    // the despawn even for sub-frame lifetimes (oid registered at
+                    // create, absent from the next entity snapshot -> MOUSE-GONE).
+                    FSO.SimAntics.Engine.Primitives.VMCreateObjectInstance.ObjectCreated +=
+                        (fr, grp, g) =>
+                    {
+                        try
+                        {
+                            var b = grp?.BaseObject;
+                            Log("AUTOTEST unl-mice CREATE-OBS oid=" + (b?.ObjectID ?? -1)
+                                + " guid=0x" + g.ToString("X")
+                                + " tree=" + (fr?.Routine?.Chunk?.ChunkID ?? 0) + "@" + (fr?.InstructionPointer ?? -1)
+                                + " pos=" + (b?.Position.x ?? (short)-32768) + "," + (b?.Position.y ?? (short)-32768)
+                                + "lv" + (b?.Position.Level ?? 0)
+                                + " by=" + (fr?.Caller?.ObjectID ?? -1) + " f=" + _unlmFrame);
+                            if (b != null && g != 0x90F874BD && _unlmCritterGuids.Contains(g))
+                            {
+                                _unlmMouseOid = b.ObjectID;
+                                _unlmCritterOids[b.ObjectID] = g;
+                                _unlmSpawns++;
+                            }
+                        }
+                        catch (Exception ox) { Log("AUTOTEST unl-mice CREATE-OBS EXC " + ox.GetType().Name); }
+                    };
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
                         _unlmOids0.Add(e.ObjectID);
                     // run-2: live surface dump — mice.iff tree ids are per-file
@@ -3603,7 +3635,11 @@ namespace Simitone.Client
                             for (int i = 0; i < tta.Length; i++) names.Add((tta.GetString(i) ?? "").Trim());
                             Log("AUTOTEST unl-mice ctr TTAs " + tta.ChunkID + " rows=[" + string.Join(" | ", names) + "]");
                         }
-                        foreach (var tid in new ushort[] { 4104, 4105, 4106, 4112, 4113, 3856, 1552, 784 })
+                        // run-17: add 4101/4107-4111 — the created mouse's main tree
+                        // lives in this same file; its early-exit/remove logic is the
+                        // leading suspect for the run-16 sub-frame mouse disappearance.
+                        foreach (var tid in new ushort[] { 4104, 4105, 4106, 4112, 4113,
+                            4101, 4107, 4108, 4109, 4110, 4111, 3856, 1552, 784 })
                         {
                             var rt = mres?.GetRoutine(tid) as VMRoutine;
                             if (rt == null) { Log("AUTOTEST unl-mice DISASM " + tid + " MISSING"); continue; }
@@ -3633,9 +3669,10 @@ namespace Simitone.Client
                     return;
                 }
                 // state 2: watches. Dialogs (Hunting skill 'Congratulations') must not
-                // block the controller's trees.
+                // block the controller's trees. run-17: per-frame through f=600 —
+                // the run-16 tick-5 mouse never surfaced in the f%30/f<=90 samples.
                 UnlShowAnswerDialogs();
-                if (_unlmFrame % 30 == 0 || _unlmFrame <= 90)
+                if (_unlmFrame % 30 == 0 || _unlmFrame <= 600)
                 {
                     // 4104 re-randomizes attr[1] (0-24) after every spawn cycle, which
                     // can land hours of sim-time away — keep the native timer hot by
@@ -3679,6 +3716,26 @@ namespace Simitone.Client
                             _unlmDespawns++;
                         }
                     }
+                    // run-17: spot lifecycle — the tick-3605 walk rejected every
+                    // candidate incl. the armed spot; watch presence/dirty/rel4
+                    // to see what changed after the tick-5 spawn.
+                    if (_unlmFrame % 150 == 0 || _unlmFrame <= 90)
+                        foreach (var soid in _unlmSpotOids)
+                        {
+                            var spw = _vm.GetObjectById(soid);
+                            if (spw == null)
+                                Log("AUTOTEST unl-mice SPOT-WATCH f=" + _unlmFrame + " oid=" + soid + " GONE");
+                            else
+                            {
+                                var rel4 = "none";
+                                if (_unlmCtr.MeToObject != null
+                                    && _unlmCtr.MeToObject.TryGetValue((ushort)soid, out var srl)
+                                    && srl.Count > 4) rel4 = srl[4].ToString();
+                                Log("AUTOTEST unl-mice SPOT-WATCH f=" + _unlmFrame + " oid=" + soid
+                                    + " dirty=" + spw.GetValue(VMStackObjectVariable.DirtyLevel)
+                                    + " rel4=" + rel4);
+                            }
+                        }
                     // cat chase watch: cat's top routing frame targeting a live mouse,
                     // or adjacency while routing
                     var cat = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0]);
