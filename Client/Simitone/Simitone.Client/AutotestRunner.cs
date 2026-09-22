@@ -3401,6 +3401,14 @@ namespace Simitone.Client
                         + " g20=" + _vm.GetGlobalValue(20));
                     _vm.SetGlobalValue(20, (short)(_vm.GetGlobalValue(20) | 64));
                     Log("AUTOTEST unl-mice g20 |= 64 -> " + _vm.GetGlobalValue(20));
+                    // run-3 read of 4104: bit6 was ALREADY set (g20=255) — the real
+                    // timer is @4/@5: the main spins until MyObjectAttributes[1] ==
+                    // Global[0] (sim-clock hour), attr[1] randomized 0-24 per cycle
+                    // (first value 0 = midnight, ~17 sim-hours past the 6:31 start).
+                    // Pin attr[1] to the current hour so the native cycle fires in
+                    // window; the spawn/despawn/chase logic stays 100% native.
+                    _unlmCtr.SetAttribute(1, (short)_vm.GetGlobalValue(0));
+                    Log("AUTOTEST unl-mice ctr.attr1 pinned to hour " + _vm.GetGlobalValue(0));
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
                         _unlmOids0.Add(e.ObjectID);
                     // run-2: live surface dump — mice.iff tree ids are per-file
@@ -3451,6 +3459,16 @@ namespace Simitone.Client
                 UnlShowAnswerDialogs();
                 if (_unlmFrame % 30 == 0)
                 {
+                    // 4104 re-randomizes attr[1] (0-24) after every spawn cycle, which
+                    // can land hours of sim-time away — keep the native timer hot by
+                    // re-pinning it to the current sim hour each watch tick.
+                    var nowHour = (short)_vm.GetGlobalValue(0);
+                    if (_unlmCtr.GetAttribute(1) != nowHour)
+                    {
+                        Log("AUTOTEST unl-mice ctr.attr1 re-pin " + _unlmCtr.GetAttribute(1)
+                            + " -> " + nowHour + " f=" + _unlmFrame);
+                        _unlmCtr.SetAttribute(1, nowHour);
+                    }
                     // spawn/despawn diff by OID (mice share one template guid)
                     var cur = new Dictionary<short, uint>();
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
@@ -3542,7 +3560,35 @@ namespace Simitone.Client
                         + " chase=" + _unlmChaseSeen);
                     Pass("unl-mice"); _unlmState = 99; return;
                 }
-                if (_unlmFrame > 4500)
+                // run-4 fallback: cat autonomy may ignore mice — push TTAs row 3
+                // 'Chase' onto the cat with a live mouse as the route target
+                // (run-21 law: Callee/StackObject override flows through ExecuteAction;
+                // thread-hog law: the cat's thread is free — no native chain needs it).
+                if (_unlmFrame == 5500 && !_unlmChaseSeen)
+                {
+                    var catF = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0]);
+                    var mo = _unlmCritterOids.Keys.Select(o => _vm.GetObjectById(o)).FirstOrDefault(e => e != null);
+                    if (catF != null && mo != null && _unlmCtr != null)
+                    {
+                        var act = _unlmCtr.GetAction(3, catF, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                        if (act != null)
+                        {
+                            act.Callee = mo; act.StackObject = mo;
+                            act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                            act.CheckRoutine = null;
+                            act.Priority = (short)VMQueuePriority.Maximum;
+                            catF.Thread.EnqueueAction(act);
+                            Log("AUTOTEST unl-mice PUSH-chase row=3 actor=cat target=mouse oid=" + mo.ObjectID + " enqueued");
+                        }
+                        else Log("AUTOTEST unl-mice PUSH-chase GetAction null row=3");
+                    }
+                    else Log("AUTOTEST unl-mice PUSH-chase skipped cat=" + (catF != null)
+                        + " mouse=" + (mo != null) + " ctr=" + (_unlmCtr != null));
+                }
+                // run-4: the mice main sleeps 1800-3600 ticks (G366) between clock
+                // checks — first native spawn lands ~f=1900, a second cycle ~f=3800+,
+                // so 4500 left no room; give it two full sleep cycles plus chase time.
+                if (_unlmFrame > 7000)
                 {
                     Log("AUTOTEST unl-mice cycle TIMEOUT f=" + _unlmFrame
                         + " spawns=" + _unlmSpawns + " despawns=" + _unlmDespawns
