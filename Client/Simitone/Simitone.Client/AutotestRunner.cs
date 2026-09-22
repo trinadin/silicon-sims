@@ -2512,6 +2512,7 @@ namespace Simitone.Client
         private static VMEntity _unlsCtr;
         private static VMEntity _unlsArena;
         private static VMEntity _unlsJudgeEnt;
+        private static bool _unlsUnbudgeted;
         private static bool _unlsArenaInjected;
         private static string _unlsInv0 = "";
         private static int _unlsEnts0;
@@ -2689,40 +2690,9 @@ namespace Simitone.Client
                             }
                             else Log("AUTOTEST unl-show arena CREATE-FAIL guid=0x389d3502 (not in catalog?)");
                         }
-                        // run-18: main @16 creates the judge 0x0c814494 OutOfWorld and
-                        // @17 FindLocationFor leaves it unplaced (run 17: no judge entity
-                        // ever appears). The pushed 4098 'Activate Head Judge' routes to
-                        // StackObject's routing slot 8 (VMGotoRoutingSlot: InitRoutes(
-                        // slot, context.StackObject)) — with the controller as push
-                        // target that slot is unroutable and NoFailureTrees tears the
-                        // interaction down silently. Pre-create the judge in-world and
-                        // push row 0 on IT: the judge shares the controller's semiglobal
-                        // (same tree 4098) but owns a real podium routing slot.
-                        if (_vm.Entities.All(e => e.Object == null || e.Object.GUID != 0x0c814494u))
-                        {
-                            VMMultitileGroup judgeGrp = null;
-                            foreach (var off in new[] { 32, -32, 48, -48, 64, -64, 80, -80 })
-                            {
-                                var cand = new FSO.LotView.Model.LotTilePos(
-                                    (short)(_unlsCtr.Position.x + off), (short)(_unlsCtr.Position.y + 16),
-                                    _unlsCtr.Position.Level);
-                                judgeGrp = _vm.Context.CreateObjectInstance(0x0c814494u, cand,
-                                    FSO.LotView.Model.Direction.NORTH);
-                                if (judgeGrp != null && judgeGrp.Objects != null && judgeGrp.Objects.Count > 0) break;
-                                judgeGrp = null;
-                            }
-                            var judge = judgeGrp?.Objects?.FirstOrDefault();
-                            if (judge != null)
-                            {
-                                Log("AUTOTEST unl-show judge oid=" + judge.ObjectID
-                                    + " reqGuid=0x" + judge.Object.GUID.ToString("x8")
-                                    + " objdGuid=0x" + judge.Object.OBJ.GUID.ToString("x8")
-                                    + " pos=" + judge.Position.x + "," + judge.Position.y + "lv" + judge.Position.Level
-                                    + " idx=" + (_vm.Context.ObjectQueries.GetObjectsByGUID(0x0c814494u)?.Count ?? -1));
-                                _unlsJudgeEnt = judge;
-                            }
-                            else Log("AUTOTEST unl-show judge CREATE-FAIL guid=0x0c814494 (not in catalog?)");
-                        }
+                        // run-19: the engine's own main @16 creates the judge avatar
+                        // (0x0c8144b4, ENT-NEW oid=252 avatar=True in run 18) — no probe
+                        // pre-create; it is adopted dynamically in the state-2 tick.
                         // script-surface dump: BHAV labels + every TTAs table (the
                         // interaction string sets — phone precedent used TTAs 129)
                         var iff = _unlsCtr.Object.Resource.Iff;
@@ -2885,6 +2855,27 @@ namespace Simitone.Client
                     // routing to the judge podium) and the tree contains DialogPrivate —
                     // answer any blocking dialog so the judge activation can proceed.
                     UnlShowAnswerDialogs();
+                    // run-19: adopt the engine-created judge avatar and unbudget the
+                    // family ents + judge — their traces must survive the lot-object
+                    // swarm that eats the shared per-tick budget (runs 11-18 law).
+                    if (_unlsJudgeEnt == null)
+                        _unlsJudgeEnt = _vm.Entities.FirstOrDefault(e => e is VMAvatar
+                            && e.Object != null && e.Object.OBJ.GUID == 0x0c8144b4u);
+                    if (_unlsJudgeEnt != null && !_unlsUnbudgeted && _unlsCtr != null)
+                    {
+                        _unlsUnbudgeted = true;
+                        var ub = FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts;
+                        ub.Clear();
+                        ub.Add(_unlsCtr.ObjectID);
+                        foreach (var a in avatars)
+                            if (a.Object.OBJ.GUID == _unlsHumanGuid
+                                || UnlTravelPetGuids.Contains(a.Object.OBJ.GUID)
+                                || ReferenceEquals(a, _unlsJudgeEnt)) ub.Add(a.ObjectID);
+                        Log("AUTOTEST unl-show unbudget ents=[" + string.Join(",", ub) + "]"
+                            + " judgeOid=" + _unlsJudgeEnt.ObjectID
+                            + " judgePos=" + _unlsJudgeEnt.Position.x + "," + _unlsJudgeEnt.Position.y
+                            + "lv" + _unlsJudgeEnt.Position.Level);
+                    }
                     if (_unlsFrame % 15 == 0 && _unlsCtr != null)
                     {
                         for (short a = 0; a < 32; a++) // run-11: state may live above attr 15
@@ -2924,7 +2915,7 @@ namespace Simitone.Client
                                 Log("AUTOTEST unl-show ENT-NEW f=" + _unlsFrame + " guid=0x" + g.ToString("x8")
                                     + " oid=" + (ne?.ObjectID ?? -1) + " avatar=" + (ne is VMAvatar)
                                     + " name=" + (catIt.HasValue ? catIt.Value.Name : "?")
-                                    + (g == UnlShowJudgeGuid || g == 0x0c814494u ? " *** JUDGE GUID ***" : ""));
+                                    + (g == UnlShowJudgeGuid || g == 0x0c8144b4u ? " *** JUDGE GUID ***" : ""));
                             }
                         }
                         var ents = _vm.Entities.Count;
@@ -2966,7 +2957,7 @@ namespace Simitone.Client
                             }
                         }
                         var ctrQ = _vm.Context.ObjectQueries.GetObjectsByGUID(UnlShowCtrGuid);
-                        var judgeQ = _vm.Context.ObjectQueries.GetObjectsByGUID(0x0c814494u);
+                        var judgeQ = _vm.Context.ObjectQueries.GetObjectsByGUID(0x0c8144b4u);
                         var inv = Content.Get().Neighborhood.GetInventoryByNID(_unlsHostNid);
                         var invN = inv == null ? "none"
                             : string.Join(",", inv.Select(x => x.Type + "/" + x.GUID.ToString("x8") + ":" + x.Count));
@@ -2994,11 +2985,39 @@ namespace Simitone.Client
                     // staged follow-ups (run-2 law: the first push alone did not start
                     // the show — judge activation and the pet-performed retry are
                     // separate rows pushed on their own schedules)
-                    if (_unlsFrame == 240 && !_unlsJudgeSeen && !_unlsPushJudge && _unlsRowJudge >= 0)
+                    if (_unlsFrame == 240 && !_unlsJudgeSeen && !_unlsPushJudge)
                     {
+                        // run-19: push 'Activate Head Judge' ON the engine-created judge
+                        // avatar — 4098 @38 routes to the push Callee; the controller as
+                        // Callee was unroutable (run-8 law), an avatar target walks and
+                        // completes the route into @50/@52/@53 (inline 4108 entry tokens).
                         var host2 = avatars.FirstOrDefault(a =>
                             a.GetPersonData(VMPersonDataVariable.NeighborId) == _unlsHostNid);
-                        if (host2 != null) { _unlsPushJudge = true; UnlShowPush(host2, _unlsRowJudge, "followup-judge", _unlsJudgeEnt); }
+                        short jrow = -1;
+                        if (_unlsJudgeEnt != null)
+                        {
+                            try
+                            {
+                                var jtabs = _unlsJudgeEnt.Object.Resource.Iff.List<FSO.Files.Formats.IFF.Chunks.TTAB>()
+                                    ?? new List<FSO.Files.Formats.IFF.Chunks.TTAB>();
+                                foreach (var jtb in jtabs)
+                                    for (int ji = 0; ji < jtb.Interactions.Length; ji++)
+                                    {
+                                        var jaf = jtb.Interactions[ji].ActionFunction;
+                                        if (jrow < 0 && (jaf & 0xFFFF) == 4098) jrow = (short)ji;
+                                        Log("AUTOTEST unl-show judgeTTAB " + jtb.ChunkID + " row=" + ji
+                                            + " af=" + jaf + " test=" + jtb.Interactions[ji].TestFunction);
+                                    }
+                            }
+                            catch (Exception jx) { Log("AUTOTEST unl-show judgeTTAB error: " + jx.Message); }
+                        }
+                        if (host2 != null && _unlsJudgeEnt != null && jrow >= 0)
+                        { _unlsPushJudge = true; UnlShowPush(host2, jrow, "judge-activation", _unlsJudgeEnt); }
+                        else if (host2 != null && _unlsRowJudge >= 0)
+                        { _unlsPushJudge = true; UnlShowPush(host2, _unlsRowJudge, "followup-judge", _unlsJudgeEnt); }
+                        else
+                            Log("AUTOTEST unl-show judge push skipped host=" + (host2 != null)
+                                + " judge=" + (_unlsJudgeEnt != null) + " jrow=" + jrow);
                     }
                     if (_unlsFrame == 600 && !attrTrans && !_unlsPushPet && _unlsRowShow >= 0)
                     {
