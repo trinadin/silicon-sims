@@ -659,6 +659,11 @@ namespace Simitone.Client
                     return;
                 }
 
+                // EXP-06 V1 'ss-mount' opt-in (additive): Superstar pack mount
+                // census — see RunSSMount. Only reachable when the checks
+                // string names it; the default suite is untouched.
+                if (CheckEnabled("ss-mount")) RunSSMount();
+
                 if (CheckEnabled("corpus")) RunCorpus();
 
                 if (CheckEnabled("uicapture"))
@@ -28282,6 +28287,169 @@ namespace Simitone.Client
                 }
                 if (tempSaved) avatar.Thread.TempRegisters[0] = priorTemp0;
             }
+        }
+
+        // EXP-06 V1 ('ss-mount', opt-in): Superstar pack mount census against EXA-06's
+        // accepted census (coordination/evidence/EXA-06/ss-census.json + status.md).
+        // Superstar's acceptance minimum is the fame/Studio Town behavioral loop; this
+        // leg pins the static surface the loop rides before any live drive:
+        //   1. the 11 SimType controllers of the Studio Town controller bank mount
+        //      through the generic FAR object provider (TS1ObjectProvider.Entries),
+        //      GUID-exact: 6 ControllerStudioLot OBJDs (Studio Traffic / Build+Buy /
+        //      Celebrity Spawn / Studio NPC / Home Fame Decay / Insanity) + NPCControllerSS
+        //      + PhonePluginStudioLots + StereoSpeakersSuperstar + the Obsessed-Fan
+        //      generator + ControllerSpa;
+        //   2. the full 56-person Studio Town cast mounts Person-typed
+        //      (TS1ObjectProvider.PersonGUIDs) — clerks, dancers, masseurs, the fame
+        //      production cast (fashion/movie/TV directors, photographers, producers,
+        //      scene partners), vendors, celebrities, obsessed fan, paparazzi, butler;
+        //   3. sep6snds.hot merged into TS1Audio with the fame/station registrations
+        //      exact: station_superstar (kSetMusicMode, track 13), the superstar
+        //      transition (kSetMusicMode, 14 = KSST), the fame award/promotion/demotion
+        //      stings (kSoundobPlay 103744/103741/103742), the SS TV station (kTurnOnTV
+        //      103000) — plus the MusicModes routing entries 13/14.
+        //   4. the Studio Town template lots exist on the TS1 data root
+        //      (TemplateStudiotown/House81..89.iff + LotLocations.iff — the travel
+        //      destination range; houseID 80-89 reads STDesc per GetHouseNameDesc).
+        private static void RunSSMount()
+        {
+            bool ok = true;
+            try
+            {
+                var ts1p = Content.Get().WorldObjects as FSO.Content.TS1.TS1ObjectProvider;
+                if (ts1p == null)
+                {
+                    Log("AUTOTEST ss-mount WorldObjects is " + Content.Get().WorldObjects.GetType().Name);
+                    ok = false;
+                }
+                else
+                {
+                    Log("AUTOTEST ss-mount mounted object entries=" + ts1p.Entries.Count
+                        + " persons=" + ts1p.PersonGUIDs.Count);
+
+                    // (1) Studio Town controller bank — census-exact GUIDs (EXA-06
+                    // simtype_controllers), with the mounted OBJD name logged so a
+                    // divergence names itself.
+                    var controllers = new Dictionary<uint, string>
+                    {
+                        { 0xDE1FD99Au, "NPC Controller - Superstar (NPCControllerSS)" },
+                        { 0xC61F8102u, "Phone - Go Studio Plugin (PhonePluginStudioLots)" },
+                        { 0x3B5A39F9u, "Stereo Speakers - Superstar Music Controller" },
+                        { 0x94400258u, "NPC Obsessed Fan - Generator" },
+                        { 0xDF820338u, "Controller - Spa" },
+                        { 0x91D0C8CDu, "Controller - Studio Traffic (ControllerStudioLot)" },
+                        { 0x8EFA9A92u, "Controller - Studio Build/Buy (ControllerStudioLot)" },
+                        { 0x6A75FC81u, "Controller - Celebrity Spawn (ControllerStudioLot)" },
+                        { 0x925C17A2u, "Controller - Studio NPC (ControllerStudioLot)" },
+                        { 0x20E32C3Cu, "Controller - Home Fame Decay (ControllerStudioLot)" },
+                        { 0xC2AF7E1Cu, "Controller - Insanity (ControllerStudioLot)" }
+                    };
+                    int cfound = 0;
+                    foreach (var kv in controllers)
+                    {
+                        FSO.Files.Formats.IFF.Chunks.OBJD objd;
+                        if (ts1p.Entries.ContainsKey(kv.Key) && FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID.TryGetValue(kv.Key, out objd))
+                        {
+                            cfound++;
+                            Log("AUTOTEST ss-mount controller 0x" + kv.Key.ToString("x8") + " name=\""
+                                + objd.ChunkLabel + "\" want=" + kv.Value);
+                        }
+                        else { Log("AUTOTEST ss-mount controller 0x" + kv.Key.ToString("x8") + " MISSING (" + kv.Value + ")"); ok = false; }
+                    }
+                    Log("AUTOTEST ss-mount controllers=" + cfound + "/" + controllers.Count);
+
+                    // (2) the 56-person Studio Town cast, Person-typed (EXA-06 persons).
+                    uint[] cast = {
+                        0xD932FC29u, 0xA295FB82u, 0x74EFFBFEu, 0xD9B0FB54u, 0x55FCFB32u, 0x68A8FAFDu, 0x02F9DC42u,
+                        0xC6D85D3Fu, 0xE7CF69F3u, 0x15B45D0Au, 0xCC5469C8u, 0x0D882E43u, 0xAA8B692Du, 0xC1144BC9u,
+                        0xCD5E7AE2u, 0x29736784u, 0xABA3CEA9u, 0xD098519Fu, 0xA2B64A17u, 0x79184C1Du, 0x00FB4BD8u,
+                        0x25604C00u, 0x51294D14u, 0x9E0B4D63u, 0x36434D0Au, 0x2367B7B1u, 0x4656FCF8u, 0x7A104D1Au,
+                        0xA3644D21u, 0xD33558DBu, 0x7178EB1Bu, 0x5D6F3537u, 0x9669EB2Eu, 0x386BCE33u, 0x8092506Fu,
+                        0x4CDC448Bu, 0x5183F3D5u, 0x18D2F3C0u, 0x6EC4F3DDu, 0x3C9085B8u, 0xC4881C24u, 0x17DF16D5u,
+                        0x3396AA53u, 0x22EAE6B4u, 0xA20FFB6Au, 0xE1D61496u, 0x36F5D5CAu, 0x22B5A78Cu, 0xCA29D5F7u,
+                        0xAEF74DA1u, 0x1E4060D8u, 0x4E777166u, 0x7F446268u, 0x55984D57u, 0x66D2626Eu, 0x8C1BEA25u
+                    };
+                    int pfound = cast.Count(g => ts1p.PersonGUIDs.Contains(g));
+                    foreach (var g in cast.Where(g => !ts1p.PersonGUIDs.Contains(g)))
+                        Log("AUTOTEST ss-mount person 0x" + g.ToString("x8") + " NOT-PERSON-TYPED");
+                    Log("AUTOTEST ss-mount cast persons=" + pfound + "/" + cast.Length);
+                    if (pfound != cast.Length) ok = false;
+                }
+
+                var tAudio = Content.Get().Audio as FSO.Content.TS1.TS1Audio;
+                if (tAudio == null)
+                {
+                    Log("AUTOTEST ss-mount audio provider is not TS1Audio");
+                    ok = false;
+                }
+                else
+                {
+                    var evts = tAudio.Events;
+                    Log("AUTOTEST ss-mount events total=" + evts.Count);
+                    // (3) fame + station registrations from sep6snds.hot (parsed from the
+                    // pack's own HOT file; the fame stings are the award/agent/promo/dem
+                    // reward sounds of the fame system).
+                    var wantEvents = new (string Name, FSO.Files.HIT.HITEvents Type, uint Track)[]
+                    {
+                        ("station_superstar", FSO.Files.HIT.HITEvents.kSetMusicMode, 13u),
+                        ("music_superstar_transition", FSO.Files.HIT.HITEvents.kSetMusicMode, 14u),
+                        ("sting_fame_award", FSO.Files.HIT.HITEvents.kSoundobPlay, 103744u),
+                        ("sting_fame_pro", FSO.Files.HIT.HITEvents.kSoundobPlay, 103741u),
+                        ("sting_fame_dem", FSO.Files.HIT.HITEvents.kSoundobPlay, 103742u),
+                        ("tv_superstar_animal", FSO.Files.HIT.HITEvents.kTurnOnTV, 103000u)
+                    };
+                    foreach (var want in wantEvents)
+                    {
+                        FSO.Content.Model.HITEventRegistration reg;
+                        if (evts.TryGetValue(want.Name, out reg))
+                        {
+                            Log("AUTOTEST ss-mount event " + want.Name + " type=" + reg.EventType + " track=" + reg.TrackID);
+                            if (reg.EventType != want.Type || reg.TrackID != want.Track) { Log("AUTOTEST ss-mount event " + want.Name + " MISMATCH"); ok = false; }
+                        }
+                        else { Log("AUTOTEST ss-mount event " + want.Name + " MISSING"); ok = false; }
+                    }
+                    // MusicModes routing: 13 = the superstar station, 14 = the SS
+                    // transition mode ("KSST" -> Music/Modes/Superstar/). Mode 13's
+                    // value is the raw IIS(100100) encoding (length-prefixed bytes,
+                    // NUL-terminated) — assert non-empty but do NOT log it raw: a
+                    // NUL in the log makes BSD grep classify it binary and the
+                    // launcher's SUMMARY parse prints "Binary file matches".
+                    string mm13, mm14;
+                    bool m13 = tAudio.MusicModes.TryGetValue(13, out mm13);
+                    bool m14 = tAudio.MusicModes.TryGetValue(14, out mm14);
+                    bool m13Clean = m13 && mm13.Length > 0 && mm13.IndexOf('\0') < 0;
+                    Log("AUTOTEST ss-mount musicmodes 13=" + (m13 ? ("len" + mm13.Length + (m13Clean ? " text-ok" : " raw-iis")) : "MISSING")
+                        + " 14=" + (m14 ? mm14 : "MISSING"));
+                    if (!m13 || string.IsNullOrEmpty(mm13) || !m14 || mm14 != "KSST") ok = false;
+                }
+
+                // (4) Studio Town template lots on the TS1 data root.
+                var ts1Root = GlobalSettings.Default.TS1HybridPath;
+                if (string.IsNullOrEmpty(ts1Root))
+                {
+                    Log("AUTOTEST ss-mount TS1HybridPath empty");
+                    ok = false;
+                }
+                else
+                {
+                    int lotsFound = 0;
+                    for (int house = 81; house <= 89; house++)
+                    {
+                        var p = Path.Combine(ts1Root, "TemplateStudiotown", "House" + house + ".iff");
+                        if (File.Exists(p)) lotsFound++;
+                        else { Log("AUTOTEST ss-mount lot MISSING " + p); ok = false; }
+                    }
+                    bool lotLoc = File.Exists(Path.Combine(ts1Root, "TemplateStudiotown", "LotLocations.iff"));
+                    Log("AUTOTEST ss-mount template lots=" + lotsFound + "/9 lotLocations=" + lotLoc);
+                    if (!lotLoc) ok = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST ss-mount EXC " + ex.GetType().Name + " " + ex.Message);
+                ok = false;
+            }
+            if (ok) Pass("ss-mount"); else Fail("ss-mount");
         }
 
         private static void Pass(string check)
