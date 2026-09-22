@@ -3396,6 +3396,11 @@ namespace Simitone.Client
                     // run-7: unbudget the controller — its trace lines must not die to
                     // the shared per-tick budget (run-19 starvation law).
                     FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Add(_unlmCtr.ObjectID);
+                    // run-11: the tick-5 spawn walk (~296 4106@3/@12 pairs) died to the
+                    // 240-line budget in runs 8-10 — its ENDING (4113 accepts vs op=42
+                    // create failures) is exactly the evidence needed. Budget 4000 covers
+                    // the full first tick; later ticks refill +20/family-line.
+                    FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 4000;
                     Log("AUTOTEST unl-mice ITRACE armed on ctr oid=" + _unlmCtr.ObjectID);
                     // run-2: the show controller's main slept on the same semiglobal
                     // zoning gate (366 → mode-28 → Global[10]); 555 opens it via the
@@ -3573,7 +3578,7 @@ namespace Simitone.Client
                 // state 2: watches. Dialogs (Hunting skill 'Congratulations') must not
                 // block the controller's trees.
                 UnlShowAnswerDialogs();
-                if (_unlmFrame % 30 == 0)
+                if (_unlmFrame % 30 == 0 || _unlmFrame <= 90)
                 {
                     // 4104 re-randomizes attr[1] (0-24) after every spawn cycle, which
                     // can land hours of sim-time away — keep the native timer hot by
@@ -3592,7 +3597,10 @@ namespace Simitone.Client
                     foreach (var kv in cur)
                     {
                         if (_unlmOids0.Contains(kv.Key) || _unlmCritterOids.ContainsKey(kv.Key)) continue;
-                        bool critter = _unlmCritterGuids.Contains((uint)kv.Key) && kv.Key != _unlmCtr.ObjectID;
+                        // run-11 fix: test the entry's GUID (kv.Value) against the
+                        // guid set — kv.Key is the OID and never matches, so
+                        // spawns/despawns were silently uncountable in runs 8-10.
+                        bool critter = _unlmCritterGuids.Contains(kv.Value) && kv.Key != _unlmCtr.ObjectID;
                         Log("AUTOTEST unl-mice ENT-NEW f=" + _unlmFrame + " oid=" + kv.Key
                             + " guid=0x" + kv.Value.ToString("x8") + (critter ? " *** MOUSE-SPAWN ***" : ""));
                         if (critter) { _unlmCritterOids[kv.Key] = kv.Value; _unlmSpawns++; }
