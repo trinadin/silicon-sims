@@ -565,9 +565,14 @@ namespace FSO.Content.TS1
         /// <summary>
         /// SAV-06 / r253-import-export port-audit §3.2: serialize familyId to a
         /// .FAM in &lt;UserPath&gt;Export/ and return the written path (or null on
-        /// failure). Reuses the R248 FAM layout. Chunk set written in this tranche:
-        /// EXPi, FAMI (live clone), FAMs, NBRS (member subset). uChr/CTSS/FINV/SIMI
-        /// are NOT yet written (see the SAV-06 result note / follow-up).
+        /// failure). Reuses the R248 FAM layout. Chunk set: EXPi, FAMI (live
+        /// clone), FAMs, NBRS (member subset), uChr/CTSS per member, FINV when any
+        /// member carries an inventory, and SIMI(1) when the family's house is the
+        /// tutorial house (global 26 mirrored from the house-file SIMI — the same
+        /// field ImportFamFile's step-7 tutorial latch reads; a FAM without SIMI
+        /// imports non-tutorial). Gtab is omitted on fresh export (it is an
+        /// old→new mapping produced by re-import). A memberless family exports as
+        /// a husk (EXPi 0 active members) — verified graceful (E2).
         /// </summary>
         public string ExportFamily(ushort familyId)
         {
@@ -643,6 +648,34 @@ namespace FSO.Content.TS1
                 finv.Inventories.Add(GetInventoryByNID(nid) ?? new List<InventoryItem>());
             finv.ChunkLabel ??= "";
             if (finv.Inventories.Any(x => x.Count > 0)) fam.AddChunk(finv);
+
+            // (SAV-06 SIMI tranche, port-audit §3.2 'SIMI (optional)'): when the
+            // family's house is the tutorial house, carry the flag as SIMI(1)
+            // global 26 — the exact field ImportFamFile's step-7 tutorial latch
+            // reads (shipped Tutorial.FAM carries g26 = 1); omit otherwise. The
+            // SAV-12 SIMI writer emits the Hot Date 0x40/64-global dialect.
+            if (fami.HouseNumber > 0)
+            {
+                var houseSimi = GetHouse(fami.HouseNumber)?.Get<SIMI>(1);
+                if (houseSimi?.GlobalData != null && houseSimi.GlobalData.Length > 26
+                    && houseSimi.GlobalData[26] != 0)
+                {
+                    var simi = new SIMI
+                    {
+                        ChunkID = 1,
+                        Version = 0x40,
+                        GlobalData = new short[64],
+                        BudgetDays = new SIMI.SIMIBudgetDay[]
+                        {
+                            new SIMI.SIMIBudgetDay(), new SIMI.SIMIBudgetDay(), new SIMI.SIMIBudgetDay(),
+                            new SIMI.SIMIBudgetDay(), new SIMI.SIMIBudgetDay(), new SIMI.SIMIBudgetDay()
+                        }
+                    };
+                    simi.GlobalData[26] = 1;
+                    simi.ChunkLabel ??= "";
+                    fam.AddChunk(simi);
+                }
+            }
 
             // IffFile.Write requires a non-null ChunkLabel (WriteCString pads it);
             // newly-created chunks default it to null.
@@ -1548,7 +1581,20 @@ namespace FSO.Content.TS1
 
             // --- step 25: portrait regeneration — N/A (ADAPT): the port renders
             //neighborhood cards from live data; there is no PersonFinder::
-            //GenerateBitmaps bitmap cache to refresh.
+            //GenerateBitmaps bitmap cache to refresh. The Export/ mirror refresh IS
+            //implemented: the imported family and the evicted family (it lost the
+            //house; the step-12 sweep already deleted its members, so its export is
+            //the verified-graceful memberless husk) re-export to Export/, id 4000
+            //reserved (audit §3.4, ADAPT note :950-953). Best-effort: a mirror
+            //failure must not fail the committed import.
+            try
+            {
+                if (newId != 4000) ExportFamily((ushort)newId);
+                if (evicted != null && evicted.ChunkID != 4000)
+                    ExportFamily((ushort)evicted.ChunkID);
+            }
+            catch { //the mirror is secondary to the committed import (native best-effort)
+            }
             LastImportHouse = house; //reloadScreen gate for the client (decode §1.2)
 
             // --- free-wrapper tail (r247-fam-import decode §2.3, 0x231df0): the
