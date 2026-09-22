@@ -3484,7 +3484,7 @@ namespace Simitone.Client
                             for (int i = 0; i < tta.Length; i++) names.Add((tta.GetString(i) ?? "").Trim());
                             Log("AUTOTEST unl-mice ctr TTAs " + tta.ChunkID + " rows=[" + string.Join(" | ", names) + "]");
                         }
-                        foreach (var tid in new ushort[] { 4104, 4105, 4106, 3856, 1552, 4112, 784 })
+                        foreach (var tid in new ushort[] { 4104, 4105, 4106, 4112, 4113, 3856, 1552, 784 })
                         {
                             var rt = mres?.GetRoutine(tid) as VMRoutine;
                             if (rt == null) { Log("AUTOTEST unl-mice DISASM " + tid + " MISSING"); continue; }
@@ -3598,6 +3598,31 @@ namespace Simitone.Client
                                 + " trees=[" + string.Join("/", stc.Select(f => f.Routine?.Chunk?.ChunkID ?? 0)) + "]"
                                 + " crittersLive=" + _unlmCritterOids.Count
                                 + " spawns=" + _unlmSpawns + " despawns=" + _unlmDespawns);
+                        // run-9: the 1800-tick VMSleep wake never fired after tick=5
+                        // (zero trace lines) — dump the controller's scheduling state
+                        // and search the private timing wheel for its pending slot.
+                        if (_unlmFrame % 450 == 0)
+                        {
+                            try
+                            {
+                                var sched = _vm.Scheduler;
+                                var map = typeof(FSO.SimAntics.Engine.VMScheduler)
+                                    .GetField("TickSchedule", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                                    ?.GetValue(sched) as System.Collections.Generic.Dictionary<uint, System.Collections.Generic.List<FSO.SimAntics.VMEntity>>;
+                                uint? nextKey = null;
+                                if (map != null)
+                                    foreach (var kv in map)
+                                        if (kv.Key >= sched.CurrentTickID && kv.Value.Contains(_unlmCtr)
+                                            && (nextKey == null || kv.Key < nextKey)) nextKey = kv.Key;
+                                Log("AUTOTEST unl-mice SCHED f=" + _unlmFrame
+                                    + " tick=" + sched.CurrentTickID
+                                    + " idleEnd=" + _unlmCtr.Thread.ScheduleIdleEnd
+                                    + " idleStart=" + _unlmCtr.Thread.ScheduleIdleStart
+                                    + " interrupt=" + _unlmCtr.Thread.Interrupt
+                                    + " nextScheduled=" + (nextKey?.ToString() ?? "NONE"));
+                            }
+                            catch (Exception se2) { Log("AUTOTEST unl-mice SCHED error: " + se2.Message); }
+                        }
                     }
                 }
                 // Hunting skill dialog evidence (mice.iff STR# 'Congratulations! Your
