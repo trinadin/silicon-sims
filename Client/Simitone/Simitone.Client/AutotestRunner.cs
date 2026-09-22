@@ -3473,74 +3473,65 @@ namespace Simitone.Client
                                 + " cat d65=" + cat5.GetPersonData(VMPersonDataVariable.Gender));
                     }
                     catch (Exception te) { Log("AUTOTEST unl-mice run5-setup EXC " + te.GetType().Name + " " + te.Message); }
-                    // run-9 post-mortem: the wake fires on schedule (SCHED idleStart
-                    // 5->1805, idleEnd->3605) and the @8->4106 spawn walk runs, but
-                    // 4113 (mouse spot-test) rejected all 296 lot objects — it is a
-                    // whitelist: op=32 TestObjectType checks against ~17 fixed GUIDs
-                    // (T:255 = accept; @0 data39<600 is a side bypass). The native
-                    // trigger is simply having one of those objects on the lot.
-                    // run-10: resolve the whitelist GUIDs against the catalog, place
-                    // the first one that lands in-world near the controller (V4
-                    // arena-create pattern), BEFORE the oid baseline snapshot.
+                    // run-9/10/12 decode, corrected in run-13 by the 255=RETURN_FALSE
+                    // law (VMThread.cs MoveToInstruction: case 255 -> Pop(RETURN_FALSE),
+                    // case 254 -> Pop(RETURN_TRUE)): 4113 'try mouse here' is a
+                    // REJECT-list, not a whitelist — REJECT when data39
+                    // (=OBJD.CatalogStringsID, index 39) < 600 (@0 T:20 -> @20 rel-read
+                    // FailIfTooSmall GOTO_FALSE -> F:255) or when the candidate's
+                    // guid/master-guid is in this 19-guid list of spot types
+                    // (@1-@19 op=32 match -> T:255; tubs/beds/showers/flood/newspaper).
+                    // ACCEPT (@17/@19 F:254) requires data39 >= 600 AND guid outside
+                    // the reject list. ALL 296 native downtown-lot objects have
+                    // CatalogStringsID < 600 (run-12: 296 bypasses, 1 reject-list hit),
+                    // so nothing native is ever acceptable — run-13: scan the mounted
+                    // TS1 OBJDs for buyable spot objects (CTSS >= 600, MasterID==0 so
+                    // the entity keeps its own guid, Disabled==0, NumGraphics>0,
+                    // ObjectType==Normal) and place up to 3 near the controller.
                     var wlGuids = new uint[] { 1550318735u, 1047818486u, 2246060608u,
                         2197962150u, 2246052162u, 3829773478u, 3689637396u, 391616896u,
                         814340306u, 1704186513u, 1715384316u, 2195737691u, 243452227u,
                         2165807795u, 3933325788u, 3785108735u, 3870451713u };
-                    var woCat = FSO.Content.Content.Get().WorldObjects;
-                    foreach (var wg in wlGuids)
+                    var rejectGuids = new HashSet<uint>(wlGuids);
+                    var objdByGuid = FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID;
+                    var spotLog = new System.Text.StringBuilder();
+                    int spotsPlaced = 0;
+                    foreach (var kv in objdByGuid)
                     {
-                        string wname;
-                        try
+                        if (spotsPlaced >= 3) break;
+                        var od = kv.Value;
+                        if (od.CatalogStringsID < 600) continue;
+                        if (od.MasterID != 0 || od.SubIndex != -1) continue;
+                        if (od.Disabled != 0 || od.NumGraphics == 0) continue;
+                        if ((int)od.ObjectType != 4) continue; // Normal buyable
+                        if (rejectGuids.Contains(kv.Key)) continue;
+                        foreach (var off in new[] { -16, 16, -48, 48, -80, 80 })
                         {
-                            var wo = woCat.Get(wg);
-                            wname = wo != null
-                                ? ((wo.Resource?.MainIff?.Filename ?? "?") + "/" + (wo.OBJ?.ChunkID.ToString() ?? "?"))
-                                : "NOT-IN-CATALOG";
-                        }
-                        catch (Exception wx) { wname = "EXC " + wx.GetType().Name; }
-                        Log("AUTOTEST unl-mice WL guid=" + wg + " (0x" + wg.ToString("X") + ") -> " + wname);
-                    }
-                    VMEntity wlObj = null; uint wlUsed = 0;
-                    foreach (var wg in wlGuids)
-                    {
-                        if (woCat.Get(wg) == null) continue;
-                        foreach (var off in new[] { -16, 16, -32, 32, -48, 48, -64, 64 })
-                        {
-                            VMMultitileGroup wgrp = null;
+                            VMMultitileGroup sgrp = null;
                             try
                             {
                                 var cand = new FSO.LotView.Model.LotTilePos(
                                     (short)(_unlmCtr.Position.x + off), _unlmCtr.Position.y,
                                     _unlmCtr.Position.Level);
-                                wgrp = _vm.Context.CreateObjectInstance(wg, cand,
+                                sgrp = _vm.Context.CreateObjectInstance(kv.Key, cand,
                                     FSO.LotView.Model.Direction.NORTH);
                             }
                             catch { }
-                            var wfirst = wgrp?.Objects?.FirstOrDefault();
-                            if (wfirst != null && wfirst.Position.x != -32768)
+                            var sfirst = sgrp?.Objects?.FirstOrDefault();
+                            if (sfirst != null && sfirst.Position.x != -32768)
                             {
-                                wlObj = wfirst; wlUsed = wg; break;
+                                spotsPlaced++;
+                                // verify the entity kept the requested guid (op=32
+                                // compares obj.Object.GUID) — log the actual value.
+                                spotLog.Append(" oid=").Append(sfirst.ObjectID)
+                                    .Append("(0x").Append(sfirst.Object.GUID.ToString("X"))
+                                    .Append(" req0x").Append(kv.Key.ToString("X"))
+                                    .Append("/ctss=").Append(od.CatalogStringsID).Append(")");
+                                break;
                             }
                         }
-                        if (wlObj != null) break;
                     }
-                    if (wlObj != null)
-                    {
-                        // run-12: read back what op=32 will actually compare — the
-                        // GameObject wrapper GUID (VMTestObjectType uses obj.Object.GUID)
-                        // vs the OBJD literal — and evaluate the @1 comparison directly.
-                        var wle = _vm.GetObjectById((short)wlObj.ObjectID);
-                        Log("AUTOTEST unl-mice WL-CHECK oid=" + wle.ObjectID
-                            + " wrapGUID=0x" + wle.Object.GUID.ToString("x")
-                            + " objdGUID=0x" + wle.Object.OBJ.GUID.ToString("x")
-                            + " op32@1-match=" + (wle.Object.GUID == 1550318735u)
-                            + " pos=" + wle.Position.x + "," + wle.Position.y + "lv" + wle.Position.Level);
-                        Log("AUTOTEST unl-mice WL-PLACED guid=" + wlUsed + " (0x" + wlUsed.ToString("X")
-                            + ") oid=" + wlObj.ObjectID + " pos=" + wlObj.Position.x + "," + wlObj.Position.y
-                            + "lv" + wlObj.Position.Level);
-                    }
-                    else
-                        Log("AUTOTEST unl-mice WL-PLACE-FAIL no whitelisted guid landed in-world");
+                    Log("AUTOTEST unl-mice SPOT-PLACED n=" + spotsPlaced + spotLog.ToString());
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
                         _unlmOids0.Add(e.ObjectID);
                     // run-2: live surface dump — mice.iff tree ids are per-file
