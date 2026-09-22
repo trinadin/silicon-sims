@@ -2900,8 +2900,12 @@ namespace Simitone.Client
                         // run-10: judge may be a plain object entity, not an avatar — scan
                         // ALL entities; and diff the entity guid set so any spawn/departure
                         // is visible with its guid (run 9: ents rose 296->302 at f=1800).
+                        // run-29: also accept the engine-created judge avatar 0x0c8144b4
+                        // (spawned every run since run 18, oid 252; ran the full 4098
+                        // chain in runs 27/28) — the 0x96717225 NPC is spawn-variance.
                         _unlsJudgeSeen |= _vm.Entities.Any(a => a != null
-                            && a.Object != null && a.Object.OBJ.GUID == UnlShowJudgeGuid);
+                            && a.Object != null && (a.Object.OBJ.GUID == UnlShowJudgeGuid
+                                || a.Object.OBJ.GUID == 0x0c8144b4u));
                         var guids = new System.Collections.Generic.HashSet<uint>(
                             _vm.Entities.Where(e => e?.Object != null).Select(e => e.Object.OBJ.GUID));
                         var added = _unlsGuids0.Where(g => !guids.Contains(g)).ToList();
