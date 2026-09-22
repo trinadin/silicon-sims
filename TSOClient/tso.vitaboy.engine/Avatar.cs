@@ -65,12 +65,6 @@ namespace FSO.Vitaboy
         public bool HideHead;
         protected Matrix[] SkelBones;
 
-        /// <summary>
-        /// Virtual property for skin tone access in censorship rendering.
-        /// Override in SimAvatar to return the actual skin tone.
-        /// </summary>
-        protected virtual AppearanceType? SkinToneForCensor => null;
-
         public static void setVitaboyEffect(Effect e) {
             Effect = e;
         }
@@ -312,65 +306,92 @@ namespace FSO.Vitaboy
         public static int DefaultTechnique = 0;
         public Vector4 AmbientLight = Vector4.One;
 
-        // Censorship pixelation effect resources
+        // Censorship pixelation effect resources (UI-32: the ORIGINAL's law,
+        // r221 decode — see DrawCensoredMeshesPixelated)
         private static SpriteBatch _censorSpriteBatch;
+        private static Texture2D _censorWhitePx;
 
-        // Per-skin-tone mosaic textures for censorship
-        private static Dictionary<AppearanceType, Texture2D> _mosaicTextures = new Dictionary<AppearanceType, Texture2D>();
+        /// <summary>
+        /// UI-32: deterministic jitter seed. The ORIGINAL draws three random
+        /// values per cell and keeps (v &amp; 0xF) - 8 of each; the port runs
+        /// the same arithmetic over a hash chain pinned by this seed so
+        /// headless gates can assert exact cells.
+        /// </summary>
+        public static int CensorJitterSeed = 0x53494D53; // "SIMS"
 
-        private static Texture2D GetMosaicTexture(GraphicsDevice device, AppearanceType skinTone)
+        // Zoom tiers of RenderCensoredBlocks @0x1ce5b4.
+        public const int CENSOR_FAR = 0, CENSOR_MED = 1, CENSOR_NEAR = 2;
+
+        /// <summary>
+        /// UI-32: zoom tier from the projection (the same thresholds that
+        /// select the port's 35/50/70 censor-rect width). Perspective cameras
+        /// default to the middle tier.
+        /// </summary>
+        public static int CensorZoomTier(float projM11, bool perspective)
         {
-            if (_mosaicTextures.TryGetValue(skinTone, out var tex) && !tex.IsDisposed)
-                return tex;
+            if (perspective) return CENSOR_MED;
+            if (projM11 > 0.015f) return CENSOR_NEAR;
+            if (projM11 > 0.008f) return CENSOR_MED;
+            return CENSOR_FAR;
+        }
 
-            // Color palettes per skin tone (base + variations, opaque)
-            Color[] colors = skinTone switch
+        /// <summary>
+        /// UI-32: the native cell ladder (w,h) per zoom tier —
+        /// (1,3)/(2,6)/(4,12) at the native 800px design width, scaled to the
+        /// actual surface and never degenerate.
+        /// </summary>
+        public static Point CensorCellSize(int tier, float designScale)
+        {
+            int w = tier == CENSOR_NEAR ? 4 : (tier == CENSOR_MED ? 2 : 1);
+            int h = tier == CENSOR_NEAR ? 12 : (tier == CENSOR_MED ? 6 : 3);
+            return new Point(
+                Math.Max(1, (int)Math.Round(w * designScale)),
+                Math.Max(1, (int)Math.Round(h * designScale)));
+        }
+
+        /// <summary>
+        /// The ORIGINAL's jitter arithmetic: three calls, each kept as
+        /// (v &amp; 0xF) - 8 (range [-8,7]); sourced from a deterministic
+        /// hash chain instead of a random number generator.
+        /// </summary>
+        private static int CensorJitter(ref int h)
+        {
+            unchecked
             {
-                AppearanceType.Light => new Color[] {
-                    new Color(255, 224, 196),  // light base
-                    new Color(255, 210, 180),
-                    new Color(248, 216, 188),
-                    new Color(255, 200, 170)
-                },
-                AppearanceType.Medium => new Color[] {
-                    new Color(224, 172, 132),  // medium base
-                    new Color(210, 160, 120),
-                    new Color(200, 150, 110),
-                    new Color(215, 165, 125)
-                },
-                AppearanceType.Dark => new Color[] {
-                    new Color(140, 90, 60),    // dark base
-                    new Color(130, 80, 50),
-                    new Color(150, 95, 65),
-                    new Color(120, 75, 45)
-                },
-                _ => new Color[] {  // fallback = Dark
-                    new Color(140, 90, 60),
-                    new Color(130, 80, 50),
-                    new Color(150, 95, 65),
-                    new Color(120, 75, 45)
-                }
-            };
-
-            // Generate 64x64 texture with 8x8 grid
-            int size = 64, gridSize = 8;
-            var data = new Color[size * size];
-
-            for (int y = 0; y < size; y++)
-            {
-                for (int x = 0; x < size; x++)
-                {
-                    int gridX = x / (size / gridSize);
-                    int gridY = y / (size / gridSize);
-                    int colorIndex = (gridX * 3 + gridY * 7) % colors.Length;
-                    data[y * size + x] = colors[colorIndex];
-                }
+                h = (int)((uint)h * 16777619u ^ 0x9E3779B9u);
+                h ^= h >> 13;
             }
+            return (h & 0xF) - 8;
+        }
 
-            var texture = new Texture2D(device, size, size);
-            texture.SetData(data);
-            _mosaicTextures[skinTone] = texture;
-            return texture;
+        private static int CensorClamp(int v)
+        {
+            return v < 0 ? 0 : (v > 255 ? 255 : v);
+        }
+
+        /// <summary>
+        /// UI-32: HouseViewer::Censor @0x1ce894 per-cell law — the per-channel
+        /// MEAN of the cell's underlying pixels, plus a ±8-per-channel jitter
+        /// (three (v &amp; 0xF) - 8 draws), clamped 0..255: one flat color per
+        /// cell. Exposed pure so the censorpixel gate pins the exact law.
+        /// </summary>
+        public static Color CensorCellColor(Color[] px, int pitch, Rectangle cell, int seed)
+        {
+            long r = 0, g = 0, b = 0; int n = 0;
+            for (int y = cell.Y; y < cell.Y + cell.Height; y++)
+                for (int x = cell.X; x < cell.X + cell.Width; x++)
+                {
+                    var p = px[y * pitch + x];
+                    r += p.R; g += p.G; b += p.B; n++;
+                }
+            if (n == 0) n = 1;
+            int h = seed;
+            int jr = CensorJitter(ref h);
+            int jg = CensorJitter(ref h);
+            int jb = CensorJitter(ref h);
+            return new Color(CensorClamp((int)(r / n) + jr),
+                             CensorClamp((int)(g / n) + jg),
+                             CensorClamp((int)(b / n) + jb));
         }
 
         /// <summary>
@@ -540,18 +561,18 @@ namespace FSO.Vitaboy
         }
 
         /// <summary>
-        /// Draws a simple procedural mosaic at the pelvis position.
-        /// Uses fixed sizes based on zoom level for consistent appearance.
+        /// UI-32: draws the censorship mosaic per the ORIGINAL's decoded law
+        /// (r221: HouseViewer::Censor @0x1ce894 + RenderCensoredBlocks
+        /// @0x1ce5b4). The underlying frame pixels of the censor rect (the
+        /// scene as of this avatar's draw) are reduced to per-cell MEAN
+        /// colors over the zoom cell ladder (1,3)/(2,6)/(4,12) — scaled to
+        /// the render surface — with a ±8-per-channel deterministic jitter
+        /// and a 0..255 clamp. The rect is the port's disclosed 35/50/70
+        /// ×1.4 pelvis model (unchanged); skin tone is no longer an input
+        /// (the mosaic colors ARE the covered pixels, as native).
         /// </summary>
         private void DrawCensoredMeshesPixelated(GraphicsDevice device, Effect effect, int censorshipFlags)
         {
-            // Get skin tone (default to Dark if unknown, per user request)
-            var skinTone = SkinToneForCensor ?? AppearanceType.Dark;
-            var mosaicTexture = GetMosaicTexture(device, skinTone);
-
-            if (_censorSpriteBatch == null || _censorSpriteBatch.IsDisposed)
-                _censorSpriteBatch = new SpriteBatch(device);
-
             // Get pelvis screen position
             var viewMatrix = effect.Parameters["View"].GetValueMatrix();
             var projMatrix = effect.Parameters["Projection"].GetValueMatrix();
@@ -570,19 +591,10 @@ namespace FSO.Vitaboy
 
             if (screenPos.Z < 0 || screenPos.Z > 1) return;
 
-            // Fixed size - simple and reliable
-            // Use projection diagonal to estimate zoom (works for both 2D and 3D)
-            int censorSize = 50; // default
+            // Zoom tier + rect (the port's rect model, unchanged)
             bool isPerspective = Math.Abs(projMatrix.M34) > 0.0001f;
-
-            if (!isPerspective)
-            {
-                // 2D orthographic - use projection scale
-                float scale = Math.Abs(projMatrix.M11);
-                if (scale > 0.015f) censorSize = 70;       // Near
-                else if (scale > 0.008f) censorSize = 50;  // Medium
-                else censorSize = 35;                       // Far
-            }
+            int tier = CensorZoomTier(Math.Abs(projMatrix.M11), isPerspective);
+            int censorSize = tier == CENSOR_NEAR ? 70 : (tier == CENSOR_MED ? 50 : 35);
 
             int censorWidth = censorSize;
             int censorHeight = (int)(censorSize * 1.4f);
@@ -595,10 +607,85 @@ namespace FSO.Vitaboy
                 censorHeight
             );
 
-            _censorSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
+            // The native law reduces the UNDERLYING pixels: read the censor
+            // rect from the current render surface (clipped), then fill each
+            // ladder cell with its mean+jitter color.
+            var srcRect = Rectangle.Intersect(destRect, CensorSurfaceBounds(device));
+            if (srcRect.Width <= 0 || srcRect.Height <= 0) return;
+            var px = ReadSurfacePixels(device, srcRect);
+            if (px == null) return;
+
+            if (_censorSpriteBatch == null || _censorSpriteBatch.IsDisposed)
+                _censorSpriteBatch = new SpriteBatch(device);
+            if (_censorWhitePx == null || _censorWhitePx.IsDisposed)
+            {
+                _censorWhitePx = new Texture2D(device, 1, 1);
+                _censorWhitePx.SetData(new[] { Color.White });
+            }
+
+            var cellSize = CensorCellSize(tier, viewport.Width / 800f);
+            _censorSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque,
                 SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-            _censorSpriteBatch.Draw(mosaicTexture, destRect, Color.White);
+            for (int y = 0; y < srcRect.Height; y += cellSize.Y)
+            {
+                int ch = Math.Min(cellSize.Y, srcRect.Height - y);
+                for (int x = 0; x < srcRect.Width; x += cellSize.X)
+                {
+                    int cw = Math.Min(cellSize.X, srcRect.Width - x);
+                    var seed = CensorJitterSeed
+                        ^ ((srcRect.X + x) * 73856093)
+                        ^ ((srcRect.Y + y) * 19349663);
+                    var col = CensorCellColor(px, srcRect.Width, new Rectangle(x, y, cw, ch), seed);
+                    _censorSpriteBatch.Draw(_censorWhitePx,
+                        new Rectangle(srcRect.X + x, srcRect.Y + y, cw, ch), col);
+                }
+            }
             _censorSpriteBatch.End();
+        }
+
+        /// Bounds of the currently bound render surface (render target or
+        /// the window backbuffer).
+        private static Rectangle CensorSurfaceBounds(GraphicsDevice device)
+        {
+            var bindings = device.GetRenderTargets();
+            if (bindings.Length > 0 && bindings[0].RenderTarget is RenderTarget2D bound)
+                return new Rectangle(0, 0, bound.Width, bound.Height);
+            return new Rectangle(0, 0, device.Viewport.Width, device.Viewport.Height);
+        }
+
+        /// <summary>
+        /// Reads a rect of pixels from the current render surface. A bound
+        /// render target is briefly unbound for the read and restored with
+        /// its viewport/scissor afterwards (the PPX TargetScope pattern);
+        /// the window backbuffer path uses GetBackBufferData. Returns null
+        /// when the read is not possible this frame.
+        /// </summary>
+        private static Color[] ReadSurfacePixels(GraphicsDevice device, Rectangle rect)
+        {
+            try
+            {
+                var px = new Color[rect.Width * rect.Height];
+                var bindings = device.GetRenderTargets();
+                if (bindings.Length > 0 && bindings[0].RenderTarget is RenderTarget2D rt)
+                {
+                    var vp = device.Viewport;
+                    var scissor = device.ScissorRectangle;
+                    device.SetRenderTarget(null);
+                    rt.GetData(0, rect, px, 0, px.Length);
+                    device.SetRenderTargets(bindings);
+                    device.Viewport = vp;
+                    device.ScissorRectangle = scissor;
+                }
+                else
+                {
+                    device.GetBackBufferData(rect, px, 0, px.Length);
+                }
+                return px;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public void DrawHeadObject(GraphicsDevice device, Effect effect)
