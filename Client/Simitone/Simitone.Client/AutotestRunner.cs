@@ -3468,6 +3468,63 @@ namespace Simitone.Client
                                 + " cat d65=" + cat5.GetPersonData(VMPersonDataVariable.Gender));
                     }
                     catch (Exception te) { Log("AUTOTEST unl-mice run5-setup EXC " + te.GetType().Name + " " + te.Message); }
+                    // run-9 post-mortem: the wake fires on schedule (SCHED idleStart
+                    // 5->1805, idleEnd->3605) and the @8->4106 spawn walk runs, but
+                    // 4113 (mouse spot-test) rejected all 296 lot objects — it is a
+                    // whitelist: op=32 TestObjectType checks against ~17 fixed GUIDs
+                    // (T:255 = accept; @0 data39<600 is a side bypass). The native
+                    // trigger is simply having one of those objects on the lot.
+                    // run-10: resolve the whitelist GUIDs against the catalog, place
+                    // the first one that lands in-world near the controller (V4
+                    // arena-create pattern), BEFORE the oid baseline snapshot.
+                    var wlGuids = new uint[] { 1550318735u, 1047818486u, 2246060608u,
+                        2197962150u, 2246052162u, 3829773478u, 3689637396u, 391616896u,
+                        814340306u, 1704186513u, 1715384316u, 2195737691u, 243452227u,
+                        2165807795u, 3933325788u, 3785108735u, 3870451713u };
+                    var woCat = FSO.Content.Content.Get().WorldObjects;
+                    foreach (var wg in wlGuids)
+                    {
+                        string wname;
+                        try
+                        {
+                            var wo = woCat.Get(wg);
+                            wname = wo != null
+                                ? ((wo.Resource?.MainIff?.Filename ?? "?") + "/" + (wo.OBJ?.ChunkID.ToString() ?? "?"))
+                                : "NOT-IN-CATALOG";
+                        }
+                        catch (Exception wx) { wname = "EXC " + wx.GetType().Name; }
+                        Log("AUTOTEST unl-mice WL guid=" + wg + " (0x" + wg.ToString("X") + ") -> " + wname);
+                    }
+                    VMEntity wlObj = null; uint wlUsed = 0;
+                    foreach (var wg in wlGuids)
+                    {
+                        if (woCat.Get(wg) == null) continue;
+                        foreach (var off in new[] { -16, 16, -32, 32, -48, 48, -64, 64 })
+                        {
+                            VMMultitileGroup wgrp = null;
+                            try
+                            {
+                                var cand = new FSO.LotView.Model.LotTilePos(
+                                    (short)(_unlmCtr.Position.x + off), _unlmCtr.Position.y,
+                                    _unlmCtr.Position.Level);
+                                wgrp = _vm.Context.CreateObjectInstance(wg, cand,
+                                    FSO.LotView.Model.Direction.NORTH);
+                            }
+                            catch { }
+                            var wfirst = wgrp?.Objects?.FirstOrDefault();
+                            if (wfirst != null && wfirst.Position.x != -32768)
+                            {
+                                wlObj = wfirst; wlUsed = wg; break;
+                            }
+                        }
+                        if (wlObj != null) break;
+                    }
+                    if (wlObj != null)
+                        Log("AUTOTEST unl-mice WL-PLACED guid=" + wlUsed + " (0x" + wlUsed.ToString("X")
+                            + ") oid=" + wlObj.ObjectID + " pos=" + wlObj.Position.x + "," + wlObj.Position.y
+                            + "lv" + wlObj.Position.Level);
+                    else
+                        Log("AUTOTEST unl-mice WL-PLACE-FAIL no whitelisted guid landed in-world");
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
                         _unlmOids0.Add(e.ObjectID);
                     // run-2: live surface dump — mice.iff tree ids are per-file
@@ -3669,10 +3726,11 @@ namespace Simitone.Client
                     else Log("AUTOTEST unl-mice PUSH-chase skipped cat=" + (catF != null)
                         + " mouse=" + (mo != null) + " ctr=" + (_unlmCtr != null));
                 }
-                // run-4: the mice main sleeps 1800-3600 ticks (G366) between clock
-                // checks — first native spawn lands ~f=1900, a second cycle ~f=3800+,
-                // so 4500 left no room; give it two full sleep cycles plus chase time.
-                if (_unlmFrame > 7000)
+                // run-9 SCHED law: the VM runs ONE sim-tick per TWO frames (tick=f/2),
+                // so the controller's wakes land at f≈3610 (tick 1805), 7210 (3605),
+                // 10810 (5405) — run-8's 7000-frame window ended before wake #2.
+                // 11000 frames covers three wakes plus chase/despawn time.
+                if (_unlmFrame > 11000)
                 {
                     Log("AUTOTEST unl-mice cycle TIMEOUT f=" + _unlmFrame
                         + " spawns=" + _unlmSpawns + " despawns=" + _unlmDespawns
