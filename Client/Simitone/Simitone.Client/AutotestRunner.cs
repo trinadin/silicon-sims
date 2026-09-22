@@ -3257,6 +3257,254 @@ namespace Simitone.Client
             }
         }
 
+        // ---------- EXP-05 V5 ('unl-mice') ----------
+        // The Unleashed mice controller (mice.iff OBJD 'Controller - Unleashed -
+        // Mice', census guid 0x90F874BD — resident on Old Town per run-10) drives
+        // mice spawn/despawn cycles; pets chase mice and earn Hunting skill
+        // (mice.iff STR#: 'Congratulations! Your pet has earned a Hunting skill
+        // point.'). Acceptance per scope: >=2 critter spawns with >=1 despawn
+        // between (a cycle), a cat chase of a live mouse, no fault. The controller
+        // is summoned probe-side onto house 5 beside the family (run-5 in-world
+        // placement law). Its main-loop tree ids are per-file (offline parse
+        // misaligned) so execution is evidenced probe-side via stack Routine
+        // ChunkIDs, not the 4096-4109 ITRACE band. Spawn/despawn diffing is by
+        // entity OID (mice share one template guid).
+        private static int _unlmState, _unlmSettle, _unlmFrame, _unlmSpawns, _unlmDespawns, _unlmChaseTicks;
+        private static uint _unlmHumanGuid;
+        private static bool _unlmChaseSeen;
+        private static FSO.Files.Formats.IFF.Chunks.FAMI _unlmFam;
+        private static VMEntity _unlmCtr;
+        private static HashSet<short> _unlmOids0 = new HashSet<short>();
+        private static Dictionary<short, uint> _unlmCritterOids = new Dictionary<short, uint>();
+        private static HashSet<uint> _unlmCritterGuids = new HashSet<uint>();
+
+        private static void UnlMiceTick()
+        {
+            try
+            {
+                var avatars = _vm == null ? new List<VMAvatar>() : _vm.Entities.OfType<VMAvatar>().ToList();
+                if (_unlmState == 0)
+                {
+                    if (++_unlmSettle < 90) return;
+                    _unlmSettle = 0; _unlmState = 1;
+                    FSO.SimAntics.Engine.VMThread.AutotestVacLotOverride = 0;
+                    // same FC-B family law as unl-show: house-5 human + template pets
+                    var neigh = Content.Get().Neighborhood;
+                    uint human = 0;
+                    var fam5 = neigh.GetFamilyForHouse(5);
+                    if (fam5 != null && fam5.FamilyGUIDs != null)
+                        human = fam5.FamilyGUIDs.FirstOrDefault(g => !UnlTravelPetGuids.Contains(g));
+                    if (human == 0)
+                    {
+                        var objs = Content.Get().WorldObjects as FSO.Content.TS1.TS1ObjectProvider;
+                        if (objs != null) human = objs.PersonGUIDs.OrderBy(x => x).FirstOrDefault();
+                    }
+                    _unlmHumanGuid = human;
+                    var guids = new[] { human, UnlTravelPetGuids[0], UnlTravelPetGuids[1] };
+                    var fams = neigh.MainResource.List<FAMI>() ?? new List<FAMI>();
+                    ushort newId = 0;
+                    foreach (var f in fams.OrderBy(x => x.ChunkID))
+                    {
+                        if (f.ChunkID == newId) newId++;
+                        else break;
+                    }
+                    int famNum = fams.Count == 0 ? 1 : fams.Max(x => x.FamilyNumber) + 1;
+                    _unlmFam = new FSO.Files.Formats.IFF.Chunks.FAMI
+                    {
+                        ChunkLabel = "",
+                        ChunkID = newId,
+                        ChunkProcessed = true,
+                        ChunkType = "FAMI",
+                        ChunkParent = neigh.MainResource,
+                        AddedByPatch = true,
+                        FamilyGUIDs = guids,
+                        RuntimeSubset = guids,
+                        FamilyNumber = famNum,
+                        Unknown = 1,
+                        Budget = 20000,
+                    };
+                    neigh.MainResource.AddChunk(_unlmFam);
+                    var famsChunk = new FAMs
+                    {
+                        ChunkLabel = "",
+                        ChunkID = newId,
+                        ChunkProcessed = true,
+                        ChunkType = "FAMs",
+                        ChunkParent = neigh.MainResource,
+                        AddedByPatch = true,
+                    };
+                    famsChunk.InsertString(0, new FSO.Files.Formats.IFF.Chunks.STRItem { Comment = "", Value = "MiceProbe" });
+                    neigh.MainResource.AddChunk(famsChunk);
+                    neigh.SetFamilyForHouse(UnlTravelHouse, _unlmFam, false);
+                    Log("AUTOTEST unl-mice attach famId=" + newId + " house=" + UnlTravelHouse
+                        + " human=0x" + human.ToString("x8")
+                        + " pets=" + string.Join(",", UnlTravelPetGuids.Select(g => "0x" + g.ToString("x8"))));
+                    _screen.PlayHouse(UnlTravelHouse, null);
+                    _unlmFrame = 0;
+                    return;
+                }
+                _unlmFrame++;
+                // post-PlayHouse VM swap (unl-show rebind law)
+                if (_screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    _vm = _screen.vm;
+                if (_unlmState == 1)
+                {
+                    var fam = new[] { _unlmHumanGuid, UnlTravelPetGuids[0], UnlTravelPetGuids[1] };
+                    var spawned = fam.Select(g => avatars.FirstOrDefault(a => a.Object.OBJ.GUID == g)).ToList();
+                    if (!spawned.All(a => a != null)) return;
+                    // resolve mice.iff object guids from the mounted catalog
+                    var ts1p = Content.Get().WorldObjects as FSO.Content.TS1.TS1ObjectProvider;
+                    if (ts1p != null)
+                    {
+                        foreach (var kv in ts1p.Entries)
+                        {
+                            var stem = (kv.Value.FileName ?? "").ToLowerInvariant();
+                            if (!stem.StartsWith("mice")) continue;
+                            _unlmCritterGuids.Add((uint)kv.Key);
+                        }
+                    }
+                    _unlmCritterGuids.Remove(0x90F874BDu);
+                    var host2 = spawned[0].GetPersonData(VMPersonDataVariable.PersonsAge) >= 18 ? spawned[0]
+                        : spawned.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? spawned[0];
+                    // run-5 law: in-world placement (OOW starves every interaction)
+                    var grp = _vm.Context.CreateObjectInstance(0x90F874BDu,
+                        new FSO.LotView.Model.LotTilePos(
+                            (short)(host2.Position.x - 64), (short)(host2.Position.y - 64), host2.Position.Level),
+                        FSO.LotView.Model.Direction.NORTH);
+                    _unlmCtr = grp?.Objects?.FirstOrDefault();
+                    if (_unlmCtr == null)
+                    {
+                        Log("AUTOTEST unl-mice ctr CREATE-FAIL guid=0x90f874bd");
+                        Fail("unl-mice"); _unlmState = 99; return;
+                    }
+                    foreach (var e in _vm.Entities.Where(e => e?.Object != null))
+                        _unlmOids0.Add(e.ObjectID);
+                    Log("AUTOTEST unl-mice SETUP f=" + _unlmFrame
+                        + " ctr oid=" + _unlmCtr.ObjectID + " guid=0x" + _unlmCtr.Object.OBJ.GUID.ToString("x8")
+                        + " pos=" + _unlmCtr.Position.x + "," + _unlmCtr.Position.y + "lv" + _unlmCtr.Position.Level
+                        + " miceGuids=[" + string.Join(",", _unlmCritterGuids.Select(g => "0x" + g.ToString("x8"))) + "]"
+                        + " ents=" + _vm.Entities.Count
+                        + " at " + Sim3Clock());
+                    _unlmState = 2;
+                    return;
+                }
+                // state 2: watches. Dialogs (Hunting skill 'Congratulations') must not
+                // block the controller's trees.
+                UnlShowAnswerDialogs();
+                if (_unlmFrame % 30 == 0)
+                {
+                    // spawn/despawn diff by OID (mice share one template guid)
+                    var cur = new Dictionary<short, uint>();
+                    foreach (var e in _vm.Entities.Where(e => e?.Object != null))
+                        cur[e.ObjectID] = e.Object.OBJ.GUID;
+                    foreach (var kv in cur)
+                    {
+                        if (_unlmOids0.Contains(kv.Key) || _unlmCritterOids.ContainsKey(kv.Key)) continue;
+                        bool critter = _unlmCritterGuids.Contains((uint)kv.Key) && kv.Key != _unlmCtr.ObjectID;
+                        Log("AUTOTEST unl-mice ENT-NEW f=" + _unlmFrame + " oid=" + kv.Key
+                            + " guid=0x" + kv.Value.ToString("x8") + (critter ? " *** MOUSE-SPAWN ***" : ""));
+                        if (critter) { _unlmCritterOids[kv.Key] = kv.Value; _unlmSpawns++; }
+                        else if (!_unlmOids0.Contains(kv.Key)) _unlmOids0.Add(kv.Key);
+                    }
+                    foreach (var oid in _unlmCritterOids.Keys.ToList())
+                    {
+                        if (!cur.ContainsKey(oid))
+                        {
+                            Log("AUTOTEST unl-mice *** MOUSE-GONE *** f=" + _unlmFrame + " oid=" + oid);
+                            _unlmCritterOids.Remove(oid);
+                            _unlmDespawns++;
+                        }
+                    }
+                    // cat chase watch: cat's top routing frame targeting a live mouse,
+                    // or adjacency while routing
+                    var cat = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0]);
+                    if (cat != null)
+                    {
+                        var st = cat.Thread.Stack;
+                        var rfTop = st.Count > 0 ? st[st.Count - 1] as FSO.SimAntics.Engine.VMRoutingFrame : null;
+                        uint tgt = (uint)(rfTop?.StackObject?.Object?.GUID ?? 0);
+                        bool critterTgt = tgt != 0 && _unlmCritterGuids.Contains(tgt);
+                        short mouseNear = 0;
+                        foreach (var mo in _unlmCritterOids.Keys)
+                        {
+                            var me = _vm.GetObjectById(mo);
+                            if (me == null) continue;
+                            var dx = Math.Abs(me.Position.x - cat.Position.x);
+                            var dy = Math.Abs(me.Position.y - cat.Position.y);
+                            if (dx <= 32 && dy <= 32) { mouseNear = mo; break; }
+                        }
+                        if (_unlmFrame % 150 == 0 || critterTgt || mouseNear != 0)
+                            Log("AUTOTEST unl-mice cat f=" + _unlmFrame
+                                + " pos=" + cat.Position.x + "," + cat.Position.y
+                                + " stack=" + st.Count
+                                + " rfState=" + (rfTop != null ? rfTop.State.ToString() : "-")
+                                + " rfTgt=oid" + (rfTop?.StackObject?.ObjectID ?? -1) + "@0x" + tgt.ToString("x8")
+                                + " mouseNear=" + mouseNear
+                                + " q=" + cat.Thread.Queue.Count);
+                        if (critterTgt || (rfTop != null && mouseNear != 0))
+                        {
+                            _unlmChaseTicks++;
+                            if (_unlmChaseTicks >= 3 && !_unlmChaseSeen)
+                            {
+                                _unlmChaseSeen = true;
+                                Log("AUTOTEST unl-mice *** CAT-CHASE *** f=" + _unlmFrame
+                                    + " rfTgt=oid" + (rfTop?.StackObject?.ObjectID ?? -1) + "@0x" + tgt.ToString("x8")
+                                    + " mouseNear=" + mouseNear);
+                            }
+                        }
+                    }
+                    // controller execution evidence, probe-side (no ITRACE needed)
+                    if (_unlmCtr != null && _unlmCtr.Thread != null)
+                    {
+                        var stc = _unlmCtr.Thread.Stack;
+                        if (_unlmFrame % 150 == 0)
+                            Log("AUTOTEST unl-mice CTR f=" + _unlmFrame
+                                + " stack=" + stc.Count
+                                + " trees=[" + string.Join("/", stc.Select(f => f.Routine?.Chunk?.ChunkID ?? 0)) + "]"
+                                + " crittersLive=" + _unlmCritterOids.Count
+                                + " spawns=" + _unlmSpawns + " despawns=" + _unlmDespawns);
+                    }
+                }
+                // Hunting skill dialog evidence (mice.iff STR# 'Congratulations! Your
+                // pet has earned a Hunting skill point.') surfaces via the answerer's
+                // dialog logs — grepped post-run, not a PASS criterion.
+                var famAlive = avatars.Any(a => a.Object.OBJ.GUID == _unlmHumanGuid)
+                    && avatars.Any(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0])
+                    && avatars.Any(a => a.Object.OBJ.GUID == UnlTravelPetGuids[1]);
+                if (!famAlive)
+                {
+                    Log("AUTOTEST unl-mice FAMILY-REMOVED f=" + _unlmFrame
+                        + " (SimAntics fault reset?) spawns=" + _unlmSpawns + " chase=" + _unlmChaseSeen);
+                    Fail("unl-mice"); _unlmState = 99; return;
+                }
+                if (_unlmFrame > 200 && _unlmSpawns >= 2 && _unlmDespawns >= 1 && _unlmChaseSeen)
+                {
+                    Log("AUTOTEST unl-mice CYCLE-COMPLETE f=" + _unlmFrame
+                        + " spawns=" + _unlmSpawns + " despawns=" + _unlmDespawns
+                        + " chase=" + _unlmChaseSeen);
+                    Pass("unl-mice"); _unlmState = 99; return;
+                }
+                if (_unlmFrame > 4500)
+                {
+                    Log("AUTOTEST unl-mice cycle TIMEOUT f=" + _unlmFrame
+                        + " spawns=" + _unlmSpawns + " despawns=" + _unlmDespawns
+                        + " chase=" + _unlmChaseSeen + " crittersLive=" + _unlmCritterOids.Count);
+                    foreach (var a in avatars.Where(x => x.Object.OBJ.GUID == _unlmHumanGuid
+                        || UnlTravelPetGuids.Contains(x.Object.OBJ.GUID)))
+                        Log("AUTOTEST unl-mice qdump guid=0x" + a.Object.OBJ.GUID.ToString("x8")
+                            + " oid=" + a.ObjectID + " queue=" + a.Thread.Queue.Count
+                            + " active=" + (a.Thread.ActiveAction != null));
+                    Fail("unl-mice"); _unlmState = 99;
+                }
+            }
+            catch (Exception se)
+            {
+                Log("AUTOTEST unl-mice EXC " + se.GetType().Name + " " + se.Message);
+                FSO.SimAntics.Engine.VMThread.AutotestVacLotOverride = 0;
+                Fail("unl-mice"); _unlmState = 99;
+            }
+        }
+
         // run-3 law: the queue→idle-wake path never started pushed rows here (queue
         // starved behind the active action for 25 sim-min; CheckTS1Action also hard-
         // rejects pet actors on non-pet rows). Mirror the engine's own ExecuteAction
@@ -4420,6 +4668,11 @@ namespace Simitone.Client
             {
                 UnlShowTick();
             }
+            // EXP-05 V5 (opt-in "unl-mice"): Unleashed mice controller cycles.
+            if (CheckEnabled("unl-mice") && _unlmState != 99)
+            {
+                UnlMiceTick();
+            }
             var minute = _vm.Context.Clock.Minutes;
             if (_motiveStartMinute < 0) _motiveStartMinute = minute;
 
@@ -4783,12 +5036,15 @@ namespace Simitone.Client
             // While a focused EXP check is still active, hold the soak open — the check's
             // own timeout owns the verdict; SIMTONE_TIMEOUT_MS stays the backstop. The
             // one-shot mood/motive accounting below runs after the check verdicts (99).
-            if (CheckEnabled("unl-show") && _unlsState != 99)
+            if ((CheckEnabled("unl-show") && _unlsState != 99)
+                || (CheckEnabled("unl-mice") && _unlmState != 99))
             {
+                var heldTag = (CheckEnabled("unl-mice") && _unlmState != 99) ? "unl-mice" : "unl-show";
+                var heldState = heldTag == "unl-mice" ? _unlmState : _unlsState;
                 if (!_unlsSoakHeld)
                 {
                     _unlsSoakHeld = true;
-                    Log("AUTOTEST soak held for EXP unl-show (state=" + _unlsState + ")");
+                    Log("AUTOTEST soak held for EXP " + heldTag + " (state=" + heldState + ")");
                 }
                 return;
             }
