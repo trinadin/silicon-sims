@@ -336,17 +336,18 @@ namespace FSO.Vitaboy
         }
 
         /// <summary>
-        /// UI-32: the native cell ladder (w,h) per zoom tier —
-        /// (1,3)/(2,6)/(4,12) at the native 800px design width, scaled to the
-        /// actual surface and never degenerate.
+        /// UI-32/P1: the native cell ladder (w,h) per zoom tier, in LITERAL
+        /// DEVICE PIXELS — RenderCensoredBlocks @0x1ce5b4 (fresh decode,
+        /// evidence/UI-32/r221-disasm-rendercensoredblocks.txt) compares the
+        /// viewer zoom index against 1/2/4 and selects (r23,r24) =
+        /// (1,3)/(2,6)/(4,12), i.e. cell = (z, 3z), then grows the censor
+        /// rect by ±r23/+r24 in plain integer pixels: there is NO viewport
+        /// or design-width normalization anywhere in the native body.
         /// </summary>
-        public static Point CensorCellSize(int tier, float designScale)
+        public static Point CensorCellSize(int tier)
         {
-            int w = tier == CENSOR_NEAR ? 4 : (tier == CENSOR_MED ? 2 : 1);
-            int h = tier == CENSOR_NEAR ? 12 : (tier == CENSOR_MED ? 6 : 3);
-            return new Point(
-                Math.Max(1, (int)Math.Round(w * designScale)),
-                Math.Max(1, (int)Math.Round(h * designScale)));
+            int z = tier == CENSOR_NEAR ? 4 : (tier == CENSOR_MED ? 2 : 1);
+            return new Point(z, 3 * z);
         }
 
         /// <summary>
@@ -563,13 +564,15 @@ namespace FSO.Vitaboy
         /// <summary>
         /// UI-32: draws the censorship mosaic per the ORIGINAL's decoded law
         /// (r221: HouseViewer::Censor @0x1ce894 + RenderCensoredBlocks
-        /// @0x1ce5b4). The underlying frame pixels of the censor rect (the
-        /// scene as of this avatar's draw) are reduced to per-cell MEAN
-        /// colors over the zoom cell ladder (1,3)/(2,6)/(4,12) — scaled to
-        /// the render surface — with a ±8-per-channel deterministic jitter
-        /// and a 0..255 clamp. The rect is the port's disclosed 35/50/70
-        /// ×1.4 pelvis model (unchanged); skin tone is no longer an input
-        /// (the mosaic colors ARE the covered pixels, as native).
+        /// @0x1ce5b4, re-decoded 2026-09-22). The underlying frame pixels of
+        /// the censor rect (the scene as of this avatar's draw) are reduced
+        /// to per-cell MEAN colors over the zoom cell ladder (z, 3z),
+        /// z ∈ {1,2,4} — literal device pixels, as native — with a
+        /// ±8-per-channel deterministic jitter and a 0..255 clamp. The rect
+        /// is the port's disclosed 35/50/70 ×1.4 pelvis model (unchanged;
+        /// native derives its rect from GetCensorRect and expands one cell
+        /// per side — subsumed by that disclosure); skin tone is no longer
+        /// an input (the mosaic colors ARE the covered pixels, as native).
         /// </summary>
         private void DrawCensoredMeshesPixelated(GraphicsDevice device, Effect effect, int censorshipFlags)
         {
@@ -623,7 +626,7 @@ namespace FSO.Vitaboy
                 _censorWhitePx.SetData(new[] { Color.White });
             }
 
-            var cellSize = CensorCellSize(tier, viewport.Width / 800f);
+            var cellSize = CensorCellSize(tier);
             _censorSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque,
                 SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
             for (int y = 0; y < srcRect.Height; y += cellSize.Y)
@@ -671,10 +674,18 @@ namespace FSO.Vitaboy
                     var vp = device.Viewport;
                     var scissor = device.ScissorRectangle;
                     device.SetRenderTarget(null);
-                    rt.GetData(0, rect, px, 0, px.Length);
-                    device.SetRenderTargets(bindings);
-                    device.Viewport = vp;
-                    device.ScissorRectangle = scissor;
+                    try
+                    {
+                        rt.GetData(0, rect, px, 0, px.Length);
+                    }
+                    finally
+                    {
+                        // P2 (indep-review-ui32): a GetData throw must never
+                        // leave the render target unbound for the frame.
+                        device.SetRenderTargets(bindings);
+                        device.Viewport = vp;
+                        device.ScissorRectangle = scissor;
+                    }
                 }
                 else
                 {
