@@ -3448,15 +3448,16 @@ namespace Simitone.Client
                             => e.Object.OBJ.GUID == UnlTravelPetGuids[0]);
                         if (cat5 != null)
                         {
-                            // run-5 evidence: cat person-data 65 (Gender/species slot) =
-                            // 16 in FSO's template — the mice scan @13 IsFlagSet(d65, 3)
-                            // computes (16 & 3) = 0 and rejects the cat every cycle (same
-                            // defect behind V4's never-passing cat test @61). TS1 trees
-                            // expect cat=3; dog=2 already passes (2&3=2). Fam-align-class
-                            // probe-side data fix; spawn/scan logic stays native.
+                            // run-5/6/7 evidence: cat person-data 65 (Gender/species
+                            // slot) = 16 in FSO's template. VMExpression.cs law:
+                            // IsFlagSet(lhs, rhs) = (lhs & (1 << (rhs-1))) > 0 — 1-based
+                            // BIT INDEX, so the scan's @13 IsFlagSet(d65, 3) tests bit 2
+                            // = value 4. TS1 species bits are one-hot (dog=2 bit1 passed
+                            // V4's EQUALS test; cat = 4 bit2); 16 (bit4) and 3 both fail.
+                            // Run-7 ITRACE: all 8 avatar candidates rejected @13 (f=12).
                             Log("AUTOTEST unl-mice cat d65 was " + cat5.GetPersonData(VMPersonDataVariable.Gender)
-                                + " -> 3 (TS1 cat species code)");
-                            cat5.SetPersonData(VMPersonDataVariable.Gender, 3);
+                                + " -> 4 (TS1 cat species bit 2)");
+                            cat5.SetPersonData(VMPersonDataVariable.Gender, 4);
                         }
                         if (cat5 != null)
                             Log("AUTOTEST unl-mice scan-inputs g9=" + _vm.GetGlobalValue(9)
