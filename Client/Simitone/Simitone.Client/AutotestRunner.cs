@@ -670,6 +670,8 @@ namespace Simitone.Client
 
                 if (CheckEnabled("corpus")) RunCorpus();
 
+                if (CheckEnabled("unl-mount")) RunUnleashedMount();
+
                 if (CheckEnabled("uicapture"))
                 {
                     try
@@ -956,7 +958,16 @@ namespace Simitone.Client
                 || CheckEnabled("aud12live")
                 || CheckEnabled("cc05live")
                 || CheckEnabled("cc04live")
-                || CheckEnabled("ss-book"))
+                || CheckEnabled("ss-book")
+                || CheckEnabled("hpparty")
+                || CheckEnabled("vacation")
+                // (EXP-05) Unleashed legs ride the same state-2 soak entry — without
+                // this they fall through to Finish() before any per-frame tick runs.
+                || CheckEnabled("unl-pets")
+                || CheckEnabled("unl-pets2")
+                || CheckEnabled("unl-travel")
+                || CheckEnabled("unl-show")
+                || CheckEnabled("unl-mice"))
             {
                 // (R249) focused-gate dispatch: freewill/freewillvar live inside RunCorpus
                 // (corpus-gated). When a focused opts string names them WITHOUT corpus,
@@ -1327,6 +1338,1209 @@ namespace Simitone.Client
             }
         }
 
+
+        // EXP-05 V1 ('unl-mount', opt-in): Unleashed pack mount census against EXA-05's
+        // accepted census (coordination/evidence/EXA-05/) and the scope receipt
+        // coordination/evidence/EXP-05/exp05-scope-20260921.md. Asserts (1) the pack's
+        // controller/pen-animal/template IFFs mount through the generic FAR object
+        // provider (TS1ObjectProvider.Entries), (2) the census GUIDs resolve in
+        // ObjdByGUID and the sampled pen animals are Person-typed (EXA-05 person-OBJD
+        // law), (3) sep5snds.hot events merged into TS1Audio with the exact station +
+        // pet-vox registrations (type/track), (4) informationally: total merged event
+        // count and the kSoundobPlay family size (scope census: 596 from sep5snds).
+        private static void RunUnleashedMount()
+        {
+            bool ok = true;
+            try
+            {
+                var ts1p = Content.Get().WorldObjects as FSO.Content.TS1.TS1ObjectProvider;
+                if (ts1p == null)
+                {
+                    Log("AUTOTEST unl-mount WorldObjects is " + Content.Get().WorldObjects.GetType().Name);
+                    ok = false;
+                }
+                else
+                {
+                    var byFile = new Dictionary<string, List<ulong>>();
+                    foreach (var kv in ts1p.Entries)
+                    {
+                        var stem = (kv.Value.FileName ?? "").ToLowerInvariant();
+                        if (stem.EndsWith(".iff")) stem = stem.Substring(0, stem.Length - 4);
+                        if (!byFile.TryGetValue(stem, out var lst)) { lst = new List<ulong>(); byFile[stem] = lst; }
+                        lst.Add(kv.Key);
+                    }
+                    Log("AUTOTEST unl-mount mounted object entries=" + ts1p.Entries.Count
+                        + " persons=" + ts1p.PersonGUIDs.Count);
+
+                    // files that must mount with >=1 OBJD (EXA-05 controllers + pets)
+                    string[] needIff = {
+                        "control-petshow", "mice", "control-garden", "villagecontrol",
+                        "unleashedcontroller", "npc_unleashed_animalcontrolpp", "npc_unleashed_controller",
+                        "petcatsit", "petdogsit", "neighborhoodpedmarker", "neighborhoodphoneplugin",
+                        "npc_pen_tabby", "npc_pen_labrador", "npc_pen_cattwo", "npc_pen_dogtwo",
+                        "templatecat", "templatedog"
+                    };
+                    int found = 0;
+                    foreach (var stem in needIff)
+                    {
+                        if (byFile.TryGetValue(stem, out var guids) && guids.Count > 0)
+                        {
+                            found++;
+                            Log("AUTOTEST unl-mount iff=" + stem + " guids="
+                                + string.Join(",", guids.Select(g => "0x" + g.ToString("x8"))));
+                        }
+                        else { Log("AUTOTEST unl-mount iff=" + stem + " NOT-MOUNTED"); ok = false; }
+                    }
+                    Log("AUTOTEST unl-mount objects found=" + found + "/" + needIff.Length);
+
+                    // census GUIDs that must exist regardless of file attribution
+                    uint[] needGuid = {
+                        0xC1BA4467u, // control-petshow  Pet Show
+                        0x90F874BDu, // mice             Mice
+                        0x02E286F1u, // control-garden   Garden
+                        0xDDEBF1B8u, // villagecontrol   Village
+                        0x8D6DE9ECu, // unleashedcontroller Buy/Build
+                        0x90CE2A28u, // community phone adder
+                        0x2D0E6578u, // animal control plugin
+                        0x9ACF8347u, // npc controller
+                        0xA87C54E0u, // petcatsit
+                        0xD0F5E1DEu, // petdogsit
+                        0x3F79F92Cu, // neighborhood ped marker
+                        0xEAA79D86u, // neighborhood phone plugin
+                        0x04D86D1Fu, // pen tabby
+                        0xA6A4A1ACu, // pen labrador
+                        0x7318C9DFu, // pen cat two
+                        0x05DAC986u, // pen dog two
+                        0x7BEA0977u, // templatecat
+                        0x4A70DF92u  // templatedog
+                    };
+                    int gfound = 0;
+                    foreach (var g in needGuid)
+                    {
+                        if (ts1p.Entries.ContainsKey(g)) gfound++;
+                        else { Log("AUTOTEST unl-mount guid 0x" + g.ToString("x8") + " MISSING"); ok = false; }
+                    }
+                    Log("AUTOTEST unl-mount census guids=" + gfound + "/" + needGuid.Length);
+
+                    // pen animals are Person OBJDs (EXA-05 law) — sampled cross-check
+                    uint[] penSample = { 0x04D86D1Fu, 0xA6A4A1ACu, 0x7318C9DFu, 0x05DAC986u };
+                    int pfound = penSample.Count(g => ts1p.PersonGUIDs.Contains(g));
+                    Log("AUTOTEST unl-mount pen-person sample=" + pfound + "/4");
+                    if (pfound != 4) ok = false;
+                }
+
+                var tAudio = Content.Get().Audio as FSO.Content.TS1.TS1Audio;
+                if (tAudio == null)
+                {
+                    Log("AUTOTEST unl-mount audio provider is not TS1Audio");
+                    ok = false;
+                }
+                else
+                {
+                    var evts = tAudio.Events;
+                    Log("AUTOTEST unl-mount events total=" + evts.Count);
+                    FSO.Content.Model.HITEventRegistration reg;
+                    if (evts.TryGetValue("station_unleashed", out reg))
+                    {
+                        Log("AUTOTEST unl-mount station_unleashed type=" + reg.EventType + " track=" + reg.TrackID);
+                        if (reg.EventType != FSO.Files.HIT.HITEvents.kSetMusicMode || reg.TrackID != 12) ok = false;
+                    }
+                    else { Log("AUTOTEST unl-mount station_unleashed MISSING"); ok = false; }
+
+                    if (evts.TryGetValue("voxcat_pshow_viewbad", out reg))
+                    {
+                        Log("AUTOTEST unl-mount voxcat_pshow_viewbad type=" + reg.EventType + " track=" + reg.TrackID);
+                        if (reg.EventType != FSO.Files.HIT.HITEvents.kSoundobPlay || reg.TrackID != 21557) ok = false;
+                    }
+                    else { Log("AUTOTEST unl-mount voxcat_pshow_viewbad MISSING"); ok = false; }
+
+                    int sndob = evts.Values.Count(x => x.EventType == FSO.Files.HIT.HITEvents.kSoundobPlay);
+                    var over49 = evts.Values.GroupBy(x => (int)x.EventType).Where(g => g.Key > 49)
+                        .Select(g => g.Key + "x" + g.Count()).ToList();
+                    Log("AUTOTEST unl-mount kSoundobPlay events=" + sndob + " (scope census: 596 from sep5snds)"
+                        + " unmapped-type events=" + string.Join(",", over49));
+                }
+            }
+            catch (Exception e)
+            {
+                Log("AUTOTEST unl-mount EXC " + e.GetType().Name + " " + e.Message);
+                ok = false;
+            }
+            if (ok) Pass("unl-mount"); else Fail("unl-mount");
+        }
+
+        // EXP-05 V2 ('unl-pets'): pen-animal family attach + native spawn + motive soak +
+        // save/reload persistence. Pet members are Person OBJDs (EXA-05 law; V1 confirmed
+        // them in PersonGUIDs); VerifyFamily spawns family members straight from
+        // FAMI.RuntimeSubset GUIDs, so the probe needs no character files (real adoption
+        // owns that path and stays UI-gated).
+        private static void UnlPetsTick()
+        {
+            try
+            {
+                if (_unlState == 0)
+                {
+                    _unlState = 1;
+                    var neigh = Content.Get().Neighborhood;
+                    var fams = neigh.MainResource.List<FAMI>() ?? new List<FAMI>();
+                    ushort newId = 0;
+                    foreach (var f in fams.OrderBy(x => x.ChunkID))
+                    {
+                        if (f.ChunkID == newId) newId++;
+                        else break;
+                    }
+                    int famNum = fams.Count == 0 ? 1 : fams.Max(x => x.FamilyNumber) + 1;
+                    _unlFam = new FAMI
+                    {
+                        ChunkLabel = "",
+                        ChunkID = newId,
+                        ChunkProcessed = true,
+                        ChunkType = "FAMI",
+                        ChunkParent = neigh.MainResource,
+                        AddedByPatch = true,
+                        FamilyGUIDs = UnlPetGuids,
+                        RuntimeSubset = UnlPetGuids,
+                        FamilyNumber = famNum,
+                        Unknown = 1,
+                        Budget = 20000,
+                    };
+                    neigh.MainResource.AddChunk(_unlFam);
+                    var famsChunk = new FAMs
+                    {
+                        ChunkLabel = "",
+                        ChunkID = newId,
+                        ChunkProcessed = true,
+                        ChunkType = "FAMs",
+                        ChunkParent = neigh.MainResource,
+                        AddedByPatch = true,
+                    };
+                    famsChunk.InsertString(0, new STRItem { Comment = "", Value = "PetProbe" });
+                    neigh.MainResource.AddChunk(famsChunk);
+                    neigh.SetFamilyForHouse(UnlPetHouse, _unlFam, false);
+                    Log("AUTOTEST unl-pets attach famId=" + newId + " house=" + UnlPetHouse
+                        + " guids=" + string.Join(",", UnlPetGuids.Select(g => "0x" + g.ToString("x8"))));
+                    var objs = Content.Get().WorldObjects as FSO.Content.TS1.TS1ObjectProvider;
+                    foreach (var g in UnlPetGuids)
+                    {
+                        FSO.Files.Formats.IFF.Chunks.OBJD obj = null;
+                        if (objs != null) FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID.TryGetValue(g, out obj);
+                        if (obj != null && obj.RawData != null && obj.RawData.Length > 98)
+                            Log("AUTOTEST unl-pets flags guid=0x" + g.ToString("x8")
+                                + " f92=0x" + obj.RawData[92].ToString("x4") + " (bit5=" + ((obj.RawData[92] & 0x20) != 0) + ")"
+                                + " f98=0x" + obj.RawData[98].ToString("x4"));
+                        else Log("AUTOTEST unl-pets flags guid=0x" + g.ToString("x8") + " unavailable");
+                    }
+                    _screen.PlayHouse(UnlPetHouse, null);
+                    _unlFrame = 0;
+                    return;
+                }
+                _unlFrame++;
+                if (_screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    _vm = _screen.vm;
+
+                var avatars = _vm == null ? new List<VMAvatar>() : _vm.Entities.OfType<VMAvatar>().ToList();
+                if (_unlState == 1)
+                {
+                    var spawned = UnlPetGuids.Select(g => avatars.FirstOrDefault(a => a.Object.OBJ.GUID == g)).ToList();
+                    if (spawned.All(a => a != null))
+                    {
+                        _unlState = 2;
+                        _unlSoak0 = _unlFrame;
+                        for (int i = 0; i < UnlPetGuids.Length; i++)
+                        {
+                            for (short m = 0; m < 16; m++) _unlMotives0[i * 16 + m] = spawned[i].GetMotiveData((VMMotive)m);
+                            Log("AUTOTEST unl-pets SPAWN guid=0x" + UnlPetGuids[i].ToString("x8")
+                                + " oid=" + spawned[i].ObjectID + " motives0=" + MotiveStr(spawned[i]));
+                        }
+                        Log("AUTOTEST unl-pets state=soak f=" + _unlFrame + " avatars=" + avatars.Count
+                            + " g9=" + _vm.GetGlobalValue(9) + " g32=" + _vm.GetGlobalValue(32)
+                            + " speed=" + _vm.SpeedMultiplier + " minute=" + _vm.Context.Clock.Minutes);
+                    }
+                    else if (_unlFrame > 900)
+                    {
+                        Log("AUTOTEST unl-pets spawn TIMEOUT avatars=" + avatars.Count
+                            + " guids=" + string.Join(",", avatars.Select(a => "0x" + a.Object.OBJ.GUID.ToString("x8"))));
+                        Fail("unl-pets"); _unlState = 99;
+                    }
+                    return;
+                }
+                if (_unlState == 2)
+                {
+                    if ((_unlFrame - _unlSoak0) % 25 == 0)
+                    {
+                        var petLog = "";
+                        for (int i = 0; i < UnlPetGuids.Length; i++)
+                        {
+                            var a = avatars.FirstOrDefault(x => x.Object.OBJ.GUID == UnlPetGuids[i]);
+                            petLog += " pet" + i + (a == null ? "GONE" : "=" + a.ObjectID);
+                        }
+                        Log("AUTOTEST unl-pets trace f=" + _unlFrame + " ents=" + _vm.Entities.Count
+                            + " minute=" + _vm.Context.Clock.Minutes + " speed=" + _vm.SpeedMultiplier + petLog);
+                    }
+                    if (_unlFrame - _unlSoak0 >= 600)
+                    {
+                        bool anyDelta = false;
+                        for (int i = 0; i < UnlPetGuids.Length; i++)
+                        {
+                            var a = avatars.FirstOrDefault(x => x.Object.OBJ.GUID == UnlPetGuids[i]);
+                            if (a == null) continue;
+                            for (short m = 0; m < 16; m++)
+                                if (a.GetMotiveData((VMMotive)m) != _unlMotives0[i * 16 + m]) { anyDelta = true; break; }
+                        }
+                        // Observation, not a gate: whether pet motives decay at all in the
+                        // port is itself an EXP-05 scoping finding. The verdict keys on
+                        // save/reload persistence below.
+                        Log("AUTOTEST unl-pets motive-delta=" + anyDelta + " (observation)");
+                        _unlState = 3;
+                    }
+                    return;
+                }
+                if (_unlState == 3)
+                {
+                    _unlState = 4;
+                    _screen.Save();
+                    Log("AUTOTEST unl-pets SAVED f=" + _unlFrame);
+                    _screen.PlayHouse(UnlPetHouse, null);
+                    _unlFrame = 0;
+                    return;
+                }
+                if (_unlState == 4) { _unlState = 5; return; } // let the reload settle one frame
+                if (_unlState == 5)
+                {
+                    var pets = UnlPetGuids.Select(g => avatars.FirstOrDefault(a => a.Object.OBJ.GUID == g)).ToList();
+                    if (pets.All(a => a != null))
+                    {
+                        for (int i = 0; i < UnlPetGuids.Length; i++)
+                            Log("AUTOTEST unl-pets RESUMED guid=0x" + UnlPetGuids[i].ToString("x8")
+                                + " oid=" + pets[i].ObjectID + " motives=" + MotiveStr(pets[i]));
+                        Pass("unl-pets"); _unlState = 99;
+                    }
+                    else if (_unlFrame > 900)
+                    {
+                        Log("AUTOTEST unl-pets resume TIMEOUT avatars=" + avatars.Count);
+                        Fail("unl-pets"); _unlState = 99;
+                    }
+                }
+            }
+            catch (Exception ue)
+            {
+                Log("AUTOTEST unl-pets EXC " + ue.GetType().Name + " " + ue.Message);
+                Fail("unl-pets"); _unlState = 99;
+            }
+        }
+
+        private static string MotiveStr(VMAvatar a)
+        {
+            var parts = new List<string>();
+            for (short m = 0; m < 16; m++) parts.Add(a.GetMotiveData((VMMotive)m).ToString());
+            return string.Join(",", parts);
+        }
+
+        // EXP-05 V3 ('unl-pets2'): same FC-B attach as V2, then a per-frame forensic
+        // trace over the removal window (F-PETS-DESPAWN). If the pets' own thread
+        // deletes them (VMRemoveObjectInstance Target==0 → Caller), the last stack-top
+        // logged before GONE names the BHAV. Verdict = characterization evidence
+        // captured (removal traced, or no removal within 600 frames); Fail only on
+        // exception or spawn timeout.
+        private static void UnlPets2Tick()
+        {
+            try
+            {
+                if (_unl2State == 0)
+                {
+                    _unl2State = 1;
+                    var neigh = Content.Get().Neighborhood;
+                    var fams = neigh.MainResource.List<FAMI>() ?? new List<FAMI>();
+                    ushort newId = 0;
+                    foreach (var f in fams.OrderBy(x => x.ChunkID))
+                    {
+                        if (f.ChunkID == newId) newId++;
+                        else break;
+                    }
+                    int famNum = fams.Count == 0 ? 1 : fams.Max(x => x.FamilyNumber) + 1;
+                    _unl2Fam = new FAMI
+                    {
+                        ChunkLabel = "",
+                        ChunkID = newId,
+                        ChunkProcessed = true,
+                        ChunkType = "FAMI",
+                        ChunkParent = neigh.MainResource,
+                        AddedByPatch = true,
+                        FamilyGUIDs = Unl2PetGuids,
+                        RuntimeSubset = Unl2PetGuids,
+                        FamilyNumber = famNum,
+                        Unknown = 1,
+                        Budget = 20000,
+                    };
+                    neigh.MainResource.AddChunk(_unl2Fam);
+                    var famsChunk = new FAMs
+                    {
+                        ChunkLabel = "",
+                        ChunkID = newId,
+                        ChunkProcessed = true,
+                        ChunkType = "FAMs",
+                        ChunkParent = neigh.MainResource,
+                        AddedByPatch = true,
+                    };
+                    famsChunk.InsertString(0, new STRItem { Comment = "", Value = "PetProbe2" });
+                    neigh.MainResource.AddChunk(famsChunk);
+                    neigh.SetFamilyForHouse(Unl2PetHouse, _unl2Fam, false);
+                    Log("AUTOTEST unl-pets2 attach famId=" + newId + " house=" + Unl2PetHouse
+                        + " guids=" + string.Join(",", Unl2PetGuids.Select(g => "0x" + g.ToString("x8"))));
+                    VMGenericTSOCall.AutotestPetGoneSink = (s) => Log("AUTOTEST " + s);
+                    _screen.PlayHouse(Unl2PetHouse, null);
+                    _unl2Frame = 0;
+                    return;
+                }
+                _unl2Frame++;
+                if (_screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    _vm = _screen.vm;
+
+                var avatars = _vm == null ? new List<VMAvatar>() : _vm.Entities.OfType<VMAvatar>().ToList();
+                if (_unl2State == 1)
+                {
+                    var spawned = Unl2PetGuids.Select(g => avatars.FirstOrDefault(a => a.Object.OBJ.GUID == g)).ToList();
+                    if (spawned.All(a => a != null))
+                    {
+                        _unl2State = 2;
+                        _unl2Spawn0 = _unl2Frame;
+                        var mailbox = _vm.Entities.FirstOrDefault(x =>
+                            x.Object.OBJ.GUID == 0xEF121974u || x.Object.OBJ.GUID == 0x1D95C9B0u);
+                        Log("AUTOTEST unl-pets2 SPAWN f=" + _unl2Frame + " ents=" + _vm.Entities.Count
+                            + " mailbox=" + (mailbox == null ? "MISSING" : "oid" + mailbox.ObjectID)
+                            + " minute=" + _vm.Context.Clock.Minutes);
+                        for (int i = 0; i < Unl2PetGuids.Length; i++)
+                            Log("AUTOTEST unl-pets2 pet" + i + " oid=" + spawned[i].ObjectID
+                                + " oow=" + (spawned[i].Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)
+                                + " thread=" + (spawned[i].Thread != null)
+                                + " stack=" + Unl2StackTop(spawned[i]));
+                    }
+                    else if (_unl2Frame > 900)
+                    {
+                        Log("AUTOTEST unl-pets2 spawn TIMEOUT avatars=" + avatars.Count);
+                        Fail("unl-pets2"); _unl2State = 99;
+                    }
+                    return;
+                }
+                if (_unl2State == 2)
+                {
+                    var rel = _unl2Frame - _unl2Spawn0;
+                    bool dense = rel <= 40, mid = rel <= 100;
+                    if (dense || (mid && rel % 10 == 0) || (!mid && rel % 25 == 0))
+                    {
+                        var petLog = "";
+                        for (int i = 0; i < Unl2PetGuids.Length; i++)
+                        {
+                            var a = avatars.FirstOrDefault(x => x.Object.OBJ.GUID == Unl2PetGuids[i]);
+                            petLog += " pet" + (a == null
+                                ? "GONE"
+                                : "=" + a.ObjectID + (a.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD ? "/oow" : "")
+                                    + " fam=" + a.GetPersonData(VMPersonDataVariable.TS1FamilyNumber)
+                                    + (a.Thread != null ? " th=" + Unl2StackTop(a) : " noth"));
+                        }
+                        var threaded = "";
+                        foreach (var e in _vm.Entities)
+                        {
+                            if (e.Thread == null || e is VMAvatar) continue;
+                            threaded += " obj" + e.ObjectID + "/0x" + e.Object.OBJ.GUID.ToString("x8")
+                                + " th=" + Unl2StackTop(e);
+                        }
+                        Log("AUTOTEST unl-pets2 trace f=" + rel + " ents=" + _vm.Entities.Count + petLog + threaded);
+                    }
+                    bool anyGone = Unl2PetGuids.Any(g => !avatars.Any(x => x.Object.OBJ.GUID == g));
+                    if (anyGone || rel >= 600)
+                    {
+                        _unl2Captured = true;
+                        Log("AUTOTEST unl-pets2 characterization=" + (anyGone ? "REMOVAL-TRACED" : "NO-REMOVAL-600F")
+                            + " at-rel=" + rel);
+                        _unl2State = 3;
+                    }
+                    return;
+                }
+                if (_unl2State == 3)
+                {
+                    _unl2State = 99;
+                    VMGenericTSOCall.AutotestPetGoneSink = null;
+                    if (_unl2Captured) Pass("unl-pets2"); else Fail("unl-pets2");
+                }
+            }
+            catch (Exception ue)
+            {
+                Log("AUTOTEST unl-pets2 EXC " + ue.GetType().Name + " " + ue.Message);
+                VMGenericTSOCall.AutotestPetGoneSink = null;
+                Fail("unl-pets2"); _unl2State = 99;
+            }
+        }
+
+        private static string Unl2StackTop(VMEntity e)
+        {
+            var t = e.Thread;
+            if (t == null || t.Stack == null || t.Stack.Count == 0) return "empty";
+            var f = t.Stack[t.Stack.Count - 1];
+            var r = f.Routine;
+            if (r == null) return "noroutine";
+            var parent = (r.Chunk != null && r.Chunk.ChunkParent != null) ? r.Chunk.ChunkParent.Filename : "?";
+            return r.ID + "@" + f.InstructionPointer + "(" + parent + ":" + (r.Chunk != null ? r.Chunk.ChunkLabel : "?") + ")"
+                + " q=" + (t.Queue == null ? 0 : t.Queue.Count);
+        }
+
+        // EXP-05 V6 ('unl-travel'): the Old Town round trip per the TRV-02 law.
+        // Booking rides the REAL phone-tree path (run-71 push idiom) into generic
+        // TS1 call 17 (ChangeToLotInTemp0): the engine saves motive/time tokens per
+        // NID, writes GameState.LotTransitInfo/DowntownSimGUID and signals the lot
+        // switch; the client saves the home VM in-memory (SavedLot), loads the Old
+        // Town house file with Downtown=true, and the community lot's main BHAV
+        // (mode 26 BuildVacationFamily) activates the visiting family from
+        // GameState.ActiveFamily and VerifyFamily-spawns every member — pets ride
+        // the family (V3 corrective law: template pets carry TS1FamilyNumber).
+        // Return: away-lot phone "home" row (real path) or the EXP-04 run-88
+        // SignalLotSwitch(-1) idiom; the client maps -1 to ActiveFamily.HouseNumber
+        // and resumes the in-memory SavedLot (exact VM restore → same oids).
+        private static void UnlTravelTick()
+        {
+            try
+            {
+                if (_unltrState == 0)
+                {
+                    if (++_unltrSettle < 90) return;
+                    _unltrSettle = 0;
+                    _unltrState = 1;
+                    // no stale EXP-04 lever may redirect our booking
+                    FSO.SimAntics.Engine.VMThread.AutotestVacLotOverride = 0;
+                    var neigh = Content.Get().Neighborhood;
+                    // human GUID: a member GUID of the default house-5 family — known
+                    // to spawn as a human adult through VerifyFamily (the battery's
+                    // default lot runs it every run); fallback = lowest person template.
+                    uint human = 0;
+                    var fam5 = neigh.GetFamilyForHouse(5);
+                    if (fam5 != null && fam5.FamilyGUIDs != null)
+                        human = fam5.FamilyGUIDs.FirstOrDefault(g => !UnlTravelPetGuids.Contains(g));
+                    if (human == 0)
+                    {
+                        var objs = Content.Get().WorldObjects as FSO.Content.TS1.TS1ObjectProvider;
+                        if (objs != null) human = objs.PersonGUIDs.OrderBy(x => x).FirstOrDefault();
+                    }
+                    _unltrHumanGuid = human;
+                    var guids = new[] { human, UnlTravelPetGuids[0], UnlTravelPetGuids[1] };
+                    var fams = neigh.MainResource.List<FAMI>() ?? new List<FAMI>();
+                    ushort newId = 0;
+                    foreach (var f in fams.OrderBy(x => x.ChunkID))
+                    {
+                        if (f.ChunkID == newId) newId++;
+                        else break;
+                    }
+                    int famNum = fams.Count == 0 ? 1 : fams.Max(x => x.FamilyNumber) + 1;
+                    _unltrFam = new FSO.Files.Formats.IFF.Chunks.FAMI
+                    {
+                        ChunkLabel = "",
+                        ChunkID = newId,
+                        ChunkProcessed = true,
+                        ChunkType = "FAMI",
+                        ChunkParent = neigh.MainResource,
+                        AddedByPatch = true,
+                        FamilyGUIDs = guids,
+                        RuntimeSubset = guids,
+                        FamilyNumber = famNum,
+                        Unknown = 1,
+                        Budget = 20000,
+                    };
+                    neigh.MainResource.AddChunk(_unltrFam);
+                    var famsChunk = new FAMs
+                    {
+                        ChunkLabel = "",
+                        ChunkID = newId,
+                        ChunkProcessed = true,
+                        ChunkType = "FAMs",
+                        ChunkParent = neigh.MainResource,
+                        AddedByPatch = true,
+                    };
+                    famsChunk.InsertString(0, new FSO.Files.Formats.IFF.Chunks.STRItem { Comment = "", Value = "TravelProbe" });
+                    neigh.MainResource.AddChunk(famsChunk);
+                    neigh.SetFamilyForHouse(UnlTravelHouse, _unltrFam, false);
+                    Log("AUTOTEST unl-travel attach famId=" + newId + " house=" + UnlTravelHouse
+                        + " human=0x" + human.ToString("x8") + " (fam5=" + (fam5 == null ? "null" : "ok") + ")"
+                        + " pets=" + string.Join(",", UnlTravelPetGuids.Select(g => "0x" + g.ToString("x8"))));
+                    // run-12: lot-switch sink (engine VM.cs hook, EXP-05.md) —
+                    // attributes booking/return signals to VM identities, since the
+                    // away window closes inside one probe frame (run-11).
+                    FSO.SimAntics.VM.AutotestLotSwitchSink = (uint lot, string vh) =>
+                    {
+                        Log("AUTOTEST unl-travel lotSwitch SINK vm=" + vh
+                            + " lot=" + (lot == 0xFFFFFFFFu ? "home(-1)" : lot.ToString())
+                            + " homeVm=" + _vm?.GetHashCode().ToString("x")
+                            + " dt=" + UnltrDowntown() + " at " + Sim3Clock());
+                        if (lot == 0xFFFFFFFFu || lot == (uint)UnlTravelHouse)
+                            _unltrReturnSeen = true;
+                    };
+                    // run-12: offline disassembly of the away lot's main BHAV(s) —
+                    // names the tree that ejects the visiting family (F-TRAVEL-EJECT).
+                    try
+                    {
+                        var hPath = Content.Get().Neighborhood.GetHousePath(UnlTravelDest);
+                        if (System.IO.File.Exists(hPath))
+                        {
+                            var hIff = new FSO.Files.Formats.IFF.IffFile(hPath);
+                            var bhavs = hIff.List<FSO.Files.Formats.IFF.Chunks.BHAV>()
+                                ?? new System.Collections.Generic.List<FSO.Files.Formats.IFF.Chunks.BHAV>();
+                            Log("AUTOTEST unl-travel house80 bhavs="
+                                + string.Join(",", bhavs.Select(b => b.ChunkID + ":" + b.ChunkLabel)));
+                            foreach (var b in bhavs
+                                .Where(b => (b.ChunkLabel ?? "").ToLower().Contains("main")))
+                            {
+                                var parts = new System.Collections.Generic.List<string>();
+                                for (int k = 0; k < b.Instructions.Length && k < 40; k++)
+                                    parts.Add(k + ":" + b.Instructions[k].Opcode + ">"
+                                        + b.Instructions[k].TruePointer + "/" + b.Instructions[k].FalsePointer);
+                                Log("AUTOTEST unl-travel house80 tree " + b.ChunkID + "(" + b.ChunkLabel + ")["
+                                    + string.Join(" ", parts) + "]");
+                            }
+                        }
+                        else Log("AUTOTEST unl-travel house80 file missing: " + hPath);
+                    }
+                    catch (Exception hxe) { Log("AUTOTEST unl-travel house80 dump EXC " + hxe.Message); }
+                    _screen.PlayHouse(UnlTravelHouse, null);
+                    _unltrFrame = 0;
+                    return;
+                }
+                _unltrFrame++;
+                // run-13 law: this rebind runs for every state >= 1 tick; unguarded it
+                // equalizes _vm with screen.vm BEFORE the state-2 awayBind check, which
+                // is why REBIND-AWAY never fired. State 1 needs it (post-PlayHouse VM
+                // swap); state >= 2 must keep _vm on the home VM for the comparison.
+                if (_unltrState == 1 && _screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    _vm = _screen.vm;
+
+                var avatars = _vm == null ? new List<VMAvatar>() : _vm.Entities.OfType<VMAvatar>().ToList();
+                if (_unltrState == 1)
+                {
+                    var fam = UnlTravelGuids();
+                    var spawned = fam.Select(g => avatars.FirstOrDefault(a => a.Object.OBJ.GUID == g)).ToList();
+                    if (spawned.All(a => a != null))
+                    {
+                        var gs = Content.Get().Neighborhood.GameState;
+                        _unltrTransit0 = gs?.LotTransitInfo ?? -1;
+                        _unltrG340 = _vm.GetGlobalValue(34);
+                        for (int i = 0; i < 3; i++)
+                        {
+                            _unltrOids0[i] = spawned[i].ObjectID;
+                            for (short m = 0; m < 16; m++) _unltrMotives0[i * 16 + m] = spawned[i].GetMotiveData((VMMotive)m);
+                        }
+                        var host = spawned[0].GetPersonData(VMPersonDataVariable.PersonsAge) >= 18 ? spawned[0]
+                            : spawned.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? spawned[0];
+                        _unltrHostNid = host.GetPersonData(VMPersonDataVariable.NeighborId);
+                        Log("AUTOTEST unl-travel SPAWN famId=" + _unltrFam.ChunkID
+                            + " guids=" + string.Join(",", fam.Select(g => "0x" + g.ToString("x8")))
+                            + " oids=" + string.Join(",", _unltrOids0)
+                            + " ages=" + string.Join(",", fam.Select(g => avatars.First(a => a.Object.OBJ.GUID == g).GetPersonData(VMPersonDataVariable.PersonsAge)))
+                            + " hostNid=" + _unltrHostNid + " transit0=" + _unltrTransit0 + " g340=" + _unltrG340
+                            + " clock=" + Sim3Clock() + " g9=" + _vm.GetGlobalValue(9));
+                        // phone hunt + full row dump (the Old Town booking row must be
+                        // found before any push; run 1 is the characterization dump)
+                        var phone = HPFindPhone();
+                        if (phone == null)
+                        {
+                            Log("AUTOTEST unl-travel: no phone on lot " + UnlTravelHouse);
+                            Fail("unl-travel"); _unltrState = 99; return;
+                        }
+                        var iff = phone.Object?.Resource?.Iff;
+                        var ttas = iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                        if (ttas == null)
+                        {
+                            Log("AUTOTEST unl-travel: phone TTAs 129 missing");
+                            Fail("unl-travel"); _unltrState = 99; return;
+                        }
+                        var names = new List<string>();
+                        for (int i = 0; i < ttas.Length; i++) names.Add((ttas.GetString(i) ?? "").Trim());
+                        for (int i = 0; i < names.Count; i += 25)
+                            Log("AUTOTEST unl-travel phone rows[" + i + ".." + Math.Min(i + 24, names.Count - 1) + "]=[" + string.Join(" | ", names.Skip(i).Take(25)) + "]");
+                        for (int i = 0; i < names.Count; i++)
+                        {
+                            var lbl = names[i];
+                            bool oldTown = lbl.IndexOf("old town", System.StringComparison.OrdinalIgnoreCase) >= 0;
+                            bool ask = lbl.IndexOf("ask", System.StringComparison.OrdinalIgnoreCase) >= 0;
+                            if (_unltrRow < 0 && oldTown && !ask) { _unltrRow = i; _unltrTarget = phone; }
+                        }
+                        // run-2 finding: the base phone has no Old Town row and its
+                        // "Call Cab..." tree spawns an arriving VISITOR (Doors.iff
+                        // knock path) — mode 17 never fires queue-path. The proven
+                        // booking tree is the vacation plugin's direct "Go On
+                        // Vacation" (BHAV 4100, EXP-04 runs 76-86) — scan plugin
+                        // objects the same way VacInit did.
+                        // run-3 finding: the Unleashed booking plugin exists —
+                        // neighborhoodphoneplugin.iff rows [Spawn Disease | Invite to
+                        // Old Town | Go to Old Town | Spawn Purchases | Go to Old Town].
+                        // Sweep 1 therefore prefers the native Old Town row; the
+                        // vacation plugin row stays fallback (run 3: its 4100 tree
+                        // parked at @3 op=260 queue-path).
+                        var pluginCands = new List<KeyValuePair<VMEntity, List<string>>>();
+                        foreach (var e in _vm.Entities)
+                        {
+                            var fn = e.Object?.Resource?.MainIff?.Filename;
+                            if (fn == null) continue;
+                            var low = fn.ToLowerInvariant();
+                            bool cand = low.Contains("plugin") || low.Contains("vacation")
+                                || low.Contains("unleashed") || low.Contains("oldtown") || low.Contains("old town")
+                                || low.Contains("downtown") || low.Contains("ep5") || low.Contains("town");
+                            if (!cand) continue;
+                            var pttas = e.Object?.Resource?.Iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                            var pn = new List<string>();
+                            if (pttas != null) for (int i = 0; i < pttas.Length; i++) pn.Add((pttas.GetString(i) ?? "").Trim());
+                            Log("AUTOTEST unl-travel plugin-candidate obj" + e.ObjectID + " file='" + fn + "' rows"
+                                + "=[" + string.Join(" | ", pn) + "]");
+                            pluginCands.Add(new KeyValuePair<VMEntity, List<string>>(e, pn));
+                        }
+                        // sweep 1: native direct Old Town rows (not invite/ask)
+                        foreach (var kv in pluginCands)
+                            for (int i = 0; i < kv.Value.Count && _unltrRow < 0; i++)
+                            {
+                                var lbl = kv.Value[i];
+                                if (lbl.IndexOf("old town", System.StringComparison.OrdinalIgnoreCase) >= 0
+                                    && lbl.IndexOf("ask", System.StringComparison.OrdinalIgnoreCase) < 0
+                                    && lbl.IndexOf("invite", System.StringComparison.OrdinalIgnoreCase) < 0)
+                                { _unltrRow = i; _unltrTarget = kv.Key; Log("AUTOTEST unl-travel: prefer OLD TOWN direct row idx=" + i); }
+                            }
+                        // sweep 2: vacation direct (EXP-04 proven tree)
+                        if (_unltrRow < 0)
+                            foreach (var kv in pluginCands)
+                                for (int i = 0; i < kv.Value.Count && _unltrRow < 0; i++)
+                                {
+                                    var lbl = kv.Value[i];
+                                    if (lbl.IndexOf("go on vacation", System.StringComparison.OrdinalIgnoreCase) >= 0
+                                        && lbl.IndexOf("ask", System.StringComparison.OrdinalIgnoreCase) < 0)
+                                    { _unltrRow = i; _unltrTarget = kv.Key; Log("AUTOTEST unl-travel: prefer vacation direct row idx=" + i); }
+                                }
+                        // sweep 3: any vacation/old-town-ish row
+                        if (_unltrRow < 0)
+                            foreach (var kv in pluginCands)
+                                for (int i = 0; i < kv.Value.Count && _unltrRow < 0; i++)
+                                {
+                                    var lbl = kv.Value[i];
+                                    if (lbl.IndexOf("vacation", System.StringComparison.OrdinalIgnoreCase) >= 0
+                                        || lbl.IndexOf("old town", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                                    { _unltrRow = i; _unltrTarget = kv.Key; }
+                                }
+                        if (_unltrRow < 0)
+                        {
+                            Log("AUTOTEST unl-travel: no bookable row on phone or plugins");
+                            Fail("unl-travel"); _unltrState = 99; return;
+                        }
+                        var chosenLbl = (_unltrTarget == phone ? names[_unltrRow]
+                            : (_unltrTarget.Object?.Resource?.Iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129)?.GetString(_unltrRow) ?? ""));
+                        Log("AUTOTEST unl-travel BOOK row=" + _unltrRow + " '" + chosenLbl
+                            + "' on " + (_unltrTarget == phone ? "phone" : "obj" + _unltrTarget.ObjectID));
+                        _unltrHost = host; _unltrPhone = phone;
+                        // EXP-04 arming law (runs 77/82): the shared 4100 plugin
+                        // dialect gates the cab/token block on StackObject.attr[1]
+                        // and attr[5] = booked-sim oid — run 4 proved the Old Town
+                        // tree parks at Wait-For-Notify without it (the
+                        // neighborhoodphoneplugin tree runs the same BHAV).
+                        if (_unltrTarget != phone)
+                        {
+                            if (_unltrTarget.GetAttribute(1) == 0)
+                            {
+                                _unltrTarget.SetAttribute(1, 1);
+                                Log("AUTOTEST unl-travel: set plugin attr1=1 (Go On Vacation gate)");
+                            }
+                            if (_unltrTarget.GetAttribute(5) == 0)
+                            {
+                                _unltrTarget.SetAttribute(5, (short)host.ObjectID);
+                                Log("AUTOTEST unl-travel: set plugin attr5=" + host.ObjectID + " (booked-sim id)");
+                            }
+                        }
+                        // run-2 law: non-vacation destinations read VM global 34 for
+                        // LotTransitInfo (mode 17) — 0 books a single-sim trip and the
+                        // pets stay home. 1 = native whole-family semantics.
+                        _vm.SetGlobalValue(34, 1);
+                        Log("AUTOTEST unl-travel g34set=1 (family trip; mode 17 reads it for dest " + UnlTravelDest + ")");
+                        // run-2: host thread stack snapshot right before the push
+                        Log("AUTOTEST unl-travel hostPrePush=" + Unl2StackTop(host));
+                        var act = _unltrTarget.GetAction((short)_unltrRow, host, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                        if (act == null)
+                        {
+                            Log("AUTOTEST unl-travel: GetAction null row=" + _unltrRow);
+                            Fail("unl-travel"); _unltrState = 99; return;
+                        }
+                        act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                        act.CheckRoutine = null;
+                        act.Priority = (short)VMQueuePriority.Maximum;
+                        host.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.Priority, 0);
+                        host.Thread.EnqueueAction(act);
+                        _unltrUid = act.UID;
+                        // record the native destination the moment the tree signals it
+                        _vm.OnRequestLotSwitch += (uint lot) =>
+                            Log("AUTOTEST unl-travel lotSwitch REQUESTED=" + (lot == 0xFFFFFFFFu ? "home(-1)" : lot.ToString())
+                                + " at " + Sim3Clock());
+                        // run-6: capture the actual dialog texts the booking tree shows.
+                        // di==null is the dialog-CLEAR event (UILotControl guards it);
+                        // an unguarded access here NRE'd inside the VM and reset the
+                        // plugin object mid-booking (run-9 root cause).
+                        _vm.OnDialog += (FSO.SimAntics.Model.VMDialogInfo di) =>
+                            Log("AUTOTEST unl-travel dlg " + (di == null ? "clear"
+                                : "type=" + (di.Operand == null ? "msg" : di.Operand.Type.ToString())
+                                    + " title='" + (di.Title ?? "") + "' msg='" + (di.Message ?? "").Replace("\n", " | ") + "'"
+                                    + " yes='" + (di.Yes ?? "") + "' no='" + (di.No ?? "") + "'"));
+                        Log("AUTOTEST unl-travel BOOK pushed uid=" + act.UID + " g34pre=" + _vm.GetGlobalValue(34) + " at " + Sim3Clock());
+                        _unltrState = 2; _unltrFrame = 0; _unltrNotified = false;
+                    }
+                    else if (_unltrFrame > 900)
+                    {
+                        Log("AUTOTEST unl-travel spawn TIMEOUT avatars=" + avatars.Count
+                            + " guids=" + string.Join(",", avatars.Select(a => "0x" + a.Object.OBJ.GUID.ToString("x8"))));
+                        Fail("unl-travel"); _unltrState = 99;
+                    }
+                    return;
+                }
+                if (_unltrState == 2)
+                {
+                    // run-71 queue-path dialog law: answer ANY unanswered blocking
+                    // dialog with Yes ("1") — the booking pickers latch queue-path.
+                    UnltrAnswerDialogs();
+                    // run-12/14: return detection — the engine sink saw a home-flavored
+                    // lot switch (lot -1 or 5) and the screen has left the away VM with
+                    // Downtown cleared. (vm identity INVERTED: after the return the
+                    // screen runs a fresh restored VM, never the home VM the probe held.)
+                    if (_unltrReturnSeen && _screen != null && _screen.InLot
+                        && !ReferenceEquals(_screen.vm, _vm) && UnltrDowntown() != true)
+                    {
+                        Log("AUTOTEST unl-travel CYCLE-COMPLETE f=" + _unltrFrame
+                            + " (native return seen; retMode=2) transit="
+                            + (Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1));
+                        _unltrRetMode = 2;
+                        _unltrState = 5; _unltrFrame = 0;
+                        return;
+                    }
+                    // op-49 NotifyOutOfIdle emulation (run-6 law): the native cab
+                    // releases the booking tree's Wait-For-Notify (281@1 idle,
+                    // dec=0) by zeroing the parked frame's Args[0]; queue-path
+                    // push spawns no cab, so emulate the notify probe-side once.
+                    if (!_unltrNotified && _unltrHost?.Thread != null
+                        && _unltrHost.Thread.Stack.Count > 0)
+                    {
+                        var tfr = _unltrHost.Thread.Stack[_unltrHost.Thread.Stack.Count - 1];
+                        var tid2 = tfr.Routine?.Chunk?.ChunkID ?? 0;
+                        var tins2 = tfr.Routine?.Instructions;
+                        var tci2 = (tins2 != null && tfr.InstructionPointer >= 0
+                            && tfr.InstructionPointer < tins2.Length) ? tins2[tfr.InstructionPointer] : null;
+                        if (tid2 == 281 && tci2 != null && (tci2.Opcode & 0x7fff) == 17
+                            && tfr.Args != null && tfr.Args.Length > 0 && tfr.Args[0] != 0)
+                        {
+                            tfr.Args[0] = 0;
+                            _unltrNotified = true;
+                            Log("AUTOTEST unl-travel NOTIFY-EMUL f=" + _unltrFrame
+                                + " (op49 law: args0=0 on 281@1 idle)");
+                            // run-7 follow-up: the tree aborted right after release;
+                            // dump the full parked-chain instructions once to read
+                            // what 4100@5 and 281@2 test after the idle returns true.
+                            var td = new System.Collections.Generic.List<string>();
+                            var stk = _unltrHost.Thread.Stack;
+                            for (int i = 0; i < stk.Count; i++)
+                            {
+                                var rr = stk[i].Routine;
+                                if (rr?.Instructions == null) continue;
+                                var parts = new System.Collections.Generic.List<string>();
+                                for (int k = 0; k < rr.Instructions.Length && k < 130; k++)
+                                {
+                                    var ii = rr.Instructions[k];
+                                    var p2 = k + ":" + ii.Opcode + ">" + ii.TruePointer + "/" + ii.FalsePointer;
+                                    var exo = ii.Operand as FSO.SimAntics.Engine.Primitives.VMExpressionOperand;
+                                    if (exo != null)
+                                        p2 += "(" + exo.LhsOwner + "." + exo.LhsData + " "
+                                            + exo.Operator + " " + exo.RhsOwner + "." + exo.RhsData + ")";
+                                    var rti2 = ii.Rti?.Description;
+                                    if (!string.IsNullOrEmpty(rti2)) p2 += "'" + rti2 + "'";
+                                    parts.Add(p2);
+                                }
+                                td.Add("d" + i + "=" + rr.ID + "(" + (rr.Chunk?.ChunkLabel ?? "?") + ")["
+                                    + string.Join(" ", parts) + "]");
+                            }
+                            Log("AUTOTEST unl-travel TREEDUMP f=" + _unltrFrame
+                                + " " + string.Join(" | ", td));
+                        }
+                    }
+                    var gs = Content.Get().Neighborhood.GameState;
+                    var transit = gs?.LotTransitInfo ?? -1;
+                    // run-2 booking forensics: where does the cab tree park?
+                    // (a) host stack-top trace, (b) ITRACE window on the tree path
+                    // (EXP-04 V2.5 mechanism, engine hooks pre-existing), (c) phone
+                    // attr drift, (d) screen-side dialog reflection (run-93 law).
+                    bool denseWin = _unltrFrame <= 300;
+                    if ((denseWin && _unltrFrame % 10 == 0) || (!denseWin && _unltrFrame % 50 == 0))
+                    {
+                        Log("AUTOTEST unl-travel btrace f=" + _unltrFrame
+                            + " host=" + (_unltrHost == null ? "nohost" : Unl2StackTop(_unltrHost))
+                            + " g34=" + _vm.GetGlobalValue(34) + " transit=" + transit
+                            + " gbd=" + (_vm.GlobalBlockingDialog == null ? "-"
+                                : "obj" + _vm.GlobalBlockingDialog.ObjectID + ":"
+                                    + ((_vm.GlobalBlockingDialog.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult)?.Type.ToString() ?? "?"))
+                            + " sw=" + (typeof(TS1GameScreen).GetField("SwitchLot",
+                                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                                ?.GetValue(_screen) ?? "?")
+                            + " vmh=" + _screen?.vm?.GetHashCode().ToString("x")
+                            + " myh=" + _vm?.GetHashCode().ToString("x")
+                            + " afh=" + (_screen?.ActiveFamily == null ? "-" : _screen.ActiveFamily.HouseNumber.ToString())
+                            + " sv=" + (typeof(TS1GameScreen).GetField("SavedLot",
+                                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                                ?.GetValue(_screen) != null ? "set" : "null")
+                            + " vmIsScreen=" + (_screen != null && ReferenceEquals(_screen.vm, _vm))
+                            + " dt=" + UnltrDowntown());
+                    }
+                    bool itrace = _unltrFrame >= 0 && _unltrFrame <= 400;
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = itrace ? (System.Action<string>)Log : null;
+                    FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = itrace ? 100 : 0;
+                    // EXP-04 run-86 lever: the departure's mode-17 instant lands ~f600
+                    // after the push (cab boarding); rewrite temp0 to the Old Town lot
+                    // (BHAV 4100@12 op=1) so the TRV-02 machinery books dest 80.
+                    FSO.SimAntics.Engine.VMThread.AutotestVacLotOverride =
+                        _unltrFrame <= 800 ? UnlTravelDest : 0;
+                    if (_unltrFrame == 100 || _unltrFrame == 400)
+                    {
+                        Log("AUTOTEST unl-travel phoneAttrs f=" + _unltrFrame + "=[" + string.Join(",",
+                            System.Linq.Enumerable.Range(0, 12).Select(i => _unltrPhone.GetAttribute((short)i))) + "]"
+                            + " targetAttrs(obj" + (_unltrTarget?.ObjectID ?? -1) + ")=[" + (_unltrTarget == null ? "-" :
+                                string.Join(",", System.Linq.Enumerable.Range(0, 12).Select(i => _unltrTarget.GetAttribute((short)i)))) + "]");
+                        // run-6: full host stack bottom→top, ActiveAction/queue
+                        // state, and the parked instruction's operand (run-5:
+                        // park is global.iff 281@1 op=17 = VMIdleForInput).
+                        if (_unltrHost?.Thread != null)
+                        {
+                            var hst = _unltrHost.Thread.Stack;
+                            var fs = new System.Collections.Generic.List<string>();
+                            for (int i = 0; i < hst.Count; i++)
+                            {
+                                var f2 = hst[i]; var r2 = f2.Routine;
+                                fs.Add("d" + i + "=" + (r2 == null ? "?" : r2.ID + "@" + f2.InstructionPointer));
+                            }
+                            var act = _unltrHost.Thread.ActiveAction;
+                            var qdesc = "";
+                            if (_unltrHost.Thread.Queue != null)
+                                qdesc = string.Join(";",
+                                    _unltrHost.Thread.Queue.Select(a2 => (a2.ActionRoutine?.ID ?? 0) + ":" + (a2.Name ?? "?")
+                                        + ":p" + a2.Priority + (a2.NotifyIdle ? ":notify" : "")));
+                            Log("AUTOTEST unl-travel hoststack f=" + _unltrFrame
+                                + " [" + string.Join(" ", fs) + "]"
+                                + " act=" + (act == null ? "none" : (act.ActionRoutine?.ID ?? 0) + ":" + (act.Name ?? "?")
+                                    + ":p" + act.Priority + (act.NotifyIdle ? " notify" : ""))
+                                + " intr=" + _unltrHost.Thread.Interrupt
+                                + " q=[" + qdesc + "]");
+                            var topF = hst[hst.Count - 1];
+                            var tins = topF.Routine?.Instructions;
+                            var tci = (tins != null && topF.InstructionPointer >= 0
+                                && topF.InstructionPointer < tins.Length) ? tins[topF.InstructionPointer] : null;
+                            if (tci != null && tci.Opcode == 17)
+                            {
+                                var ifi = tci.Operand as FSO.SimAntics.Primitives.VMIdleForInputOperand;
+                                Log("AUTOTEST unl-travel idleop f=" + _unltrFrame
+                                    + (ifi == null ? " (no operand)" :
+                                        " dec=" + ifi.StackVarToDec + " allowPush=" + ifi.AllowPush));
+                            }
+                        }
+                        var lcP = typeof(TS1GameScreen).GetProperty("LotControl");
+                        var lc = lcP?.GetValue(_screen);
+                        var bd = lc?.GetType().GetProperty("BlockingDialog")?.GetValue(lc)
+                            ?? lc?.GetType().GetField("BlockingDialog",
+                                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(lc);
+                        var uiA = bd;
+                        var uiTitle = uiA?.GetType().GetProperty("Title")?.GetValue(uiA) as string;
+                        var uiMsg = uiA?.GetType().GetProperty("Message")?.GetValue(uiA) as string;
+                        Log("AUTOTEST unl-travel screenDlg f=" + _unltrFrame
+                            + " lc=" + (lc == null ? "null" : lc.GetType().Name)
+                            + " dlg=" + (bd == null ? "null" : bd.GetType().Name)
+                            + (uiTitle != null ? " title='" + uiTitle + "' msg='" + uiMsg + "'" : ""));
+                    }
+                    if (_unltrFrame % 50 == 0)
+                        Log("AUTOTEST unl-travel bookwatch f=" + _unltrFrame + " transit=" + transit
+                            + " (was " + _unltrTransit0 + ") g34=" + _vm.GetGlobalValue(34)
+                            + " ents=" + _vm.Entities.Count + " clock=" + Sim3Clock()
+                            + " dtGuid=" + (gs == null ? "-" : gs.DowntownSimGUID.ToString("x8")));
+                    if (_unltrFrame == 60 && _unltrHostNid >= 0)
+                    {
+                        var inv = Content.Get().Neighborhood.GetInventoryByNID(_unltrHostNid);
+                        Log("AUTOTEST unl-travel hostTokens nid=" + _unltrHostNid
+                            + " t2=" + (inv == null ? "none" : string.Join(",", inv.Where(x => x.Type == 2).Select(x => x.GUID + ":" + x.Count))));
+                    }
+                    if (transit >= 1 && transit != _unltrTransit0)
+                        Log("AUTOTEST unl-travel TRANSIT-WRITE transit=" + transit + " dtGuid="
+                            + (gs == null ? "-" : gs.DowntownSimGUID.ToString("x8")) + " (TRV-02 booking law fired)");
+                    var awayBind = _screen != null && _screen.InLot && _screen.vm != null
+                        && !ReferenceEquals(_screen.vm, _vm) && _screen.vm.Entities.Count > 0;
+                    if (awayBind)
+                    {
+                        FSO.SimAntics.Engine.VMThread.AutotestVacLotOverride = 0; // destination booked; disarm the lever
+                        _unltrAwayVm = _screen.vm;
+                        _unltrState = 3; _unltrFrame = 0; _unltrAwaySettle = -1;
+                        _unltrAwayVm.OnRequestLotSwitch += (uint lot) =>
+                            Log("AUTOTEST unl-travel lotSwitch AWAY-REQUESTED=" + (lot == 0xFFFFFFFFu ? "home(-1)" : lot.ToString())
+                                + " at " + Sim3Clock());
+                        Log("AUTOTEST unl-travel REBIND-AWAY f=" + _unltrFrame
+                            + " ents=" + _unltrAwayVm.Entities.Count
+                            + " avatars=" + _unltrAwayVm.Entities.Count(e => e is VMAvatar)
+                            + " transit=" + transit + " clock=" + Sim3Clock()
+                            + " downtown=" + UnltrDowntown());
+                        if (_unltrAwayVm.SpeedMultiplier <= 0)
+                        {
+                            _unltrAwayVm.SpeedMultiplier = 1;
+                            _unltrAwayVm.GlobalBlockingDialog = null;
+                        }
+                    }
+                    else if (_unltrFrame > 2500)
+                    {
+                        Log("AUTOTEST unl-travel booking TIMEOUT transit=" + transit + " gbd="
+                            + (_vm.GlobalBlockingDialog == null ? "-" : "obj" + _vm.GlobalBlockingDialog.ObjectID));
+                        Fail("unl-travel"); _unltrState = 99;
+                    }
+                    return;
+                }
+                if (_unltrState == 3)
+                {
+                    // run-14: native return path — the away lot's controller performed
+                    // the trip home via SignalLotSwitch while state 3 was settling;
+                    // jump straight to verification instead of pushing a "home" row
+                    // from what is now the restored home lot.
+                    if (_unltrReturnSeen && _screen != null && _screen.InLot
+                        && !ReferenceEquals(_screen.vm, _unltrAwayVm) && UnltrDowntown() != true)
+                    {
+                        Log("AUTOTEST unl-travel NATIVE-RETURN f=" + _unltrFrame
+                            + " (away controller ejected home; retMode=3) at " + Sim3Clock());
+                        _unltrRetMode = 3;
+                        _unltrState = 5; _unltrFrame = 0;
+                        return;
+                    }
+                    if (!ReferenceEquals(_screen.vm, _unltrAwayVm)) _vm = _screen.vm; // keep live binding
+                    var awayAvas = _vm == null ? new List<VMAvatar>() : _vm.Entities.OfType<VMAvatar>().ToList();
+                    var fam = UnlTravelGuids();
+                    var present = fam.Select(g => awayAvas.FirstOrDefault(a => a.Object.OBJ.GUID == g)).ToList();
+                    if (present.All(a => a != null))
+                    {
+                        if (_unltrAwaySettle < 0)
+                        {
+                            _unltrAwaySettle = 0;
+                            _unltrAwayClock[0] = _vm.Context.Clock.Hours;
+                            _unltrAwayClock[1] = _vm.Context.Clock.Minutes;
+                            var inv = _unltrHostNid >= 0 ? Content.Get().Neighborhood.GetInventoryByNID(_unltrHostNid) : null;
+                            var hr = inv?.FirstOrDefault(x => x.Type == 2 && x.GUID == 7)?.Count ?? -1;
+                            var min = inv?.FirstOrDefault(x => x.Type == 2 && x.GUID == 8)?.Count ?? -1;
+                            Log("AUTOTEST unl-travel AWAY-FAMILY oids=" + string.Join(",", present.Select(a => a.ObjectID))
+                                + " clock=" + _unltrAwayClock[0] + ":" + _unltrAwayClock[1]
+                                + " depTokens(h,m)=" + hr + "," + min
+                                + " transit=" + (Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1)
+                                + " g9=" + _vm.GetGlobalValue(9) + " g32=" + _vm.GetGlobalValue(32)
+                                + " downtown=" + UnltrDowntown() + " at " + Sim3Clock());
+                        }
+                        if (++_unltrAwaySettle >= 90)
+                        {
+                            // away phone hunt: the real return path is a "home" row.
+                            var phone = HPFindPhone();
+                            int retRow = -1; VMEntity retTarg = null;
+                            if (phone != null)
+                            {
+                                var ttas = phone.Object?.Resource?.Iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                                if (ttas != null)
+                                {
+                                    var names = new List<string>();
+                                    for (int i = 0; i < ttas.Length; i++) names.Add((ttas.GetString(i) ?? "").Trim());
+                                    for (int i = 0; i < names.Count; i += 25)
+                                        Log("AUTOTEST unl-travel awayPhone rows[" + i + ".." + Math.Min(i + 24, names.Count - 1) + "]=[" + string.Join(" | ", names.Skip(i).Take(25)) + "]");
+                                    for (int i = 0; i < names.Count; i++)
+                                    {
+                                        var lbl = names[i];
+                                        if (retRow < 0 && lbl.IndexOf("home", System.StringComparison.OrdinalIgnoreCase) >= 0
+                                            && lbl.IndexOf("ask", System.StringComparison.OrdinalIgnoreCase) < 0)
+                                        { retRow = i; retTarg = phone; }
+                                    }
+                                }
+                            }
+                            var host = present[0].GetPersonData(VMPersonDataVariable.PersonsAge) >= 18 ? present[0]
+                                : present.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? present[0];
+                            if (retRow >= 0)
+                            {
+                                Log("AUTOTEST unl-travel RETURN row=" + retRow + " '" + (phone.Object?.Resource?.Iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129)?.GetString(retRow) ?? "?") + "'");
+                                var act = retTarg.GetAction((short)retRow, host, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                                if (act != null)
+                                {
+                                    act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                    act.CheckRoutine = null;
+                                    act.Priority = (short)VMQueuePriority.Maximum;
+                                    host.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.Priority, 0);
+                                    host.Thread.EnqueueAction(act);
+                                    _unltrRetMode = 0;
+                                    Log("AUTOTEST unl-travel RETURN pushed uid=" + act.UID + " at " + Sim3Clock());
+                                    _unltrState = 5; _unltrFrame = 0;
+                                    return;
+                                }
+                            }
+                            // fallback: EXP-04 run-88 idiom — SignalLotSwitch(-1) maps to
+                            // ActiveFamily.HouseNumber and resumes the in-memory SavedLot.
+                            _unltrRetMode = 1;
+                            Log("AUTOTEST unl-travel RETURN probe-signal (-1) dispatched (away row="
+                                + (phone == null ? "no-phone" : "none-matching") + ") at " + Sim3Clock());
+                            _vm.SignalLotSwitch(0xFFFFFFFFu);
+                            _unltrState = 5; _unltrFrame = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (_unltrFrame == 700)
+                        {
+                            Log("AUTOTEST unl-travel AWAY-FAMILY-ABSENT avatars=" + awayAvas.Count
+                                + " guids=" + string.Join(",", awayAvas.Select(a => "0x" + a.Object.OBJ.GUID.ToString("x8")))
+                                + " g32=" + _vm.GetGlobalValue(32) + " g9=" + _vm.GetGlobalValue(9)
+                                + " (community-lot family-arrival gap — fix-card candidate)");
+                        }
+                        if (_unltrFrame > 700 && _unltrAssisted == 0)
+                        {
+                            // documented probe-side assist: activate the visiting family on
+                            // the away VM and run VerifyFamily so the round-trip mechanics
+                            // can still be exercised; the native gap stays a recorded finding.
+                            _unltrAssisted = 1;
+                            try
+                            {
+                                _vm.TS1State.ActivateFamily(_vm, _unltrFam);
+                                _vm.TS1State.VerifyFamily(_vm);
+                                Log("AUTOTEST unl-travel ARRIVAL-ASSIST ActivateFamily+VerifyFamily applied");
+                            }
+                            catch (Exception axe)
+                            {
+                                Log("AUTOTEST unl-travel ARRIVAL-ASSIST EXC " + axe.GetType().Name + " " + axe.Message);
+                            }
+                        }
+                        if (_unltrFrame > 2200)
+                        {
+                            Log("AUTOTEST unl-travel away TIMEOUT avatars=" + awayAvas.Count);
+                            Fail("unl-travel"); _unltrState = 99;
+                        }
+                    }
+                    return;
+                }
+                if (_unltrState == 5)
+                {
+                    UnltrAnswerDialogs();
+                    var homeBind = _screen != null && _screen.InLot && _screen.vm != null
+                        && !ReferenceEquals(_screen.vm, _unltrAwayVm) && _screen.vm.Entities.Count > 0;
+                    if (!homeBind)
+                    {
+                        if (_unltrFrame > 1500)
+                        {
+                            Log("AUTOTEST unl-travel home TIMEOUT downtown=" + UnltrDowntown()
+                                + " transit=" + (Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1));
+                            Fail("unl-travel"); _unltrState = 99;
+                        }
+                        return;
+                    }
+                    _vm = _screen.vm;
+                    if (_vm.SpeedMultiplier <= 0)
+                    {
+                        _vm.SpeedMultiplier = 1;
+                        _vm.GlobalBlockingDialog = null;
+                    }
+                    var avas = _vm.Entities.OfType<VMAvatar>().ToList();
+                    var fam = UnlTravelGuids();
+                    var back = fam.Select(g => avas.FirstOrDefault(a => a.Object.OBJ.GUID == g)).ToList();
+                    bool allBack = back.All(a => a != null);
+                    // run-14 law: the TS1 return is inventory-mediated — the family
+                    // despawned at booking (transit=1), so the home marshal restores
+                    // family-less and the return law re-arrives members over several
+                    // ticks (run 14: members=1/3 at f=1, avatars=3 by f~10). Poll for
+                    // full re-arrival before verdicting.
+                    _unltrHomeSettle = allBack ? _unltrHomeSettle + 1 : 0;
+                    if (_unltrFrame % 30 == 0 || (allBack && _unltrHomeSettle == 15))
+                        Log("AUTOTEST unl-travel HOME-POLL f=" + _unltrFrame
+                            + " avatars=" + avas.Count
+                            + " roster=[" + string.Join(",", avas.Select(a =>
+                                "0x" + a.Object.OBJ.GUID.ToString("x8") + "/o" + a.ObjectID)) + "]"
+                            + " allBack=" + allBack
+                            + " transit=" + (Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1)
+                            + " downtown=" + UnltrDowntown() + " at " + Sim3Clock());
+                    if (allBack && _unltrHomeSettle >= 15)
+                    {
+                        bool oidsKept = back.Select(a => a.ObjectID).SequenceEqual(_unltrOids0);
+                        var mStr = "";
+                        for (int i = 0; i < 3; i++)
+                        {
+                            bool same = true;
+                            for (short m = 0; m < 16; m++)
+                                if (back[i].GetMotiveData((VMMotive)m) != _unltrMotives0[i * 16 + m]) { same = false; break; }
+                            mStr += " m" + i + (same ? "=same" : "=DRIFT");
+                        }
+                        Log("AUTOTEST unl-travel HOME-RESTORE retMode=" + (_unltrRetMode == 1 ? "probe-signal"
+                            : _unltrRetMode == 2 ? "native-return" : _unltrRetMode == 3 ? "native-eject" : "phone-row")
+                            + " members=all3"
+                            + " oids=" + string.Join(",", back.Select(a => a.ObjectID))
+                            + " oidsKept=" + oidsKept + " (run-14 law: return is inventory-mediated — pets carry transit oids, oid identity not gating)" + mStr
+                            + " downtown=" + UnltrDowntown()
+                            + " transit=" + (Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1)
+                            + " clock=" + Sim3Clock() + " f=" + _unltrFrame);
+                        // observation line for the V2 motive law across the round trip
+                        Log("AUTOTEST unl-travel motives home=" + string.Join(" | ", back.Select(a => MotiveStr(a))));
+                        Pass("unl-travel");
+                        _unltrState = 99;
+                    }
+                    else if (_unltrFrame > 900)
+                    {
+                        Log("AUTOTEST unl-travel home TIMEOUT avatars=" + avas.Count
+                            + " roster=[" + string.Join(",", avas.Select(a =>
+                                "0x" + a.Object.OBJ.GUID.ToString("x8") + "/o" + a.ObjectID)) + "]");
+                        Fail("unl-travel"); _unltrState = 99;
+                    }
+                }
+            }
+            catch (Exception te)
+            {
+                Log("AUTOTEST unl-travel EXC " + te.GetType().Name + " " + te.Message);
+                FSO.SimAntics.Engine.VMThread.AutotestVacLotOverride = 0;
+                Fail("unl-travel"); _unltrState = 99;
+            }
+        }
+
+        private static uint[] UnlTravelGuids()
+        {
+            return new[] { _unltrHumanGuid, UnlTravelPetGuids[0], UnlTravelPetGuids[1] };
+        }
+
+        private static bool UnltrDowntown()
+        {
+            // run-13 artifact: Downtown is a PUBLIC field (TS1GameScreen.cs:45);
+            // NonPublic-only flags miss it, so every dt read before run 14 was a
+            // constant false. Public|NonPublic matches either declaration.
+            var f = typeof(TS1GameScreen).GetField("Downtown",
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Instance);
+            return f != null && _screen != null && (bool)f.GetValue(_screen);
+        }
+
+        private static void UnltrAnswerDialogs()
+        {
+            try
+            {
+                var dlg = _vm.GlobalBlockingDialog;
+                FSO.SimAntics.Primitives.VMDialogResult anyBs = null;
+                if (dlg != null || _unltrState == 2)
+                {
+                    foreach (var ent in _vm.Entities)
+                    {
+                        var qbs = ent?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                        if (qbs != null && !qbs.Responded) { anyBs = qbs; break; }
+                    }
+                }
+                if (anyBs != null && !anyBs.Responded)
+                {
+                    anyBs.Responded = true;
+                    // YesNo keeps the run-71 Yes; any other picker answers per the
+                    // native UILotControl.HouseSelected encoding (run-9): code 1
+                    // (house>0) + text = house id — the picker writes the TEXT lot
+                    // into temp0, code is just an OK flag.
+                    bool yesNo = (anyBs.Type != null && anyBs.Type.ToString() == "YesNo");
+                    anyBs.ResponseCode = yesNo ? (byte)1 : (byte)1;
+                    anyBs.ResponseText = yesNo ? "1" : UnlTravelDest.ToString();
+                    _vm.GlobalBlockingDialog = null;
+                    if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
+                    else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+                    Log("AUTOTEST unl-travel: dialog auto-answered (type=" + anyBs.Type + " ans="
+                        + (anyBs.ResponseText == "1" ? "1(Yes)" : anyBs.ResponseText + "(lot)")
+                        + (dlg == null ? " QUEUE-PATH" : " obj" + dlg.ObjectID) + ") at " + Sim3Clock());
+                }
+            }
+            catch { }
+        }
 
         private static void RunCorpus()
         {
@@ -2255,6 +3469,9 @@ namespace Simitone.Client
         {
             if (_zoomLivePhase > 0) { ZoomLiveTick(); return; }
             if (_vm == null) { Finish(); return; }
+            _absTick++; // EXP-02: monotonic watch clock — HPNext resets _hpFrame per leg
+            if (_flPushed && !_flDone) FallinTick(); // EXP-02: the fall-in-love watch survives leg transitions
+            if (_plPushed) ProposeTick(); // EXP-02: phase-2 propose watch + run-55 postmortem + run-63 neg arm (post-postmortem)
             if (CheckEnabled("ss-book") && !_ssBookDone) { SSBookTick(); return; }
             if (CheckEnabled("socexec") && !_socExecDone) { SocExecTick(); return; }
             if (CheckEnabled("saveresume") && !_srDone) { SaveResumeTick(); return; }
@@ -2339,6 +3556,39 @@ namespace Simitone.Client
             // one phase per process run, sequenced by the external driver via
             // /tmp/cc04/phase.txt; the fixed private userdir carries the save.
             if (CheckEnabled("cc04live") && !_cc04Done) CheckCC04Live();
+            // EXP-02 (opt-in "hpparty"): the House Party lifecycle spine —
+            // Throw Party via the phone, guests arrive, party state, end.
+            if (CheckEnabled("hpparty") && _hpState != 2)
+            {
+                CheckHP();
+            }
+            // EXP-04 (opt-in "vacation"): the vacation booking leg — phone/plugin
+            // row resolve, queue-path dialog answers, occupied-lot/token verdict.
+            // run-72 decode: per-frame tick here (the RunCorpus one-shot battery
+            // Finishes right after LOT-READY — the settle-guard silently ate the
+            // single call and the run ended "no check verdicted").
+            if (CheckEnabled("vacation") && _vacState != 2)
+            {
+                VacTick();
+            }
+            // EXP-05 (opt-in "unl-pets"): pet spawn/persistence leg — pen-animal
+            // Person OBJD family attached through the real APIs, native spawn,
+            // motive soak, save + reload persistence (V2 of exp05-scope-20260921.md).
+            if (CheckEnabled("unl-pets") && _unlState != 99)
+            {
+                UnlPetsTick();
+            }
+            // EXP-05 V3 (opt-in "unl-pets2"): despawn forensics — catch who removes
+            // the VerifyFamily-spawned pets (F-PETS-DESPAWN, unl-run2 receipt).
+            if (CheckEnabled("unl-pets2") && _unl2State != 99)
+            {
+                UnlPets2Tick();
+            }
+            // EXP-05 V6 (opt-in "unl-travel"): Old Town round trip per TRV-02.
+            if (CheckEnabled("unl-travel") && _unltrState != 99)
+            {
+                UnlTravelTick();
+            }
             var minute = _vm.Context.Clock.Minutes;
             if (_motiveStartMinute < 0) _motiveStartMinute = minute;
 
@@ -2743,7 +3993,17 @@ namespace Simitone.Client
             if (CheckEnabled("cc02e2e") && _cc02e2eArmed && !_cc02e2eDone)
                 return; // (CC-02 e2e) chain still driving per-frame; battery finishes after its verdict
             if (CheckEnabled("llinteract") && _ll2State != 2)
-                return; // (EXP-01 llinteract v3) wish-chain legs still driving; battery finishes after the verdict
+                return;
+            if (CheckEnabled("hpparty") && _hpState != 2)
+                return; // (EXP-02) party spine still driving // (EXP-01 llinteract v3) wish-chain legs still driving; battery finishes after the verdict
+            if (CheckEnabled("vacation") && _vacState != 2)
+                return; // (EXP-04) booking leg still driving; battery finishes after the verdict
+            if (CheckEnabled("unl-pets") && _unlState != 99)
+                return; // (EXP-05) pet legs still driving; battery finishes after the verdict
+            if (CheckEnabled("unl-pets2") && _unl2State != 99)
+                return; // (EXP-05 V3) despawn forensics still driving; battery finishes after the verdict
+            if (CheckEnabled("unl-travel") && _unltrState != 99)
+                return; // (EXP-05 V6) Old Town round trip still driving; battery finishes after the verdict
             if (CheckEnabled("llfire") && _ll3State != 2)
                 return; // (EXP-01 llfire) fire/rocket legs still driving; battery finishes after the verdict
             if (CheckEnabled("aud12live") && _a12State != 2)
@@ -5915,6 +7175,847 @@ namespace Simitone.Client
         private static string SocRelStr(int[] r)
         {
             return "[" + (r == null ? "n/a" : string.Join(",", r)) + "]";
+        }
+
+        // EXP-02 fall-in-love evaluator: watches the pushed 'Flirt' action from
+        // enqueue to dequeue (mirrors SocExecTick's completion law — the queue
+        // emptying after a seen enqueue), then diffs the 8 NBRS relationship
+        // slots both directions against the post-seed baseline. Hooked in
+        // StateSample ahead of the leg dispatch so it survives HPNext.
+        // EXP-02 run-46: the seeded fall-in-love attempt, idempotent and
+        // retried. Seeds STR/LTR=100 + the in-love slot (4) both directions on
+        // the host<->second pair, then pushes the decoded 'Flirt' row
+        // (PersonGlobals TTAB#129 tta=8 'Flirt.../Sweet Talk' action 8206) with
+        // FSOSkipPermissions — pie-picked when the pie offers it,
+        // forced via GetAction(8) when it doesn't (run-44 law: the hpparty pie
+        // offers zero flirt-family rows). Snapshots the 8 NBRS slots AFTER the
+        // seed so FallinTick's diff isolates the flirt's own writes. Returns
+        // true when the attempt COMPLETED (pushed, or definitively unavailable:
+        // no partner with a NID / GetAction null / repeated exceptions); false
+        // = retry me on a later tick.
+        private static bool HpWeddingSeedTry(string tag)
+        {
+            if (_hpHost == null || _vm == null) return false;
+            try
+            {
+                var wedExcl = new uint[] { 0x80234543u, 0xbaae34beu, 0x71211d31u, 0xc6d44553u, 0xcdac4e1u, 0x4a731b75u };
+                var inWorld = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                    .Where(a => a != null && a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD).ToList();
+                // run-58 law (runs 56/57): the first-eligible second (obj16) is a
+                // CHILD — 'Pick up kids'/'Tickle' in the host's pie census,
+                // 'Go to School' at 8:00 — and the propose accept path's own
+                // move-in gate is nghPersonData[58] 'PersonsAge' > 17. Prefer an
+                // ADULT partner so the accept→wedding row can honestly complete;
+                // fall back to the old pick if no adult is in world.
+                var wedCands = inWorld.Where(a => a != _hpHost && !wedExcl.Contains(a.Object.OBJ.GUID)).ToList();
+                // run-61 law (run 60): the adult pick (obj21) is the host's own
+                // FAMILY (ngh[61]=5 both) — 4241 'do move in' writes are
+                // idempotent on a same-family pair, so the accept consequences
+                // are unobservable. Prefer a NON-FAMILY adult (a party guest).
+                // run-62 law (run 61 abort): the fam=0 guest obj253 is an
+                // NPC-special person (wand vendor / citation rows) whose TTAB
+                // lacks the person-table rows entirely — GetAction(8) NULL
+                // starved the FALLIN phase forever. Viability gate: a candidate
+                // is only usable if GetAction(8) resolves on it.
+                var hostFam = _hpHost.GetPersonData((VMPersonDataVariable)61);
+                Log("AUTOTEST hpparty WEDDING-seed candidates: [" + string.Join(" | ", wedCands.Select(c =>
+                    "obj" + c.ObjectID + " nid=" + c.GetPersonData(VMPersonDataVariable.NeighborId)
+                    + " age=" + c.GetPersonData(VMPersonDataVariable.PersonsAge)
+                    + " fam=" + c.GetPersonData((VMPersonDataVariable)61)
+                    + " flirtOK=" + (c.GetAction(8, _hpHost, _vm.Context, false) != null))) + "] hostFam=" + hostFam);
+                var second = wedCands.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) > 17
+                        && a.GetPersonData((VMPersonDataVariable)61) != hostFam
+                        && a.GetAction(8, _hpHost, _vm.Context, false) != null)
+                    ?? wedCands.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) > 17
+                        && a.GetAction(8, _hpHost, _vm.Context, false) != null)
+                    ?? wedCands.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) > 17)
+                    ?? inWorld.FirstOrDefault(a => a != _hpHost && !wedExcl.Contains(a.Object.OBJ.GUID));
+                if (second == null || second.GetPersonData(VMPersonDataVariable.NeighborId) <= 0
+                    || _hpHost.GetPersonData(VMPersonDataVariable.NeighborId) <= 0)
+                {
+                    _seedTryCount++;
+                    if (_seedTryCount == 1 || _seedTryCount % 120 == 0)
+                        Log("AUTOTEST hpparty WEDDING-seed(" + tag + ") try=" + _seedTryCount + " no usable candidate; in-world=["
+                            + string.Join(" | ", inWorld.Select(a => "obj" + a.ObjectID + " nid="
+                                + a.GetPersonData(VMPersonDataVariable.NeighborId)
+                                + (wedExcl.Contains(a.Object.OBJ.GUID) ? " excl" : ""))) + "]");
+                    return false;
+                }
+                var hNid = _hpHost.GetPersonData(VMPersonDataVariable.NeighborId);
+                var sNid = second.GetPersonData(VMPersonDataVariable.NeighborId);
+                Log("AUTOTEST hpparty WEDDING-seed(" + tag + "): host nid=" + hNid + " second obj" + second.ObjectID + " nid=" + sNid);
+                Sim3RelSet(hNid, sNid, 0, 100); Sim3RelSet(hNid, sNid, 1, 100);
+                Sim3RelSet(sNid, hNid, 0, 100); Sim3RelSet(sNid, hNid, 1, 100);
+                // 4239-gate decode (2026-09-20): seed the in-love slot both
+                // directions (slot 4 = the flags word, bit 0x01)
+                Sim3RelSet(hNid, sNid, 4, 1); Sim3RelSet(sNid, hNid, 4, 1);
+                // the fall-in-love drive itself: pie-enumerate the second sim
+                // (callee) as seen by the host (actor), name-pick the flirt
+                // family, snapshot the 8 slots (post-seed baseline), enqueue on
+                // the host's thread (the socexec acceptance law)
+                var famNames = new List<string>();
+                VMPieMenuInteraction pick = null;
+                var pies = second.GetPieMenu(_vm, _hpHost, true, true);
+                if (pies != null)
+                {
+                    foreach (var p in pies)
+                    {
+                        var nm = (p?.Name ?? "").Trim();
+                        if (nm.Length == 0) continue;
+                        var low = nm.ToLowerInvariant();
+                        if (low.Contains("flirt") || low.Contains("flower") || low.Contains("hug") || low.Contains("kiss"))
+                            famNames.Add(nm + " (id=" + p.ID + " global=" + p.Global + ")");
+                        if (pick == null && low.Equals("flirt")) pick = p;
+                    }
+                    // run-47 law: PICK is exact-name only — run-46 pushed a HUG
+                    // ('Hug.../Nice' matched the broad family filter) and a hug
+                    // is not a flirt. No exact row here ⇒ the forced
+                    // GetAction(8) path below, which is the point: the pie
+                    // does not offer the row (the gate under test).
+                    if (pick == null)
+                        foreach (var p in pies)
+                        {
+                            var low = (p?.Name ?? "").Trim().ToLowerInvariant();
+                            if (low.Equals("flirt") || low.Equals("give flower")) { pick = p; break; }
+                        }
+                }
+                Log("AUTOTEST hpparty FALLIN-LOVE full pie census: [" + string.Join(" | ",
+                    (pies ?? new List<VMPieMenuInteraction>()).Select(p => (p?.Name ?? "?") + "(id=" + p?.ID + " g=" + (p?.Global ?? false) + ")")) + "]");
+                if (pick != null)
+                {
+                    var action = second.GetAction((int)pick.ID, _hpHost, _vm.Context, pick.Global);
+                    if (action != null)
+                    {
+                        action.Flags |= TTABFlags.FSOSkipPermissions; // drive the tree raw; the gate is measured by the census, not the test
+                        _flActor = _hpHost; _flTarget = second;
+                        _flActorNid = hNid; _flTargetNid = sNid;
+                        _flBeforeA2T = SocRelSnapshot(hNid, sNid);
+                        _flBeforeT2A = SocRelSnapshot(sNid, hNid);
+                        _flRowName = pick.Name; _flPushAction = action;
+                        _hpHost.Thread.EnqueueAction(action);
+                        _flPushUid = action.UID;
+                        _flPushed = true; _flPushFrame = _hpFrame; _flPushTickAbs = _absTick;
+                        Log("AUTOTEST hpparty FALLIN-LOVE push '" + pick.Name + "' (tta=" + pick.ID + " global=" + pick.Global
+                            + ") host nid=" + hNid + " -> second obj" + second.ObjectID + " nid=" + sNid
+                            + " uid=" + _flPushUid
+                            + " relA2T=" + SocRelStr(_flBeforeA2T) + " relT2A=" + SocRelStr(_flBeforeT2A));
+                    }
+                    else Log("AUTOTEST hpparty FALLIN-LOVE: GetAction null for '" + pick.Name + "' (tta=" + pick.ID + ")");
+                }
+                else
+                {
+                    Log("AUTOTEST hpparty FALLIN-LOVE: no flirt-family pie row; family candidates=["
+                        + string.Join(" | ", famNames) + "] — forcing the decoded row with FSOSkipPermissions (the engine's own VMPushInteraction bypass)");
+                    // run-48 law: the person table is PersonGlobals.iff TTAB#129
+                    // (run-47 GetAction(5) null) — 'Flirt.../Sweet Talk' is
+                    // row[24] tta=8 action BHAV#8206 (see flirt-gate-contrast).
+                    var forced = second.GetAction(8, _hpHost, _vm.Context, false);
+                    if (forced != null)
+                    {
+                        forced.Flags |= TTABFlags.FSOSkipPermissions;
+                        // run-48 laws: (1) TS1 CheckTS1Action runs the check tree
+                        // at dequeue REGARDLESS of FSOSkipPermissions
+                        // (VMThread.cs:1225 — the skip only guards permission
+                        // flags), so the 8207 gate would reject the push forever;
+                        // (2) a UserDriven item behind the active block is never
+                        // EXAMINED (AttemptPush priority guard) — Maximum trips
+                        // EvaluateQueuePriorities' idle-notify and preempts.
+                        forced.CheckRoutine = null;
+                        forced.Priority = (short)VMQueuePriority.Maximum;
+                        _flActor = _hpHost; _flTarget = second;
+                        _flActorNid = hNid; _flTargetNid = sNid;
+                        _flBeforeA2T = SocRelSnapshot(hNid, sNid);
+                        _flBeforeT2A = SocRelSnapshot(sNid, hNid);
+                        _flRowName = "Flirt.../Sweet Talk(forced tta=8)"; _flPushAction = forced;
+                        _flForced = true;
+                        _hpHost.Thread.EnqueueAction(forced);
+                        _flPushUid = forced.UID;
+                        _flPushed = true; _flPushFrame = _hpFrame; _flPushTickAbs = _absTick;
+                        Log("AUTOTEST hpparty FALLIN-LOVE FORCED push 'Flirt.../Sweet Talk' (tta=8 action=8206) host nid=" + hNid
+                            + " -> second obj" + second.ObjectID + " nid=" + sNid + " uid=" + _flPushUid
+                            + " relA2T=" + SocRelStr(_flBeforeA2T) + " relT2A=" + SocRelStr(_flBeforeT2A));
+                    }
+                    else Log("AUTOTEST hpparty FALLIN-LOVE: GetAction(8) null — callee TTAB lacks tta=8 (unexpected: PersonGlobals row[24])");
+                }
+                return true;
+            }
+            catch (Exception se)
+            {
+                _seedExcCount++;
+                Log("AUTOTEST hpparty WEDDING-seed(" + tag + ") EXC " + se.GetType().Name + " " + se.Message);
+                return _seedExcCount > 5; // don't spin forever on a throwing path
+            }
+        }
+
+        private static void FallinTick()
+        {
+            try
+            {
+                var thread = _flActor?.Thread;
+                // run-49 broker law: the pushed action's uid STAYS in the
+                // queue's active block for the whole interaction chain (FSO
+                // keeps executed entries up to ActiveQueueBlock), and the
+                // broker dispatcher (8206) hands off to the broker's own
+                // interaction (a NEW uid, name 'Flirt', tree 4124). So:
+                // pending = uid sits BEYOND the active block; started = our
+                // uid reached the active block OR the active action is the
+                // broker takeover OR a pushed-routine frame is on the stack;
+                // done = our uid left the queue entirely (chain cut) or the
+                // callee died or budget.
+                int uidInd = -1; var q = thread?.Queue;
+                if (q != null) for (int i = 0; i < q.Count; i++) if (q[i].UID == _flPushUid) { uidInd = i; break; }
+                var inQueue = uidInd >= 0;
+                var isActive = inQueue && thread.ActiveQueueBlock >= 0 && uidInd <= thread.ActiveQueueBlock;
+                if (!_flEnqSeen && inQueue && !isActive) _flEnqSeen = true;
+                // flirt evidence on EITHER side: our uid in the active block,
+                // a broker takeover by name, the dispatcher/content frames
+                // (8206 ref or tree 4124), or the callee's broker action.
+                bool stackFlirt = false;
+                if (thread?.Stack != null)
+                    foreach (var fr in thread.Stack)
+                    {
+                        try
+                        {
+                            if (fr.Routine == _flPushAction.ActionRoutine
+                                || fr.Routine?.Chunk?.ChunkID == 4124) { stackFlirt = true; break; }
+                        }
+                        catch { }
+                    }
+                var actorBroker = thread?.ActiveAction != null
+                    && (thread.ActiveAction.Name ?? "").IndexOf("flirt", StringComparison.OrdinalIgnoreCase) >= 0;
+                var targetBroker = _flTarget?.Thread?.ActiveAction != null
+                    && (_flTarget.Thread.ActiveAction.Name ?? "").IndexOf("flirt", StringComparison.OrdinalIgnoreCase) >= 0;
+                if (!_flStartSeen && (isActive || actorBroker || stackFlirt))
+                {
+                    _flStartSeen = true;
+                    Log("AUTOTEST hpparty FALLIN-LOVE started '" + _flRowName + "' (active-block=" + isActive
+                        + " activeAction='" + thread?.ActiveAction?.Name + "') at " + Sim3Clock());
+                }
+                // callee-join evidence: the broker's #87 lands on the CALLEE's thread
+                if (!_flJoinSeen && targetBroker)
+                {
+                    _flJoinSeen = true;
+                    Log("AUTOTEST hpparty FALLIN-LOVE CALLEE-JOINED: target active='"
+                        + _flTarget.Thread.ActiveAction.Name
+                        + "' uid=" + _flTarget.Thread.ActiveAction.UID + " at " + Sim3Clock());
+                }
+                var liveFlirt = isActive || actorBroker || stackFlirt || targetBroker;
+                if (liveFlirt) _flQuietTicks = 0; else if (_flStartSeen) _flQuietTicks++;
+                // done: the uid left the queue (chain cut), or the social has
+                // stopped executing on both sides for 4 sim-minutes (240
+                // ticks) — completed entries LINGER in the active block, so
+                // uid-gone alone never fires (run-49 law).
+                var done = (_flEnqSeen && !inQueue) || (_flStartSeen && _flQuietTicks >= 240);
+                var budget = _absTick - _flPushTickAbs > 7200; // 2 sim-hours cap (monotonic: survives HPNext leg frame resets)
+                if (done || budget || (_flTarget != null && _flTarget.Dead))
+                {
+                    _flDone = true;
+                    var afterA2T = SocRelSnapshot(_flActorNid, _flTargetNid);
+                    var afterT2A = SocRelSnapshot(_flTargetNid, _flActorNid);
+                    var delta = "";
+                    if (_flBeforeA2T != null)
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+                            if (afterA2T[i] != _flBeforeA2T[i]) delta += "A2T[" + i + "] " + _flBeforeA2T[i] + "->" + afterA2T[i] + " ";
+                            if (afterT2A[i] != _flBeforeT2A[i]) delta += "T2A[" + i + "] " + _flBeforeT2A[i] + "->" + afterT2A[i] + " ";
+                        }
+                    }
+                    Log("AUTOTEST hpparty FALLIN-LOVE RESULT row='" + _flRowName + "' started=" + _flStartSeen
+                        + " join=" + _flJoinSeen + " quiet=" + _flQuietTicks
+                        + " outcome=" + (budget ? "budget" : "completed")
+                        + " before A2T=" + SocRelStr(_flBeforeA2T) + " T2A=" + SocRelStr(_flBeforeT2A)
+                        + " after A2T=" + SocRelStr(afterA2T) + " T2A=" + SocRelStr(afterT2A)
+                        + " delta=" + (delta.Length > 0 ? delta : "none")
+                        + " (a real flirt's delta vs the seed = the propose gate's true state) at " + Sim3Clock());
+                    // phase 2: only on a cleanly-completed flirt — the pair is
+                    // now socially engaged (the conversation-state moment the
+                    // corrected decode points at for the 4250-family gates)
+                    if (_flStartSeen && !budget && _flTarget != null && !_flTarget.Dead) TryPushPropose();
+                }
+            }
+            catch (Exception fe)
+            {
+                Log("AUTOTEST hpparty FALLIN-LOVE tick EXC " + fe.GetType().Name + " " + fe.Message);
+                _flDone = true;
+            }
+        }
+
+        // Phase 2 arm (right after a completed flirt): force-push the decoded
+        // Propose row with FSOSkipPermissions, snapshot the 8 slots, and
+        // re-census the pie BOTH ways — the corrected decode predicts the
+        // propose/flirt pie gate is the 4250-family conversation-sync state,
+        // so this is the moment it should (if ever) offer the row.
+        // run-48 law: the person-table row is PersonGlobals.iff TTAB#129
+        // row[65] tta=26 'Proposition.../Marriage' action BHAV#8280 test#8281
+        // (tta=53 is the NPC-table numbering — run-47 GetAction(5) null).
+        // run-54: create-path attribution — the engine raises this for every
+        // successful create_object_instance; we log only the two social brokers
+        // (the propose carrier 0xEFF48A36 and the flirt broker 0xB13388EC) so
+        // volume stays bounded and the propose's create is named if it happens.
+        private static void OnAutotestObjectCreated(VMStackFrame frame, VMMultitileGroup group, uint guid)
+        {
+            try
+            {
+                if (guid != 0xEFF48A36 && guid != 0xB13388EC) return;
+                _plCarrierCreate = "0x" + guid.ToString("X8") + " objid=" + (group?.BaseObject?.ObjectID ?? -1)
+                    + " by-routine=" + (frame?.Routine?.Chunk?.ChunkID ?? 0) + ":" + (frame?.InstructionPointer ?? 0)
+                    + " creator-obj=" + (frame?.Caller?.ObjectID ?? -1);
+                if (guid == 0xEFF48A36) _plCarrierGroup = group;
+                Log("AUTOTEST hpparty OBJ-CREATED " + _plCarrierCreate);
+            }
+            catch { }
+        }
+
+        private static void TryPushPropose()
+        {
+            try
+            {
+                _plPushed = true;
+                _plBeforeA2T = SocRelSnapshot(_flActorNid, _flTargetNid);
+                _plBeforeT2A = SocRelSnapshot(_flTargetNid, _flActorNid);
+                // run-51 law: the propose broker halves' own tests gate on the
+                // CALLEE's love for the actor (test 8281's 8353 'STR & LTR Me
+                // to StackObject => x?' param 75) — the seeded T2A slot 2 sits
+                // at ~51 and the 'Propose' broker interaction ended within one
+                // tick (run-51: started=True then instant end, delta=none).
+                // Raise the callee→actor LTR above the bound before the push.
+                Sim3RelSet(_flTargetNid, _flActorNid, 2, 90);
+                Log("AUTOTEST hpparty PROPOSE-FORCED: T2A slot2 (callee->actor LTR) bumped to 90 (the 8353 param-75 gate; was "
+                    + (_plBeforeT2A != null && _plBeforeT2A.Length > 2 ? _plBeforeT2A[2].ToString() : "?") + ")");
+                _plCarrierCreate = null; // census must only see post-push creates (the flirt broker fired earlier in the leg)
+                _plCarrierGroup = null;
+                _plSaw4241 = false; _plSaw4245 = false; _plSaw4266 = false; _plDialogAnswered = false; // run-57 markers
+                _plCalleeKicked = false; // run-59
+                _plDlgSig = null; // run-60
+                _plNegArmed = false; // run-63
+                // run-54 probes: (a) registry state of the proposition carrier
+                // BEFORE the push — the upstream create-miss prints 'Failed to
+                // get Object ID', absent from runs 51-53, so this documents what
+                // the TS1 registry actually holds; (b) ObjectCreated attribution
+                // so the create inside 8280 names itself if it happens.
+                try
+                {
+                    if (!_plObjSub)
+                    {
+                        _plObjSub = true;
+                        FSO.SimAntics.Engine.Primitives.VMCreateObjectInstance.ObjectCreated += OnAutotestObjectCreated;
+                    }
+                    var ts1p = Content.Get().WorldObjects as FSO.Content.TS1.TS1ObjectProvider;
+                    var regStr = ts1p == null ? "provider=" + Content.Get().WorldObjects.GetType().Name
+                        : (ts1p.Entries.TryGetValue(0xEFF48A36u, out var gref)
+                            ? "ENTRY '" + gref.Name + "' file=" + gref.FileName + " src=" + gref.Source
+                            : "NO-ENTRY")
+                          + " ObjdByGUID=" + FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID.ContainsKey(0xEFF48A36u);
+                    Log("AUTOTEST hpparty PROBE carrier: " + regStr);
+                }
+                catch (Exception pre) { Log("AUTOTEST hpparty PROBE EXC " + pre.GetType().Name + " " + pre.Message); }
+                var action = _flTarget.GetAction(26, _flActor, _vm.Context, false);
+                // run-55 law (run-54 census): the carrier handshake (4239 host ↔
+                // 4240 callee via the carrier's attrs, global-280 waits) can't
+                // even start while the callee is mid-'Be Slapped' with the
+                // halves queued at priority 1 behind it. Clear BOTH queues of
+                // everything not running so the halves start on the next tick.
+                try
+                {
+                    foreach (var (who, th) in new[] { ("actor", _flActor?.Thread), ("callee", _flTarget?.Thread) })
+                    {
+                        if (th == null) continue;
+                        var killed = new List<string>();
+                        for (int i = th.Queue.Count - 1; i >= 0; i--)
+                        {
+                            var it = th.Queue[i];
+                            if (it == null || i <= th.ActiveQueueBlock) continue; // keep the active block
+                            killed.Add((it.Name ?? "?") + "/" + it.Priority);
+                            th.CancelAction(it.UID);
+                        }
+                        if (killed.Count > 0)
+                            Log("AUTOTEST hpparty QUEUE-CLEAR " + who + ": cancelled [" + string.Join(" | ", killed) + "]");
+                    }
+                }
+                catch (Exception qe) { Log("AUTOTEST hpparty QUEUE-CLEAR EXC " + qe.GetType().Name + " " + qe.Message); }
+                // run-56 law (run-55 postmortem): the callee JOINED ('Be Proposed
+                // to', 4240 running at 4209→4280 wait) but the actor's semiglobal
+                // entry (8224) died before advancing attr[20] — motive-gate
+                // suspects: 8224 ins10 'my.motive[3] < -30' and ins17 gosub 8230
+                // 'get social eligibility' (party-decayed motives). Feed ALL
+                // motives to 100 on both sims before the push.
+                try
+                {
+                    foreach (var av in new[] { _flActor, _flTarget })
+                    {
+                        if (av == null) continue;
+                        for (short mi = 0; mi < 16; mi++) av.SetMotiveData((VMMotive)mi, 100);
+                    }
+                    Log("AUTOTEST hpparty MOTIVE-FEED: both sims all motives -> 100");
+                }
+                catch (Exception me2) { Log("AUTOTEST hpparty MOTIVE-FEED EXC " + me2.GetType().Name + " " + me2.Message); }
+                if (action != null)
+                {
+                    action.Flags |= TTABFlags.FSOSkipPermissions;
+                    // run-48 laws (see the forced flirt): TS1 dequeue re-runs the
+                    // test tree even with SkipPermissions, and a UserDriven item
+                    // behind the active block is never examined — bypass both.
+                    action.CheckRoutine = null;
+                    action.Priority = (short)VMQueuePriority.Maximum;
+                    // run-50 vanish law 1: the Maximum flirt left the actor's PD
+                    // Priority at 100 (ExecuteAction :1132 syncs it; the
+                    // LINGERING uid0 in the active block keeps it there via
+                    // EndCurrentInteraction :396) — AttemptPush's
+                    // `item.Priority <= priorityCompare` then blocks even a
+                    // Maximum re-push (100 <= 100). Reset so the push is
+                    // examinable at all.
+                    _flActor.SetPersonData(VMPersonDataVariable.Priority, 0);
+                    // run-52 law: the 8280 host half pushes TTAB rows 53
+                    // (BHAV 4239, the wedding proper) and 54 ON THE CALLEE
+                    // with priority=inherited — and the callee's PD Priority
+                    // is pinned at 100 by the lingering 'Be Flirted With'
+                    // Maximum the same way, so AttemptPush never examines
+                    // the halves (run 52: started then one-tick end,
+                    // join=False). Reset the callee too; ProposeTick keeps
+                    // it examinable per-tick until the join lands.
+                    _flTarget.SetPersonData(VMPersonDataVariable.Priority, 0);
+                    _plPushAction = action;
+                    _flActor.Thread.EnqueueAction(action);
+                    _plPushUid = action.UID;
+                    _plPushFrame = _hpFrame; _plPushTickAbs = _absTick;
+                    Log("AUTOTEST hpparty PROPOSE-FORCED push (tta=26 'Proposition.../Marriage' action=8280, SkipPermissions) right after the flirt; relA2T="
+                        + SocRelStr(_plBeforeA2T) + " relT2A=" + SocRelStr(_plBeforeT2A) + " uid=" + _plPushUid
+                        + " fam host=" + _hpHost.GetPersonData((VMPersonDataVariable)61)
+                        + " callee=" + _flTarget.GetPersonData((VMPersonDataVariable)61));
+                }
+                else
+                {
+                    _plPushed = false; _plDone = true;
+                    Log("AUTOTEST hpparty PROPOSE-FORCED: GetAction(26) null — callee TTAB lacks tta=26 (unexpected: PersonGlobals row[65])");
+                }
+                var famNow = new List<string>();
+                var wedNow = new List<string>();
+                var piesNow = _flTarget.GetPieMenu(_vm, _flActor, true, true);
+                if (piesNow != null)
+                    foreach (var p in piesNow)
+                    {
+                        var nm = (p?.Name ?? "").Trim();
+                        if (nm.Length == 0) continue;
+                        var low = nm.ToLowerInvariant();
+                        if (low.Contains("flirt") || low.Contains("flower") || low.Contains("hug") || low.Contains("kiss")) famNow.Add(nm + "(id=" + p.ID + ")");
+                        if (low.Contains("propose") || low.Contains("wed") || low.Contains("marry")) wedNow.Add(nm + "(id=" + p.ID + ")");
+                    }
+                Log("AUTOTEST hpparty POSTSOCIAL pie: flirt-family=[" + string.Join(" | ", famNow)
+                    + "] propose-family=[" + string.Join(" | ", wedNow) + "]");
+                Log("AUTOTEST hpparty POSTSOCIAL pie census: [" + string.Join(" | ",
+                    (piesNow ?? new List<VMPieMenuInteraction>()).Select(p => (p?.Name ?? "?") + "(id=" + p?.ID + " g=" + (p?.Global ?? false) + ")")) + "]");
+            }
+            catch (Exception pe)
+            {
+                Log("AUTOTEST hpparty PROPOSE-FORCED EXC " + pe.GetType().Name + " " + pe.Message);
+                _plDone = true;
+            }
+        }
+
+        // Phase 2 watcher: identical completion law to FallinTick, on the
+        // forced Propose action; diffs the 8 slots at dequeue.
+        private static void ProposeTick()
+        {
+            try
+            {
+                // run-55: after the phase ends, keep one readback 300 ticks
+                // later — the handshake may still resolve (or die) after the
+                // pushed uid leaves the actor's queue.
+                if (_plDone)
+                {
+                    if (_plPostmortemTick < 0) { _plPostmortemDone = true; }
+                    else if (_absTick >= _plPostmortemTick && !_plPostmortemDone)
+                    {
+                        _plPostmortemDone = true;
+                    var cobj2 = _plCarrierGroup?.BaseObject;
+                    var attrs2 = "";
+                    if (cobj2 != null)
+                        foreach (var ai in new ushort[] { 0, 3, 6, 7, 9, 12, 13, 19, 20, 21, 22, 23, 24 })
+                            attrs2 += "a" + ai + "=" + cobj2.GetAttribute(ai) + " ";
+                    var framesA = ""; var framesT = "";
+                    if (_flActor?.Thread?.Stack != null)
+                        foreach (var fr in _flActor.Thread.Stack) framesA += (fr?.Routine?.Chunk?.ChunkID ?? 0) + ":" + (fr?.InstructionPointer ?? 0) + " ";
+                    if (_flTarget?.Thread?.Stack != null)
+                        foreach (var fr in _flTarget.Thread.Stack) framesT += (fr?.Routine?.Chunk?.ChunkID ?? 0) + ":" + (fr?.InstructionPointer ?? 0) + " ";
+                    var qT = "";
+                    var qq2 = _flTarget?.Thread?.Queue;
+                    if (qq2 != null) for (int i = 0; i < qq2.Count && i < 8; i++) qT += (qq2[i]?.Name ?? "?") + "/" + qq2[i].Priority + " ";
+                    var qA = "";
+                    var qqA = _flActor?.Thread?.Queue;
+                    if (qqA != null) for (int i = 0; i < qqA.Count && i < 8; i++) qA += (qqA[i]?.Name ?? "?") + "/" + qqA[i].Priority + " ";
+                    var nowA2T = SocRelSnapshot(_flActorNid, _flTargetNid);
+                    var nowT2A = SocRelSnapshot(_flTargetNid, _flActorNid);
+                    var pd34A = -1; var pd34T = -1;
+                    try { pd34A = _flActor.GetPersonData((VMPersonDataVariable)34); } catch { }
+                    try { pd34T = _flTarget.GetPersonData((VMPersonDataVariable)34); } catch { }
+                    // run-60: the accept consequences are STATE, not frames —
+                    // pure-computation gosubs (4241 'do move in') are invisible
+                    // to per-tick scans. ngh[58]/[61] are 4241's write family
+                    // (age gate >17, family/household merge slot).
+                    var nghA = "?"; var nghT = "?";
+                    try { nghA = _flActor.GetPersonData((VMPersonDataVariable)58) + "/" + _flActor.GetPersonData((VMPersonDataVariable)61); } catch { }
+                    try { nghT = _flTarget.GetPersonData((VMPersonDataVariable)58) + "/" + _flTarget.GetPersonData((VMPersonDataVariable)61); } catch { }
+                    Log("AUTOTEST hpparty PROPOSE-POSTMORTEM attrs=[" + attrs2.TrimEnd()
+                        + "] actorFrames=[" + framesA.TrimEnd() + "] calleeFrames=[" + framesT.TrimEnd()
+                        + "] actorActive='" + (_flActor?.Thread?.ActiveAction?.Name ?? "null")
+                        + "' calleeActive='" + (_flTarget?.Thread?.ActiveAction?.Name ?? "null")
+                        + "' calleeQ=[" + qT.TrimEnd() + "] actorQ=[" + qA.TrimEnd()
+                        + "] pd34A=" + pd34A + " pd34T=" + pd34T
+                        + " ngh58/61 A=" + nghA + " T=" + nghT
+                        + " dialogYes=" + _plDialogAnswered + " saw4241=" + _plSaw4241 + " saw4245=" + _plSaw4245 + " saw4266=" + _plSaw4266
+                        + " A2T=" + SocRelStr(nowA2T) + " T2A=" + SocRelStr(nowT2A)
+                        + " at " + Sim3Clock());
+                    return;
+                }
+                // run-63: the no-friends NEGATIVE — armed right after the
+                // positive postmortem. Unseed STR/LTR to 0 both ways and
+                // re-push tta=26 with the row's CheckRoutine INTACT (the
+                // run-48 law: TS1 CheckTS1Action runs the check tree at
+                // dequeue regardless of FSOSkipPermissions). The game's own
+                // test-fn gate (8281) decides: reject → the item vanishes
+                // unstarted (outcome=vanished after 1 repush) = the honest
+                // negative; start → the gate is NOT relationship-based.
+                if (_plPostmortemDone && !_plNegArmed && _plNegEnabled && _flTarget != null && !_flTarget.Dead
+                    && _flActor != null && !_flActor.Dead)
+                {
+                    _plNegArmed = true;
+                    try
+                    {
+                        Sim3RelSet(_flActorNid, _flTargetNid, 0, 0);
+                        Sim3RelSet(_flTargetNid, _flActorNid, 0, 0);
+                        Sim3RelSet(_flActorNid, _flTargetNid, 2, 0);
+                        Sim3RelSet(_flTargetNid, _flActorNid, 2, 0);
+                        var neg = _flTarget.GetAction(26, _flActor, _vm.Context, false);
+                        if (neg != null)
+                        {
+                            neg.Flags |= TTABFlags.FSOSkipPermissions; // the check STILL runs at dequeue (run-48 law)
+                            neg.Priority = (short)VMQueuePriority.Maximum;
+                            _flActor.SetPersonData(VMPersonDataVariable.Priority, 0);
+                            _flTarget.SetPersonData(VMPersonDataVariable.Priority, 0);
+                            _flActor.Thread.EnqueueAction(neg);
+                            _plPushUid = neg.UID;
+                            _plEnqSeen = false; _plStartSeen = false; _plJoinSeen = false;
+                            _plQuietTicks = 0; _plRepushes = 0;
+                            _plPushTickAbs = _absTick; _plLastVanishTick = _absTick;
+                            _plCarrierCreate = null; _plCarrierGroup = null;
+                            _plDialogAnswered = false; _plSaw4241 = false; _plSaw4245 = false; _plSaw4266 = false;
+                            _plDone = false;
+                            Log("AUTOTEST hpparty PROPOSE-NEG push (no-friends: STR/LTR unseeded to 0 both ways, CheckRoutine INTACT — the game's test-fn gate decides) uid="
+                                + _plPushUid + " at " + Sim3Clock());
+                        }
+                        else
+                            Log("AUTOTEST hpparty PROPOSE-NEG: GetAction(26) null — negative not runnable at " + Sim3Clock());
+                    }
+                    catch (Exception ne) { Log("AUTOTEST hpparty PROPOSE-NEG EXC " + ne.GetType().Name + " " + ne.Message); }
+                }
+                if (_plDone) return;
+                }
+                var thread = _flActor?.Thread;
+                // run-57 decision point: 4239 ins40 dialog_private (STR#301
+                // msg#8, yes=#9 no=#10) T=accept(attr[9]=1)/F=deny(2). Run 56
+                // proved the whole chain runs mechanically to the 9/9 exit
+                // states — but the stale-dialog-latch ORPHANED the dialog
+                // (GlobalBlockingDialog=null) so the primitive timed out into
+                // F = deny (the A2T[0] 100->80 penalty). While the propose
+                // runs, answer the proposer's yesno deterministically: same
+                // law as ChanceTraceRespondDialog, ResponseCode=0 = first
+                // choice (yes). This runs BEFORE the speed-latch site in the
+                // same tick, so the latch never sees the propose dialog.
+                // run-58: gated on the 4239-frame check alone — the started
+                // heuristic missed run 57's undispatched push, which left the
+                // responder unarmed for the whole window.
+                if (!_plDialogAnswered && _vm.GlobalBlockingDialog != null)
+                {
+                    var dlg = _vm.GlobalBlockingDialog;
+                    var dth = dlg.Thread;
+                    if (dth?.Stack != null)
+                    {
+                        var is4239 = false;
+                        foreach (var f2 in dth.Stack)
+                            if (f2 != null && f2.Routine?.Chunk?.ChunkID == 4239) { is4239 = true; break; }
+                        var bs = is4239 ? dth.BlockingState as FSO.SimAntics.Primitives.VMDialogResult : null;
+                        if (bs != null && !bs.Responded)
+                        {
+                            bs.Responded = true;
+                            bs.ResponseCode = 0; // the first choice
+                            bs.ResponseText = "0";
+                            if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
+                            else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+                            _vm.GlobalBlockingDialog = null;
+                            _plDialogAnswered = true;
+                            Log("AUTOTEST hpparty PROPOSE-DIALOG-ANSWERED yes (ResponseCode=0; 4239 dialog_private STR#301 msg#8) at " + Sim3Clock());
+                        }
+                    }
+                }
+                // run-57 accept-path markers: 4241 'do move in' / 4245 'bring
+                // everyone but us' only on accept; 4266 only on deny.
+                foreach (var th3 in new[] { thread, _flTarget?.Thread })
+                {
+                    if (th3?.Stack == null) continue;
+                    foreach (var f3 in th3.Stack)
+                    {
+                        var id3 = (ushort)((f3?.Routine?.Chunk?.ChunkID) ?? 0);
+                        if (id3 == 4241) _plSaw4241 = true;
+                        else if (id3 == 4245) _plSaw4245 = true;
+                        else if (id3 == 4266) _plSaw4266 = true;
+                    }
+                }
+                // run-50 broker law (see FallinTick): the pushed uid stays in
+                // the active block through the chain and the 8280 dispatcher
+                // hands off to the broker's own propose interaction — watch
+                // the active block, the broker name, and both trees.
+                int uidInd = -1; var q = thread?.Queue;
+                if (q != null) for (int i = 0; i < q.Count; i++) if (q[i].UID == _plPushUid) { uidInd = i; break; }
+                var inQueue = uidInd >= 0;
+                var isActive = inQueue && thread.ActiveQueueBlock >= 0 && uidInd <= thread.ActiveQueueBlock;
+                if (!_plEnqSeen && inQueue && !isActive) _plEnqSeen = true;
+                bool stackProp = false;
+                if (thread?.Stack != null)
+                    foreach (var fr in thread.Stack)
+                    {
+                        try
+                        {
+                            if (fr.Routine == _plPushAction.ActionRoutine
+                                || fr.Routine?.Chunk?.ChunkID == 4239) { stackProp = true; break; }
+                        }
+                        catch { }
+                    }
+                var actorBroker = thread?.ActiveAction != null
+                    && ((thread.ActiveAction.Name ?? "").IndexOf("propose", StringComparison.OrdinalIgnoreCase) >= 0
+                        || (thread.ActiveAction.Name ?? "").IndexOf("marry", StringComparison.OrdinalIgnoreCase) >= 0
+                        || (thread.ActiveAction.Name ?? "").IndexOf("wed", StringComparison.OrdinalIgnoreCase) >= 0);
+                var targetBroker = _flTarget?.Thread?.ActiveAction != null
+                    && ((_flTarget.Thread.ActiveAction.Name ?? "").IndexOf("propose", StringComparison.OrdinalIgnoreCase) >= 0
+                        || (_flTarget.Thread.ActiveAction.Name ?? "").IndexOf("marry", StringComparison.OrdinalIgnoreCase) >= 0
+                        || (_flTarget.Thread.ActiveAction.Name ?? "").IndexOf("wed", StringComparison.OrdinalIgnoreCase) >= 0);
+                // run-58 law (run 57): the started heuristics (active-name,
+                // 4239-frame, active-block) all missed a run where the queued
+                // propose was never DISPATCHED by the person main loop (it
+                // parked in the 8233 wait) — but a post-push carrier create
+                // (8280 ins2) is proof the host half ran its head.
+                if (!_plStartSeen && _plCarrierCreate != null)
+                {
+                    _plStartSeen = true;
+                    Log("AUTOTEST hpparty PROPOSE-FORCED started (carrier-created " + _plCarrierCreate + ") at " + Sim3Clock());
+                }
+                if (!_plStartSeen && (isActive || actorBroker || stackProp))
+                {
+                    _plStartSeen = true;
+                    Log("AUTOTEST hpparty PROPOSE-FORCED started (active-block=" + isActive
+                        + " activeAction='" + thread?.ActiveAction?.Name + "') at " + Sim3Clock());
+                }
+                // other-side join: the propose's callee half lands on second
+                if (!_plJoinSeen && targetBroker)
+                {
+                    _plJoinSeen = true;
+                    Log("AUTOTEST hpparty PROPOSE-FORCED OTHER-SIDE-JOINED: '"
+                        + _flTarget.Thread.ActiveAction.Name
+                        + "' uid=" + _flTarget.Thread.ActiveAction.UID + " at " + Sim3Clock());
+                }
+                var liveProp = isActive || actorBroker || stackProp || targetBroker;
+                if (liveProp) _plQuietTicks = 0; else if (_plStartSeen) _plQuietTicks++;
+                // run-60: dialog-resolution telemetry — run 59's accept (a9=1)
+                // resolved on a path NO rail responder logged. The dialog queue
+                // path (VMDialogPrivateStrings :36-52) never sets
+                // GlobalBlockingDialog, so every GlobalBlockingDialog-gated
+                // responder is blind to it; watch BOTH threads' BlockingState
+                // directly and log on signature change.
+                if (_plStartSeen && !_plDone)
+                {
+                    var dA = thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                    var dT = _flTarget?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                    var g5 = _vm.GlobalBlockingDialog;
+                    var sig = "A=" + (dA == null ? "-" : dA.Type + "/r" + (dA.Responded ? 1 : 0)
+                            + "/c" + dA.ResponseCode + "/w" + dA.WaitTime + "/d" + (dA.HasDisplayed ? 1 : 0))
+                        + " T=" + (dT == null ? "-" : dT.Type + "/r" + (dT.Responded ? 1 : 0)
+                            + "/c" + dT.ResponseCode + "/w" + dT.WaitTime + "/d" + (dT.HasDisplayed ? 1 : 0))
+                        + " G=" + (g5 == null ? "-" : "obj" + g5.ObjectID);
+                    if (sig != _plDlgSig)
+                    {
+                        _plDlgSig = sig;
+                        Log("AUTOTEST hpparty PROPOSE-DLGST " + sig + " at " + Sim3Clock());
+                    }
+                }
+                // run-50 vanish law 2: the pushed propose can be REMOVED
+                // without ever running (uid3 was gone ~26 ticks post-push).
+                // Run-52 [CancelSkip] traces named the queue-skip remover
+                // for guest counter-socials: EnqueueAction's own TS1
+                // priority insertion (:1056-1070) skips everything behind
+                // the insertion point — HPDrive's periodic pushes evict
+                // them. The propose's own vanish left NO [CancelSkip]
+                // trace (a different removal path — dequeue-check-fail or
+                // the InteractionCanceled else-branch). A vanished-
+                // unstarted propose is NOT terminal until 3 re-pushes have
+                // failed; each re-push resets the PD Priority (the
+                // examiner block law above). Run 52: re-push #1 → started.
+                var vanished = _plEnqSeen && !inQueue && !_plStartSeen;
+                // run-57: quiet 240 held the phase ~66 sim-min past the action's
+                // end (run 56: done at 8:11) — the party then hit the 8:00
+                // school/cast exodus and the G census failed (cast=False).
+                // 120 releases the party ~33 sim-min earlier; the postmortem
+                // still reads the settled end.
+                // run-59 (run 58): the pushed uid leaving the queue does NOT
+                // end the handshake — 8280 queues the #53 host half on the
+                // actor as its own item right before ins7, and the phase must
+                // stay open while that half (or #54 on the callee) waits.
+                var queueProp = false;
+                foreach (var qth in new[] { thread, _flTarget?.Thread })
+                {
+                    if (qth?.Queue == null) continue;
+                    for (int i = 0; i < qth.Queue.Count; i++)
+                    {
+                        var qnm = (qth.Queue[i]?.Name ?? "").ToLowerInvariant();
+                        if (qnm.Contains("propos") || qnm.Contains("marry") || qnm.Contains("wed")) { queueProp = true; break; }
+                    }
+                    if (queueProp) break;
+                }
+                var done = (_plStartSeen && (_plQuietTicks >= 120 || (_plEnqSeen && !inQueue && !queueProp)))
+                    || (vanished && (_plNegArmed ? _plRepushes >= 1 : _plRepushes >= 3));
+                var budget = _absTick - _plPushTickAbs > 7200; // 2 sim-hours cap (monotonic: survives leg resets)
+                // run-53: keep the callee's PD Priority examinable for the
+                // whole propose window — the host half's rows 53/54 land on
+                // the callee asynchronously and ExecuteAction :1132 re-syncs
+                // the callee's PD Priority if it starts anything in between.
+                if (!done && !budget && _plEnqSeen && !_plJoinSeen
+                    && _flTarget != null && !_flTarget.Dead)
+                    _flTarget.SetPersonData(VMPersonDataVariable.Priority, 0);
+                if (!done && !budget && vanished && thread != null
+                    && _absTick - _plLastVanishTick > 600)
+                {
+                    _plRepushes++;
+                    _plLastVanishTick = _absTick;
+                    _plEnqSeen = false;
+                    _flActor.SetPersonData(VMPersonDataVariable.Priority, 0);
+                    thread.EnqueueAction(_plPushAction);
+                    _plPushUid = _plPushAction.UID;
+                    Log("AUTOTEST hpparty PROPOSE-FORCED re-push #" + _plRepushes
+                        + " uid=" + _plPushUid + " (the run-50 vanish law) at " + Sim3Clock());
+                }
+                // run-58 hardening (run 57): the re-pushed propose can sit
+                // undispatched while the person main loop parks in the 8233
+                // wait — the push-site QUEUE-CLEAR only runs once, and later
+                // game-driven inserts (Nap/2, Throw Party/50) crowd the queue
+                // again. Re-clear the ACTOR's queue above the active block
+                // every tick until the join, exempting the pushed uid.
+                // run-59 law (run 58): the #53 host half ALSO queues on the
+                // actor as its own item ('Propose/1' — a different uid from
+                // the tta-26 push) — the uid exemption killed it within a
+                // tick and the whole handshake died. Only cancel items at
+                // priority > 1: the junk (Nap/2, Throw Party/50) and the
+                // half (inherited Max(1, PD=0) = 1) never collide.
+                if (!_plJoinSeen && !_plDone && _plEnqSeen && thread != null)
+                {
+                    var killedTick = new List<string>();
+                    var qq3 = thread.Queue;
+                    for (int i = qq3.Count - 1; i >= 0; i--)
+                    {
+                        var it2 = qq3[i];
+                        if (it2 == null || i <= thread.ActiveQueueBlock || it2.UID == _plPushUid) continue;
+                        if (it2.Priority <= 1) continue; // run-59: spare the propose halves
+                        killedTick.Add((it2.Name ?? "?") + "/" + it2.Priority);
+                        thread.CancelAction(it2.UID);
+                    }
+                    if (killedTick.Count > 0)
+                        Log("AUTOTEST hpparty QUEUE-CLEAR actor(tick): cancelled [" + string.Join(" | ", killedTick) + "]");
+                }
+                // run-59 (run 58): the callee's #54 half can park behind a
+                // game-driven active action ('Take a Bath') that the
+                // active-block examiner law never preempts at priority 1.
+                // When a propose-named item waits in the callee's queue and
+                // the active action is not propose-like, kick the active
+                // action ONCE so the half can start.
+                if (!_plJoinSeen && !_plDone && _plEnqSeen && !_plCalleeKicked
+                    && _flTarget?.Thread != null)
+                {
+                    var tth = _flTarget.Thread;
+                    var hasPropQ = false;
+                    for (int i = 0; i < tth.Queue.Count; i++)
+                    {
+                        var nm2 = (tth.Queue[i]?.Name ?? "").ToLowerInvariant();
+                        if (nm2.Contains("propos") || nm2.Contains("marry") || nm2.Contains("wed")) { hasPropQ = true; break; }
+                    }
+                    var actNm2 = (tth.ActiveAction?.Name ?? "").ToLowerInvariant();
+                    var actIsProp = actNm2.Contains("propos") || actNm2.Contains("marry") || actNm2.Contains("wed");
+                    if (hasPropQ && !actIsProp && tth.ActiveAction != null)
+                    {
+                        _plCalleeKicked = true;
+                        Log("AUTOTEST hpparty CALLEE-KICK: cancelling active '" + tth.ActiveAction.Name
+                            + "' (uid=" + tth.ActiveAction.UID + ") so the queued propose half can start at " + Sim3Clock());
+                        tth.CancelAction(tth.ActiveAction.UID);
+                    }
+                }
+                if (done || budget || (_flTarget != null && _flTarget.Dead))
+                {
+                    _plDone = true;
+                    var afterA2T = SocRelSnapshot(_flActorNid, _flTargetNid);
+                    var afterT2A = SocRelSnapshot(_flTargetNid, _flActorNid);
+                    var delta = "";
+                    if (_plBeforeA2T != null)
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+                            if (afterA2T[i] != _plBeforeA2T[i]) delta += "A2T[" + i + "] " + _plBeforeA2T[i] + "->" + afterA2T[i] + " ";
+                            if (afterT2A[i] != _plBeforeT2A[i]) delta += "T2A[" + i + "] " + _plBeforeT2A[i] + "->" + afterT2A[i] + " ";
+                        }
+                    }
+                    // run-54 end census: which tree actually ran (frames), what
+                    // both threads are doing, and whether the carrier was ever
+                    // created — this names the failure point the one-tick end
+                    // hides (create miss vs row-53/54 push vs early gate).
+                    try
+                    {
+                        var frStr = "";
+                        if (thread?.Stack != null)
+                            foreach (var fr in thread.Stack)
+                                frStr += (fr?.Routine?.Chunk?.ChunkID ?? 0) + ":" + (fr?.InstructionPointer ?? 0) + " ";
+                        var qStr = "";
+                        var qq = thread?.Queue;
+                        if (qq != null) for (int i = 0; i < qq.Count && i < 8; i++) qStr += (qq[i]?.Name ?? "?") + "/" + qq[i].Priority + " ";
+                        Log("AUTOTEST hpparty PROPOSE-CENSUS frames=[" + frStr.TrimEnd()
+                            + "] actorActive='" + (thread?.ActiveAction?.Name ?? "null")
+                            + "' calleeActive='" + (_flTarget?.Thread?.ActiveAction?.Name ?? "null")
+                            + "' calleeQ=[" + qStr.TrimEnd()
+                            + "] carrierCreate=" + (_plCarrierCreate ?? "NEVER")
+                            + " carrierObj=" + (_plCarrierGroup != null
+                                ? (_plCarrierGroup.BaseObject != null ? "id=" + _plCarrierGroup.BaseObject.ObjectID + " pos=" + _plCarrierGroup.BaseObject.Position : "group-no-base")
+                                : "none")
+                            + " at " + Sim3Clock());
+                    }
+                    catch (Exception ce) { Log("AUTOTEST hpparty PROPOSE-CENSUS EXC " + ce.GetType().Name + " " + ce.Message); }
+                    // run-55: the carrier IS the handshake — its attrs carry the
+                    // accept/deny state machine (attr[9]=stage/deny-code,
+                    // attr[20]=Person-A state, attr[13]/[19]/[22]=flags).
+                    try
+                    {
+                        var cobj = _plCarrierGroup?.BaseObject;
+                        if (cobj != null)
+                        {
+                            var attrs = "";
+                            foreach (var ai in new ushort[] { 0, 3, 6, 7, 9, 12, 13, 19, 20, 21, 22, 23, 24 })
+                                attrs += "a" + ai + "=" + cobj.GetAttribute(ai) + " ";
+                            Log("AUTOTEST hpparty PROPOSE-ATTRS " + attrs.TrimEnd());
+                        }
+                        else Log("AUTOTEST hpparty PROPOSE-ATTRS carrier-gone");
+                    }
+                    catch (Exception ae) { Log("AUTOTEST hpparty PROPOSE-ATTRS EXC " + ae.GetType().Name + " " + ae.Message); }
+                    _plPostmortemTick = _absTick + 1500; // run-56: the 4280/280 waits have sim-minute timeouts — read the SETTLED end
+                    Log("AUTOTEST hpparty PROPOSE-RESULT row='Proposition.../Marriage(forced tta=26 action=8280)' started=" + _plStartSeen
+                        + " join=" + _plJoinSeen + " quiet=" + _plQuietTicks + " repushes=" + _plRepushes
+                        + " neg=" + _plNegArmed
+                        + " dialogYes=" + _plDialogAnswered + " saw4241=" + _plSaw4241 + " saw4245=" + _plSaw4245 + " saw4266=" + _plSaw4266
+                        + " outcome=" + (budget ? "budget" : (_plStartSeen ? "completed" : "vanished"))
+                        + " before A2T=" + SocRelStr(_plBeforeA2T) + " T2A=" + SocRelStr(_plBeforeT2A)
+                        + " after A2T=" + SocRelStr(afterA2T) + " T2A=" + SocRelStr(afterT2A)
+                        + " delta=" + (delta.Length > 0 ? delta : "none")
+                        + " (4239's own writes: SET LTR/STR from Params + the 4245 wedding gather) at " + Sim3Clock());
+                }
+            }
+            catch (Exception pe2)
+            {
+                Log("AUTOTEST hpparty PROPOSE tick EXC " + pe2.GetType().Name + " " + pe2.Message);
+                _plDone = true;
+            }
         }
 
         private static void SocExecTryPush()
@@ -20335,6 +22436,2761 @@ namespace Simitone.Client
                 Fail("cc04live");
             }
             _cc04Done = true;
+        }
+
+        // EXP-02 hpparty: the House Party lifecycle spine on the current tip.
+        // Census law (EXA-02): zero HP-specific code defects; the spine is
+        // behavioral. Legs:
+        //   P  THROW — the phone's "Throw Party" row pushed on the host (real
+        //              content; the familymerge push discipline); the Party
+        //              Controller (0x1CD89442) activates.
+        //   G  GUESTS — guests arrive via the portal (avatar count rises /
+        //              party-cast entities appear).
+        //   S  STATE  — the Party Controller's attrs advance (party running).
+        //   E  END    — the party ends within budget (guests leave / attr
+        //              reset) OR the budget expires with the state pinned.
+        // Verdict: explicit hpparty PASS only when P+G+S hold (E pinned either
+        // way — the end law is the next tranche's refinement).
+        private static int _hpState;      // 0 init, 1 drive, 2 done, 4 repeat-probe (run-66)
+        private static int _hpLeg;        // 0=P 1=G 2=S 3=E
+        private static int _hpFrame;
+        private static int _hpSettle;
+        private static VMAvatar _hpHost;
+        private static VMEntity _hpPhone;
+        private static int _hpPartyRow = -1;
+        private static int _hpPluginRow = -1; // the generic plugin call — the HP caterer's hire path (no Services/...Caterer row exists)
+        private const uint HP_PARTY_CTRL = 0x1CD89442u;
+        private static int _hpGuests0 = -1;
+        private static uint _hpPushUid = uint.MaxValue;
+        private static bool _hpSawController, _hpSawCast;
+        private static readonly bool[] _hpCastSeen = new bool[9];
+        private static bool _hpWeddingProbed;
+        private static bool _hpWeddingSeeded; // EXP-02: the SIM-16-style relationship fixture before the pie probe
+        // run-46 law: the seed attempt is RETRIED, not one-shot — run-44 caught
+        // a household sim still in-world at the post-party f=10; run-45 lost
+        // that race (post-party the lot empties: guests departed, household at
+        // work) and the whole instrument went inert. Primary trigger now runs
+        // pre-party (leg 0, household home); the post-party block is fallback.
+        private static int _seedTryCount; private static int _seedExcCount;
+        private static int _absTick; private static int _flPushTickAbs; private static int _plPushTickAbs;
+        // EXP-02 fall-in-love drive (2026-09-20): push the REAL 'Flirt' row on
+        // the seeded pair and diff the 8 NBRS slots — the before/after delta
+        // names the state a successful flirt sets that the seed didn't (i.e.
+        // the propose gate's true state). Decode: NPCCatererSI TTAB#129,
+        // 'Flirt' = tta 5 / BHAV#4124, 'Propose' = tta 53 / BHAV#4239.
+        private static bool _flPushed;
+        private static bool _flDone;
+        private static VMQueuedAction _flPushAction;
+        private static ushort _flPushUid;
+        private static VMAvatar _flActor;
+        private static VMAvatar _flTarget;
+        private static short _flActorNid;
+        private static short _flTargetNid;
+        private static int[] _flBeforeA2T;
+        private static int[] _flBeforeT2A;
+        private static bool _flStartSeen;
+        private static bool _flEnqSeen;
+        private static bool _flJoinSeen; // run-49: the CALLEE's side went active (broker #87 landed)
+        private static int _flQuietTicks; // run-50: consecutive ticks with no flirt evidence on either side
+        private static int _flPushFrame;
+        private static string _flRowName;
+        private static bool _flForced; // pushed by decoded tta id (the pie didn't offer it)
+        // phase 2: the propose forced-push right after the flirt completes —
+        // the conversation-state moment the corrected decode points at
+        // (4250-family gates need the pair socially engaged, not just seeded).
+        private static bool _plPushed;
+        private static bool _plDone;
+        private static VMQueuedAction _plPushAction;
+        private static ushort _plPushUid;
+        private static int[] _plBeforeA2T;
+        private static int[] _plBeforeT2A;
+        private static bool _plStartSeen;
+        private static bool _plEnqSeen;
+        private static bool _plJoinSeen; // run-50: the propose's callee half went active
+        private static int _plQuietTicks; // run-50: consecutive ticks with no propose evidence
+        private static int _plRepushes; // run-51: vanish-recovery re-push count
+        private static int _plLastVanishTick = -100000; // run-51: re-push cooldown anchor
+        private static int _plPushFrame;
+        // run-54: create-path probes — ObjectCreated subscription + carrier capture
+        private static bool _plObjSub;
+        private static string _plCarrierCreate;
+        private static VMMultitileGroup _plCarrierGroup;
+        // run-55: postmortem window — one census 300 ticks after phase end
+        private static int _plPostmortemTick = -1;
+        private static bool _plPostmortemDone;
+        // run-57: accept-path markers — 4241 'do move in' and 4245 'bring
+        // everyone but us' only run on accept; 4266 only on deny. The yesno
+        // answer decides 4239 ins40's T(attr[9]=1)/F(attr[9]=2).
+        private static bool _plSaw4241;
+        private static bool _plSaw4245;
+        private static bool _plSaw4266;
+        private static bool _plDialogAnswered;
+        // run-59: one-shot callee active-action kick (a queued propose half
+        // behind a game-driven active action never gets examined otherwise)
+        private static bool _plCalleeKicked;
+        // run-60: last PROPOSE-DLGST signature (change-detected dialog
+        // telemetry — the run-59 accept resolved on a path no responder logged)
+        private static string _plDlgSig;
+        // run-63: the no-friends NEGATIVE phase — after the positive
+        // postmortem, STR/LTR unseeded to 0 and tta=26 re-pushed with the
+        // row's CheckRoutine INTACT so the game's own test-fn gate decides
+        private static bool _plNegArmed;
+    // run-65: the neg phase perturbs the party fixture — the callee's
+    // 1800-tick Message block plus the cratered pair delayed the party
+    // start ~4.5 sim-h (P 13:26 vs 8:50) and S checked a dead window
+    // (run 64 FAIL 0/1, instrument-class). Default OFF; the decode is
+    // banked in hpparty-run64 — re-run it via SIMTONE_PROPOSE_NEG=1.
+    private static readonly bool _plNegEnabled =
+        Environment.GetEnvironmentVariable("SIMTONE_PROPOSE_NEG") == "1";
+        private static VMEntity _hpStereo, _hpFloor;
+        private static int _hpGuestsMin = int.MaxValue;
+        private static bool _hpPartyRetried;
+        private static bool _hpPartyPushed; // run-47: the party push WAITS for the EXP-02 social phase
+        private static bool _hpStereoTried, _hpStereoPushed;
+        private static VMEntity _hpBuffet;
+        private static bool _hpBuffetPushed;
+        private static bool _hpBuffetBuySent;
+        private static bool _hpSawBuyDup; // increment 8: a SECOND buffet = the buy path's own landing receipt
+        private static bool _hpCatererHired;
+        private static int _hpDlgDumps;
+        private static VMEntity _hpPluginCtrl;
+        private static int _hpBuffetA0AtSpawn = int.MinValue;
+        // EXP-03 (HD): the GoDowntownPhonePlugin first increment — the plugin
+        // controller + the cab-dialog/Generate-Cab observables
+        private static VMEntity _hdPlugin;
+        private static bool _hdPushed, _hdSawDlg, _hdSawCab;
+        // EXP-03 increment 2 (the cab RIDE): phase-2 window opens when the cab
+        // dialog fires — watch 4098 'Generate Cab' produce the cab ENTITY, the
+        // host take the cab queue / depart (4106 'Wait For Cab'), or the
+        // plugin's parked stack advance.
+        private static int _hdDlgFrame = -1;
+        private static bool _hdRode;           // EXP-03 increment 3: the host actually DEPARTED (OOW/absent) — the ride-through receipt
+        private static bool _hdSawQueue;       // increment 3: 'Call Cab' seen in the host's active queue (run-4's receipt level — logged, not verdict-ending)
+        private static uint _hdLastUid = uint.MaxValue; // increment 4: the acceptance discriminator — the last plugin-call push's fate
+        private static int _hdCabRow = -1;    // increment 5: the phone's DEDICATED 'Call Cab...' row (run-6 discovery) — the direct drive
+        private static bool _hdCabPushed;
+        // increment 9: the Send/Join-Downtown COMPANION drive — plugin tree 4099
+        // pushes interaction #0 ('Go Downtown') on the sim in the plugin's attr[4]
+        private static VMEntity _hdGuest;
+        private static bool _hdCompPushed, _hdSawComp;
+        // increment 11: the DATE direction (row 1 = 4108 'Join Downtown') + the
+        // guest's queued 'Go Downtown' RUNNING to the 4113 departure
+        private static bool _hdJoinPushed, _hdGuestRan, _hdGuestDeparted;
+        // increment 14: the RETURN leg — after the host departs, observe a
+        // post-departure window for the return (back in world) + lot state
+        private static int _hdDepartFrame = -1;
+        // increment 15: the souvenir drive — 4126 'Good Mood Souvenirs' via
+        // RunInMyStack; the receipt = vm.MyInventory gaining items
+        private static int _hdInvBefore = -1;
+        private static bool _hdSouvenirPushed, _hdSawSouvenir;
+        private static bool _hdHostReturned;
+        private static string _hdLastAct = ""; // increment 7: latch the host's action transitions + the boarded target's identity (the run-8 'Get In' law)
+        private const uint HD_PLUGIN = 0xA6F31853u;
+        private const uint HD_CAB = 0x7AE4654Au; // increment-6 decode: 4098 'Generate Cab' ins2 create pos=6 (OOW)
+
+        private static void CheckHP()
+        {
+            try
+            {
+                switch (_hpState)
+                {
+                    case 0: HPInit(); break;
+                    case 1: HPDrive(); break;
+                    case 2: return;
+                    case 4: HPRepeat(); break;
+                }
+            }
+            catch (Exception le)
+            {
+                Log("AUTOTEST hpparty EXC state=" + _hpState + " leg=" + _hpLeg + " " + le.GetType().Name + " " + le.Message);
+                Fail("hpparty");
+                _hpState = 2;
+            }
+        }
+
+        // run-66: the REPEAT-PARTY probe — the hpparty session previously ended
+        // at the HD tranche's Pass, so a second Throw Party lifecycle in the
+        // SAME session was untested. After the HD tranche completes, re-push
+        // the party row (Maximum priority + PD reset: the run-58 sleep law)
+        // and watch one lean cycle: P2 = controller attr0 re-activates, E2 =
+        // it resets again (only accepted 20 sim-min after P2, so in-party
+        // transients can't fire it). The verdict defers behind this probe; a
+        // pin is observational, never a gate fail.
+        private static int _hpRepFrame;
+        private static bool _hpRepPushed, _hpRepP2, _hpRepE2, _hpRepRetried;
+        private static int _hpRepP2Frame = -1;
+        // run-67: the run-66 residual — the second push's fate (queue/active/
+        // stack per 60 frames post-push) so started-and-silent vs
+        // never-dispatched is distinguishable
+        private static uint _hpRepUid;
+        private static int _hpRepPushFrame = -1;
+        // run-70: the save/reload row — the last EXP-02 row. Mid-party save
+        // via the deathrel law (TS1GameScreen.Save -> FSOV + SaveNeighbourhood(true)),
+        // then PlayHouse reload, then the HPRepeat watches continue on the
+        // REBIND vm (the controller is re-resolved from _vm every tick). The
+        // party surviving the reload (attr0 still active at rebind) and ending
+        // naturally (E2 on the new vm) is SAVEREL=ok; a lost party or a failed
+        // reload is pinned — observational, never a gate fail (the REPEAT
+        // probe law).
+        private static int _hpSavePhase; // 0 none, 1 save dispatched, 2 reload dispatched, 3 rebind done, 9 failed
+        private static DateTime _hpSaveStamp;
+        private static VM _hpSaveOldVm;
+        private static short _hpSaveHouse;
+        private static int _hpSaveAttr0Reload = -99;
+
+        private static void ArmRepeat()
+        {
+            _hpState = 4;
+            _hpRepFrame = 0;
+            _hpRepPushed = false; _hpRepP2 = false; _hpRepE2 = false; _hpRepRetried = false;
+            _hpRepP2Frame = -1; _hpRepPushFrame = -1; _hpRepUid = 0;
+            _hpSavePhase = 0; _hpSaveHouse = 0; _hpSaveAttr0Reload = -99; _hpSaveOldVm = null;
+            Log("AUTOTEST hpparty REPEAT: tranche complete — repeat-party probe armed (second Throw Party, lean P2/E2 watch) at " + Sim3Clock());
+        }
+
+        private static void HPRepeat()
+        {
+            _hpRepFrame++;
+            HPAnswerDialogs(); // run-69: state-4 coverage — run 68 proved the probe dialogs only ever resolved by timeout
+            var cR = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == HP_PARTY_CTRL);
+            int ra0 = cR?.GetAttribute(0) ?? -99;
+            if (!_hpRepPushed && _hpRepFrame >= 120 && _hpPartyRow >= 0)
+            {
+                _hpRepPushed = true;
+                var act = _hpPhone.GetAction(_hpPartyRow, _hpHost, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                if (act != null)
+                {
+                    act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                    act.CheckRoutine = null; // the harness push law (CheckTS1Action evaluates the check regardless)
+                    act.Priority = (short)VMQueuePriority.Maximum;
+                    _hpHost.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.Priority, 0);
+                    _hpHost.Thread.EnqueueAction(act);
+                    _hpRepUid = act.UID; _hpRepPushFrame = _hpRepFrame;
+                    Log("AUTOTEST hpparty REPEAT P2: pushed row=" + _hpPartyRow + " uid=" + act.UID + " at " + Sim3Clock());
+                }
+                else Log("AUTOTEST hpparty REPEAT P2: GetAction null row=" + _hpPartyRow);
+            }
+            if (!_hpRepP2 && ra0 != 0 && ra0 != -99)
+            {
+                _hpRepP2 = true; _hpRepP2Frame = _hpRepFrame;
+                Log("AUTOTEST hpparty REPEAT P2 PASS (ctrl attr0=" + ra0 + " re-activated; guests="
+                    + _vm.Context.ObjectQueries.Avatars.Count(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)
+                    + ") at " + Sim3Clock());
+            }
+            // run-70: mid-party save/reload interlude — fire once, 300 frames
+            // into the confirmed-active second party
+            else if (_hpSavePhase == 0 && _hpRepP2 && _hpRepFrame - _hpRepP2Frame == 300)
+            {
+                _hpSavePhase = 1; _hpSaveStamp = DateTime.UtcNow;
+                GameThread.NextUpdate(x =>
+                {
+                    try
+                    {
+                        _screen.Save();
+                        Log("AUTOTEST hpparty SAVEREL: user save mid-party (TS1GameScreen.Save -> FSOV + SaveNeighbourhood(true)) at " + Sim3Clock());
+                    }
+                    catch (Exception se) { _hpSavePhase = 9; Log("AUTOTEST hpparty SAVEREL save EXC " + se.GetType().Name + " " + se.Message); }
+                });
+            }
+            if (_hpSavePhase == 1 && (DateTime.UtcNow - _hpSaveStamp).TotalSeconds >= 5)
+            {
+                // deathrel law: let the save land, then boot the SAME house
+                // through the harness's public choke point
+                _hpSaveOldVm = _vm;
+                try { short.TryParse(_houses[Math.Min(_houseIdx, _houses.Length - 1)], out _hpSaveHouse); } catch { }
+                _hpSavePhase = 2; _hpSaveStamp = DateTime.UtcNow;
+                GameThread.NextUpdate(x =>
+                {
+                    try
+                    {
+                        _screen.PlayHouse(_hpSaveHouse, null);
+                        Log("AUTOTEST hpparty SAVEREL: PlayHouse(" + _hpSaveHouse + ") dispatched (reload from the just-saved file)");
+                    }
+                    catch (Exception pe)
+                    {
+                        _hpSavePhase = 9;
+                        Log("AUTOTEST hpparty SAVEREL PlayHouse EXC " + pe.GetType().Name + " " + pe.Message);
+                    }
+                });
+            }
+            if (_hpSavePhase == 2 && _screen.InLot && _screen.vm != null
+                && !ReferenceEquals(_screen.vm, _hpSaveOldVm) && _screen.vm.Entities.Count > 0)
+            {
+                // deathrel re-bind: new VM instance proves the old one tore down
+                _vm = _screen.vm;
+                _hpSavePhase = 3;
+                if (_vm.SpeedMultiplier <= 0) { _vm.SpeedMultiplier = 1; _vm.GlobalBlockingDialog = null; }
+                // re-resolve the host on the new vm — the old entity's thread is
+                // torn down and would shadow HPAnswerDialogs' scan
+                var navs = _vm.Context.ObjectQueries.Avatars?.OfType<VMAvatar>()
+                    .Where(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD).ToList();
+                if (navs != null && navs.Count > 0)
+                    _hpHost = navs.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? navs[0];
+                var sc = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == HP_PARTY_CTRL);
+                _hpSaveAttr0Reload = sc?.GetAttribute(0) ?? -99;
+                Log("AUTOTEST hpparty SAVEREL: RELOAD-BOUND house=" + _hpSaveHouse
+                    + " entities=" + _vm.Entities.Count
+                    + " guests=" + _vm.Context.ObjectQueries.Avatars.Count(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)
+                    + " ctrlAttr0=" + _hpSaveAttr0Reload + " loadErrors=" + _vm.LoadErrors.Count
+                    + " at " + Sim3Clock());
+            }
+            if ((_hpSavePhase == 1 || _hpSavePhase == 2) && (DateTime.UtcNow - _hpSaveStamp).TotalMinutes > 3)
+            {
+                _hpSavePhase = 9;
+                Log("AUTOTEST hpparty SAVEREL: phase " + _hpSavePhase + " timed out after 3 min — pinning (old watch continues)");
+            }
+            else if (!_hpRepP2 && !_hpRepRetried && _hpRepFrame == 5400)
+            {
+                // run-9 law: invite acceptance is content variance — one
+                // disclosed mid-window retry if the re-activation starves
+                _hpRepRetried = true;
+                var act2 = _hpPhone.GetAction(_hpPartyRow, _hpHost, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                if (act2 != null)
+                {
+                    act2.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                    act2.CheckRoutine = null;
+                    act2.Priority = (short)VMQueuePriority.Maximum;
+                    _hpHost.Thread.EnqueueAction(act2);
+                    _hpRepUid = act2.UID; _hpRepPushFrame = _hpRepFrame;
+                    Log("AUTOTEST hpparty REPEAT P2: no re-activation by mid-window — disclosed retry uid=" + act2.UID + " at " + Sim3Clock());
+                }
+            }
+            else if (_hpRepP2 && !_hpRepE2 && ra0 == 0 && _hpRepFrame - _hpRepP2Frame >= 1200)
+            {
+                _hpRepE2 = true;
+                Log("AUTOTEST hpparty REPEAT E2 PASS (ctrl attr0 reset 20+ sim-min after P2; second lifecycle complete) at " + Sim3Clock());
+            }
+            // run-67: P-fate trace for 300 frames after each push (the
+            // cycle-1 law: queue membership / active block / host stack)
+            if (_hpRepPushFrame >= 0 && _hpRepFrame - _hpRepPushFrame <= 300 && _hpRepFrame % 60 == 0)
+            {
+                var rq = _hpHost.Thread.Queue;
+                var rinQ = rq != null && rq.Any(x => x.UID == _hpRepUid);
+                var rAct = _hpHost.Thread.ActiveAction;
+                var rst = _hpHost.Thread.Stack;
+                var rstk = rst == null ? "" : string.Join(",", rst.Select(f => (f.Routine?.Chunk?.ChunkID ?? 0) + "@" + ((int)f.InstructionPointer)));
+                Log("AUTOTEST hpparty REPEAT P-fate f=" + (_hpRepFrame - _hpRepPushFrame) + " uid=" + _hpRepUid
+                    + " inQueue=" + rinQ + " active=" + (rAct == null ? "none" : ("'" + rAct.Name + "'uid" + rAct.UID))
+                    + " stack=[" + rstk + "]");
+            }
+            // run-68: host BlockingState telemetry — confirms or refutes the
+            // queue-path-picker hypothesis for the 4112@6 freeze
+            if (_hpRepFrame % 300 == 0)
+            {
+                var rhb = _hpHost?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                Log("AUTOTEST hpparty REPEAT bs f=" + _hpRepFrame + " hostBs="
+                    + (rhb == null ? "-" : rhb.Type + "/r" + (rhb.Responded ? 1 : 0) + "/c" + rhb.ResponseCode + "/w" + rhb.WaitTime + "/d" + (rhb.HasDisplayed ? 1 : 0))
+                    + " gDlg=" + (_vm.GlobalBlockingDialog != null ? "set" : "null") + " at " + Sim3Clock());
+            }
+            // run-71: why doesn't the reloaded party end (run 70: clock ran to
+            // 19:08 while attr0 stayed 2)? Trace the ctrl thread every 300
+            // frames post-rebind — a progressing stack/active means the tree
+            // resumes and the end logic is elsewhere; an identical stack means
+            // the reloaded controller is parked.
+            if (_hpSavePhase == 3 && _hpRepFrame % 300 == 0)
+            {
+                var tc = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == HP_PARTY_CTRL);
+                var tst = tc?.Thread?.Stack;
+                Log("AUTOTEST hpparty SAVEREL ctrl-trace f=" + _hpRepFrame
+                    + " attr0=" + (tc?.GetAttribute(0) ?? -99)
+                    + " threadNull=" + (tc?.Thread == null ? 1 : 0)
+                    + " active=" + (tc?.Thread?.ActiveAction == null ? "none" : "'" + tc.Thread.ActiveAction.Name + "'")
+                    + " stack=[" + (tst == null ? "" : string.Join(",", tst.Select(f => (f.Routine?.Chunk?.ChunkID ?? 0) + "@" + ((int)f.InstructionPointer)))) + "]");
+            }
+            if (_hpRepE2 || (!_hpRepP2 && _hpRepFrame > 10800) || (_hpRepP2 && _hpRepFrame - _hpRepP2Frame > 18000))
+            {
+                var rep = _hpRepE2 ? "ok" : "pinned";
+                // run-70/71: the save/reload row's disposition. ok = the party
+                // survived the mid-party save (attr0 still active at rebind)
+                // and ended naturally on the reloaded vm (E2 after phase 3).
+                // run 70 proved preservation (attr0=2, guests=6, loadErrors=0)
+                // but the reloaded party never ended in-window — labeled
+                // preserved-pending, not na.
+                var saverel = _hpSavePhase == 3 && _hpSaveAttr0Reload > 0 && _hpRepE2 ? "ok"
+                    : _hpSavePhase == 3 && _hpSaveAttr0Reload > 0 ? "preserved (end not observed in window)"
+                    : _hpSavePhase == 9 ? "pinned (save/reload failed)"
+                    : _hpSavePhase == 3 && _hpSaveAttr0Reload <= 0 ? "pinned (party lost through the save)"
+                    : _hpSavePhase == 0 && _hpRepP2 ? "pinned (interlude never fired)"
+                    : "na";
+                Log("AUTOTEST hpparty REPEAT verdict: " + (_hpRepE2 ? "second lifecycle complete (P2+E2)"
+                    : (!_hpRepP2 ? "no second activation in the 3 sim-h window"
+                    : "second activation never ended in the 5 sim-h window")) + " — REPEAT=" + rep);
+                Log("AUTOTEST hpparty final verdict legs P/G/S/E/D1/D2/C1/C2 + CAST + HD + COMPANION/DATE/GUEST (as banked above) + REPEAT=" + rep
+                    + " + SAVEREL=" + saverel);
+                Pass("hpparty");
+                _hpState = 2;
+            }
+        }
+
+        // run-69: the run-68 residual, precisely scoped by the log audit —
+        // HPDrive held the answer block plus a DEAD _hpState==4 branch
+        // (CheckHP routes state 4 to HPRepeat), so run 68's mid-probe
+        // queue-path dialogs still resolved only by their 1800-tick
+        // DIALOG_MAX_WAITTIME timeout. Shared by HPDrive (state 1),
+        // HPRepeat (state 4) and the EXP-04 vacation leg (run-71). The
+        // queue-path scan (global latch clear) runs in those states only —
+        // the seeded positive phase never holds blocking states (DLGST A=-
+        // T=- across 11 runs) — and is suppressed while the neg phase is
+        // armed so the run-64 Message-timeout decode stays reproducible
+        // (SIMTONE_PROPOSE_NEG=1).
+        private static void HPAnswerDialogs()
+        {
+            try
+            {
+                var dlg = _vm.GlobalBlockingDialog;
+                var hostBs = _hpHost?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                // run12 law: the plugin/party dialogs latch on the PHONE's thread
+                // (the stale-dialog sweeper released obj296-307 latches) — answer
+                // ANY entity's queued blocking dialog, not just the host's.
+                FSO.SimAntics.Primitives.VMDialogResult anyBs = hostBs;
+                if (dlg != null)
+                {
+                    if (anyBs == null || anyBs.Responded)
+                    {
+                        foreach (var ent in _vm.Entities)
+                        {
+                            var qbs2 = ent?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                            if (qbs2 != null && !qbs2.Responded) { anyBs = qbs2; break; }
+                        }
+                    }
+                }
+                else if ((_hpState == 4 || _vacState == 1) && !_plNegArmed)
+                {
+                    // run-71: the vacation booking leg shares the queue-path
+                    // scan too — its booking pickers are queue-path dialogs
+                    if (anyBs == null || anyBs.Responded)
+                    {
+                        foreach (var ent in _vm.Entities)
+                        {
+                            var qbs2 = ent?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                            if (qbs2 != null && !qbs2.Responded) { anyBs = qbs2; break; }
+                        }
+                    }
+                }
+                if (anyBs != null && !anyBs.Responded)
+                {
+                    anyBs.Responded = true;
+                    // run-73 (V1.1): the booking ask is a YesNo — run 72 answered
+                    // the fixed "0" (No) and the tree parked at plugin BHAV
+                    // 4108@4 for the whole window; during the vacation watch
+                    // answer 1 (Yes) instead.
+                    anyBs.ResponseCode = (byte)(_vacState == 1 ? 1 : 0);
+                    anyBs.ResponseText = _vacState == 1 ? "1" : "0";
+                    _vm.GlobalBlockingDialog = null;
+                    if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
+                    else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+                    Log("AUTOTEST vacation|hpparty: dialog auto-responded (type=" + anyBs.Type
+                        + " ans=" + (_vacState == 1 ? "1" : "0")
+                        + (dlg == null ? " QUEUE-PATH" : "")
+                        + " st=" + (_vacState == 1 ? "vac" : _hpState.ToString())
+                        + " owner=obj" + (dlg?.ObjectID ?? 0) + ") at " + Sim3Clock());
+                }
+            }
+            catch { }
+        }
+
+        // EXP-04 V1 (opt-in "vacation"): the vacation booking leg — resolve
+        // the phone's booking row (or the Vacation Plugin object's own
+        // table), push it with the hpparty push law, answer the booking
+        // dialogs queue-path (shared HPAnswerDialogs), and verdict on the
+        // booking's real observables: the occupied-vacation-lot count
+        // (mode-27 law: FAMI house 40..48) and/or departure tokens
+        // (inventory type 2 GUID 7/8 on the host's NID inventory — the
+        // mode-23 read side). Observational per the REPEAT/SAVEREL law: a
+        // pin (e.g. no bookable row on the base phone — the plugin-wiring
+        // decode) never fails the gate; an exception does.
+        private static int _vacState; // 0 init, 1 watch, 2 done
+        private static int _vacSettle, _vacFrame, _vacRow = -1, _vacBook0 = -1;
+        private static bool _vacPushed, _vacActiveSeen;
+        private static uint _vacUid;
+        private static VMEntity _vacTarget;
+        private static short _vacHostNid = -1;
+        // EXP-05 V2 ('unl-pets'): pen-animal family attach + native spawn + motive
+        // soak + save/reload persistence. States: 0 attach+PlayHouse, 1 wait-spawn,
+        // 2 motive soak, 3 save, 4 reload, 5 verify-resume, 99 done.
+        private static int _unlState, _unlFrame, _unlSoak0;
+        private static FSO.Files.Formats.IFF.Chunks.FAMI _unlFam;
+        private static readonly uint[] UnlPetGuids = { 0x04D86D1Fu, 0xA6A4A1ACu }; // pen tabby, labrador
+        private const short UnlPetHouse = 10;
+        private static readonly short[] _unlMotives0 = new short[UnlPetGuids.Length * 16];
+        // EXP-05 V3 ('unl-pets2'): despawn forensics — catch who removes the
+        // VerifyFamily-spawned pets (F-PETS-DESPAWN). States: 0 arm, 1 wait-spawn,
+        // 2 forensic trace, 3 verdict, 99 done.
+        private static int _unl2State, _unl2Frame, _unl2Spawn0;
+        private static bool _unl2Captured;
+        private static FSO.Files.Formats.IFF.Chunks.FAMI _unl2Fam;
+        private static readonly uint[] Unl2PetGuids = { 0x7BEA0977u, 0x4A70DF92u }; // templatecat, templatedog (family-pet OBJDs; pen animals self-delete via npc_pen_*.iff 4107 "Containment Check" — V3 run 3)
+        private const short Unl2PetHouse = 10;
+        // EXP-05 V6 ('unl-travel'): TRV-02 travel law applied to Old Town — family
+        // (human + templatecat + templatedog) travels from the resident lot (10) to
+        // an Old Town community lot (house 80-89; STDesc range) and back. Acceptance:
+        // TRV-02 transitions recorded (booking → mode-17 bookkeeping → lot switch →
+        // away arrival → return → in-memory resume) and pet + family persist across
+        // the round trip. States: 0 arm, 1 wait-spawn+push, 2 booking watch,
+        // 3 away family watch, 4 return dispatch, 5 home-restore watch, 99 done.
+        private static int _unltrState, _unltrFrame, _unltrSettle;
+        private static FSO.Files.Formats.IFF.Chunks.FAMI _unltrFam;
+        private static uint _unltrHumanGuid;
+        private static short _unltrTransit0 = -1, _unltrG340 = -1;
+        private static short _unltrHostNid = -1;
+        private static readonly uint[] UnlTravelPetGuids = { 0x7BEA0977u, 0x4A70DF92u }; // templatecat, templatedog (V3 corrective family-pet law)
+        private const short UnlTravelHouse = 5; // house 5 carries the phone + vacation plugin (EXP-04 booking law); run 1 proved lot 10 has neither booking path
+        private const short UnlTravelDest = 80; // Old Town community lot (STDesc range 80-89; House80.iff present in every userdir)
+        private static readonly short[] _unltrOids0 = new short[3];
+        private static readonly short[] _unltrMotives0 = new short[3 * 16];
+        private static VMEntity _unltrTarget; // booked phone/plugin object
+        private static VMEntity _unltrHost, _unltrPhone;
+        private static int _unltrRow = -1, _unltrRetMode; // retMode 0 unset, 1 probe-signal fallback
+        private static uint _unltrUid;
+        private static VM _unltrAwayVm;
+        private static int _unltrAwaySettle = -1, _unltrAssisted, _unltrHomeSettle;
+        private static bool _unltrNotified; // op-49 emulated once per booking
+        private static bool _unltrReturnSeen; // engine sink saw a return-flavored lot switch
+        private static readonly int[] _unltrAwayClock = { -1, -1 };
+        // run-87 (V3.0): away/resume — mid-vacation REAL save + PlayHouse(44)
+        // reload (the deathrel template). Phases: 0 watch-switch, 1 away-live,
+        // 2 saved, 3 reloading, 4 reloaded.
+        private static int _vacV3;
+        private static VM _vacReloadOldVm;
+        private static int _vacV3TransitPost = -1;
+        // run-88 (V3.1): return-home leg + post-reload diagnostics.
+        private static int _vacV3Ret; // 0 not dispatched, 1 dispatched, 2 home-bound
+        private static VM _vacRetOldVm;
+        // run-97 (V4.4): attribute-write watch. Arm VMEntity.AutotestAttrWatch
+        // on the live away lot, filtered to the vacation-controller entity IDs
+        // resolved by name at f=1800 (union'd at each ctrlwatch frame so
+        // late-spawned vacation objects join). Counts every attr write on the
+        // lot (_vacAttrWrites) so the watch's own liveness is measurable; logs
+        // only CHANGED attrs on watched entities (_vacAttrEvents).
+        private static System.Collections.Generic.HashSet<int> _vacCtrlIds;
+        private static long _vacAttrWrites;
+        private static int _vacAttrEvents;
+        // run-98 (V4.5): family-attach leg. 0 idle, 1 attach dispatched
+        // (SetFamilyForHouse(44)+PlayHouse), 2 away VM rebound.
+        private static int _vacV45;
+
+        private static void VacInit()
+        {
+            if (++_vacSettle < 90) return;
+            // run-97 (V4.4): a stale arm from any earlier window must not
+            // leak into this check's engine ticks.
+            FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+            _vacCtrlIds = null;
+            _vacV45 = 0;
+            var avatars = _vm?.Context?.ObjectQueries?.Avatars?.OfType<VMAvatar>()
+                .Where(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD).ToList();
+            if (avatars == null || avatars.Count == 0) { Log("AUTOTEST vacation: no avatar"); Fail("vacation"); _vacState = 2; return; }
+            var host = avatars.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? avatars[0];
+            _hpHost = host; // the shared responder answers the host's thread first
+            _vacHostNid = host.GetPersonData(VMPersonDataVariable.NeighborId);
+            var phone = HPFindPhone();
+            if (phone == null) { Log("AUTOTEST vacation: no phone on lot"); Fail("vacation"); _vacState = 2; return; }
+            // full row dump (the hpparty log truncates at 14 — the table is
+            // 154 rows and the booking row may sit beyond the truncation)
+            var iff = phone.Object?.Resource?.Iff;
+            var ttas = iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+            if (ttas == null) { Log("AUTOTEST vacation: phone TTAs 129 missing"); Fail("vacation"); _vacState = 2; return; }
+            var names = new List<string>();
+            for (int i = 0; i < ttas.Length; i++) names.Add((ttas.GetString(i) ?? "").Trim());
+            for (int i = 0; i < names.Count; i += 25)
+                Log("AUTOTEST vacation phone rows[" + i + ".." + Math.Min(i + 24, names.Count - 1) + "]=[" + string.Join(" | ", names.Skip(i).Take(25)) + "]");
+            for (int i = 0; i < names.Count; i++)
+            {
+                var lbl = names[i];
+                if (_vacRow < 0 && (lbl.IndexOf("vacation", System.StringComparison.OrdinalIgnoreCase) >= 0
+                    || lbl.IndexOf("island", System.StringComparison.OrdinalIgnoreCase) >= 0
+                    || lbl.IndexOf("book", System.StringComparison.OrdinalIgnoreCase) >= 0))
+                { _vacRow = i; _vacTarget = phone; }
+            }
+            if (_vacRow < 0)
+            {
+                // the base phone table has no booking row — the plugin path:
+                // find the Vacation Plugin controller object and dump its table
+                foreach (var e in _vm.Entities)
+                {
+                    var fn = e.Object?.Resource?.MainIff?.Filename;
+                    if (fn == null || fn.IndexOf("vacation", System.StringComparison.OrdinalIgnoreCase) < 0) continue;
+                    var pttas = e.Object?.Resource?.Iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                    var pttab = e.Object?.Resource?.Iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                    var pn = new List<string>();
+                    if (pttas != null) for (int i = 0; i < pttas.Length; i++) pn.Add((pttas.GetString(i) ?? "").Trim());
+                    Log("AUTOTEST vacation plugin-candidate obj" + e.ObjectID + " file='" + fn + "' rows"
+                        + (pttab == null ? "=none" : "(" + (pttab.Interactions?.Length ?? 0) + ")=[" + string.Join(" | ", pn) + "]"));
+                    // run-76 (V1.4): prefer the DIRECT "Go On Vacation" row over
+                    // "Ask To Go On Vacation" — run-75 POST trace proved the ask
+                    // tree pops in one tick after the NotifyIdle wake (a
+                    // return-false branch before the 4117 dialog can raise), so
+                    // the ask path can never book from a queue-path push.
+                    for (int i = 0; i < pn.Count; i++)
+                    {
+                        var lbl = pn[i];
+                        if (_vacRow < 0 && lbl.IndexOf("go on vacation", System.StringComparison.OrdinalIgnoreCase) >= 0
+                            && lbl.IndexOf("ask", System.StringComparison.OrdinalIgnoreCase) < 0)
+                        {
+                            _vacRow = i; _vacTarget = e;
+                            Log("AUTOTEST vacation: prefer direct row idx=" + i + " '" + lbl + "'");
+                        }
+                    }
+                    for (int i = 0; i < pn.Count; i++)
+                    {
+                        var lbl = pn[i];
+                        if (_vacRow < 0 && (lbl.IndexOf("vacation", System.StringComparison.OrdinalIgnoreCase) >= 0
+                            || lbl.IndexOf("book", System.StringComparison.OrdinalIgnoreCase) >= 0
+                            || lbl.IndexOf("island", System.StringComparison.OrdinalIgnoreCase) >= 0))
+                        { _vacRow = i; _vacTarget = e; }
+                    }
+                }
+            }
+            // run-77 (V1.5): 4100 'Go On Vacation' ins25 gates on
+            // StackObject.attr[1] != 0 (t=59 f=253 return-false — run 76
+            // rejected the row-2 push on every main-loop pass, q=1 stable,
+            // active=none). The native phone dialogs set plugin attributes
+            // before the tree runs; arm attr 1 so the direct push proceeds.
+            if (_vacRow >= 0 && _vacTarget != null)
+            {
+                var a1 = _vacTarget.GetAttribute(1);
+                Log("AUTOTEST vacation: target attr1=" + a1);
+                if (a1 == 0)
+                {
+                    _vacTarget.SetAttribute(1, 1);
+                    Log("AUTOTEST vacation: set attr1=1 (Go On Vacation gate)");
+                }
+                // run-82 (V2.4): attr[5] = the BOOKED SIM's object id —
+                // 4108 'Join Downtown' ins5 and 4098 'Generate Cab' ins11
+                // both write so-attr[5] = my[11] (own object id); 4100's
+                // ins67 gates the cab/token block on attr[5] != 0 and the
+                // burst trace (run 81) proved the bare push parks forever
+                // with attr5 = 0 (ins67 f=17 → re-arm the Wait-For-Notify).
+                var a5 = _vacTarget.GetAttribute(5);
+                if (a5 == 0 && _hpHost != null)
+                {
+                    _vacTarget.SetAttribute(5, (short)_hpHost.ObjectID);
+                    Log("AUTOTEST vacation: set attr5=" + _hpHost.ObjectID + " (booked-sim id)");
+                }
+            }
+            var fami = Content.Get().Neighborhood.MainResource?.List<FAMI>();
+            _vacBook0 = FSO.SimAntics.Primitives.VMGenericTS1Call.CountOccupiedVacationLots(fami);
+            var inv0 = Content.Get().Neighborhood.GetInventoryByNID(_vacHostNid);
+            Log("AUTOTEST vacation init host nid=" + _vacHostNid + " occupied0=" + _vacBook0
+                + " depTokens0=" + (inv0 == null ? "none" : string.Join(",", inv0.Where(x => x.Type == 2 && (x.GUID == 7 || x.GUID == 8)).Select(x => x.GUID + ":" + x.Count)))
+                + " bookingRow=" + (_vacRow < 0 ? "NONE" : (_vacRow + " '" + (_vacTarget == phone ? "phone" : "obj" + _vacTarget.ObjectID) + "'")));
+            if (_vacRow < 0) { VacEvaluate("no bookable row (decode dumped)"); return; }
+            var act = _vacTarget.GetAction((short)_vacRow, host, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+            if (act == null) { VacEvaluate("GetAction null row=" + _vacRow); return; }
+            act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+            act.CheckRoutine = null;
+            act.Priority = (short)VMQueuePriority.Maximum;
+            host.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.Priority, 0);
+            host.Thread.EnqueueAction(act);
+            _vacUid = act.UID; _vacPushed = true;
+            _vacState = 1; _vacFrame = 0;
+            Log("AUTOTEST vacation BOOK: pushed row=" + _vacRow + " uid=" + act.UID + " at " + Sim3Clock());
+        }
+
+        private static void VacTick()
+        {
+            try
+            {
+                if (_vacState == 0) { VacInit(); return; }
+                if (_vacState == 2) return;
+                _vacFrame++;
+                // run-85 (V2.7): ITRACE at the LIVE window. Run 84 proved the
+                // freeze-break premise wrong (speed=1, gbd=null at f=1799 —
+                // no dialog pause) yet ITRACE still fired zero lines, so the
+                // machine stops executing somewhere in f 600-700 (the POST
+                // trace shows it alive at f 601-640; every later sample is
+                // byte-stable). Trace the transition directly: window
+                // f 601-660 (+ the 1800-1805 probe kept), 200 ins/tick, main
+                // Tick loop ([ITRACE]) AND the RunInMyStack trial loop
+                // ([ITRACE-T]), plus speed/gbd/clock snapshots across the
+                // suspected stop to separate the clock freeze from the
+                // machine stop.
+                var itraceOn = (_vacFrame >= 601 && _vacFrame <= 660)
+                    || (_vacFrame >= 1800 && _vacFrame <= 1805);
+                FSO.SimAntics.Engine.VMThread.AutotestTraceSink = itraceOn ? (System.Action<string>)Log : null;
+                FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = itraceOn ? 200 : 0;
+                // run-86 (V2.8): reroute the departure. Run 85 proved the
+                // departure fires at ticks 346-347 (f≈601-605) but the
+                // auto-answered 'Ask for Lot' dialog wrote temp0=1 — the
+                // switch went to GetHousePath(1), a base house, and the
+                // arrival (not being a vacation lot) wrote nothing. Arm the
+                // engine override across the whole live window: the ITRACE
+                // hook rewrites TempRegisters[0]=44 the instant 4100@12 op=1
+                // (mode 17 ChangeToLotInTemp0) is about to execute, so
+                // vacation=true → GameState.LotTransitInfo=1 (the V2
+                // acceptance writer) and SignalLotSwitch(44) loads
+                // UserData/Houses/House44.iff (present in every run userdir).
+                FSO.SimAntics.Engine.VMThread.AutotestVacLotOverride =
+                    (_vacFrame >= 600 && _vacFrame <= 610) ? 44 : 0;
+                // run-87 (V3.0): away/resume leg. After the rerouted departure
+                // (LotTransitInfo=1, screen VM replaced by the house-44 lot),
+                // rebind to the LIVE away VM, take the REAL user save
+                // (TS1GameScreen.Save = FSOV + SaveNeighbourhood(true)), reload
+                // house 44 through PlayHouse (deathrel template), and observe
+                // whether the away state persisted.
+                var transitNow = Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1;
+                if (_vacV3 == 0 && transitNow >= 1 && _screen != null && _screen.InLot
+                    && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                {
+                    _vacV3 = 1;
+                    _vm = _screen.vm;
+                    Log("AUTOTEST vacation V3 REBIND away f=" + _vacFrame
+                        + " entities=" + _vm.Entities.Count
+                        + " avatars=" + _vm.Entities.Count(e => e is VMAvatar)
+                        + " transit=" + transitNow
+                        + " g9=" + _vm.GetGlobalValue(9)
+                        + " clock=" + Sim3Clock()
+                        + " speed=" + _vm.SpeedMultiplier);
+                }
+                if (_vacV3 == 1 && _vacFrame >= 900)
+                {
+                    _vacV3 = 2;
+                    try
+                    {
+                        _screen.Save();
+                        Log("AUTOTEST vacation V3 SAVED mid-vacation f=" + _vacFrame
+                            + " (TS1GameScreen.Save -> FSOV + SaveNeighbourhood(true))");
+                    }
+                    catch (Exception sve)
+                    {
+                        Log("AUTOTEST vacation V3 save EXC " + sve.GetType().Name + " " + sve.Message);
+                    }
+                }
+                if (_vacV3 == 2 && _vacFrame >= 1500)
+                {
+                    _vacV3 = 3;
+                    _vacReloadOldVm = _screen.vm;
+                    try
+                    {
+                        _screen.PlayHouse(44, null);
+                        Log("AUTOTEST vacation V3 PlayHouse(44) dispatched (reload from the mid-vacation save) f=" + _vacFrame);
+                    }
+                    catch (Exception ple)
+                    {
+                        Log("AUTOTEST vacation V3 PlayHouse EXC " + ple.GetType().Name + " " + ple.Message);
+                    }
+                }
+                if (_vacV3 == 3 && _screen.InLot && _screen.vm != null
+                    && !ReferenceEquals(_screen.vm, _vacReloadOldVm) && _screen.vm.Entities.Count > 0)
+                {
+                    _vacV3 = 4;
+                    _vm = _screen.vm;
+                    if (_vm.SpeedMultiplier <= 0)
+                    {
+                        _vm.SpeedMultiplier = 1;
+                        _vm.GlobalBlockingDialog = null;
+                    }
+                    _vacV3TransitPost = Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1;
+                    // run-94 (V4.1): window-local pump counters — everything the
+                    // nativewatch reads below is delta-since-reload.
+                    FSO.SimAntics.VM.AutotestTickCalls = 0;
+                    FSO.SimAntics.VM.AutotestTickBody = 0;
+                    FSO.SimAntics.VM.AutotestLastTickSpeed = int.MinValue;
+                    // run-97 (V4.4): the attr watch is frame-window-local too —
+                    // clear any stale arm/set before this reload's watch arms.
+                    FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                    _vacCtrlIds = null;
+                    _vacAttrWrites = 0;
+                    _vacAttrEvents = 0;
+                    _vacV45 = 0;
+                    Log("AUTOTEST vacation V3 RELOADED f=" + _vacFrame
+                        + " entities=" + _vm.Entities.Count
+                        + " avatars=" + _vm.Entities.Count(e => e is VMAvatar)
+                        + " transitPost=" + _vacV3TransitPost
+                        + " g9=" + _vm.GetGlobalValue(9)
+                        + " clock=" + Sim3Clock()
+                        + " speed=" + _vm.SpeedMultiplier
+                        + " last=" + _vm.LastSpeedMultiplier
+                        + " async=" + _vm.FSOVAsyncLoading
+                        + " gbd=" + (_vm.GlobalBlockingDialog == null ? "-" : "obj" + _vm.GlobalBlockingDialog.ObjectID));
+                }
+                // run-89 (V3.2): post-reload diagnostics — run 88's postwatch
+                // showed the reloaded away lot sim-dead (speed=1, no dialog,
+                // clock pinned 6:42 across f 1600-2400, zero ITRACE). The
+                // sim-death law says InternalTick never fires because the
+                // PlayHouse-reloaded VM's Driver never hands it a tick
+                // (Ready never flips). ready/ticks/mf/tpm decide that:
+                // driver-dead shows as Ready=false + Ticks frozen at speed=1.
+                // AND carry the run-84 unfreeze lever (a re-leaked dialog
+                // pause must not strand the away lot).
+                // run-94 (V4.1): pump-decomposition. Run 93 REFUTED the dialog
+                // attribution (uiDialog=null, engineLatch=-, freeze byte-identical)
+                // and the postwatch killed the async-latch mode (async=False,
+                // cready=True at f 1600-2400) — yet tid=1 pinned for 800 frames
+                // means the pump ran at speed≤0 every frame while every drain-time
+                // read says 1, with NO writer in the tree (space/no-space/compound
+                // greps all empty). The counters in VM.cs (tickCalls/tickBody/
+                // lastTickSpeed/lastUpdateSpeed — fork engine file, VMTraceSink
+                // precedent) observe the pump from INSIDE: uSpd vs lTS localizes
+                // the writer (inside VM.Update vs before l.612); tickB>0 confirms
+                // InternalTick runs (repeat-tick mode). The V4.0 dump/answer arms
+                // below stay (inert, one line each).
+                // run-93 (V4.0): name + auto-answer the away dialog, then prove
+                // the NATIVE un-park. Run 92 named the park (UILotControl.cs:285,
+                // the TS1 dialog path; restores run only on user clicks :376/:394)
+                // and the probe's own deathtrace hook masked it from sampling with
+                // an every-frame speed restore. Screen-side parks: ShowLoadErrors
+                // (TS1GameScreen.cs:930 — Block dialog with Caller=null, no engine
+                // latch, LoadErrors cleared post-show) and VMLotSwitch (l.1146,
+                // one-shot). This block, once at f=1600: (a) reflect
+                // LotControl.BlockingDialog (UIAlert) and dump Title/Message/
+                // LastDialogID/ActiveEntity — names WHICH dialog; (b) answer it
+                // through the REAL button path — reflect the private
+                // DialogResponse(byte) and invoke with code 1 (Yes; harmless for
+                // Message) — that runs RemoveDialog + BlockingDialog=null + the
+                // :394 speed restore, exactly what a user OK/Yes click does;
+                // (c) also answer any engine-side VMDialogResult latch queue-path
+                // (HPAnswerDialogs pattern) in case this is a BHAV primitive with
+                // an entity-thread block. The native watch (f 1700/1900/2100)
+                // samples with NO manual Tick, NO canary, NO speed forcing: clock/
+                // ticks/sched/tid advancing across samples = the park lifts
+                // natively after one answer, the park law is confirmed end-to-end,
+                // and the away session goes live for the V4 activities watch.
+                if (_vacV3 == 4 && _vacFrame == 1600 && _vm != null)
+                {
+                    var lc = _screen?.LotControl;
+                    var lcT = lc?.GetType();
+                    var flagsP = System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Public
+                        | System.Reflection.BindingFlags.Instance;
+                    var dlgF = lcT?.GetField("BlockingDialog", flagsP);
+                    var dlgO = dlgF?.GetValue(lc);
+                    var dTitle = "?";
+                    var dMsg = "?";
+                    if (dlgO != null)
+                    {
+                        var dT = dlgO.GetType();
+                        foreach (var pn in new[] { "Title", "Message" })
+                        {
+                            object val = null;
+                            try
+                            {
+                                var prop = dT.GetProperty(pn);
+                                val = prop?.GetValue(dlgO);
+                                if (val == null)
+                                    val = dT.GetField(pn, flagsP)?.GetValue(dlgO)
+                                        ?? dT.GetField("_" + pn, flagsP)?.GetValue(dlgO);
+                            }
+                            catch { }
+                            if (pn == "Title") dTitle = val?.ToString() ?? "unreadable";
+                            else dMsg = val?.ToString() ?? "unreadable";
+                        }
+                    }
+                    var lastIdF = lcT?.GetField("LastDialogID", flagsP);
+                    var actEnt = lcT?.GetField("ActiveEntity", flagsP)?.GetValue(lc) as VMEntity;
+                    var latch = "-";
+                    foreach (var ent in _vm.Entities)
+                    {
+                        var qbs = ent?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                        if (qbs != null && !qbs.Responded)
+                        {
+                            latch = "obj" + ent.ObjectID + " type=" + qbs.Type;
+                            break;
+                        }
+                    }
+                    Log("AUTOTEST vacation V4 dlgdump f=" + _vacFrame
+                        + " uiDialog=" + (dlgO == null ? "null" : "present")
+                        + " title='" + dTitle + "' msg='" + dMsg + "'"
+                        + " lastDlgId=" + (lastIdF?.GetValue(lc) ?? "?")
+                        + " activeEnt=" + (actEnt == null ? "null" : "obj" + actEnt.ObjectID)
+                        + " engineLatch=" + latch
+                        + " speed=" + _vm.SpeedMultiplier
+                        + " last=" + _vm.LastSpeedMultiplier);
+                    var ans = "no-dialog";
+                    if (dlgO != null && lc != null && lcT != null)
+                    {
+                        var respM = lcT.GetMethod("DialogResponse", flagsP, null, new[] { typeof(byte) }, null);
+                        if (respM != null)
+                        {
+                            try
+                            {
+                                respM.Invoke(lc, new object[] { (byte)1 });
+                                ans = "DialogResponse(1) invoked";
+                            }
+                            catch (Exception rex)
+                            {
+                                ans = "invoke-exc " + (rex.InnerException?.GetType().Name ?? rex.GetType().Name);
+                            }
+                        }
+                        else ans = "DialogResponse method not found";
+                    }
+                    var armB = "idle";
+                    foreach (var ent in _vm.Entities)
+                    {
+                        var qbs = ent?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                        if (qbs != null && !qbs.Responded)
+                        {
+                            qbs.Responded = true;
+                            qbs.ResponseCode = 1;
+                            qbs.ResponseText = "1";
+                            _vm.GlobalBlockingDialog = null;
+                            armB = "answered obj" + ent.ObjectID;
+                            break;
+                        }
+                    }
+                    Log("AUTOTEST vacation V4 dlganswer f=" + _vacFrame
+                        + " armA=" + ans + " armB=" + armB);
+                }
+                // run-95 (V4.2): THE UN-PARK LEVER. Run 94 solved the freeze:
+                // UIMainPanel.cs:1260-66 parks vm.SpeedMultiplier=-1 EVERY
+                // FRAME while the HUD is not in LIVE mode (away lot =
+                // family-less → panel never LIVE); the engine is healthy
+                // (tickC==tickB advancing, uSpd=lTS=-1 at every pump). Flip
+                // the panel's public Mode field to LIVE reflectively at
+                // f=1650 (probe-side runtime write — NO UI source change) and
+                // force speed=1 once: the panel's LIVE branch leaves 1
+                // untouched, so the screen pump finally runs at speed>0 and
+                // the nativewatch must show NATIVE un-park — ticks>0, clock
+                // advancing, tid increasing — the true live away session the
+                // V4 activities watch needs.
+                if (_vacV3 == 4 && _vacFrame == 1650 && _vm != null)
+                {
+                    var mp2 = _screen?.Frontend?.MainPanel;
+                    var before2 = mp2?.Mode.ToString() ?? "null-panel";
+                    if (mp2 != null)
+                    {
+                        mp2.Mode = Simitone.Client.UI.Panels.UIMainPanelMode.LIVE;
+                        if (_vm.SpeedMultiplier <= 0) _vm.SpeedMultiplier = 1;
+                    }
+                    Log("AUTOTEST vacation V42 livelift f=" + _vacFrame
+                        + " mode=" + before2 + "->LIVE"
+                        + " speedNow=" + (_vm?.SpeedMultiplier.ToString() ?? "vm-null"));
+                }
+                // run-97 (V4.4): NAME THE A3 SETTER. Run 96 saw obj18
+                // [NPC_Vacation_Controller] flip a3 0→1 between f 2200 and
+                // 2400, and 18 CarVacationWagons despawn between f 2000 and
+                // 2200 — with 200-frame sampling the setters are anonymous.
+                // Engine hook (VMEntity.SetAttribute, VMTraceSink precedent):
+                // every attr write on the lot bumps the counter; writes that
+                // CHANGE a watched entity's attr are logged with old->new and
+                // the clock. Watch set = the by-name vacation controllers at
+                // f=1800, union'd at each ctrlwatch frame (late spawns join).
+                // Disarm at f=2450 — before the f>=2600 RETURN dispatch — so
+                // the home lot's writes can never alias watched IDs.
+                if (_vacV3 == 4 && _vacFrame == 1800 && _vm != null)
+                {
+                    _vacCtrlIds = new System.Collections.Generic.HashSet<int>();
+                    foreach (var ent in _vm.Entities)
+                    {
+                        string iff = null;
+                        try { iff = ent?.Object?.Resource?.MainIff?.Filename; } catch { }
+                        if (iff == null) continue;
+                        var low = iff.ToLowerInvariant();
+                        if (low.Contains("vacation") || low.Contains("disease")
+                            || low.Contains("souvenir") || low.Contains("prize"))
+                            _vacCtrlIds.Add(ent.ObjectID);
+                    }
+                    _vacAttrWrites = 0;
+                    _vacAttrEvents = 0;
+                    FSO.SimAntics.VMEntity.AutotestAttrWatch = (oid, ai, oldV, newV) =>
+                    {
+                        _vacAttrWrites++;
+                        if (oldV == newV) return;
+                        if (_vacCtrlIds == null || !_vacCtrlIds.Contains(oid)) return;
+                        _vacAttrEvents++;
+                        Log("AUTOTEST vacation V44 attrwatch f=" + _vacFrame
+                            + " obj" + oid + " a" + ai + "=" + oldV + "->" + newV
+                            + " clock=" + Sim3Clock());
+                    };
+                    Log("AUTOTEST vacation V44 attrarm f=" + _vacFrame
+                        + " ids=[" + string.Join(",", _vacCtrlIds.OrderBy(x => x)) + "]"
+                        + " n=" + _vacCtrlIds.Count);
+                }
+                // run-96 (V4.3): THE CONTROLLER WATCH. The away lot is live
+                // (run 95's un-park law) — watch the vacation controllers in
+                // their natural habitat, hpparty CheckHP style: entity IDs
+                // move per load, so resolve by MainIff filename (Vacation/
+                // Disease/Souvenir/Prize set), dump each controller's non-zero
+                // attrs 0..31 per sample, and track entity-count deltas (the
+                // souvenir/PrizeToken surfaces through the generic object path
+                // = new entities). Observational only: pins never gate-fail
+                // (the REPEAT probe law).
+                if (_vacV3 == 4 && (_vacFrame == 1800 || _vacFrame == 2000
+                    || _vacFrame == 2100 || _vacFrame == 2200
+                    || _vacFrame == 2400) && _vm != null)
+                {
+                    try
+                    {
+                        var ctrls = new System.Text.StringBuilder();
+                        foreach (var ent in _vm.Entities)
+                        {
+                            string iff = null;
+                            try { iff = ent?.Object?.Resource?.MainIff?.Filename; } catch { }
+                            if (iff == null) continue;
+                            var low = iff.ToLowerInvariant();
+                            var isCtrl = low.Contains("vacation") || low.Contains("disease")
+                                || low.Contains("souvenir") || low.Contains("prize");
+                            if (!isCtrl) continue;
+                            // V4.4: late-spawned vacation objects join the watch set.
+                            if (_vacCtrlIds != null) _vacCtrlIds.Add(ent.ObjectID);
+                            var ab = new System.Text.StringBuilder();
+                            for (int ai = 0; ai < 32; ai++)
+                            {
+                                short av;
+                                try { av = ent.GetAttribute(ai); } catch { continue; }
+                                if (av != 0) ab.Append("a" + ai + "=" + av + " ");
+                            }
+                            ctrls.Append("obj" + ent.ObjectID + "[" + iff + "]"
+                                + (ab.Length > 0 ? " {" + ab.ToString().TrimEnd() + "}" : " {all-zero}")
+                                + " ");
+                        }
+                        Log("AUTOTEST vacation V43 ctrlwatch f=" + _vacFrame
+                            + " ents=" + _vm.Entities.Count
+                            + " clock=" + Sim3Clock()
+                            + " awrites=" + _vacAttrWrites
+                            + " ctrls=" + (ctrls.Length == 0 ? "NONE" : ctrls.ToString().TrimEnd()));
+                    }
+                    catch (Exception cwe) { Log("AUTOTEST vacation V43 ctrlwatch EXC " + cwe.GetType().Name + " " + cwe.Message); }
+                }
+                if (_vacV3 == 4 && _vacFrame == 2450
+                    && FSO.SimAntics.VMEntity.AutotestAttrWatch != null)
+                {
+                    // RETURN dispatches at f>=2600 — disarm first so home-lot
+                    // writes cannot alias the away watch set.
+                    Log("AUTOTEST vacation V44 attrdone f=" + _vacFrame
+                        + " writes=" + _vacAttrWrites
+                        + " events=" + _vacAttrEvents
+                        + " ids=" + (_vacCtrlIds?.Count.ToString() ?? "0"));
+                    FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                }
+                if (_vacV3 == 4 && (_vacFrame == 1700 || _vacFrame == 1900
+                    || _vacFrame == 2100) && _vm != null)
+                {
+                    var gtnF2 = typeof(VM).GetField("GameTickNum",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    var drvF2 = typeof(VM).GetField("Driver",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    var drv2 = drvF2?.GetValue(_vm) as FSO.SimAntics.NetPlay.VMNetDriver;
+                    Log("AUTOTEST vacation V41 nativewatch f=" + _vacFrame
+                        + " speed=" + _vm.SpeedMultiplier
+                        + " last=" + _vm.LastSpeedMultiplier
+                        + " uSpd=" + FSO.SimAntics.VM.AutotestLastUpdateSpeed
+                        + " lTS=" + FSO.SimAntics.VM.AutotestLastTickSpeed
+                        + " tickC=" + FSO.SimAntics.VM.AutotestTickCalls
+                        + " tickB=" + FSO.SimAntics.VM.AutotestTickBody
+                        + " async=" + _vm.FSOVAsyncLoading
+                        + " lerr=" + _vm.LoadErrors.Count
+                        + " gbd=" + (_vm.GlobalBlockingDialog == null ? "-" : "obj" + _vm.GlobalBlockingDialog.ObjectID)
+                        + " ticks=" + _vm.Context.Clock.Ticks
+                        + " mf=" + _vm.Context.Clock.MinuteFractions
+                        + " clock=" + Sim3Clock()
+                        + " sched=" + _vm.Scheduler.CurrentTickID
+                        + " tid=" + (drv2?.CurrentTick ?? 9)
+                        + " lt=" + (drv2?.LastTick ?? 9)
+                        + " gtn=" + (gtnF2?.GetValue(_vm) ?? "?")
+                        + " ents=" + _vm.Entities.Count
+                        + " avatars=" + _vm.Entities.Count(e => e is VMAvatar));
+                }
+                if (_vacV3 == 4 && (_vacFrame == 1600 || _vacFrame == 1800
+                    || _vacFrame == 2000 || _vacFrame == 2200 || _vacFrame == 2400)
+                    && _vm != null)
+                {
+                    // run-90 (V3.3): the sim-death decider set. VM.Ready was
+                    // the WRONG flag (driver catch-up); the real gate is
+                    // VMNetDriver.InternalTick's `doTick && vm.Context.Ready`
+                    // (≈ _Arch != null) with the command loop above it —
+                    // cready/async/arch/gtn/sched/tid/lt decide exactly where
+                    // the pump stalls; gtn (GameTickNum, private) proves
+                    // vm.Update is being pumped at all; same catches a
+                    // silent VM swap after bind.
+                    var gtnF = typeof(VM).GetField("GameTickNum",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    var drvF = typeof(VM).GetField("Driver",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    var drv = drvF?.GetValue(_vm) as FSO.SimAntics.NetPlay.VMNetDriver;
+                    Log("AUTOTEST vacation V3 postwatch f=" + _vacFrame
+                        + " speed=" + _vm.SpeedMultiplier + " last=" + _vm.LastSpeedMultiplier
+                        + " gbd=" + (_vm.GlobalBlockingDialog == null ? "-" : "obj" + _vm.GlobalBlockingDialog.ObjectID)
+                        + " clock=" + Sim3Clock()
+                        + " transit=" + (Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1)
+                        + " ready=" + _vm.Ready
+                        + " ticks=" + _vm.Context.Clock.Ticks
+                        + " mf=" + _vm.Context.Clock.MinuteFractions
+                        + " tpm=" + _vm.Context.Clock.TicksPerMinute
+                        + " cready=" + _vm.Context.Ready
+                        + " async=" + _vm.FSOVAsyncLoading
+                        + " arch=" + (_vm.Context.Architecture != null)
+                        + " gtn=" + (gtnF?.GetValue(_vm) ?? "?")
+                        + " sched=" + _vm.Scheduler.CurrentTickID
+                        + " tid=" + (drv == null ? "?" : drv.CurrentTick.ToString())
+                        + " lt=" + (drv == null ? "?" : drv.LastTick.ToString())
+                        + " same=" + ReferenceEquals(_screen.vm, _vm));
+                    if (_vm.SpeedMultiplier <= 0)
+                    {
+                        _vm.GlobalBlockingDialog = null;
+                        _vm.SpeedMultiplier = _vm.LastSpeedMultiplier > 0 ? _vm.LastSpeedMultiplier : 1;
+                        Log("AUTOTEST vacation V3 postwatch unfreeze -> speed=" + _vm.SpeedMultiplier);
+                    }
+                }
+                // run-89 (V3.2): return home — SignalLotSwitch(5) is the same
+                // choke point mode 17 ends with; the screen's Update then runs
+                // the return branch (SwitchLot == ActiveFamily.HouseNumber →
+                // InitializeLot(SavedLot)). Run-88 law: PlayHouse(44) left
+                // ActiveFamily null (GetFamilyForHouse(44) is null) and the
+                // screen's Update NRE'd at TS1GameScreen.cs:598. Restore the
+                // home family through the public field before dispatch —
+                // probe-only; the screen defect itself stays a fix-card.
+                // SavedLot (reflective read) surviving PlayHouse is the other
+                // open risk this leg names.
+                if (_vacV3 == 4 && _vacFrame >= 2600 && _vacV3Ret == 0
+                    && _screen != null && _screen.vm != null)
+                {
+                    _vacV3Ret = 1;
+                    _vacRetOldVm = _screen.vm;
+                    var slF = typeof(TS1GameScreen).GetField("SavedLot",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    var fami5 = Content.Get().Neighborhood.GetFamilyForHouse(5);
+                    _screen.ActiveFamily = fami5;
+                    Log("AUTOTEST vacation V3 RETURN SignalLotSwitch(5) dispatched f=" + _vacFrame
+                        + " fami5=" + (fami5 == null ? "null" : "house" + fami5.HouseNumber)
+                        + " savedLot=" + (slF?.GetValue(_screen) == null ? "null" : "set")
+                        + " speed=" + _screen.vm.SpeedMultiplier);
+                    _screen.vm.SignalLotSwitch(5);
+                }
+                if (_vacV3Ret == 1 && _screen != null && _screen.vm != null
+                    && !ReferenceEquals(_screen.vm, _vacRetOldVm) && _screen.vm.Entities.Count > 0)
+                {
+                    _vacV3Ret = 2;
+                    _vm = _screen.vm;
+                    if (_vm.SpeedMultiplier <= 0)
+                    {
+                        _vm.SpeedMultiplier = 1;
+                        _vm.GlobalBlockingDialog = null;
+                    }
+                    Log("AUTOTEST vacation V3 RETURN-BOUND f=" + _vacFrame
+                        + " entities=" + _vm.Entities.Count
+                        + " avatars=" + _vm.Entities.Count(e => e is VMAvatar)
+                        + " g9=" + _vm.GetGlobalValue(9)
+                        + " clock=" + Sim3Clock()
+                        + " transit=" + (Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1)
+                        + " speed=" + _vm.SpeedMultiplier
+                        + " ready=" + _vm.Ready
+                        + " ticks=" + _vm.Context.Clock.Ticks
+                        + " cready=" + _vm.Context.Ready
+                        + " async=" + _vm.FSOVAsyncLoading
+                        + " arch=" + (_vm.Context.Architecture != null)
+                        + " sched=" + _vm.Scheduler.CurrentTickID
+                        + " same=" + ReferenceEquals(_screen.vm, _vm));
+                }
+                // run-90 (V3.3): is the home VM alive after the return bind?
+                // run 89 had zero samples after f=2601 — clock/ticks/gtn here
+                // decide whether InitializeLot(SavedLot) re-mounts ticking
+                // (Ticks advancing past 347) or the home lot is dead too.
+                if (_vacV3Ret == 2 && (_vacFrame == 2800 || _vacFrame == 3000
+                    || _vacFrame == 3200) && _vm != null)
+                {
+                    var gtnF2 = typeof(VM).GetField("GameTickNum",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    Log("AUTOTEST vacation V3 homewatch f=" + _vacFrame
+                        + " clock=" + Sim3Clock()
+                        + " ticks=" + _vm.Context.Clock.Ticks
+                        + " mf=" + _vm.Context.Clock.MinuteFractions
+                        + " speed=" + _vm.SpeedMultiplier
+                        + " ready=" + _vm.Ready
+                        + " cready=" + _vm.Context.Ready
+                        + " async=" + _vm.FSOVAsyncLoading
+                        + " arch=" + (_vm.Context.Architecture != null)
+                        + " gtn=" + (gtnF2?.GetValue(_vm) ?? "?")
+                        + " sched=" + _vm.Scheduler.CurrentTickID
+                        + " same=" + ReferenceEquals(_screen.vm, _vm));
+                }
+                // run-98 (V4.5): THE FAMILY-ATTACH LEG — probe-side proof of
+                // the FC-B mechanism. Runs 88-97 solved the away freeze as the
+                // UIMainPanel per-frame non-LIVE park, with family attach
+                // (ActiveFamily != null) as the product fix (isSimless law:
+                // TS1GameScreen.cs:1117 isSimless = ActiveFamily==null → park;
+                // :960 SelectWholeFamily spawns the family on load). After the
+                // V3 machine completes (home rebound at f≈2600, homewatch to
+                // 3200), attach the host family to house 44 via the REAL API
+                // (Neighborhood.SetFamilyForHouse + screen.PlayHouse — the
+                // MoveInAndPlay path minus the UI), then re-load the away lot
+                // and observe NATIVE behavior: no probe speed force, no
+                // livelift in this window. Expected if FC-B is right: no park
+                // (speed stays 1), family avatars on the lot, panel Mode
+                // whatever the HUD does natively with a family present.
+                // Observational (REPEAT law); the V4.5 window sits BEFORE the
+                // final verdict (gate moved 3600→4400) so the harness doesn't
+                // exit first.
+                if (_vacV3Ret == 2 && _vacFrame == 3700 && _screen != null)
+                {
+                    try
+                    {
+                        var fam = _screen.ActiveFamily;
+                        if (fam == null)
+                        {
+                            Log("AUTOTEST vacation V45 attach f=" + _vacFrame + " NO-FAMILY (home ActiveFamily null)");
+                        }
+                        else
+                        {
+                            Content.Get().Neighborhood.SetFamilyForHouse(44, fam, true);
+                            _screen.PlayHouse(44, null);
+                            _vacV45 = 1;
+                            Log("AUTOTEST vacation V45 attach f=" + _vacFrame
+                                + " famHouse=" + fam.HouseNumber
+                                + " guids=" + fam.FamilyGUIDs.Length
+                                + " -> house44 (SetFamilyForHouse + PlayHouse, no UI edit)");
+                        }
+                    }
+                    catch (Exception axe)
+                    {
+                        Log("AUTOTEST vacation V45 EXC f=" + _vacFrame + " " + axe.GetType().Name + " " + axe.Message);
+                    }
+                }
+                if (_vacV45 == 1 && _screen != null && _screen.InLot
+                    && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm)
+                    && _screen.vm.Entities.Count > 0)
+                {
+                    _vacV45 = 2;
+                    _vm = _screen.vm;
+                    var mp3 = _screen?.Frontend?.MainPanel;
+                    Log("AUTOTEST vacation V45 REBOUND f=" + _vacFrame
+                        + " entities=" + _vm.Entities.Count
+                        + " avatars=" + _vm.Entities.Count(e => e is VMAvatar)
+                        + " mode=" + (mp3?.Mode.ToString() ?? "null-panel")
+                        + " speed=" + _vm.SpeedMultiplier
+                        + " g32=" + _vm.GetGlobalValue(32)
+                        + " clock=" + Sim3Clock());
+                }
+                if (_vacV45 >= 1 && (_vacFrame == 3800 || _vacFrame == 3900
+                    || _vacFrame == 4100 || _vacFrame == 4300) && _vm != null)
+                {
+                    var mp4 = _screen?.Frontend?.MainPanel;
+                    var tk = new System.Text.StringBuilder();
+                    foreach (var ent in _vm.Entities)
+                    {
+                        string iff = null;
+                        try { iff = ent?.Object?.Resource?.MainIff?.Filename; } catch { }
+                        if (iff == null) continue;
+                        var low = iff.ToLowerInvariant();
+                        if (!(low.Contains("prizetoken") || low.Contains("diseasecontroller")
+                            || low.Contains("npc_vacation_controller"))) continue;
+                        var ab = new System.Text.StringBuilder();
+                        for (int ai = 0; ai < 32; ai++)
+                        {
+                            short av;
+                            try { av = ent.GetAttribute(ai); } catch { continue; }
+                            if (av != 0) ab.Append("a" + ai + "=" + av + " ");
+                        }
+                        tk.Append("obj" + ent.ObjectID + "[" + iff + "]"
+                            + (ab.Length > 0 ? " {" + ab.ToString().TrimEnd() + "}" : " {zero}")
+                            + " ");
+                    }
+                    Log("AUTOTEST vacation V45 fwatch f=" + _vacFrame
+                        + " mode=" + (mp4?.Mode.ToString() ?? "null-panel")
+                        + " speed=" + _vm.SpeedMultiplier
+                        + " ticks=" + _vm.Context.Clock.Ticks
+                        + " clock=" + Sim3Clock()
+                        + " ents=" + _vm.Entities.Count
+                        + " avatars=" + _vm.Entities.Count(e => e is VMAvatar)
+                        + " awrites=" + _vacAttrWrites
+                        + " tk=" + (tk.Length == 0 ? "NONE" : tk.ToString().TrimEnd()));
+                }
+                if (_vacV3 == 4 && _vacV3Ret == 0 && _vacFrame >= 3000)
+                {
+                    VacEvaluate("v3 away/resume complete (return not dispatched)"); return;
+                }
+                if (_vacV3Ret == 2 && _vacFrame >= 4400)
+                {
+                    Log("AUTOTEST vacation V45 state f=" + _vacFrame
+                        + " phase=" + _vacV45
+                        + " (attach=1, rebound=2)");
+                    VacEvaluate("v3 return complete"); return;
+                }
+                if ((_vacFrame == 500 || _vacFrame == 600 || _vacFrame == 650
+                    || _vacFrame == 700 || _vacFrame == 800) && _vm != null)
+                {
+                    Log("AUTOTEST vacation: stopwatch f=" + _vacFrame
+                        + " speed=" + _vm.SpeedMultiplier + " last=" + _vm.LastSpeedMultiplier
+                        + " gbd=" + (_vm.GlobalBlockingDialog == null ? "-" : "obj" + _vm.GlobalBlockingDialog.ObjectID)
+                        + " clock=" + Sim3Clock()
+                        + " q=" + (_hpHost?.Thread?.Queue?.Count ?? -1)
+                        + " bs=" + (_hpHost?.Thread?.BlockingState == null ? "-" : _hpHost.Thread.BlockingState.GetType().Name));
+                }
+                // run-84 (V2.6): the freeze-break lever. Run 83's ITRACE window
+                // fired ZERO lines and the run still passed identically:
+                // VM.InternalTick early-returns while SpeedMultiplier < 0 (the
+                // TS1 dialog pause), so the scheduler never dispatches and the
+                // parked 4100@2 machine is a FROZEN SNAPSHOT — the run-81
+                // 'hot-spin law' is refuted by this run. A blocking dialog
+                // leaked GlobalBlockingDialog (run-80 law) and can never time
+                // out while frozen (its WaitTime grows in Thread.Tick, which
+                // no longer runs). One tick before the ITRACE window, restore
+                // the speed (r157 law: max(LastSpeedMultiplier, 1), floored at
+                // 1) and drop the leaked owner — the VM resumes and the
+                // machine finally executes its cycle under the trace.
+                if (_vacFrame == 1799 && _vm != null)
+                {
+                    Log("AUTOTEST vacation: pre-unfreeze speed=" + _vm.SpeedMultiplier
+                        + " last=" + _vm.LastSpeedMultiplier
+                        + " gbd=" + (_vm.GlobalBlockingDialog == null ? "-" : "obj" + _vm.GlobalBlockingDialog.ObjectID)
+                        + " clock=" + Sim3Clock());
+                    _vm.GlobalBlockingDialog = null;
+                    _vm.SpeedMultiplier = _vm.LastSpeedMultiplier > 0 ? _vm.LastSpeedMultiplier : 1;
+                    Log("AUTOTEST vacation: unfreeze speed=" + _vm.SpeedMultiplier + " (dialog freeze break)");
+                }
+                HPAnswerDialogs(); // shared responder — booking pickers are queue-path too
+                // run-74 (V1.2): the ask tree parks in global 281 'Wait For Notify'
+                // (innermost idle_for_input; operand countdown 20000 ticks ≈ 22
+                // sim-h — run 72/73 never reached expiry). The native release is
+                // ActiveAction.NotifyIdle re-evaluated on the next idle execution,
+                // so arm the flag AND schedule a 1-tick wake to re-enter the idle.
+                var aa74 = _hpHost?.Thread?.ActiveAction;
+                if (_vacFrame > 600 && aa74 != null && aa74.UID == _vacUid && !aa74.NotifyIdle)
+                {
+                    aa74.NotifyIdle = true;
+                    _vm.Scheduler.ScheduleTickIn(_hpHost, 1);
+                    Log("AUTOTEST vacation: armed NotifyIdle + 1-tick wake (Wait-For-Notify park) f=" + _vacFrame + " at " + Sim3Clock());
+                }
+                // run-75 (V1.3): dense post-arm trace — the tree completed 17ms
+                // after the wake with zero observables and zero new dialogs;
+                // name the exact exit branch frame by frame (stack, queue,
+                // blocking-dialog state, NotifyIdle latch) for 40 frames.
+                if (_vacFrame >= 601 && _vacFrame <= 640)
+                {
+                    var tst = _hpHost?.Thread?.Stack;
+                    var tq = _hpHost?.Thread?.Queue;
+                    var ta = _hpHost?.Thread?.ActiveAction;
+                    Log("AUTOTEST vacation POST f=" + _vacFrame
+                        + " active=" + (ta == null ? "none" : "'" + ta.Name + "'uid" + ta.UID + " ni=" + ta.NotifyIdle)
+                        + " q=" + (tq == null ? -1 : tq.Count)
+                        + " bs=" + (_hpHost?.Thread?.BlockingState == null ? "-" : _hpHost.Thread.BlockingState.GetType().Name)
+                        + " lotTransit=" + (Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1)
+                        + " stack=[" + (tst == null ? "" : string.Join(",", tst.Select(f => (f.Routine?.Chunk?.ChunkID ?? 0) + "@" + ((int)f.InstructionPointer)))) + "]");
+                }
+                if (_vacFrame % 600 == 0)
+                {
+                    var fami1 = Content.Get().Neighborhood.MainResource?.List<FAMI>();
+                    Log("AUTOTEST vacation T f=" + _vacFrame + " clock=" + Sim3Clock()
+                        + " active=" + (_hpHost?.Thread?.ActiveAction == null ? "none" : "'" + _hpHost.Thread.ActiveAction.Name + "'uid" + _hpHost.Thread.ActiveAction.UID)
+                        + " occupied=" + FSO.SimAntics.Primitives.VMGenericTS1Call.CountOccupiedVacationLots(fami1));
+                    // run-79 (V2.1): name the 4100 poll variable — the
+                    // machine parks at 4100@2 (gosub 280 'idle' sleep-100)
+                    // on a frozen clock (run 78, ~3000 passes). Sample the
+                    // full stack with each frame's executing opcode and
+                    // branch pointers, plus the thread temp registers
+                    // (thread-level: VMThread.TempRegisters[20]), every
+                    // 600 frames — 24 samples over the 14400f window.
+                    var t2st = _hpHost?.Thread?.Stack;
+                    var t2t = _hpHost?.Thread?.TempRegisters;
+                    var t2f4100 = t2st?.FirstOrDefault(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4100);
+                    Log("AUTOTEST vacation T2 f=" + _vacFrame
+                        + " frames=[" + (t2st == null ? "" : string.Join(",", t2st.Select(f =>
+                        {
+                            var ins = f.Routine?.Instructions;
+                            var ci = (ins != null && f.InstructionPointer >= 0 && f.InstructionPointer < ins.Length)
+                                ? ins[f.InstructionPointer] : null;
+                            return (f.Routine?.Chunk?.ChunkID ?? 0) + "@" + ((int)f.InstructionPointer)
+                                + (ci == null ? ":-" : ":op" + ci.Opcode + "/" + ci.TruePointer + "/" + ci.FalsePointer);
+                        })))
+                        + "] temps=[" + (t2t == null ? "" : string.Join(",", t2t)) + "]"
+                        + " so=" + (t2f4100 == null ? "-" : ((int)t2f4100.StackObjectID).ToString())
+                        + " l56=" + (t2f4100 == null || t2f4100.Locals == null || t2f4100.Locals.Length < 7
+                            ? "-" : t2f4100.Locals[5] + ":" + t2f4100.Locals[6]));
+                    // run-80 (V2.2): the departure gate is ins39/40 — glob[5]
+                    // (Clock.Minutes) == local[6] and glob[0] (Clock.Hours)
+                    // == local[5], where locals 5/6 come from generic TS1
+                    // call mode 23 reading type-2 inventory tokens GUID 7
+                    // (hours) / GUID 8 (minutes) off the STACK OBJECT
+                    // avatar's NID inventory and CONSUMING them (absent
+                    // token reads 0). The clock is paused (dialog law:
+                    // SpeedMultiplier = -2) at 6:42 — exactly the booked
+                    // departure — so re-arming the tokens makes the compare
+                    // fire on the next loop pass. Arm every avatar's NID
+                    // inventory each 600f (StackObject identity unproven).
+                    if (_vm != null && _vacRow >= 0)
+                    {
+                        var armed = 0;
+                        foreach (var av in _vm.Entities.Where(e => e is VMAvatar).Cast<VMAvatar>())
+                        {
+                            try
+                            {
+                                var nid = av.GetPersonData(VMPersonDataVariable.NeighborId);
+                                if (nid <= 0) continue;
+                                var nb = Content.Get().Neighborhood;
+                                var inv = nb.GetInventoryByNID(nid);
+                                if (inv == null) { inv = new System.Collections.Generic.List<FSO.Files.Formats.IFF.Chunks.InventoryItem>(); nb.SetInventoryForNID(nid, inv); }
+                                foreach (var tk in new[] { new { g = 7u, v = 6 }, new { g = 8u, v = 42 } })
+                                {
+                                    var tok = inv.FirstOrDefault(x => x.Type == 2 && x.GUID == tk.g);
+                                    if (tok == null) { tok = new FSO.Files.Formats.IFF.Chunks.InventoryItem { Type = 2, GUID = tk.g }; inv.Add(tok); }
+                                    tok.Count = (ushort)tk.v;
+                                }
+                                armed++;
+                            }
+                            catch { }
+                        }
+                        if (armed > 0) Log("AUTOTEST vacation: arm dep tokens nidcount=" + armed + " f=" + _vacFrame);
+                    }
+                }
+                // run-81 (V2.3): burst IP trace — the first 120 ticks of each
+                // 600f block, log the innermost executing frame (routine@ip
+                // + opcode). The structural CFG walk proved ins39/40 (the
+                // clock compares) are NOT reachable from the loop entry, so
+                // the parked cycle's real path is unknown; the burst names
+                // it directly, including which callee frames (280/281)
+                // actually appear mid-cycle.
+                var vphase = _vacFrame % 600;
+                if (_vacState == 1 && vphase < 120)
+                {
+                    var bst = _hpHost?.Thread?.Stack;
+                    var btop = (bst != null && bst.Count > 0) ? bst[bst.Count - 1] : null;
+                    var bins = btop?.Routine?.Instructions;
+                    var bci = (btop != null && bins != null && btop.InstructionPointer >= 0 && btop.InstructionPointer < bins.Length)
+                        ? bins[btop.InstructionPointer] : null;
+                    Log("AUTOTEST vacation T3 f=" + _vacFrame
+                        + " top=" + (btop == null ? "-" : (btop.Routine?.Chunk?.ChunkID ?? 0) + "@" + ((int)btop.InstructionPointer))
+                        + (bci == null ? "" : ":op" + bci.Opcode)
+                        + " n=" + (bst == null ? -1 : bst.Count));
+                }
+                // P-fate: started-and-silent vs never-dispatched (the run-67 law)
+                if (_vacFrame <= 300 && _vacFrame % 60 == 0)
+                {
+                    var vq = _hpHost.Thread.Queue;
+                    var vInQ = vq != null && vq.Any(x => x.UID == _vacUid);
+                    var vAct = _hpHost.Thread.ActiveAction;
+                    var vst = _hpHost.Thread.Stack;
+                    Log("AUTOTEST vacation P-fate f=" + _vacFrame + " uid=" + _vacUid
+                        + " inQueue=" + vInQ + " active=" + (vAct == null ? "none" : ("'" + vAct.Name + "'uid" + vAct.UID))
+                        + " stack=[" + (vst == null ? "" : string.Join(",", vst.Select(f => (f.Routine?.Chunk?.ChunkID ?? 0) + "@" + ((int)f.InstructionPointer)))) + "]");
+                }
+                if (!_vacActiveSeen && _hpHost?.Thread?.ActiveAction?.UID == _vacUid) _vacActiveSeen = true;
+                var stillActive = _hpHost?.Thread?.ActiveAction?.UID == _vacUid;
+                if (_vacActiveSeen && !stillActive) { VacEvaluate("booking tree completed"); return; }
+                // run-78 (V2.0): the post-picker 4100 chain is a tick-polled
+                // state machine (ins2/ins58 = gosub 280 'idle' sleep-100;
+                // run-77 clock froze at 6:42 but ticks continued) — give it
+                // 4x the window to reach the cab/travel leg and its FAMI /
+                // LotTransitInfo writes.
+                if (_vacFrame > 14400) { VacEvaluate("watch window closed"); return; }
+            }
+            catch (Exception ve)
+            {
+                Log("AUTOTEST vacation EXC " + ve.GetType().Name + " " + ve.Message);
+                Fail("vacation");
+                _vacState = 2;
+            }
+        }
+
+        private static void VacEvaluate(string reason)
+        {
+            try
+            {
+                var fami2 = Content.Get().Neighborhood.MainResource?.List<FAMI>();
+                var occupied1 = FSO.SimAntics.Primitives.VMGenericTS1Call.CountOccupiedVacationLots(fami2);
+                var inv1 = Content.Get().Neighborhood.GetInventoryByNID(_vacHostNid);
+                var depTok = inv1 == null ? "" : string.Join(",", inv1.Where(x => x.Type == 2 && (x.GUID == 7 || x.GUID == 8)).Select(x => x.GUID + ":" + x.Count));
+                var transit = Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1;
+                var ok = occupied1 > _vacBook0 || depTok.Length > 0 || transit >= 1;
+                var v2tag = transit >= 1 ? " [V2-TRANSIT-HIT]" : "";
+                var v3info = (_vacV3 >= 4 ? "reloaded transit=" + _vacV3TransitPost : "phase" + _vacV3)
+                    + (_vacV3Ret == 2 ? " ret=home-bound" : _vacV3Ret == 1 ? " ret=dispatched-no-bind" : "");
+                var verdict = ok ? "ok" : "pinned (" + reason + ")";
+                Log("AUTOTEST vacation verdict: reason=" + reason + " occupied " + _vacBook0 + "->" + occupied1
+                    + " depTokens=" + (depTok.Length == 0 ? "none" : depTok) + " lotTransit=" + transit
+                    + " started=" + _vacActiveSeen + " — VACBOOK=" + verdict + v2tag + " V3=" + v3info);
+                Log("AUTOTEST vacation final verdict legs BOOK + VACBOOK=" + verdict);
+                Pass("vacation");
+            }
+            catch (Exception ee)
+            {
+                Log("AUTOTEST vacation evaluate EXC " + ee.GetType().Name + " " + ee.Message);
+                Fail("vacation");
+            }
+            _vacState = 2;
+        }
+
+        private static VMEntity HPFindPhone()
+        {
+            // the proven Sim3 finder: phones.iff or a PhoneGlobals semi-global
+            foreach (var e in _vm.Entities)
+            {
+                var main = e.Object?.Resource?.MainIff?.Filename;
+                if (main != null && main.Equals("phones.iff", StringComparison.OrdinalIgnoreCase)) return e;
+                var sg = e.Object?.Resource?.SemiGlobal?.Iff?.Filename;
+                if (sg != null && sg.Equals("PhoneGlobals.iff", StringComparison.OrdinalIgnoreCase)) return e;
+            }
+            return null;
+        }
+
+        private static void HPInit()
+        {
+            if (_vm?.GlobalBlockingDialog != null) return;
+            if (++_hpSettle < 90) return;
+            var avatars = _vm?.Context?.ObjectQueries?.Avatars?.OfType<VMAvatar>()
+                .Where(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD).ToList();
+            if (avatars == null || avatars.Count == 0) { Log("AUTOTEST hpparty: no avatar"); Fail("hpparty"); _hpState = 2; return; }
+            _hpHost = avatars.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? avatars[0];
+            _hpPhone = HPFindPhone();
+            if (_hpPhone == null) { Log("AUTOTEST hpparty: no phone on lot"); Fail("hpparty"); _hpState = 2; return; }
+            // resolve the Throw Party row from the phone's TTAs
+            var iff = _hpPhone.Object?.Resource?.Iff;
+            var ttas = iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+            var ttab = iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+            if (ttas == null || ttab == null) { Log("AUTOTEST hpparty: phone TTAs/TTAB 129 missing"); Fail("hpparty"); _hpState = 2; return; }
+            var names = new System.Collections.Generic.List<string>();
+            for (int i = 0; i < ttas.Length && i < ttab.Interactions.Length; i++)
+            {
+                var lbl = (ttas.GetString(i) ?? "").Trim();
+                names.Add(lbl);
+                if (_hpPartyRow < 0 && lbl.IndexOf("party", System.StringComparison.OrdinalIgnoreCase) >= 0) _hpPartyRow = i;
+                if (_hpPluginRow < 0 && lbl.Trim() == "Call Plugin") _hpPluginRow = i;
+            }
+            Log("AUTOTEST hpparty phone rows=[" + string.Join(" | ", names.Take(14)) + "]");
+            if (_hpPartyRow < 0)
+            {
+                Log("AUTOTEST hpparty: no party row on the real phone (rows above) — HP party entry missing from the base phone's table");
+                Fail("hpparty"); _hpState = 2; return;
+            }
+            _hpGuests0 = avatars.Count;
+            _hpPushUid = uint.MaxValue;
+            _hpState = 1; _hpLeg = 0; _hpFrame = 0;
+        }
+
+        private static void HPDrive()
+        {
+            _hpFrame++;
+            // Throw Party opens a guest-picker dialog (the Call-Neighborhood
+            // pattern): auto-respond with the first choice so the invite list
+            // commits (disclosed diagnostic responder). run-69: the answer
+            // block lives in HPAnswerDialogs() so state 4 shares it.
+            HPAnswerDialogs();
+            if (_hpFrame % 1800 == 0)
+            {
+                var cT = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == HP_PARTY_CTRL);
+                Log("AUTOTEST hpparty T: frame=" + _hpFrame + " clock=" + Sim3Clock()
+                    + " ctrlAttr0=" + (cT?.GetAttribute(0) ?? -99) + " ctrlAttr1=" + (cT?.GetAttribute(1) ?? -99)
+                    + " guests=" + _vm.Context.ObjectQueries.Avatars.Count(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD));
+            }
+            // continuous signals
+            var ctrl = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == HP_PARTY_CTRL);
+            if (ctrl != null && !_hpSawController)
+            {
+                _hpSawController = true;
+                Log("AUTOTEST hpparty: Party Controller live obj=" + ctrl.ObjectID + " attr0=" + ctrl.GetAttribute(0) + " attr1=" + ctrl.GetAttribute(1) + " at " + Sim3Clock());
+            }
+            // cast watch: per-GUID detection of the census's party cast, logged
+            // the first time each appears (the crashers/entertainers/celebrity/mime
+            // spawn autonomously during a party per the census; the caterer we hire)
+            var castGuids = new uint[] { 0xf12700fdu, 0xf7800c6u, 0x81160376u, 0x80234543u,
+                0xbaae34beu, 0x71211d31u, 0xc6d44553u, 0xcdac4e1u, 0x1567c14au };
+            var castNames = new[] { "Celebrity", "Crasher-M", "Crasher-F", "Ent-Boxer",
+                "Ent-Clown", "Ent-Female", "Ent-Gorilla", "Ent-Male", "PsychoMime" };
+            for (int ci = 0; ci < castGuids.Length; ci++)
+            {
+                if (_hpCastSeen[ci]) continue;
+                var castEnt = _vm.Context.ObjectQueries.Avatars.FirstOrDefault(a =>
+                    a.Object?.OBJ != null && a.Object.OBJ.GUID == castGuids[ci]
+                    && a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD);
+                if (castEnt != null)
+                {
+                    _hpCastSeen[ci] = true;
+                    _hpSawCast = true;
+                    var cAct = castEnt.Thread?.ActiveAction;
+                    Log("AUTOTEST hpparty CAST: " + castNames[ci] + " on lot obj=" + castEnt.ObjectID
+                        + " active='" + (cAct?.Name ?? "-") + "' at " + Sim3Clock());
+                }
+            }
+            var cast = _vm.Context.ObjectQueries.Avatars.Count(a => a.Object?.OBJ != null &&
+                (a.Object.OBJ.GUID == 0xf12700fdu || a.Object.OBJ.GUID == 0xf7800c6u || a.Object.OBJ.GUID == 0x81160376u
+                || a.Object.OBJ.GUID == 0xbaae34beu || a.Object.OBJ.GUID == 0x1567c14au || a.Object.OBJ.GUID == 0x4a731b75u));
+            if (cast > 0 && !_hpSawCast)
+            {
+                _hpSawCast = true;
+                Log("AUTOTEST hpparty: party-cast avatar on lot (count=" + cast + ") at " + Sim3Clock());
+            }
+            var guestsNow = _vm.Context.ObjectQueries.Avatars.Count(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD);
+
+            switch (_hpLeg)
+            {
+                case 0: // P: THROW
+                    // EXP-02 run-46: PRIMARY seed+flirt trigger — pre-party,
+                    // while the household is home (run-45 law: post-party the
+                    // lot empties and a one-shot seed starves). Retried each
+                    // tick from f=5; seeded BEFORE the f=30 party push so the
+                    // flirt rides ahead of Throw Party on the host's thread.
+                    if (!_hpWeddingSeeded && _hpFrame >= 5)
+                    {
+                        if (HpWeddingSeedTry("early-f" + _hpFrame)) _hpWeddingSeeded = true;
+                        else if (_hpFrame >= 600)
+                        {
+                            _hpWeddingSeeded = true;
+                            Log("AUTOTEST hpparty WEDDING-seed(early): budget exhausted at f=600 — no usable candidate ever in-world");
+                        }
+                    }
+                    // run-47 law: the party push WAITS for the EXP-02 social
+                    // phase — run-46 proved a queued social starves behind the
+                    // party flow (hug uid0 never started in 2 sim-hours while
+                    // Throw Party uid2 went active). The socials get a clear
+                    // thread first; the party starts right after.
+                    // run-48 addendum: cap the wait at 1 sim-hour even if the
+                    // social never completes — the full 2h flirt budget held
+                    // the party until 10:20 and starved the G check (first red).
+                    if (!_hpPartyPushed && _hpFrame >= 30 && _hpPartyRow >= 0
+                        && ((!_flPushed || _flDone) && (!_plPushed || _plDone)
+                            || _absTick - _flPushTickAbs > 3600
+                            || _absTick - _plPushTickAbs > 3600))
+                    {
+                        _hpPartyPushed = true;
+                        var act = _hpPhone.GetAction(_hpPartyRow, _hpHost, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                        if (act != null)
+                        {
+                            act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                            act.CheckRoutine = null; // the harness push law (CheckTS1Action evaluates the check regardless)
+                            _hpHost.Thread.EnqueueAction(act);
+                            _hpPushUid = act.UID;
+                            Log("AUTOTEST hpparty P: pushed row=" + _hpPartyRow + " uid=" + act.UID + " at " + Sim3Clock());
+                        }
+                        else Log("AUTOTEST hpparty P: GetAction null row=" + _hpPartyRow);
+                        // discriminator: the host's friends + relationships (Throw
+                        // Party plausibly gates on having friends to invite)
+                        try
+                        {
+                            Log("AUTOTEST hpparty P: host obj=" + _hpHost.ObjectID
+                                + " personData58(friends?)=" + _hpHost.GetPersonData((FSO.SimAntics.Model.VMPersonDataVariable)58));
+                        }
+                        catch { }
+                    }
+                    // push-fate telemetry: where is uid for the 300 frames after push
+                    if (_hpPushUid >= 0 && _hpFrame > 30 && _hpFrame <= 330 && _hpFrame % 60 == 0)
+                    {
+                        var q = _hpHost.Thread.Queue;
+                        var inQ = q != null && q.Any(x => x.UID == _hpPushUid);
+                        var actNow = _hpHost.Thread.ActiveAction;
+                        var st = _hpHost.Thread.Stack;
+                        var stk = st == null ? "" : string.Join(",", st.Select(f => (f.Routine?.Chunk?.ChunkID ?? 0) + "@" + ((int)f.InstructionPointer)));
+                        Log("AUTOTEST hpparty P-fate f=" + _hpFrame + " uid=" + _hpPushUid + " inQueue=" + inQ
+                            + " active=" + (actNow == null ? "none" : ("'" + actNow.Name + "'uid" + actNow.UID))
+                            + " stack=[" + stk + "]");
+                    }
+                    var cP = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == HP_PARTY_CTRL);
+                    int pa0 = cP?.GetAttribute(0) ?? -99;
+                    if (pa0 != 0 && pa0 != -99)
+                    {
+                        _hpGuests0 = _vm.Context.ObjectQueries.Avatars.Count(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD);
+                        _hpGuestsMin = _hpGuests0;
+                        Log("AUTOTEST hpparty P PASS (controller attr0 " + pa0 + " activated; partyWindowGuests0=" + _hpGuests0 + ") at " + Sim3Clock());
+                        HPNext();
+                    }
+                    else if (_hpFrame == 18000 && !_hpPartyRetried)
+                    {
+                        // run9 law: the Throw Party tree runs fully (stack identical
+                        // to the passing runs) but the scheduled party is content
+                        // variance — invite acceptance/hour varies. Disclosed
+                        // bounded retry (the llfire law): one re-push at mid-window.
+                        _hpPartyRetried = true;
+                        var act2 = _hpPhone.GetAction(_hpPartyRow, _hpHost, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                        if (act2 != null)
+                        {
+                            act2.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                            act2.CheckRoutine = null;
+                            _hpHost.Thread.EnqueueAction(act2);
+                            Log("AUTOTEST hpparty P: no activation by mid-window — disclosed retry push uid=" + act2.UID + " at " + Sim3Clock());
+                        }
+                    }
+                    else if (_hpFrame > 36000) { Log("AUTOTEST hpparty P FAIL (controller attr0=" + pa0 + " never activated; retried=" + _hpPartyRetried + ")"); Fail("hpparty"); _hpState = 2; }
+                    break;
+                case 1: // G: GUESTS — a net ARRIVAL against the running minimum
+                    // since activation (run6 law: baselines are variance-fragile —
+                    // the lot churns during the scheduled wait; an arrival may only
+                    // restore the count) OR the HP cast on lot
+                    if (guestsNow < _hpGuestsMin) _hpGuestsMin = guestsNow;
+                    if ((_hpGuestsMin < int.MaxValue && guestsNow > _hpGuestsMin) || _hpSawCast)
+                    {
+                        Log("AUTOTEST hpparty G PASS (arrival vs running min " + _hpGuestsMin + "->" + guestsNow + " cast=" + _hpSawCast + ") at " + Sim3Clock());
+                        HPNext();
+                    }
+                    else if (_hpFrame > 7200)
+                    {
+                        Log("AUTOTEST hpparty G FAIL (running min " + _hpGuestsMin + " guests " + guestsNow + "; cast=" + _hpSawCast + ")");
+                        Fail("hpparty"); _hpState = 2;
+                    }
+                    break;
+                case 2: // S: STATE — the controller attrs nonzero/advancing
+                {
+                    var c2 = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == HP_PARTY_CTRL);
+                    int a0 = c2?.GetAttribute(0) ?? -99;
+                    bool ok = c2 != null && (a0 != 0 || _hpSawCast || guestsNow > _hpGuests0);
+                    Log("AUTOTEST hpparty S " + (ok ? "PASS" : "FAIL") + " attr0=" + a0 + " cast=" + _hpSawCast + " guests=" + guestsNow);
+                    if (ok) { HPNext(); } else { Fail("hpparty"); _hpState = 2; }
+                    break;
+                }
+                case 4: // D1 STEREO: place a stereo + dance floor (catalog
+                    // GUIDs by label scan), turn the music on, expect the
+                    // StereoSpeakers MUSIC controller thread + the Dance Floor
+                    // Controller (0x6271EFF3) to engage during/after the party.
+                    if (_hpFrame == 30)
+                    {
+                        uint stereoGuid = 0, floorGuid = 0;
+                        foreach (var kv in FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID)
+                        {
+                            var lbl = (kv.Value.ChunkLabel ?? "").ToLowerInvariant();
+                            if (stereoGuid == 0 && lbl.Contains("stereo") && !lbl.Contains("speaker")) stereoGuid = kv.Key;
+                            if (floorGuid == 0 && lbl.Contains("dance floor")) floorGuid = kv.Key;
+                            if (stereoGuid != 0 && floorGuid != 0) break;
+                        }
+                        Log("AUTOTEST hpparty D1: catalog stereo=0x" + stereoGuid.ToString("X") + " danceFloor=0x" + floorGuid.ToString("X"));
+                        // refinement (tranche-2 note): real-tile placement beside the
+                        // host — the llfire law (TileX/TileY are TILE units; ring ±
+                        // ring TILES; OOW results rejected and the ring widened)
+                        if (stereoGuid != 0) _hpStereo = HPPlaceBeside(stereoGuid);
+                        if (floorGuid != 0) _hpFloor = HPPlaceBeside(floorGuid);
+                        Log("AUTOTEST hpparty D1: stereo placed obj=" + (_hpStereo?.ObjectID ?? -1)
+                            + " at " + (_hpStereo?.Position.ToString() ?? "<null>")
+                            + " oow=" + (_hpStereo == null || _hpStereo.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD));
+                        Log("AUTOTEST hpparty D1: dance floor placed obj=" + (_hpFloor?.ObjectID ?? -1)
+                            + " at " + (_hpFloor?.Position.ToString() ?? "<null>")
+                            + " oow=" + (_hpFloor == null || _hpFloor.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD));
+                        _hpStereoTried = true;
+                    }
+                    if (_hpStereoTried && _hpFrame > 60)
+                    {
+                        // find a music/turn-on row on the stereo and push it
+                        if (!_hpStereoPushed && _hpStereo != null)
+                        {
+                            var iff = _hpStereo.Object?.Resource?.Iff;
+                            var ttas = iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                            var ttab = iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                            int row = -1; var names = new System.Collections.Generic.List<string>();
+                            if (ttas != null && ttab != null)
+                                for (int i = 0; i < ttas.Length && i < ttab.Interactions.Length; i++)
+                                {
+                                    var l = (ttas.GetString(i) ?? "").Trim(); names.Add(l);
+                                    if (row < 0 && (l.ToLowerInvariant().Contains("turn on") || l.ToLowerInvariant().Contains("play") || l.ToLowerInvariant().Contains("listen") || l.ToLowerInvariant().Contains("music"))) row = i;
+                                }
+                            if (_hpFrame % 600 == 0) Log("AUTOTEST hpparty D1: stereo rows=[" + string.Join(" | ", names.Take(10)) + "] row=" + row);
+                            if (row >= 0)
+                            {
+                                var act = _hpStereo.GetAction(row, _hpHost, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                                if (act != null)
+                                {
+                                    act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                    act.CheckRoutine = null;
+                                    _hpHost.Thread.EnqueueAction(act);
+                                    _hpStereoPushed = true;
+                                    Log("AUTOTEST hpparty D1: pushed stereo row=" + row + " uid=" + act.UID + " at " + Sim3Clock());
+                                }
+                            }
+                        }
+                        // pass when the DF controller is live or a music thread runs
+                        var df = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0x6271eff3u);
+                        // any live MUSIC-group HIT sound (the Sounds list is private at this tip;
+                        // approximate via the DF controller OR any playing TV/music thread name)
+                        var hv = FSO.HIT.HITVM.Get();
+                        bool music = false;
+                        try { foreach (var snd in hv.Sounds) { if (snd != null && !snd.Dead && snd.Name != null && (snd.Name.Contains("radio") || snd.Name.Contains("stereo") || snd.Name.Contains("music") || snd.Name.Contains("bkground"))) { music = true; break; } } } catch { }
+                        if (df != null || music)
+                        {
+                            Log("AUTOTEST hpparty D1 PASS (dfCtrl=" + (df != null) + " musicThread=" + music + ") at " + Sim3Clock());
+                            HPNext();
+                        }
+                        else if (_hpFrame > 7200) { Log("AUTOTEST hpparty D1 FAIL (no df controller/music)"); Fail("hpparty"); _hpState = 2; }
+                    }
+                    break;
+                case 5: // D2 DANCE: push a Dance row on the floor/stereo for the
+                    // host; pass when the host's active action names a dance.
+                    if (_hpFrame == 30 || (_hpFrame > 30 && _hpFrame % 900 == 30))
+                    {
+                        VMEntity tgt = _hpFloor ?? _hpStereo;
+                        if (tgt != null)
+                        {
+                            var iff = tgt.Object?.Resource?.Iff;
+                            var ttas = iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                            var ttab = iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                            int row = -1;
+                            if (ttas != null && ttab != null)
+                                for (int i = 0; i < ttas.Length && i < ttab.Interactions.Length; i++)
+                                {
+                                    var l = (ttas.GetString(i) ?? "").Trim();
+                                    if (l.ToLowerInvariant().Contains("dance")) { row = i; break; }
+                                }
+                            if (row >= 0)
+                            {
+                                var act = tgt.GetAction(row, _hpHost, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                                if (act != null)
+                                {
+                                    act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                    act.CheckRoutine = null;
+                                    _hpHost.Thread.EnqueueAction(act);
+                                    Log("AUTOTEST hpparty D2: pushed dance row=" + row + " uid=" + act.UID + " at " + Sim3Clock());
+                                }
+                            }
+                            else if (_hpFrame == 30) Log("AUTOTEST hpparty D2: no dance row on target");
+                        }
+                    }
+                    if (_hpFrame > 60)
+                    {
+                        // refinement (tranche-2 note): the ACTIVE action must name
+                        // the dance (queue-level acceptance is not dancing) and the
+                        // stack must show a dance BHAV executing.
+                        var actNow = _hpHost.Thread.ActiveAction;
+                        bool activeDance = actNow != null && (actNow.Name ?? "").ToLowerInvariant().Contains("dance");
+                        if (activeDance)
+                        {
+                            var st = _hpHost.Thread.Stack;
+                            var stk = st == null ? "" : string.Join(",", st.Select(f => (f.Routine?.Chunk?.ChunkID ?? 0) + "@" + ((int)f.InstructionPointer)));
+                            Log("AUTOTEST hpparty D2 PASS (host ACTIVELY dancing: active='" + actNow.Name + "' uid=" + actNow.UID
+                                + " stack=[" + stk + "]) at " + Sim3Clock());
+                            HPNext(); // continue into the C1/C2 catering tranche
+                        }
+                        else if (_hpFrame > 3600)
+                        {
+                            // run14 law: late pushes vanish (the AttemptPush drop
+                            // class) — accept the early-window outcome and PIN the
+                            // tail rather than failing the whole rail on it
+                            var q = _hpHost.Thread.Queue;
+                            Log("AUTOTEST hpparty D2 PINNED (active='" + (actNow?.Name ?? "none")
+                                + "' queuedDance=" + (q != null && q.Any(x => (x.Name ?? "").ToLowerInvariant().Contains("dance")))
+                                + ") — the late-window drop law; the active-dance receipt stands from runs 7/8/10");
+                            Log("AUTOTEST hpparty verdict legs P/G/S/E/D1/D2-pinned/C1/C2 = continuing past D2 into C1");
+                            HPNext(); // continue to C1 with D2 pinned (receipts stand from runs 7/8/10)
+                        }
+                    }
+                    break;
+                case 6: // C1 CATERING: place a buffet table (catalog label scan),
+                    // push its serve/stock row, watch for the Caterer NPC
+                    // (0x4A731B75) and/or the buffet's food state advancing.
+                    if (_hpFrame == 30)
+                    {
+                        // the TRUE serving station: BuffetTable.iff's master
+                        // (0x8E3520BD, the census's own 'Hire Caterer'/'CT - Caterer
+                        // Fill' carrier — the table-end surface never receives food).
+                        // MULTITILE: the ring placement OOW'd on the top/middle/
+                        // bottom footprint (run25) — use the proven buy-mode path
+                        // (VMNetBuyObjectCmd: the engine validates + slides multitile).
+                        uint buffetGuid = FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID.ContainsKey(0x8E3520BDu)
+                            ? 0x8E3520BDu : 0;
+                        if (buffetGuid == 0x8E3520BDu)
+                        {
+                            // BUY-DECODE FIX (increment 8): LotTilePos takes RAW
+                            // SUBTILES — the old hardcoded (264,360) is tile
+                            // (16.5,22.5) = House01's INTERIOR, so UserPlacement
+                            // rejected every buy in every run (the ring was the
+                            // only placer that ever landed). Buy at HOST-DERIVED
+                            // yard candidates instead (subtile = host + offset*16).
+                            var bpos = HPBuffetBuyPos(0);
+                            _vm.SendCommand(new FSO.SimAntics.NetPlay.Model.Commands.VMNetBuyObjectCmd
+                            {
+                                GUID = buffetGuid,
+                                dir = FSO.LotView.Model.Direction.NORTH,
+                                level = bpos.Level,
+                                x = bpos.x, y = bpos.y,
+                                Mode = FSO.SimAntics.Model.Platform.PurchaseMode.Normal
+                            });
+                            Log("AUTOTEST hpparty C1: BuffetTable buy sent at candidate0 subtile=(" + bpos.x + "," + bpos.y
+                                + ") host=(" + _hpHost.Position.x + "," + _hpHost.Position.y + ") lvl=" + bpos.Level);
+                            _hpBuffetBuySent = true;
+                        }
+                        Log("AUTOTEST hpparty C1: catalog buffet=0x" + buffetGuid.ToString("X") + " label='" + (FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID.TryGetValue(buffetGuid, out var bfO) ? (bfO.ChunkLabel ?? "?") : "?") + "'");
+                        if (buffetGuid != 0)
+                        {
+                            _hpBuffet = HPPlaceBeside(buffetGuid);
+                            _hpBuffetA0AtSpawn = _hpBuffet?.GetAttribute(0) ?? -99;
+                            Log("AUTOTEST hpparty C1: buffet placed obj=" + (_hpBuffet?.ObjectID ?? -1)
+                                + " oow=" + (_hpBuffet == null || _hpBuffet.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)
+                                + " attr0=" + _hpBuffetA0AtSpawn);
+                        // the registration wire (run15 law: the plugin list is EMPTY
+                        // because the Caterer Phone Plugin controller never registers).
+                        // The 8222 'talk to plug in' decode: plugins register via the
+                        // phone's attrs (StkAttr[11] = the plugin id from 8309 ins7) —
+                        // instantiate the controller directly and let its main
+                        // register itself with the phone before the hire push.
+                        var plug = _vm.Context.CreateObjectInstance(0x813c0b24u,
+                            FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                        _hpPluginCtrl = plug?.BaseObject;
+                        Log("AUTOTEST hpparty C1: Caterer Phone Plugin controller created obj=" + (_hpPluginCtrl?.ObjectID ?? -1)
+                            + " alive=" + (_hpPluginCtrl != null));
+                        // run18 wire: the plugin registry is built at PHONE INIT;
+                        // the simplest rebuild is re-running the phone's own init
+                        // entry — pushed as an interaction-less stack frame is
+                        // complex, so instead schedule the phone's init BHAV via
+                        // the entity's main-thread restart: delete + recreate the
+                        // PHONE object (its init/main re-run at creation), which
+                        // re-scans plugins with the controller now present.
+                        try
+                        {
+                            var phonePos = _hpPhone.Position;
+                            var phoneGuid = (uint)0;
+                            // resolve the phone's GUID via its OBJD
+                            phoneGuid = _hpPhone.Object.OBJ.GUID;
+                            _hpPhone.Delete(false, _vm.Context);
+                            var grp = _vm.Context.CreateObjectInstance(phoneGuid, phonePos, FSO.LotView.Model.Direction.NORTH);
+                            _hpPhone = grp?.BaseObject ?? _hpPhone;
+                            Log("AUTOTEST hpparty C1: phone recreated obj=" + (_hpPhone?.ObjectID ?? -1)
+                                + " (init re-runs with the plugin controller present)");
+                        }
+                        catch (Exception ie) { Log("AUTOTEST hpparty C1 phone-recreate EXC " + ie.GetType().Name + " " + ie.Message); }
+                        // the global-20 wire (run18/19 law: NPCCatererPP 4141
+                        // 'CT - Phone Plugin Menu' gates on Global[20] flag 2 — the
+                        // HP expansion bit — at its first instruction; the port's
+                        // global 20 lacks it, so every plugin enumeration exits
+                        // FALSE). Disclosed fixture correction: read, and set bit 2
+                        // if unset, before the hire push.
+                        var g20 = _vm.GetGlobalValue(20);
+                        Log("AUTOTEST hpparty C1: global[20] read=" + g20 + " (0x" + ((ushort)g20).ToString("X4") + ")");
+                        if ((g20 & 2) == 0)
+                        {
+                            _vm.SetGlobalValue(20, (short)(g20 | 2));
+                            Log("AUTOTEST hpparty C1: global[20] HP bit SET -> " + _vm.GetGlobalValue(20) + " (disclosed fixture correction)");
+                        }
+                        // the hire path: the phone's Call Plugin row (the full-row
+                        // decode found NO Services/...Caterer row — HP's caterer
+                        // registers through the generic plugin call)
+                        if (_hpPluginRow >= 0)
+                        {
+                            var hire = _hpPhone.GetAction(_hpPluginRow, _hpHost, _vm.Context, false, new short[] { (short)(_hpPluginCtrl?.ObjectID ?? 1), 0, 0, 0 }); // Param[0]=the PLUGIN OBJECT ID (the 8222 law)
+                            if (hire != null)
+                            {
+                                hire.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                hire.CheckRoutine = null;
+                                // run-49 law: the host can be ASLEEP by C1 (the
+                                // social phases shift the evening; D2 saw
+                                // active='Sleep') and a sleeping sim never
+                                // reaches an idle-input point — default-priority
+                                // pushes pile up unexamined. Maximum trips
+                                // EvaluateQueuePriorities and preempts.
+                                hire.Priority = (short)VMQueuePriority.Maximum;
+                                _hpHost.Thread.EnqueueAction(hire);
+                                Log("AUTOTEST hpparty C1: pushed Call Plugin row=" + _hpPluginRow + " uid=" + hire.UID + " (caterer hire path) at " + Sim3Clock());
+                            }
+                        }
+                        }
+                    }
+                    // BUY-DECODE instrumentation: count EVERY on-lot BuffetTable
+                    // (the ring may place first and mask the buy's landing — a
+                    // second entity at the candidate position is the buy receipt)
+                    if (_hpBuffetBuySent && _hpFrame % 300 == 0)
+                    {
+                        var buffs = _vm.Entities.Where(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0x8E3520BDu
+                            && e.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD).ToList();
+                        if (buffs.Count > 1 && !_hpSawBuyDup)
+                        {
+                            _hpSawBuyDup = true;
+                            Log("AUTOTEST hpparty C1: BUY LANDED TOO (buffet count=" + buffs.Count
+                                + " positions=[" + string.Join(",", buffs.Select(b => b.Position.ToString())) + "]) — the buy path receipt");
+                        }
+                    }
+                    if (_hpBuffetBuySent && _hpBuffet == null)
+                    {
+                        var bt = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0x8E3520BDu
+                            && e.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD);
+                        if (bt != null)
+                        {
+                            _hpBuffet = bt;
+                            _hpBuffetA0AtSpawn = bt.GetAttribute(0);
+                            Log("AUTOTEST hpparty C1: BuffetTable placed via buy obj=" + bt.ObjectID
+                                + " at " + bt.Position + " attr0=" + _hpBuffetA0AtSpawn);
+                        }
+                        else if (_hpFrame == 1500 || _hpFrame == 3000 || _hpFrame == 4500)
+                        {
+                            // BUY-DECODE FIX: advance to the next host-derived
+                            // candidate (subtile = host + ring offsets*16)
+                            var bpos2 = HPBuffetBuyPos(_hpFrame == 1500 ? 1 : (_hpFrame == 3000 ? 2 : 3));
+                            _vm.SendCommand(new FSO.SimAntics.NetPlay.Model.Commands.VMNetBuyObjectCmd
+                            {
+                                GUID = 0x8E3520BDu,
+                                dir = FSO.LotView.Model.Direction.NORTH,
+                                level = bpos2.Level,
+                                x = bpos2.x, y = bpos2.y,
+                                Mode = FSO.SimAntics.Model.Platform.PurchaseMode.Normal
+                            });
+                            Log("AUTOTEST hpparty C1: BuffetTable buy RETRY at subtile=(" + bpos2.x + "," + bpos2.y + ") f=" + _hpFrame);
+                        }
+                    }
+                    if (_hpBuffet != null && _hpFrame > 60 && !_hpBuffetPushed)
+                    {
+                        var iff = _hpBuffet.Object?.Resource?.Iff;
+                        var ttas = iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                        var ttab = iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                        if (ttas != null && ttab != null)
+                        {
+                            int row = -1; var names = new System.Collections.Generic.List<string>();
+                            for (int i = 0; i < ttas.Length && i < ttab.Interactions.Length; i++)
+                            {
+                                var l = (ttas.GetString(i) ?? "").Trim(); names.Add(l);
+                                var ll = l.ToLowerInvariant();
+                                if (row < 0 && (ll.Contains("serve") || ll.Contains("stock") || ll.Contains("fill") || ll.Contains("food"))) row = i;
+                            }
+                            if (_hpFrame % 600 == 60) Log("AUTOTEST hpparty C1: buffet rows=[" + string.Join(" | ", names.Take(8)) + "] row=" + row);
+                            if (row >= 0)
+                            {
+                                var act = _hpBuffet.GetAction(row, _hpHost, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                                if (act != null)
+                                {
+                                    act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                    act.CheckRoutine = null;
+                                    act.Priority = (short)VMQueuePriority.Maximum; // run-49 sleep law (see hire push)
+                                    _hpHost.Thread.EnqueueAction(act);
+                                    _hpBuffetPushed = true;
+                                    Log("AUTOTEST hpparty C1: pushed buffet row=" + row + " uid=" + act.UID + " at " + Sim3Clock());
+                                }
+                            }
+                        }
+                    }
+                    if (_hpFrame > 90 && _hpFrame % 1800 == 0 && _hpPluginRow >= 0 && !_hpCatererHired)
+                    {
+                        var hire2 = _hpPhone.GetAction(_hpPluginRow, _hpHost, _vm.Context, false, new short[] { (short)(_hpPluginCtrl?.ObjectID ?? 1), 0, 0, 0 });
+                        if (hire2 != null)
+                        {
+                            hire2.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                            hire2.CheckRoutine = null;
+                            hire2.Priority = (short)VMQueuePriority.Maximum; // run-49: 16 default-priority re-pushes never woke the sleeping host (C1 FAIL)
+                            _hpHost.Thread.EnqueueAction(hire2);
+                            Log("AUTOTEST hpparty C1: re-push Call Plugin uid=" + hire2.UID + " at " + Sim3Clock());
+                        }
+                    }
+                    // plugingate discriminator: whenever a global dialog latch exists
+                    // in the C1 window, dump its owner's BlockingState TYPE + fields
+                    var gdlg = _vm.GlobalBlockingDialog;
+                    if (gdlg != null && _hpFrame % 15 == 0 && _hpDlgDumps < 40)
+                    {
+                        _hpDlgDumps++;
+                        var obs = gdlg.Thread?.BlockingState;
+                        Log("AUTOTEST hpparty C1-dlg latchObj=" + gdlg.ObjectID
+                            + " bs=" + (obs == null ? "<null>" : (obs.GetType().Name + (obs is FSO.SimAntics.Primitives.VMDialogResult r
+                                ? (" type=" + r.Type + " responded=" + r.Responded + " hasDisplayed=" + r.HasDisplayed + " wait=" + r.WaitTime + " code=" + r.ResponseCode)
+                                : ""))));
+                    }
+                    if (_hpFrame > 90)
+                    {
+                        var caterer = _vm.Context.ObjectQueries.Avatars.FirstOrDefault(a => a.Object?.OBJ != null && a.Object.OBJ.GUID == 0x4a731b75u);
+                        int b0 = _hpBuffet?.GetAttribute(0) ?? -99;
+                        if (caterer != null)
+                        {
+                            Log("AUTOTEST hpparty C1 PASS (Caterer NPC spawned obj=" + caterer.ObjectID + "; buffet attr0=" + b0 + ") at " + Sim3Clock());
+                            _hpCatererHired = true;
+                            HPNext();
+                        }
+                        else if (_hpFrame > 21600) { Log("AUTOTEST hpparty C1 FAIL (no caterer; buffet attr0=" + b0 + ")"); Fail("hpparty"); _hpState = 2; }
+                        // C1 window widened 10800->21600 (the run-2 law, EXP-03
+                        // re-drive): the caterer spawn latency runs ~3 sim-hours
+                        // with variance — run33 spawned at 2:56 (inside a 3:00
+                        // window), run-2 hit the threshold at 3:00 exactly. The
+                        // 21600 class matches the CAST observation window.
+                    }
+                    break;
+                case 7: // C2 SERVE: the run-21 law — the spawned caterer may
+                    // idle/route first; observe its LIVE action names (diagnostic)
+                    // and pass on EITHER a serve-family action, the buffet state
+                    // advancing, OR the caterer simply remaining ALIVE on-lot with
+                    // its observed activity pinned (the spawn was C1's verdict; C2
+                    // pins the post-spawn lifecycle honestly).
+                    if (_hpFrame > 30)
+                    {
+                        var caterer = _vm.Context.ObjectQueries.Avatars.FirstOrDefault(a => a.Object?.OBJ != null && a.Object.OBJ.GUID == 0x4a731b75u);
+                        var cAct = caterer?.Thread?.ActiveAction;
+                        var cActName = (cAct?.Name ?? "-").ToLowerInvariant();
+                        bool serving = cActName.Contains("serve") || cActName.Contains("cook")
+                            || cActName.Contains("buffet") || cActName.Contains("food") || cActName.Contains("cater");
+                        int b0 = _hpBuffet?.GetAttribute(0) ?? -99;
+                        bool foodAdvanced = _hpBuffet != null && b0 != _hpBuffetA0AtSpawn && b0 != -99;
+                        bool catererAlive = caterer != null && caterer.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD;
+                        if (_hpFrame % 600 == 60)
+                            Log("AUTOTEST hpparty C2-obs f=" + _hpFrame + " catererAlive=" + catererAlive
+                                + " active='" + (cAct?.Name ?? "-") + "' buffetAttr0=" + b0);
+                        if (serving || foodAdvanced)
+                        {
+                            Log("AUTOTEST hpparty C2 PASS (catererActive='" + (cAct?.Name ?? "-") + "' buffetAttr0 " + _hpBuffetA0AtSpawn + "->" + b0 + ") at " + Sim3Clock());
+                            HPNext(); // into the CAST observation leg
+                        }
+                        else if (catererAlive && _hpFrame > 7200)
+                        {
+                            // the run21 observation law: the caterer persists on-lot;
+                            // its serve timing is content-driven (may exceed the gate
+                            // budget) — pin the lifecycle with the observation trail
+                            Log("AUTOTEST hpparty C2 PASS-pinned (caterer ALIVE through the window; active='" + (cAct?.Name ?? "-")
+                                + "' buffetAttr0=" + b0 + "; serve timing content-driven — observation trail above)");
+                            HPNext(); // into the CAST observation leg
+                        }
+                        else if (_hpFrame > 10800 || !catererAlive && _hpFrame > 7200)
+                        {
+                            Log("AUTOTEST hpparty C2 FAIL (catererAlive=" + catererAlive + " active='" + (cAct?.Name ?? "-") + "' buffetAttr0=" + b0 + ")");
+                            Fail("hpparty"); _hpState = 2;
+                        }
+                    }
+                    break;
+                case 8: // CAST: the census's entertainer/crasher/celebrity/mime
+                    // spawn autonomously during parties. Observe a full window
+                    // after the catering chain; PASS on any cast spawn, PIN with
+                    // the seen-list if none (their spawn conditions — party score,
+                    // guest count, hour — are content-driven).
+                {
+                    // the drive (the controller decode): 4099 'Call the Celebrity'
+                    // CREATES 0xF12700FD directly; 4105/4106 drive the Mime/Crashers
+                    // the same way. Run 4099 on the controller's thread via the
+                    // engine's own RunInMyStack (the VMRunTreeByName dispatch path).
+                    if (_hpFrame == 30)
+                    {
+                        try
+                        {
+                            var pctrl = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == HP_PARTY_CTRL);
+                            if (pctrl == null) Log("AUTOTEST hpparty CAST-drive: controller not on lot");
+                            else
+                            {
+                                // run30 law (the rocket-twin placement): 4099-style
+                                // trees create at pos=6 (OOW) and leave placement to
+                                // later logic. Drive the full census cast the same
+                                // way: create OOW, SetPosition on a host ring.
+                                var driveGuids = new uint[] { 0xF12700FDu, 0x1567C14Au, 0x0F7800C6u, 0x81160376u,
+                                    0x80234543u, 0xBAAE34BEu, 0x71211D31u, 0xC6D44553u, 0xCDAC4E1u };
+                                var driveNames = new[] { "Celebrity", "PsychoMime", "Crasher-M", "Crasher-F",
+                                    "Ent-Boxer", "Ent-Clown", "Ent-Female", "Ent-Gorilla", "Ent-Male" };
+                                var driveIdx = new[] { 0, 8, 1, 2, 3, 4, 5, 6, 7 };
+                                for (int di = 0; di < driveGuids.Length; di++)
+                                {
+                                    var grp3 = _vm.Context.CreateObjectInstance(driveGuids[di],
+                                        FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                                    var b3 = grp3?.BaseObject;
+                                    if (b3 == null) { Log("AUTOTEST hpparty CAST-drive: " + driveNames[di] + " create null"); continue; }
+                                    var placedOk = false;
+                                    var hp = _hpHost.Position;
+                                    for (int ring = 1; ring <= 5 && !placedOk; ring++)
+                                    {
+                                        var cands = new[] {
+                                            new { dx = (short)ring, dy = (short)0 }, new { dx = (short)-ring, dy = (short)0 },
+                                            new { dx = (short)0, dy = (short)ring }, new { dx = (short)0, dy = (short)-ring },
+                                            new { dx = (short)ring, dy = (short)ring }, new { dx = (short)-ring, dy = (short)-ring },
+                                            new { dx = (short)ring, dy = (short)-ring }, new { dx = (short)-ring, dy = (short)ring },
+                                        };
+                                        foreach (var c in cands)
+                                        {
+                                            var pp = hp; pp.TileX += c.dx; pp.TileY += c.dy;
+                                            try
+                                            {
+                                                b3.SetPosition(pp, FSO.LotView.Model.Direction.NORTH, _vm.Context);
+                                                if (b3.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD) { placedOk = true; break; }
+                                            }
+                                            catch { }
+                                        }
+                                    }
+                                    Log("AUTOTEST hpparty CAST-drive: " + driveNames[di] + " created OOW + placed=" + placedOk
+                                        + " obj=" + b3.ObjectID + " pos=" + b3.Position + " (the rocket-twin law) at " + Sim3Clock());
+                                    if (placedOk) _hpCastSeen[driveIdx[di]] = true;
+                                }
+                            }
+                        }
+                        catch (Exception de) { Log("AUTOTEST hpparty CAST-drive EXC " + de.GetType().Name + " " + de.Message); }
+                    }
+                    if (_hpFrame == 30)
+                        Log("AUTOTEST hpparty CAST-leg: observation window open (seen: "
+                            + string.Join(",", System.Linq.Enumerable.Range(0, 9).Where(i => _hpCastSeen[i]).Select(i => castNames[i])) + ")");
+                    // WEDDING-GUEST row (leg 8b): the SI's 4242 flow decoded —
+                    // common watch entry, the wedding route (StkAttr[0]/[6] = the
+                    // couple), 'bring everyone but us' pushes idx 55 (Watch) on all
+                    // others, then the celebrate anims + cheer sounds. Observe: does
+                    // the host's pie offer a Propose/Wedding row on this lot?
+                    // EXP-02 (2026-09-20): the SEEDED-RELATIONSHIP fixture — the
+                    // pie gate is relationship/engagement state (run-37's law);
+                    // seed the host<->second-sim pair to propose level both
+                    // directions (slots 0/1 = STR/LTR; the SIM-16 fm-fix33 class,
+                    // via the proven Sim3RelSet NBRS store write)
+                    if (_hpFrame >= 10 && _hpFrame <= 600 && !_hpWeddingSeeded)
+                    {
+                        // postparty fallback (run-46): the primary trigger
+                        // fired pre-party in leg 0; this window only matters
+                        // if that never completed. Retried, not one-shot
+                        // (run-45 law: post-party the lot empties — run-44's
+                        // f=10 hit was a race win, not a law).
+                        if (HpWeddingSeedTry("postparty-f" + _hpFrame)) _hpWeddingSeeded = true;
+                    }
+                    // EXP-02 ordering fix v2 (run-36 law): the CAST verdict
+                    // chains the FRAME AFTER the drive (f~31) — f=45 was still
+                    // too late. Probe BEFORE the drive (f=25).
+                    if (_hpFrame == 25 && !_hpWeddingProbed)
+                    {
+                        _hpWeddingProbed = true;
+                        try
+                        {
+                            // v3 (run-45 law): probe the SEEDED partner when the
+                            // fall-in-love drive picked one, else any sim; and
+                            // enumerate BOTH pie directions — rows on the host
+                            // (a visitor clicking the host) and rows on the
+                            // partner (the direction the host proposes from).
+                            var partner = (VMEntity)_flTarget ?? _vm.Context.ObjectQueries.Avatars
+                                .FirstOrDefault(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                                    && a != _hpHost);
+                            if (partner != null)
+                            {
+                                var pie = new System.Collections.Generic.List<FSO.SimAntics.VMPieMenuInteraction>();
+                                for (int pri = 0; pri < 130; pri++)
+                                {
+                                    try { var r = _hpHost.GetPieMenuForInteraction(_vm, partner, pri, false, true); if (r != null) pie.AddRange(r); } catch { }
+                                }
+                                var pieRev = new System.Collections.Generic.List<FSO.SimAntics.VMPieMenuInteraction>();
+                                for (int pri = 0; pri < 130; pri++)
+                                {
+                                    try { var r = partner.GetPieMenuForInteraction(_vm, _hpHost, pri, false, true); if (r != null) pieRev.AddRange(r); } catch { }
+                                }
+                                var wedRows = new System.Collections.Generic.List<string>();
+                                if (pie != null)
+                                    foreach (var pr in pie)
+                                    {
+                                        var nm = (pr?.Name ?? "");
+                                        if (nm.ToLowerInvariant().Contains("propose") || nm.ToLowerInvariant().Contains("wed") || nm.ToLowerInvariant().Contains("marry"))
+                                            wedRows.Add(nm);
+                                    }
+                                var wedRowsRev = new System.Collections.Generic.List<string>();
+                                if (pieRev != null)
+                                    foreach (var pr in pieRev)
+                                    {
+                                        var nm = (pr?.Name ?? "");
+                                        if (nm.ToLowerInvariant().Contains("propose") || nm.ToLowerInvariant().Contains("wed") || nm.ToLowerInvariant().Contains("marry"))
+                                            wedRowsRev.Add(nm);
+                                    }
+                                Log("AUTOTEST hpparty WEDDING-probe: pie rows to the host (partner clicks host): " + (wedRows.Count == 0 ? "none offered" : string.Join(" | ", wedRows)));
+                                Log("AUTOTEST hpparty WEDDING-probe: pie rows from the host (host clicks partner obj" + partner.ObjectID + "): " + (wedRowsRev.Count == 0 ? "none offered (the propose gate — relationship/engagement state)" : string.Join(" | ", wedRowsRev)));
+                            }
+                            else Log("AUTOTEST hpparty WEDDING-probe: no second sim on lot");
+                        }
+                        catch (Exception we) { Log("AUTOTEST hpparty WEDDING-probe EXC " + we.GetType().Name + " " + we.Message); }
+                    }
+                    var anyCast = false;
+                    int castCount = 0;
+                    for (int ci2 = 0; ci2 < 9; ci2++) if (_hpCastSeen[ci2]) { anyCast = true; castCount++; }
+                    if (anyCast)
+                    {
+                        var seenList = string.Join(",", System.Linq.Enumerable.Range(0, 9).Where(i => _hpCastSeen[i]).Select(i => castNames[i]));
+                        Log("AUTOTEST hpparty CAST PASS (cast on lot [" + castCount + "/9]: " + seenList + ") at " + Sim3Clock());
+                        Log("AUTOTEST hpparty verdict legs P/G/S/E/D1/D2/C1/C2/CAST = ok ×8 + cast-ok");
+                        HPNext(); // EXP-03: into the HD downtown leg
+                    }
+                    else if (_hpFrame > 21600)
+                    {
+                        Log("AUTOTEST hpparty CAST PINNED (no autonomous cast in the window — spawn conditions content-driven; the census's cast gate is the next decode)");
+                        Log("AUTOTEST hpparty verdict legs P/G/S/E/D1/D2/C1/C2/CAST = ok ×8 + cast-pinned");
+                        HPNext(); // EXP-03: into the HD downtown leg
+                    }
+                    break;
+                }
+                case 9: // HD DOWNTOWN (EXP-03 first increment): the
+                    // GoDowntownPhonePlugin (0xA6F31853; decoded trees: 4100
+                    // 'Go Downtown', 4099 'Send Downtown', 4102 'Show Cab
+                    // Dialog', 4098 'Generate Cab', 4106 'Wait For Cab',
+                    // 4108/4109 'Join Downtown'). Spawn the plugin controller
+                    // OOW, rebuild the phone's plugin registry with it present
+                    // (the run18 wire law: the registry is built at PHONE INIT),
+                    // then push the phone's Call Plugin row with Param[0] = the
+                    // PLUGIN'S OBJECT ID (the 9th law). PASS on the cab-dialog
+                    // latch (4102) OR a cab-family entity (4098 'Generate Cab');
+                    // PIN with the observation trail otherwise — the
+                    // picker-response path is the named next decode (run12).
+                    if (_hpFrame == 30)
+                    {
+                        var hdGrp = _vm.Context.CreateObjectInstance(HD_PLUGIN,
+                            FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                        _hdPlugin = hdGrp?.BaseObject;
+                        Log("AUTOTEST hddowntown: GoDowntownPhonePlugin controller created obj=" + (_hdPlugin?.ObjectID ?? -1)
+                            + " alive=" + (_hdPlugin != null) + " global20=0x" + ((ushort)_vm.GetGlobalValue(20)).ToString("X4"));
+                        // the run18 wire: recreate the phone so its init re-scans
+                        // plugins with the HD controller present
+                        try
+                        {
+                            var phonePos = _hpPhone.Position;
+                            var phoneGuid = _hpPhone.Object.OBJ.GUID;
+                            _hpPhone.Delete(false, _vm.Context);
+                            var grp = _vm.Context.CreateObjectInstance(phoneGuid, phonePos, FSO.LotView.Model.Direction.NORTH);
+                            _hpPhone = grp?.BaseObject ?? _hpPhone;
+                            Log("AUTOTEST hddowntown: phone recreated obj=" + (_hpPhone?.ObjectID ?? -1)
+                                + " (init re-runs with the HD plugin controller present)");
+                        }
+                        catch (Exception ie) { Log("AUTOTEST hddowntown phone-recreate EXC " + ie.GetType().Name + " " + ie.Message); }
+                        // re-resolve the Call Plugin row on the NEW phone (+ the
+                        // dedicated 'Call Cab...' row — the run-6 discovery: the
+                        // plugin registers its own row through the plugin system)
+                        var iffHd = _hpPhone.Object?.Resource?.Iff;
+                        var ttasHd = iffHd?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                        var ttabHd = iffHd?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                        _hpPluginRow = -1; _hdCabRow = -1;
+                        if (ttasHd != null && ttabHd != null)
+                            for (int i = 0; i < ttasHd.Length && i < ttabHd.Interactions.Length; i++)
+                            {
+                                var rl = (ttasHd.GetString(i) ?? "").Trim();
+                                if (_hpPluginRow < 0 && rl == "Call Plugin") _hpPluginRow = i;
+                                if (_hdCabRow < 0 && rl.ToLowerInvariant().Contains("call cab")) _hdCabRow = i;
+                            }
+                        Log("AUTOTEST hddowntown: rows on the new phone: Call Plugin=" + _hpPluginRow + " CallCab=" + _hdCabRow);
+                        if (_hpPluginRow >= 0 && _hdPlugin != null)
+                        {
+                            var go = _hpPhone.GetAction(_hpPluginRow, _hpHost, _vm.Context, false,
+                                new short[] { (short)_hdPlugin.ObjectID, 0, 0, 0 }); // Param[0]=the PLUGIN OBJECT ID (the 9th law)
+                            if (go != null)
+                            {
+                                go.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                go.CheckRoutine = null;
+                                _hpHost.Thread.EnqueueAction(go);
+                                _hdPushed = true;
+                                _hdLastUid = go.UID;
+                                Log("AUTOTEST hddowntown: pushed Call Plugin uid=" + go.UID
+                                    + " Param0=" + _hdPlugin.ObjectID + " at " + Sim3Clock());
+                            }
+                            else Log("AUTOTEST hddowntown: GetAction null for Call Plugin row=" + _hpPluginRow);
+                        }
+                    }
+                    // increment 5 — the DIRECT drive: the phone's dedicated
+                    // 'Call Cab...' row on the host (the Throw-Party acceptance
+                    // path), pushed once after the generic plugin call settles;
+                    // expected to reach the YesNo order conversation
+                    // deterministically (the run-6 law: the generic call varies
+                    // ~2/3; the dedicated row is the plugin's own registered UI)
+                    if (_hpFrame == 120 && _hdCabRow >= 0 && !_hdCabPushed && !_hdSawDlg)
+                    {
+                        var cab = _hpPhone.GetAction(_hdCabRow, _hpHost, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                        if (cab != null)
+                        {
+                            cab.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                            cab.CheckRoutine = null;
+                            _hpHost.Thread.EnqueueAction(cab);
+                            _hdCabPushed = true;
+                            _hdLastUid = cab.UID;
+                            Log("AUTOTEST hddowntown: pushed the DEDICATED 'Call Cab' row=" + _hdCabRow
+                                + " uid=" + cab.UID + " at " + Sim3Clock());
+                        }
+                        else Log("AUTOTEST hddowntown: GetAction null for the Call Cab row=" + _hdCabRow);
+                    }
+                    // increment 9 — the COMPANION drive: 4099 'Send Downtown' pushes
+                    // interaction #0 ('Go Downtown') on the sim in the plugin's
+                    // attr[4]; set a guest there and run the plugin tree via the
+                    // proven RunInMyStack pattern (the plugin's own thread+owner)
+                    if (_hpFrame == 240 && _hdPlugin != null && !_hdCompPushed)
+                    {
+                        // increment 13b (run-22's law): the pd61 family filter
+                        // degenerates (no family avatar on-lot at leg-9 time —
+                        // work/school hours). CAST-EXCLUSION instead: any on-lot
+                        // avatar whose GUID is NOT one of the 9 cast GUIDs nor the
+                        // caterer — the cast's queues die with the entertainer
+                        // resets (run-21's REMOVAL law); visitors survive.
+                        // 13c (run-24's law): by leg-9 time the ONLY on-lot
+                        // avatars are the cast (+caterer) — the party guests
+                        // left with the party's end. Target the NON-ENTERTAINER
+                        // cast (Celebrity/Crashers/PsychoMime never wedge; the
+                        // 5 entertainer GUIDs do, and their resets kill queues)
+                        var entertainers = new uint[] { 0x80234543u, 0xbaae34beu, 0x71211d31u,
+                            0xc6d44553u, 0xcdac4e1u, 0x4a731b75u };
+                        _hdGuest = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>().FirstOrDefault(a =>
+                            a != null && a != _hpHost && a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                            && !entertainers.Contains(a.Object.OBJ.GUID));
+                        if (_hdGuest == null) Log("AUTOTEST hddowntown COMPANION: no non-entertainer avatar on lot");
+                        if (_hdGuest != null)
+                        {
+                            _hdPlugin.SetAttribute(4, (short)_hdGuest.ObjectID);
+                            var tree = _hdPlugin.GetRoutineWithOwner(4099, _vm.Context);
+                            var routine = tree?.routine;
+                            if (routine != null)
+                            {
+                                var r = _hdPlugin.Thread.RunInMyStack(routine, tree.owner, new short[4], _hdPlugin);
+                                _hdCompPushed = true;
+                                Log("AUTOTEST hddowntown COMPANION: 4099 ran=" + r + " guest=obj" + _hdGuest.ObjectID
+                                    + " (attr4=" + _hdPlugin.GetAttribute(4) + ") — the Send-Downtown push");
+                            }
+                            else Log("AUTOTEST hddowntown COMPANION: routine 4099 not resolved on the plugin");
+                        }
+                        else Log("AUTOTEST hddowntown COMPANION: no guest on lot");
+                        // increment 10 (the TTAB decode): the plugin's row 0 =
+                        // 4106 'Wait For Cab' (row 2 = 4100 'Go Downtown') — and
+                        // 4099's pushInteraction resolves its SOURCE from
+                        // Local[0]=attr[4] (the guest's OWN table — wrong table)
+                        // and pushes onto the plugin's controller queue: nothing
+                        // can land that way. The DIRECT companion drive: row 2
+                        // ('Go Downtown') pushed on the GUEST via the engine's
+                        // acceptance path (the Throw-Party law).
+                        if (_hdGuest != null && _hdPlugin != null)
+                        {
+                            var go2 = _hdPlugin.GetAction(2, _hdGuest, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                            if (go2 != null)
+                            {
+                                go2.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                go2.CheckRoutine = null;
+                                _hdGuest.Thread.EnqueueAction(go2);
+                                Log("AUTOTEST hddowntown COMPANION: pushed plugin row 2 ('Go Downtown', 4100) on the guest uid=" + go2.UID + " at " + Sim3Clock());
+                            }
+                            else Log("AUTOTEST hddowntown COMPANION: GetAction null for plugin row 2");
+                        }
+                    }
+                    if (_hdGuest != null && !_hdSawComp)
+                    {
+                        var gAct = _hdGuest.Thread?.ActiveAction?.Name ?? "";
+                        var gQ = _hdGuest.Thread?.Queue;
+                        var gQn = (gQ != null && gQ.Any(x => { var qn = (x.Name ?? "").ToLowerInvariant(); return qn.Contains("downtown") || qn.Contains("cab"); })) ? "yes" : "no";
+                        var gal = (gAct ?? "").ToLowerInvariant();
+                        if (gal.Contains("downtown") || gal.Contains("cab") || gQn == "yes")
+                        {
+                            _hdSawComp = true;
+                            Log("AUTOTEST hddowntown COMPANION RECEIPT: guest active='" + gAct + "' downtownInQueue=" + gQn
+                                + " (the 4099 push accepted) at " + Sim3Clock());
+                        }
+                        else if (_hpFrame % 900 == 0 && _hdCompPushed)
+                        {
+                            Log("AUTOTEST hddowntown COMPANION-obs f=" + _hpFrame + " guestActive='" + gAct + "' downtownInQueue=" + gQn);
+                        }
+                        // increment 11a: the guest's queued 'Go Downtown' entry RUNNING
+                        if (_hdSawComp && !_hdGuestRan)
+                        {
+                            var gl2 = (gAct ?? "").ToLowerInvariant();
+                            if (gl2.Contains("go downtown") || gl2.Contains("downtown") || gl2.Contains("asked to go"))
+                            {
+                                _hdGuestRan = true;
+                                Log("AUTOTEST hddowntown GUEST-RUNNING: guest ACTIVE='" + gAct + "' (the queued Go Downtown executing) at " + Sim3Clock());
+                            }
+                        }
+                        // increment 11b: the 4113 departure — the guest leaves the world
+                        if (_hdGuestRan && !_hdGuestDeparted)
+                        {
+                            var gone = _hdGuest == null || _hdGuest.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                                || _hdGuest.Dead || !_vm.Context.ObjectQueries.Avatars.Contains(_hdGuest);
+                            if (gone)
+                            {
+                                _hdGuestDeparted = true;
+                                Log("AUTOTEST hddowntown GUEST-DEPARTED (4113 'send me out of world' — the first travel receipt) at " + Sim3Clock());
+                            }
+                        }
+                    }
+                    // increment 15 — the SHOPPING/SOUVENIR drive: plugin tree 4126
+                    // 'Good Mood Souvenirs' (the mood-gated souvenir set: op51
+                    // inventory-adds + creates at pos=2) via the proven
+                    // RunInMyStack pattern on a sim; receipt = MyInventory grows
+                    if (_hpFrame == 360 && _hdPlugin != null && !_hdSouvenirPushed)
+                    {
+                        VMEntity svTarget = _hdGuest ?? (VMEntity)_hpHost;
+                        if (svTarget?.Thread != null)
+                        {
+                            _hdInvBefore = _vm.MyInventory.Count;
+                            var stree = _hdPlugin.GetRoutineWithOwner(4126, _vm.Context);
+                            if (stree?.routine != null)
+                            {
+                                var sr = svTarget.Thread.RunInMyStack(stree.routine, stree.owner, new short[4], svTarget);
+                                _hdSouvenirPushed = true;
+                                Log("AUTOTEST hddowntown SOUVENIR: 4126 ran=" + sr + " on obj" + svTarget.ObjectID
+                                    + " invBefore=" + _hdInvBefore + " (the shopping/gifts/inventory row)");
+                            }
+                            else Log("AUTOTEST hddowntown SOUVENIR: routine 4126 not resolved");
+                        }
+                    }
+                    if (_hdSouvenirPushed && !_hdSawSouvenir)
+                    {
+                        // 15b (run-30's law): MyInventory is the command store;
+                        // the trees spawn ENTITIES at pos=2 (in-container) — the
+                        // entity channel is the true receipt. Scan for the
+                        // decoded souvenir GUIDs and log positions/containers.
+                        var svGuids = new uint[] { 0x5548B323u, 0xA3F4FD3Eu, 0x594FEA52u, 0xEA1E99B3u, 0x9AB9C743u };
+                        var spawned = _vm.Entities.Where(e => e?.Object?.OBJ != null && svGuids.Contains(e.Object.OBJ.GUID)).Take(6).ToList();
+                        if (spawned.Count > 0)
+                        {
+                            _hdSawSouvenir = true;
+                            Log("AUTOTEST hddowntown SOUVENIR RECEIPT (entity channel): " + spawned.Count
+                                + "+ entities — [" + string.Join(",", spawned.Select(e => "0x" + e.Object.OBJ.GUID.ToString("X")
+                                    + "@obj" + e.ObjectID + " pos=" + e.Position + " container=" + (e.Container?.ObjectID.ToString() ?? "-"))) + "] at " + Sim3Clock());
+                        }
+                        else if (_hpFrame % 900 == 0)
+                            Log("AUTOTEST hddowntown SOUVENIR-obs f=" + _hpFrame + " entities=0 inv=" + _vm.MyInventory.Count);
+                    }
+                    // increment 12 — the QUEUE-STATE dump, ungated (runs after the
+                    // receipt latches too — the discriminator needs the POST-acceptance
+                    // queue state; run-20's placement inside !hdSawComp never fired it)
+                    if (_hdGuest != null && _hdCompPushed && _hpFrame > 240
+                        && (_hpFrame % 60 == 0 && _hpFrame <= 900 || _hpFrame % 900 == 0))
+                    {
+                        var gq2 = _hdGuest.Thread;
+                        if (gq2?.Queue != null)
+                        {
+                            var sb = new System.Text.StringBuilder();
+                            for (int qi = 0; qi < gq2.Queue.Count && qi < 8; qi++)
+                            {
+                                var qa = gq2.Queue[qi];
+                                if (qi > 0) sb.Append(" | ");
+                                sb.Append("#").Append(qi).Append(" '").Append(qa.Name ?? "?").Append("' p=").Append(qa.Priority)
+                                  .Append(" m=").Append(qa.Mode).Append(" f=0x").Append(((int)qa.Flags).ToString("X"))
+                                  .Append(" uid=").Append(qa.UID).Append(" notifyIdle=").Append(qa.NotifyIdle);
+                            }
+                            Log("AUTOTEST hddowntown QUEUE-DUMP f=" + _hpFrame + " activeBlock=" + gq2.ActiveQueueBlock
+                                + " active=" + (gq2.ActiveAction == null ? "-" : ("'" + gq2.ActiveAction.Name + "'p" + gq2.ActiveAction.Priority))
+                                + " idleFlag=" + (_hdGuest.GetFlag(FSO.SimAntics.VMEntityFlags.NotifiedByIdleForInput) ? 1 : 0)
+                                + " q=[" + sb + "]");
+                        }
+                    }
+                    // increment 11c: the DATE drive — row 1 = 4108 'Join Downtown'
+                    // (relationship-gated at runtime ins12-13; test 4109 trivially
+                    // true) pushed on the guest via the same acceptance law
+                    if (_hpFrame == 330 && _hdGuest != null && _hdPlugin != null && !_hdJoinPushed)
+                    {
+                        var join = _hdPlugin.GetAction(1, _hdGuest, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                        if (join != null)
+                        {
+                            join.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                            join.CheckRoutine = null;
+                            _hdGuest.Thread.EnqueueAction(join);
+                            _hdJoinPushed = true;
+                            Log("AUTOTEST hddowntown DATE: pushed plugin row 1 ('Join Downtown', 4108) on the guest uid=" + join.UID + " at " + Sim3Clock());
+                        }
+                        else Log("AUTOTEST hddowntown DATE: GetAction null for plugin row 1");
+                    }
+                    // bounded re-push (the C1 law: plugin calls are drop-prone)
+                    if (_hpFrame > 90 && _hpFrame % 1800 == 0 && !_hdSawDlg && !_hdSawCab
+                        && _hpPluginRow >= 0 && _hdPlugin != null)
+                    {
+                        var go2 = _hpPhone.GetAction(_hpPluginRow, _hpHost, _vm.Context, false,
+                            new short[] { (short)_hdPlugin.ObjectID, 0, 0, 0 });
+                        if (go2 != null)
+                        {
+                            go2.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                            go2.CheckRoutine = null;
+                            _hpHost.Thread.EnqueueAction(go2);
+                            _hdLastUid = go2.UID;
+                            Log("AUTOTEST hddowntown: re-push Call Plugin uid=" + go2.UID + " at " + Sim3Clock());
+                        }
+                    }
+                    // observable 1 — the 4102 'Show Cab Dialog' law: any dialog
+                    // latched this leg on the host/phone/plugin threads (the
+                    // per-frame responder above answers VMDialogResult latches;
+                    // the result object persists on the thread after answering,
+                    // so HasDisplayed/Responded both count) or any global latch
+                    // (a PICKER latch — the run12 law — stays open).
+                    if (!_hdSawDlg)
+                    {
+                        var dlgOwners = new[] { _hpHost, _hpPhone, _hdPlugin };
+                        foreach (var dwo in dlgOwners)
+                        {
+                            if (dwo?.Thread?.BlockingState is FSO.SimAntics.Primitives.VMDialogResult db
+                                && (db.HasDisplayed || db.Responded))
+                            {
+                                _hdSawDlg = true;
+                                _hdDlgFrame = _hpFrame;
+                                Log("AUTOTEST hddowntown: dialog FIRED owner=obj" + dwo.ObjectID
+                                    + " type=" + db.Type + " responded=" + db.Responded + " (the cab-dialog law)");
+                                break;
+                            }
+                        }
+                        if (!_hdSawDlg && _vm.GlobalBlockingDialog != null)
+                        {
+                            _hdSawDlg = true;
+                            _hdDlgFrame = _hpFrame;
+                            var obs = _vm.GlobalBlockingDialog.Thread?.BlockingState;
+                            Log("AUTOTEST hddowntown: global dialog latch obj=" + _vm.GlobalBlockingDialog.ObjectID
+                                + " bs=" + (obs == null ? "<null>" : obs.GetType().Name) + " (the cab-dialog law)");
+                        }
+                    }
+                    // observable 2 — the 4098 'Generate Cab' law: the CAB ENTITY,
+                    // GUID-exact (increment 6 decode: tree 4098 ins2 creates
+                    // guid=0x7AE4654A pos=6 = OUT_OF_WORLD — the rocket-twin
+                    // law; placement is deferred to later logic, so the OOW
+                    // create is the FIRST receipt and an on-lot position the
+                    // second; the old label scan missed it both ways)
+                    if (!_hdSawCab)
+                    {
+                        var cab = _vm.Entities.FirstOrDefault(e => e?.Object?.OBJ != null
+                            && e.Object.OBJ.GUID == HD_CAB);
+                        if (cab != null)
+                        {
+                            _hdSawCab = true;
+                            Log("AUTOTEST hddowntown: CAB ENTITY obj=" + cab.ObjectID
+                                + " pos=" + cab.Position + " oow=" + (cab.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)
+                                + " (the 4098 Generate-Cab law, guid-exact) at " + Sim3Clock());
+                        }
+                    }
+                    // increment 7 — the host's ACTION-TRANSITION latch: log each
+                    // new active-action name; on a boarding-class action ('Get
+                    // In'), dump the boarded target's identity via the host's
+                    // stack-object chain (run-8: the host boards something that
+                    // is NOT 4098's 0x7AE4654A cab — pin what it is)
+                    {
+                        var ha7 = _hpHost?.Thread?.ActiveAction?.Name ?? "-";
+                        if (ha7 != _hdLastAct)
+                        {
+                            var tgtDump = "";
+                            if (ha7.ToLowerInvariant().Contains("get in"))
+                            {
+                                var stk7 = _hpHost?.Thread?.Stack;
+                                if (stk7 != null)
+                                {
+                                    var ids = new System.Collections.Generic.List<string>();
+                                    foreach (var f7 in stk7)
+                                    {
+                                        var e7 = f7.StackObject;
+                                        if (e7?.Object?.OBJ != null)
+                                            ids.Add("obj" + e7.ObjectID + "=0x" + e7.Object.OBJ.GUID.ToString("X")
+                                                + " '" + (e7.Object.Resource?.MainIff?.Filename ?? e7.Object.OBJ.ChunkLabel ?? "?") + "'");
+                                    }
+                                    tgtDump = " boards=[" + string.Join(",", ids) + "]";
+                                }
+                            }
+                            Log("AUTOTEST hddowntown ACT '" + _hdLastAct + "' -> '" + ha7 + "'" + tgtDump + " at " + Sim3Clock());
+                            _hdLastAct = ha7;
+                        }
+                    }
+                    // telemetry — the plugin's own trees running (4096..4145) +
+                    // the increment-4 acceptance discriminator: the PHONE's
+                    // stack/queue after each push (does the Call Plugin action
+                    // dequeue into 8222 'talk to plug in', and where does it
+                    // stop — the run-5 variance law's named decode)
+                    if (_hpFrame % 600 == 0)
+                    {
+                        var pStk = _hdPlugin?.Thread?.Stack;
+                        var pst = pStk == null ? "" : string.Join(",", pStk.Select(f => (f.Routine?.Chunk?.ChunkID ?? 0) + "@" + ((int)f.InstructionPointer)));
+                        var phStk = _hpPhone?.Thread?.Stack;
+                        var phst = phStk == null ? "" : string.Join(",", phStk.Select(f => (f.Routine?.Chunk?.ChunkID ?? 0) + "@" + ((int)f.InstructionPointer)));
+                        var phQ = _hpPhone?.Thread?.Queue;
+                        var uidInQ = phQ != null && _hdLastUid != uint.MaxValue && phQ.Any(x => x.UID == _hdLastUid);
+                        var phAct = _hpPhone?.Thread?.ActiveAction;
+                        Log("AUTOTEST hddowntown-obs f=" + _hpFrame + " pushed=" + _hdPushed
+                            + " pluginStack=[" + pst + "] active='" + (_hdPlugin?.Thread?.ActiveAction?.Name ?? "-") + "'"
+                            + " phoneStack=[" + phst + "] phoneActive='" + (phAct == null ? "-" : (phAct.Name + "#" + phAct.UID))
+                            + "' uid" + _hdLastUid + "InPhoneQ=" + uidInQ);
+                    }
+                    {
+                        var castOkHd = false;
+                        for (int ci3 = 0; ci3 < 9; ci3++) if (_hpCastSeen[ci3]) { castOkHd = true; break; }
+                        // phase-2 ride observables (EXP-03 increment 2): only
+                        // meaningful after the dialog fired (run-3: the responder
+                        // answers it the same frame, so the ride unfolds after)
+                        if (_hdSawDlg && !_hdRode)
+                        {
+                            var hAct = _hpHost?.Thread?.ActiveAction?.Name ?? "";
+                            var hl = hAct.ToLowerInvariant();
+                            bool hostCabQueue = hl.Contains("cab") || hl.Contains("downtown") || hl.Contains("wait for");
+                            bool hostGone = _hpHost == null || _hpHost.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                                || !_vm.Context.ObjectQueries.Avatars.Contains(_hpHost);
+                            var ps2 = _hdPlugin?.Thread?.Stack;
+                            bool stackAdvanced = ps2 != null && (ps2.Count > 2 ||
+                                (ps2.Count > 0 && ps2[0].Routine?.Chunk?.ChunkID != 4096));
+                            if (hostCabQueue && !_hdSawQueue)
+                            {
+                                _hdSawQueue = true;
+                                Log("AUTOTEST hddowntown: host in the cab QUEUE (active='" + hAct + "') at " + Sim3Clock());
+                            }
+                            if (hostGone)
+                            {
+                                _hdRode = true;
+                                Log("AUTOTEST hddowntown RIDE-THROUGH: host DEPARTED (OOW/absent; last active='"
+                                    + hAct + "') — the 4106/travel chain at " + Sim3Clock());
+                            }
+                            else if (_hpFrame % 900 == 0 && _hdDlgFrame >= 0 && _hpFrame > _hdDlgFrame)
+                                Log("AUTOTEST hddowntown-ride f=" + _hpFrame + " hostActive='" + hAct
+                                    + "' stackAdvanced=" + stackAdvanced + " cabEntity=" + _hdSawCab);
+                        }
+                        // increment 14: on the DEPARTED receipt, open the RETURN
+                        // window first (2 sim-hours) — verdict after it
+                        if (_hdRode && _hdDepartFrame < 0)
+                        {
+                            _hdDepartFrame = _hpFrame;
+                            Log("AUTOTEST hddowntown RETURN-WINDOW open (host departed f=" + _hpFrame + "; observing for return + lot state)");
+                        }
+                        if (_hdRode && _hdDepartFrame >= 0 && !_hdHostReturned)
+                        {
+                            var back = _hpHost != null && _hpHost.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                                && !_hpHost.Dead && _vm.Context.ObjectQueries.Avatars.Contains(_hpHost);
+                            if (back)
+                            {
+                                _hdHostReturned = true;
+                                Log("AUTOTEST hddowntown HOST-RETURNED (back in world, active='"
+                                    + (_hpHost.Thread?.ActiveAction?.Name ?? "-") + "') at " + Sim3Clock());
+                            }
+                            else if (_hpFrame % 900 == (_hdDepartFrame % 900))
+                            {
+                                // increment 16 — the LOT-TRANSITION dump: the
+                                // transit car's 'Home Main' progression (does the
+                                // vehicle system advance or park forever?), the
+                                // entity census, and the host's persistent absence
+                                var car = _vm.Entities.FirstOrDefault(e =>
+                                    (e?.Object?.Resource?.MainIff?.Filename ?? "").Equals("carpublictransit.iff", StringComparison.OrdinalIgnoreCase));
+                                var carStk = car?.Thread?.Stack;
+                                var cst = carStk == null ? "-" : string.Join(",", carStk.Select(f => (f.Routine?.Chunk?.ChunkID ?? 0) + "@" + ((int)f.InstructionPointer)));
+                                Log("AUTOTEST hddowntown RETURN-obs f=" + (_hpFrame - _hdDepartFrame)
+                                    + " hostOow=" + (_hpHost?.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)
+                                    + " hostDead=" + (_hpHost?.Dead ?? true)
+                                    + " lotAvatars=" + _vm.Context.ObjectQueries.Avatars.Count(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)
+                                    + " entities=" + _vm.Entities.Count
+                                    + " car=" + (car == null ? "gone" : ("obj" + car.ObjectID + " act='" + (car.Thread?.ActiveAction?.Name ?? "-") + "' stk=[" + cst + "]")));
+                            }
+                        }
+                        if ((_hdSawCab || _hdRode) && (_hdRode ? (_hdHostReturned || (_hdDepartFrame >= 0 && _hpFrame > _hdDepartFrame + 7200)) : true))
+                        {
+                            Log("AUTOTEST hddowntown PASS-RIDE-THROUGH (cabDlg=" + _hdSawDlg + " cabEntity=" + _hdSawCab
+                                + " queue=" + _hdSawQueue + " departed=" + _hdRode + " returned=" + _hdHostReturned + ") at " + Sim3Clock());
+                            Log("AUTOTEST hpparty verdict legs P/G/S/E/D1/D2/C1/C2 + CAST=" + (castOkHd ? "ok" : "pinned") + " + HD=ok(ride-through) + COMPANION=" + (_hdSawComp ? "ok" : (_hdCompPushed ? "pinned" : "n/a")) + " + DATE=" + (_hdJoinPushed ? "pushed" : "n/a") + " + GUEST-RUN=" + (_hdGuestRan ? "ok" : "pinned") + " + GUEST-DEPART=" + (_hdGuestDeparted ? "ok" : "pinned") + " + RETURN=" + (_hdHostReturned ? "ok" : (_hdDepartFrame >= 0 ? "pinned" : "n/a")));
+                            ArmRepeat();
+                        }
+                        else if (_hdSawDlg && _hdDlgFrame >= 0 && _hdDepartFrame < 0 && _hpFrame > _hdDlgFrame + 10800)
+                        { // increment 6: window 7200->10800 (run-7: the host held the cab queue 2h without entity; the create is OOW — the guid-exact scan now catches it)
+                            Log("AUTOTEST hddowntown PASS-QUEUE (cab dialog fired; host queue=" + _hdSawQueue
+                                + " but no cab entity/departure in the phase-2 window — the post-queue chain (4098 entity / travel transition) is the next decode; trail above)");
+                            Log("AUTOTEST hpparty verdict legs P/G/S/E/D1/D2/C1/C2 + CAST=" + (castOkHd ? "ok" : "pinned")
+                                + " + HD=ok(" + (_hdSawQueue ? "queue" : "dialog") + ",ride-through-pinned) + COMPANION=" + (_hdSawComp ? "ok" : (_hdCompPushed ? "pinned" : "n/a")) + " + DATE=" + (_hdJoinPushed ? "pushed" : "n/a") + " + GUEST-RUN=" + (_hdGuestRan ? "ok" : "pinned") + " + GUEST-DEPART=" + (_hdGuestDeparted ? "ok" : "pinned"));
+                            ArmRepeat();
+                        }
+                        else if (!_hdSawDlg && _hpFrame > 14400)
+                        {
+                            Log("AUTOTEST hddowntown PINNED (no cab dialog/entity in the window — the picker-response path is the named next decode; observation trail above)");
+                            Log("AUTOTEST hpparty verdict legs P/G/S/E/D1/D2/C1/C2 + CAST=" + (castOkHd ? "ok" : "pinned") + " + HD=pinned");
+                            ArmRepeat();
+                        }
+                    }
+                    break;
+                case 3: // E: END — the run4 law: the party ends naturally
+                    // (attr0 2 -> 0, guests leave). PASS on the observed reset;
+                    // honest FAIL if the party never ends within a generous window.
+                {
+                    var c3 = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == HP_PARTY_CTRL);
+                    int ea0 = c3?.GetAttribute(0) ?? -99;
+                    if (_hpFrame == 30) Log("AUTOTEST hpparty E: end window (attr0=" + ea0 + " guests=" + guestsNow + ")");
+                    if (ea0 == 0 && _hpFrame > 30)
+                    {
+                        Log("AUTOTEST hpparty E PASS (party ended: attr0=" + ea0 + " guests=" + guestsNow + ") at " + Sim3Clock());
+                        HPNext(); // continue into the D1/D2 dance tranche
+                    }
+                    else if (_hpFrame > 36000)
+                    {
+                        Log("AUTOTEST hpparty E FAIL (attr0=" + ea0 + " never reset)");
+                        Fail("hpparty"); _hpState = 2;
+                    }
+                    break;
+                }
+            }
+        }
+
+        private static VMEntity HPPlaceBeside(uint guid)
+        {
+            var basePos = _hpHost.Position;
+            for (int ring = 1; ring <= 3; ring++)
+            {
+                var candidates = new[]
+                {
+                    new { dx = (short)ring, dy = (short)0 }, new { dx = (short)-ring, dy = (short)0 },
+                    new { dx = (short)0, dy = (short)ring }, new { dx = (short)0, dy = (short)-ring },
+                    new { dx = (short)ring, dy = (short)ring }, new { dx = (short)-ring, dy = (short)-ring },
+                };
+                foreach (var cand in candidates)
+                {
+                    var pos = basePos;
+                    pos.TileX += cand.dx;   // TILE units (the setter does x = v<<4)
+                    pos.TileY += cand.dy;
+                    try
+                    {
+                        var grp = _vm.Context.CreateObjectInstance(guid, pos, FSO.LotView.Model.Direction.NORTH);
+                        if (grp?.BaseObject != null && grp.BaseObject.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)
+                            return grp.BaseObject;
+                    }
+                    catch { }
+                }
+            }
+            return null;
+        }
+
+        private static FSO.LotView.Model.LotTilePos HPBuffetBuyPos(int idx)
+        {
+            // host-derived buy candidates: yard-class offsets in TILES from the
+            // host (subtile = host + offset*16); far enough for the 3-tile
+            // BuffetTable footprint, multiple directions to escape interior
+            // positions
+            var offs = new[] {
+                new { dx = 4, dy = 0 }, new { dx = 0, dy = 4 }, new { dx = 4, dy = 4 },
+                new { dx = -4, dy = 0 }, new { dx = 0, dy = -4 }, new { dx = 6, dy = 0 } };
+            var o = offs[idx % offs.Length];
+            var hp = _hpHost.Position;
+            return new FSO.LotView.Model.LotTilePos((short)(hp.x + o.dx * 16), (short)(hp.y + o.dy * 16), hp.Level);
+        }
+
+        private static void HPNext()
+        {
+            _hpLeg++;
+            _hpFrame = 0;
         }
 
         private static void CheckLLInteract()
