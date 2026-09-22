@@ -85,6 +85,36 @@ namespace FSO.SimAntics.Engine
 
         public static readonly int MAX_LOOP_COUNT = 500000;
 
+        // EXP-06 (declared in coordination/tasks/EXP-06.md before this edit):
+        // per-instruction trace sink for the autotest, ported from the EXP-04
+        // ITRACE / EXP-05 V4.4 sink precedent (hddowntown fork-engine pattern).
+        // While the autotest holds AutotestInstrTraceBudget > 0, every executed
+        // instruction on a stack containing routine 4100 is emitted through the
+        // injected sink, naming the pickup machine's executed cycle directly (the
+        // ss-book leg-4 diagnostic: the machine polls at 4100@2 with temp0 banked
+        // and the departure tokens unread — the trace names which branch cycles).
+        // Inert when the sink is null and the budget is 0 — normal play and every
+        // other check never touch either. Read-only: no REWRITE capability.
+        public static Action<string> AutotestTraceSink;
+        public static int AutotestInstrTraceBudget;
+
+        private void AutotestSSInstructionTrace()
+        {
+            if (AutotestTraceSink == null || AutotestInstrTraceBudget <= 0 || Stack.Count == 0) return;
+            var tf = Stack[Stack.Count - 1];
+            var tid = tf.Routine?.Chunk?.ChunkID ?? 0;
+            if (tid != 4100 && !Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4100)) return;
+            var tins = tf.Routine?.Instructions;
+            var tci = (tins != null && tf.InstructionPointer >= 0 && tf.InstructionPointer < tins.Length)
+                ? tins[tf.InstructionPointer] : null;
+            if (tci == null) return;
+            AutotestInstrTraceBudget--;
+            AutotestTraceSink("[SS-ITRACE] ent=" + Entity.ObjectID + " d=" + (Stack.Count - 1)
+                + " tick=" + Context.VM.Scheduler.CurrentTickID
+                + " " + tid + "@" + tf.InstructionPointer
+                + " op=" + tci.Opcode + " t=" + tci.TruePointer + " f=" + tci.FalsePointer);
+        }
+
         // WEDGE-1 (EntertainerFemale decode, 2026-09-19): native TS1 time-slices
         // thread execution per tick; the port runs a thread to its next yield with
         // only the MAX_LOOP_COUNT kill. Content that legitimately cycles on
@@ -290,6 +320,7 @@ namespace FSO.SimAntics.Engine
                         ForcedYieldStreak = 0;
                         throw new Exception("Thread entered infinite loop! (forced-yield streak)!");
                     }
+                    AutotestSSInstructionTrace();
                     ContinueExecution = false;
                     NextInstruction();
                 }
@@ -495,6 +526,7 @@ namespace FSO.SimAntics.Engine
                                 ForcedYieldStreak = 0;
                                 throw new Exception("Thread entered infinite loop! (forced-yield streak)!");
                             }
+                            AutotestSSInstructionTrace();
                             ContinueExecution = false;
                             NextInstruction();
                         }
