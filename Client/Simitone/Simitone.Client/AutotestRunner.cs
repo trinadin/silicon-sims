@@ -3496,7 +3496,7 @@ namespace Simitone.Client
                     var spotEnts = new List<VMEntity>();
                     foreach (var kv in objdByGuid)
                     {
-                        if (spotsPlaced >= 3) break;
+                        if (spotsPlaced >= 6) break;
                         var od = kv.Value;
                         if (od.CatalogStringsID < 600) continue;
                         if (od.MasterID != 0 || od.SubIndex != -1) continue;
@@ -3541,10 +3541,21 @@ namespace Simitone.Client
                     {
                         var was = sp.GetValue(VMStackObjectVariable.DirtyLevel);
                         sp.SetValue(VMStackObjectVariable.DirtyLevel, 1000);
+                        // run-15: the create branch (4106@5 op=42) requires the
+                        // controller->spot relationship entry to EXIST with value 0
+                        // (@13 read GOTO_FALSE when missing -> @15 writes 1 -> walk
+                        // continues with no create; native saves persist this
+                        // matrix, a probe-created controller has none). Pre-create
+                        // zeroed lists — Count must exceed RelVar(4) for the
+                        // FailIfTooSmall read to pass.
+                        if (_unlmCtr.MeToObject == null)
+                            _unlmCtr.MeToObject = new Dictionary<ushort, List<short>>();
+                        _unlmCtr.MeToObject[(ushort)sp.ObjectID] = new List<short> { 0, 0, 0, 0, 0 };
                         Log("AUTOTEST unl-mice SPOT-DIRTY oid=" + sp.ObjectID
                             + " DirtyLevel " + was + " -> " + sp.GetValue(VMStackObjectVariable.DirtyLevel)
                             + " guid=0x" + sp.Object.GUID.ToString("X")
-                            + " reject-list-miss=" + (!rejectGuids.Contains((uint)sp.Object.GUID)));
+                            + " reject-list-miss=" + (!rejectGuids.Contains((uint)sp.Object.GUID))
+                            + " rel0=armed");
                     }
                     Log("AUTOTEST unl-mice SPOT-PLACED n=" + spotsPlaced + spotLog.ToString());
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
