@@ -2511,6 +2511,7 @@ namespace Simitone.Client
         private static short _unlsHostNid = -1;
         private static VMEntity _unlsCtr;
         private static VMEntity _unlsArena;
+        private static VMEntity _unlsJudgeEnt;
         private static bool _unlsArenaInjected;
         private static string _unlsInv0 = "";
         private static int _unlsEnts0;
@@ -2688,6 +2689,40 @@ namespace Simitone.Client
                             }
                             else Log("AUTOTEST unl-show arena CREATE-FAIL guid=0x389d3502 (not in catalog?)");
                         }
+                        // run-18: main @16 creates the judge 0x0c814494 OutOfWorld and
+                        // @17 FindLocationFor leaves it unplaced (run 17: no judge entity
+                        // ever appears). The pushed 4098 'Activate Head Judge' routes to
+                        // StackObject's routing slot 8 (VMGotoRoutingSlot: InitRoutes(
+                        // slot, context.StackObject)) — with the controller as push
+                        // target that slot is unroutable and NoFailureTrees tears the
+                        // interaction down silently. Pre-create the judge in-world and
+                        // push row 0 on IT: the judge shares the controller's semiglobal
+                        // (same tree 4098) but owns a real podium routing slot.
+                        if (_vm.Entities.All(e => e.Object == null || e.Object.GUID != 0x0c814494u))
+                        {
+                            VMMultitileGroup judgeGrp = null;
+                            foreach (var off in new[] { 32, -32, 48, -48, 64, -64, 80, -80 })
+                            {
+                                var cand = new FSO.LotView.Model.LotTilePos(
+                                    (short)(_unlsCtr.Position.x + off), (short)(_unlsCtr.Position.y + 16),
+                                    _unlsCtr.Position.Level);
+                                judgeGrp = _vm.Context.CreateObjectInstance(0x0c814494u, cand,
+                                    FSO.LotView.Model.Direction.NORTH);
+                                if (judgeGrp != null && judgeGrp.Objects != null && judgeGrp.Objects.Count > 0) break;
+                                judgeGrp = null;
+                            }
+                            var judge = judgeGrp?.Objects?.FirstOrDefault();
+                            if (judge != null)
+                            {
+                                Log("AUTOTEST unl-show judge oid=" + judge.ObjectID
+                                    + " reqGuid=0x" + judge.Object.GUID.ToString("x8")
+                                    + " objdGuid=0x" + judge.Object.OBJ.GUID.ToString("x8")
+                                    + " pos=" + judge.Position.x + "," + judge.Position.y + "lv" + judge.Position.Level
+                                    + " idx=" + (_vm.Context.ObjectQueries.GetObjectsByGUID(0x0c814494u)?.Count ?? -1));
+                                _unlsJudgeEnt = judge;
+                            }
+                            else Log("AUTOTEST unl-show judge CREATE-FAIL guid=0x0c814494 (not in catalog?)");
+                        }
                         // script-surface dump: BHAV labels + every TTAs table (the
                         // interaction string sets — phone precedent used TTAs 129)
                         var iff = _unlsCtr.Object.Resource.Iff;
@@ -2714,7 +2749,7 @@ namespace Simitone.Client
                             try
                             {
                                 var res = _unlsCtr.Object.Resource;
-                                foreach (var tid in new ushort[] { 4096, 4098, 4099, 4100, 4102, 4103, 4108 })
+                                foreach (var tid in new ushort[] { 4096, 4098, 4099, 4100, 4102, 4103, 4104, 4105, 4108 })
                                 {
                                     var rt = res?.GetRoutine(tid) as VMRoutine;
                                     if (rt == null) { Log("AUTOTEST unl-show DISASM " + tid + " MISSING"); continue; }
@@ -2889,7 +2924,7 @@ namespace Simitone.Client
                                 Log("AUTOTEST unl-show ENT-NEW f=" + _unlsFrame + " guid=0x" + g.ToString("x8")
                                     + " oid=" + (ne?.ObjectID ?? -1) + " avatar=" + (ne is VMAvatar)
                                     + " name=" + (catIt.HasValue ? catIt.Value.Name : "?")
-                                    + (g == UnlShowJudgeGuid ? " *** JUDGE GUID ***" : ""));
+                                    + (g == UnlShowJudgeGuid || g == 0x0c814494u ? " *** JUDGE GUID ***" : ""));
                             }
                         }
                         var ents = _vm.Entities.Count;
@@ -2931,16 +2966,28 @@ namespace Simitone.Client
                             }
                         }
                         var ctrQ = _vm.Context.ObjectQueries.GetObjectsByGUID(UnlShowCtrGuid);
+                        var judgeQ = _vm.Context.ObjectQueries.GetObjectsByGUID(0x0c814494u);
                         var inv = Content.Get().Neighborhood.GetInventoryByNID(_unlsHostNid);
                         var invN = inv == null ? "none"
                             : string.Join(",", inv.Select(x => x.Type + "/" + x.GUID.ToString("x8") + ":" + x.Count));
+                        // run-18: entry/prize tokens land in PET inventories, not the
+                        // host's — dump those too.
+                        var petInv = "";
+                        foreach (var pe in avatars.Where(x => UnlTravelPetGuids.Contains(x.Object.OBJ.GUID)))
+                        {
+                            var pinv = Content.Get().Neighborhood.GetInventoryByNID(
+                                pe.GetPersonData(VMPersonDataVariable.NeighborId));
+                            petInv += " p" + pe.ObjectID + "=[" + (pinv == null ? "none"
+                                : string.Join(",", pinv.Select(x => x.Type + "/" + x.GUID.ToString("x8") + ":" + x.Count))) + "]";
+                        }
                         Log("AUTOTEST unl-show watch f=" + _unlsFrame + " ents=" + ents + "/" + _unlsEnts0
                             + " judge=" + (_unlsJudgeSeen ? "SEEN" : "-")
                             + " arenaQ=" + (arenaQ == null ? -1 : arenaQ.Count)
                             + " ctrQ=" + (ctrQ == null ? -1 : ctrQ.Count)
+                            + " judgeQ=" + (judgeQ == null ? -1 : judgeQ.Count)
                             + " trees=[" + string.Join(",", _unlsTreesRun) + "]"
                             + " ctrAlive=" + (_unlsCtr != null && _vm.Entities.Contains(_unlsCtr))
-                            + " inv=[" + invN + "] clock=" + Sim3Clock());
+                            + " inv=[" + invN + "]" + petInv + " clock=" + Sim3Clock());
                     }
                     bool attrTrans = _unlsAttrSeen.Values.Any(v => v.Count >= 2);
                     bool ctrAlive = _unlsCtr != null && _vm.Entities.Contains(_unlsCtr);
@@ -2951,7 +2998,7 @@ namespace Simitone.Client
                     {
                         var host2 = avatars.FirstOrDefault(a =>
                             a.GetPersonData(VMPersonDataVariable.NeighborId) == _unlsHostNid);
-                        if (host2 != null) { _unlsPushJudge = true; UnlShowPush(host2, _unlsRowJudge, "followup-judge"); }
+                        if (host2 != null) { _unlsPushJudge = true; UnlShowPush(host2, _unlsRowJudge, "followup-judge", _unlsJudgeEnt); }
                     }
                     if (_unlsFrame == 600 && !attrTrans && !_unlsPushPet && _unlsRowShow >= 0)
                     {
@@ -3043,10 +3090,13 @@ namespace Simitone.Client
         // rejects pet actors on non-pet rows). Mirror the engine's own ExecuteAction
         // (VMThread.cs:1205): person Priority = action priority, ToStackFrame,
         // SpecialResult=Interaction, Push — skipping queue and test entirely.
-        private static void UnlShowPush(VMAvatar actor, short row, string tag)
+        private static void UnlShowPush(VMAvatar actor, short row, string tag, VMEntity target = null)
         {
             if (_unlsCtr == null || actor == null) { Log("AUTOTEST unl-show PUSH-" + tag + " skipped (no ctr/actor)"); return; }
-            var act = _unlsCtr.GetAction(row, actor, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+            // run-18: optional push target — 4098 routes to StackObject's routing
+            // slot, so the judge podium (not the controller marker) must carry it.
+            var tgt = target ?? _unlsCtr;
+            var act = tgt.GetAction(row, actor, _vm.Context, false, new short[] { 0, 0, 0, 0 });
             if (act == null) { Log("AUTOTEST unl-show PUSH-" + tag + " GetAction null row=" + row); return; }
             // Run-6 law: a directly pushed frame lands on the stack ABOVE the brain's
             // suspended IdleForInput primitive, which owns the control point — the frame
@@ -3063,7 +3113,8 @@ namespace Simitone.Client
             act.Priority = (short)VMQueuePriority.Maximum;
             actor.Thread.EnqueueAction(act);
             Log("AUTOTEST unl-show PUSH-" + tag + " row=" + row + " actor=0x"
-                + actor.Object.OBJ.GUID.ToString("x8") + " enqueued pri=" + act.Priority
+                + actor.Object.OBJ.GUID.ToString("x8") + " target=0x"
+                + tgt.Object.OBJ.GUID.ToString("x8") + " enqueued pri=" + act.Priority
                 + " actorPri=" + actor.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.Priority)
                 + " at " + Sim3Clock());
         }
