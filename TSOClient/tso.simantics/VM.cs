@@ -383,6 +383,8 @@ namespace FSO.SimAntics
                 LastFrameSpeed = SpeedMultiplier;
             }
 
+            AutotestPumpUpdates++;
+            AutotestPumpLastSpeed = SpeedMultiplier;
             var mul = Math.Max(SpeedMultiplier, 1);
             var oldFrame = (GameTickNum * 30 * mul) / GameTickRate;
             GameTickNum++;
@@ -450,6 +452,7 @@ namespace FSO.SimAntics
 
         public void Tick()
         {
+            AutotestPumpTicks++;
             if (FSOVAsyncLoading) return;
             if (BHAVDirty)
             {
@@ -878,6 +881,15 @@ namespace FSO.SimAntics
         public bool FSOVClientJoin;
         public int FSOVObjLoaded;
         public int FSOVObjTotal;
+
+        // EXP-06 (declared in coordination/tasks/EXP-06.md before this edit):
+        // pump observability counters for the ss-book leg-4 stall bisect (the
+        // EXP-04 V4.1 AutotestTickCalls precedent). Written unconditionally on
+        // every Update/Tick; read only by the autotest. Plain int increments —
+        // inert for normal play.
+        public static int AutotestPumpUpdates;
+        public static int AutotestPumpTicks;
+        public static int AutotestPumpLastSpeed;
 
         public void Load(VMMarshal input)
         {
