@@ -35,8 +35,10 @@ namespace Simitone.Client
         /// avatar0, render world PreDraw+Draw offscreen with the component's
         /// CensorshipFlags forced 0 then 3) — the diff must be a dense block.
         /// Leg B (ladder): horizontal run structure of the mosaic must match
-        /// the native zoom cell ladder (1,3)/(2,6)/(4,12) scaled to the
-        /// surface — and NOT the old rectW/8 grid (color-change rate).
+        /// the native zoom cell ladder (z, 3z), z ∈ {1,2,4}, in LITERAL
+        /// DEVICE PIXELS (fresh RenderCensoredBlocks decode: the native body
+        /// normalizes by no viewport/design width) — and NOT the old rectW/8
+        /// grid (color-change rate).
         /// Leg C (mean law): the mosaic rect is recovered from the diff and
         /// each cell's ON color must equal CensorCellColor over the OFF
         /// frame's underlying pixels with the exact seed mix (drift between
@@ -97,12 +99,13 @@ namespace Simitone.Client
                             bounds &= Math.Abs(got.R - mr / 4) <= 8 && Math.Abs(got.G - mg / 4) <= 8 && Math.Abs(got.B - mb / 4) <= 8;
                         }
                 }
-                // ladder + tier
-                bool ladder = Avatar.CensorCellSize(Avatar.CENSOR_FAR, 1f) == new Point(1, 3)
-                    && Avatar.CensorCellSize(Avatar.CENSOR_MED, 1f) == new Point(2, 6)
-                    && Avatar.CensorCellSize(Avatar.CENSOR_NEAR, 1f) == new Point(4, 12)
-                    && Avatar.CensorCellSize(Avatar.CENSOR_NEAR, 2f) == new Point(8, 24)
-                    && Avatar.CensorCellSize(Avatar.CENSOR_FAR, 0.2f) == new Point(1, 1);
+                // ladder + tier — the ladder is LITERAL DEVICE PIXELS per the
+                // fresh RenderCensoredBlocks decode (zoom index 1/2/4 ->
+                // (1,3)/(2,6)/(4,12); no resolution normalization in the
+                // native body)
+                bool ladder = Avatar.CensorCellSize(Avatar.CENSOR_FAR) == new Point(1, 3)
+                    && Avatar.CensorCellSize(Avatar.CENSOR_MED) == new Point(2, 6)
+                    && Avatar.CensorCellSize(Avatar.CENSOR_NEAR) == new Point(4, 12);
                 bool tier = Avatar.CensorZoomTier(0.02f, false) == Avatar.CENSOR_NEAR
                     && Avatar.CensorZoomTier(0.01f, false) == Avatar.CENSOR_MED
                     && Avatar.CensorZoomTier(0.005f, false) == Avatar.CENSOR_FAR
@@ -175,7 +178,7 @@ namespace Simitone.Client
                     // expected tier + cell ladder at this surface
                     var proj = world.State.Projection;
                     int tier = Avatar.CensorZoomTier(Math.Abs(proj.M11), Math.Abs(proj.M34) > 0.0001f);
-                    var cell = Avatar.CensorCellSize(tier, sw / 800f);
+                    var cell = Avatar.CensorCellSize(tier);
                     int expRectW = tier == Avatar.CENSOR_NEAR ? 70 : (tier == Avatar.CENSOR_MED ? 50 : 35);
                     int expRectH = (int)(expRectW * 1.4f);
 
