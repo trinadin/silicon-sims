@@ -109,8 +109,9 @@ namespace Simitone.Client
                     case 1: PhaseGenericImport(); break;
                     case 2: PhaseCollisionHouseMove(); break;
                     case 3: PhaseEviction(); break;
-                    case 4: PhaseRefusalNegatives(); break;
-                    case 5: PhaseIntegrityVerdict(); break;
+                    case 4: PhaseExportMirror(); break;
+                    case 5: PhaseRefusalNegatives(); break;
+                    case 6: PhaseIntegrityVerdict(); break;
                 }
             }
             catch (Exception e)
@@ -441,6 +442,33 @@ namespace Simitone.Client
             Check(nowFiles.Length == expect, "S3 eviction deletes occupant characters ("
                 + _char0 + " -> " + nowFiles.Length + ", expected " + expect + ")");
             _charFiles0 = nowFiles; _char0 = nowFiles.Length;
+            Next();
+        }
+
+        /// <summary>SAV-06 validation rider: the step-25 Export/ mirror refresh.
+        /// After the eviction import the mirrored exports must exist — the evicted
+        /// id-0 family as the verified memberless husk — and reserved id 4000 must
+        /// never appear in Export/ (audit §3.4).</summary>
+        private void PhaseExportMirror()
+        {
+            var exportDir = Path.Combine(N.UserPath, "Export");
+            Check(Directory.Exists(exportDir), "EM Export/ exists");
+            var huskPath = Path.Combine(exportDir, "Charming_0.FAM");
+            Check(File.Exists(huskPath), "EM evicted id-0 family mirrored to Export/Charming_0.FAM");
+            Check(!Directory.GetFiles(exportDir, "*_4000.FAM").Any(),
+                "EM reserved id 4000 never exported");
+            try
+            {
+                var h = new IffFile(huskPath);
+                var expi = h.List<EXPi>()?.FirstOrDefault();
+                Check(expi != null && expi.ActiveMemberIDs.Length == 0,
+                    "EM evicted export is the memberless husk (EXPi 0 active)");
+                Check(h.List<SIMI>() == null, "EM husk carries no SIMI (non-tutorial house)");
+            }
+            catch (Exception e)
+            {
+                Fail("EM husk fresh-parse failed: " + e.Message);
+            }
             Next();
         }
 
