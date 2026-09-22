@@ -3118,12 +3118,16 @@ namespace Simitone.Client
                     // Remaining pushes: (1) grant entry tokens via judge TTAB row 3
                     // (af 4108 'CT - Generate Pet Tokens'); (2) a pet performs judge
                     // row 0 (af 4102 'Do Pet Show') on the judge.
-                    if (_unlsFrame == 900 && !_unlsPushTokens && _unlsJudgeEnt != null)
+                    // run-28: pushes moved early (was f=900/f=960) — run-27 PASSED at
+                    // f=962 before either push dequeued; the judge is free after its
+                    // 4098 completes (~tick 460), so f=560/f=620 land while there is
+                    // still run window for the live op=51 token evidence.
+                    if (_unlsFrame == 560 && !_unlsPushTokens && _unlsJudgeEnt != null)
                     {
                         _unlsPushTokens = true;
                         UnlShowPush((VMAvatar)_unlsJudgeEnt, 3, "judge-token-grant", _unlsCtr);
                     }
-                    if (_unlsFrame == 960 && !_unlsPushPetShow && _unlsJudgeEnt != null)
+                    if (_unlsFrame == 620 && !_unlsPushPetShow && _unlsJudgeEnt != null)
                     {
                         var pet3 = avatars.FirstOrDefault(a => UnlTravelPetGuids.Contains(a.Object.OBJ.GUID));
                         if (pet3 != null)
@@ -3194,6 +3198,24 @@ namespace Simitone.Client
                                       + " rfTgt=oid" + (rfTop.StackObject?.ObjectID.ToString() ?? "-")
                                       + "@0x" + (rfTop.StackObject?.Object?.GUID.ToString("x8") ?? "-")
                                     : ""));
+                        }
+                    }
+                    // run-28: TS1 inventory dump — tokens granted inside tree 4212
+                    // (4103's grant subtree) are invisible to the 4096-4109 ITRACE
+                    // band; the neighborhood inventory keyed by avatar NID is the
+                    // ground truth for entry/prize tokens.
+                    if (_unlsFrame % 60 == 10)
+                    {
+                        foreach (var a in avatars)
+                        {
+                            var nid = a.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.NeighborId);
+                            if (nid <= 0) continue;
+                            var inv = FSO.Content.Content.Get().Neighborhood.GetInventoryByNID(nid);
+                            if (inv == null || inv.Count == 0) continue;
+                            Log("AUTOTEST unl-show INV f=" + _unlsFrame + " oid=" + a.ObjectID
+                                + " guid=0x" + a.Object.OBJ.GUID.ToString("x8") + " nid=" + nid
+                                + " tokens=" + string.Join("/",
+                                    inv.Select(t => "0x" + t.GUID.ToString("x8") + ":t" + t.Type + "x" + t.Count)));
                         }
                     }
                     if (!ctrAlive)
