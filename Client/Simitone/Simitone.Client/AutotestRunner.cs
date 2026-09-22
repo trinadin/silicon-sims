@@ -3366,19 +3366,68 @@ namespace Simitone.Client
                     _unlmCritterGuids.Remove(0x90F874BDu);
                     var host2 = spawned[0].GetPersonData(VMPersonDataVariable.PersonsAge) >= 18 ? spawned[0]
                         : spawned.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? spawned[0];
-                    // run-5 law: in-world placement (OOW starves every interaction)
-                    var grp = _vm.Context.CreateObjectInstance(0x90F874BDu,
-                        new FSO.LotView.Model.LotTilePos(
-                            (short)(host2.Position.x - 64), (short)(host2.Position.y - 64), host2.Position.Level),
-                        FSO.LotView.Model.Direction.NORTH);
+                    // run-5 law: in-world placement (OOW starves every interaction).
+                    // run-1: host-64/-64 was blocked (pos=-32768) — try a fan of
+                    // offsets like the show probe's arena loop.
+                    VMMultitileGroup grp = null;
+                    foreach (var off in new[] { -64, 64, -96, 96, -128, 128 })
+                    {
+                        var cand = new FSO.LotView.Model.LotTilePos(
+                            (short)(host2.Position.x + off), host2.Position.y, host2.Position.Level);
+                        grp = _vm.Context.CreateObjectInstance(0x90F874BDu, cand,
+                            FSO.LotView.Model.Direction.NORTH);
+                        if (grp != null && grp.Objects != null && grp.Objects.Count > 0
+                            && grp.Objects[0].Position.x != -32768) break;
+                        grp = null;
+                    }
                     _unlmCtr = grp?.Objects?.FirstOrDefault();
                     if (_unlmCtr == null)
                     {
                         Log("AUTOTEST unl-mice ctr CREATE-FAIL guid=0x90f874bd");
                         Fail("unl-mice"); _unlmState = 99; return;
                     }
+                    // run-2: the show controller's main slept on the same semiglobal
+                    // zoning gate (366 → mode-28 → Global[10]); 555 opens it via the
+                    // mode-28 default. The mice main (4104) shows the same
+                    // 4104/366/280 shape — apply the same hack.
+                    _vm.SetGlobalValue(10, 555);
+                    Log("AUTOTEST unl-mice zoning-gate Global[10]=555");
                     foreach (var e in _vm.Entities.Where(e => e?.Object != null))
                         _unlmOids0.Add(e.ObjectID);
+                    // run-2: live surface dump — mice.iff tree ids are per-file
+                    // (main=4104 in its own numbering); decode the main-loop trees
+                    // and the TTAB/TTAs rows (a chase row may be pushable onto the
+                    // cat, UnlShowPush-style, if autonomy never targets mice).
+                    try
+                    {
+                        var mres = _unlmCtr.Object.Resource;
+                        var mttas = mres?.List<TTAs>() ?? new List<TTAs>();
+                        foreach (var tta in mttas)
+                        {
+                            var names = new List<string>();
+                            for (int i = 0; i < tta.Length; i++) names.Add((tta.GetString(i) ?? "").Trim());
+                            Log("AUTOTEST unl-mice ctr TTAs " + tta.ChunkID + " rows=[" + string.Join(" | ", names) + "]");
+                        }
+                        foreach (var tid in new ushort[] { 4104, 3856, 1552, 4112, 784 })
+                        {
+                            var rt = mres?.GetRoutine(tid) as VMRoutine;
+                            if (rt == null) { Log("AUTOTEST unl-mice DISASM " + tid + " MISSING"); continue; }
+                            Log("AUTOTEST unl-mice DISASM tree" + tid + " n=" + rt.Instructions.Length
+                                + " locals=" + rt.Locals + " args=" + rt.Arguments);
+                            for (int i = 0; i < rt.Instructions.Length; i++)
+                            {
+                                var ins = rt.Instructions[i];
+                                var opProps = ins.Operand?.GetType().GetProperties() ?? new System.Reflection.PropertyInfo[0];
+                                var opDesc = ins.Operand == null ? "null"
+                                    : opProps.Length == 0 ? "RawVal=" + Convert.ToString(ins.Operand)
+                                    : string.Join(",",
+                                        opProps.Select(p => p.Name + "=" + Convert.ToString(p.GetValue(ins.Operand))));
+                                Log("AUTOTEST unl-mice D" + tid + " @" + i + " op=" + ins.Opcode
+                                    + " T:" + ins.TruePointer + " F:" + ins.FalsePointer + " " + opDesc);
+                            }
+                        }
+                    }
+                    catch (Exception de) { Log("AUTOTEST unl-mice DISASM error: " + de.Message); }
                     Log("AUTOTEST unl-mice SETUP f=" + _unlmFrame
                         + " ctr oid=" + _unlmCtr.ObjectID + " guid=0x" + _unlmCtr.Object.OBJ.GUID.ToString("x8")
                         + " pos=" + _unlmCtr.Position.x + "," + _unlmCtr.Position.y + "lv" + _unlmCtr.Position.Level
