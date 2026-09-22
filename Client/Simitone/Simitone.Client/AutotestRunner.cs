@@ -3023,6 +3023,20 @@ namespace Simitone.Client
                             }
                             catch (Exception jx) { Log("AUTOTEST unl-show judgeTTAB error: " + jx.Message); }
                         }
+                        // run-22: the engine scatters the judge (520,488 / 696,56 /
+                        // 264,760 across runs 19-21) and the slot-8 walk stalled ~40
+                        // tiles short (run-21) — park it next to the controller first
+                        // so the route is short, same-room and completable.
+                        if (_unlsJudgeEnt != null && _unlsCtr != null)
+                        {
+                            var jtele = new FSO.LotView.Model.LotTilePos(
+                                (short)(_unlsCtr.Position.x + 16), (short)(_unlsCtr.Position.y - 16),
+                                _unlsCtr.Position.Level);
+                            var jst = _unlsJudgeEnt.SetPosition(jtele,
+                                FSO.LotView.Model.Direction.NORTH, _vm.Context);
+                            Log("AUTOTEST unl-show JUDGE-TELEPORT to " + jtele.x + "," + jtele.y
+                                + "lv" + jtele.Level + " status=" + jst);
+                        }
                         if (host2 != null && jtgt != null && jrow >= 0)
                         { _unlsPushJudge = true; UnlShowPush(host2, jrow, "judge-activation", jtgt); }
                         else if (host2 != null && _unlsRowJudge >= 0)
