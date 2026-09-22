@@ -3052,6 +3052,27 @@ namespace Simitone.Client
                             Log("AUTOTEST unl-show HOST-TELEPORT to " + htele.x + "," + htele.y
                                 + "lv" + htele.Level + " status=" + hst);
                         }
+                        // run-24: 4098's @24 gate is pet.TS1FamilyNumber == data61 of
+                        // the entity whose oid sits in Global[3] (@0→@25→@26). Run 23
+                        // proved the scan exhausted (two dogs hit flag65==2, both
+                        // failed @24) and fell back to @40 StackObject=MyObject →
+                        // route-to-self. No controller tree ever writes Global[3], so
+                        // point it at the host and align the host's family number with
+                        // the pets' so the judge scan finds a show pet.
+                        if (host2 != null)
+                        {
+                            var petFam = avatars.Where(a => UnlTravelPetGuids.Contains(a.Object.OBJ.GUID))
+                                .Select(a => a.GetPersonData(VMPersonDataVariable.TS1FamilyNumber))
+                                .FirstOrDefault(x => x > 0);
+                            var hostFam = host2.GetPersonData(VMPersonDataVariable.TS1FamilyNumber);
+                            Log("AUTOTEST unl-show fam g3=" + _vm.GetGlobalValue(3)
+                                + " g9=" + _vm.GetGlobalValue(9)
+                                + " hostFam=" + hostFam + " petFam=" + petFam
+                                + " hostOid=" + host2.ObjectID);
+                            _vm.SetGlobalValue(3, host2.ObjectID);
+                            if (hostFam != petFam && petFam > 0)
+                                host2.SetPersonData(VMPersonDataVariable.TS1FamilyNumber, petFam);
+                        }
                         if (host2 != null && jtgt != null && jrow >= 0)
                         { _unlsPushJudge = true; UnlShowPush(host2, jrow, "judge-activation", jtgt); }
                         else if (host2 != null && _unlsRowJudge >= 0)
