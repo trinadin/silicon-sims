@@ -28334,7 +28334,7 @@ namespace Simitone.Client
                     {
                         { 0xDE1FD99Au, "NPC Controller - Superstar (NPCControllerSS)" },
                         { 0xC61F8102u, "Phone - Go Studio Plugin (PhonePluginStudioLots)" },
-                        { 0x3B5A39F9u, "Stereo Speakers - Superstar Music Controller" },
+                        { 0x3B5A39F9u, "Stereo Speakers - Superstar - Music Controller" },
                         { 0x94400258u, "NPC Obsessed Fan - Generator" },
                         { 0xDF820338u, "Controller - Spa" },
                         { 0x91D0C8CDu, "Controller - Studio Traffic (ControllerStudioLot)" },
