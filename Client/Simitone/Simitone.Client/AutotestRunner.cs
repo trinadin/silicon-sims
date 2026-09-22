@@ -3364,6 +3364,13 @@ namespace Simitone.Client
                         }
                     }
                     _unlmCritterGuids.Remove(0x90F874BDu);
+                    // run-7: ITRACE the controller's own execution — the parked
+                    // [4104/366/280] shape cannot disambiguate the @3 (g1==attr0 tie)
+                    // vs @14 (scan-fail) sleep loops; the trace prints the exact IP
+                    // every wake tick. Sink + band flag here, unbudget entry once the
+                    // controller oid is resolved below; cleared at state 99.
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = Log;
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = true;
                     var host2 = spawned[0].GetPersonData(VMPersonDataVariable.PersonsAge) >= 18 ? spawned[0]
                         : spawned.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? spawned[0];
                     // run-5 law: in-world placement (OOW starves every interaction).
@@ -3386,6 +3393,10 @@ namespace Simitone.Client
                         Log("AUTOTEST unl-mice ctr CREATE-FAIL guid=0x90f874bd");
                         Fail("unl-mice"); _unlmState = 99; return;
                     }
+                    // run-7: unbudget the controller — its trace lines must not die to
+                    // the shared per-tick budget (run-19 starvation law).
+                    FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Add(_unlmCtr.ObjectID);
+                    Log("AUTOTEST unl-mice ITRACE armed on ctr oid=" + _unlmCtr.ObjectID);
                     // run-2: the show controller's main slept on the same semiglobal
                     // zoning gate (366 → mode-28 → Global[10]); 555 opens it via the
                     // mode-28 default. The mice main (4104) shows the same
@@ -4823,6 +4834,17 @@ namespace Simitone.Client
             if (CheckEnabled("unl-mice") && _unlmState != 99)
             {
                 UnlMiceTick();
+            }
+            else if (CheckEnabled("unl-mice"))
+            {
+                // run-7: verdict recorded — tear the ITRACE sink down so later
+                // states (or the battery) don't drown in controller trace lines.
+                if (FSO.SimAntics.Engine.VMThread.AutotestTraceSink != null)
+                {
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = null;
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = false;
+                    FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Clear();
+                }
             }
             var minute = _vm.Context.Clock.Minutes;
             if (_motiveStartMinute < 0) _motiveStartMinute = minute;
