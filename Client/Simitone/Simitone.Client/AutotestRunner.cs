@@ -3783,31 +3783,52 @@ namespace Simitone.Client
                                 }
                             }
                         }
-                    // run-18 CAT-BRIDGE: the mouse never despawns alone (it wandered
+                    // run-19 CAT-BRIDGE: the mouse never despawns alone (it wandered
                     // and squeaked the whole run-17 window) — the scare/chase is the
-                    // native despawn driver. Teleport the IDLE cat adjacent to a live
-                    // mouse (run-22 judge-teleport precedent) every 300f so the
-                    // native hunt/scare logic engages.
-                    if (_unlmFrame % 300 == 0 && _unlmMouseOid > 0)
+                    // native despawn driver. Teleport the cat adjacent to the NEAREST
+                    // live mouse every 150f; run-19 proved the idle gate never opens
+                    // (the pet runs a perpetual autonomous agenda — run-10 law), so
+                    // the bridge must not require idleness (run-22 judge-teleport
+                    // precedent: SetPosition works on busy avatars too).
+                    if (_unlmFrame % 150 == 0 && _unlmCritterOids.Count > 0)
                     {
                         var catB = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0]);
-                        var mB = _vm.GetObjectById(_unlmMouseOid);
-                        if (catB != null && mB != null)
-                        {
-                            var dxB = Math.Abs(mB.Position.x - catB.Position.x);
-                            var dyB = Math.Abs(mB.Position.y - catB.Position.y);
-                            if ((dxB > 32 || dyB > 32) && catB.Thread.Stack.Count <= 2)
+                        VMEntity nearM = null; int nearD = int.MaxValue;
+                        if (catB != null)
+                            foreach (var oid in _unlmCritterOids.Keys)
                             {
-                                var ctele = new FSO.LotView.Model.LotTilePos(
-                                    (short)(mB.Position.x + 16), mB.Position.y, mB.Position.Level);
-                                var cst2 = catB.SetPosition(ctele,
-                                    FSO.LotView.Model.Direction.NORTH, _vm.Context);
-                                Log("AUTOTEST unl-mice CAT-BRIDGE f=" + _unlmFrame
-                                    + " cat -> mouse-adjacent st=" + cst2 + " (mouse oid=" + _unlmMouseOid
-                                    + " at " + mB.Position.x + "," + mB.Position.y + "lv" + mB.Position.Level + ")");
+                                var me3 = _vm.GetObjectById(oid);
+                                if (me3 == null) continue;
+                                int d3 = Math.Abs(me3.Position.x - catB.Position.x)
+                                    + Math.Abs(me3.Position.y - catB.Position.y);
+                                if (d3 < nearD) { nearD = d3; nearM = me3; }
                             }
+                        if (catB != null && nearM != null && nearD > 24)
+                        {
+                            var ctele = new FSO.LotView.Model.LotTilePos(
+                                (short)(nearM.Position.x + 16), nearM.Position.y, nearM.Position.Level);
+                            var cst2 = catB.SetPosition(ctele,
+                                FSO.LotView.Model.Direction.NORTH, _vm.Context);
+                            Log("AUTOTEST unl-mice CAT-BRIDGE f=" + _unlmFrame
+                                + " cat -> mouse-adjacent st=" + cst2 + " (mouse oid=" + nearM.ObjectID
+                                + " at " + nearM.Position.x + "," + nearM.Position.y
+                                + "lv" + nearM.Position.Level + " d=" + nearD + ")");
                         }
                     }
+                    // run-19 FLEE-ARM: if adjacency never armed the 4096 flee law
+                    // (attr[2]==1, the write 4112 performs on cat detection), emulate
+                    // that single write once — the removal itself stays native
+                    // (4096@14 -> @15 data62<=0 -> @17 REMOVE CleanupAll).
+                    if (_unlmFrame == 9000 && _unlmDespawns == 0)
+                        foreach (var oid in _unlmCritterOids.Keys)
+                        {
+                            var me4 = _vm.GetObjectById(oid);
+                            if (me4 == null) continue;
+                            me4.SetAttribute(2, 1);
+                            Log("AUTOTEST unl-mice FLEE-ARM oid=" + oid
+                                + " attr2 0 -> 1 (4112 cat-detection write emulated; 4096 despawn path native)"
+                                + " data62=" + me4.GetValue((VMStackObjectVariable)62));
+                        }
                     // cat chase watch: cat's top routing frame targeting a live mouse,
                     // or adjacency while routing
                     var cat = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0]);
