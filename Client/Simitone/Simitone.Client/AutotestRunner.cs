@@ -3436,6 +3436,18 @@ namespace Simitone.Client
                         var cat5 = _vm.Entities.OfType<VMAvatar>().FirstOrDefault(e
                             => e.Object.OBJ.GUID == UnlTravelPetGuids[0]);
                         if (cat5 != null)
+                        {
+                            // run-5 evidence: cat person-data 65 (Gender/species slot) =
+                            // 16 in FSO's template — the mice scan @13 IsFlagSet(d65, 3)
+                            // computes (16 & 3) = 0 and rejects the cat every cycle (same
+                            // defect behind V4's never-passing cat test @61). TS1 trees
+                            // expect cat=3; dog=2 already passes (2&3=2). Fam-align-class
+                            // probe-side data fix; spawn/scan logic stays native.
+                            Log("AUTOTEST unl-mice cat d65 was " + cat5.GetPersonData(VMPersonDataVariable.Gender)
+                                + " -> 3 (TS1 cat species code)");
+                            cat5.SetPersonData(VMPersonDataVariable.Gender, 3);
+                        }
+                        if (cat5 != null)
                             Log("AUTOTEST unl-mice scan-inputs g9=" + _vm.GetGlobalValue(9)
                                 + " g1=" + _vm.GetGlobalValue(1)
                                 + " attr0=" + _unlmCtr.GetAttribute(0)
