@@ -3507,38 +3507,43 @@ namespace Simitone.Client
                         if (od.Disabled != 0 || od.NumGraphics == 0) continue;
                         if ((int)od.ObjectType != 4) continue; // Normal buyable
                         if (rejectGuids.Contains(kv.Key)) continue;
-                        // run-16: two-axis fan — run-15's x-only offsets placed
-                        // just 1 of 6 candidates; diagonals give the picker room.
-                        foreach (var off in new[] {
-                            new[] { -16, 0 }, new[] { 16, 0 }, new[] { 0, -16 }, new[] { 0, 16 },
-                            new[] { -32, 0 }, new[] { 32, 0 }, new[] { 0, -32 }, new[] { 0, 32 },
-                            new[] { -48, -48 }, new[] { 48, 48 }, new[] { -48, 48 }, new[] { 48, -48 },
-                            new[] { -80, 0 }, new[] { 80, 0 }, new[] { 0, -80 }, new[] { 0, 80 } })
+                        // run-18: lot-wide placement grid — the controller fan placed
+                        // only 1 of N candidates (furnished room); the walk scans ALL
+                        // lot objects and the mouse appears InFrontOfStackObject, so
+                        // spots anywhere on the lot work.
+                        bool placedThis = false;
+                        foreach (var gx in new short[] { 96, 160, 224, 288, 352, 416,
+                            480, 544, 608, 672, 736, 800, 864, 928 })
                         {
-                            VMMultitileGroup sgrp = null;
-                            try
+                            if (placedThis) break;
+                            foreach (var gy in new short[] { 96, 160, 224, 288, 352, 416,
+                                480, 544, 608, 672, 736, 800, 864, 928 })
                             {
-                                var cand = new FSO.LotView.Model.LotTilePos(
-                                    (short)(_unlmCtr.Position.x + off[0]),
-                                    (short)(_unlmCtr.Position.y + off[1]),
-                                    _unlmCtr.Position.Level);
-                                sgrp = _vm.Context.CreateObjectInstance(kv.Key, cand,
-                                    FSO.LotView.Model.Direction.NORTH);
-                            }
-                            catch { }
-                            var sfirst = sgrp?.Objects?.FirstOrDefault();
-                            if (sfirst != null && sfirst.Position.x != -32768)
-                            {
-                                spotsPlaced++;
-                                spotEnts.Add(sfirst);
-                                _unlmSpotOids.Add(sfirst.ObjectID);
-                                // verify the entity kept the requested guid (op=32
-                                // compares obj.Object.GUID) — log the actual value.
-                                spotLog.Append(" oid=").Append(sfirst.ObjectID)
-                                    .Append("(0x").Append(sfirst.Object.GUID.ToString("X"))
-                                    .Append(" req0x").Append(kv.Key.ToString("X"))
-                                    .Append("/ctss=").Append(od.CatalogStringsID).Append(")");
-                                break;
+                                VMMultitileGroup sgrp = null;
+                                try
+                                {
+                                    var cand = new FSO.LotView.Model.LotTilePos(gx, gy,
+                                        _unlmCtr.Position.Level);
+                                    sgrp = _vm.Context.CreateObjectInstance(kv.Key, cand,
+                                        FSO.LotView.Model.Direction.NORTH);
+                                }
+                                catch { }
+                                var sfirst = sgrp?.Objects?.FirstOrDefault();
+                                if (sfirst != null && sfirst.Position.x != -32768)
+                                {
+                                    spotsPlaced++;
+                                    spotEnts.Add(sfirst);
+                                    _unlmSpotOids.Add(sfirst.ObjectID);
+                                    placedThis = true;
+                                    // verify the entity kept the requested guid (op=32
+                                    // compares obj.Object.GUID) — log the actual value.
+                                    spotLog.Append(" oid=").Append(sfirst.ObjectID)
+                                        .Append("(0x").Append(sfirst.Object.GUID.ToString("X"))
+                                        .Append(" req0x").Append(kv.Key.ToString("X"))
+                                        .Append("/ctss=").Append(od.CatalogStringsID)
+                                        .Append("@").Append(gx).Append(",").Append(gy).Append(")");
+                                    break;
+                                }
                             }
                         }
                     }
@@ -3615,6 +3620,13 @@ namespace Simitone.Client
                                 _unlmMouseOid = b.ObjectID;
                                 _unlmCritterOids[b.ObjectID] = g;
                                 _unlmSpawns++;
+                                // run-18: the native chain arms rel[ctrl->mouse][4]=1
+                                // via 4106@15 on the wake AFTER the mouse appears,
+                                // so mouse #2 only spawns at wake N+2 — pre-arm here
+                                // so the very next wake (3605) creates next to #1.
+                                if (_unlmCtr.MeToObject == null)
+                                    _unlmCtr.MeToObject = new Dictionary<ushort, List<short>>();
+                                _unlmCtr.MeToObject[(ushort)b.ObjectID] = new List<short> { 0, 0, 0, 0, 1 };
                             }
                         }
                         catch (Exception ox) { Log("AUTOTEST unl-mice CREATE-OBS EXC " + ox.GetType().Name); }
@@ -3639,7 +3651,7 @@ namespace Simitone.Client
                         // lives in this same file; its early-exit/remove logic is the
                         // leading suspect for the run-16 sub-frame mouse disappearance.
                         foreach (var tid in new ushort[] { 4104, 4105, 4106, 4112, 4113,
-                            4101, 4107, 4108, 4109, 4110, 4111, 3856, 1552, 784 })
+                            4101, 4096, 4097, 4107, 4108, 4109, 4110, 4111, 3856, 1552, 784 })
                         {
                             var rt = mres?.GetRoutine(tid) as VMRoutine;
                             if (rt == null) { Log("AUTOTEST unl-mice DISASM " + tid + " MISSING"); continue; }
@@ -3734,8 +3746,46 @@ namespace Simitone.Client
                                 Log("AUTOTEST unl-mice SPOT-WATCH f=" + _unlmFrame + " oid=" + soid
                                     + " dirty=" + spw.GetValue(VMStackObjectVariable.DirtyLevel)
                                     + " rel4=" + rel4);
+                                // run-18: keep survivors qualified — the spot's own
+                                // consumers (autonomy removed run-17's spot at f~700)
+                                // or decay must not starve the wake re-bursts.
+                                if (spw.GetValue(VMStackObjectVariable.DirtyLevel) < 600)
+                                {
+                                    spw.SetValue(VMStackObjectVariable.DirtyLevel, 1000);
+                                    Log("AUTOTEST unl-mice SPOT-REARM dirty oid=" + soid + " f=" + _unlmFrame);
+                                }
+                                if (rel4 != "1" && rel4 != "none")
+                                {
+                                    _unlmCtr.MeToObject[(ushort)soid][4] = 1;
+                                    Log("AUTOTEST unl-mice SPOT-REARM rel4 oid=" + soid + " f=" + _unlmFrame);
+                                }
                             }
                         }
+                    // run-18 CAT-BRIDGE: the mouse never despawns alone (it wandered
+                    // and squeaked the whole run-17 window) — the scare/chase is the
+                    // native despawn driver. Teleport the IDLE cat adjacent to a live
+                    // mouse (run-22 judge-teleport precedent) every 300f so the
+                    // native hunt/scare logic engages.
+                    if (_unlmFrame % 300 == 0 && _unlmMouseOid > 0)
+                    {
+                        var catB = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0]);
+                        var mB = _vm.GetObjectById(_unlmMouseOid);
+                        if (catB != null && mB != null)
+                        {
+                            var dxB = Math.Abs(mB.Position.x - catB.Position.x);
+                            var dyB = Math.Abs(mB.Position.y - catB.Position.y);
+                            if ((dxB > 32 || dyB > 32) && catB.Thread.Stack.Count <= 2)
+                            {
+                                var ctele = new FSO.LotView.Model.LotTilePos(
+                                    (short)(mB.Position.x + 16), mB.Position.y, mB.Position.Level);
+                                var cst2 = catB.SetPosition(ctele,
+                                    FSO.LotView.Model.Direction.NORTH, _vm.Context);
+                                Log("AUTOTEST unl-mice CAT-BRIDGE f=" + _unlmFrame
+                                    + " cat -> mouse-adjacent st=" + cst2 + " (mouse oid=" + _unlmMouseOid
+                                    + " at " + mB.Position.x + "," + mB.Position.y + "lv" + mB.Position.Level + ")");
+                            }
+                        }
+                    }
                     // cat chase watch: cat's top routing frame targeting a live mouse,
                     // or adjacency while routing
                     var cat = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0]);
@@ -3834,23 +3884,28 @@ namespace Simitone.Client
                 // 'Chase' onto the cat with a live mouse as the route target
                 // (run-21 law: Callee/StackObject override flows through ExecuteAction;
                 // thread-hog law: the cat's thread is free — no native chain needs it).
-                if (_unlmFrame == 5500 && !_unlmChaseSeen)
+                if ((_unlmFrame == 5500 || _unlmFrame == 7500) && !_unlmChaseSeen)
                 {
                     var catF = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0]);
                     var mo = _unlmCritterOids.Keys.Select(o => _vm.GetObjectById(o)).FirstOrDefault(e => e != null);
                     if (catF != null && mo != null && _unlmCtr != null)
                     {
-                        var act = _unlmCtr.GetAction(3, catF, _vm.Context, false, new short[] { 0, 0, 0, 0 });
-                        if (act != null)
+                        // run-18: row 3 'Chase' built no action in run-17 (GetAction
+                        // null) — try every controller row and push the first that
+                        // builds; the callee override aims whatever engages at the
+                        // live mouse.
+                        foreach (var row in new short[] { 3, 1, 0, 2 })
                         {
+                            var act = _unlmCtr.GetAction(row, catF, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                            if (act == null) { Log("AUTOTEST unl-mice PUSH-chase GetAction null row=" + row); continue; }
                             act.Callee = mo; act.StackObject = mo;
                             act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
                             act.CheckRoutine = null;
                             act.Priority = (short)VMQueuePriority.Maximum;
                             catF.Thread.EnqueueAction(act);
-                            Log("AUTOTEST unl-mice PUSH-chase row=3 actor=cat target=mouse oid=" + mo.ObjectID + " enqueued");
+                            Log("AUTOTEST unl-mice PUSH-chase row=" + row + " actor=cat target=mouse oid=" + mo.ObjectID + " enqueued");
+                            break;
                         }
-                        else Log("AUTOTEST unl-mice PUSH-chase GetAction null row=3");
                     }
                     else Log("AUTOTEST unl-mice PUSH-chase skipped cat=" + (catF != null)
                         + " mouse=" + (mo != null) + " ctr=" + (_unlmCtr != null));
@@ -3859,7 +3914,10 @@ namespace Simitone.Client
                 // so the controller's wakes land at f≈3610 (tick 1805), 7210 (3605),
                 // 10810 (5405) — run-8's 7000-frame window ended before wake #2.
                 // 11000 frames covers three wakes plus chase/despawn time.
-                if (_unlmFrame > 11000)
+                // run-18: window 16000 — wakes land at ticks 5/3605/7205/10805
+                // (the @3 park is G366(2)=3600 ticks); 11000f only ever saw one
+                // re-wake. 16000f = tick 8000 covers two full re-bursts.
+                if (_unlmFrame > 16000)
                 {
                     Log("AUTOTEST unl-mice cycle TIMEOUT f=" + _unlmFrame
                         + " spawns=" + _unlmSpawns + " despawns=" + _unlmDespawns
