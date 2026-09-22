@@ -2525,7 +2525,7 @@ namespace Simitone.Client
         private static bool _unlsJudgeSeen, _unlsRewardSeen;
         private static short _unlsRowShow = -1, _unlsRowJudge = -1;
         private static bool _unlsSoakHeld, _unlsPushJudge, _unlsPushPet, _unlsPushJudgeNative,
-            _unlsBridgeAttr4, _unlsPushTokens, _unlsPushPetShow;
+            _unlsPushTokens, _unlsPushPetShow;
 
         private static void UnlShowTick()
         {
@@ -3074,9 +3074,13 @@ namespace Simitone.Client
                             if (hostFam != petFam && petFam > 0)
                                 host2.SetPersonData(VMPersonDataVariable.TS1FamilyNumber, petFam);
                         }
-                        if (host2 != null && jtgt != null && jrow >= 0)
+                        // run-27: the host's own 4098 push is GONE — it hogged the
+                        // host's thread ~2000 ticks, so the judge's 'Listen' push sat
+                        // queued until long after the judge's 300-tick wait loop
+                        // expired. The judge-native push below drives the whole chain.
+                        if (false && host2 != null && jtgt != null && jrow >= 0)
                         { _unlsPushJudge = true; UnlShowPush(host2, jrow, "judge-activation", jtgt); }
-                        else if (host2 != null && _unlsRowJudge >= 0)
+                        else if (false && host2 != null && _unlsRowJudge >= 0)
                         {
                             // run-21: no judge TTAB carries 4098 (judge rows are
                             // 4102/4104/4106/4108) — push the CONTROLLER's row 0 but
@@ -3106,25 +3110,15 @@ namespace Simitone.Client
                         var pet = avatars.FirstOrDefault(a => UnlTravelPetGuids.Contains(a.Object.OBJ.GUID));
                         if (pet != null) { _unlsPushPet = true; UnlShowPush(pet, _unlsRowShow, "retry-pet"); }
                     }
-                    // run-26 bridges: (1) the judge's 4098 wait loop polls the
-                    // scan-hit's attr[4] but 'Listen' writes the CONTROLLER's attr[4]
-                    // (GetAction StackObject=this law) — flip the host's attr[4]
-                    // while the poll is live so the loop exits into the route body;
-                    // (2) grant entry tokens via judge TTAB row 3 (af 4108 'CT -
-                    // Generate Pet Tokens'); (3) a pet performs judge row 0
-                    // (af 4102 'Do Pet Show') on the judge.
-                    if (!_unlsBridgeAttr4 && _unlsJudgeEnt != null
-                        && _unlsJudgeEnt.Thread.Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4098))
-                    {
-                        var hB = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == _unlsHumanGuid);
-                        if (hB != null)
-                        {
-                            _unlsBridgeAttr4 = true;
-                            hB.SetAttribute(4, 1);
-                            Log("AUTOTEST unl-show BRIDGE host.attr4=1 f=" + _unlsFrame);
-                        }
-                    }
-                    if (_unlsFrame == 900 && _unlsBridgeAttr4 && !_unlsPushTokens && _unlsJudgeEnt != null)
+                    // run-27: the run-26 host.attr4 bridge targeted the wrong
+                    // entity — 4098@15 sets StackObject=Local[1]=CONTROLLER, so the
+                    // judge's wait loop polls controller.attr[4], which 'Listen'
+                    // (4099@1) sets natively. No bridge needed once the host thread
+                    // is free (the f=240 host pushes above are disabled).
+                    // Remaining pushes: (1) grant entry tokens via judge TTAB row 3
+                    // (af 4108 'CT - Generate Pet Tokens'); (2) a pet performs judge
+                    // row 0 (af 4102 'Do Pet Show') on the judge.
+                    if (_unlsFrame == 900 && !_unlsPushTokens && _unlsJudgeEnt != null)
                     {
                         _unlsPushTokens = true;
                         UnlShowPush((VMAvatar)_unlsJudgeEnt, 3, "judge-token-grant", _unlsCtr);
