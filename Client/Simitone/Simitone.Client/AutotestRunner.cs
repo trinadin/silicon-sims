@@ -80,7 +80,7 @@ namespace Simitone.Client
             // candidate house ids, tried in order until one loads with >=1 avatar
             public static string HouseCandidates =
                 "5,4,3,2,1,0,6,7,8,9,10,11,21,22,23,24,25,26,27,28,29,30,40,41,42,43,44,45,46,47,48";
-            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258";
+            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall";
             public static int TimeoutMs = 300000; // hard cap (real ms)
             public static bool ExitOnDone = true;
         }
@@ -1824,6 +1824,10 @@ namespace Simitone.Client
             if (CheckEnabled("uisyschrome")) CheckUISysChrome();
             if (CheckEnabled("uibigbtn")) CheckUIBigButton();
             if (CheckEnabled("uismall")) CheckUISmallMounts();
+            // UI-32 'uitall': the TallSubpanel double-byte predicate (256-value
+            // truth table), the double-byte arm's art/ctor, and the live
+            // single-byte no-mount. Check body: AutotestUI32.cs.
+            if (CheckEnabled("uitall")) CheckUI32TallBackdrop();
             if (CheckEnabled("uiviewpie")) CheckUIViewPie();
             if (CheckEnabled("uiballoon")) CheckUISpeechBalloon();
             if (CheckEnabled("uicas")) CheckUICAS();
@@ -8088,200 +8092,6 @@ namespace Simitone.Client
                 catch (Exception rw) { Log("AUTOTEST relation-write EXC " + rw.GetType().Name + " " + rw.Message); }
             }
             catch (Exception re) { Log("AUTOTEST relation EXC " + re.GetType().Name + " " + re.Message); Fail("relation"); }
-        }
-
-        // CENSOR runtime probe: PersonData variable CensorshipFlags (var 30) must round-trip, and
-        // the renderer must receive it (VMAvatar.PreFrame sets AvatarComponent.CensorshipFlags =
-        // GetPersonData(CensorshipFlags) every frame). The original TS1 drives this variable via
-        // BHAVs during private activities; we verify the engine pipeline is live headlessly.
-        // (Round 221) CENSOR PIXEL-LEVEL MOSAIC CHECK — the R36 render pair proved EMPTY
-        // (GetLotThumb never rasterizes the avatar censor overlay: the saved off/on PNGs
-        // diff 0 pixels — measured r221 on the r36 artifacts). This check captures through
-        // the LIVE world composition (the simvis grab idiom: frame the camera on avatar0,
-        // render world.PreDraw+Draw to a render target, read back) with the component's
-        // CensorshipFlags forced 0 then 3 (IFF-literal Pelvis|SpineIfFemale, the value the
-        // ORIGINAL dress paths write to pd30). The diff IS the mosaic. Analysis: coverage
-        // + bbox near the sim, and BLOCKINESS — horizontal runs of identical pixels in the
-        // ON region vs the same region OFF (the port's mosaic is an 8x8 grid of 4
-        // skin-tone palette colors stretched over the zoom-sized rect; the ORIGINAL's law,
-        // decoded r221 from HouseViewer::Censor @0x1ce894 + RenderCensoredBlocks @0x1ce5b4,
-        // is per-cell MEAN of the underlying pixels + a +-8-per-channel jitter + clamp with
-        // a 1x3/2x6/4x12 zoom cell ladder — the approximation delta is disclosed).
-        private static void CheckCensorPixel()
-        {
-            try
-            {
-                var scr = GameFacade.Screens.CurrentUIScreen as Simitone.Client.UI.Screens.TS1GameScreen;
-                var world = scr?.LotControl?.World;
-                var gd = FSO.Client.GameFacade.GraphicsDevice;
-                if (world == null || gd == null || _avatars.Count == 0)
-                { Log("AUTOTEST censorpixel: no world/device/avatar"); Fail("censorpixel"); return; }
-                var a0 = _avatars[0];
-                var comp = a0.WorldUI as FSO.LotView.Components.AvatarComponent;
-                if (comp == null) { Log("AUTOTEST censorpixel: null AvatarComponent"); Fail("censorpixel"); return; }
-                int sw = gd.Viewport.Width, sh = gd.Viewport.Height;
-                var origCenter = world.State.CenterTile;
-                var origLevel = world.State.Level;
-                int prevFlags = -1;
-                try { prevFlags = comp.CensorshipFlags; } catch { }
-                System.Func<Color[]> grab = () =>
-                {
-                    using (var rt = FSO.Common.Utils.PPXDepthEngine.CreateRenderTarget(
-                        gd, 1, 0, SurfaceFormat.Color, sw, sh, DepthFormat.None))
-                    {
-                        gd.SetRenderTarget(rt);
-                        gd.Clear(new Color(0x72, 0x72, 0x72, 0xFF));
-                        try { world.PreDraw(gd); } catch { }
-                        gd.SetRenderTarget(rt);
-                        try { world.Draw(gd); } catch { }
-                        gd.SetRenderTarget(null);
-                        var px = new Color[sw * sh];
-                        rt.GetData<Color>(px);
-                        return px;
-                    }
-                };
-                try
-                {
-                    // frame the camera on the sim (simvis idiom) so the mosaic is on-screen
-                    world.State.CenterTile = new Microsoft.Xna.Framework.Vector2(a0.Position.x / 16f, a0.Position.y / 16f);
-                    world.State.Level = (sbyte)Math.Max(0, (int)a0.Position.Level);
-                    world.State.PrepareCamera();
-                    comp.CensorshipFlags = 0;
-                    var off = grab();
-                    comp.CensorshipFlags = 3;
-                    var on = grab();
-                    // the sim's screen pos must be computed against the FRAMED camera —
-                    // grab it before the restore below
-                    float simX = -1, simY = -1;
-                    try
-                    {
-                        var wp = world.State.View * world.State.Projection;
-                        var wpos = FSO.LotView.WorldSpace.GetWorldFromTile(new Microsoft.Xna.Framework.Vector3(a0.Position.x / 16f, a0.Position.y / 16f, a0.Position.Level));
-                        var clip = Microsoft.Xna.Framework.Vector4.Transform(wpos, wp);
-                        float cw = clip.W == 0 ? 1f : clip.W;
-                        simX = (clip.X / cw + 1f) / 2f * sw;
-                        simY = (1f - (clip.Y / cw + 1f) / 2f) * sh;
-                    }
-                    catch { }
-                    // restore before any early exit
-                    comp.CensorshipFlags = (short)(prevFlags >= 0 ? prevFlags : 0);
-                    world.State.CenterTile = origCenter;
-                    world.State.Level = origLevel;
-                    world.State.PrepareCamera();
-                    // save the pair for the evidence doc (r36's pair proved empty — these
-                    // are through the live composition path)
-                    try
-                    {
-                        using (var tOff = new Texture2D(gd, sw, sh))
-                        { tOff.SetData(off); using (var f = System.IO.File.Create(System.IO.Path.Combine(FSO.Common.FSOEnvironment.UserDir, "r221-censor-off.png"))) tOff.SaveAsPng(f, sw, sh); }
-                        using (var tOn = new Texture2D(gd, sw, sh))
-                        { tOn.SetData(on); using (var f = System.IO.File.Create(System.IO.Path.Combine(FSO.Common.FSOEnvironment.UserDir, "r221-censor-on.png"))) tOn.SaveAsPng(f, sw, sh); }
-                    }
-                    catch { }
-                    // diff
-                    int diff = 0;
-                    for (int y = 0; y < sh; y++)
-                        for (int x = 0; x < sw; x++)
-                        {
-                            var p1 = on[y * sw + x]; var p2 = off[y * sw + x];
-                            if (p1.R != p2.R || p1.G != p2.G || p1.B != p2.B) diff++;
-                        }
-                    if (diff == 0)
-                    {
-                        Log("AUTOTEST censorpixel: ZERO diff through the live composition (mosaic not rasterized on this path)");
-                        Fail("censorpixel"); return;
-                    }
-                    // WINDOW analysis: consecutive grabs drift (animation interpolation
-                    // scatters thousands of changed pixels) and the palette colors match
-                    // the sim's own skin, so neither isolates the mosaic alone. The mosaic
-                    // IS a dense solid block of diff pixels at the sim's pelvis — analyze
-                    // a window centered on the framed sim's screen position.
-                    if (simX < 0) simX = sw / 2; if (simY < 0) simY = sh / 2;
-                    // the mosaic draws at the PELVIS projection — above the sim's ground
-                    // point — so SEARCH the densest 96x112 diff window near the sim rather
-                    // than centering blindly (the mosaic is a solid block; drift is scattered)
-                    int winW = 96, winH = 112;
-                    int wx0 = (int)simX - 48, wy0 = (int)simY - 48;
-                    int bestCnt = -1;
-                    for (int oy = -140; oy <= 40; oy += 16)
-                        for (int ox = -64; ox <= 64; ox += 16)
-                        {
-                            int cx = Math.Max(0, Math.Min(sw - winW, (int)simX - winW / 2 + ox));
-                            int cy = Math.Max(0, Math.Min(sh - winH, (int)simY + oy));
-                            int cnt = 0;
-                            for (int y = cy; y < cy + winH; y += 2)
-                                for (int x = cx; x < cx + winW; x += 2)
-                                {
-                                    var p1 = on[y * sw + x]; var p2 = off[y * sw + x];
-                                    if (p1.R != p2.R || p1.G != p2.G || p1.B != p2.B) cnt++;
-                                }
-                            if (cnt > bestCnt) { bestCnt = cnt; wx0 = cx; wy0 = cy; }
-                        }
-                    int wx1 = wx0 + winW - 1, wy1 = wy0 + winH - 1;
-                    int[][] palette = new int[][] {
-                        new[] {255,224,196}, new[] {255,210,180}, new[] {248,216,188}, new[] {255,200,170}, // Light
-                        new[] {224,172,132}, new[] {210,160,120}, new[] {200,150,110}, new[] {215,165,125}, // Medium
-                        new[] {140,90,60},  new[] {130,80,50},  new[] {150,95,65},  new[] {120,75,45 }  // Dark/fallback
-                    };
-                    int winDiff = 0, winPal = 0;
-                    var wmask = new bool[sh * sw];
-                    for (int y = wy0; y <= wy1; y++)
-                        for (int x = wx0; x <= wx1; x++)
-                        {
-                            var p1 = on[y * sw + x]; var p2 = off[y * sw + x];
-                            if (p1.R == p2.R && p1.G == p2.G && p1.B == p2.B) continue;
-                            winDiff++;
-                            wmask[y * sw + x] = true;
-                            foreach (var c in palette)
-                                if (Math.Abs(p1.R - c[0]) <= 3 && Math.Abs(p1.G - c[1]) <= 3 && Math.Abs(p1.B - c[2]) <= 3)
-                                { winPal++; break; }
-                        }
-                    if (winDiff == 0)
-                    {
-                        Log("AUTOTEST censorpixel: ZERO diff in the sim window (mosaic not at the framed sim)");
-                        Fail("censorpixel"); return;
-                    }
-                    // blockiness: horizontal runs of consecutive diff pixels within the window
-                    var runs = new List<int>();
-                    for (int y = wy0; y <= wy1; y++)
-                    {
-                        int run = 0;
-                        for (int x = wx0; x <= wx1; x++)
-                        {
-                            if (wmask[y * sw + x]) run++;
-                            else { if (run > 0) runs.Add(run); run = 0; }
-                        }
-                        if (run > 0) runs.Add(run);
-                    }
-                    runs.Sort();
-                    int runMed = runs.Count > 0 ? runs[runs.Count / 2] : 0;
-                    int longest = runs.Count > 0 ? runs[runs.Count - 1] : 0;
-                    _ = 0; // (the window/diff analysis above is the R221 discriminator)
-                    int bw = wx1 - wx0 + 1, bh = wy1 - wy0 + 1;
-                    double density = winDiff / (double)(bw * bh);
-                    double palFrac = winPal / (double)winDiff;
-                    Log("AUTOTEST censorpixel: totalDiff=" + diff + "px window=" + bw + "x" + bh +
-                        " @(" + wx0 + "," + wy0 + ") simScreen=(" + simX.ToString("0") + "," + simY.ToString("0") +
-                        ") winDiff=" + winDiff + " density=" + density.ToString("0.00") +
-                        " paletteFrac=" + palFrac.ToString("0.00") +
-                        " medianRun=" + runMed + " longestRun=" + longest +
-                        " (port law: 8x8 grid of the 12-color palette over a 35/50/70px rect; original law: per-cell mean + jitter, 1x3/2x6/4x12 ladder)");
-                    bool coverage = winDiff >= 1000 && density >= 0.25;
-                    bool blocky = runMed >= 3 || longest >= 24;
-                    bool paletteOk = palFrac >= 0.8;
-                    Log("AUTOTEST censorpixel: coverage=" + coverage + " blocky=" + blocky + " palette=" + paletteOk);
-                    if (coverage && blocky && paletteOk) Pass("censorpixel"); else Fail("censorpixel");
-                }
-                catch (Exception ce)
-                {
-                    try { comp.CensorshipFlags = (short)(prevFlags >= 0 ? prevFlags : 0); } catch { }
-                    world.State.CenterTile = origCenter;
-                    world.State.Level = origLevel;
-                    Log("AUTOTEST censorpixel EXC " + ce.GetType().Name + " " + ce.Message);
-                    Fail("censorpixel");
-                }
-            }
-            catch (Exception oe) { Log("AUTOTEST censorpixel outer EXC " + oe.GetType().Name); Fail("censorpixel"); }
         }
 
         private static void CheckCensor()
