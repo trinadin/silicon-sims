@@ -2524,7 +2524,7 @@ namespace Simitone.Client
         private static readonly HashSet<string> _unlsTreesRun = new HashSet<string>();
         private static bool _unlsJudgeSeen, _unlsRewardSeen;
         private static short _unlsRowShow = -1, _unlsRowJudge = -1;
-        private static bool _unlsSoakHeld, _unlsPushJudge, _unlsPushPet;
+        private static bool _unlsSoakHeld, _unlsPushJudge, _unlsPushPet, _unlsPushJudgeNative;
 
         private static void UnlShowTick()
         {
@@ -3088,26 +3088,42 @@ namespace Simitone.Client
                             Log("AUTOTEST unl-show judge push skipped host=" + (host2 != null)
                                 + " jrow=" + jrow + " av=" + (_unlsJudgeEnt != null)
                                 + " npc=" + (_unlsJudgeNpc != null));
+                        // run-25: native-shaped activation — the judge performs
+                        // controller row 0 (4098) with StackObject=callee=controller
+                        // (GetAction law: StackObject=this), so @1 captures the
+                        // CONTROLLER oid and @4 pushes row 1 'Listen' (4099) onto the
+                        // scan-chosen pet instead of the 4104 dud the run-21/24
+                        // StackObject override produced.
+                        if (_unlsJudgeEnt != null && _unlsCtr != null && !_unlsPushJudgeNative)
+                        {
+                            _unlsPushJudgeNative = true;
+                            UnlShowPush((VMAvatar)_unlsJudgeEnt, 0, "judge-native-activation", _unlsCtr);
+                        }
                     }
                     if (_unlsFrame == 600 && !attrTrans && !_unlsPushPet && _unlsRowShow >= 0)
                     {
                         var pet = avatars.FirstOrDefault(a => UnlTravelPetGuids.Contains(a.Object.OBJ.GUID));
                         if (pet != null) { _unlsPushPet = true; UnlShowPush(pet, _unlsRowShow, "retry-pet"); }
                     }
-                    if (_unlsFrame >= 660 && _unlsFrame % 60 == 0 && _unlsPushPet && !_unlsRewardSeen)
+                    if (_unlsFrame >= 300 && _unlsFrame % 60 == 0 && !_unlsRewardSeen)
                     {
-                        // run-12: the pet's autonomous agenda keeps it busy forever, so the
-                        // enqueued 'Do Pet Show' never dequeues (queue waits behind the
-                        // active action). Set the engine's own cancel flag — routing frames
-                        // and idles abort on it (VMRoutingFrame.cs:519), the active action
-                        // ends, and the scheduler picks the queued pri-100 interaction.
-                        var pet2 = avatars.FirstOrDefault(a => UnlTravelPetGuids.Contains(a.Object.OBJ.GUID));
-                        if (pet2 != null && !pet2.Thread.Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4102))
+                        // run-12/run-25: autonomous agendas keep pets AND the judge
+                        // busy forever, so enqueued show interactions never dequeue
+                        // (queue waits behind the active action). Set the engine's own
+                        // cancel flag — routing frames and idles abort on it
+                        // (VMRoutingFrame.cs:519) — until the show chain (4102/4098)
+                        // is actually running on that actor.
+                        foreach (var y in avatars.Where(a => UnlTravelPetGuids.Contains(a.Object.OBJ.GUID)
+                            || a.Object.OBJ.GUID == 0x0c8144b4u))
                         {
-                            pet2.SetFlag(FSO.SimAntics.VMEntityFlags.InteractionCanceled, true);
-                            Log("AUTOTEST unl-show pet-yield f=" + _unlsFrame + " guid=0x"
-                                + pet2.Object.OBJ.GUID.ToString("x8")
-                                + " q=" + pet2.Thread.Queue.Count);
+                            if (!y.Thread.Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4102
+                                || (f.Routine?.Chunk?.ChunkID ?? 0) == 4098))
+                            {
+                                y.SetFlag(FSO.SimAntics.VMEntityFlags.InteractionCanceled, true);
+                                Log("AUTOTEST unl-show yield f=" + _unlsFrame + " guid=0x"
+                                    + y.Object.OBJ.GUID.ToString("x8")
+                                    + " q=" + y.Thread.Queue.Count);
+                            }
                         }
                     }
                     if (_unlsFrame == 30)
@@ -3125,7 +3141,8 @@ namespace Simitone.Client
                         // actor stack-top watch: is a pushed frame alive (4102/4098 on
                         // top) or did it pop silently (back to brain 8330/main)?
                         foreach (var a in avatars.Where(x => x.Object.OBJ.GUID == _unlsHumanGuid
-                            || UnlTravelPetGuids.Contains(x.Object.OBJ.GUID)))
+                            || UnlTravelPetGuids.Contains(x.Object.OBJ.GUID)
+                            || x.Object.OBJ.GUID == 0x0c8144b4u))
                         {
                             var st = a.Thread.Stack;
                             // run-23: the top routing frame prints as a stale
