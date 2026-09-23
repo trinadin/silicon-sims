@@ -407,6 +407,7 @@ namespace Simitone.Client
                     case 14: StateUI30(); break;
                     case 15: StateArchUndo(); break;
                     case 16: StateExp09Io(); break;
+                    case 17: StateExp09Route(); break;
                 }
             }
             catch (Exception e)
@@ -476,6 +477,16 @@ namespace Simitone.Client
                     (short h) => _screen.PlayHouse(h, null));
                 _state = 16;
                 return;}
+            // EXP-09 leg 5 'exp09route' opt-in (additive): multi-neighborhood
+            // routing-table verification (headless; no lot load needed).
+            if (CheckEnabled("exp09route"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST exp09route neighborhood-screen ready; entering routing battery");
+                _exp09route = new AutotestExp09Route(Log);
+                _state = 17;
+                return;
+            }
             // SAV-07 'sav07live'/'sav07live2' opt-in (additive): the live
             // export→import→save→fresh-load round-trip the impexport battery
             // excluded. Run 1 resets the deterministic isolation dir and does
@@ -810,6 +821,19 @@ namespace Simitone.Client
 
         // EXP-09 leg 3 'exp09io': pet import/export fixture (AutotestExp09Io).
         private static AutotestExp09Io _exp09io;
+
+        // EXP-09 leg 5 'exp09route': routing-table fixture (AutotestExp09Route).
+        private static AutotestExp09Route _exp09route;
+
+        private static void StateExp09Route()
+        {
+            if (_exp09route == null) { Finish(); return; }
+            if (!_exp09route.Tick()) return;
+            if (_exp09route.Passed) Pass("exp09route"); else Fail("exp09route");
+            Log("AUTOTEST exp09route " + _exp09route.Diagnostics);
+            _exp09route = null;
+            Finish();
+        }
 
         private static void StateExp09Io()
         {
@@ -5225,6 +5249,21 @@ namespace Simitone.Client
             if (CheckEnabled("exp09spawn") && _trsState != 99)
             {
                 Exp09SpawnTick();
+            }
+            // EXP-09 leg 4 (opt-in "exp09neg"): negatives/cancel for the
+            // booking gate.
+            if (CheckEnabled("exp09neg") && _ngState != 99)
+            {
+                Exp09NegTick();
+            }
+            if (CheckEnabled("exp09neg") && _ngState != 99)
+            {
+                if (!_unlsSoakHeld)
+                {
+                    _unlsSoakHeld = true;
+                    Log("AUTOTEST soak held for exp09neg (state=" + _ngState + ")");
+                }
+                return;
             }
             // EXP-09 leg 4 (opt-in "exp09neg"): negatives/cancel for the
             // booking gate.
