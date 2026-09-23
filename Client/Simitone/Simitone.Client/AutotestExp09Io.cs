@@ -106,11 +106,16 @@ namespace Simitone.Client
                     _ticks++; return false;
                 }
                 Log("AUTOTEST exp09io neighborhood resolved");
+                _ticks = 0;
+            }
+            if (_phase == 0)
+            {
                 if (_ticks++ < 30) return false;
                 _phase = 1; _ticks = 0;
                 return false;
             }
-            Log("AUTOTEST exp09io phase=" + _phase + " tick=" + _ticks);
+            if (_ticks % 150 == 0)
+                Log("AUTOTEST exp09io phase=" + _phase + " tick=" + _ticks);
             switch (_phase)
             {
                 case 1: PhaseStage(); break;
