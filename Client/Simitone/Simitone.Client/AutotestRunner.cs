@@ -406,6 +406,7 @@ namespace Simitone.Client
                     case 13: StateCutaway25(); break;
                     case 14: StateUI30(); break;
                     case 15: StateArchUndo(); break;
+                    case 16: StateExp09Io(); break;
                 }
             }
             catch (Exception e)
@@ -463,6 +464,18 @@ namespace Simitone.Client
                 _state = 10;
                 return;
             }
+            // EXP-09 leg 3 'exp09io' opt-in (additive): pet import/export — the
+            // shipped Strays_4000.FAM pet template staged patched (house 11, id
+            // 60), production import poll, runtime spawn via PlayHouse, then
+            // ExportFamily + artifact parse. No probe state writes.
+            if (CheckEnabled("exp09io"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST exp09io neighborhood-screen ready; entering pet io battery");
+                _exp09io = new AutotestExp09Io(Log, () => _vm, () => _screen != null && _screen.InLot,
+                    (short h) => _screen.PlayHouse(h, null));
+                _state = 16;
+                return;}
             // SAV-07 'sav07live'/'sav07live2' opt-in (additive): the live
             // export→import→save→fresh-load round-trip the impexport battery
             // excluded. Run 1 resets the deterministic isolation dir and does
@@ -792,6 +805,20 @@ namespace Simitone.Client
             Log("AUTOTEST impexport " + _impexport.Diagnostics);
             if (!_impexport.Passed) Log("AUTOTEST impexport FAILURES " + _impexport.Failures);
             _impexport = null;
+            Finish();
+        }
+
+        // EXP-09 leg 3 'exp09io': pet import/export fixture (AutotestExp09Io).
+        private static AutotestExp09Io _exp09io;
+
+        private static void StateExp09Io()
+        {
+            if (_exp09io == null) { Finish(); return; }
+            if (!_exp09io.Tick()) return;
+            if (_exp09io.Passed) Pass("exp09io"); else Fail("exp09io");
+            Log("AUTOTEST exp09io " + _exp09io.Diagnostics);
+            if (!_exp09io.Passed) Log("AUTOTEST exp09io FAILURES " + _exp09io.Failures);
+            _exp09io = null;
             Finish();
         }
 
