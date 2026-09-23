@@ -98,11 +98,19 @@ namespace Simitone.Client
             if (N == null)
             {
                 N = Content.Get().Neighborhood;
-                if (N == null || N.MainResource == null || N.UserPath == null) { _ticks++; return false; }
+                if (N == null || N.MainResource == null || N.UserPath == null)
+                {
+                    if (_ticks % 600 == 0)
+                        Log("AUTOTEST exp09io waiting neighborhood: N=" + (N != null)
+                            + " mr=" + (N?.MainResource != null) + " userPath=" + (N?.UserPath != null));
+                    _ticks++; return false;
+                }
+                Log("AUTOTEST exp09io neighborhood resolved");
                 if (_ticks++ < 30) return false;
                 _phase = 1; _ticks = 0;
                 return false;
             }
+            Log("AUTOTEST exp09io phase=" + _phase + " tick=" + _ticks);
             switch (_phase)
             {
                 case 1: PhaseStage(); break;
