@@ -109,6 +109,7 @@ namespace Simitone.Client
 
         public bool Tick()
         {
+            if (Done) return true;
             try { return TickInner(); }
             catch (Exception e)
             {
@@ -184,7 +185,7 @@ namespace Simitone.Client
             if (_fami == null)
             { Fail("import did not create/refresh family 4000 (rc=" + rc + ")"); Done = true; return; }
             if (_fami.FamilyGUIDs == null || _fami.FamilyGUIDs.Length < 2)
-            { Fail("imported family 60 carries " + (_fami.FamilyGUIDs?.Length ?? 0) + " members (want >=2)"); Done = true; return; }
+            { Fail("imported family 4000 carries " + (_fami.FamilyGUIDs?.Length ?? 0) + " members (want >=2)"); Done = true; return; }
             Log("AUTOTEST exp09io IMPORTED family 4000 house=" + _fami.HouseNumber + " members="
                 + _fami.FamilyGUIDs.Length + " *** PET IMPORT VERIFIED *** (runtime spawn leg scoped separately: needs a lot context)");
             Done = true;
