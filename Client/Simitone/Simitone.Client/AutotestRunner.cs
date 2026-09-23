@@ -5218,6 +5218,12 @@ namespace Simitone.Client
             {
                 Exp09TrainTick();
             }
+            // EXP-09 leg 3 runtime half (opt-in "exp09spawn"): spawn family
+            // 4000 on house 10 and verify the production export artifact.
+            if (CheckEnabled("exp09spawn") && _trsState != 99)
+            {
+                Exp09SpawnTick();
+            }
             if (CheckEnabled("exp09train") && _trState != 99)
             {
                 if (!_unlsSoakHeld)
@@ -24626,6 +24632,91 @@ namespace Simitone.Client
         // run-98 (V4.5): family-attach leg. 0 idle, 1 attach dispatched
         // (SetFamilyForHouse(44)+PlayHouse), 2 away VM rebound.
         private static int _vacV45;
+
+        // EXP-09 leg 3 runtime half (opt-in "exp09spawn"): the family 4000
+        // imported by exp09io (8 pet members, house 0 strays) is bound to
+        // house 10 via SetFamilyForHouse, spawned through PlayHouse, and the
+        // production ExportFamily artifact is parsed for the pet members.
+        // Zero probe state writes beyond the documented house assignment.
+        private static int _trsState; // 0 arm, 1 wait-spawn, 2 export watch, 99 done
+        private static int _trsSettle, _trsFrame;
+        private static FSO.Files.Formats.IFF.Chunks.FAMI _trsFami;
+
+        private static void Exp09SpawnInit()
+        {
+            if (++_trsSettle < 90) return;
+            _trsFami = Content.Get().Neighborhood.MainResource.List<FAMI>()
+                ?.FirstOrDefault(f => f != null && f.ChunkID == 4000);
+            if (_trsFami == null)
+            { Log("AUTOTEST exp09spawn: family 4000 not present (run exp09io first)"); Fail("exp09spawn"); _trsState = 99; return; }
+            Log("AUTOTEST exp09spawn arm family=4000 members="
+                + _trsFami.FamilyGUIDs.Length + " ["
+                + string.Join(",", _trsFami.FamilyGUIDs.Select(g => "0x" + g.ToString("x8"))) + "]");
+            Content.Get().Neighborhood.SetFamilyForHouse(10, _trsFami, false);
+            _screen.PlayHouse(10, null);
+            _trsState = 1; _trsFrame = 0;
+        }
+
+        private static void Exp09SpawnTick()
+        {
+            try
+            {
+                if (_trsState == 0) { Exp09SpawnInit(); return; }
+                if (_trsState == 99) return;
+                _trsFrame++;
+                if (_trsState == 1 && _screen != null && _screen.vm != null
+                    && !ReferenceEquals(_screen.vm, _vm))
+                    _vm = _screen.vm;
+                var avatars = _vm == null ? new List<VMAvatar>() : _vm.Entities.OfType<VMAvatar>().ToList();
+                if (_trsState == 1)
+                {
+                    var spawned = _trsFami.FamilyGUIDs
+                        .Select(g => avatars.FirstOrDefault(a => a.Object.OBJ.GUID == g)).ToList();
+                    if (_trsFrame > 12000)
+                    {
+                        Fail("exp09spawn"); _trsState = 99;
+                        Log("AUTOTEST exp09spawn spawn TIMEOUT present="
+                            + spawned.Count(a => a != null) + "/" + spawned.Count);
+                        return;
+                    }
+                    if (spawned.All(a => a != null))
+                    {
+                        Log("AUTOTEST exp09spawn SPAWNED f=" + _trsFrame + " oids="
+                            + string.Join(",", spawned.Select(a => "oid" + a.ObjectID)));
+                        _trsState = 2; _trsFrame = 0;
+                    }
+                    return;
+                }
+                // state 2: production export + artifact parse
+                var artifact = Content.Get().Neighborhood.ExportFamily(4000);
+                if (artifact == null)
+                { Fail("exp09spawn"); _trsState = 99; Log("AUTOTEST exp09spawn: ExportFamily(4000) null"); return; }
+                var expPath = Path.Combine(Content.Get().Neighborhood.UserPath, "Export", Path.GetFileName(artifact));
+                var h = new IffFile(expPath);
+                var expi = h.List<EXPi>()?.FirstOrDefault();
+                var fami = h.List<FAMI>()?.FirstOrDefault();
+                var nbrs = h.List<NBRS>()?.FirstOrDefault();
+                Log("AUTOTEST exp09io EXPORT artifact=" + Path.GetFileName(expPath)
+                    + " expiActive=" + (expi?.ActiveMemberIDs.Length ?? -1)
+                    + " nbrs=" + (nbrs?.Entries.Count ?? -1)
+                    + " famiMembers=" + (fami?.FamilyGUIDs?.Length ?? -1));
+                if (expi == null || fami == null || nbrs == null)
+                { Fail("exp09spawn"); _trsState = 99; Log("AUTOTEST exp09spawn: export chunks missing"); return; }
+                if (expi.ActiveMemberIDs.Length >= 8 && nbrs.Entries.Count >= 8
+                    && fami.FamilyGUIDs.Length >= 8)
+                {
+                    Log("AUTOTEST exp09spawn *** EXPORT CARRIES ALL 8 PETS ***");
+                    Pass("exp09spawn"); _trsState = 99; return;
+                }
+                Fail("exp09spawn"); _trsState = 99;
+                Log("AUTOTEST exp09spawn: export artifact incomplete — honest FAIL");
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST exp09spawn EXC " + ex.GetType().Name + ": " + ex.Message);
+                Fail("exp09spawn"); _trsState = 99;
+            }
+        }
 
         // EXP-09 leg 2 (opt-in "exp09train"): pet training via the Unleashed
         // Pet Trainer NPC (Person-typed 0x5b65e20b, census persons[31]). The
