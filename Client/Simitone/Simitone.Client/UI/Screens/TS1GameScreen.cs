@@ -985,8 +985,13 @@ namespace Simitone.Client.UI.Screens
                     // TRV-03 gap). Creates only MISSING members. DEFERRED to
                     // the next update: running it synchronously inside
                     // InitializeLot crashes the load (run-3 NRE in Draw).
-                    var tripVm = vm;
-                    GameThread.NextUpdate((state) => tripVm.TS1State.VerifyFamily(tripVm));
+                    // capture the SCREEN, not the vm: at callback time the
+                    // screen's vm is the newly-loaded away lot.
+                    var tripScreen = this;
+                    GameThread.NextUpdate((state) => {
+                        if (tripScreen.vm != null)
+                            tripScreen.vm.TS1State.VerifyFamily(tripScreen.vm);
+                    });
                 }
                 BlueprintReset(lotName, null);
                 // Read saved weather state now; apply it deferred in UpdateWeatherEffects
