@@ -971,11 +971,6 @@ namespace Simitone.Client.UI.Screens
                 // in progress (LotTransitInfo >= 1): VerifyFamily creates only
                 // the MISSING members, so the traveler is not duplicated.
                 var tripInProgress = (Content.Get().Neighborhood?.GameState?.LotTransitInfo ?? 0) >= 1;
-                // bounded diagnostic (TRV-03 fix verification): one line per
-                // away load, naming the branch inputs.
-                if (Downtown)
-                    Console.WriteLine("[TRV03-AWAY-ACTIVATE] downtown=True trip=" + tripInProgress
-                        + " activeFamily=" + (ActiveFamily != null ? ActiveFamily.ChunkID.ToString() : "null"));
                 if (ActiveFamily != null && (!Downtown || tripInProgress))
                 {
                     ActiveFamily.SelectWholeFamily();
