@@ -3272,6 +3272,13 @@ namespace Simitone.Client
         private static int _unlmState, _unlmSettle, _unlmFrame, _unlmSpawns, _unlmDespawns, _unlmChaseTicks;
         private static uint _unlmHumanGuid;
         private static bool _unlmChaseSeen;
+        // EXP-09 leg 1 (native-chase evidence): when set, the CAT-BRIDGE
+        // adjacency teleports are DISABLED and the chase criterion requires
+        // the cat's own routing frame to target a live mouse (critterTgt) —
+        // native chase execution, no probe-manufactured adjacency
+        // (arc-review P2 row; indep-review-exp05-arc).
+        private static readonly bool UnlmNativeChase =
+            Environment.GetEnvironmentVariable("SIMTONE_EXP09_NOBRIDGE") == "1";
         private static FSO.Files.Formats.IFF.Chunks.FAMI _unlmFam;
         private static VMEntity _unlmCtr;
         private static HashSet<short> _unlmOids0 = new HashSet<short>();
@@ -3790,7 +3797,7 @@ namespace Simitone.Client
                     // (the pet runs a perpetual autonomous agenda — run-10 law), so
                     // the bridge must not require idleness (run-22 judge-teleport
                     // precedent: SetPosition works on busy avatars too).
-                    if (_unlmFrame % 150 == 0 && _unlmCritterOids.Count > 0)
+                    if (!UnlmNativeChase && _unlmFrame % 150 == 0 && _unlmCritterOids.Count > 0)
                     {
                         var catB = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0]);
                         VMEntity nearM = null; int nearD = int.MaxValue;
@@ -3855,7 +3862,10 @@ namespace Simitone.Client
                                 + " rfTgt=oid" + (rfTop?.StackObject?.ObjectID ?? -1) + "@0x" + tgt.ToString("x8")
                                 + " mouseNear=" + mouseNear
                                 + " q=" + cat.Thread.Queue.Count);
-                        if (critterTgt || (rfTop != null && mouseNear != 0))
+                        // EXP-09 leg 1: in native-chase mode the adjacency proxy
+                        // (mouseNear) does NOT count — only the cat's own routing
+                        // frame targeting a live mouse evidences a native chase.
+                        if (critterTgt || (!UnlmNativeChase && rfTop != null && mouseNear != 0))
                         {
                             _unlmChaseTicks++;
                             if (_unlmChaseTicks >= 3 && !_unlmChaseSeen)
