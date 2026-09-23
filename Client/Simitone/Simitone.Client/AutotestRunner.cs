@@ -5225,6 +5225,21 @@ namespace Simitone.Client
             {
                 Exp09SpawnTick();
             }
+            // EXP-09 leg 4 (opt-in "exp09neg"): negatives/cancel for the
+            // booking gate.
+            if (CheckEnabled("exp09neg") && _ngState != 99)
+            {
+                Exp09NegTick();
+            }
+            if (CheckEnabled("exp09neg") && _ngState != 99)
+            {
+                if (!_unlsSoakHeld)
+                {
+                    _unlsSoakHeld = true;
+                    Log("AUTOTEST soak held for exp09neg (state=" + _ngState + ")");
+                }
+                return;
+            }
             if (CheckEnabled("exp09train") && _trState != 99)
             {
                 if (!_unlsSoakHeld)
@@ -5667,6 +5682,10 @@ namespace Simitone.Client
                 return; // (EXP-05 V3) despawn forensics still driving; battery finishes after the verdict
             if (CheckEnabled("unl-travel") && _unltrState != 99)
                 return; // (EXP-05 V6) Old Town round trip still driving; battery finishes after the verdict
+            if (CheckEnabled("exp09spawn") && _trsState != 99)
+                return; // (EXP-09) spawn/export still driving
+            if (CheckEnabled("exp09neg") && _ngState != 99)
+                return; // (EXP-09 leg 4) negatives still driving
             if (CheckEnabled("exp09train") && _trState != 99)
                 return; // (EXP-09) training trial still driving; battery finishes after the verdict
             if (CheckEnabled("llfire") && _ll3State != 2)
@@ -24633,6 +24652,170 @@ namespace Simitone.Client
         // run-98 (V4.5): family-attach leg. 0 idle, 1 attach dispatched
         // (SetFamilyForHouse(44)+PlayHouse), 2 away VM rebound.
         private static int _vacV45;
+
+        // EXP-09 leg 4 (opt-in "exp09neg"): negatives/cancel for the booking
+        // gate. Phase NEG: family budget forced to 100 (below the 4100@1
+        // $500 TransferFunds JustTest) -> push plugin row 2 (tests KEPT) ->
+        // the tree must refuse CLEANLY (interaction gone, no tokens, no
+        // transit, budget untouched, no crash) — formalizing the exp09spawn
+        // run-2 law. Phase CANCEL: budget raised to 50000, row 2 re-pushed;
+        // once the interaction engages, CancelAction(uid) mid-flight -> clean
+        // teardown, still no tokens (cancel must not half-book). PASS = both
+        // negatives clean.
+        private static int _ngState; // 0 settle+neg push, 1 neg watch, 2 cancel push, 3 cancel watch, 4 pos re-push, 5 pos watch, 99 done
+        private static int _ngSettle, _ngFrame, _ngRow = -1;
+        private static uint _ngUid;
+        private static VMEntity _ngTarget;
+        private static VMAvatar _ngHost;
+        private static FSO.Files.Formats.IFF.Chunks.FAMI _ngFam;
+        private static bool _ngNegOk, _ngCancelOk, _ngEngaged;
+
+        private static void Exp09NegInit()
+        {
+            if (++_ngSettle < 90) return;
+            var avatars = _vm?.Context?.ObjectQueries?.Avatars?.OfType<VMAvatar>()
+                .Where(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD).ToList();
+            if (avatars == null || avatars.Count == 0)
+            { Log("AUTOTEST exp09neg: no avatar"); Fail("exp09neg"); _ngState = 99; return; }
+            _ngHost = avatars.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? avatars[0];
+            foreach (var e in _vm.Entities)
+            {
+                var ttab = e.Object?.Resource?.Iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                if (ttab == null || (ttab.Interactions?.Length ?? 0) == 0) continue;
+                for (int i = 0; i < ttab.Interactions.Length; i++)
+                    if (ttab.Interactions[i].ActionFunction == 4100) { _ngRow = i; _ngTarget = e; break; }
+                if (_ngRow >= 0) break;
+            }
+            if (_ngRow < 0)
+            { Log("AUTOTEST exp09neg: no 'Go On Vacation' (4100) row found"); Fail("exp09neg"); _ngState = 99; return; }
+            _ngFam = Content.Get().Neighborhood.GetFamilyForHouse(5);
+            if (_ngFam == null)
+            { Log("AUTOTEST exp09neg: house-5 family missing"); Fail("exp09neg"); _ngState = 99; return; }
+            // NEG fixture prep (disclosed): force the budget below the $500
+            // test — the refusal must be clean and leave no state behind.
+            _ngFam.Budget = 100;
+            Log("AUTOTEST exp09neg: budget forced 100 (NEG prep, FAMI field); row=" + _ngRow
+                + " af=4100 on obj" + _ngTarget.ObjectID);
+            var act = _ngTarget.GetAction((short)_ngRow, _ngHost, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+            if (act == null)
+            { Log("AUTOTEST exp09neg: GetAction null at NEG (clean refusal at enqueue)"); Fail("exp09neg"); _ngState = 99; return; }
+            _ngHost.Thread.EnqueueAction(act);
+            _ngUid = act.UID;
+            _ngState = 1; _ngFrame = 0;
+            Log("AUTOTEST exp09neg NEG PUSH uid=" + act.UID + " at " + Sim3Clock());
+        }
+
+        private static void Exp09NegTick()
+        {
+            try
+            {
+                if (_ngState == 0) { Exp09NegInit(); return; }
+                if (_ngState == 99) return;
+                _ngFrame++;
+                HPAnswerDialogs(); // queue-path responder for any dialog the gate raises
+                var transit = Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1;
+                var tokens = TrvbTokensHost(_ngHost);
+                switch (_ngState)
+                {
+                    case 1: // NEG watch: refusal must be clean
+                        if (_ngFrame >= 900)
+                        {
+                            var aa = _ngHost.Thread.ActiveAction;
+                            bool engaged = aa != null && aa.UID == _ngUid;
+                            bool clean = !engaged && tokens == "none" && transit < 1 && _ngFam.Budget == 100;
+                            Log("AUTOTEST exp09neg NEG result engaged=" + engaged + " tokens=" + tokens
+                                + " transit=" + transit + " budget=" + _ngFam.Budget
+                                + " -> " + (clean ? "CLEAN REFUSAL" : "UNEXPECTED STATE"));
+                            if (!clean) { Fail("exp09neg"); _ngState = 99; return; }
+                            _ngNegOk = true;
+                            // CANCEL phase: restore the budget, re-push, cancel mid-flight
+                            _ngFam.Budget = 50000;
+                            Log("AUTOTEST exp09neg: budget restored 50000 (CANCEL prep)");
+                            var act = _ngTarget.GetAction((short)_ngRow, _ngHost, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                            if (act == null)
+                            { Log("AUTOTEST exp09neg: CANCEL GetAction null"); Fail("exp09neg"); _ngState = 99; return; }
+                            _ngHost.Thread.EnqueueAction(act);
+                            _ngUid = act.UID; _ngEngaged = false;
+                            _ngState = 2; _ngFrame = 0;
+                            Log("AUTOTEST exp09neg CANCEL PUSH uid=" + act.UID);
+                        }
+                        break;
+                    case 2: // wait for engagement
+                        var aa2 = _ngHost.Thread.ActiveAction;
+                        if (aa2 != null && aa2.UID == _ngUid)
+                        {
+                            _ngEngaged = true;
+                            Log("AUTOTEST exp09neg: engaged uid" + _ngUid + " '" + aa2.Name + "' at " + Sim3Clock());
+                        }
+                        if (_ngFrame >= 600)
+                        {
+                            if (!_ngEngaged)
+                            { Log("AUTOTEST exp09neg: row never engaged within 600f (treated as refusal-class; skip cancel)"); _ngState = 4; _ngFrame = 0; break; }
+                            // CANCEL mid-flight
+                            _ngHost.Thread.CancelAction((ushort)_ngUid);
+                            Log("AUTOTEST exp09neg CANCELLED uid=" + _ngUid + " mid-flight at " + Sim3Clock());
+                            _ngState = 3; _ngFrame = 0;
+                        }
+                        break;
+                    case 3: // cancel watch: clean teardown, no partial state
+                        if (_ngFrame >= 900)
+                        {
+                            var aa3 = _ngHost.Thread.ActiveAction;
+                            bool still = aa3 != null && aa3.UID == _ngUid;
+                            bool clean2 = !still && tokens == "none" && transit < 1;
+                            Log("AUTOTEST exp09neg CANCEL result stillRunning=" + still + " tokens=" + tokens
+                                + " transit=" + transit + " budget=" + _ngFam.Budget
+                                + " -> " + (clean2 ? "CLEAN CANCEL" : "PARTIAL STATE"));
+                            _ngCancelOk = clean2;
+                            // POS observational: healthy budget re-push, log only
+                            var act = _ngTarget.GetAction((short)_ngRow, _ngHost, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                            if (act != null)
+                            {
+                                _ngHost.Thread.EnqueueAction(act);
+                                _ngUid = act.UID;
+                                Log("AUTOTEST exp09neg POS PUSH uid=" + act.UID + " (observational booking window)");
+                            }
+                            _ngState = 4; _ngFrame = 0;
+                        }
+                        break;
+                    case 4: // positive observational window
+                        HPAnswerDialogs();
+                        if (_ngFrame % 150 == 0)
+                        {
+                            var aa4 = _ngHost.Thread.ActiveAction;
+                            Log("AUTOTEST exp09neg POS f=" + _ngFrame + " aa=" + (aa4 == null ? "none" : "'" + aa4.Name + "'")
+                                + " transit=" + transit + " tokens=" + tokens + " budget=" + _ngFam.Budget);
+                        }
+                        if (transit >= 1 || (tokens != "none" && tokens.Length > 0))
+                        {
+                            Log("AUTOTEST exp09neg POS: booking observable landed f=" + _ngFrame + " tokens=" + tokens + " transit=" + transit);
+                        }
+                        if (_ngFrame >= 4000)
+                        {
+                            Log("AUTOTEST exp09neg POS window closed (observational; no verdict requirement)");
+                            if (_ngNegOk && _ngCancelOk) { Pass("exp09neg"); }
+                            else { Fail("exp09neg"); }
+                            _ngState = 99;
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST exp09neg EXC " + ex.GetType().Name + ": " + ex.Message + " @ " + ex.StackTrace);
+                Fail("exp09neg"); _ngState = 99;
+            }
+        }
+
+        /// <summary>TrvbTokens for an arbitrary avatar (host-based token probe).</summary>
+        private static string TrvbTokensHost(VMAvatar host)
+        {
+            var inv = Content.Get().Neighborhood.GetInventoryByNID(
+                host.GetPersonData(VMPersonDataVariable.NeighborId));
+            return inv == null ? "none" : string.Join(",", inv
+                .Where(x => x.Type == 2 && (x.GUID == 7 || x.GUID == 8))
+                .Select(x => x.GUID + ":" + x.Count));
+        }
 
         // EXP-09 leg 3 runtime half (opt-in "exp09spawn"): the family 4000
         // imported by exp09io (8 pet members, house 0 strays) is bound to
