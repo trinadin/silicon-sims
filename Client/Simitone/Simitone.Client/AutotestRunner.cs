@@ -24653,6 +24653,14 @@ namespace Simitone.Client
             Log("AUTOTEST exp09spawn arm family=4000 members="
                 + _trsFami.FamilyGUIDs.Length + " ["
                 + string.Join(",", _trsFami.FamilyGUIDs.Select(g => "0x" + g.ToString("x8"))) + "]");
+            if (_screen == null)
+            {
+                // screen not constructed yet (early neighborhood frames) —
+                // retry on a later tick, do not consume the settle.
+                _trsSettle = 89;
+                Log("AUTOTEST exp09spawn: screen not ready, retrying");
+                return;
+            }
             Content.Get().Neighborhood.SetFamilyForHouse(10, _trsFami, false);
             _screen.PlayHouse(10, null);
             _trsState = 1; _trsFrame = 0;
@@ -24714,7 +24722,7 @@ namespace Simitone.Client
             }
             catch (Exception ex)
             {
-                Log("AUTOTEST exp09spawn EXC " + ex.GetType().Name + ": " + ex.Message);
+                Log("AUTOTEST exp09spawn EXC " + ex.GetType().Name + ": " + ex.Message + " @ " + ex.StackTrace);
                 Fail("exp09spawn"); _trsState = 99;
             }
         }
