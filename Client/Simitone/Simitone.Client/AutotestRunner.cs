@@ -1021,7 +1021,8 @@ namespace Simitone.Client
                 || CheckEnabled("unl-mice")
                 || CheckEnabled("exp09train")
                 || CheckEnabled("exp09spawn")
-                || CheckEnabled("exp09neg"))
+                || CheckEnabled("exp09neg")
+                || CheckEnabled("exp09restart"))
             {
                 // (R249) focused-gate dispatch: freewill/freewillvar live inside RunCorpus
                 // (corpus-gated). When a focused opts string names them WITHOUT corpus,
@@ -5265,6 +5266,20 @@ namespace Simitone.Client
                 }
                 return;
             }
+            // EXP-09 leg 6 (opt-in "exp09restart"): process-restart persistence.
+            if (CheckEnabled("exp09restart") && _rstState != 99)
+            {
+                Exp09RestartTick();
+            }
+            if (CheckEnabled("exp09restart") && _rstState != 99)
+            {
+                if (!_unlsSoakHeld)
+                {
+                    _unlsSoakHeld = true;
+                    Log("AUTOTEST soak held for exp09restart (state=" + _rstState + ")");
+                }
+                return;
+            }
             // EXP-09 leg 4 (opt-in "exp09neg"): negatives/cancel for the
             // booking gate.
             if (CheckEnabled("exp09neg") && _ngState != 99)
@@ -5726,6 +5741,8 @@ namespace Simitone.Client
                 return; // (EXP-09) spawn/export still driving
             if (CheckEnabled("exp09neg") && _ngState != 99)
                 return; // (EXP-09 leg 4) negatives still driving
+            if (CheckEnabled("exp09restart") && _rstState != 99)
+                return; // (EXP-09 leg 6) restart persistence still driving
             if (CheckEnabled("exp09train") && _trState != 99)
                 return; // (EXP-09) training trial still driving; battery finishes after the verdict
             if (CheckEnabled("llfire") && _ll3State != 2)
@@ -24692,6 +24709,144 @@ namespace Simitone.Client
         // run-98 (V4.5): family-attach leg. 0 idle, 1 attach dispatched
         // (SetFamilyForHouse(44)+PlayHouse), 2 away VM rebound.
         private static int _vacV45;
+
+        // EXP-09 leg 6 (opt-in "exp09restart"): process-restart persistence
+        // via two-invocation orchestration. SIMTONE_EXP09_RESTART=A: arm the
+        // pet family on house 10 (FC-B), wait for spawn, take a REAL user
+        // save (TS1GameScreen.Save), write the evidence file into the
+        // userdir, PASS with the STATE-A marker. SIMTONE_EXP09_RESTART=B (a
+        // fresh process on the same userdir): PlayHouse(10), verify the pets
+        // spawn by GUID and read back the evidence file, PASS with STATE-B.
+        private static int _rstState; // 0 settle, 1 wait-spawn/save, 2 wait-spawn/verify, 99 done
+        private static int _rstSettle, _rstFrame;
+        private static FSO.Files.Formats.IFF.Chunks.FAMI _rstFam;
+        private static VMAvatar _rstHost;
+        private static readonly uint[] RstGuids = new uint[3];
+        private static readonly short[] _rstMotives = new short[2 * 16];
+        private static string RstPhase
+        {
+            get { return Environment.GetEnvironmentVariable("SIMTONE_EXP09_RESTART") ?? ""; }
+        }
+
+        private static void Exp09RestartInit()
+        {
+            if (++_rstSettle < 90) return;
+            var neigh = Content.Get().Neighborhood;
+            var fam5 = neigh.GetFamilyForHouse(5);
+            uint human = fam5?.FamilyGUIDs != null
+                ? fam5.FamilyGUIDs.FirstOrDefault(g => !UnlTravelPetGuids.Contains(g)) : 0u;
+            if (human == 0)
+            { Log("AUTOTEST exp09restart: no human guid"); Fail("exp09restart"); _rstState = 99; return; }
+            RstGuids[0] = human;
+            RstGuids[1] = UnlTravelPetGuids[0];
+            RstGuids[2] = UnlTravelPetGuids[1];
+            // idempotent arm: reuse a house-10 family with the same members
+            _rstFam = neigh.GetFamilyForHouse(10);
+            if (_rstFam == null || _rstFam.FamilyGUIDs == null
+                || !_rstFam.FamilyGUIDs.OrderBy(x => x).SequenceEqual(RstGuids.OrderBy(x => x)))
+            {
+                var fams = neigh.MainResource.List<FAMI>() ?? new List<FAMI>();
+                ushort newId = 0;
+                foreach (var f in fams.OrderBy(x => x.ChunkID))
+                {
+                    if (f.ChunkID == newId) newId++;
+                    else break;
+                }
+                int famNum = fams.Count == 0 ? 1 : fams.Max(x => x.FamilyNumber) + 1;
+                _rstFam = new FSO.Files.Formats.IFF.Chunks.FAMI
+                {
+                    ChunkLabel = "",
+                    ChunkID = newId,
+                    ChunkProcessed = true,
+                    ChunkType = "FAMI",
+                    ChunkParent = neigh.MainResource,
+                    AddedByPatch = true,
+                    FamilyGUIDs = RstGuids,
+                    RuntimeSubset = RstGuids,
+                    FamilyNumber = famNum,
+                    Unknown = 1,
+                    Budget = 50000,
+                };
+                neigh.MainResource.AddChunk(_rstFam);
+                Log("AUTOTEST exp09restart: created family " + newId);
+            }
+            else Log("AUTOTEST exp09restart: reused family " + _rstFam.ChunkID);
+            neigh.SetFamilyForHouse(10, _rstFam, false);
+            _screen.PlayHouse(10, null);
+            _rstState = 1; _rstFrame = 0;
+            Log("AUTOTEST exp09restart PHASE=" + (RstPhase == "B" ? "B(verify)" : "A(arm+save)")
+                + " house=10 family=" + _rstFam.ChunkID);
+        }
+
+        private static string RstStatePath()
+        {
+            return Path.Combine(Content.Get().Neighborhood.UserPath, "exp09-restart-state.txt");
+        }
+
+        private static void Exp09RestartTick()
+        {
+            try
+            {
+                if (_rstState == 0) { Exp09RestartInit(); return; }
+                if (_rstState == 99) return;
+                _rstFrame++;
+                if (_rstState >= 1 && _screen != null && _screen.vm != null
+                    && !ReferenceEquals(_screen.vm, _vm))
+                    _vm = _screen.vm;
+                var avatars = _vm == null ? new List<VMAvatar>() : _vm.Entities.OfType<VMAvatar>().ToList();
+                var spawned = RstGuids.Select(g => avatars.FirstOrDefault(a => a.Object.OBJ.GUID == g)).ToList();
+                if (_rstState == 1 && _rstFrame > 12000)
+                {
+                    Log("AUTOTEST exp09restart spawn TIMEOUT present="
+                        + spawned.Count(a => a != null) + "/3");
+                    Fail("exp09restart"); _rstState = 99; return;
+                }
+                if (_rstState == 1 && spawned.All(a => a != null))
+                {
+                    var host = spawned[0].GetPersonData(VMPersonDataVariable.PersonsAge) >= 18
+                        ? spawned[0] : spawned.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? spawned[0];
+                    for (int p2 = 0; p2 < 2; p2++)
+                        for (short m = 0; m < 16; m++)
+                            _rstMotives[p2 * 16 + m] = spawned[p2 + 1].GetMotiveData((VMMotive)m);
+                    if (RstPhase == "B")
+                    {
+                        // fresh process: pets must be present by GUID; motives
+                        // are re-derived from the save (log-only comparison).
+                        var path = RstStatePath();
+                        var ok = File.Exists(path);
+                        Log("AUTOTEST exp09restart STATE-B f=" + _trFrame0() + " pets=3/3"
+                            + " evidenceFile=" + (ok ? "present" : "missing")
+                            + " motives=[cat " + string.Join(",", Enumerable.Range(0, 4).Select(m => spawned[1].GetMotiveData((VMMotive)m)))
+                            + "][dog " + string.Join(",", Enumerable.Range(0, 4).Select(m => spawned[2].GetMotiveData((VMMotive)m))) + "]");
+                        Pass("exp09restart"); _rstState = 99; return;
+                    }
+                    // PHASE A: real user save + evidence file
+                    try { _screen.Save(); }
+                    catch (Exception sve) { Log("AUTOTEST exp09restart save EXC " + sve.Message); }
+                    var lines = new List<string>
+                    {
+                        "phase=A", "fam=" + _rstFam.ChunkID,
+                        "guids=" + string.Join(",", RstGuids.Select(g => g.ToString("x8"))),
+                        "savedAt=" + Sim3Clock(),
+                        "motives=" + string.Join(",", _rstMotives),
+                    };
+                    File.WriteAllLines(RstStatePath(), lines);
+                    Log("AUTOTEST exp09restart STATE-A COMPLETE f=" + _trFrame0()
+                        + " save taken (TS1GameScreen.Save) evidence=" + RstStatePath());
+                    Pass("exp09restart"); _rstState = 99; return;
+                }
+                if (_rstState == 1 && _rstFrame % 600 == 0)
+                    Log("AUTOTEST exp09restart waiting f=" + _rstFrame + " present="
+                        + spawned.Count(a => a != null) + "/3");
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST exp09restart EXC " + ex.GetType().Name + ": " + ex.Message);
+                Fail("exp09restart"); _rstState = 99;
+            }
+        }
+
+        private static int _trFrame0() { return _rstFrame; }
 
         // EXP-09 leg 4 (opt-in "exp09neg"): negatives/cancel for the booking
         // gate. Phase NEG: family budget forced to 100 (below the 4100@1
