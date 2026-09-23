@@ -967,7 +967,8 @@ namespace Simitone.Client
                 || CheckEnabled("unl-pets2")
                 || CheckEnabled("unl-travel")
                 || CheckEnabled("unl-show")
-                || CheckEnabled("unl-mice"))
+                || CheckEnabled("unl-mice")
+                || CheckEnabled("exp09train"))
             {
                 // (R249) focused-gate dispatch: freewill/freewillvar live inside RunCorpus
                 // (corpus-gated). When a focused opts string names them WITHOUT corpus,
@@ -5184,6 +5185,21 @@ namespace Simitone.Client
                     FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Clear();
                 }
             }
+            // EXP-09 leg 2 (opt-in "exp09train"): trainer-NPC training trial.
+            // Ticks BEFORE the soak-hold (which returns while active).
+            if (CheckEnabled("exp09train") && _trState != 99)
+            {
+                Exp09TrainTick();
+            }
+            if (CheckEnabled("exp09train") && _trState != 99)
+            {
+                if (!_unlsSoakHeld)
+                {
+                    _unlsSoakHeld = true;
+                    Log("AUTOTEST soak held for exp09train (state=" + _trState + ")");
+                }
+                return;
+            }
             var minute = _vm.Context.Clock.Minutes;
             if (_motiveStartMinute < 0) _motiveStartMinute = minute;
 
@@ -5617,6 +5633,8 @@ namespace Simitone.Client
                 return; // (EXP-05 V3) despawn forensics still driving; battery finishes after the verdict
             if (CheckEnabled("unl-travel") && _unltrState != 99)
                 return; // (EXP-05 V6) Old Town round trip still driving; battery finishes after the verdict
+            if (CheckEnabled("exp09train") && _trState != 99)
+                return; // (EXP-09) training trial still driving; battery finishes after the verdict
             if (CheckEnabled("llfire") && _ll3State != 2)
                 return; // (EXP-01 llfire) fire/rocket legs still driving; battery finishes after the verdict
             if (CheckEnabled("aud12live") && _a12State != 2)
@@ -24581,6 +24599,156 @@ namespace Simitone.Client
         // run-98 (V4.5): family-attach leg. 0 idle, 1 attach dispatched
         // (SetFamilyForHouse(44)+PlayHouse), 2 away VM rebound.
         private static int _vacV45;
+
+        // EXP-09 leg 2 (opt-in "exp09train"): pet training via the Unleashed
+        // Pet Trainer NPC (Person-typed 0x5b65e20b, census persons[31]). The
+        // trainer joins the arm family through the proven FC-B VerifyFamily
+        // path; once spawned, its own TTAB row 'Train Pet' (af 4105) is
+        // pushed as a REAL queued interaction on the trainer, tests kept,
+        // with Param[0] = the dog's object id (the 4105 ladder reads
+        // pd[pet][12] training level and pushes trick interactions per
+        // rung). Verdict: pet pd[12] delta vs the pre-push snapshot (the
+        // training skill write), zero faults. Honest FAIL dumps name the
+        // barrier (spawn gap / row rejection / no writes).
+        private static int _trState; // 0 arm, 1 wait-spawn+push, 2 watch, 99 done
+        private static int _trSettle, _trFrame;
+        private static FSO.Files.Formats.IFF.Chunks.FAMI _trFam;
+        private static readonly uint Exp09TrainerGuid = 0x5b65e20bu;
+        private static VMAvatar _trTrainer;
+        private static uint _trUid;
+        private static short _trDogPd12 = -1, _trCatPd12 = -1;
+        private static readonly uint[] _trGuids = new uint[4];
+
+        private static void Exp09TrainInit()
+        {
+            if (++_trSettle < 90) return;
+            var neigh = Content.Get().Neighborhood;
+            uint human = 0;
+            var fam5 = neigh.GetFamilyForHouse(5);
+            if (fam5?.FamilyGUIDs != null)
+                human = fam5.FamilyGUIDs.FirstOrDefault(g => !UnlTravelPetGuids.Contains(g));
+            _trGuids[0] = human;
+            _trGuids[1] = UnlTravelPetGuids[0];
+            _trGuids[2] = UnlTravelPetGuids[1];
+            _trGuids[3] = Exp09TrainerGuid;
+            if (human == 0)
+            { Log("AUTOTEST exp09train: no human guid"); Fail("exp09train"); _trState = 99; return; }
+            var fams = neigh.MainResource.List<FAMI>() ?? new List<FAMI>();
+            ushort newId = 0;
+            foreach (var f in fams.OrderBy(x => x.ChunkID))
+            {
+                if (f.ChunkID == newId) newId++;
+                else break;
+            }
+            int famNum = fams.Count == 0 ? 1 : fams.Max(x => x.FamilyNumber) + 1;
+            _trFam = new FSO.Files.Formats.IFF.Chunks.FAMI
+            {
+                ChunkLabel = "",
+                ChunkID = newId,
+                ChunkProcessed = true,
+                ChunkType = "FAMI",
+                ChunkParent = neigh.MainResource,
+                AddedByPatch = true,
+                FamilyGUIDs = _trGuids,
+                RuntimeSubset = _trGuids,
+                FamilyNumber = famNum,
+                Unknown = 1,
+                Budget = 50000,
+            };
+            neigh.MainResource.AddChunk(_trFam);
+            neigh.SetFamilyForHouse(10, _trFam, false);
+            Log("AUTOTEST exp09train arm famId=" + newId + " house=10 guids="
+                + string.Join(",", _trGuids.Select(g => "0x" + g.ToString("x8"))));
+            _screen.PlayHouse(10, null);
+            _trState = 1; _trFrame = 0;
+        }
+
+        private static void Exp09TrainTick()
+        {
+            try
+            {
+                if (_trState == 0) { Exp09TrainInit(); return; }
+                if (_trState == 99) return;
+                _trFrame++;
+                if (_trState == 1 && _screen != null && _screen.vm != null
+                    && !ReferenceEquals(_screen.vm, _vm))
+                    _vm = _screen.vm; // post-PlayHouse rebind (state-1 law)
+                var avatars = _vm == null ? new List<VMAvatar>() : _vm.Entities.OfType<VMAvatar>().ToList();
+                if (_trState == 1)
+                {
+                    if (_trFrame > 12000)
+                    {
+                        Log("AUTOTEST exp09train spawn TIMEOUT avatars="
+                            + string.Join(",", avatars.Select(a => "0x" + a.Object.OBJ.GUID.ToString("x8"))));
+                        Fail("exp09train"); _trState = 99; return;
+                    }
+                    var spawned = _trGuids.Select(g => avatars.FirstOrDefault(a => a.Object.OBJ.GUID == g)).ToList();
+                    if (spawned.Any(a => a == null))
+                    {
+                        if (_trFrame % 600 == 0)
+                            Log("AUTOTEST exp09train waiting f=" + _trFrame + " spawned="
+                                + string.Join(",", spawned.Select(a => a == null ? "-" : "oid" + a.ObjectID)));
+                        return;
+                    }
+                    _trTrainer = spawned[3];
+                    var cat = spawned[1]; var dog = spawned[2];
+                    _trCatPd12 = cat.GetPersonData((VMPersonDataVariable)12);
+                    _trDogPd12 = dog.GetPersonData((VMPersonDataVariable)12);
+                    var ttab = _trTrainer.Object?.Resource?.Iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                    int row = -1;
+                    if (ttab != null)
+                        for (int i = 0; i < ttab.Interactions.Length; i++)
+                            if (ttab.Interactions[i].ActionFunction == 4105) { row = i; break; }
+                    if (row < 0)
+                    { Log("AUTOTEST exp09train: no 'Train Pet' (af 4105) row on the trainer"); Fail("exp09train"); _trState = 99; return; }
+                    // the push: real queued interaction on the trainer, tests
+                    // kept, Param[0] = the DOG's object id (4105 ladder input).
+                    var act = _trTrainer.GetAction((short)row, _trTrainer, _vm.Context, false,
+                        new short[] { dog.ObjectID, 0, 0, 0 });
+                    if (act == null)
+                    { Log("AUTOTEST exp09train: GetAction null (test rejected Train Pet)"); Fail("exp09train"); _trState = 99; return; }
+                    _trTrainer.Thread.EnqueueAction(act);
+                    _trUid = act.UID;
+                    _trState = 2; _trFrame = 0;
+                    Log("AUTOTEST exp09train PUSH row=" + row + " uid=" + act.UID
+                        + " checkRoutine=" + (act.CheckRoutine == null ? "null" : "KEPT")
+                        + " param0=" + dog.ObjectID + " (dog oid" + dog.ObjectID
+                        + " pd12=" + _trDogPd12 + " cat pd12=" + _trCatPd12 + ") at " + Sim3Clock());
+                    return;
+                }
+                // state 2: watch the training ladder
+                var dogNow = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[1]);
+                var catNow = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0]);
+                var dog12 = dogNow != null ? dogNow.GetPersonData((VMPersonDataVariable)12) : _trDogPd12;
+                var cat12 = catNow != null ? catNow.GetPersonData((VMPersonDataVariable)12) : _trCatPd12;
+                if (_trFrame % 150 == 0)
+                {
+                    var aa = _trTrainer?.Thread?.ActiveAction;
+                    var aaDog = dogNow?.Thread?.ActiveAction;
+                    Log("AUTOTEST exp09train f=" + _trFrame + " trainerAA=" + (aa == null ? "none" : "'" + aa.Name + "' uid" + aa.UID)
+                        + " (train uid" + _trUid + ") dogAA=" + (aaDog == null ? "none" : "'" + aaDog.Name + "' uid" + aaDog.UID)
+                        + " dog pd12=" + dog12 + " (was " + _trDogPd12 + ") cat pd12=" + cat12
+                        + " avatars=" + avatars.Count);
+                }
+                if ((dog12 != _trDogPd12 || cat12 != _trCatPd12) && _trFrame >= 60)
+                {
+                    Log("AUTOTEST exp09train TRAINED f=" + _trFrame + " dog pd12 " + _trDogPd12 + "->" + dog12
+                        + " cat pd12 " + _trCatPd12 + "->" + cat12);
+                    Pass("exp09train"); _trState = 99; return;
+                }
+                if (_trFrame >= 12000)
+                {
+                    Log("AUTOTEST exp09train TIMEOUT f=" + _trFrame + " dog pd12=" + dog12
+                        + " cat pd12=" + cat12 + " — honest FAIL: training ladder never wrote");
+                    Fail("exp09train"); _trState = 99; return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST exp09train EXC " + ex.GetType().Name + ": " + ex.Message);
+                Fail("exp09train"); _trState = 99;
+            }
+        }
 
         private static void VacInit()
         {
