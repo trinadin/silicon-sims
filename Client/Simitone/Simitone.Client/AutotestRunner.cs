@@ -24687,12 +24687,13 @@ namespace Simitone.Client
                 {
                     var spawned = _trsFami.FamilyGUIDs
                         .Select(g => avatars.FirstOrDefault(a => a.Object.OBJ.GUID == g)).ToList();
-                    if (_trsFrame > 12000)
+                    if (_trsFrame > 1500)
                     {
                         // run 4 law: imported strays GUIDs are generated character
                         // ids, not catalog templates — none can spawn. Proceed to
                         // the export verification (registry-level; the artifact
-                        // should still carry all 8 pet members).
+                        // should still carry all 8 pet members). 1500f keeps the
+                        // verdict inside the master's ~40s REL-11 window.
                         Log("AUTOTEST exp09spawn spawn window closed (present="
                             + spawned.Count(a => a != null) + "/" + spawned.Count
                             + " — unresolvable-template law) — proceeding to export verify");
