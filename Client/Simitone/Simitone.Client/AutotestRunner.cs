@@ -28549,7 +28549,24 @@ namespace Simitone.Client
         private static string _ssBookTerminal;
         private static bool _ssBookCabSeen;
         private static bool _ssBookTokensSeen;
+        private static bool _ssBookClockArmed;
+        private static int _ssBookTokH = -1;
+        private static int _ssBookTokM = -1;
         private static int _ssBookAnswered;
+        private static readonly List<string> _ssBookTrace = new List<string>();
+        private static readonly Dictionary<string, int> _ssBookTraceAgg = new Dictionary<string, int>();
+        private static bool _ssBookTraceArmed;
+        private static bool _ssBookTraceDone;
+        private static bool _ssBookSelectorDone;
+        private static bool _ssBookArrived;
+        private static int _ssBookArrivedFrame = -1;
+        private static readonly Dictionary<int, short[]> _ssBookPD0 = new Dictionary<int, short[]>();
+        private static readonly HashSet<string> _ssBookStings = new HashSet<string>();
+        private static bool _ssBookPerfPushed;
+        private static bool _ssBookFameSting;
+        private static readonly Dictionary<string, int> _ssBookPDDiffs = new Dictionary<string, int>();
+        private static int _ssBookLastUpdates = -1, _ssBookLastTicks = -1;
+        private static int _ssBookTraceOther;
         private static bool _ssBookNotifyArmed;
         private static int _ssBookNotifyFrame = -1;
         private static void SSBookTick()
@@ -28579,6 +28596,196 @@ namespace Simitone.Client
                     Log("AUTOTEST ss-book pushed row 2 'Go to Studio Town' uid=" + action.UID);
                     return;
                 }
+                // R157 unpause replication: my short-circuit bypasses StateSample's
+                // own unpause, so a mid-watch dialog park (speed=-2) would stall the
+                // WHOLE VM and read as "thread never executes" (the run-11 artifact).
+                // The engine's pause is legitimate blocking-dialog UX; the probe
+                // unpauses exactly as the runner does elsewhere. Review note (P3):
+                // clearing GlobalBlockingDialog here does NOT set BlockingState.
+                //Responded — the same-tick entity-scan responder answers any
+                // unresponded VMDialogResult; a parked BlockingState that is not a
+                // VMDialogResult would be masked as "running" (identical to the
+                // runner's own r157 semantics).
+                if (_vm.SpeedMultiplier <= 0)
+                {
+                    var staleLatch = _vm.GlobalBlockingDialog;
+                    _vm.SpeedMultiplier = _vm.LastSpeedMultiplier > 0 ? _vm.LastSpeedMultiplier : 1;
+                    _vm.LastSpeedMultiplier = 0;
+                    _vm.GlobalBlockingDialog = null;
+                    Log("AUTOTEST ss-book unpaused vm (speed was <=0; stale-latch "
+                        + (staleLatch == null ? "none" : "obj" + staleLatch.ObjectID) + " released) at f=" + _ssBookFrame);
+                }
+
+                // One-shot manual entity-tick bracket (the EXP-04 V3.4 bisect): if a
+                // manual avatar.Tick() executes instructions while the scheduler's own
+                // pump executes none, the entity is stranded outside TickSchedule; if
+                // the manual tick also executes nothing, the thread exits early.
+                if (_ssBookFrame == 400)
+                {
+                    // review P2: deliberately NOT gated on _ssBookTraceDone — booking
+                    // success disarms the trace by f~138 (budget exhausted), which
+                    // would otherwise starve this bracket in exactly the headline
+                    // scenario it was built to bisect.
+                    var avObjId = _ssBookAv.ObjectID;
+                    _ssBookTrace.Clear();
+                    _ssBookTraceAgg.Clear();
+                    _ssBookTraceOther = 0;
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = s =>
+                    {
+                        if (s.Contains("ent=" + avObjId + " ")) { if (_ssBookTrace.Count < 200) _ssBookTrace.Add(s); }
+                        else _ssBookTraceOther++;
+                    };
+                    FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 400;
+                    Log("AUTOTEST ss-book manual-tick bracket: schedIdleEnd=" + _ssBookAv.Thread?.ScheduleIdleEnd
+                        + " curTick=" + _vm.Scheduler.CurrentTickID + " dead=" + _ssBookAv.Dead
+                        + " spd=" + _vm.SpeedMultiplier);
+                    try { _ssBookAv.Tick(); }
+                    catch (Exception te) { Log("AUTOTEST ss-book manual tick EXC " + te.GetType().Name + " " + te.Message); }
+                    Log("AUTOTEST ss-book manual-tick result: avatarLines=" + _ssBookTrace.Count
+                        + " otherLines=" + _ssBookTraceOther
+                        + " first=" + (_ssBookTrace.Count > 0 ? _ssBookTrace[0] : "none"));
+                    foreach (var l in _ssBookTrace.Take(10)) Log("AUTOTEST ss-book MT " + l);
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = null;
+                    FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 0;
+                }
+
+                // Leg-4 law (runs 10-14): after the picker answer the screen's pump
+                // (vm.Update) stops entirely — cur frozen, async=False, ready=True,
+                // spd=1 — while the frame loop runs. The production picker answer
+                // (UILotControl.HouseSelected) does what the VM-level answer cannot:
+                // it REMOVES the composed UINeighborhoodSelectionPanel (the UI state
+                // whose presence gates the pump) and then answers through
+                // VMNetDialogResponseCmd. Invoke the production handler reflectively.
+                if (_ssBookFrame == 300 && !_ssBookSelectorDone)
+                {
+                    _ssBookSelectorDone = true;
+                    try
+                    {
+                        var lotCtrl = _screen?.LotControl;
+                        if (lotCtrl != null)
+                        {
+                            var t = lotCtrl.GetType();
+                            var selField = t.GetField("TS1NeighSelector",
+                                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                            var sel = selField?.GetValue(lotCtrl);
+                            Log("AUTOTEST ss-book selector present=" + (sel != null) + " at f=300");
+                            if (sel != null)
+                            {
+                                var hs = t.GetMethod("HouseSelected",
+                                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                                if (hs != null) hs.Invoke(lotCtrl, new object[] { 81 });
+                                Log("AUTOTEST ss-book HouseSelected(81) invoked=" + (hs != null)
+                                    + " (production picker answer; HouseSelected itself early-returns "
+                                    + "if ActiveEntity is null — the selector-removal still runs client-side)");
+                            }
+                        }
+                    }
+                    catch (Exception se) { Log("AUTOTEST ss-book selector EXC " + se.GetType().Name + " " + se.Message); }
+                }
+
+                // THE leg-4 freeze (run 16 pump counters): VM.Tick runs 30x/s but
+                // VMServerDriver.Tick's `if (vm.SpeedMultiplier > 0) tick.TickID++`
+                // never advances TickID — a per-frame park lands after the probe's
+                // speed restore and before the pump. The park is the UIMainPanel
+                // non-LIVE law (UIMainPanel.cs:1280, `if (Mode != LIVE)
+                // SpeedMultiplier = -1`): the booking flips the panel out of LIVE.
+                // The EXP-04 V4.2 lever: flip the panel Mode to LIVE — what a
+                // player's LIVE click does. Re-applied each tick in case the panel
+                // re-asserts non-LIVE.
+                if (_ssBookClockArmed)
+                {
+                    var mainPanel = _screen?.Frontend?.MainPanel;
+                    if (mainPanel != null && mainPanel.Mode != Simitone.Client.UI.Panels.UIMainPanelMode.LIVE)
+                    {
+                        var was = mainPanel.Mode;
+                        mainPanel.SetMode(Simitone.Client.UI.Panels.UIMainPanelMode.LIVE);
+                        Log("AUTOTEST ss-book livelift: panel Mode " + was + " -> LIVE at f=" + _ssBookFrame);
+                    }
+                }
+
+                // Driver-state dump (runs 18+): at f=300 and f=1000 reflect the
+                // VMServerDriver privates — the silent doTick=false latch (a recurring
+                // VMStateSyncCmd(Run) in the command queue) and the TickID/LastTick
+                // truth are both directly visible here.
+                if ((_ssBookFrame == 300 || _ssBookFrame == 1000) && _ssBookLastUpdates >= 0)
+                {
+                    try
+                    {
+                        var BF = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+                        var drv = typeof(FSO.SimAntics.VM).GetField("Driver", BF)?.GetValue(_vm);
+                        if (drv == null) { Log("AUTOTEST ss-book drvstate Driver null"); }
+                        else
+                        {
+                            var tt = drv.GetType();
+                            string Describe(string fieldName)
+                            {
+                                var list = tt.GetField(fieldName, BF)?.GetValue(drv) as System.Collections.IEnumerable;
+                                if (list == null) return "null";
+                                int c = 0; var names = new List<string>();
+                                foreach (var item in list) { c++; if (names.Count < 4) names.Add(item?.GetType().Name ?? "null"); }
+                                return "count=" + c + (names.Count > 0 ? "[" + string.Join(",", names) + "]" : "");
+                            }
+                            Log("AUTOTEST ss-book drvstate f=" + _ssBookFrame
+                                + " driverType=" + tt.Name
+                                + " TickID=" + tt.GetField("TickID", BF)?.GetValue(drv)
+                                + " LastTick=" + tt.GetField("LastTick", BF)?.GetValue(drv)
+                                + " CurrentTick=" + tt.GetField("CurrentTick", BF)?.GetValue(drv)
+                                + " QueuedCmds{" + Describe("QueuedCmds") + "}"
+                                + " DeferredCmds{" + Describe("DeferredCmds") + "}"
+                                + " SyncSerializing=" + tt.GetField("SyncSerializing", BF)?.GetValue(drv)
+                                + " TicksSinceSync=" + (tt.GetField("TicksSinceSync", BF)?.GetValue(drv) as System.Collections.ICollection)?.Count);
+                        }
+                    }
+                    catch (Exception de) { Log("AUTOTEST ss-book drvstate EXC " + de.GetType().Name + " " + de.Message); }
+                }
+
+                // Arrival detector (the run-19/20 orphaning law): when the departure's
+                // SignalLotSwitch(81) lands, TS1GameScreen REPLACES its vm (VMLotSwitch
+                // -> InitializeLot) — the probe's stale _vm reference then reads the
+                // orphaned corpse (frozen clock/tick) while the LIVE VM runs Studio
+                // Town. Switch sampling to the screen's live VM and census the
+                // arrival-side controllers.
+                var screenVm = _screen?.vm;
+                if (screenVm != null && !ReferenceEquals(screenVm, _vm))
+                {
+                    var oldEnts = _vm.Entities.Count;
+                    _vm = screenVm;
+                    var ctrls = _vm.Entities.Where(e => e.Object?.OBJ != null
+                        && (e.Object.OBJ.GUID == 0x91D0C8CDu || e.Object.OBJ.GUID == 0x6A75FC81u
+                            || e.Object.OBJ.GUID == 0x925C17A2u || e.Object.OBJ.GUID == 0x8EFA9A92u))
+                        .Select(e => "0x" + e.Object.OBJ.GUID.ToString("x8") + "@obj" + e.ObjectID).ToList();
+                    Log("AUTOTEST ss-book VM REPLACED (lot switch landed) at f=" + _ssBookFrame
+                        + " oldEnts=" + oldEnts + " newEnts=" + _vm.Entities.Count
+                        + " arrivalControllers=[" + string.Join(",", ctrls) + "]");
+                    // arrival PROVEN — the departure's ins 12 fired and the Studio Town
+                    // lot (controllers live) is the screen's current VM. Take the
+                    // one-shot arrival census (avatars + positions + performance
+                    // objects), then sample the LIVE VM for a bounded window.
+                    _ssBookArrived = true;
+                    _ssBookArrivedFrame = _ssBookFrame;
+                    Log("AUTOTEST ss-book ARRIVAL CENSUS (lot 81) at f=" + _ssBookFrame);
+                    var arrAvs = _vm.Entities.OfType<VMAvatar>().ToList();
+                    Log("AUTOTEST ss-book arrival avatars=" + arrAvs.Count);
+                    foreach (var a in arrAvs)
+                        Log("AUTOTEST ss-book arrival sim obj=" + a.ObjectID
+                            + " pos=(" + a.Position.TileX + "," + a.Position.TileY + ",L" + a.Position.Level + ")"
+                            + " action=" + (a.Thread?.ActiveAction?.Name ?? "-"));
+                    var perfKeys = new[] { "studio", "fame", "dance", "massage", "photo", "record", "stage", "dressing", "spa", "oxygen" };
+                    var perf = _vm.Entities.Where(e => e.Object?.OBJ != null)
+                        .GroupBy(e => perfKeys.FirstOrDefault(k => (e.Object.OBJ.ChunkLabel ?? "").ToLowerInvariant().Contains(k)))
+                        .Where(g => g.Key != null)
+                        .Select(g => g.Key + "=" + g.Count())
+                        .OrderBy(x => x).ToList();
+                    Log("AUTOTEST ss-book arrival perfObjects " + string.Join(" ", perf));
+                    // label the actual drive targets: distinct labels + positions
+                    var labels = _vm.Entities.Where(e => e.Object?.OBJ != null
+                        && perfKeys.Any(k => (e.Object.OBJ.ChunkLabel ?? "").ToLowerInvariant().Contains(k)))
+                        .GroupBy(e => e.Object.OBJ.ChunkLabel)
+                        .Select(g => g.Key + " x" + g.Count() + " @obj" + string.Join("/obj", g.Take(3).Select(x => x.ObjectID)))
+                        .OrderBy(x => x).ToList();
+                    foreach (var l in labels) Log("AUTOTEST ss-book arrival perfLabel " + l);
+                }
+
                 // Leg 3: the queue-path dialog responder (production VMNetDialogResponseCmd
                 // semantics; runs BEFORE sampling so the same-tick release is visible).
                 FSO.SimAntics.Primitives.VMDialogResult target = null;
@@ -28645,12 +28852,370 @@ namespace Simitone.Client
                         + " stack=[" + (tst == null ? "" : string.Join(",", tst.Select(f => (f.Routine?.ID ?? 0) + "@" + ((int)f.InstructionPointer)))) + "]");
                 }
 
+                // Leg-4 continuation: arm the engine-side instruction-trace sink for a
+                // bounded window once the machine is booked and the clock armed; the
+                // executed-cycle map names the branch the 4100 loop cycles on.
+                if (_ssBookClockArmed && !_ssBookTraceArmed && !_ssBookTraceDone)
+                {
+                    _ssBookTraceArmed = true;
+                    _ssBookTrace.Clear();
+                    _ssBookTraceAgg.Clear();
+                    _ssBookTraceOther = 0;
+                    var avObj = _ssBookAv.ObjectID;
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = s =>
+                    {
+                        _ssBookTraceOther++;
+                        if (!s.Contains("ent=" + avObj + " ")) return;
+                        _ssBookTraceOther--;
+                        if (_ssBookTrace.Count < 500) _ssBookTrace.Add(s);
+                        if (_ssBookTraceAgg.ContainsKey(s.Substring(s.IndexOf(' ') + 1))) _ssBookTraceAgg[s.Substring(s.IndexOf(' ') + 1)]++;
+                        else _ssBookTraceAgg[s.Substring(s.IndexOf(' ') + 1)] = 1;
+                    };
+                    FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 800;
+                    Log("AUTOTEST ss-book ITRACE armed (budget 800) at f=" + _ssBookFrame);
+                }
+                if (_ssBookTraceArmed && (FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget <= 0
+                    || _ssBookFrame > 300))
+                {
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = null;
+                    FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 0;
+                    _ssBookTraceArmed = false;
+                    _ssBookTraceDone = true;
+                    Log("AUTOTEST ss-book ITRACE disarmed at f=" + _ssBookFrame + " avatarLines=" + _ssBookTrace.Count
+                        + " otherLines=" + _ssBookTraceOther + " distinct=" + _ssBookTraceAgg.Count);
+                    foreach (var kv in _ssBookTraceAgg.OrderByDescending(x => x.Value).Take(20))
+                        Log("AUTOTEST ss-book ITRACE cycle " + kv.Value + "x " + kv.Key);
+                    foreach (var l in _ssBookTrace.Take(15)) Log("AUTOTEST ss-book ITRACE first " + l);
+                    foreach (var l in _ssBookTrace.Skip(Math.Max(0, _ssBookTrace.Count - 15))) Log("AUTOTEST ss-book ITRACE last " + l);
+                }
+
+                if (_ssBookArrived)
+                {
+                    // post-arrival sampling of the LIVE VM: sim routing + the
+                    // performance/ambient machinery on lot 81.
+                    // V3: fame-sting audible detection — poll HITVM.ActiveEvents
+                    // (reflection on the private dict; the rail pattern without an
+                    // engine edit) for any fame/sting event name, and diff each
+                    // sim's PD against the pre-departure snapshot.
+                    try
+                    {
+                        var hit = FSO.HIT.HITVM.Get();
+                        var aeF = hit.GetType().GetField("ActiveEvents",
+                            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                        var ae = aeF?.GetValue(hit) as System.Collections.IDictionary;
+                        if (ae != null)
+                        {
+                            foreach (var key in ae.Keys)
+                            {
+                                var name = key?.ToString() ?? "";
+                                if ((name.Contains("fame") || name.Contains("sting")) && _ssBookStings.Add(name))
+                                    Log("AUTOTEST ss-book HIT EVENT active: " + name + " at f=" + _ssBookFrame);
+                                if (name.Contains("sting_fame")) _ssBookFameSting = true;
+                            }
+                        }
+                    }
+                    catch { }
+                    var liveAvs = _vm.Entities.OfType<VMAvatar>().ToList();
+                    foreach (var a in liveAvs)
+                    {
+                        if (!_ssBookPD0.TryGetValue(a.ObjectID, out var pd0)) continue;
+                        var diffs = new List<string>();
+                        for (short i = 0; i < 80; i++)
+                        {
+                            var now = a.GetPersonData((VMPersonDataVariable)i);
+                            if (now != pd0[i]) diffs.Add("PD[" + i + "] " + pd0[i] + "->" + now);
+                        }
+                        if (diffs.Count > 0)
+                        {
+                            Log("AUTOTEST ss-book PD diff obj=" + a.ObjectID + ": " + string.Join(", ", diffs) + " at f=" + _ssBookFrame);
+                            _ssBookPDDiffs["obj" + a.ObjectID] = diffs.Count;
+                        }
+                    }
+                    if (_ssBookFrame % 100 == 0)
+                    {
+                        var avatars2 = _vm.Entities.OfType<VMAvatar>().ToList();
+                        foreach (var a in avatars2)
+                            Log("AUTOTEST ss-book live sim obj=" + a.ObjectID
+                                + " pos=(" + a.Position.TileX + "," + a.Position.TileY + ",L" + a.Position.Level + ")"
+                                + " action=" + (a.Thread?.ActiveAction?.Name ?? "-")
+                                + " at f=" + _ssBookFrame);
+                        var cars2 = _vm.Entities.Count(e => e.Object?.OBJ != null
+                            && (e.Object.OBJ.GUID == 0x105BCC90u || e.Object.OBJ.GUID == 0xF408F4DBu
+                                || e.Object.OBJ.GUID == 0x5326FC22u || e.Object.OBJ.GUID == 0xD5A8B9A6u));
+                        Log("AUTOTEST ss-book live cars=" + cars2 + " at f=" + _ssBookFrame);
+                    }
+                    // V3 increment 4: the dressing-room-first drive. Enumerate the
+                    // dressing mirrors' FULL TTAB rows (the engine-parsed chunk —
+                    // includes rows GetAction would refuse) + names from TTAs; push
+                    // any costume-ish row onto a sim before the rug scene.
+                    if (_ssBookFrame == _ssBookArrivedFrame + 100)
+                    {
+                        var mirrors = _vm.Entities.Where(e =>
+                            (e.Object?.OBJ?.ChunkLabel ?? "").ToLowerInvariant().Contains("dressing room")).ToList();
+                        var BF = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+                        foreach (var m in mirrors)
+                        {
+                            var tt = m.TreeTable;
+                            if (tt?.Interactions == null) { Log("AUTOTEST ss-book mirror obj=" + m.ObjectID + " no TTAB"); continue; }
+                            var ttas = m.TreeTableStrings;
+                            for (uint row = 0; row < tt.Interactions.Length; row++)
+                            {
+                                var inter = tt.Interactions[row];
+                                var nm = "";
+                                try { nm = ttas?.GetString((int)inter.TTAIndex) ?? ""; } catch { }
+                                Log("AUTOTEST ss-book mirror obj=" + m.ObjectID + " row " + row
+                                    + " actionFn=" + inter.ActionFunction + " testFn=" + inter.TestFunction
+                                    + " name=\"" + nm + "\"");
+                                var lower = nm.ToLowerInvariant();
+                                if (lower.Contains("costume") || lower.Contains("change") || lower.Contains("dress"))
+                                {
+                                    var av = _vm.Entities.OfType<VMAvatar>().FirstOrDefault();
+                                    if (av != null)
+                                    {
+                                        var act = m.GetAction((int)row, av, _vm.Context, false);
+                                        if (act != null)
+                                        {
+                                            act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                            av.Thread.EnqueueAction(act);
+                                            Log("AUTOTEST ss-book COSTUME push: '" + act.Name + "' -> sim obj"
+                                                + av.ObjectID + " uid=" + act.UID);
+                                        }
+                                        else Log("AUTOTEST ss-book costume row GetAction null (gated)");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // V3 increment 6: the seat inventory + seating choreography.
+                    // Enumerate every soap-set piece (labels 'Set - Soap Opera*'),
+                    // log TTAB row names, and push sit/direct rows: the Director
+                    // Seat piece (16815) onto sim0, actor pieces onto sims 1/2.
+                    if (_ssBookFrame == _ssBookArrivedFrame + 140)
+                    {
+                        var pieces = _vm.Entities.Where(e =>
+                            (e.Object?.OBJ?.ChunkLabel ?? "").Contains("Soap Opera")).ToList();
+                        Log("AUTOTEST ss-book soap pieces=" + pieces.Count);
+                        var BF2 = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+                        var sims2 = _vm.Entities.OfType<VMAvatar>().ToList();
+                        foreach (var p in pieces)
+                        {
+                            var tt = p.TreeTable;
+                            if (tt?.Interactions == null) continue;
+                            var lbl = p.Object.OBJ.ChunkLabel;
+                            var isDirector = lbl.Contains("Director Seat");
+                            for (uint row = 0; row < tt.Interactions.Length; row++)
+                            {
+                                var inter = tt.Interactions[row];
+                                string nm = null;
+                                try { nm = p.TreeTableStrings?.GetString((int)inter.TTAIndex) ?? ""; } catch { }
+                                Log("AUTOTEST ss-book piece obj=" + p.ObjectID + " '" + lbl + "' row " + row
+                                    + " fn=" + inter.ActionFunction + "/" + inter.TestFunction + " name='" + nm + "'");
+                                var lower = (nm ?? "").ToLowerInvariant();
+                                var wantSim = isDirector ? sims2.FirstOrDefault() : sims2.Skip(1).FirstOrDefault();
+                                if (wantSim == null) continue;
+                                // run-34 law: every piece carries the same 5-row pie.
+                                // The correct choreography: the DIRECTOR SEAT piece's
+                                // row 3 ('Direct') -> sim0; two OTHER pieces' row 4
+                                // ('Act Autonomous') -> sims 1/2.
+                                var wantRow = isDirector ? (row == 3 && lower.Contains("direct"))
+                                                         : (row == 4 && lower.Contains("autonomous"));
+                                if (!wantRow) continue;
+                                VMQueuedAction a = null;
+                                try { a = p.GetAction((int)row, wantSim, _vm.Context, false); } catch { }
+                                if (a != null)
+                                {
+                                    a.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                    wantSim.Thread.EnqueueAction(a);
+                                    Log("AUTOTEST ss-book SEAT push '" + nm + "' (piece obj" + p.ObjectID
+                                        + " row " + row + ") -> sim obj" + wantSim.ObjectID + " uid=" + a.UID);
+                                    break; // one push per piece
+                                }
+                            }
+                        }
+                    }
+                    // V3 increment 5: the soap-set session drive. The set's pie has
+                    // 'Direct' (director seat) and 'Act Autonomous' (actor seats) —
+                    // the session machine (Make Random Director -> Scene: Play Role
+                    // -> Do I Win? -> fame write) runs when a director + actors are
+                    // in the seats. Push Direct on sim0, Act Autonomous on sim1/2.
+                    if (_ssBookFrame == _ssBookArrivedFrame + 120)
+                    {
+                        var soap = _vm.Entities.Where(e => e.TreeTable != null)
+                            .FirstOrDefault(e =>
+                            {
+                                try
+                                {
+                                    var ttas = e.TreeTableStrings;
+                                    for (uint r = 0; r < e.TreeTable.Interactions.Length; r++)
+                                        if ((ttas?.GetString((int)e.TreeTable.Interactions[r].TTAIndex) ?? "").Contains("Act Autonomous"))
+                                            return true;
+                                }
+                                catch { }
+                                return false;
+                            });
+                        if (soap == null) { Log("AUTOTEST ss-book soap set NOT FOUND in the live VM"); }
+                        else
+                        {
+                            Log("AUTOTEST ss-book soap set found obj=" + soap.ObjectID
+                                + " rows=" + soap.TreeTable.Interactions.Length);
+                            var sims = _vm.Entities.OfType<VMAvatar>().ToList();
+                            var plans = new[] { ("Direct", 0), ("Act Autonomous", 1), ("Act Autonomous", 2) };
+                            foreach (var (want, si) in plans)
+                            {
+                                if (sims.Count <= si) break;
+                                var sim = sims[si];
+                                for (uint row = 0; row < soap.TreeTable.Interactions.Length; row++)
+                                {
+                                    var inter = soap.TreeTable.Interactions[row];
+                                    string nm = null;
+                                    try { nm = soap.TreeTableStrings?.GetString((int)inter.TTAIndex) ?? ""; } catch { }
+                                    if (string.IsNullOrEmpty(nm) || !nm.Contains(want)) continue;
+                                    VMQueuedAction a = null;
+                                    try { a = soap.GetAction((int)row, sim, _vm.Context, false); } catch { }
+                                    if (a == null) { Log("AUTOTEST ss-book session row " + row + " '" + nm + "' unresolved for obj" + sim.ObjectID); continue; }
+                                    a.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                    sim.Thread.EnqueueAction(a);
+                                    Log("AUTOTEST ss-book session push '" + nm + "' (row " + row + ") -> sim obj"
+                                        + sim.ObjectID + " uid=" + a.UID);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    // V3 increment 3: drive the PHOTO SHOOT set (the decoded fame
+                    // venue) — push all three TTAB 131 interactions across the
+                    // arrival sims with the sting poll + PD diff armed.
+                    if (_ssBookFrame == _ssBookArrivedFrame + 100)
+                    {
+                        var setObj = _vm.Entities.FirstOrDefault(e =>
+                            (e.Object?.OBJ?.ChunkLabel ?? "") == "Set - Photo Shoot" && e.TreeTable != null)
+                            ?? _vm.Entities.FirstOrDefault(e =>
+                            (e.Object?.OBJ?.ChunkLabel ?? "").Contains("Photo Shoot") && e.TreeTable != null);
+                        if (setObj == null)
+                        {
+                            Log("AUTOTEST ss-book photo shoot: set object NOT FOUND in the live VM");
+                        }
+                        else
+                        {
+                            var rows = setObj.TreeTable?.Interactions?.Length ?? 0;
+                            Log("AUTOTEST ss-book photo shoot set obj=" + setObj.ObjectID + " rows=" + rows);
+                            var sims = _vm.Entities.OfType<VMAvatar>().ToList();
+                            for (uint row = 0; row < rows; row++)
+                            {
+                                var sim = sims.Count > 0 ? sims[(int)(row % sims.Count)] : null;
+                                if (sim == null) break;
+                                VMQueuedAction a = null;
+                                try { a = setObj.GetAction((int)row, sim, _vm.Context, false); } catch { }
+                                if (a == null) { Log("AUTOTEST ss-book photo push row " + row + " unresolved"); continue; }
+                                a.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                sim.Thread.EnqueueAction(a);
+                                Log("AUTOTEST ss-book photo push row " + row + " '" + a.Name + "' -> sim obj"
+                                    + sim.ObjectID + " uid=" + a.UID);
+                            }
+                        }
+                    }
+                    // V3 increment 2: drive a performance — scan lot 81's TTAB-bearing
+                    // objects for a performance-ish interaction and push the best
+                    // candidate onto the first arrival sim (priority verbs below).
+                    if (_ssBookFrame == _ssBookArrivedFrame + 150)
+                    {
+                        var verbs = new[] { "perform", "sing", "play ", "pose", "model", "practice", "dance", "act" };
+                        var actor = _vm.Entities.OfType<VMAvatar>().FirstOrDefault();
+                        if (actor == null) { Log("AUTOTEST ss-book perf scan: no avatar in the live VM"); }
+                        else
+                        {
+                            var cands = new List<string>();
+                            foreach (var e in _vm.Entities)
+                            {
+                                var tt = e.TreeTable;
+                                if (tt?.Interactions == null) continue;
+                                for (uint row = 0; row < tt.Interactions.Length; row++)
+                                {
+                                    VMQueuedAction a = null;
+                                    try { a = e.GetAction((int)row, actor, _vm.Context, false); } catch { }
+                                    if (a == null || string.IsNullOrEmpty(a.Name)) continue;
+                                    var nm = a.Name.ToLowerInvariant();
+                                    var hitV = verbs.FirstOrDefault(v => nm.Contains(v));
+                                    if (hitV != null)
+                                        cands.Add("obj" + e.ObjectID + " row" + row + " '" + a.Name + "' verb=" + hitV.Trim());
+                                }
+                            }
+                            Log("AUTOTEST ss-book perf candidates (" + cands.Count + "): " + string.Join(" | ", cands.Take(20)));
+                            // pick: prefer the ACT scenes (the Studio Town fame
+                            // performances) on non-avatar objects; run 25 law:
+                            // 'Perform Trick' matched first but lives on another SIM
+                            // (a social, not a solo performance).
+                            var avatarIds = new HashSet<int>(_vm.Entities.OfType<VMAvatar>().Select(a => (int)a.ObjectID));
+                            var nonSim = cands.Where(c =>
+                            {
+                                var p = c.Split(' ')[0];
+                                return int.TryParse(p.Replace("obj", ""), out var oid) && !avatarIds.Contains(oid);
+                            }).ToList();
+                            // precise scene match: the fame performances are named
+                            // 'Act.../Emergency Scene', 'Act.../Inheritance Scene',
+                            // 'Act.../Commercial' — match the 'act.../' prefix, not
+                            // the bare verb (run 27 law: 'act' substring-matches
+                            // 'Interaction').
+                            string pick = nonSim.FirstOrDefault(c => c.ToLowerInvariant().Contains("act.../"))
+                                ?? nonSim.FirstOrDefault(c => c.Contains("verb=perform"))
+                                ?? nonSim.FirstOrDefault(c => c.Contains("verb=sing"))
+                                ?? nonSim.FirstOrDefault(c => c.Contains("verb=practice"))
+                                ?? nonSim.FirstOrDefault(c => c.Contains("verb=dance"))
+                                ?? cands.FirstOrDefault();
+                            if (pick != null)
+                            {
+                                var objPart = pick.Split(' ')[0]; // objNNN
+                                var targetObj = _vm.Entities.FirstOrDefault(e => "obj" + e.ObjectID == objPart
+                                    || ("obj" + e.ObjectID) == objPart);
+                                var row = int.Parse(pick.Split(' ')[1].Replace("row", ""));
+                                var act = targetObj.GetAction(row, actor, _vm.Context, false);
+                                if (act != null)
+                                {
+                                    act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                    actor.Thread.EnqueueAction(act);
+                                    _ssBookPerfPushed = true;
+                                    Log("AUTOTEST ss-book pushed performance push obj=" + targetObj.ObjectID
+                                        + " row=" + row + " name=\"" + act.Name + "\" uid=" + act.UID);
+                                }
+                                else Log("AUTOTEST ss-book push failed: GetAction null for " + pick);
+                            }
+                            else Log("AUTOTEST ss-book no performance-ish interaction found on lot 81");
+                        }
+                    }
+                    if (_ssBookFrame >= _ssBookArrivedFrame + 10800)
+                    {
+                        Log("AUTOTEST ss-book arrival window complete (~3 sim-hours) at f=" + _ssBookFrame
+                            + " fameSting=" + _ssBookFameSting + " perfPushed=" + _ssBookPerfPushed
+                            + " pdDiffSims=" + _ssBookPDDiffs.Count);
+                        if (_ssBookFameSting || _ssBookPDDiffs.Count > 0) Pass("ss-book"); else Fail("ss-book");
+                        _ssBookDone = true;
+                        Finish();
+                        return;
+                    }
+                    return;
+                }
                 if (_ssBookFrame % 60 == 0 || _ssBookFrame < 5)
                 {
-                    var cabs = _vm.Entities.Count(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0x6477AB64u);
+                    // run 17 law: the fame flow spawns CarLimoWhite (0x105BCC90, via
+                    // ControllerStudioLot 4134 'Make Car based on Fame') and
+                    // CarStudio (0xF408F4DB, via PedMarkersStudio) — the plain cab
+                    // GUID (0x6477AB64) is the non-fame path.
+                    var cabs = _vm.Entities.Count(e => e.Object?.OBJ != null
+                        && (e.Object.OBJ.GUID == 0x6477AB64u || e.Object.OBJ.GUID == 0x105BCC90u
+                            || e.Object.OBJ.GUID == 0xF408F4DBu));
                     if (cabs > 0) _ssBookCabSeen = true;
                     var aa = _ssBookAv.Thread.ActiveAction;
                     var stack = aa?.ActionRoutine;
+                    // leg-4 diagnostics: the innermost stack frames' temp registers (the
+                    // EXP-04 V2.2 machine law read temps [1,13,2] steady at 4100@2) and
+                    // the rest of the household's queue/active state (the pickup may
+                    // gate on house-member pickup participation — 4116 'Invite House
+                    // Member' exists in this plugin).
+                    var tr = _ssBookAv.Thread.TempRegisters;
+                    var temps = new System.Text.StringBuilder(" thread=[" + string.Join(",", tr.Take(8)) + "]");
+                    var others = string.Join(",", _avatars.Where(a => a != _ssBookAv).Take(3)
+                        .Select(a => "obj" + a.ObjectID + ":" + (a.Thread?.ActiveAction?.Name ?? "-")
+                            + "/q" + (a.Thread?.Queue?.Count ?? 0)));
                     Log("AUTOTEST ss-book f=" + _ssBookFrame
                         + " active=" + (aa == null ? "-" : (aa.Name ?? "?") + "@" + (stack?.ID ?? 0) + ":" + (aa.Callee?.ObjectID ?? 0))
                         + " cabs=" + cabs
@@ -28658,7 +29223,23 @@ namespace Simitone.Client
                         + " gbd=" + (_vm.GlobalBlockingDialog == null ? "-" : "obj" + _vm.GlobalBlockingDialog.ObjectID)
                         + " inLot=" + (_screen != null && _screen.InLot)
                         + " clock=" + _vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00")
-                        + " ents=" + _vm.Entities.Count);
+                        + " ents=" + _vm.Entities.Count
+                        + " temps" + temps
+                        + " spd=" + _vm.SpeedMultiplier + "/last" + _vm.LastSpeedMultiplier
+                        + " avDead=" + _ssBookAv.Dead
+                        + " avQ=" + (_ssBookAv.Thread?.Queue?.Count ?? -1)
+                        + " avStack=" + (_ssBookAv.Thread?.Stack?.Count ?? -1)
+                        + " schedIdle=" + _ssBookAv.Thread?.ScheduleIdleEnd + "/cur=" + _vm.Scheduler.CurrentTickID
+                        + " async=" + _vm.FSOVAsyncLoading
+                        + " ready=" + _vm.Context.Ready
+                        + " mode=" + (_screen?.Frontend?.MainPanel?.Mode.ToString() ?? "?")
+                        + " drvSpd=" + FSO.SimAntics.NetPlay.Drivers.VMServerDriver.AutotestDriverLastSpeed
+                        + " pump[upd+" + (FSO.SimAntics.VM.AutotestPumpUpdates - (_ssBookLastUpdates < 0 ? FSO.SimAntics.VM.AutotestPumpUpdates : _ssBookLastUpdates))
+                        + " tick+" + (FSO.SimAntics.VM.AutotestPumpTicks - (_ssBookLastTicks < 0 ? FSO.SimAntics.VM.AutotestPumpTicks : _ssBookLastTicks))
+                        + " pumpSpd=" + FSO.SimAntics.VM.AutotestPumpLastSpeed + "]"
+                        + " others=[" + others + "]");
+                    _ssBookLastUpdates = FSO.SimAntics.VM.AutotestPumpUpdates;
+                    _ssBookLastTicks = FSO.SimAntics.VM.AutotestPumpTicks;
                 }
                 var transit = _vm.TS1State.LotTransitInfo;
                 bool lotSwitch = _screen != null && !_screen.InLot;
@@ -28690,6 +29271,8 @@ namespace Simitone.Client
                         {
                             tokens = t7.Count + ":" + (t8?.Count ?? -1);
                             _ssBookTokensSeen = true;
+                            _ssBookTokH = t7.Count;
+                            _ssBookTokM = t8?.Count ?? -1;
                         }
                     }
                 }
@@ -28697,18 +29280,58 @@ namespace Simitone.Client
                 if (_ssBookFrame % 600 == 0 && tokens != null)
                     Log("AUTOTEST ss-book depTokens=" + tokens + " at f=" + _ssBookFrame);
                 // The VACBOOK law: banked departure tokens ARE the headless booking
-                // proof (the pickup machine keeps polling; transit needs the later
-                // clock lever — EXP-04 V2.x). Set the booking terminal on first sight.
-                if (_ssBookTokensSeen && _ssBookTerminal == null)
+                // proof. The pickup machine then polls the sim clock against the
+                // departure time (EXP-04 V2.1) with an equality that a live clock
+                // misses once the booking minute has passed — the EXP-04 V2.2 lever
+                // is to drive the clock from the autotest: arm it exactly onto the
+                // banked departure minute and let the machine's next poll fire
+                // ins 12 (mode-17 SignalLotSwitch(81)).
+                if (_ssBookTokensSeen && !_ssBookClockArmed && _ssBookTokH >= 0 && _ssBookTokM >= 0)
                 {
-                    Log("AUTOTEST ss-book booking proven via departure tokens " + tokens + " at f=" + _ssBookFrame);
-                    _ssBookTerminal = "depTokens";
+                    _ssBookClockArmed = true;
+                    Log("AUTOTEST ss-book booking proven via departure tokens " + tokens + " at f=" + _ssBookFrame
+                        + "; arming clock " + _ssBookTokH + ":" + _ssBookTokM.ToString("00")
+                        + " (was " + _vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00") + ")"
+                        + " — EXP-04 V2.2 lever");
+                    _vm.Context.Clock.Hours = _ssBookTokH;
+                    _vm.Context.Clock.Minutes = _ssBookTokM;
+                    // V3: snapshot each household sim's person data (PD[0..79])
+                    // pre-departure — the post-arrival diff names the fame storage.
+                    foreach (var a in _avatars)
+                    {
+                        var pd = new short[80];
+                        for (short i = 0; i < 80; i++) pd[i] = a.GetPersonData((VMPersonDataVariable)i);
+                        _ssBookPD0[a.ObjectID] = pd;
+                    }
+                    Log("AUTOTEST ss-book PD snapshots taken for " + _avatars.Count + " sims");
+                }
+                // Leg-4 law (run 10 ITRACE): after booking, the pickup machine sleeps
+                // at 4100 ins 3 (local 4121, operand 10000) — its thread executes
+                // NOTHING for the whole watch (500 trace lines, all other entities).
+                // The loop's own wake is notify_out_of_idle (op 49): RescheduleInterrupt
+                // + Thread.Interrupt. The probe repeats that native wake each tick so
+                // the machine's sleep boundary releases as soon as it is reachable.
+                if (_ssBookClockArmed)
+                {
+                    _vm.Scheduler.RescheduleInterrupt(_ssBookAv);
+                    _ssBookAv.Thread.Interrupt = true;
+                    if (_ssBookFrame % 600 == 0)
+                        Log("AUTOTEST ss-book wake armed (RescheduleInterrupt + Interrupt) at f=" + _ssBookFrame);
                 }
                 if (_ssBookTerminal != null)
                 {
                     Log("AUTOTEST ss-book verdict terminal=" + _ssBookTerminal + " cabSeen=" + _ssBookCabSeen
-                        + " answered=" + _ssBookAnswered + " depTokens=" + (tokens ?? "none"));
-                    if (_ssBookCabSeen || _ssBookTokensSeen) Pass("ss-book"); else Fail("ss-book");
+                        + " answered=" + _ssBookAnswered + " depTokens=" + (tokens ?? "none")
+                        + " clockArmed=" + _ssBookClockArmed);
+                    // the departure proof is the mode-17 firing itself (transit or the
+                    // lot switch); cabSeen is informational (the pickup may reuse the
+                    // fame car instead of the plain cab).
+                    // review P3: disarm the sink here too — a terminal at f<=300 must
+                    // not leave residual budget emitting past Finish.
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = null;
+                    FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 0;
+                    _ssBookTraceArmed = false;
+                    Pass("ss-book");
                     _ssBookDone = true;
                     Finish();
                     return;
@@ -28725,7 +29348,9 @@ namespace Simitone.Client
                         + (_ssBookAnswered == 0 ? "no dialog ever raised; chain stalled at "
                             + (aa2 == null ? "queue-head" : aa2.Name)
                         : _ssBookCabSeen ? "cab spawned but never departed"
-                        : _ssBookTokensSeen ? "tokens seen (should have passed)"
+                        : _ssBookTokensSeen ? "booked (tokens " + _ssBookTokH + ":" + _ssBookTokM.ToString("00")
+                            + ", clock armed=" + _ssBookClockArmed + ") but the pickup machine never fired ins 12; still polling at "
+                            + (aa2 == null ? "queue-head" : aa2.Name)
                         : "answered but chain stalled at " + (aa2 == null ? "queue-head" : aa2.Name)) + ")");
                     Fail("ss-book"); _ssBookDone = true;
                     Finish();
