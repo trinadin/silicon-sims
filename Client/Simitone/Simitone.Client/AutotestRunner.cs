@@ -24661,7 +24661,13 @@ namespace Simitone.Client
                 Log("AUTOTEST exp09spawn: screen not ready, retrying");
                 return;
             }
+            // run-88 law: the lot switch compares the target house against the
+            // bound family's own HouseNumber — a strays family carries house 0,
+            // so bind the field to house 10 (the registry assignment this probe
+            // documents) before the switch.
+            _trsFami.HouseNumber = 10;
             Content.Get().Neighborhood.SetFamilyForHouse(10, _trsFami, false);
+            Log("AUTOTEST exp09spawn bound fami4000 -> house 10 (HouseNumber field set)");
             _screen.PlayHouse(10, null);
             _trsState = 1; _trsFrame = 0;
         }
