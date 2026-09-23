@@ -83,6 +83,30 @@ namespace Simitone.Client
             return patched;
         }
 
+        private static bool PatchFirstFamiHouseOnly(byte[] bytes, int house)
+        {
+            int pos = 64;
+            bool patched = false;
+            while (pos + 76 <= bytes.Length)
+            {
+                string type = System.Text.Encoding.ASCII.GetString(bytes, pos, 4);
+                uint size = (uint)((bytes[pos + 4] << 24) | (bytes[pos + 5] << 16)
+                    | (bytes[pos + 6] << 8) | bytes[pos + 7]);
+                if (size < 76 || pos + size > bytes.Length) return false;
+                if (type == "FAMI" && !patched)
+                {
+                    int h = pos + 76 + 12;
+                    bytes[h] = (byte)house;
+                    bytes[h + 1] = (byte)(house >> 8);
+                    bytes[h + 2] = (byte)(house >> 16);
+                    bytes[h + 3] = (byte)(house >> 24);
+                    patched = true;
+                }
+                pos += (int)size;
+            }
+            return patched;
+        }
+
         public bool Tick()
         {
             try { return TickInner(); }
@@ -139,16 +163,16 @@ namespace Simitone.Client
                 "TemplateFamilyUnleashed", "Strays_4000.FAM");
             if (!File.Exists(src)) { Fail("template pet FAM missing: " + src); Done = true; return; }
             var bytes = File.ReadAllBytes(src);
-            if (!PatchFirstFami(bytes, 11, 60)) { Fail("FAMI patch failed"); Done = true; return; }
+            if (!PatchFirstFamiHouseOnly(bytes, 11)) { Fail("FAMI house patch failed"); Done = true; return; }
             var path = Path.Combine(ImportDir(), "Exp09Strays.FAM");
             File.WriteAllBytes(path, bytes);
             var verify = new IffFile(path);
             var fami = verify.List<FAMI>()?.FirstOrDefault();
-            if (fami == null || fami.ChunkID != 60 || fami.HouseNumber != 11)
+            if (fami == null || fami.ChunkID != 4000 || fami.HouseNumber != 11)
             { Fail("staged pet FAM parse failed (id=" + fami?.ChunkID + " house=" + fami?.HouseNumber + ")"); Done = true; return; }
             if (fami.FamilyGUIDs == null || fami.FamilyGUIDs.Length < 2)
             { Fail("staged pet FAM has " + (fami.FamilyGUIDs?.Length ?? 0) + " member guids (want >=2 pets)"); Done = true; return; }
-            Log("AUTOTEST exp09io staged Strays_4000 -> id=60 house=11 members="
+            Log("AUTOTEST exp09io staged Strays_4000 -> id=4000 house=11 members="
                 + fami.FamilyGUIDs.Length + " [" + string.Join(",", fami.FamilyGUIDs.Select(g => "0x" + g.ToString("x8"))) + "]");
             _phase = 2; _ticks = 0;
         }
@@ -158,9 +182,9 @@ namespace Simitone.Client
             if (_ticks++ < 10) return;
             var rc = N.CheckForNewImports();
             Log("AUTOTEST exp09io CheckForNewImports rc=" + rc);
-            _fami = N.MainResource.List<FAMI>()?.FirstOrDefault(f => f != null && f.ChunkID == 60);
+            _fami = N.MainResource.List<FAMI>()?.FirstOrDefault(f => f != null && f.ChunkID == 4000);
             if (_fami == null)
-            { Fail("import did not create family 60 (rc=" + rc + ")"); Done = true; return; }
+            { Fail("import did not create/refresh family 4000 (rc=" + rc + ")"); Done = true; return; }
             if (_fami.FamilyGUIDs == null || _fami.FamilyGUIDs.Length < 2)
             { Fail("imported family 60 carries " + (_fami.FamilyGUIDs?.Length ?? 0) + " members (want >=2)"); Done = true; return; }
             Log("AUTOTEST exp09io IMPORTED family 60 house=" + _fami.HouseNumber + " members="
