@@ -159,11 +159,25 @@ namespace FSO.SimAntics.Model.TS1Platform
                 missingMembers.Remove(avatar.Object.OBJ.GUID);
             }
 
+            int unresolvable = 0;
             foreach (var member in missingMembers)
             {
                 // SAV-11: a dead family member must not re-spawn; the tombstone stands.
                 if (IsDeadInStore(member)) continue;
-                var sim = vm.Context.CreateObjectInstance(member, LotView.Model.LotTilePos.OUT_OF_WORLD, LotView.Model.Direction.NORTH).Objects[0];
+                // EXP-09 (defect banked in coordination/evidence/EXP-09/
+                // exp09-io-runtime-20260924.md): an imported family member whose
+                // template does not resolve must SKIP, not crash the house load
+                // (NullReferenceException on Objects[0] when CreateObjectInstance
+                // returns no group — reproduced with the imported Strays_4000
+                // family). Bounded log so missing members stay diagnosable.
+                var group = vm.Context.CreateObjectInstance(member, LotView.Model.LotTilePos.OUT_OF_WORLD, LotView.Model.Direction.NORTH);
+                if (group == null || group.Objects == null || group.Objects.Count == 0)
+                {
+                    if (unresolvable++ < 20)
+                        Console.WriteLine("[FAMILY-SKIP] member 0x" + member.ToString("x8") + " did not resolve (imported/gone template)");
+                    continue;
+                }
+                var sim = group.Objects[0];
                 ((VMAvatar)sim).SetPersonData(VMPersonDataVariable.TS1FamilyNumber, (short)CurrentFamily.ChunkID);
                 var mailbox = vm.Entities.FirstOrDefault(x => (x.Object.OBJ.GUID == 0xEF121974 || x.Object.OBJ.GUID == 0x1D95C9B0));
                 if (mailbox != null) VMFindLocationFor.FindLocationFor(sim, mailbox, vm.Context, VMPlaceRequestFlags.Default);
