@@ -982,8 +982,11 @@ namespace Simitone.Client.UI.Screens
                     vm.TS1State.ActivateFamily(vm, ActiveFamily);
                     // away loads lack the home path's activator VerifyFamily
                     // call — without it the traveling pets never spawn (the
-                    // TRV-03 gap). Creates only MISSING members.
-                    vm.TS1State.VerifyFamily(vm);
+                    // TRV-03 gap). Creates only MISSING members. DEFERRED to
+                    // the next update: running it synchronously inside
+                    // InitializeLot crashes the load (run-3 NRE in Draw).
+                    var tripVm = vm;
+                    GameThread.NextUpdate((state) => tripVm.TS1State.VerifyFamily(tripVm));
                 }
                 BlueprintReset(lotName, null);
                 // Read saved weather state now; apply it deferred in UpdateWeatherEffects
