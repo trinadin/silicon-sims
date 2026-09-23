@@ -24753,6 +24753,25 @@ namespace Simitone.Client
                     _screen.PlayHouse(10, null);
                     _trState = 1; return;
                 }
+                // run 4: re-push 'Train Pet' while the trainer is present and
+                // idle — each push runs one ladder pass; sessions accumulate.
+                if (_trFrame % 900 == 0 && trainerNow != null && _trRepushes < 3)
+                {
+                    var tAa2 = trainerNow.Thread?.ActiveAction;
+                    if (tAa2 == null)
+                    {
+                        _trRepushes++;
+                        var act2 = trainerNow.GetAction(0, trainerNow, _vm.Context, false,
+                            new short[] { (short)(avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[1])?.ObjectID ?? 0), 0, 0, 0 });
+                        if (act2 != null)
+                        {
+                            trainerNow.Thread.EnqueueAction(act2);
+                            _trUid = act2.UID;
+                            Log("AUTOTEST exp09train RE-PUSH " + _trRepushes + "/3 uid=" + act2.UID
+                                + " param0=" + act2.Args[0]);
+                        }
+                    }
+                }
                 // pet-yield (unl-show precedent): cancel the dog's autonomous
                 // agenda every 60f until a training-labelled action runs on it
                 // — the trick session needs the pet engaged to complete.
