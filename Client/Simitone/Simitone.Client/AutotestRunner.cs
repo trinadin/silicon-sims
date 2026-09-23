@@ -995,7 +995,8 @@ namespace Simitone.Client
                 || CheckEnabled("unl-travel")
                 || CheckEnabled("unl-show")
                 || CheckEnabled("unl-mice")
-                || CheckEnabled("exp09train"))
+                || CheckEnabled("exp09train")
+                || CheckEnabled("exp09spawn"))
             {
                 // (R249) focused-gate dispatch: freewill/freewillvar live inside RunCorpus
                 // (corpus-gated). When a focused opts string names them WITHOUT corpus,
