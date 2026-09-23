@@ -980,6 +980,10 @@ namespace Simitone.Client.UI.Screens
                 {
                     ActiveFamily.SelectWholeFamily();
                     vm.TS1State.ActivateFamily(vm, ActiveFamily);
+                    // away loads lack the home path's activator VerifyFamily
+                    // call — without it the traveling pets never spawn (the
+                    // TRV-03 gap). Creates only MISSING members.
+                    vm.TS1State.VerifyFamily(vm);
                 }
                 BlueprintReset(lotName, null);
                 // Read saved weather state now; apply it deferred in UpdateWeatherEffects
