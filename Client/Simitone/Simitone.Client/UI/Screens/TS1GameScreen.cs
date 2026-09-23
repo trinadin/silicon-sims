@@ -962,7 +962,16 @@ namespace Simitone.Client.UI.Screens
             
             if (!external)
             {
-                if (!Downtown && ActiveFamily != null)
+                // TRV-03 (F-TRAVEL-PETS, defect banked in
+                // coordination/evidence/TRV-03/ + EXP-09): away loads skipped
+                // family activation entirely, so the traveling family's PETS
+                // never arrived on the away lot (only the human, via the
+                // transit machinery) and a duplicate human instance appeared.
+                // Activate the bound family on away loads too when a trip is
+                // in progress (LotTransitInfo >= 1): VerifyFamily creates only
+                // the MISSING members, so the traveler is not duplicated.
+                var tripInProgress = (Content.Get().Neighborhood?.GameState?.LotTransitInfo ?? 0) >= 1;
+                if (ActiveFamily != null && (!Downtown || tripInProgress))
                 {
                     ActiveFamily.SelectWholeFamily();
                     vm.TS1State.ActivateFamily(vm, ActiveFamily);
