@@ -357,6 +357,7 @@ namespace FSO.SimAntics
 
         public void Update()
         {
+            AutotestLastUpdateSpeed = SpeedMultiplier;
             if (UseWorld)
             {
                 Microsoft.Xna.Framework.Audio.SoundEffect.DistanceScale = 10;
@@ -452,8 +453,11 @@ namespace FSO.SimAntics
 
         public void Tick()
         {
+            AutotestTickCalls++;
+            AutotestLastTickSpeed = SpeedMultiplier;
             AutotestPumpTicks++;
             if (FSOVAsyncLoading) return;
+            AutotestTickBody++;
             if (BHAVDirty)
             {
                 foreach (var ent in Entities)
@@ -767,6 +771,11 @@ namespace FSO.SimAntics
 
         public void SignalLotSwitch(uint lotId)
         {
+            // EXP-05 V6 watch hook: the away lot ejects the visiting family
+            // within a single probe frame, so no probe-side poll can attribute
+            // the return signal; this sink logs every switch with its VM
+            // identity. Null when no autotest runs.
+            AutotestLotSwitchSink?.Invoke(lotId, GetHashCode().ToString("x"));
             OnRequestLotSwitch?.Invoke(lotId);
         }
 
@@ -890,6 +899,19 @@ namespace FSO.SimAntics
         public static int AutotestPumpUpdates;
         public static int AutotestPumpTicks;
         public static int AutotestPumpLastSpeed;
+
+        // EXP-05 arc integration (ported from the hddowntown fork lineage,
+        // 152b3a9): pump-decomposition counters under the names the EXP-04/05
+        // probes read. Coexists with the AutotestPump* trio above (leg-4
+        // naming); all are unconditional int writes, inert for normal play.
+        public static long AutotestTickCalls;
+        public static long AutotestTickBody;
+        public static int AutotestLastTickSpeed = int.MinValue;
+        public static int AutotestLastUpdateSpeed = int.MinValue;
+
+        /// <summary>EXP-05 V6 watch hook (V4.4 sink precedent) — fired from
+        /// SignalLotSwitch with (lotId, vmHash). Null when no autotest runs.</summary>
+        public static Action<uint, string> AutotestLotSwitchSink;
 
         public void Load(VMMarshal input)
         {

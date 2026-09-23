@@ -80,10 +80,19 @@ namespace FSO.SimAntics
             return Attributes[index];
         }
 
+        // EXP-04 V4.4 (run 97) attribute-write watch, ported with the EXP-05
+        // arc (review: indep-review-exp05-arc-20260923-zcode-assist.md). Fired
+        // from SetAttribute with (objectID, index, oldValue, newValue) AFTER
+        // the write; the probe arms and filters it. Null when unarmed — the
+        // cost is one static read per attribute write.
+        public static System.Action<int, int, short, short> AutotestAttrWatch;
+
         public virtual void SetAttribute(int index, short value)
         {
+            var oldV = index < Attributes.Count ? Attributes[index] : (short)0;
             while (index >= Attributes.Count) Attributes.Add(0);
             Attributes[index] = value;
+            AutotestAttrWatch?.Invoke(ObjectID, index, oldV, value);
         }
 
         /** Relationship variables **/

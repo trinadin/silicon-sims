@@ -94,25 +94,54 @@ namespace FSO.SimAntics.Engine
         // ss-book leg-4 diagnostic: the machine polls at 4100@2 with temp0 banked
         // and the departure tokens unread — the trace names which branch cycles).
         // Inert when the sink is null and the budget is 0 — normal play and every
-        // other check never touch either. Read-only: no REWRITE capability.
+        // other check never touch either. The EXP-05 arc integration adds an
+        // armed-only REWRITE lever below (AutotestVacLotOverride, default 0 =
+        // inert) — the only write path, disclosed in
+        // coordination/evidence/COORD/indep-review-exp05-arc-20260923-zcode-assist.md.
         public static Action<string> AutotestTraceSink;
         public static int AutotestInstrTraceBudget;
+        // EXP-05 arc integration (ported from the hddowntown fork lineage
+        // 152b3a9/28bfa7f/9abfc6f): show/mice trace admission + unbudgeted-entity
+        // set, written only by the autotest. Inert (and read-only) in normal play.
+        public static bool AutotestTraceShowTrees;
+        public static readonly HashSet<int> AutotestUnbudgetedEnts = new HashSet<int>();
+        // EXP-04 V2.8 lever: when > 0, the trace hook rewrites TempRegisters[0]
+        // to this lot id immediately before a 4100@12 op=1 (mode 17
+        // ChangeToLotInTemp0) executes. Armed by the autotest only; 0 = inert.
+        public static int AutotestVacLotOverride;
 
-        private void AutotestSSInstructionTrace()
+        private void AutotestSSInstructionTrace(string tag)
         {
-            if (AutotestTraceSink == null || AutotestInstrTraceBudget <= 0 || Stack.Count == 0) return;
+            if (AutotestTraceSink == null || Stack.Count == 0) return;
+            var unbudgeted = AutotestUnbudgetedEnts.Contains(Entity.ObjectID);
+            if (AutotestInstrTraceBudget <= 0 && !unbudgeted) return;
             var tf = Stack[Stack.Count - 1];
             var tid = tf.Routine?.Chunk?.ChunkID ?? 0;
-            if (tid != 4100 && !Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4100)) return;
+            // EXP-05 arc admission: the show/mice band 4096-4113, the classic
+            // 4100 family, and the mice-park 366/280 frames over a 4104 stack.
+            // Shared by BOTH loop tails through this helper (fixes the fork
+            // lineage's Tick-tail asymmetry flagged in the arc review).
+            if (!((AutotestTraceShowTrees && tid >= 4096 && tid <= 4113)
+                || ((tid == 4100 || tid == 280 || tid == 281 || tid == 4103)
+                    && Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4100))
+                || ((tid == 366 || tid == 280)
+                    && Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4104)))) return;
             var tins = tf.Routine?.Instructions;
             var tci = (tins != null && tf.InstructionPointer >= 0 && tf.InstructionPointer < tins.Length)
                 ? tins[tf.InstructionPointer] : null;
             if (tci == null) return;
-            AutotestInstrTraceBudget--;
-            AutotestTraceSink("[SS-ITRACE] ent=" + Entity.ObjectID + " d=" + (Stack.Count - 1)
+            if (!unbudgeted) AutotestInstrTraceBudget--;
+            AutotestTraceSink(tag + " ent=" + Entity.ObjectID + " d=" + (Stack.Count - 1)
                 + " tick=" + Context.VM.Scheduler.CurrentTickID
                 + " " + tid + "@" + tf.InstructionPointer
                 + " op=" + tci.Opcode + " t=" + tci.TruePointer + " f=" + tci.FalsePointer);
+            if (AutotestVacLotOverride > 0 && tid == 4100
+                && tf.InstructionPointer == 12 && tci.Opcode == 1)
+            {
+                TempRegisters[0] = (short)AutotestVacLotOverride;
+                AutotestTraceSink(tag + " REWRITE temp0=" + AutotestVacLotOverride
+                    + " (mode 17 ChangeToLotInTemp0 reroute) ent=" + Entity.ObjectID);
+            }
         }
 
         // WEDGE-1 (EntertainerFemale decode, 2026-09-19): native TS1 time-slices
@@ -320,7 +349,7 @@ namespace FSO.SimAntics.Engine
                         ForcedYieldStreak = 0;
                         throw new Exception("Thread entered infinite loop! (forced-yield streak)!");
                     }
-                    AutotestSSInstructionTrace();
+                    AutotestSSInstructionTrace("[ITRACE-T]");
                     ContinueExecution = false;
                     NextInstruction();
                 }
@@ -526,7 +555,7 @@ namespace FSO.SimAntics.Engine
                                 ForcedYieldStreak = 0;
                                 throw new Exception("Thread entered infinite loop! (forced-yield streak)!");
                             }
-                            AutotestSSInstructionTrace();
+                            AutotestSSInstructionTrace("[ITRACE]");
                             ContinueExecution = false;
                             NextInstruction();
                         }

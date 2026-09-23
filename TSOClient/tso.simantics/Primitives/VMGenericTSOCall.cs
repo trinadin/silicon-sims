@@ -16,6 +16,20 @@ namespace FSO.SimAntics.Primitives
 
     public class VMGenericTSOCall : VMPrimitiveHandler
     {
+        // EXP-05 V3 (unl-pets2) read-only watch hook, ported with the EXP-05
+        // arc (VMThread.AutotestTraceSink pattern): armed by the autotest only;
+        // names the BHAV that drives a pet off-lot (F-PETS-DESPAWN). Null in
+        // normal play.
+        public static Action<string> AutotestPetGoneSink;
+
+        internal static string FrameInfo(VMStackFrame f)
+        {
+            var r = f.Routine;
+            if (r == null) return "noroutine";
+            var parent = (r.Chunk != null && r.Chunk.ChunkParent != null) ? r.Chunk.ChunkParent.Filename : "?";
+            return r.ID + "@" + f.InstructionPointer + "(" + parent + ":" + (r.Chunk != null ? r.Chunk.ChunkLabel : "?") + ")";
+        }
+
         public override VMPrimitiveExitCode Execute(VMStackFrame context, VMPrimitiveOperand args)
         {
             var operand = (VMGenericTSOCallOperand)args;
@@ -108,7 +122,10 @@ namespace FSO.SimAntics.Primitives
                     return VMPrimitiveExitCode.GOTO_TRUE;
 
                 case VMGenericTSOCallMode.LeaveLot: //25
-                    //SPECIAL: cancel all interactions with us that have not been started. 
+                    //SPECIAL: cancel all interactions with us that have not been started.
+                    if (AutotestPetGoneSink != null)
+                        AutotestPetGoneSink("petleave caller=0x" + context.Caller.Object.OBJ.GUID.ToString("x8")
+                            + "/oid" + context.Caller.ObjectID + " at " + FrameInfo(context));
                     bool canLeave = true;
                     var avaUs = ((VMAvatar)context.Caller);
                     foreach (var ava2 in context.VM.Context.ObjectQueries.Avatars)
