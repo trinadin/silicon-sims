@@ -24618,6 +24618,9 @@ namespace Simitone.Client
         private static uint _trUid;
         private static short _trDogPd12 = -1, _trCatPd12 = -1;
         private static bool _trYieldLogged;
+        private static bool _trYieldTrainerLogged;
+        private static int _trRepushes;
+        private static short _trLastDog12 = -1;
         private static readonly uint[] _trGuids = new uint[4];
 
         private static void Exp09TrainInit()
@@ -24720,6 +24723,36 @@ namespace Simitone.Client
                 // state 2: watch the training ladder
                 var dogNow = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[1]);
                 var catNow = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0]);
+                var trainerNow = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == Exp09TrainerGuid);
+                // run 3 retention: (a) preemptively cancel the trainer's
+                // departure (name-matched leave/goodbye actions) so sessions
+                // accumulate without a reload; (b) if it despawned anyway,
+                // re-arm the FC-B family (bounded 3) — pets re-spawn fresh,
+                // so pd[12] increments are logged per-session and summed.
+                if (trainerNow != null && trainerNow.Thread != null && _trFrame % 60 == 0)
+                {
+                    var tAa = trainerNow.Thread.ActiveAction;
+                    var tName = (tAa?.Name ?? "").ToLowerInvariant();
+                    var leaving = tName.Contains("leave") || tName.Contains("goodbye")
+                        || tName.Contains("go home") || tName.Contains("exit");
+                    if (leaving)
+                    {
+                        trainerNow.SetFlag(FSO.SimAntics.VMEntityFlags.InteractionCanceled, true);
+                        if (!_trYieldTrainerLogged)
+                        {
+                            _trYieldTrainerLogged = true;
+                            Log("AUTOTEST exp09train: trainer departure cancelled ('" + tAa.Name + "')");
+                        }
+                    }
+                }
+                if (trainerNow == null && _trFrame > 1200 && _trRepushes < 3)
+                {
+                    _trRepushes++;
+                    Log("AUTOTEST exp09train RE-ARM " + _trRepushes + "/3: trainer despawned — re-running FC-B arm");
+                    Content.Get().Neighborhood.SetFamilyForHouse(10, _trFam, false);
+                    _screen.PlayHouse(10, null);
+                    _trState = 1; return;
+                }
                 // pet-yield (unl-show precedent): cancel the dog's autonomous
                 // agenda every 60f until a training-labelled action runs on it
                 // — the trick session needs the pet engaged to complete.
@@ -24736,6 +24769,16 @@ namespace Simitone.Client
                     }
                 }
                 var dog12 = dogNow != null ? dogNow.GetPersonData((VMPersonDataVariable)12) : _trDogPd12;
+                // run 3 verdict: any observed pd[12] INCREMENT on the dog
+                // (per-session baseline tracking, survives re-arms).
+                if (_trLastDog12 < 0) _trLastDog12 = dog12;
+                if (dog12 > _trLastDog12)
+                {
+                    Log("AUTOTEST exp09train TRAINED f=" + _trFrame + " dog pd12 " + _trLastDog12
+                        + "->" + dog12 + " (re-arms=" + _trRepushes + ")");
+                    Pass("exp09train"); _trState = 99; return;
+                }
+                _trLastDog12 = dog12;
                 var cat12 = catNow != null ? catNow.GetPersonData((VMPersonDataVariable)12) : _trCatPd12;
                 if (_trFrame % 150 == 0)
                 {
