@@ -24733,6 +24733,12 @@ namespace Simitone.Client
                                 + " -> " + (clean ? "CLEAN (no partial booking state)" : "UNEXPECTED STATE"));
                             if (!clean) { Fail("exp09neg"); _ngState = 99; return; }
                             _ngNegOk = true;
+                            // run-4 linger-clear: the NEG interaction is still
+                            // parked on the host (engage-and-linger law) —
+                            // cancel it so the CANCEL-phase push can engage
+                            // (the linger-blocks-repush law, runs 2-3).
+                            _ngHost.Thread.CancelAction((ushort)_ngUid);
+                            Log("AUTOTEST exp09neg: linger cleared (CancelAction uid" + _ngUid + ")");
                             // CANCEL phase: restore the budget, re-push, cancel mid-flight
                             _ngFam.Budget = 50000;
                             Log("AUTOTEST exp09neg: budget restored 50000 (CANCEL prep)");
