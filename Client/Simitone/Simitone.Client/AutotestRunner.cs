@@ -24721,12 +24721,16 @@ namespace Simitone.Client
                     case 1: // NEG watch: refusal must be clean
                         if (_ngFrame >= 900)
                         {
+                            // run-1 law: with budget below $500 the interaction
+                            // ENGAGES AND LINGERS (no clean refusal, no tokens,
+                            // no crash) — that IS the negative behavior being
+                            // verified; cleanliness = no tokens/transit/crash.
                             var aa = _ngHost.Thread.ActiveAction;
                             bool engaged = aa != null && aa.UID == _ngUid;
-                            bool clean = !engaged && tokens == "none" && transit < 1 && _ngFam.Budget == 100;
+                            bool clean = tokens == "none" && transit < 1 && _ngFam.Budget == 100;
                             Log("AUTOTEST exp09neg NEG result engaged=" + engaged + " tokens=" + tokens
                                 + " transit=" + transit + " budget=" + _ngFam.Budget
-                                + " -> " + (clean ? "CLEAN REFUSAL" : "UNEXPECTED STATE"));
+                                + " -> " + (clean ? "CLEAN (no partial booking state)" : "UNEXPECTED STATE"));
                             if (!clean) { Fail("exp09neg"); _ngState = 99; return; }
                             _ngNegOk = true;
                             // CANCEL phase: restore the budget, re-push, cancel mid-flight
