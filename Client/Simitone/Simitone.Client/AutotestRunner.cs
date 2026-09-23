@@ -24617,6 +24617,7 @@ namespace Simitone.Client
         private static VMAvatar _trTrainer;
         private static uint _trUid;
         private static short _trDogPd12 = -1, _trCatPd12 = -1;
+        private static bool _trYieldLogged;
         private static readonly uint[] _trGuids = new uint[4];
 
         private static void Exp09TrainInit()
@@ -24719,6 +24720,21 @@ namespace Simitone.Client
                 // state 2: watch the training ladder
                 var dogNow = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[1]);
                 var catNow = avatars.FirstOrDefault(a => a.Object.OBJ.GUID == UnlTravelPetGuids[0]);
+                // pet-yield (unl-show precedent): cancel the dog's autonomous
+                // agenda every 60f until a training-labelled action runs on it
+                // — the trick session needs the pet engaged to complete.
+                if (_trFrame % 60 == 0 && dogNow != null && dogNow.Thread != null)
+                {
+                    var dAa = dogNow.Thread.ActiveAction;
+                    var trickUp = dAa != null && (dAa.Name ?? "").IndexOf("train", StringComparison.OrdinalIgnoreCase) >= 0;
+                    if (!trickUp)
+                        dogNow.SetFlag(FSO.SimAntics.VMEntityFlags.InteractionCanceled, true);
+                    else if (!_trYieldLogged)
+                    {
+                        _trYieldLogged = true;
+                        Log("AUTOTEST exp09train: dog engaged training row '" + dAa.Name + "' uid" + dAa.UID);
+                    }
+                }
                 var dog12 = dogNow != null ? dogNow.GetPersonData((VMPersonDataVariable)12) : _trDogPd12;
                 var cat12 = catNow != null ? catNow.GetPersonData((VMPersonDataVariable)12) : _trCatPd12;
                 if (_trFrame % 150 == 0)
