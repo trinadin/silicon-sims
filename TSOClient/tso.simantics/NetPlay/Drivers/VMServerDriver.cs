@@ -270,8 +270,17 @@ namespace FSO.SimAntics.NetPlay.Drivers
             }
         }
 
+        // EXP-06 (declared in coordination/tasks/EXP-06.md before this edit):
+        // driver-time speed counter for the ss-book leg-4 stall bisect — the
+        // pump counters (VM.cs) proved vm.Update/VM.Tick run while TickID freezes;
+        // this records the speed the driver itself sees at entry, before its
+        // `if (vm.SpeedMultiplier > 0) tick.TickID = TickID++` gate. Read only by
+        // the autotest; inert for normal play.
+        public static int AutotestDriverLastSpeed;
+
         public override bool Tick(VM vm)
         {
+            AutotestDriverLastSpeed = vm.SpeedMultiplier;
             HandleClients(vm);
 
             //copy the queue when we can acquire a lock
