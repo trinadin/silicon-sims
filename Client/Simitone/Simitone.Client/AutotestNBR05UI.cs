@@ -145,9 +145,16 @@ namespace Simitone.Client
             }
             catch (Exception e)
             {
+                // [NBR05-DIAG] inner-exception unwrap (diagnostic; retire with the
+                // wrap-leg bring-up): TargetInvocationException hides the real fault.
                 var at = (e.StackTrace ?? "").Split('\n').FirstOrDefault()
                     ?.TrimStart().Split('(').FirstOrDefault();
-                Fail("EXC phase " + _phase + ": " + e.GetType().Name + " " + e.Message
+                var msg = e.GetType().Name + " " + e.Message;
+                for (var ie = e.InnerException; ie != null; ie = ie.InnerException)
+                    msg += " || INNER " + ie.GetType().Name + " " + ie.Message + " @ "
+                        + ((ie.StackTrace ?? "").Split('\n').FirstOrDefault()
+                            ?.TrimStart() ?? "?");
+                Fail("EXC phase " + _phase + ": " + msg
                     + (at == null ? "" : " @ " + at));
                 _done = true;
             }
