@@ -445,7 +445,31 @@ namespace FSO.Content.TS1
                     return true;
                 }
             }
-            return false;
+            // NBR-05 amendment: the template LotZoning.iff lists only lots 1-10
+            // and 50+, but the dictionary's construction law treats every absent
+            // lot as residential — the native runtime zoning table covers all
+            // lots. An absent lot therefore rezones by APPENDING its row in the
+            // parse law's format ("lot, community" / "lot, ") instead of
+            // refusing. Disclosed on the NBR-05 receipt for review.
+            var langSet = zones.GetLanguageSet(STRLangCode.Default);
+            if (langSet?.Strings == null) return false;
+            var template = langSet.Strings.Length > 0 ? langSet.Strings[0] : null;
+            var row = new STRItem
+            {
+                LanguageCode = template?.LanguageCode ?? 0,
+                Value = lot + ((zoneType == 1) ? ", community" : ", "),
+                Comment = template?.Comment ?? ""
+            };
+            var grown = new STRItem[langSet.Strings.Length + 1];
+            Array.Copy(langSet.Strings, grown, langSet.Strings.Length);
+            grown[langSet.Strings.Length] = row;
+            langSet.Strings = grown;
+            try
+            {
+                AtomicWrite(Path.Combine(UserPath, "LotZoning.iff"), s => LotZoning.Write(s));
+            }
+            catch { return false; }
+            return true;
         }
 
         /// <summary>
