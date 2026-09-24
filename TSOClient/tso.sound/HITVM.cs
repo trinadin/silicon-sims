@@ -364,7 +364,13 @@ namespace FSO.HIT
                 else if (SubroutinePointer != 0)
                 {
                     var thread = new HITThread(evtent.ResGroup, this);
-                    thread.PC = SubroutinePointer;
+                    // AUD-13: on TS1 the event track's SubroutineID is a [TrackData]
+                    // ID, not a file offset — the entry PC needs the same remap that
+                    // in-code jumps get via PCTrans (e.g. 0x115 -> 0x17f in
+                    // SimsGeneratedHitSource). Without it every voice stem executes
+                    // garbage bytes and dies before note_on; tracks without an @tkd
+                    // subroutine (all aud12 fx legs) never took this branch.
+                    thread.PC = HITInterpreter.PCTrans(SubroutinePointer, thread);
                     thread.LoopPointer = (int)thread.PC;
                     if (TrackID != 0) thread.SetTrack(TrackID, evtent.TrackID);
                     Sounds.Add(thread);
