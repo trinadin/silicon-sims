@@ -508,11 +508,13 @@ namespace Simitone.Client
                 && !ReferenceEquals(Screen.TS1NeighSwitcher, firstSwitcher),
                 "successful-switch-remounts-the-switcher");
             Switcher = Screen.TS1NeighSwitcher as UINeighbourhoodSwitcher;
+            Check(Switcher != null, "remounted-switcher-is-uineighbourhoodswitcher");
             if (Switcher == null) { _done = true; return; }
 
             // Wrap UP: Next from the LAST neighborhood lands on the FIRST —
             // on the REBUILT switcher's real button (the production remount).
             next = ToolbarButton("NghUI\\Next.bmp");
+            Check(next != null, "next-button-present-after-remount");
             if (next == null) { _done = true; return; }
             Press(next);
             Check(Screen.SwitchAttemptsForProbe == attempts0 + 2, "wrap-next-click-counted");
@@ -521,6 +523,7 @@ namespace Simitone.Client
             Switcher = Screen.TS1NeighSwitcher as UINeighbourhoodSwitcher;
             next = ToolbarButton("NghUI\\Next.bmp");
             prev = ToolbarButton("NghUI\\Previous.bmp");
+            Check(next != null && prev != null, "wrap-buttons-present-after-second-remount");
             if (next == null || prev == null) { _done = true; return; }
 
             // The in-range directions pin the non-wrap half of the cycle.
@@ -530,6 +533,7 @@ namespace Simitone.Client
                 "next-from-first-advances-in-range (id " + N.CurrentNeighborhoodID + ")");
             Switcher = Screen.TS1NeighSwitcher as UINeighbourhoodSwitcher;
             prev = ToolbarButton("NghUI\\Previous.bmp");
+            Check(prev != null, "previous-button-present-after-third-remount");
             if (prev == null) { _done = true; return; }
 
             Press(prev);
