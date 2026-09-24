@@ -246,6 +246,12 @@ namespace FSO.Content.TS1
             var missing = objs.PersonGUIDs.Where(x => !Neighbors.Entries.Any(y => y.GUID == x)).Select(x => objs.Get(x));
             foreach (var obj in missing)
             {
+                // NBR-05 wrap-leg finding: PersonGUIDs accumulates across
+                // neighborhood mounts and is not cleared on unmount, so during a
+                // switch the Get() for a previously-mounted hood's person misses
+                // (logged engine-side) and would NRE here. The migration covers
+                // currently-mounted persons only; skip the rest.
+                if (obj == null) continue;
                 var id = Neighbors.GetFreeID();
                 Neighbors.AddNeighbor(new Neighbour()
                 {
