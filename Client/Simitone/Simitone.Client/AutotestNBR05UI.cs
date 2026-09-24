@@ -45,6 +45,17 @@ namespace Simitone.Client
     /// 6. Previous/Next — the real buttons call SwitchNeighborhood; on the
     ///    single-neighborhood isolated userdir the switch is a counted no-op
     ///    (enumeration law asserted).
+    /// 7. Previous/Next wrap math (P2, indep-review-nbr05-20260924) — a
+    ///    second neighborhood materialized in the isolated userdir (byte-copy
+    ///    of the live UserData = id 1) opens the single-hood guard; the real
+    ///    buttons cycle the ascending enumeration with wrap both ways, and
+    ///    every success rebuilds the screen in place through the production
+    ///    RefreshNeighborhoodScreen.
+    /// 8. Switch failure leg (P2, indep-review-nbr05-20260924) — the bounded
+    ///    failure law: an id with no materialized dir and no template backing
+    ///    refuses and stays put (the ShowSwitchFail trigger predicate), and
+    ///    the real ShowSwitchFail mounts the OK alert (STR# 131 [10] 'Error'
+    ///    title + the disclosed port literal) whose OK closes it.
     ///
     /// Disclosed: the lot-query Rezone button is the touch-layout surface and
     /// shares RezoneLotClickFlow with the toolbar tool proven here (desktop lot
@@ -62,6 +73,8 @@ namespace Simitone.Client
         private TS1GameScreen Screen;
         private UINeighbourhoodSwitcher Switcher;
         private UINeighborhoodSelectionPanel Panel;
+        private UIMobileAlert _failDialog;   // phase 8: the mounted switch-fail alert
+        private int _failCloseTicks;         // phase 8: fade-out wait counter
 
         // isolation (UI-30 idiom, workspace-persistent: INSIDE the private userdir)
         private static string _priorUserDir;
@@ -123,6 +136,8 @@ namespace Simitone.Client
                     case 4: PhaseVacantBuiltRezone(); break;
                     case 5: PhaseOccupiedRezoneNo(); break;
                     case 6: PhasePrevNext(); break;
+                    case 7: PhaseNeighborhoodWrap(); break;
+                    case 8: PhaseSwitchFail(); break;
                     default:
                         _done = true;
                         break;
@@ -448,7 +463,151 @@ namespace Simitone.Client
             Check(Screen.SwitchAttemptsForProbe == attempts0 + 2, "previous-click-counted");
             Check(N.CurrentNeighborhoodID == 0, "single-hood-previous-stays-put");
             Check(Screen._rezoneDialog == null, "no-failure-dialog-on-the-guarded-no-op");
+            // P2 (indep-review-nbr05-20260924): the single-hood guard law is
+            // asserted — continue into the wrap-math + failure-leg phases
+            // (additive; the proposal's "Prev/Next id math + failure leg").
+            Next();
+        }
+
+        private void PhaseNeighborhoodWrap()
+        {
+            // P2 (indep-review-nbr05-20260924): machine-verify the Prev/Next
+            // wrap math (TS1GameScreen.SwitchNeighborhood — cycle the ascending
+            // enumeration with both-way modulo wrap) that the reviewed probe
+            // left inspection-cleared. Materialize a second neighborhood dir in
+            // the isolated userdir — a byte-copy of the live UserData (id 1),
+            // disposable with the rest of the fixture — so the enumeration
+            // carries two ids and the single-hood guard opens.
+            var second = Path.Combine(RedirectDir, "UserData2");
+            Check(!Directory.Exists(second), "second-neighborhood-dir-absent-before-materialization");
+            CopyDirectory(N.UserPath, second);
+            Check(File.Exists(Path.Combine(second, "Neighborhood.iff")),
+                "second-neighborhood-materialized-from-the-live-userdata");
+            var available = N.GetAvailableNeighborhoods();
+            Check(available.Count == 2 && available[0] == 0 && available[1] == 1,
+                "two-neighborhoods-enumerated-ascending (" + string.Join(",", available) + ")");
+            Check(N.CurrentNeighborhoodID == 0, "wrap-legs-start-on-neighborhood-0");
+
+            var prev = ToolbarButton("NghUI\\Previous.bmp");
+            var next = ToolbarButton("NghUI\\Next.bmp");
+            Check(prev != null && next != null, "wrap-leg-buttons-found");
+            if (prev == null || next == null) { _done = true; return; }
+            var attempts0 = Screen.SwitchAttemptsForProbe;
+            var switches0 = Screen.SwitchesForProbe;
+            var firstSwitcher = Switcher;
+
+            // Wrap DOWN: Previous from the FIRST neighborhood lands on the
+            // LAST (((0-1)%2+2)%2 = 1), through the real toolbar button.
+            Press(prev);
+            Check(Screen.SwitchAttemptsForProbe == attempts0 + 1, "wrap-previous-click-counted");
+            Check(N.CurrentNeighborhoodID == available[available.Count - 1],
+                "previous-from-first-wraps-to-last (id " + N.CurrentNeighborhoodID + ")");
+            Check(ReferenceEquals(GameFacade.Screens.CurrentUIScreen, Screen),
+                "successful-switch-rebuilds-in-place");
+            Check(Screen.TS1NeighSwitcher != null
+                && !ReferenceEquals(Screen.TS1NeighSwitcher, firstSwitcher),
+                "successful-switch-remounts-the-switcher");
+            Switcher = Screen.TS1NeighSwitcher as UINeighbourhoodSwitcher;
+            if (Switcher == null) { _done = true; return; }
+
+            // Wrap UP: Next from the LAST neighborhood lands on the FIRST —
+            // on the REBUILT switcher's real button (the production remount).
+            next = ToolbarButton("NghUI\\Next.bmp");
+            if (next == null) { _done = true; return; }
+            Press(next);
+            Check(Screen.SwitchAttemptsForProbe == attempts0 + 2, "wrap-next-click-counted");
+            Check(N.CurrentNeighborhoodID == available[0],
+                "next-from-last-wraps-to-first (id " + N.CurrentNeighborhoodID + ")");
+            Switcher = Screen.TS1NeighSwitcher as UINeighbourhoodSwitcher;
+            next = ToolbarButton("NghUI\\Next.bmp");
+            prev = ToolbarButton("NghUI\\Previous.bmp");
+            if (next == null || prev == null) { _done = true; return; }
+
+            // The in-range directions pin the non-wrap half of the cycle.
+            Press(next);
+            Check(Screen.SwitchAttemptsForProbe == attempts0 + 3, "step-next-click-counted");
+            Check(N.CurrentNeighborhoodID == available[available.Count - 1],
+                "next-from-first-advances-in-range (id " + N.CurrentNeighborhoodID + ")");
+            Switcher = Screen.TS1NeighSwitcher as UINeighbourhoodSwitcher;
+            prev = ToolbarButton("NghUI\\Previous.bmp");
+            if (prev == null) { _done = true; return; }
+
+            Press(prev);
+            Check(Screen.SwitchAttemptsForProbe == attempts0 + 4, "step-previous-click-counted");
+            Check(N.CurrentNeighborhoodID == available[0],
+                "previous-from-last-retreats-in-range (id " + N.CurrentNeighborhoodID + ")");
+            Check(Screen.SwitchesForProbe == switches0 + 4,
+                "successful-switches-counted (" + (Screen.SwitchesForProbe - switches0) + ")");
+            Check(N.CurrentNeighborhoodID == 0, "wrap-legs-end-on-neighborhood-0");
+            if (!_passed) { _done = true; return; }
+            Next();
+        }
+
+        private void PhaseSwitchFail()
+        {
+            // P2 (indep-review-nbr05-20260924): the failure leg. Through the
+            // real SwitchNeighborhood the fail path (ShowSwitchFail) is
+            // defensive-only — the wrap target always comes from the
+            // materialized enumeration that SwitchToNeighborhood re-checks, so
+            // a consistent tree cannot fail the mount. The leg verifies both
+            // halves of the landed failure law at their real seams:
+            // (1) the trigger predicate the code defines — an id with no
+            //     materialized dir AND no template backing refuses and stays
+            //     put (no silent switch, no save);
+            // (2) the real ShowSwitchFail on the live screen mounts the
+            //     bounded OK alert (STR# 131 [10] 'Error' title + the
+            //     disclosed port literal) and OK closes it. Invoked by
+            //     reflection (the Press idiom — the dialog rides no probe
+            //     seam); the close fades out, so removal is awaited.
+            if (_failDialog == null)
+            {
+                Check(N.GetAvailableNeighborhoods().Count == 2,
+                    "two-neighborhoods-before-failure-leg");
+                var before = N.CurrentNeighborhoodID;
+                Check(!N.SwitchToNeighborhood(999), "unbacked-id-switch-refused (999)");
+                Check(N.CurrentNeighborhoodID == before, "refused-switch-stays-put");
+
+                var showFail = typeof(TS1GameScreen).GetMethod("ShowSwitchFail",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+                Check(showFail != null, "showswitchfail-resolved");
+                if (showFail == null) { _done = true; return; }
+                showFail.Invoke(Screen, null);
+                var dlg = GameFacade.Screens.TopVisibleDialog as UIMobileAlert;
+                Check(dlg != null, "switch-fail-dialog-mounted");
+                if (dlg == null) { _done = true; return; }
+                Check(dlg.TitleTextForProbe == GameFacade.Strings.GetString("131", "10"),
+                    "switch-fail-title-is-str131-10-error");
+                Check(dlg.MessageTextForProbe == "Could not switch neighborhood.",
+                    "switch-fail-message-is-the-port-literal");
+                UIButton ok = null;
+                dlg.ButtonMap.TryGetValue(UIAlertButtonType.OK, out ok);
+                Check(ok != null, "switch-fail-has-ok");
+                if (ok == null) { _done = true; return; }
+                _failDialog = dlg;
+                Press(ok);
+                return; // Close() fades out; removal completes on a later tick
+            }
+
+            // OK dispatched the real Close(): once the fade removes the alert
+            // it is no longer the top visible dialog (bounded wait, then an
+            // honest FAIL — the mounted alert must be dismissible).
+            if (GameFacade.Screens.TopVisibleDialog == _failDialog
+                && ++_failCloseTicks < 300) return;
+            Check(GameFacade.Screens.TopVisibleDialog != _failDialog, "switch-fail-ok-closed");
             _done = true;
+        }
+
+        /// <summary>Recursive copy of the live neighborhood dir — materializes
+        /// the second neighborhood the wrap legs cycle onto, inside the
+        /// disposable isolated userdir (the UI-30 fixture idiom's cost: the
+        /// fresh dir is private to this run and discarded with it).</summary>
+        private static void CopyDirectory(string src, string dst)
+        {
+            Directory.CreateDirectory(dst);
+            foreach (var file in Directory.GetFiles(src))
+                File.Copy(file, Path.Combine(dst, Path.GetFileName(file)), true);
+            foreach (var dir in Directory.GetDirectories(src))
+                CopyDirectory(dir, Path.Combine(dst, Path.GetFileName(dir)));
         }
     }
 }
