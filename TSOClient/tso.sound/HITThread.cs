@@ -354,6 +354,7 @@ namespace FSO.HIT
                 //instance.Play();
 
                 var entry = new HITNoteEntry(sound, instance, Patch, TickN);
+                entry.Source = this; // AUD-13: marker-stamp attribution (NoteQueued fires at PLAY time; handle identity breaks across retire-and-refire)
                 VM.QueuePlay(entry);
                 Notes.Add(entry);
                 NotesByChannel.Add(instance, entry);
@@ -389,6 +390,7 @@ namespace FSO.HIT
                 //instance.Play();
 
                 var entry = new HITNoteEntry(sound, instance, Patch, TickN);
+                entry.Source = this; // AUD-13: marker-stamp attribution (NoteQueued fires at PLAY time; handle identity breaks across retire-and-refire)
                 VM.QueuePlay(entry);
                 Notes.Add(entry);
                 NotesByChannel.Add(instance, entry);
@@ -578,6 +580,7 @@ namespace FSO.HIT
 
     public class HITNoteEntry 
     {
+        public HITThread Source; // AUD-13: the thread that queued this note (marker-stamp attribution)
         public SoundEffectInstance instance;
         public Patch Sound; //This is for killing specific sounds, see HITInterpreter.SeqGroupKill.
         public bool started;
