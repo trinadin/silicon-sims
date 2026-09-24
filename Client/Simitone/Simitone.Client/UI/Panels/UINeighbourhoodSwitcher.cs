@@ -42,8 +42,12 @@ namespace Simitone.Client.UI.Panels
 // UI-30 ports the decoded laws' last dead buttons: Credits mounts the
 // cWinCredits overlay (navbar button + banner), Bulldoze arms the evict/
 // bulldoze mode (lot clicks follow the EvictModeLotHandler branch law on
-// TS1GameScreen); Import is UI-21's staged-FAM flow; Inet/Previous/Next/Rezone
-// remain mounted no-ops (UI-29 dispositions).
+// TS1GameScreen); Import is UI-21's staged-FAM flow; Previous/Next cycle the
+// available neighborhoods through NBR-02's switch backend (NBR-05); Rezone
+// arms the rezone mode (NBR-05 — the STR# 151 [10] 'Evict or Rezone' tool,
+// armed lot clicks follow the STR# 131 rezone cascade on TS1GameScreen);
+// Inet remains a mounted no-op (UI-29 disposition; explicit exclusion — the
+// TSO-era web-pages viewer has no port system).
     // Destination modes mount the home grid minus home-only buttons plus a Return
     // button in the MoveIn slot — the engine's own DT/Vacation/Studio/Magic
     // toolbars (Return/Exchange/Credits/Import/Bulldoze per STR# 169/170/173/174,
@@ -135,8 +139,28 @@ namespace Simitone.Client.UI.Panels
             BulldozeArmed = armed;
             BulldozeArmTogglesForProbe++;
             if (BulldozeButtonForProbe != null) BulldozeButtonForProbe.Selected = armed;
+            if (armed) SetRezoneArmed(false);
             BulldozeArmChanged?.Invoke(armed);
             GameLog.Write("uinav: bulldoze mode " + (armed ? "ARMED" : "disarmed"));
+        }
+
+        // NBR-05: the Rezone button arms the rezone twin of the evict/bulldoze
+        // mode (STR# 151 [10] 'Evict or Rezone' vs Bulldoze's [1] 'Evict or
+        // Bulldoze' — the two armed tools of the same EvictModeBtnHandler law).
+        // The two modes are mutually exclusive: arming one disarms the other;
+        // every non-tool toolbar click disarms both (the pre-subscribed hook).
+        public bool RezoneArmed { get; private set; }
+        public UIOriginalNavbarButton RezoneButtonForProbe;
+        public int RezoneArmTogglesForProbe;
+
+        public void SetRezoneArmed(bool armed)
+        {
+            if (RezoneArmed == armed) return;
+            RezoneArmed = armed;
+            RezoneArmTogglesForProbe++;
+            if (RezoneButtonForProbe != null) RezoneButtonForProbe.Selected = armed;
+            if (armed) SetBulldozeArmed(false);
+            GameLog.Write("uinav: rezone mode " + (armed ? "ARMED" : "disarmed"));
         }
 
         // UI-21 probe seams: the mounted Import button (home + destination
@@ -231,6 +255,8 @@ namespace Simitone.Client.UI.Panels
             // session, not of the strip).
             BulldozeArmed = false;
             BulldozeButtonForProbe = null;
+            RezoneArmed = false;
+            RezoneButtonForProbe = null;
             CreditsButtonForProbe = null;
 
             // Banner: kNghBarBkg (5420) on the neighborhood screens, kDTBarBkg (5422)
@@ -243,9 +269,10 @@ namespace Simitone.Client.UI.Panels
             {
                 // UI-30: the full strip is clickable and opens the credits/picker
                 // (vt+0x98(0x400,0), RegularModeBtnHandler credits case) — the port
-                // mounts the cWinCredits overlay; the armed bulldoze mode disarms
+                // mounts the cWinCredits overlay; the armed tool modes disarm
                 // first (the banner rides the same button law).
                 SetBulldozeArmed(false);
+                SetRezoneArmed(false);
                 var gs = UIScreen.Current as Screens.TS1GameScreen;
                 if (gs != null) gs.ShowCreditsScreen();
                 else GameLog.Write("uinav: banner click (no TS1GameScreen)");
@@ -321,17 +348,27 @@ namespace Simitone.Client.UI.Panels
                 // All entries ultimately share the banner/artboard origin.
                 RegisterAnchor(btn, new Vector2(slot.X, slot.Y), true);
                 if (slot.Cols == 1) btn.ForceState = 0;   // logo: SetImage(1,1), one state
-                // UI-30 EvictModeBtnHandler law: the Bulldoze click arms; EVERY
-                // other toolbar click disarms first. Subscribed BEFORE WireClick,
+                // UI-30 EvictModeBtnHandler law: a tool click arms its mode (and
+                // disarms the other tool — NBR-05 mutual exclusion); EVERY other
+                // toolbar click disarms both first. Subscribed BEFORE WireClick,
                 // so the disarm lands before the button's own action.
                 if (slot.DebugName == "Bulldoze")
                 {
                     BulldozeButtonForProbe = btn;
                     btn.OnButtonClick += (b) => SetBulldozeArmed(!BulldozeArmed);
                 }
+                else if (slot.DebugName == "Rezone")
+                {
+                    RezoneButtonForProbe = btn;
+                    btn.OnButtonClick += (b) => SetRezoneArmed(!RezoneArmed);
+                }
                 else
                 {
-                    btn.OnButtonClick += (b) => SetBulldozeArmed(false);
+                    btn.OnButtonClick += (b) =>
+                    {
+                        SetBulldozeArmed(false);
+                        SetRezoneArmed(false);
+                    };
                 }
                 if (slot.DebugName == "Credits") CreditsButtonForProbe = btn;
                 WireClick(btn, slot, mode, tipTable);
@@ -351,6 +388,7 @@ namespace Simitone.Client.UI.Panels
                     ret.OnButtonClick += (btn) =>
                     {
                         SetBulldozeArmed(false);   // UI-30: another toolbar click disarms first
+                        SetRezoneArmed(false);     // NBR-05: both armed tools disarm
                         PopMode(4);
                     };
                     Add(ret);
@@ -426,6 +464,25 @@ namespace Simitone.Client.UI.Panels
                     // Armed/disarmed by the pre-subscribed EvictModeBtnHandler
                     // law hook above; nothing further (native jump-table case
                     // ends in the mode switch itself).
+                    break;
+                case "Rezone":
+                    // NBR-05: armed/disarmed by the pre-subscribed hook above
+                    // (the STR# 151 [10] 'Evict or Rezone' tool — the rezone twin
+                    // of the Bulldoze arm). Armed lot clicks follow the STR# 131
+                    // rezone cascade on TS1GameScreen (RezoneLotClickFlow).
+                    break;
+                case "Previous":
+                case "Next":
+                    // NBR-05: the native Next/Previous (@0xad170/@0xad1f0) feed
+                    // SwitchToNewNeighborhood a direction; the port's backend
+                    // (NBR-02) takes the target id, so the wrap/selection order
+                    // is this UI's concern: cycle the enumerated available ids.
+                    btn.OnButtonClick += (b) =>
+                    {
+                        var gs = UIScreen.Current as Screens.TS1GameScreen;
+                        if (gs != null) gs.SwitchNeighborhood(slot.DebugName == "Next" ? 1 : -1);
+                        else GameLog.Write("uinav: " + slot.DebugName + " click (no TS1GameScreen)");
+                    };
                     break;
                 case "MoveIn":
                     btn.OnButtonClick += (b) =>

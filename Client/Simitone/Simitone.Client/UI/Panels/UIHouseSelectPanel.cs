@@ -330,7 +330,10 @@ namespace Simitone.Client.UI.Panels
             var optionFunctions = new ButtonClickDelegate[]
             {
                 (family==null)?null:(ButtonClickDelegate)((btn) => Evict(family)),
-                null,
+                // NBR-05: the Rezone option runs the same armed rezone cascade
+                // as the toolbar tool (STR# 131 law; one code path, two entries).
+                // The panel is a Simitone surface (no native counterpart).
+                (ButtonClickDelegate)((btn) => ((TS1GameScreen)UIScreen.Current).RezoneLotClickFlow(HouseID)),
                 (family==null)?null:(ButtonClickDelegate)((btn) => ExportToDisk(family)),
                 (btn) => ShowMore(false)
             };

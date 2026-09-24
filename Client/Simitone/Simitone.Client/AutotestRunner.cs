@@ -355,6 +355,11 @@ namespace Simitone.Client
             // the credits+bulldoze battery's mutations land in run-local space.
             // Opt-in only — inert unless the checks string names it.
             AutotestUI30.BeginIsolation(c);
+            // NBR-05 'nbr05ui': the UI-30 isolation idiom — a fresh dir INSIDE
+            // the launcher's private userdir so the rezone/switch battery's
+            // mutations land in run-local space. Opt-in only — inert unless the
+            // checks string names it.
+            AutotestNBR05UI.BeginIsolation(c);
             if (timeoutMs > 0) Config.TimeoutMs = timeoutMs;
             Config.ExitOnDone = exitOnDone;
 
@@ -408,6 +413,7 @@ namespace Simitone.Client
                     case 15: StateArchUndo(); break;
                     case 16: StateExp09Io(); break;
                     case 17: StateExp09Route(); break;
+                    case 18: StateNBR05UI(); break;
                 }
             }
             catch (Exception e)
@@ -523,6 +529,18 @@ namespace Simitone.Client
                 Log("AUTOTEST nghbtns neighborhood-screen ready; entering credits+bulldoze battery");
                 _ui30 = new AutotestUI30(Log);
                 _state = 14;
+                return;
+            }
+            // NBR-05 'nbr05ui' opt-in (additive): takes over at the neighborhood
+            // screen — the armed rezone cascade + Previous/Next switch law through
+            // the REAL toolbar buttons (AutotestNBR05UI; the UI-30 template laws).
+            // Only reachable when the configured Checks string names it.
+            if (CheckEnabled("nbr05ui"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST nbr05ui neighborhood-screen ready; entering rezone+switch battery");
+                _nbr05 = new AutotestNBR05UI(Log);
+                _state = 18;
                 return;
             }
             // Only the visual survey needs a settled neighborhood frame. Do
@@ -877,6 +895,23 @@ namespace Simitone.Client
             Log("AUTOTEST nghbtns " + _ui30.Diagnostics);
             if (!_ui30.Passed) Log("AUTOTEST nghbtns FAILURES " + _ui30.Failures);
             _ui30 = null;
+            Finish();
+        }
+
+        // NBR-05 'nbr05ui' (opt-in, additive): the neighborhood-completion
+        // acceptance fixture — see AutotestNBR05UI.cs. Reached only through the
+        // state-18 dispatcher case, which is entered only when the configured
+        // Checks string contains "nbr05ui".
+        private static AutotestNBR05UI _nbr05;
+
+        private static void StateNBR05UI()
+        {
+            if (_nbr05 == null) { Finish(); return; }
+            if (!_nbr05.Tick()) return;
+            if (_nbr05.Passed) Pass("nbr05ui"); else Fail("nbr05ui");
+            Log("AUTOTEST nbr05ui " + _nbr05.Diagnostics);
+            if (!_nbr05.Passed) Log("AUTOTEST nbr05ui FAILURES " + _nbr05.Failures);
+            _nbr05 = null;
             Finish();
         }
 

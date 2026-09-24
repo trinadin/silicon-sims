@@ -426,10 +426,15 @@ namespace Simitone.Client.UI.Screens
             var kids = GetChildren();
             if (kids != null)
                 foreach (var child in kids.Where(c => c is UINeighbourhoodSwitcher).ToList()) Remove(child);
-            // UI-30: the credits overlay and the armed mode belong to the
-            // neighborhood screen — neither survives a lot load.
+            // UI-30: the credits overlay and the armed modes belong to the
+            // neighborhood screen — neither survives a lot load (NBR-05 adds
+            // the rezone twin to the disarm law).
             CloseCreditsScreen();
-            if (switcher is UINeighbourhoodSwitcher nav) nav.SetBulldozeArmed(false);
+            if (switcher is UINeighbourhoodSwitcher nav)
+            {
+                nav.SetBulldozeArmed(false);
+                nav.SetRezoneArmed(false);
+            }
         }
 
         public void MoveInAndPlay(short house, int family, UIElement switcher)
@@ -1633,13 +1638,30 @@ namespace Simitone.Client.UI.Screens
     internal int ArmedBulldozesForProbe;           // BulldozeLot calls through the armed path
     internal int LotTileRefreshesForProbe;         // post-success repaints
 
-    // Port literals (disclosed): confirm-2 and the OK wording are not in any
-    // decoded STR set; the eviction confirm reuses the user-approved STR# 131.
+    // NBR-05 probe seams: the armed rezone flow (the STR# 151 [10] 'Evict or
+    // Rezone' tool) and the neighborhood switcher's Previous/Next backend.
+    internal UIMobileAlert _rezoneDialog;          // probe seam: the mounted rezone confirm
+    internal int RezoneConfirmEvictForProbe;       // occupied rezone confirm ([6]/[7]) shown
+    internal int RezoneConfirmBulldozeForProbe;    // vacant+built rezone confirm ([8]/[9]) shown
+    internal int RezoneDirectForProbe;             // vacant+unbuilt direct rezone attempts
+    internal int RezonesForProbe;                  // successful SetZoningType toggles
+    internal int RezoneEvictsForProbe;             // MoveOut calls through the rezone cascade
+    internal int SwitchAttemptsForProbe;           // Previous/Next switch attempts
+    internal int SwitchesForProbe;                 // successful SwitchToNeighborhood + rebuild
+
+    // Port literals (disclosed): confirm-2, the rezone receipt and the switch
+    // failure wording are not in any decoded STR set; the rezone cascade
+    // confirms reuse the user-approved STR# 131 (r197 decode).
     internal const string BulldozeTitle = "Bulldoze";
     internal const string BulldozeConfirmMessage = "Bulldoze this house? The building will be demolished.";
     internal const string BulldozeAlsoMessage = "Do you also want to bulldoze the house and delete the family members?";
     internal const string EvictDoneMessage = "The family has moved out.";
     internal const string BulldozeDoneMessage = "The house has been bulldozed.";
+    internal const string RezoneTitle = "Rezone";
+    internal const string RezoneDoneMessage = "Lot rezoned.";
+    internal const string RezoneFailMessage = "Could not rezone the lot.";
+    internal const string SwitchFailTitle = "Error";
+    internal const string SwitchFailMessage = "Could not switch neighborhood.";
 
     /// <summary>Installs the armed lot-click hook on the mounted neighborhood
     /// panel + switcher (called from NeighSelection where both are live). The
@@ -1649,9 +1671,17 @@ namespace Simitone.Client.UI.Screens
     {
         panel.ArmedLotClick = (house) =>
         {
-            if (!switcher.BulldozeArmed) return false;
-            BulldozeLotClickFlow(house);
-            return true;
+            if (switcher.BulldozeArmed)
+            {
+                BulldozeLotClickFlow(house);
+                return true;
+            }
+            if (switcher.RezoneArmed)   // NBR-05: the rezone twin tool
+            {
+                RezoneLotClickFlow(house);
+                return true;
+            }
+            return false;
         };
     }
 
@@ -1766,6 +1796,154 @@ namespace Simitone.Client.UI.Screens
         {
             GameLog.Write("nghbtns: lot " + house + " is occupied; evict the family first");
         }
+    }
+
+    // ---- NBR-05: the armed rezone lot flow (the STR# 151 [10] 'Evict or
+    // Rezone' tool; the rezone twin of the UI-30 evict/bulldoze arm) ----
+    // Armed lot clicks land here on the STR# 131 'EvictModeStrs' cascade
+    // (r197 decode — the rezone strings live in the evict-mode set):
+    //   occupied → confirm [6]/[7] "cannot rezone until ... evicted. Proceed
+    //     with the eviction?" — YES = MoveOut(house, killSims:false) (eviction
+    //     only; the native chain depth beyond this step is undecoded — the
+    //     next armed click re-decides the branch); NO = inert.
+    //   vacant + built → confirm [8]/[9] "cannot rezone until ... bulldozed.
+    //     Proceed with the bulldoze?" — YES = BulldozeLot (NBR-03); NO = inert.
+    //   vacant + unbuilt → direct SetZoningType toggle (nothing blocks the
+    //     rezone; no dialog). Target = the provider's other value (0
+    //     residential ↔ 1 community; NBR-03's clamp, absent = residential).
+    // Success refreshes the lot tile; the receipt is a port literal (disclosed).
+    internal int HouseRezonedForProbe = -1;        // last successfully rezoned lot
+    internal void RezoneLotClickFlow(int house)
+    {
+        var neigh = Content.Get().Neighborhood;
+        var family = neigh.GetFamilyForHouse((short)house);
+        var simi = neigh.GetHouse(house)?.Get<SIMI>(1);
+        // HouseInfo+0x18 proxy: the port's built marker (same gate as move-in
+        // and the bulldoze arm).
+        bool built = simi != null && (simi.ObjectsValue > 0 || simi.ArchitectureValue > 0);
+
+        if (family != null)
+        {
+            var familyName = neigh.MainResource.Get<FAMs>(family.ChunkID)?.GetString(0) ?? "selected";
+            RezoneConfirmEvictForProbe++;
+            UIMobileAlert confirm = null;
+            confirm = new UIMobileAlert(new UIAlertOptions
+            {
+                Title = GameFacade.Strings.GetString("131", "6"),
+                Message = GameFacade.Strings.GetString("131", "7", new string[]
+                {
+                    familyName,
+                    "§" + (family.ValueInArch + family.Budget).ToString("##,#0")
+                }),
+                Buttons = UIAlertButton.YesNo(
+                    (b) =>
+                    {
+                        confirm.Close(); _rezoneDialog = null;
+                        RezoneEvictsForProbe++;
+                        if (neigh.MoveOut((short)house, false) != 1) return;   // native nonzero = nothing happened
+                        neigh.SaveNeighbourhood(false);   // the eviction confirm path owns the save
+                        RefreshLotTile(house);
+                        ShowRezoneOk(EvictDoneMessage);
+                    },
+                    (b) => { confirm.Close(); _rezoneDialog = null; })
+            });
+            _rezoneDialog = confirm;
+            GlobalShowDialog(confirm, true);
+            return;
+        }
+
+        if (built)
+        {
+            RezoneConfirmBulldozeForProbe++;
+            UIMobileAlert confirm = null;
+            confirm = new UIMobileAlert(new UIAlertOptions
+            {
+                Title = GameFacade.Strings.GetString("131", "8"),
+                Message = GameFacade.Strings.GetString("131", "9"),
+                Buttons = UIAlertButton.YesNo(
+                    (b) => { confirm.Close(); _rezoneDialog = null; ArmedBulldoze(house); },
+                    (b) => { confirm.Close(); _rezoneDialog = null; })
+            });
+            _rezoneDialog = confirm;
+            GlobalShowDialog(confirm, true);
+            return;
+        }
+
+        // Vacant + unbuilt: the direct rezone. Toggle the zoning (0 ↔ 1); the
+        // backend persists LotZoning.iff atomically (NBR-03), so no neighborhood
+        // save rides here.
+        RezoneDirectForProbe++;
+        var zone = neigh.GetZoningType((short)house);
+        var target = (short)(zone == 1 ? 0 : 1);
+        if (neigh.SetZoningType((short)house, target))
+        {
+            RezonesForProbe++;
+            HouseRezonedForProbe = house;
+            RefreshLotTile(house);
+            ShowRezoneOk(RezoneDoneMessage);
+        }
+        else
+        {
+            GameLog.Write("nghbtns: lot " + house + " could not be rezoned (LotZoning.iff)");
+        }
+    }
+
+    private void ShowRezoneOk(string message)
+    {
+        UIMobileAlert ok = null;
+        ok = new UIMobileAlert(new UIAlertOptions
+        {
+            Title = RezoneTitle,
+            Message = message,
+            Buttons = UIAlertButton.Ok((b) => { ok.Close(); _rezoneDialog = null; })
+        });
+        _rezoneDialog = ok;
+        GlobalShowDialog(ok, true);
+    }
+
+    // ---- NBR-05: Previous/Next neighborhood cycling (NBR-02 backend) ----
+    // The native Next/Previous (@0xad170/@0xad1f0) feed SwitchToNewNeighborhood
+    // a direction; the port's SwitchToNeighborhood takes the target id, so the
+    // wrap/selection order is this UI's concern (undecoded — disclosed): cycle
+    // the enumerated available ids in ascending order, wrapping both ways.
+    // SwitchToNeighborhood saves the live neighborhood then mounts the target
+    // (InitSpecific full reload); the screen rebuilds through the production
+    // RefreshNeighborhoodScreen path. A target with no materialized dir AND no
+    // template backing fails bounded: OK alert, stay put.
+    public void SwitchNeighborhood(int delta)
+    {
+        SwitchAttemptsForProbe++;
+        var neigh = Content.Get().Neighborhood;
+        var available = neigh.GetAvailableNeighborhoods();
+        if (available.Count < 2)
+        {
+            GameLog.Write("nghbtns: neighborhood switch requested with "
+                + available.Count + " available (single-hood install)");
+            return;
+        }
+        var idx = available.IndexOf(neigh.CurrentNeighborhoodID);
+        if (idx < 0) idx = 0;
+        var target = available[((idx + delta) % available.Count + available.Count) % available.Count];
+        if (!neigh.SwitchToNeighborhood(target))
+        {
+            ShowSwitchFail();
+            return;
+        }
+        SwitchesForProbe++;
+        GameLog.Write("nghbtns: switched to neighborhood " + target);
+        RefreshNeighborhoodScreen();
+    }
+
+    private void ShowSwitchFail()
+    {
+        UIMobileAlert ok = null;
+        ok = new UIMobileAlert(new UIAlertOptions
+        {
+            Title = SwitchFailTitle,
+            Message = SwitchFailMessage,
+            Buttons = UIAlertButton.Ok((b) => ok.Close())
+        });
+        GlobalShowDialog(ok, true);
     }
 
     private void RefreshLotTile(int house)
