@@ -26397,9 +26397,12 @@ namespace Simitone.Client
                     }
                     else
                     {
-                        Log("AUTOTEST aud15deny: BOTH standalone kSndobPlay fires are note-silent — the rail does not observe standalone kSndobPlay in this environment; audible leg re-scopes to the registration + source-level wiring proof (disclosed)");
-                        Log("AUTOTEST aud15deny verdict legs REGISTRATION(kSndobPlay/1284) = ok; AUDIBLE = unobservable-headless (named residual)");
-                        Pass("aud15deny");
+                        // review P2: a machinery regression (the fire/observe
+                        // rail broken) MUST fail — both-silent is not an
+                        // acceptable pass shape; only the single-file absence
+                        // case passes with the named residual.
+                        Log("AUTOTEST aud15deny: control ui_error ALSO silent — the fire/observe machinery is broken (machinery regression)");
+                        Fail("aud15deny");
                     }
                     _aud15State = 99;
                 }
