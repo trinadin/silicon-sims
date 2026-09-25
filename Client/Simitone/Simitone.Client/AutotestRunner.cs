@@ -5305,69 +5305,6 @@ namespace Simitone.Client
                 if (!_unlsSoakHeld)
                 {
                     _unlsSoakHeld = true;
-            // AUD-15 (opt-in "aud15deny"): the native terrain-tool denied sound
-            // — content registration ('denied' in the TS1 HOT [EventMapping])
-            // + the audible law (kSndobPlay -> denied.xa notes through the
-            // NoteQueued rail). Ticks BEFORE the soak-hold.
-            if (CheckEnabled("aud15deny") && _aud15State != 99)
-            {
-                Aud15Tick();
-            }
-            if (CheckEnabled("aud15deny") && _aud15State != 99)
-            {
-                if (!_unlsSoakHeld)
-                {
-                    _unlsSoakHeld = true;
-                    Log("AUTOTEST soak held for aud15deny (state=" + _aud15State + ")");
-                }
-                return;
-            }
-            // ENG-03 (opt-in "aud15deny"): the layout-score sampler law — the
-            // verified native predicate (family-members-only, awake, route-hold
-            // flag = VMRoutingFrame on the thread stack). Ticks BEFORE the
-            // soak-hold.
-            if (CheckEnabled("aud15deny") && _aud15State != 99)
-            {
-                Eng03Tick();
-            }
-            if (CheckEnabled("aud15deny") && _aud15State != 99)
-            {
-                if (!_unlsSoakHeld)
-                {
-                    _unlsSoakHeld = true;
-                    Log("AUTOTEST soak held for aud15deny (state=" + _aud15State + ")");
-                }
-                return;
-            }
-                }
-                return;
-            }
-            // ENG-03 (opt-in "eng03flag"): the layout-score sampler law — the
-            // verified native predicate (family-members-only, awake, route-hold
-            // flag = VMRoutingFrame on the thread stack). Ticks BEFORE the
-            // soak-hold.
-            if (CheckEnabled("eng03flag") && _eng3State != 99)
-            {
-                Eng03Tick();
-            }
-            if (CheckEnabled("eng03flag") && _eng3State != 99)
-            {
-                if (!_unlsSoakHeld)
-                {
-                    _unlsSoakHeld = true;
-            // AUD-15 (opt-in "aud15deny"): the native terrain-tool denied sound
-            // — content registration ('denied' in the TS1 HOT [EventMapping])
-            // + the audible law (kSndobPlay -> denied.xa notes through the
-            // NoteQueued rail). Ticks BEFORE the soak-hold.
-            if (CheckEnabled("aud15deny") && _aud15State != 99)
-            {
-                Aud15Tick();
-            }
-            if (CheckEnabled("aud15deny") && _aud15State != 99)
-            {
-                if (!_unlsSoakHeld)
-                {
-                    _unlsSoakHeld = true;
                     Log("AUTOTEST soak held for aud15deny (state=" + _aud15State + ")");
                 }
                 return;
@@ -5386,9 +5323,6 @@ namespace Simitone.Client
                 {
                     _unlsSoakHeld = true;
                     Log("AUTOTEST soak held for eng03flag (state=" + _eng3State + ")");
-                }
-                return;
-            }
                 }
                 return;
             }
