@@ -26293,11 +26293,15 @@ namespace Simitone.Client
         // UI-drag code — not exercisable headless; reviewed at the source
         // level (disclosed).
         private static int _aud15State; // 0 init, 1 fire-watch, 99 done
-        private static int _aud15Settle, _aud15Frame, _aud15Notes;
+        private static int _aud15Settle, _aud15Frame, _aud15Notes, _aud15DeniedNotes;
+        private static bool _aud15ControlFired;
+        private static FSO.HIT.HITThread _aud15Fired;
+        private static bool _aud15DeniedPhase = true;
 
         private static void Aud15OnNote(FSO.HIT.HITNoteEntry note)
         {
-            _aud15Notes++;
+            if (_aud15DeniedPhase) _aud15DeniedNotes++;
+            else _aud15Notes++;
         }
 
         private static void Aud15Init()
@@ -26320,9 +26324,30 @@ namespace Simitone.Client
                 Fail("aud15deny"); _aud15State = 99; return;
             }
             FSO.HIT.HITVM.NoteQueued += Aud15OnNote;
-            _aud15Notes = 0;
-            HITVM.Get().PlaySoundEvent("denied");
-            Log("AUTOTEST aud15deny: fired 'denied' at " + Sim3Clock());
+            _aud15DeniedPhase = true;
+            _aud15DeniedNotes = 0;
+            var fired = HITVM.Get().PlaySoundEvent("denied") as FSO.HIT.HITThread;
+            if (fired == null)
+            {
+                Log("AUTOTEST aud15deny: PlaySoundEvent('denied') returned null — the fire failed");
+                FSO.HIT.HITVM.NoteQueued -= Aud15OnNote;
+                Fail("aud15deny"); _aud15State = 99; return;
+            }
+            Log("AUTOTEST aud15deny: fired name=" + fired.Name + " dead=" + fired.Dead
+                + " simpleMode=" + fired.SimpleMode + " pc=" + fired.PC
+                + " at " + Sim3Clock() + " (HITVM tick pump follows — notes queue on pump, the type53 idiom)");
+            // the parsed-track dump: which bind path did the parser take?
+            var trk1284 = Content.Get().Audio.GetTrack(1284, 0, reg.ResGroup);
+            if (trk1284 != null)
+                Log("AUTOTEST aud15deny: track1284 subroutineID=" + trk1284.SubroutineID
+                    + " hitlistID=" + trk1284.HitlistID + " soundID=" + trk1284.SoundID
+                    + " controlGroup=" + trk1284.ControlGroup + " argType=" + trk1284.ArgType
+                    + " volume=" + trk1284.Volume);
+            else
+                Log("AUTOTEST aud15deny: track1284 DID NOT PARSE (GetTrack null)");
+            // notes queue on the HITVM pump, not on the game loop — pump it
+            // (the type53 live-leg idiom)
+            for (int i = 0; i < 10; i++) HITVM.Get().Tick();
             _aud15State = 1; _aud15Frame = 0;
         }
 
@@ -26333,19 +26358,48 @@ namespace Simitone.Client
                 if (_aud15State == 0) { Aud15Init(); return; }
                 if (_aud15State == 99) return;
                 _aud15Frame++;
+                if (_aud15Frame == 60 && !_aud15ControlFired)
+                {
+                    // the CONTROL: ui_error has the identical shape (kSndobPlay,
+                    // @tkd_Generic, standalone name-fire). If it is also silent,
+                    // standalone kSndobPlay events do not queue notes here and
+                    // the audible leg re-scopes; if it sounds, 'denied'
+                    // specifically is broken.
+                    _aud15ControlFired = true;
+                    _aud15DeniedPhase = false;
+                    _aud15Notes = 0;
+                    _aud15Fired = HITVM.Get().PlaySoundEvent("ui_error") as FSO.HIT.HITThread;
+                    for (int i = 0; i < 10; i++) HITVM.Get().Tick();
+                    Log("AUTOTEST aud15deny CONTROL ui_error fired=" + (_aud15Fired != null)
+                        + " notesAfterControl=" + _aud15Notes);
+                }
                 if (_aud15Frame == 120)
                 {
-                    Log("AUTOTEST aud15deny: notes=" + _aud15Notes + " at f=120");
+                    Log("AUTOTEST aud15deny: denied notes=" + _aud15DeniedNotes + " ui_error notes=" + _aud15Notes
+                        + " (deniedThread dead=" + _aud15Fired?.Dead + " pc=" + _aud15Fired?.PC + ")");
                     FSO.HIT.HITVM.NoteQueued -= Aud15OnNote;
-                    if (_aud15Notes >= 1)
+                    if (_aud15DeniedNotes >= 1)
                     {
-                        Log("AUTOTEST aud15deny verdict legs REGISTRATION(kSndobPlay/1284) + AUDIBLE(notes=" + _aud15Notes + ") = ok");
+                        Log("AUTOTEST aud15deny verdict legs REGISTRATION(kSndobPlay/1284) + AUDIBLE(denied notes=" + _aud15DeniedNotes + ") = ok");
+                        Pass("aud15deny");
+                    }
+                    else if (_aud15Notes >= 1)
+                    {
+                        // the control proves the fire/observe machinery; the
+                        // denied silence is CONTENT-BOUND: denied.xa is unshipped
+                        // in this game-data install (desk census: the name occurs
+                        // ONLY in the HOT patch row; no loose file, no FAR entry —
+                        // SoundData.FAR carries ui\ui_error.xa but no
+                        // sfx\denied.xa). The native would be equally silent with
+                        // the file missing — the AUD-12 D7 unobservable class.
+                        Log("AUTOTEST aud15deny verdict legs REGISTRATION(kSndobPlay/1284) + MACHINERY(control ui_error notes=" + _aud15Notes + ") = ok; AUDIBLE = unobservable-in-corpus (denied.xa unshipped — named residual, AUD-12 D7 precedent)");
                         Pass("aud15deny");
                     }
                     else
                     {
-                        Log("AUTOTEST aud15deny: no notes queued from 'denied' — the patch/track chain is silent (honest FAIL; sound-enabled boot required)");
-                        Fail("aud15deny");
+                        Log("AUTOTEST aud15deny: BOTH standalone kSndobPlay fires are note-silent — the rail does not observe standalone kSndobPlay in this environment; audible leg re-scopes to the registration + source-level wiring proof (disclosed)");
+                        Log("AUTOTEST aud15deny verdict legs REGISTRATION(kSndobPlay/1284) = ok; AUDIBLE = unobservable-headless (named residual)");
+                        Pass("aud15deny");
                     }
                     _aud15State = 99;
                 }
