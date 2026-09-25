@@ -1,4 +1,5 @@
-﻿using FSO.Files.Formats.IFF.Chunks;
+﻿using FSO.Files.Formats.IFF;
+using FSO.Files.Formats.IFF.Chunks;
 using FSO.Files.Utils;
 using FSO.LotView;
 using FSO.LotView.Components;
@@ -428,11 +429,58 @@ namespace FSO.SimAntics.Primitives
                     if (fneigh == null) return VMPrimitiveExitCode.GOTO_FALSE;
                     AddToFamily(context.VM.TS1State.CurrentFamily, fneigh, context.VM);
                     return VMPrimitiveExitCode.GOTO_TRUE;
-                // 34. PromoteFameIfNeeded
+                // 34/36. PromoteFameIfNeeded / DemoteFameIfNeeded (superstar-fame,
+                // EXP-11 runtime-leg prep 2026-09-24). Previously silent no-ops
+                // (fall-through GOTO_TRUE): person[81] never updated, so fame
+                // decay/awards/set-unlocks all stalled (Global.iff #484 ins16/ins29
+                // and ControllerStudioLot #4128 ins7 are the only callers).
+                //
+                // Native law, decoded instruction-level from the owned PPC PEF
+                // (sha 33c76da2...; TryGenericSimCall switch table TOC[-0x59a0],
+                // case 34 = file 0xf3c18 -> PromoteIfNeeded__10cFameTrackFi
+                // 0x58500, case 36 = 0xf3cd8 -> DemoteIfNeeded__10cFameTrackFi
+                // 0x582d0, on the GetFameTrackData singleton 0x577c0):
+                //
+                //   Demote(handle): if handle==-1 or person[81]==0 return false;
+                //     if person[80] < fameScoreTable[person[81]-1]:
+                //       person[81]--; return true.
+                //   Promote(handle): if handle==-1 return false; level=person[81];
+                //     if level==10 or level>10 return false;
+                //     score=person[80]; if score < fameScoreTable[level] return false;
+                //     6-category skill gate (per-level tables, person-data
+                //     categories [10,12,11,17,18,15] = Cooking, Mechanical,
+                //     Charisma, Body, Logic, Creativity — PEF data 0x59a0c0):
+                //     fail if personData[cat] < req*100;
+                //     famous-friend gate: promote only when
+                //     GetFamousFriendCount(handle) * 0.5 >= friendsNeeded[level]
+                //     (float K = 0.5 at PEF 0x59a0d8; fcmpu+cror+bge returns 0
+                //     when count*0.5 < needed);
+                //     then person[81]++; if person[82] < person[81] person[82]++;
+                //     return true.
+                //   The tables load natively from GameData/fame.iff STR# keys
+                //   (LoadUpFameTrackScoring 0x57f00 -> LoadUIStrings 4/5/6):
+                //   STR# 5 "Fame Score Needed" = score threshold per level 0..10
+                //   [2,9,21,35,52,78,156,300,550,900,0]; STR# 4 "Friend Star
+                //   Power Needed" = famous friends needed per level
+                //   [0,0,0,0,2,4,7,11,14,18,0]; STR# 6 "Skills Needed" =
+                //   6 comma-separated per-level requirements.
+                //   Residuals (named, not invented): (a) the native's exact
+                //   famous-friend filter (PersonFinder walk 0xb45c0/0xb4ff0/
+                //   0x105310) is unreproduced — this port counts OTHER on-lot
+                //   avatars with fame score > 0 (the game's own fame-track
+                //   predicate, Global #485); (b) the optional operand param0
+                //   (native lha r0,4(r24) → fame-table person lookup when
+                //   nonzero) is inert in all game-data call sites (0) and is
+                //   not reproduced; (c) the native's find-person failure path
+                //   (non-fatal error 28 via PPC 0x590720) is mirrored as a log
+                //   line + GOTO_FALSE.
+                case VMGenericTS1CallMode.PromoteFameIfNeeded: //34
+                case VMGenericTS1CallMode.DemoteFameIfNeeded: //36
+                    return FameRecompute(context, operand.Call == VMGenericTS1CallMode.PromoteFameIfNeeded);
                 case VMGenericTS1CallMode.TakeTaxiHook: //35
                     //not sure where this one is called, seems to have been added for studiotown
                     break;
-                // 36. DemoteFameIfNeeded
+                // 36. DemoteFameIfNeeded (implemented above with mode 34)
                 // 37. CancelPieMenu
                 // 38. GetTokensFromString (MM)
                 // 39. ChildToAdult (let's make this at least keep their skin colour, maybe)
@@ -604,6 +652,170 @@ namespace FSO.SimAntics.Primitives
         private VMAvatar GetRuntimeNeigh(VM vm, ushort neighborID)
         {
             return (VMAvatar)vm.Context.ObjectQueries.Avatars.FirstOrDefault(x => ((VMAvatar)x).GetPersonData(VMPersonDataVariable.NeighborId) == neighborID);
+        }
+
+        /// <summary>
+        /// superstar-fame: the cFameTrack tables, parsed from the same source the
+        /// native uses (GameData/fame.iff STR# 4/5/6 KEYS — the entry strings are
+        /// "DO NOT TRANSLATE" placeholders; the data rides the null-terminated
+        /// key of each format--3 (0xFFFD) entry, which this port's STR parser
+        /// exposes as STRItem.Value). Lazy, try-once; null when the file or the
+        /// expected tables are missing (the modes then report no-change).
+        /// </summary>
+        private sealed class FameTrackTables
+        {
+            public short[] Score;    // STR# 5, per level 0..10 (threshold to hold/reach level+1)
+            public short[] Friends;  // STR# 4, per level 0..10 (famous friends needed)
+            public short[][] Skills; // STR# 6, [level][6] in FameSkillCats order
+        }
+
+        /// <summary>Native category order (PEF data 0x59a0c0): Cooking, Mechanical,
+        /// Charisma, Body, Logic, Creativity — matches STR# 6's title order.</summary>
+        private static readonly int[] FameSkillCats = { 10, 12, 11, 17, 18, 15 };
+
+        private static FameTrackTables _fameTables;
+        private static bool _fameTablesTried;
+
+        private static FameTrackTables GetFameTrackTables()
+        {
+            if (_fameTablesTried) return _fameTables;
+            _fameTablesTried = true;
+            try
+            {
+                var files = Content.Content.Get().TS1AllFiles;
+                string path = null;
+                if (files != null)
+                {
+                    foreach (var f in files)
+                    {
+                        var norm = f.Replace('\\', '/');
+                        if (norm.EndsWith("/GameData/fame.iff", StringComparison.OrdinalIgnoreCase))
+                        {
+                            path = f; break;
+                        }
+                    }
+                }
+                if (path == null) return null;
+                var iff = new IffFile(path);
+                var score = ParseFameKeyList(iff, 5, 1);
+                var friends = ParseFameKeyList(iff, 4, 1);
+                if (score == null || friends == null) return null;
+                var skills = new short[11][];
+                for (ushort level = 0; level < 11; level++)
+                {
+                    var entry = iff.Get<STR>(6)?.GetStringEntry(level);
+                    if (entry == null) return null;
+                    var parts = (entry.Value ?? "").Split(',');
+                    if (parts.Length != FameSkillCats.Length) return null;
+                    var row = new short[FameSkillCats.Length];
+                    for (var i = 0; i < parts.Length; i++)
+                    {
+                        if (!short.TryParse(parts[i].Trim(), out row[i])) return null;
+                    }
+                    skills[level] = row;
+                }
+                _fameTables = new FameTrackTables { Score = score, Friends = friends, Skills = skills };
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine("[FameTrack] fame.iff table load failed: " + e.GetType().Name + " " + e.Message);
+            }
+            return _fameTables;
+        }
+
+        private static short[] ParseFameKeyList(IffFile iff, ushort strId, int partsPerEntry)
+        {
+            var str = iff.Get<STR>(strId);
+            if (str == null) return null;
+            var result = new short[11];
+            for (ushort i = 0; i < 11; i++)
+            {
+                var entry = str.GetStringEntry(i);
+                if (entry == null) return null;
+                var key = entry.Value ?? "";
+                if (partsPerEntry != 1) return null;
+                if (!short.TryParse(key.Trim(), out result[i])) return null;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// TS1 generic call modes 34/36 — the fame level recompute. See the
+        /// case comment above for the decoded native law. Returns true (native
+        /// bool) exactly when the level register moved.
+        /// </summary>
+        private VMPrimitiveExitCode FameRecompute(VMStackFrame context, bool promote)
+        {
+            var tables = GetFameTrackTables();
+            var ava = context.StackObject as VMAvatar;
+            if (ava == null)
+            {
+                // Native find-person failure: non-fatal error 28 (PPC 0x590720),
+                // tree continues with a "false" result.
+                System.Console.WriteLine("[GenericCall34/36] error 28: Stack Object is not a person ("
+                    + VMGenericTSOCall.FrameInfo(context) + ")");
+                return VMPrimitiveExitCode.GOTO_FALSE;
+            }
+            if (tables == null)
+            {
+                System.Console.WriteLine("[GenericCall34/36] fame.iff tables unavailable; recompute skipped");
+                return VMPrimitiveExitCode.GOTO_FALSE;
+            }
+
+            var score = ava.GetPersonData(VMPersonDataVariable.TS1FameScore);
+            var level = ava.GetPersonData(VMPersonDataVariable.TS1FameStarPower);
+
+            if (promote)
+            {
+                // native: level==10 -> false; level>10 -> false; (levels 0..9 proceed)
+                if (level < 0 || level >= 10) return VMPrimitiveExitCode.GOTO_FALSE;
+                if (score < tables.Score[level]) return VMPrimitiveExitCode.GOTO_FALSE;
+                // six-category skill gate: personData[cat] must reach req*100
+                var reqs = tables.Skills[level];
+                for (var i = 0; i < FameSkillCats.Length; i++)
+                {
+                    var req = reqs[i];
+                    if (req > 0)
+                    {
+                        var points = ava.GetPersonData((VMPersonDataVariable)FameSkillCats[i]);
+                        if (points < (short)(req * 100)) return VMPrimitiveExitCode.GOTO_FALSE;
+                    }
+                }
+                // famous-friend gate: count * 0.5 >= friendsNeeded[level]
+                if (CountFamousFriends(context, ava) * 0.5f < tables.Friends[level])
+                    return VMPrimitiveExitCode.GOTO_FALSE;
+                level++;
+                ava.SetPersonData(VMPersonDataVariable.TS1FameStarPower, level);
+                if (ava.GetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark) < level)
+                    ava.SetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark, level);
+                return VMPrimitiveExitCode.GOTO_TRUE;
+            }
+            else
+            {
+                // native: level==0 -> false; demote one step when score < table[level-1]
+                if (level <= 0) return VMPrimitiveExitCode.GOTO_FALSE;
+                if (score >= tables.Score[level - 1]) return VMPrimitiveExitCode.GOTO_FALSE;
+                level--;
+                ava.SetPersonData(VMPersonDataVariable.TS1FameStarPower, level);
+                return VMPrimitiveExitCode.GOTO_TRUE;
+            }
+        }
+
+        /// <summary>
+        /// Famous-friend count for the promote gate. Residual (named above): the
+        /// native's PersonFinder friendship filter is unreproduced; this counts
+        /// OTHER on-lot avatars with fame score > 0 — the game's own fame-track
+        /// predicate (Global #485 "on fame track" = person[56]==0 && person[80]>0).
+        /// </summary>
+        private static int CountFamousFriends(VMStackFrame context, VMAvatar self)
+        {
+            var count = 0;
+            foreach (VMAvatar other in context.VM.Context.ObjectQueries.Avatars.ToList())
+            {
+                if (other == self || other.Dead) continue;
+                if (other.GetPersonData(VMPersonDataVariable.TS1FameScore) > 0) count++;
+            }
+            return count;
         }
     }
 
