@@ -33,6 +33,10 @@ namespace FSO.Client.UI.Panels.LotControls
 
         private VMArchitectureCommand LastCmd;
         private bool WasDown;
+        // AUD-15: the native per-tool denied-sound rate limit — one fire per
+        // 400 VM ticks (cTool::DoDeniedSound 0x192070 keys its limiter the
+        // same way: a global tick stamp vs this tool instance).
+        private long LastDeniedTick = long.MinValue;
 
         public UITerrainFlatten(VM vm, LotView.World world, ILotControl parent, List<int> parameters)
         {
@@ -171,9 +175,23 @@ namespace FSO.Client.UI.Panels.LotControls
                         : TerrainToolErrors.CostText(cost);
                     state.UIState.TooltipProperties.UpdateDead = false;
 
-                    if (!cmds[0].Equals(LastCmd) && disallowed)
+                    // AUD-15: the native terrain-tool denied sound. The R203
+                    // tools played the generic ui_error; natively the dirt-tool
+                    // family branches to cTool::DoDeniedSound, which fires HIT
+                    // event 0x4D35A (the shared tool-sound table base 0x4d300 +
+                    // 90) rate-limited to one per 400 VM ticks. The port's TS1
+                    // content registers the same logical event BY NAME:
+                    // 'denied' (SimsSound.hot [EventMapping]
+                    // denied=kSndobPlay,1284 -> patch 1283 =
+                    // sounddata\sfx\denied.xa); the port fires events by
+                    // name, and 0x4D35A is the native-generated numbering of
+                    // this event.
+                    var deniedTicks = vm?.Context?.Clock?.Ticks ?? 0;
+                    if (!cmds[0].Equals(LastCmd) && disallowed
+                        && deniedTicks - LastDeniedTick >= 400)
                     {
-                        HITVM.Get().PlaySoundEvent(UISounds.Error);
+                        LastDeniedTick = deniedTicks;
+                        HITVM.Get().PlaySoundEvent("denied");
                     }
                 }
                 else
