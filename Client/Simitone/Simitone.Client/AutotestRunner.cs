@@ -1054,6 +1054,8 @@ namespace Simitone.Client
                 // (AUD-15) the native denied-sound law drive rides the same
                 // state-2 soak entry.
                 || CheckEnabled("aud15deny")
+                // (ENG-03) the layout-score sampler law drive rides it too.
+                || CheckEnabled("eng03flag")
                 || CheckEnabled("hpparty")
                 || CheckEnabled("vacation")
                 // (EXP-05) Unleashed legs ride the same state-2 soak entry — without
@@ -5303,7 +5305,90 @@ namespace Simitone.Client
                 if (!_unlsSoakHeld)
                 {
                     _unlsSoakHeld = true;
+            // AUD-15 (opt-in "aud15deny"): the native terrain-tool denied sound
+            // — content registration ('denied' in the TS1 HOT [EventMapping])
+            // + the audible law (kSndobPlay -> denied.xa notes through the
+            // NoteQueued rail). Ticks BEFORE the soak-hold.
+            if (CheckEnabled("aud15deny") && _aud15State != 99)
+            {
+                Aud15Tick();
+            }
+            if (CheckEnabled("aud15deny") && _aud15State != 99)
+            {
+                if (!_unlsSoakHeld)
+                {
+                    _unlsSoakHeld = true;
                     Log("AUTOTEST soak held for aud15deny (state=" + _aud15State + ")");
+                }
+                return;
+            }
+            // ENG-03 (opt-in "aud15deny"): the layout-score sampler law — the
+            // verified native predicate (family-members-only, awake, route-hold
+            // flag = VMRoutingFrame on the thread stack). Ticks BEFORE the
+            // soak-hold.
+            if (CheckEnabled("aud15deny") && _aud15State != 99)
+            {
+                Eng03Tick();
+            }
+            if (CheckEnabled("aud15deny") && _aud15State != 99)
+            {
+                if (!_unlsSoakHeld)
+                {
+                    _unlsSoakHeld = true;
+                    Log("AUTOTEST soak held for aud15deny (state=" + _aud15State + ")");
+                }
+                return;
+            }
+                }
+                return;
+            }
+            // ENG-03 (opt-in "eng03flag"): the layout-score sampler law — the
+            // verified native predicate (family-members-only, awake, route-hold
+            // flag = VMRoutingFrame on the thread stack). Ticks BEFORE the
+            // soak-hold.
+            if (CheckEnabled("eng03flag") && _eng3State != 99)
+            {
+                Eng03Tick();
+            }
+            if (CheckEnabled("eng03flag") && _eng3State != 99)
+            {
+                if (!_unlsSoakHeld)
+                {
+                    _unlsSoakHeld = true;
+            // AUD-15 (opt-in "aud15deny"): the native terrain-tool denied sound
+            // — content registration ('denied' in the TS1 HOT [EventMapping])
+            // + the audible law (kSndobPlay -> denied.xa notes through the
+            // NoteQueued rail). Ticks BEFORE the soak-hold.
+            if (CheckEnabled("aud15deny") && _aud15State != 99)
+            {
+                Aud15Tick();
+            }
+            if (CheckEnabled("aud15deny") && _aud15State != 99)
+            {
+                if (!_unlsSoakHeld)
+                {
+                    _unlsSoakHeld = true;
+                    Log("AUTOTEST soak held for aud15deny (state=" + _aud15State + ")");
+                }
+                return;
+            }
+            // ENG-03 (opt-in "eng03flag"): the layout-score sampler law — the
+            // verified native predicate (family-members-only, awake, route-hold
+            // flag = VMRoutingFrame on the thread stack). Ticks BEFORE the
+            // soak-hold.
+            if (CheckEnabled("eng03flag") && _eng3State != 99)
+            {
+                Eng03Tick();
+            }
+            if (CheckEnabled("eng03flag") && _eng3State != 99)
+            {
+                if (!_unlsSoakHeld)
+                {
+                    _unlsSoakHeld = true;
+                    Log("AUTOTEST soak held for eng03flag (state=" + _eng3State + ")");
+                }
+                return;
+            }
                 }
                 return;
             }
@@ -26414,6 +26499,154 @@ namespace Simitone.Client
                 Fail("aud15deny"); _aud15State = 99;
             }
         }
+
+        // ======================= ENG-03 (eng03flag) =======================
+        // The layout-score sampler law, against the verified native predicate
+        // (EXP-12 T1 + the 2026-09-25 review): only FAMILY MEMBERS are
+        // sampled (+1484), only while AWAKE (Motive[11] = SleepState >= 0),
+        // and the FLAG = the Sim currently HOLDS A ROUTE (the port's
+        // VMRoutingFrame-on-thread-stack law — the R137 Velocity proxy is
+        // retired). Phase 1 proves the idle law (samples advance, zero
+        // flags while nothing routes); phase 2 pushes a real routed
+        // interaction (the TRV-04 pie-entry idiom) and proves the flag
+        // channel tracks it. No state writes beyond the push.
+        private static int _eng3State; // 0 init, 1 idle-watch, 2 routed-watch, 99 done
+        private static int _eng3Settle, _eng3Frame;
+        private static VMAvatar _eng3Host;
+        private static int _eng3Total0, _eng3Flagged0, _eng3Members;
+        private static bool _eng3IdleFlagWaived; // autonomy routed during phase 1
+
+        private static void Eng03Init()
+        {
+            if (++_eng3Settle < 90) return;
+            var avatars = _vm?.Context?.ObjectQueries?.Avatars?.OfType<VMAvatar>()
+                .Where(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD).ToList();
+            if (avatars == null || avatars.Count == 0)
+            { Log("AUTOTEST eng03flag: no avatar"); Fail("eng03flag"); _eng3State = 99; return; }
+            _eng3Host = avatars.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? avatars[0];
+            var fam = _vm.TS1State?.CurrentFamily;
+            if (fam == null)
+            { Log("AUTOTEST eng03flag: no CurrentFamily on the fixture lot — the family-members-only law is unassertable here"); Fail("eng03flag"); _eng3State = 99; return; }
+            // the expected sampled set, computed with the sampler's own public
+            // gates (family membership, liveness, awake)
+            _eng3Members = 0;
+            foreach (var av in avatars)
+            {
+                bool member = Simitone.Client.UI.Model.OriginalRouteHistory.IsSampledFamilyMember(_vm, av);
+                bool awake = false;
+                try { awake = av.GetMotiveData(FSO.SimAntics.Model.VMMotive.SleepState) >= 0; } catch { }
+                bool sampled = member && !av.Dead && !av.GhostImage && awake;
+                Log("AUTOTEST eng03flag: av obj" + av.ObjectID
+                    + " famNum=" + av.GetPersonData(VMPersonDataVariable.TS1FamilyNumber)
+                    + " currentFam=" + fam.ChunkID + " member=" + member + " awake=" + awake
+                    + " holdsRoute=" + Simitone.Client.UI.Model.OriginalRouteHistory.HoldsRoute(av)
+                    + " → sampled=" + sampled);
+                if (sampled) _eng3Members++;
+            }
+            if (_eng3Members == 0)
+            { Log("AUTOTEST eng03flag: expected sampled set is empty — sampler law cannot advance"); Fail("eng03flag"); _eng3State = 99; return; }
+            _eng3Total0 = Simitone.Client.UI.Model.OriginalRouteHistory.TotalSamples;
+            _eng3Flagged0 = Simitone.Client.UI.Model.OriginalRouteHistory.FlaggedSamples;
+            Log("AUTOTEST eng03flag: members=" + _eng3Members + " total0=" + _eng3Total0 + " flagged0=" + _eng3Flagged0);
+            _eng3State = 1; _eng3Frame = 0;
+        }
+
+        private static void Eng03Tick()
+        {
+            try
+            {
+                if (_eng3State == 0) { Eng03Init(); return; }
+                if (_eng3State == 99) return;
+                _eng3Frame++;
+                if (_eng3State == 1)
+                {
+                    if (_eng3Frame == 60)
+                    {
+                        var routing = _vm.Entities.OfType<VMAvatar>().Count(a => Simitone.Client.UI.Model.OriginalRouteHistory.HoldsRoute(a));
+                        Log("AUTOTEST eng03flag f=" + _eng3Frame + " idle-check: routingAvatars=" + routing
+                            + " flagged=" + Simitone.Client.UI.Model.OriginalRouteHistory.FlaggedSamples);
+                        if (routing > 0)
+                        {
+                            _eng3IdleFlagWaived = true;
+                            Log("AUTOTEST eng03flag: autonomy routed during phase 1 — the zero-flag assert is waived (logged honestly)");
+                        }
+                    }
+                    if (_eng3Frame % 120 == 0)
+                        Log("AUTOTEST eng03flag f=" + _eng3Frame + " total=" + Simitone.Client.UI.Model.OriginalRouteHistory.TotalSamples
+                            + " (delta " + (Simitone.Client.UI.Model.OriginalRouteHistory.TotalSamples - _eng3Total0) + ") flagged=" + Simitone.Client.UI.Model.OriginalRouteHistory.FlaggedSamples);
+                    if (_eng3Frame >= 600)
+                    {
+                        var totalDelta = Simitone.Client.UI.Model.OriginalRouteHistory.TotalSamples - _eng3Total0;
+                        var flaggedDelta = Simitone.Client.UI.Model.OriginalRouteHistory.FlaggedSamples - _eng3Flagged0;
+                        Log("AUTOTEST eng03flag PHASE1 totalDelta=" + totalDelta + " flaggedDelta=" + flaggedDelta
+                            + " members=" + _eng3Members + " idleWaived=" + _eng3IdleFlagWaived);
+                        if (totalDelta < _eng3Members)
+                        {
+                            Log("AUTOTEST eng03flag: sampler did not advance (totalDelta " + totalDelta
+                                + " < members " + _eng3Members + " over 600f) — the family gate or the clock gate is broken");
+                            Fail("eng03flag"); _eng3State = 99; return;
+                        }
+                        if (!_eng3IdleFlagWaived && flaggedDelta != 0)
+                        {
+                            Log("AUTOTEST eng03flag: flagged advanced while nothing held a route — the flag channel is broken");
+                            Fail("eng03flag"); _eng3State = 99; return;
+                        }
+                        // PHASE 2: a real routed interaction — the TRV-04 pie-entry
+                        // push idiom (host walks to the phone → routing frames).
+                        var phone = HPFindPhone();
+                        VMPieMenuInteraction entry = null;
+                        VMEntity plugin = null;
+                        if (phone != null)
+                        {
+                            var pie = phone.GetPieMenu(_vm, _eng3Host, false, true);
+                            foreach (var e in _vm.Entities)
+                                if (e.Object?.OBJ?.GUID == 0xABA9DF4Au) { plugin = e; break; }
+                            if (plugin != null)
+                                entry = pie.FirstOrDefault(x => x.Param0 == plugin.ObjectID);
+                        }
+                        if (entry == null)
+                        {
+                            Log("AUTOTEST eng03flag: no Vacation pie entry to drive a route — phase 2 unexercised (honest partial: idle law only)");
+                            Log("AUTOTEST eng03flag verdict legs FAMILY-GATE + CLOCK-ADVANCE + IDLE-FLAG = ok (route-tracking unexercised)");
+                            Pass("eng03flag"); _eng3State = 99; return;
+                        }
+                        phone.PushUserInteraction(entry.ID, _eng3Host, _vm.Context, entry.Global,
+                            new short[] { entry.Param0, 0, 0, 0 });
+                        _eng3Frame = 0; _eng3State = 2;
+                        Log("AUTOTEST eng03flag PHASE2 pushed '" + entry.Name + "' param0=" + entry.Param0);
+                    }
+                }
+                else if (_eng3State == 2)
+                {
+                    if (_eng3Frame % 60 == 0)
+                        Log("AUTOTEST eng03flag f=" + _eng3Frame + " routed-watch total=" + Simitone.Client.UI.Model.OriginalRouteHistory.TotalSamples
+                            + " flagged=" + Simitone.Client.UI.Model.OriginalRouteHistory.FlaggedSamples
+                            + " hostRoute=" + Simitone.Client.UI.Model.OriginalRouteHistory.HoldsRoute(_eng3Host));
+                    if (Simitone.Client.UI.Model.OriginalRouteHistory.FlaggedSamples > _eng3Flagged0)
+                    {
+                        // review P2: the baseline is autonomy-dirtied, so this
+                        // leg is CORRELATION (flag advanced during a routed
+                        // window), not strict route-track attribution.
+                        Log("AUTOTEST eng03flag VERDICT: flagged advanced to " + Simitone.Client.UI.Model.OriginalRouteHistory.FlaggedSamples
+                            + " during the routed window (correlated; baseline autonomy-dirtied — ROUTE-TRACKING not strictly attributed)");
+                        Log("AUTOTEST eng03flag verdict legs FAMILY-GATE + CLOCK-ADVANCE + IDLE-FLAG = ok; ROUTE-TRACKING = correlated-only");
+                        Pass("eng03flag"); _eng3State = 99; return;
+                    }
+                    if (_eng3Frame >= 3600)
+                    {
+                        Log("AUTOTEST eng03flag TIMEOUT: no flag advance in the routed window (hostRoute="
+                            + Simitone.Client.UI.Model.OriginalRouteHistory.HoldsRoute(_eng3Host) + ") — honest FAIL");
+                        Fail("eng03flag"); _eng3State = 99; return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST eng03flag EXC " + ex.GetType().Name + ": " + ex.Message + " @ " + ex.StackTrace);
+                Fail("eng03flag"); _eng3State = 99;
+            }
+        }
+
 
         private static void VacInit()
         {

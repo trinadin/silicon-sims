@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Simitone.Client.UI.Model
 {
@@ -9,20 +10,28 @@ namespace Simitone.Client.UI.Model
     /// GetHouseStats tail 0x8c2ec-0x8c3d8 — machine-verified in
     /// tools/iff-dump/r136/, the call site decoded in r137/).
     ///
-    /// ENGINE MODEL (decoded):
+    /// ENGINE MODEL — RE-DERIVED AND VERIFIED (EXP-12 T1 decode, coordinated
+    /// by the 2026-09-25 independent review
+    /// coordination/evidence/COORD/indep-review-exp12-20260925-*; the R137
+    /// field glosses below were REFUTED by that verification and corrected):
     ///   * House keeps twelve counters at +48..+92 = six (total, flagged)
-    ///     generations; AddLayoutTick(flag) adds one sample per call.
-    ///   * R137 — THE CALL SITE (cXPerson::Simulate(long) 0x10bff0, the
-    ///     per-Sim update loop, decoded): the tick fires when
-    ///       delta % 10 == 0
-    ///       && s16[this+1484] == 0        (the sleep/consciousness state: AWAKE)
-    ///       && s16[this+142] == 0         (the hidden flag: VISIBLE)
-    ///       && f32[this+0x7b8] >= 0.0f    (Motives[11] >= 0)
+    ///     generations; AddLayoutTick(flag) adds one sample per call:
+    ///     `if (flag) H92++; H88++` — 0x10c2d8 is its ONLY call site.
+    ///   * THE CALL SITE (cXPerson::Simulate, guard chain 0x10c254-0x10c2d8):
+    ///     the tick fires when
+    ///       personTick % 10 == 0
+    ///       && s16[this+1484] == 0     (FAMILY-MEMBER gate: set by
+    ///                                   Neighborhood::UpdateInstanceVisitorTypes
+    ///                                   = Family::TestMember ? 0 : 1 —
+    ///                                   VISITORS ARE NEVER SAMPLED)
+    ///       && s16[this+142] == 0      (the cXObject dynamic flag)
+    ///       && GetMotive(11) >= 0      (AWAKE: IsSleeping 0x108180 is
+    ///                                   exactly GetMotive(11) < 0)
     ///     and the FLAG = (GetCurrentRoute() != NULL) — the Sim currently
-    ///     HOLDS A ROUTE (is moving). So the total channel counts sampled
-    ///     awake+visible Sims and the flagged channel counts those in
-    ///     motion; LayoutScore = 100 x (1 - 2 x route occupancy), decaying
-    ///     as Sims spend more of their sampled time trekking.
+    ///     HOLDS A ROUTE (inlined: route-stack count at +2724 != 0). So the
+    ///     total channel counts sampled family-member Sims and the flagged
+    ///     channel counts those holding a route; LayoutScore decays as Sims
+    ///     spend more of their sampled time trekking.
     ///   * ClearRouteHistory 0x8c430 reseeds all twelve from a global
     ///     ([TOC-29460], BSS — the seed N0 is statically unrecoverable);
     ///     called from the house-rebuild/stat-snapshot paths
@@ -35,14 +44,23 @@ namespace Simitone.Client.UI.Model
     ///     guard at 0x8c338 pins the intended divisor as the TOTAL.
     ///
     /// PORT (disclosed where engine-internal):
-    ///   * sampling: one pass per cadence tick; each live avatar
-    ///     contributes one total sample, flagged when it is currently
-    ///     moving (VMAvatar.Velocity != 0 — set by the routing frame on
-    ///     movement ticks, zeroed otherwise; the engine's proxy for
-    ///     GetCurrentRoute()). Sampling only advances when the VM clock
-    ///     ticks (pause = no Simulate = no samples, engine-faithful).
-    ///     The awake/visible/motive[11] gates are approximated by
-    ///     liveness (Dead/GhostImage excluded) — disclosed.
+    ///   * FLAG: the port's GetCurrentRoute() equivalent is a VMRoutingFrame
+    ///     on the avatar's thread stack (the engine PushNewRoutingFrame per
+    ///     route; it pops when the route completes) — NOT the R137
+    ///     Velocity!=0 movement proxy (the route-hold state outlives
+    ///     per-frame movement).
+    ///   * GATES: family membership = GetPersonData(TS1FamilyNumber) ==
+    ///     VM.TS1State.CurrentFamily.ChunkID (the engine's own test,
+    ///     VMNetSimJoinCmd); awake = GetMotiveData(VMMotive.SleepState)
+    ///     >= 0 (the port's motive slot 11 is literally SleepState). A
+    ///     family-less lot samples nobody — engine-faithful (no TestMember
+    ///     pass natively either).
+    ///   * the +142 dynamic flag has NO port mapping — the Dead/GhostImage
+    ///     liveness exclusion stands in for it (disclosed).
+    ///   * cadence: the port samples once per VM clock tick rather than
+    ///     every 10th per-person tick; the score normalizes by the total,
+    ///     so the ratio is cadence-invariant (disclosed; unchanged from
+    ///     R137).
     ///   * the seed N0 is unrecoverable; the port normalizes by the total
     ///     (the engine's own guarded sum):
     ///     LayoutScore = (int)(100.0 * clamp(1f - 2f*flagged/max(1,total), 0, 1)).
@@ -56,9 +74,40 @@ namespace Simitone.Client.UI.Model
         private static long LastClockTicks = -1;
 
         /// <summary>
-        /// One sampling pass over every Sim: each live avatar is one sample
-        /// (the engine's AddLayoutTick population channel); the flag marks
-        /// Sims currently holding a route (moving this tick).
+        /// The port's GetCurrentRoute() law: the avatar currently HOLDS a
+        /// route iff a VMRoutingFrame sits on its thread stack (the native
+        /// route-stack count at +2724).
+        /// </summary>
+        public static bool HoldsRoute(FSO.SimAntics.VMAvatar av)
+        {
+            var stack = av?.Thread?.Stack;
+            if (stack == null) return false;
+            foreach (var frame in stack)
+                if (frame is FSO.SimAntics.Engine.VMRoutingFrame) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// The verified +1484 gate: only members of the current family are
+        /// sampled (native Family::TestMember; the engine's own membership
+        /// test is TS1FamilyNumber == CurrentFamily.ChunkID).
+        /// </summary>
+        public static bool IsSampledFamilyMember(FSO.SimAntics.VM vm, FSO.SimAntics.VMAvatar av)
+        {
+            var fam = vm?.TS1State?.CurrentFamily;
+            if (fam == null) return false; // family-less lot: nobody samples
+            try
+            {
+                return av.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.TS1FamilyNumber)
+                    == fam.ChunkID;
+            }
+            catch { return false; }
+        }
+
+        /// <summary>
+        /// One sampling pass over the family: each live, awake family-member
+        /// Sim is one sample (AddLayoutTick's population channel); the flag
+        /// marks Sims currently holding a route.
         /// </summary>
         public static void Sample(FSO.SimAntics.VM vm)
         {
@@ -76,11 +125,13 @@ namespace Simitone.Client.UI.Model
             {
                 var av = e as FSO.SimAntics.VMAvatar;
                 if (av == null || av.Dead || av.GhostImage) continue;
+                // the verified +1484 gate: family members only
+                if (!IsSampledFamilyMember(vm, av)) continue;
+                // the verified awake gate: Motive[11] (SleepState) >= 0
+                try { if (av.GetMotiveData(FSO.SimAntics.Model.VMMotive.SleepState) < 0) continue; }
+                catch { continue; }
                 TotalSamples++;
-                bool moving;
-                try { moving = av.Velocity != Microsoft.Xna.Framework.Vector3.Zero; }
-                catch { moving = false; }
-                if (moving) FlaggedSamples++;
+                if (HoldsRoute(av)) FlaggedSamples++;
             }
         }
 
