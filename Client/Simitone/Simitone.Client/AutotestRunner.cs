@@ -1048,6 +1048,9 @@ namespace Simitone.Client
                 || CheckEnabled("cc04live")
                 || CheckEnabled("ss-book")
                 || CheckEnabled("famesess")
+                // (TRV-04) the phone-plugin menu/booking drive rides the same
+                // state-2 soak entry as the expansion legs.
+                || CheckEnabled("trv04book")
                 || CheckEnabled("hpparty")
                 || CheckEnabled("vacation")
                 // (EXP-05) Unleashed legs ride the same state-2 soak entry — without
@@ -5265,6 +5268,24 @@ namespace Simitone.Client
             if (CheckEnabled("unl-travel") && _unltrState != 99)
             {
                 UnlTravelTick();
+            }
+            // TRV-04 (opt-in "trv04book"): the phone-plugin menu/booking drive —
+            // the real 'Call Plugin' pie entry (Param0 = plugin oid) pushed as a
+            // user click; zero probe emulation (no plugin creation, no attr arms,
+            // no NotifyIdle). Ticks BEFORE the soak-hold (which returns while the
+            // check is active).
+            if (CheckEnabled("trv04book") && _trvbState != 99)
+            {
+                TrvBookTick();
+            }
+            if (CheckEnabled("trv04book") && _trvbState != 99)
+            {
+                if (!_unlsSoakHeld)
+                {
+                    _unlsSoakHeld = true;
+                    Log("AUTOTEST soak held for trv04book (state=" + _trvbState + ")");
+                }
+                return;
             }
             // EXP-05 V4 (opt-in "unl-show"): Pet Show controller loop.
             if (CheckEnabled("unl-show") && _unlsState != 99)
@@ -26092,6 +26113,149 @@ namespace Simitone.Client
             {
                 Log("AUTOTEST exp09train EXC " + ex.GetType().Name + ": " + ex.Message);
                 Fail("exp09train"); _trState = 99;
+            }
+        }
+
+        // ======================= TRV-04 (trv04book) =======================
+        // The approved Call Plugin implementation drive. The fix: the boot-spawn
+        // of missing Global objects (VMTS1ActivatorNew controllerObjects loop)
+        // now registers phone plugins in object category 1 — the native law
+        // (every shipped lot's plugin instances carry ObjectData[59]=1; the
+        // phone's 'Call Plugin' check, PhoneGlobals 8308, enumerates
+        // category-SP0(=1) objects and runs each one's 'CT - Phone Plugin Menu'
+        // tree, whose change_action_string adds the pie entry with
+        // Param0 = the plugin's object id). This check drives the REAL path:
+        // pie entries -> the chosen entry's push (param0 rides in Args[0]) ->
+        // 8309 (attr[11]=param0 @7) -> pickup wait -> 8222 -> the plugin's
+        // 'CT - Plugin Call' (4134) -> 4098 cab -> 4100 books. NO plugin
+        // creation, NO attr arms, NO NotifyIdle/op-49 emulation, NO phone
+        // recreation; dialogs answered by the production-semantics responder.
+        private static int _trvbState; // 0 init, 1 watch, 99 done
+        private static int _trvbSettle, _trvbFrame;
+        private static VMAvatar _trvbHost;
+        private static short _trvbHostNid = -1;
+        private static uint _trvbUid;
+        private static VMEntity _trvbPlugin; // the Vacation phone-plugin entity
+        private static VMPieMenuInteraction _trvbEntry; // the pie entry we drove
+
+        private static string TrvbTokens()
+        {
+            var inv = Content.Get().Neighborhood.GetInventoryByNID(_trvbHostNid);
+            return inv == null ? "none" : string.Join(",", inv
+                .Where(x => x.Type == 2 && (x.GUID == 7 || x.GUID == 8))
+                .Select(x => x.GUID + ":" + x.Count));
+        }
+
+        private static void TrvBookInit()
+        {
+            if (++_trvbSettle < 90) return;
+            var avatars = _vm?.Context?.ObjectQueries?.Avatars?.OfType<VMAvatar>()
+                .Where(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD).ToList();
+            if (avatars == null || avatars.Count == 0)
+            { Log("AUTOTEST trv04book: no avatar"); Fail("trv04book"); _trvbState = 99; return; }
+            _trvbHost = avatars.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? avatars[0];
+            _hpHost = _trvbHost; // the shared responder answers the host's thread first
+            _trvbHostNid = _trvbHost.GetPersonData(VMPersonDataVariable.NeighborId);
+
+            // (1) REGISTRATION OBSERVABLE: the Vacation plugin entity exists and
+            // carries Category=1 (ObjectData[59]) — the fix's law.
+            foreach (var e in _vm.Entities)
+            {
+                if (e.Object?.OBJ == null) continue;
+                if (e.Object.OBJ.GUID == 0xABA9DF4Au) { _trvbPlugin = e; break; }
+            }
+            if (_trvbPlugin == null)
+            {
+                Log("AUTOTEST trv04book: VacationPhonePlugin entity NOT on lot (controller spawn failed)");
+                Fail("trv04book"); _trvbState = 99; return;
+            }
+            var cat = _trvbPlugin.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.Category);
+            Log("AUTOTEST trv04book: plugin obj" + _trvbPlugin.ObjectID
+                + " cat(ObjectData59)=" + cat
+                + " registered=" + (_vm.Context.ObjectQueries.GetObjectsByCategory(1)?.Contains(_trvbPlugin) == true));
+            if (cat != 1)
+            {
+                Log("AUTOTEST trv04book: plugin NOT registered in category 1 — the fix's observable failed");
+                Fail("trv04book"); _trvbState = 99; return;
+            }
+
+            // (2) MENU OBSERVABLE: the phone pie (the real GetPieMenu the client
+            // renders) contains the plugin's entry with Param0 = plugin oid.
+            var phone = HPFindPhone();
+            if (phone == null)
+            { Log("AUTOTEST trv04book: no phone on lot"); Fail("trv04book"); _trvbState = 99; return; }
+            var pie = phone.GetPieMenu(_vm, _trvbHost, false, true);
+            var pluginEntries = pie.Where(x => x.Param0 == _trvbPlugin.ObjectID).ToList();
+            foreach (var pe in pluginEntries)
+                Log("AUTOTEST trv04book: PIE plugin-entry '" + pe.Name + "' Param0=" + pe.Param0 + " ID=" + pe.ID);
+            Log("AUTOTEST trv04book: pie n=" + pie.Count + " ["
+                + string.Join(" | ", pie.Take(20).Select(x => (x.Name ?? "?") + (x.Param0 != 0 ? "(p" + x.Param0 + ")" : ""))) + "]");
+            if (pluginEntries.Count == 0)
+            {
+                Log("AUTOTEST trv04book: no pie entry with Param0=plugin oid — the 8308 menu build failed (check tree or 'CT - Phone Plugin Menu' gates)");
+                Fail("trv04book"); _trvbState = 99; return;
+            }
+            _trvbEntry = pluginEntries[0];
+
+            // (3) THE CLICK: push the pie entry exactly as UIPieMenu's click does
+            // (VMNetInteractionCmd.Execute -> PushUserInteraction with the
+            // entry's Param0 in Args[0]). This is the true user-click shape.
+            var fam5 = Content.Get().Neighborhood.GetFamilyForHouse(5);
+            Log("AUTOTEST trv04book: fam5 budget=" + (fam5?.Budget ?? -1) + " (no fixture write; 4141's $500 JustTest must pass on real funds)");
+            phone.PushUserInteraction(_trvbEntry.ID, _trvbHost, _vm.Context, _trvbEntry.Global,
+                new short[] { _trvbEntry.Param0, 0, 0, 0 });
+            var aa0 = _trvbHost.Thread.Queue.LastOrDefault();
+            _trvbUid = aa0?.UID ?? 0;
+            Log("AUTOTEST trv04book PUSH pie-row=" + _trvbEntry.ID + " '" + _trvbEntry.Name
+                + "' param0=" + _trvbEntry.Param0 + " uid=" + _trvbUid
+                + " pluginAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _trvbPlugin.GetAttribute((short)i))) + "]"
+                + " at " + Sim3Clock());
+            _trvbState = 1; _trvbFrame = 0;
+        }
+
+        private static void TrvBookTick()
+        {
+            try
+            {
+                if (_trvbState == 0) { TrvBookInit(); return; }
+                if (_trvbState == 2 || _trvbState == 99) return;
+                _trvbFrame++;
+                HPAnswerDialogs(); // production-semantics dialog responder only
+                var transit = Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1;
+                var tokens = TrvbTokens();
+                var tokened = tokens != "none" && tokens.Length > 0;
+                if (transit >= 1 || tokened)
+                {
+                    Log("AUTOTEST trv04book BOOKED f=" + _trvbFrame + " transit=" + transit
+                        + " tokens=" + tokens + " clock=" + Sim3Clock()
+                        + " pluginAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _trvbPlugin.GetAttribute((short)i))) + "]");
+                    Log("AUTOTEST trv04book verdict legs REGISTRATION(cat=1) + MENU(pie-entry p" + _trvbEntry.Param0 + ") + BOOK(chain) = ok");
+                    Pass("trv04book"); _trvbState = 99; return;
+                }
+                if (_trvbFrame % 60 == 0)
+                {
+                    var aa = _trvbHost.Thread.ActiveAction;
+                    Log("AUTOTEST trv04book f=" + _trvbFrame + " clock=" + Sim3Clock()
+                        + " q=" + _trvbHost.Thread.Queue.Count
+                        + " aa=" + (aa == null ? "none" : "'" + aa.Name + "' uid" + aa.UID)
+                        + " (pushed uid" + _trvbUid + ")"
+                        + " transit=" + transit + " tokens=" + tokens
+                        + " phoneAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => HPFindPhone()?.GetAttribute((short)i) ?? -999)) + "]"
+                        + " pluginAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _trvbPlugin.GetAttribute((short)i))) + "]");
+                }
+                if (_trvbFrame >= 15000)
+                {
+                    Log("AUTOTEST trv04book TIMEOUT f=" + _trvbFrame
+                        + " transit=" + transit + " tokens=" + tokens
+                        + " pluginAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _trvbPlugin.GetAttribute((short)i))) + "]"
+                        + " — honest FAIL: booking did not complete via the real pie-entry path");
+                    Fail("trv04book"); _trvbState = 99; return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST trv04book EXC " + ex.GetType().Name + ": " + ex.Message + " @ " + ex.StackTrace);
+                Fail("trv04book"); _trvbState = 99;
             }
         }
 
