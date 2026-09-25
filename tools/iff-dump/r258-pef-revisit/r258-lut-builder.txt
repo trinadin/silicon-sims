@@ -1,0 +1,69 @@
+R258 item5: LUT builder (InitAlphaZSpriteBlit tail) + layout
+
+0x44b440: 80c29180  lwz r6, -28288(r2)                         |....|
+0x44b444: 54a0502a  rlwinm r0, r5 <<10                         |T.P*|
+0x44b448: 5485ddb4  rlwinm r5, r4, 27, 22, 26                  |T...|
+0x44b44c: 7d060214  add r8, r6, r0                             |}...|
+0x44b450: 548005b4  rlwinm r0, r4, 0, 22, 26                   |T...|
+0x44b454: 7cc82a14  add r6, r8, r5                             ||.*.|
+0x44b458: 5467b6fe  rlwinm r7, r3, 22, 27, 31                  |Tg..|
+0x44b45c: 7c080214  add r0, r8, r0                             ||...|
+0x44b460: 5465defe  rlwinm r5, r3, 27, 27, 31                  |Te..|
+0x44b464: 7cc730ae  lbzx r6, r6, r7                            ||.0.|
+0x44b468: 7c0500ae  lbzx r0, r0, r5                            ||...|
+0x44b46c: 54842db4  rlwinm r4, r4, 5, 22, 26                   |T.-.|
+0x44b470: 546506fe  rlwinm r5, r3, 0, 27, 31                   |Te..|
+0x44b474: 7c882214  add r4, r8, r4                             ||.".|
+0x44b478: 54c3502a  rlwinm r3, r6 <<10                         |T.P*|
+0x44b47c: 54002834  rlwinm r0, r0 <<5                          |T.(4|
+0x44b480: 7c8520ae  lbzx r4, r4, r5                            ||. .|
+0x44b484: 7c600378  or r3, r0, r0                              ||`.x|
+0x44b488: 7c830378  or r4, r3, r0                              ||..x|
+0x44b48c: 4e800020  bclr                                       |N.. |
+0x44b490: 00000000  .long                                      |....|
+0x44b494: 00092040  .long                                      |.. @|
+0x44b498: 00000000  .long                                      |....|
+0x44b49c: 00000050  .long                                      |...P|
+0x44b4a0: 00142e42  .long                                      |...B|
+0x44b4a4: 6c656e64  xoris r3, r5, 28260                        |lend|
+
+builder loops+store:
+0x1a0d54: 56c0063e  rlwinm r0, r22, 0, 24, 31                  |V..>|
+0x1a0d58: 56dc1d78  rlwinm r28, r22, 3, 21, 28                 |V..x|
+0x1a0d5c: 7fbf0214  add r29, r31, r0                           |....|
+0x1a0d60: 3ae00000  addi r23, r0, 0                            |:...|
+0x1a0d64: 480003fc  b 0x1a1160                                 |H...|
+0x1a0d68: 56e02cf4  rlwinm r0, r23, 5, 19, 26                  |V.,.|
+0x1a0d6c: 7d7d0214  add r11, r29, r0                           |}}..|
+0x1a0d70: 56ec1d78  rlwinm r12, r23, 3, 21, 28                 |V..x|
+0x1a0d74: 3b000000  addi r24, r0, 0                            |;...|
+0x1a0d78: 480003d8  b 0x1a1150                                 |H...|
+0x1a0d7c: 57071d78  rlwinm r7, r24, 3, 21, 28                  |W..x|
+0x1a0d80: c09e0000  lfs f4, 0(30)                              |....|
+...
+0x1a110c: 3b5a0001  addi r26, r26, 1                           |;Z..|
+0x1a1110: 2c1a0008  cmpwi r0, r26, 8                           |,...|
+0x1a1114: 4180fcb4  bne(0) 0x1a0dc8                            |A...|
+0x1a1118: 6f238000  xoris r25, r3, 32768                       |o#..|
+0x1a111c: 91010178  stw r8, 376(r1)                            |...x|
+0x1a1120: 570053aa  rlwinm r0, r24, 10, 14, 21                 |W.S.|
+0x1a1124: 3b180001  addi r24, r24, 1                           |;...|
+0x1a1128: 9061017c  stw r3, 380(r1)                            |.a.||
+0x1a112c: c8210178  lfd f1, 376(1)                             |.!.x|
+0x1a1130: ec010028  fsubs f0, f1, f0                           |...(|
+0x1a1134: ec040024  fdivs f0, f4, f0                           |...$|
+0x1a1138: ec03002a  fadds f0, f3, f0                           |...*|
+0x1a113c: fc00001e  fctiwz f0, f0                              |....|
+0x1a1140: d8010170  stfd f0, 368(1)                            |...p|
+0x1a1144: 80610174  lwz r3, 372(r1)                            |.a.t|
+0x1a1148: 7c631e70  srawi r3, r3, 3                            ||c.p|
+0x1a114c: 7c6b01ae  stbx r3, r0, r11                           ||k..|
+0x1a1150: 5700063e  rlwinm r0, r24, 0, 24, 31                  |W..>|
+0x1a1154: 28000020  cmplwi r0, r0, 32                          |(.. |
+0x1a1158: 4180fc24  bne(0) 0x1a0d7c                            |A..$|
+0x1a115c: 3af70001  addi r23, r23, 1                           |:...|
+0x1a1160: 56e0063e  rlwinm r0, r23, 0, 24, 31                  |V..>|
+0x1a1164: 28000020  cmplwi r0, r0, 32                          |(.. |
+0x1a1168: 4180fc00  bne(0) 0x1a0d68                            |A...|
+0x1a116c: 3ad60001  addi r22, r22, 1                           |:...|
+0x1a1170: 56c0063e  rlwinm r0, r22, 0, 24, 31                  |V..>|

@@ -1,0 +1,40 @@
+001648a0: 3864e48a  addi     r3, r4, -0x1b76
+001648a4: 4bfdc9ad  bl       0x141250   ; .SetSRandSeed__FUl
+001648a8: 807e001c  lwz      r3, 0x1c(r30)
+001648ac: 38800010  li       r4, 0x10
+001648b0: 38a0ffe0  li       r5, -0x20
+001648b4: 38c000a0  li       r6, 0xa0
+001648b8: 4bff8e09  bl       0x15d6c0
+001648bc: 807e001c  lwz      r3, 0x1c(r30)
+001648c0: 38800008  li       r4, 8
+001648c4: 38a00050  li       r5, 0x50
+001648c8: 4bff8999  bl       0x15d260
+001648cc: 807e001c  lwz      r3, 0x1c(r30)
+001648d0: 38800004  li       r4, 4
+001648d4: 38a00028  li       r5, 0x28
+001648d8: 4bff8989  bl       0x15d260
+001648dc: 807e001c  lwz      r3, 0x1c(r30)
+001648e0: 38800002  li       r4, 2
+001648e4: 38a00014  li       r5, 0x14
+001648e8: 4bff8979  bl       0x15d260
+001648ec: 807e001c  lwz      r3, 0x1c(r30)
+001648f0: 38800001  li       r4, 1
+001648f4: 38a0000a  li       r5, 0xa
+001648f8: 4bff8969  bl       0x15d260
+001648fc: 7ea3ab78  mr       r3, r21
+00164900: 4bfdc951  bl       0x141250   ; .SetSRandSeed__FUl
+00164904: 807e0020  lwz      r3, 0x20(r30)
+00164908: 809e001c  lwz      r4, 0x1c(r30)
+0016490c: 4bf5c865  bl       0xc1170   ; .CopyFrom__9_c2DArrayFP9_c2DArray
+00164910: 4befc611  bl       0x60f20   ; .BuildRotationLookup__7CTilePtFv
+00164914: 93fe0010  stw      r31, 0x10(r30)
+00164918: 80628cb0  lwz      r3, -0x7350(r2)
+0016491c: 80830000  lwz      r4, 0(r3)
+00164920: 28040000  cmplwi   r4, 0
+00164924: 41820334  beq      0x164c58
+00164928: 807e0010  lwz      r3, 0x10(r30)
+0016492c: 38a00000  li       r5, 0
+00164930: 80040084  lwz      r0, 0x84(r4)
+00164934: 3863ffff  addi     r3, r3, -1
+00164938: 98a10068  stb      r5, 0x68(r1)
+0016493c: 2c000000  cmpwi    r0, 0

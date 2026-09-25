@@ -1,0 +1,38 @@
+[TOC-23664 gradeSet] entry@sec1+0x2390 -> 0x7efa0 BSS
+[TOC-23648 gradeLits] entry@sec1+0x23a0 -> 0x42bac DATA
+[TOC-23660 careerTitles] entry@sec1+0x2394 -> 0x7ef28 BSS
+[TOC-20104 str139] entry@sec1+0x3178 -> 0x59c64 DATA
+[TOC-20288 deltaAnchor] entry@sec1+0x30c0 -> 0x93508 BSS
+[TOC-21088 personFinder] entry@sec1+0x2da0 -> 0x92618 BSS
+[TOC-29292 famousFriendThreshold] entry@sec1+0x0d94 -> 0x48eb8 DATA
+[TOC-27020 smileyGate] entry@sec1+0x1674 -> 0x9358c BSS
+[TOC-27024 deepGate] entry@sec1+0x1670 -> 0x93584 BSS
+[TOC-27028 heartGate] entry@sec1+0x166c -> 0x93588 BSS
+[TOC-29292 data words] entry@sec1+0x0d94 -> 0x48eb8 DATA
+  sec1[0x48eb8] words: (25, -65, 7, 6, 8, 9)
+  code-rel candidate file 0x51d48 words: (-2126315520, -1870593860, 2087321808) (mid-instruction garbage)
+fallback literal pool at sec1 0x42bac ([TOC-23648]):
+  +   0 @0x42bac: '0 School Bus'
+  +  13 @0x42bb9: '1 Military Jeep'
+  +  29 @0x42bc9: '2 Squad Car'
+  +  41 @0x42bd5: '3 Staff Sedan'
+  +  55 @0x42be3: '4 SUV'
+  +  61 @0x42be9: '5 Town Car'
+  +  72 @0x42bf4: '6 Bentley'
+  +  82 @0x42bfe: '7 Junky'
+  +  90 @0x42c06: '8 Limo'
+  +  97 @0x42c0d: '9 Truck'
+  + 105 @0x42c15: '10 Circus Truck'
+  + 121 @0x42c25: '11 Clown Car'
+  + 134 @0x42c32: (NUL)
+  + 135 @0x42c33: '.5'
+  + 138 @0x42c36: '.0'
+  + 141 @0x42c39: 'fame.iff'
+  + 150 @0x42c42: '%d,%d,%d,%d,%d,%d'
+  + 168 @0x42c54: 'Work'
+  + 173 @0x42c59: 'Hunger : Comfort : Hygiene : Bladder : Energy : Fun : Social'
+  + 234 @0x42c96: 'To alter jobs in game, save as text to GameData/Careers.txt'
+  + 294 @0x42cd2: 'Version'
+  + 302 @0x42cda: '1'
+  + 304 @0x42cdc: 'Career Track & Level Requirements'
+GetGrade fallback = lits+134 -> b'\x00'

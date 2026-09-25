@@ -1,0 +1,56 @@
+001d7480: 5483063e  clrlwi   r3, r4, 0x18
+001d7484: 54a0063e  clrlwi   r0, r5, 0x18
+001d7488: 98a10040  stb      r5, 0x40(r1)
+001d748c: 7c630774  extsb    r3, r3
+001d7490: 7c000774  extsb    r0, r0
+001d7494: 54632036  slwi     r3, r3, 4
+001d7498: 60630008  ori      r3, r3, 8
+001d749c: 54002036  slwi     r0, r0, 4
+001d74a0: 90610058  stw      r3, 0x58(r1)
+001d74a4: 60000008  ori      r0, r0, 8
+001d74a8: 9001005c  stw      r0, 0x5c(r1)
+001d74ac: 90610050  stw      r3, 0x50(r1)
+001d74b0: 90010054  stw      r0, 0x54(r1)
+001d74b4: 80780000  lwz      r3, 0(r24)
+001d74b8: 3aa10054  addi     r21, r1, 0x54
+001d74bc: 38950000  addi     r4, r21, 0
+001d74c0: 38a10050  addi     r5, r1, 0x50
+001d74c4: 80030084  lwz      r0, 0x84(r3)
+001d74c8: 38e00400  li       r7, 0x400
+001d74cc: 20000004  subfic   r0, r0, 4
+001d74d0: 540607be  clrlwi   r6, r0, 0x1e
+001d74d4: 4bf862dd  bl       0x15d7b0   ; .RotateCoords__15cRotatableWorldCFPiPiii
+001d74d8: 839b000c  lwz      r28, 0xc(r27)
+001d74dc: 7e84a378  mr       r4, r20
+001d74e0: 80780000  lwz      r3, 0(r24)
+001d74e4: 38a00000  li       r5, 0
+001d74e8: 929b000c  stw      r20, 0xc(r27)
+001d74ec: 4bf8ae25  bl       0x162310
+001d74f0: 7fa3eb78  mr       r3, r29
+001d74f4: 4bfef67d  bl       0x1c6b70   ; .BuildMaxAltsTable__11HouseViewerFv
+001d74f8: 80780000  lwz      r3, 0(r24)
+001d74fc: 38950000  addi     r4, r21, 0
+001d7500: 38a10050  addi     r5, r1, 0x50
+001d7504: 80c30084  lwz      r6, 0x84(r3)
+001d7508: 38e00400  li       r7, 0x400
+001d750c: 4bf862a5  bl       0x15d7b0   ; .RotateCoords__15cRotatableWorldCFPiPiii
+001d7510: 80810050  lwz      r4, 0x50(r1)
+001d7514: 7fa3eb78  mr       r3, r29
+001d7518: 80a10054  lwz      r5, 0x54(r1)
+001d751c: 38e00000  li       r7, 0
+001d7520: 80dd0018  lwz      r6, 0x18(r29)
+001d7524: 39000001  li       r8, 1
+001d7528: 48000769  bl       0x1d7c90   ; .ScrollToTile__11HouseViewerF7FTilePtibb
+001d752c: 80fb0000  lwz      r7, 0(r27)
+001d7530: 38000000  li       r0, 0
+001d7534: 809d0170  lwz      r4, 0x170(r29)
+001d7538: 7fa3eb78  mr       r3, r29
+001d753c: 80db0004  lwz      r6, 4(r27)
+001d7540: 80bd0174  lwz      r5, 0x174(r29)
+001d7544: 7c872214  add      r4, r7, r4
+001d7548: 901d0170  stw      r0, 0x170(r29)
+001d754c: 7ca62a14  add      r5, r6, r5
+001d7550: 38c00001  li       r6, 1
+001d7554: 901d0174  stw      r0, 0x174(r29)
+001d7558: 4bfff7b9  bl       0x1d6d10
+001d755c: 7fa3eb78  mr       r3, r29
