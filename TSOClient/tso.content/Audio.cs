@@ -420,6 +420,10 @@ namespace FSO.Content
                         Name = entry.Name,
                         EventType = (FSO.Files.HIT.HITEvents)entry.EventType,
                         TrackID = entry.TrackID,
+                        // TYPE53-FC1: same retention as the TS1 (.hot) path; the
+                        // TSO .evt payload uses the same column layout.
+                        SequenceHitlist = entry.SequenceHitlist,
+                        SequenceFlag = entry.SequenceFlag,
                         ResGroup = group
                     });
                 }

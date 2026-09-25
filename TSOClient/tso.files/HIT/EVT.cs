@@ -50,6 +50,12 @@ namespace FSO.Files.HIT
                 Entry.Unknown2 = ParseHexString(Values[4]);
                 Entry.Unknown3 = ParseHexString(Values[5]);
                 Entry.Unknown4 = ParseHexString(Values[6]);
+                // TYPE53-FC1: field 4 is the sequence hitlist and field 5 a flag on
+                // kSequenceTrackHitList (53) payloads (TYPE53 audit §2/§4). Same
+                // column layout as the [EventMapping] reader in Hot.cs — keep both
+                // readers in agreement; additive fields, no existing semantics changed.
+                if (Values.Length > 4) Entry.SequenceHitlist = ParseHexString(Values[4]);
+                if (Values.Length > 5) Entry.SequenceFlag = ParseHexString(Values[5]);
                 Entries.Add(Entry);
             }
 
@@ -92,5 +98,10 @@ namespace FSO.Files.HIT
         public uint Unknown2;
         public uint Unknown3;
         public uint Unknown4;
+        // TYPE53-FC1: kSequenceTrackHitList (53) payload fields 4/5
+        // ("name=kSequenceTrackHitList,trackID,0,hitlistID,flag", TYPE53 audit §2).
+        // Zero for every other event type; parsed by both the EVT and Hot readers.
+        public uint SequenceHitlist;
+        public uint SequenceFlag;
     }
 }

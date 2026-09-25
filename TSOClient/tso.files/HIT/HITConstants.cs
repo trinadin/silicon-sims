@@ -63,7 +63,12 @@ namespace FSO.Files.HIT
         debugsampleson = 46,
         debugsamplesoff = 47,
         debugtrackson = 48,
-        debugtracksoff = 49
+        debugtracksoff = 49,
+        // TYPE53-FC1: kSequenceTrackHitList (sep6snds.hot equate; TYPE53 audit §1).
+        // Native dispatch is cBox::Event's TOC jump table, types 0..105 (arm itself
+        // undecoded — TOC drift, disclosed); 62 corpus registrations, 59 live via
+        // MusicRecordingStudio.iff play_sound sites.
+        kSequenceTrackHitList = 53
     }
 
     public enum HITPerson

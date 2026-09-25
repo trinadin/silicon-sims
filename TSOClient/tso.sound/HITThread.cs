@@ -40,6 +40,14 @@ namespace FSO.HIT
         public HITThread InterruptWaiter;
         public HITThread InterruptBlocker;
 
+        // TYPE53-FC1: the kSequenceTrackHitList (53) payload hitlist of the event
+        // that started this thread (HITVM.PlaySoundEvent type-53 arm). When the
+        // thread completes, HITVM.Tick chains one continuation that plays the
+        // chosen patch from this list (audit §2 native law: "play the track and
+        // sequence the payload hitlist"). 0 = not a type-53 thread.
+        public uint SequenceHitlist;
+        public bool SequenceChained;
+
         private List<HITNoteEntry> Notes;
         private Dictionary<SoundEffectInstance, HITNoteEntry> NotesByChannel;
         public int LastNote
@@ -244,6 +252,31 @@ namespace FSO.HIT
 
             SimpleMode = true;
             PlaySimple = true; //play next frame, so we have time to set volumes.
+        }
+
+        /// <summary>
+        /// TYPE53-FC1: the continuation chained when a kSequenceTrackHitList (53)
+        /// event thread completes. Plays one patch chosen from the event's payload
+        /// sequence hitlist (one-shot, no HIT code — the payload lists are the
+        /// section-sample selectors, e.g. sep6snds.hot's camerock_* sections).
+        /// Native law (TYPE53 audit §2, mechanism level): "play the track and
+        /// sequence the payload hitlist"; the card's sketch chains LoadHitlist(seq)
+        /// on track completion. Returns null if the hitlist yields no patch
+        /// (unmounted list), in which case nothing is chained.
+        /// </summary>
+        public static HITThread SequenceContinuation(HITThread finished, HITVM vm)
+        {
+            var thread = new HITThread(finished.ResGroup, vm);
+            thread.LoadHitlist(finished.SequenceHitlist);
+            var pick = thread.HitlistChoose();
+            if (pick == 0) return null;
+            // hitlist entries are patch IDs here; SetTrack's fallback resolves
+            // unknown track IDs as patches (same convention as LoadTrack users).
+            thread.SetTrack(pick);
+            thread.SimpleMode = true;
+            thread.PlaySimple = true; //play next frame, so we have time to set volumes.
+            thread.Name = finished.Name + "_seq";
+            return thread;
         }
 
         public void LoadHitlist(uint id)

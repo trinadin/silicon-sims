@@ -195,6 +195,19 @@ namespace FSO.HIT
             {
                 if (!Sounds[i].Tick())
                 {
+                    // TYPE53-FC1: a completed kSequenceTrackHitList (53) event thread
+                    // chains its payload sequence hitlist (TYPE53 audit §2 native law:
+                    // "play the track and sequence the payload hitlist"). Skipped when
+                    // the thread was Interrupted — a newer same-event thread superseded
+                    // it, so its section audio is no longer the one the object wants.
+                    var doneThread = Sounds[i] as HITThread;
+                    if (doneThread != null && doneThread.SequenceHitlist != 0
+                        && !doneThread.SequenceChained && !doneThread.Interrupted)
+                    {
+                        doneThread.SequenceChained = true;
+                        var cont = HITThread.SequenceContinuation(doneThread, this);
+                        if (cont != null) Sounds.Add(cont);
+                    }
                     Sounds[i].Dispose();
                     Sounds.RemoveAt(i--);
                 }
@@ -359,6 +372,41 @@ namespace FSO.HIT
                     if (NextMusic != null) NextMusic.Kill();
                     if (MusicEvent != null) MusicEvent.Fade();
                     NextMusic = thread;
+                    return thread;
+                }
+                else if (evtent.EventType == HITEvents.kSequenceTrackHitList)
+                {
+                    // TYPE53-FC1 (TYPE53 audit §2/§4): a type-53 event plays its
+                    // payload track and sequences the payload hitlist. The shipped
+                    // shape (MusicRecordingStudio / sep6snds.hot, 59 live events over
+                    // 5 tracks) is track-with-subroutine: the track's @tkd code plays
+                    // the track's own content and this arm records the payload
+                    // hitlist so HITVM.Tick chains the section samples when the
+                    // thread completes. Without the arm these events fell through to
+                    // the generic subroutine branch and the payload hitlist — the
+                    // actual section music — was dropped at parse time.
+                    HITThread thread = null;
+                    if (SubroutinePointer != 0)
+                    {
+                        thread = new HITThread(evtent.ResGroup, this);
+                        thread.PC = HITInterpreter.PCTrans(SubroutinePointer, thread);
+                        thread.LoopPointer = (int)thread.PC;
+                        if (TrackID != 0) thread.SetTrack(TrackID, evtent.TrackID);
+                    }
+                    else if (TrackID != 0 && content.Audio.GetTrack(TrackID, 0, evtent.ResGroup) != null)
+                    { //no subroutine: one-shot the track's own patch, the chain still applies
+                        thread = new HITThread(TrackID, this, evtent.ResGroup);
+                    }
+                    if (thread == null) return null;
+                    thread.SequenceHitlist = evtent.SequenceHitlist;
+                    Sounds.Add(thread);
+                    ActiveEvents[evt] = thread;
+                    if (InterruptBlocker != null)
+                    {
+                        InterruptBlocker.Interrupt(thread);
+                        if (!InterruptBlocker.Name.StartsWith("nc_")) InterruptBlocker.KillVocals();
+                    }
+                    thread.Name = evt;
                     return thread;
                 }
                 else if (SubroutinePointer != 0)

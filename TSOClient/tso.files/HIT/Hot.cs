@@ -140,11 +140,20 @@ namespace FSO.Files.HIT
                                     break;
                                 case HotReadMode.EventMapping:
                                     var commaSplit = Params[1].Split(',');
+                                    // TYPE53-FC1: the [EventMapping] payload is more than
+                                    // type+track for kSequenceTrackHitList (53) events:
+                                    // name=kSequenceTrackHitList,trackID,0,hitlistID,flag
+                                    // (TYPE53 audit §2/§4 — all 62 corpus records are 5 fields).
+                                    // Field 4 is the sequence hitlist that names the section
+                                    // sample(s) to play and field 5 a flag (semantics
+                                    // undisclosed — retained only). Other types leave both 0.
                                     Events[Params[0].ToLowerInvariant()] = new EVTEntry
                                     {
                                         Name = Params[0].ToLowerInvariant(),
                                         EventType = (uint)ParseEME(commaSplit[0]),
-                                        TrackID = (commaSplit.Length>1)?(uint)ParseEME(commaSplit[1]):0
+                                        TrackID = (commaSplit.Length>1)?(uint)ParseEME(commaSplit[1]):0,
+                                        SequenceHitlist = (commaSplit.Length>3)?(uint)ParseEME(commaSplit[3]):0,
+                                        SequenceFlag = (commaSplit.Length>4)?(uint)ParseEME(commaSplit[4]):0
                                     };
                                     break;
                                 case HotReadMode.Track:

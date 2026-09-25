@@ -204,6 +204,10 @@ namespace FSO.Content.TS1
                         Name = evt.Value.Name,
                         EventType = (FSO.Files.HIT.HITEvents)evt.Value.EventType,
                         TrackID = evt.Value.TrackID,
+                        // TYPE53-FC1: retain the kSequenceTrackHitList payload
+                        // (sequence hitlist + flag) that the .hot reader now parses.
+                        SequenceHitlist = evt.Value.SequenceHitlist,
+                        SequenceFlag = evt.Value.SequenceFlag,
                         ResGroup = group
                     };
                 }
