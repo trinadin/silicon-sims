@@ -4585,6 +4585,10 @@ namespace Simitone.Client
             // HITVM initialized, original audio corpus loaded, PlaySoundEvent executes without
             // exception (OpenAL/MonoGame SoundEffect path) and the created thread ticks in-loop.
             if (CheckEnabled("audio")) CheckAudio();
+            // TYPE53-FC1 audit probe (opt-in "type53"): the HIT type-53
+            // (kSequenceTrackHitList) data path — parser retention of the payload
+            // sequence-hitlist/flag fields plus the live dispatch chain, headless.
+            if (CheckEnabled("type53")) CheckType53();
             // AUD-01 audit probe (private-checkout tooling, evidence-only): runtime reproduction of
             // D1 (volume-group routing by content sniff vs .hot track control group) and D2 (the
             // load-music HITTVOn id==5 dead thread). Opt-in via -autotest-opts "audiod1d2".
@@ -35225,6 +35229,136 @@ namespace Simitone.Client
                 Pass("audiod1d2");
             }
             catch (Exception ae) { Log("AUTOTEST d1d2 EXC " + ae.GetType().Name + " " + ae.Message); Fail("audiod1d2"); }
+        }
+
+        // TYPE53-FC1 (opt-in "type53"): the HIT type-53 (kSequenceTrackHitList)
+        // data path. The 59 live type-53 events (MusicRecordingStudio.iff, the
+        // Vacation recording studio; records in sep6snds.hot [EventMapping] as
+        // `kSequenceTrackHitList,trackID,0,hitlistID,flag`) had their payload
+        // sequence-hitlist dropped at parse time. Pins (1) parser retention: every
+        // mounted type-53 registration carries a non-zero SequenceHitlist, a flag
+        // in {0,1}, the shipped ground-truth values for probe events, and payload
+        // hitlists that resolve in their resource group with entries resolving to
+        // patches; (2) live dispatch (when HITVM is up and sound enabled): firing
+        // camerock_meda starts a thread carrying the payload and, once that thread
+        // completes, the payload section sample (camerock_meda.xa) chains as a
+        // queued note from the "_seq" continuation thread.
+        private static void CheckType53()
+        {
+            try
+            {
+                var evts = FSO.Content.Content.Get().Audio?.Events;
+                if (evts == null) { Log("AUTOTEST type53: no audio events (audio corpus not mounted?)"); Fail("type53"); return; }
+
+                var t53 = evts.Values.Where(x => x.EventType == FSO.Files.HIT.HITEvents.kSequenceTrackHitList).ToList();
+                Log("AUTOTEST type53 mounted type-53 registrations=" + t53.Count);
+                if (t53.Count < 59) { Log("AUTOTEST type53 FAIL: the live MusicRecordingStudio set is 59 events, mounted " + t53.Count); Fail("type53"); return; }
+
+                // parser retention: field 4 must survive everywhere; field 5 is {0,1} corpus-wide.
+                int dropped = 0, badFlag = 0;
+                foreach (var reg in t53)
+                {
+                    if (reg.SequenceHitlist == 0) dropped++;
+                    if (reg.SequenceFlag > 1) badFlag++;
+                }
+                Log("AUTOTEST type53 droppedHitlists=" + dropped + " badFlags=" + badFlag);
+                if (dropped > 0 || badFlag > 0) { Fail("type53"); return; }
+
+                // shipped ground truth (sep6snds.hot [EventMapping] bytes; TYPE53 audit §1)
+                var pins = new Dictionary<string, uint[]> {
+                    { "camerock_meda", new uint[] { 100003, 0 } },
+                    { "camerock_secta", new uint[] { 100008, 0 } },
+                    { "sep6_recb_bal_med_sectam", new uint[] { 100047, 1 } },
+                    { "sep6_recb_dance_outrof", new uint[] { 100538, 0 } },
+                };
+                foreach (var pin in pins)
+                {
+                    if (!evts.TryGetValue(pin.Key, out var reg) || reg.SequenceHitlist != pin.Value[0] || reg.SequenceFlag != pin.Value[1])
+                    {
+                        Log("AUTOTEST type53 FAIL: ground-truth pin " + pin.Key + " expected hitlist=" + pin.Value[0] + " flag=" + pin.Value[1] +
+                            " got " + (reg == null ? "<missing>" : reg.SequenceHitlist + "/" + reg.SequenceFlag));
+                        Fail("type53"); return;
+                    }
+                    Log("AUTOTEST type53 pin " + pin.Key + " -> hitlist=" + reg.SequenceHitlist + " flag=" + reg.SequenceFlag + " ok");
+                }
+
+                // resolvability: every payload hitlist resolves in its event's
+                // resource group and every entry names a patch in that group
+                // (corpus property verified in the TYPE53 audit; asserted on the live mount).
+                int unresolvedLists = 0, unresolvedEntries = 0;
+                foreach (var reg in t53)
+                {
+                    var hot = reg.ResGroup?.hot;
+                    FSO.Files.HIT.Hitlist hl = null;
+                    if (hot == null || !hot.Hitlists.TryGetValue(reg.SequenceHitlist, out hl) || hl == null) { unresolvedLists++; continue; }
+                    foreach (var entry in hl.IDs)
+                    {
+                        if (!hot.Patches.ContainsKey(entry))
+                        {
+                            unresolvedEntries++;
+                            Log("AUTOTEST type53 unresolved entry: event=" + reg.Name + " hitlist=" + reg.SequenceHitlist + " patch=" + entry);
+                        }
+                    }
+                }
+                Log("AUTOTEST type53 unresolvedHitlists=" + unresolvedLists + " unresolvedEntries=" + unresolvedEntries);
+                if (unresolvedLists > 0 || unresolvedEntries > 0) { Fail("type53"); return; }
+
+                // live dispatch leg
+                var hitvm = FSO.HIT.HITVM.Get();
+                if (hitvm == null || FSO.HIT.HITVM.DISABLE_SOUND)
+                {
+                    Log("AUTOTEST type53: HITVM " + (hitvm == null ? "null" : "disabled") +
+                        " - live dispatch not reachable; parser-level verdict only");
+                    Pass("type53");
+                    return;
+                }
+
+                var queued = new List<FSO.HIT.HITNoteEntry>();
+                Action<FSO.HIT.HITNoteEntry> onNote = (note) => { lock (queued) queued.Add(note); };
+                FSO.HIT.HITVM.NoteQueued += onNote;
+                try
+                {
+                    FSO.HIT.HITThread probe = null;
+                    try { probe = hitvm.PlaySoundEvent("camerock_meda") as FSO.HIT.HITThread; }
+                    catch (Exception pe) { Log("AUTOTEST type53 PlaySoundEvent EXC " + pe.GetType().Name + " " + pe.Message); Fail("type53"); return; }
+                    if (probe == null) { Log("AUTOTEST type53 FAIL: PlaySoundEvent(camerock_meda) returned null"); Fail("type53"); return; }
+                    Log("AUTOTEST type53 probe fired: name=" + probe.Name + " sequenceHitlist=" + probe.SequenceHitlist + " dead=" + probe.Dead);
+                    if (probe.SequenceHitlist != 100003) { Log("AUTOTEST type53 FAIL: probe thread lost its payload hitlist"); Fail("type53"); return; }
+
+                    // let the track's @tkd subroutine run (it plays the track's own
+                    // content, camerock_intro.xa, off its hardcoded hitlist)
+                    hitvm.Tick(); hitvm.Tick();
+
+                    // force completion: stop the track's vocals and mark the bytecode
+                    // dead; the VM reap must chain the payload hitlist (single entry
+                    // -> patch 100007, camerock_meda.xa) via the "_seq" continuation.
+                    probe.KillVocals();
+                    probe.ThreadDead = true;
+                    bool chained = false;
+                    FSO.HIT.HITNoteEntry chainNote = null;
+                    for (int i = 0; i < 5 && !chained; i++)
+                    {
+                        hitvm.Tick();
+                        lock (queued) chainNote = queued.LastOrDefault(n => n.Source != null && n.Source.Name == "camerock_meda_seq");
+                        chained = chainNote != null;
+                    }
+                    Log("AUTOTEST type53 chained=" + chained + " chainNote=" +
+                        (chainNote == null || chainNote.Sound == null ? "<none>" : chainNote.Sound.Filename) +
+                        " notes=" + queued.Count);
+                    if (!chained || chainNote.Sound == null || chainNote.Sound.Filename == null
+                        || !chainNote.Sound.Filename.EndsWith("camerock_meda.xa", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Log("AUTOTEST type53 FAIL: payload section sample did not chain (expected a camerock_meda.xa note from the continuation thread)");
+                        Fail("type53"); return;
+                    }
+                    Pass("type53");
+                }
+                finally
+                {
+                    FSO.HIT.HITVM.NoteQueued -= onNote;
+                }
+            }
+            catch (Exception ae) { Log("AUTOTEST type53 EXC " + ae.GetType().Name + " " + ae.Message); Fail("type53"); }
         }
 
 
