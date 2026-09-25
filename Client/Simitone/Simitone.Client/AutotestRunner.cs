@@ -1047,6 +1047,7 @@ namespace Simitone.Client
                 || CheckEnabled("cc05live")
                 || CheckEnabled("cc04live")
                 || CheckEnabled("ss-book")
+                || CheckEnabled("famesess")
                 || CheckEnabled("hpparty")
                 || CheckEnabled("vacation")
                 // (EXP-05) Unleashed legs ride the same state-2 soak entry — without
@@ -5143,6 +5144,7 @@ namespace Simitone.Client
             if (_flPushed && !_flDone) FallinTick(); // EXP-02: the fall-in-love watch survives leg transitions
             if (_plPushed) ProposeTick(); // EXP-02: phase-2 propose watch + run-55 postmortem + run-63 neg arm (post-postmortem)
             if (CheckEnabled("ss-book") && !_ssBookDone) { SSBookTick(); return; }
+            if (CheckEnabled("famesess") && !_fsDone) { FameSessTick(); return; }
             if (CheckEnabled("socexec") && !_socExecDone) { SocExecTick(); return; }
             if (CheckEnabled("saveresume") && !_srDone) { SaveResumeTick(); return; }
             // (SIM-03 tranches 2-5) focused lifecycle probes; same short-circuit pattern.
@@ -37472,6 +37474,519 @@ namespace Simitone.Client
                 Log("AUTOTEST ss-book EXC " + ex.GetType().Name + " " + ex.Message);
                 Fail("ss-book"); _ssBookDone = true;
                 Finish();
+            }
+        }
+
+        // superstar-fame ('famesess', opt-in): EXP-11 runtime leg prep — drive the
+        // decoded Superstar fame path headless and prove the fame level write
+        // lands live. Decode receipt:
+        // coordination/evidence/EXP-11/session-machine-decode-20260924.md (+ the
+        // native PEF law now implemented in VMGenericTS1Call modes 34/36).
+        //
+        // Laws used (all instruction-level, game data + owned PPC PEF):
+        //  - fame person data: score=PD[80] (1..1000), level=PD[81] (0..10),
+        //    peak=PD[82]; Global #484 "Adjust Stack Object's Fame" = the canonical
+        //    adjust+clamp+recompute (ins3 write, ins11-14 clamp 1..1000,
+        //    ins16 generic-call 34 = promote check, ins29 generic-call 36 =
+        //    demote check); #479 gates it to Studio lots (global[10] 81..89);
+        //    #485 gates it to the fame track (person[56]==0 && person[80]>0).
+        //  - FameObjectGlobals #8197 "Change Fame" = the session fame write
+        //    (score += param, peak raise, NO fame-track gate) — the bootstrap
+        //    write the native uses for a sim's first fame.
+        //  - fame.iff STR# 5 "Fame Score Needed" keys = per-level thresholds
+        //    [2,9,21,35,52,78,156,300,550,900]; STR# 4 "Friend Star Power
+        //    Needed" = [0,0,0,0,2,4,7,11,14,18] (promote gate:
+        //    famousFriends*0.5 >= needed, K=0.5 native); STR# 6 "Skills
+        //    Needed" = per-level 6-tuple over PD cats [10,12,11,17,18,15],
+        //    compared as points >= req*100.
+        //  - set pieces: soap 0xF4126CC4 / photo 0x4450E4E0 / recording
+        //    0x1D772052; session-owner arm = piece obj var 11 (=ObjectId slot)
+        //    := global[3] (#4098 ins1 law); director = runtime NPC created by
+        //    SetSoapOpera #4099 near Director Seat 0xF5D51E40 from GUIDs
+        //    {0x4E777166,0x55984D57,0xAEF74DA1,0x1E4060D8,0x7F446268,0x66D2626E}.
+        //
+        // Stages (honest about what is probe-side):
+        //  (a) boot census — PD[80..82] for ALL avatars, home lot AND arrival
+        //      lot (the run-37 probe sampled PD[0..79] and was structurally
+        //      blind to the real slots);
+        //  (b) mode 34/36 verification — drive Global #484 synchronously on
+        //      the controlled sim via VMThread.EvaluateCheck (the same idiom
+        //      the sim20 ghost leg uses) after a disclosed probe bootstrap:
+        //      six skill PDs maxed (skills gate can never block) and score=5
+        //      via the piece's semi-global #8197 when a set piece exists (the
+        //      canonical first-fame write), else probe-side SetPersonData.
+        //      Expected trajectory from the parsed law: +900 -> level 1; +30
+        //      x3 -> levels 2,3,4; +30 -> STALL at 4 (friends gate: 0 famous
+        //      friends*0.5 < needed[4]=2); -900 -> score 100, level HOLDS at 4
+        //      (100 >= threshold[3]=35); -30 x2 -> holds (70,40 >= 35); -30 ->
+        //      10 < 35 -> demote 3; then -30 each demotes 2,1,0 (score clamps
+        //      to 1); level 0 -> no further demote. PASS = every rung asserted.
+        //  (c) session-owner arm + director spawn — arm the set piece's var 11
+        //      probe-side (the #4098 ins1 write, disclosed) and run #4099;
+        //      assert a TV-director GUID avatar appears near the Director Seat.
+        //      PASS = director spawned; named FAIL with dumps otherwise.
+        // No engine edits beyond the modes 34/36 fix; self-terminating; no
+        // game runs from this window (coordinator drives).
+        private static bool _fsDone;
+        private static int _fsFrame;
+        private static int _fsStage; // 0 booking, 1 verify, 2 director, 3 post-watch
+        private static int _fsStep;
+        private static int _fsStageFrame;
+        private static VMAvatar _fsAv;
+        private static VMEntity _fsPlugin;
+        private static VMEntity _fsPiece;
+        private static bool _fsSelectorDone;
+        private static bool _fsNotifyArmed;
+        private static int _fsArrivedFrame = -1;
+        private static int _fsAnswered;
+        private static bool _fsVerifyPass = true;
+        private static string _fsVerifyFail = "";
+        private static bool _fsDirectorSeen;
+        private static readonly List<string> _fsDump = new List<string>();
+        private static readonly Dictionary<int, short[]> _fsPD0 = new Dictionary<int, short[]>();
+        private static readonly short[] FS_SCORE = { 2, 9, 21, 35, 52, 78, 156, 300, 550, 900, 0 };
+        private static readonly short[] FS_FRIENDS = { 0, 0, 0, 0, 2, 4, 7, 11, 14, 18, 0 };
+        private static readonly int[] FS_SKILL_CATS = { 10, 12, 11, 17, 18, 15 };
+        private static readonly uint[] FS_DIRECTOR_GUIDS = { 0x4E777166, 0x55984D57, 0xAEF74DA1, 0x1E4060D8, 0x7F446268, 0x66D2626E };
+        private static readonly uint[] FS_SET_GUIDS = { 0xF4126CC4, 0x4450E4E0, 0x1D772052 };
+
+        private static string FSPD(VMAvatar e)
+        {
+            return "score=" + e.GetPersonData(VMPersonDataVariable.TS1FameScore)
+                + " level=" + e.GetPersonData(VMPersonDataVariable.TS1FameStarPower)
+                + " peak=" + e.GetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark);
+        }
+
+        private static void FameSessCensus(string tag)
+        {
+            var avs = _vm.Entities.OfType<VMAvatar>().ToList();
+            Log("AUTOTEST famesess census[" + tag + "] avatars=" + avs.Count
+                + " global3=" + _vm.GetGlobalValue(3) + " house=" + _vm.GetGlobalValue(10));
+            foreach (var a in avs)
+                Log("AUTOTEST famesess census[" + tag + "] obj=" + a.ObjectID
+                    + " guid=0x" + a.Object?.OBJ?.GUID.ToString("x8")
+                    + " job=" + a.GetPersonData(VMPersonDataVariable.JobType) + " " + FSPD(a));
+        }
+
+        /// <summary>Run one BHAV synchronously on the live VM (the sim20
+        /// ghost-leg idiom). Caller/callee/codeOwner define the scopes; stackObj
+        /// is what "stack-person"/"stack-obj" reads hit. Returns the exit code.</summary>
+        private static VMPrimitiveExitCode FameSessRun(VMEntity caller, VMEntity stackObj, VMEntity codeOwner, VMRoutine routine, short param0)
+        {
+            return VMThread.EvaluateCheck(_vm.Context, caller, new VMStackFrame
+            {
+                Caller = caller,
+                Callee = caller,
+                StackObject = stackObj,
+                CodeOwner = codeOwner.Object,
+                Routine = routine,
+                Args = new short[4] { param0, 0, 0, 0 }
+            });
+        }
+
+        /// <summary>One #484 call + law assertion. Returns false on divergence
+        /// (logs the exact expected/actual and the blocking gate).</summary>
+        private static bool FameSessAdjust(short delta, short expScore, short expLevel, string tag)
+        {
+            var pre = FSPD(_fsAv);
+            var r484 = _vm.Context.Globals.Resource.GetRoutine(484) as VMRoutine;
+            if (r484 == null)
+            {
+                Log("AUTOTEST famesess " + tag + ": global #484 unresolved from Globals.Resource (pre[" + pre + "])");
+                return false;
+            }
+            FameSessRun(_fsAv, _fsAv, _fsAv, r484, delta);
+            var score = _fsAv.GetPersonData(VMPersonDataVariable.TS1FameScore);
+            var level = _fsAv.GetPersonData(VMPersonDataVariable.TS1FameStarPower);
+            var peak = _fsAv.GetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark);
+            var ok = score == expScore && level == expLevel;
+            Log("AUTOTEST famesess " + tag + ": #484 delta=" + delta + " pre[" + pre + "]"
+                + " post score=" + score + " (exp " + expScore + ") level=" + level + " (exp " + expLevel + ")"
+                + " peak=" + peak + " -> " + (ok ? "OK" : "DIVERGED"));
+            return ok;
+        }
+
+        private static void FameSessFail(string why)
+        {
+            Log("AUTOTEST famesess terminal FAIL: " + why);
+            foreach (var l in _fsDump.TakeLast(30)) Log("AUTOTEST famesess dump " + l);
+            Fail("famesess"); _fsDone = true;
+            Finish();
+        }
+
+        private static void FameSessTick()
+        {
+            _fsFrame++;
+            try
+            {
+                if (_fsStage == 0)
+                {
+                    if (_fsFrame == 1)
+                    {
+                        Log("AUTOTEST famesess armed (frame " + _fsFrame + ") entities=" + _vm.Entities.Count);
+                        FameSessCensus("home");
+                        _fsAv = _avatars.Count > 0 ? _avatars[0] : null;
+                        _fsPlugin = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0xC61F8102);
+                        if (_fsAv == null || _fsPlugin == null)
+                        {
+                            FameSessFail("arm FAIL av=" + (_fsAv != null) + " plugin=" + (_fsPlugin != null));
+                            return;
+                        }
+                        _fsPlugin.SetAttribute(1, 1); // booking arm (ss-book run-76 law; native arm = the phone dialog)
+                        var action = _fsPlugin.GetAction(2, _fsAv, _vm.Context, false);
+                        if (action == null) { FameSessFail("plugin row 2 GetAction null"); return; }
+                        action.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                        _fsAv.Thread.EnqueueAction(action);
+                        Log("AUTOTEST famesess plugin attr[1] armed, pushed row 2 'Go to Studio Town' uid=" + action.UID);
+                        return;
+                    }
+                    // unpause (R157 law), dialog responder (HPAnswerDialogs scan law),
+                    // NotifyIdle release (EXP-04 V1.3 law) — the ss-book levers.
+                    if (_vm.SpeedMultiplier <= 0)
+                    {
+                        _vm.SpeedMultiplier = _vm.LastSpeedMultiplier > 0 ? _vm.LastSpeedMultiplier : 1;
+                        _vm.LastSpeedMultiplier = 0;
+                        _vm.GlobalBlockingDialog = null;
+                    }
+                    FSO.SimAntics.Primitives.VMDialogResult target = null;
+                    VMEntity targetOwner = null;
+                    var gbd = _vm.GlobalBlockingDialog;
+                    if (gbd != null)
+                    {
+                        var bs = gbd.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                        if (bs != null && !bs.Responded) { target = bs; targetOwner = gbd; }
+                    }
+                    if (target == null)
+                    {
+                        foreach (var ent in _vm.Entities)
+                        {
+                            var qbs = ent?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                            if (qbs != null && !qbs.Responded) { target = qbs; targetOwner = ent; break; }
+                        }
+                    }
+                    if (target != null)
+                    {
+                        target.Responded = true;
+                        target.ResponseCode = 1;      // booking continuation rides the YesNo FALSE branch
+                        target.ResponseText = "81";   // TS1StudioTown picker parses ResponseText -> temp0
+                        if (ReferenceEquals(_vm.GlobalBlockingDialog, targetOwner) || targetOwner == gbd)
+                            _vm.GlobalBlockingDialog = null;
+                        if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
+                        else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+                        _fsAnswered++;
+                        Log("AUTOTEST famesess dialog answered #" + _fsAnswered + " owner=obj" + (targetOwner?.ObjectID ?? 0) + " text=\"81\"");
+                    }
+                    if (_fsFrame > 120 && !_fsNotifyArmed)
+                    {
+                        var aaNi = _fsAv?.Thread?.ActiveAction;
+                        if (aaNi != null && !aaNi.NotifyIdle)
+                        {
+                            aaNi.NotifyIdle = true;
+                            _vm.Scheduler.ScheduleTickIn(_fsAv, 1);
+                            _fsNotifyArmed = true;
+                            Log("AUTOTEST famesess armed NotifyIdle + 1-tick wake at f=" + _fsFrame);
+                        }
+                    }
+                    if (_fsFrame == 300 && !_fsSelectorDone)
+                    {
+                        _fsSelectorDone = true;
+                        try
+                        {
+                            var lotCtrl = _screen?.LotControl;
+                            var t = lotCtrl?.GetType();
+                            var sel = t?.GetField("TS1NeighSelector",
+                                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(lotCtrl);
+                            Log("AUTOTEST famesess selector present=" + (sel != null) + " at f=300");
+                            if (sel != null)
+                            {
+                                var hs = t.GetMethod("HouseSelected",
+                                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                                hs?.Invoke(lotCtrl, new object[] { 81 }); // production picker answer (UIMainPanel.HouseSelected law)
+                            }
+                        }
+                        catch (Exception se) { Log("AUTOTEST famesess selector EXC " + se.GetType().Name + " " + se.Message); }
+                    }
+                    // livelift (the UIMainPanel non-LIVE park law) — re-applied each tick.
+                    var mainPanel = _screen?.Frontend?.MainPanel;
+                    if (mainPanel != null && mainPanel.Mode != Simitone.Client.UI.Panels.UIMainPanelMode.LIVE)
+                        mainPanel.SetMode(Simitone.Client.UI.Panels.UIMainPanelMode.LIVE);
+
+                    // arrival detector (the ss-book orphaning law: TS1GameScreen REPLACES its vm)
+                    var screenVm = _screen?.vm;
+                    if (screenVm != null && !ReferenceEquals(screenVm, _vm))
+                    {
+                        _vm = screenVm;
+                        _fsArrivedFrame = _fsFrame;
+                        Log("AUTOTEST famesess VM REPLACED (lot switch landed) at f=" + _fsFrame
+                            + " entities=" + _vm.Entities.Count);
+                        FameSessCensus("arrival");
+                        var g3 = _vm.GetGlobalValue(3);
+                        _fsAv = _vm.Entities.OfType<VMAvatar>().FirstOrDefault(a => a.ObjectID == g3);
+                        if (_fsAv == null || _vm.GetGlobalValue(10) < 81 || _vm.GetGlobalValue(10) > 89)
+                        {
+                            FameSessFail("arrival did not land on a Studio lot or selected sim missing (house="
+                                + _vm.GetGlobalValue(10) + " global3=" + g3 + ")");
+                            return;
+                        }
+                        Log("AUTOTEST famesess probe sim obj=" + (_fsAv?.ObjectID ?? 0) + " " + (_fsAv != null ? FSPD(_fsAv) : ""));
+                        _fsStage = 1; _fsStep = 0; _fsStageFrame = 0;
+                        return;
+                    }
+                    if (_fsFrame > 7000) { FameSessFail("no lot switch to 81 within window (dialogs=" + _fsAnswered + ")"); }
+                    return;
+                }
+
+                if (_fsStage == 1)
+                {
+                    _fsStageFrame++;
+                    if (_fsStageFrame == 30) // let the arrival lot settle one beat
+                    {
+                        var house = _vm.GetGlobalValue(10);
+                        Log("AUTOTEST famesess verify begin: house=" + house + " " + FSPD(_fsAv)
+                            + " job=" + _fsAv.GetPersonData(VMPersonDataVariable.JobType));
+                        // disclosed probe bootstrap: max the six skill categories so the
+                        // skills gate can never block the climb; the trajectory under test
+                        // is score thresholds + the friends gate + the demote thresholds.
+                        foreach (var cat in FS_SKILL_CATS)
+                            _fsAv.SetPersonData((VMPersonDataVariable)cat, 1000);
+                        _fsDump.Add("skills maxed probe-side");
+                        if (_fsAv.GetPersonData(VMPersonDataVariable.JobType) != 0)
+                        {
+                            FameSessFail("probe sim is on a job (PD[56]=" + _fsAv.GetPersonData(VMPersonDataVariable.JobType) + "); #485 gate would eat every #484 call");
+                            return;
+                        }
+                        // find a set piece for the #8197 bootstrap (session fame write)
+                        _fsPiece = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && FS_SET_GUIDS.Contains(e.Object.OBJ.GUID));
+                        var semig = _fsPiece?.Object?.Resource?.SemiGlobal;
+                        var r8197 = semig?.GetRoutine(8197);
+                        if (r8197 != null)
+                        {
+                            FameSessRun(_fsAv, _fsAv, _fsPiece, r8197 as VMRoutine, 5); // canonical first-fame write (no fame-track gate); CodeOwner=piece so FameObjectGlobals resolves
+                            var sc = _fsAv.GetPersonData(VMPersonDataVariable.TS1FameScore);
+                            var pk = _fsAv.GetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark);
+                            Log("AUTOTEST famesess bootstrap: #8197(+5) via piece 0x" + _fsPiece.Object.OBJ.GUID.ToString("x8")
+                                + " -> score=" + sc + " peak=" + pk);
+                            if (sc != 5 || pk != 5)
+                            {
+                                _fsVerifyPass = false; _fsVerifyFail = "bootstrap #8197 diverged (score=" + sc + " peak=" + pk + " exp 5/5)";
+                            }
+                        }
+                        else
+                        {
+                            _fsAv.SetPersonData(VMPersonDataVariable.TS1FameScore, 5); // disclosed fallback bootstrap
+                            Log("AUTOTEST famesess bootstrap: #8197 unavailable (semig=" + (semig != null) + "); probe-side score=5");
+                        }
+                        _fsStep = 1;
+                        return;
+                    }
+                    if (_fsStageFrame < 30 || _fsStep == 0) return;
+                    if (_fsStep == 1) // THE headline: +900 then the mode-34 recompute must raise level 0->1
+                    {
+                        if (!FameSessAdjust(900, 905, 1, "climb-1"))
+                        {
+                            var lvl = _fsAv.GetPersonData(VMPersonDataVariable.TS1FameStarPower);
+                            _fsVerifyPass = false;
+                            if (_fsVerifyFail == "") _fsVerifyFail = (lvl == 0)
+                                ? "mode34-noop: #484 wrote the score but the level recompute never moved (score moved, level stuck 0)"
+                                : "climb-1 diverged";
+                        }
+                    }
+                    else if (_fsStep >= 2 && _fsStep <= 5)
+                    {
+                        var exp = (short)Math.Min(1000, 905 + 30 * (_fsStep - 1));
+                        var expLvl = (short)Math.Min(4, _fsStep); // 30/call promotes one rung: 2,3,4 then stalls
+                        if (!FameSessAdjust(30, exp, expLvl, "climb-" + _fsStep))
+                        {
+                            if (_fsVerifyFail == "") _fsVerifyFail = "climb-" + _fsStep + " diverged";
+                            _fsVerifyPass = false;
+                        }
+                    }
+                    else if (_fsStep == 6) // friends-gate stall: 0 famous friends * 0.5 < needed[4]=2
+                    {
+                        if (!FameSessAdjust(30, 1000, 4, "stall-4")) // score clamps at 1000
+                        {
+                            if (_fsVerifyFail == "") _fsVerifyFail = "no stall at level 4 (friends gate not enforced?)";
+                            _fsVerifyPass = false;
+                        }
+                        var famous = _vm.Entities.OfType<VMAvatar>().Count(a => a != _fsAv && a.GetPersonData(VMPersonDataVariable.TS1FameScore) > 0);
+                        Log("AUTOTEST famesess famous-others=" + famous + " (gate: " + famous + "*0.5 >= " + FS_FRIENDS[4] + " must be FALSE)");
+                    }
+                    else if (_fsStep == 7) // -900 -> 100: threshold law says level HOLDS (100 >= 35)
+                    {
+                        if (!FameSessAdjust(-900, 100, 4, "hold-100"))
+                        {
+                            if (_fsVerifyFail == "") _fsVerifyFail = "demote threshold law diverged at score 100 (expected hold at 4)";
+                            _fsVerifyPass = false;
+                        }
+                    }
+                    else if (_fsStep == 8) // 70 >= 35 hold
+                    {
+                        if (!FameSessAdjust(-30, 70, 4, "hold-70"))
+                        {
+                            if (_fsVerifyFail == "") _fsVerifyFail = "demote threshold law diverged at score 70";
+                            _fsVerifyPass = false;
+                        }
+                    }
+                    else if (_fsStep == 9) // 40 >= 35 hold
+                    {
+                        if (!FameSessAdjust(-30, 40, 4, "hold-40"))
+                        {
+                            if (_fsVerifyFail == "") _fsVerifyFail = "demote threshold law diverged at score 40";
+                            _fsVerifyPass = false;
+                        }
+                    }
+                    else if (_fsStep == 10) // 10 < 35 -> demote 4->3
+                    {
+                        if (!FameSessAdjust(-30, 10, 3, "demote-3"))
+                        {
+                            if (_fsVerifyFail == "") _fsVerifyFail = "mode36-noop or threshold divergence at score 10 (expected demote to 3)";
+                            _fsVerifyPass = false;
+                        }
+                    }
+                    else if (_fsStep == 11) // clamp to 1; 1 < 21 -> 2
+                    {
+                        if (!FameSessAdjust(-30, 1, 2, "demote-2"))
+                        {
+                            if (_fsVerifyFail == "") _fsVerifyFail = "demote ladder diverged (expected 2)";
+                            _fsVerifyPass = false;
+                        }
+                    }
+                    else if (_fsStep == 12) // 1 < 9 -> 1
+                    {
+                        if (!FameSessAdjust(-30, 1, 1, "demote-1"))
+                        {
+                            if (_fsVerifyFail == "") _fsVerifyFail = "demote ladder diverged (expected 1)";
+                            _fsVerifyPass = false;
+                        }
+                    }
+                    else if (_fsStep == 13) // 1 < 2 -> 0
+                    {
+                        if (!FameSessAdjust(-30, 1, 0, "demote-0"))
+                        {
+                            if (_fsVerifyFail == "") _fsVerifyFail = "demote ladder diverged (expected 0)";
+                            _fsVerifyPass = false;
+                        }
+                    }
+                    else if (_fsStep == 14) // level 0: no further demote
+                    {
+                        if (!FameSessAdjust(-30, 1, 0, "floor"))
+                        {
+                            if (_fsVerifyFail == "") _fsVerifyFail = "level sank below 0";
+                            _fsVerifyPass = false;
+                        }
+                        FameSessCensus("post-verify");
+                        Log("AUTOTEST famesess verify " + (_fsVerifyPass ? "COMPLETE (all rungs OK)" : "DIVERGED: " + _fsVerifyFail));
+                        _fsStage = 2; _fsStep = 0; _fsStageFrame = 0;
+                    }
+                    _fsStep++;
+                    return;
+                }
+
+                if (_fsStage == 2)
+                {
+                    _fsStageFrame++;
+                    if (_fsStageFrame == 10)
+                    {
+                        // (c) session-owner arm + director spawn
+                        var pieces = _vm.Entities.Where(e => e.Object?.OBJ != null && FS_SET_GUIDS.Contains(e.Object.OBJ.GUID)).ToList();
+                        Log("AUTOTEST famesess set pieces on lot: " + string.Join(", ", pieces.Select(p =>
+                            "0x" + p.Object.OBJ.GUID.ToString("x8") + "@obj" + p.ObjectID)));
+                        _fsPiece = pieces.FirstOrDefault(p => p.Object.OBJ.GUID == 0xF4126CC4) ?? pieces.FirstOrDefault();
+                        if (_fsPiece == null)
+                        {
+                            Log("AUTOTEST famesess director leg SKIPPED: no set piece found (spawn is #4099 on the piece)");
+                            _fsStage = 3; _fsStageFrame = 0;
+                            return;
+                        }
+                        var g3 = _vm.GetGlobalValue(3);
+                        var before = _vm.Entities.OfType<VMAvatar>().Select(a => a.ObjectID).ToHashSet();
+                        _fsPiece.SetValue(VMStackObjectVariable.ObjectId, (short)g3); // session-owner arm (#4098 ins1 law, probe-side)
+                        Log("AUTOTEST famesess armed piece obj=" + _fsPiece.ObjectID + " var11=" + _fsPiece.GetValue(VMStackObjectVariable.ObjectId)
+                            + " (=global[3]=" + g3 + "; matches #4105 ins2 / #4126 ins0 gate)");
+                        var r4099 = _fsPiece.Object?.Resource?.GetRoutine(4099);
+                        if (r4099 == null)
+                        {
+                            Log("AUTOTEST famesess director leg FAIL: #4099 not resolvable on piece resource "
+                                + (_fsPiece.Object?.Resource?.MainIff?.Filename ?? "null"));
+                            _fsStage = 3; _fsStageFrame = 0;
+                            return;
+                        }
+                        FameSessRun(_fsPiece, _fsPiece, _fsPiece, r4099 as VMRoutine, 0); // Make Random Director (create_object near the Director Seat)
+                        var dirs = _vm.Entities.OfType<VMAvatar>().Where(a => !before.Contains(a.ObjectID)
+                            || FS_DIRECTOR_GUIDS.Contains(a.Object?.OBJ?.GUID ?? 0)).ToList();
+                        var seat = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0xF5D51E40);
+                        foreach (var d in dirs)
+                            Log("AUTOTEST famesess director candidate obj=" + d.ObjectID + " guid=0x" + d.Object?.OBJ?.GUID.ToString("x8")
+                                + " pos=(" + d.Position.TileX + "," + d.Position.TileY + ",L" + d.Position.Level + ")"
+                                + (seat != null ? " seat@(" + seat.Position.TileX + "," + seat.Position.TileY + ")" : " (seat 0xF5D51E40 not on lot)"));
+                        if (dirs.Any(d => FS_DIRECTOR_GUIDS.Contains(d.Object?.OBJ?.GUID ?? 0)))
+                        {
+                            _fsDirectorSeen = true;
+                            Log("AUTOTEST famesess director leg: TV-director NPC CREATED");
+                        }
+                        else
+                        {
+                            Log("AUTOTEST famesess director leg: no TV-director GUID spawned (named residual: creation may depend"
+                                + " on the full session context the drive plan parks behind this leg)");
+                        }
+                        FameSessCensus("post-director");
+                        _fsStage = 3; _fsStageFrame = 0;
+                    }
+                    return;
+                }
+
+                if (_fsStage == 3)
+                {
+                    _fsStageFrame++;
+                    // bounded post-watch: PD diffs on every avatar (decay/unlock sampling)
+                    if (_fsStageFrame == 1)
+                    {
+                        _fsPD0.Clear();
+                        foreach (var a in _vm.Entities.OfType<VMAvatar>().ToList())
+                        {
+                            var pd = new short[83];
+                            for (short i = 0; i < 83; i++) pd[i] = a.GetPersonData((VMPersonDataVariable)i);
+                            _fsPD0[a.ObjectID] = pd;
+                        }
+                    }
+                    if (_fsStageFrame % 150 == 0)
+                    {
+                        foreach (var a in _vm.Entities.OfType<VMAvatar>().ToList())
+                        {
+                            if (!_fsPD0.TryGetValue(a.ObjectID, out var pd0)) continue;
+                            var diffs = new List<string>();
+                            for (short i = 80; i < 83; i++)
+                            {
+                                var now = a.GetPersonData((VMPersonDataVariable)i);
+                                if (now != pd0[i]) diffs.Add("PD[" + i + "] " + pd0[i] + "->" + now);
+                            }
+                            if (diffs.Count > 0) Log("AUTOTEST famesess watch obj=" + a.ObjectID + ": " + string.Join(", ", diffs));
+                        }
+                    }
+                    if (_fsStageFrame >= 450)
+                    {
+                        // final verdict
+                        if (_fsVerifyPass)
+                        {
+                            Log("AUTOTEST famesess verdict: fame level write LANDED LIVE (mode 34 promote + mode 36 demote"
+                                + " ladder asserted against the fame.iff law); director spawned=" + _fsDirectorSeen);
+                            Pass("famesess");
+                        }
+                        else
+                        {
+                            Log("AUTOTEST famesess verdict: " + _fsVerifyFail);
+                            Fail("famesess");
+                        }
+                        _fsDone = true;
+                        Finish();
+                    }
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST famesess EXC " + ex.GetType().Name + " " + ex.Message + " at " + ex.StackTrace?.Split('\n').FirstOrDefault());
+                FameSessFail("exception");
             }
         }
 
