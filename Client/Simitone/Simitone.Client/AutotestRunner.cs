@@ -1043,6 +1043,7 @@ namespace Simitone.Client
                 || CheckEnabled("llfire")
                 || CheckEnabled("aud12live")
                 || CheckEnabled("aud13vox")
+                || CheckEnabled("type53")
                 || CheckEnabled("cc05live")
                 || CheckEnabled("cc04live")
                 || CheckEnabled("ss-book")
