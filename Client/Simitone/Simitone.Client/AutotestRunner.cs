@@ -1051,6 +1051,9 @@ namespace Simitone.Client
                 // (TRV-04) the phone-plugin menu/booking drive rides the same
                 // state-2 soak entry as the expansion legs.
                 || CheckEnabled("trv04book")
+                // (AUD-15) the native denied-sound law drive rides the same
+                // state-2 soak entry.
+                || CheckEnabled("aud15deny")
                 || CheckEnabled("hpparty")
                 || CheckEnabled("vacation")
                 // (EXP-05) Unleashed legs ride the same state-2 soak entry — without
@@ -5284,6 +5287,23 @@ namespace Simitone.Client
                 {
                     _unlsSoakHeld = true;
                     Log("AUTOTEST soak held for trv04book (state=" + _trvbState + ")");
+                }
+                return;
+            }
+            // AUD-15 (opt-in "aud15deny"): the native terrain-tool denied sound
+            // — content registration ('denied' in the TS1 HOT [EventMapping])
+            // + the audible law (kSndobPlay -> denied.xa notes through the
+            // NoteQueued rail). Ticks BEFORE the soak-hold.
+            if (CheckEnabled("aud15deny") && _aud15State != 99)
+            {
+                Aud15Tick();
+            }
+            if (CheckEnabled("aud15deny") && _aud15State != 99)
+            {
+                if (!_unlsSoakHeld)
+                {
+                    _unlsSoakHeld = true;
+                    Log("AUTOTEST soak held for aud15deny (state=" + _aud15State + ")");
                 }
                 return;
             }
@@ -26256,6 +26276,85 @@ namespace Simitone.Client
             {
                 Log("AUTOTEST trv04book EXC " + ex.GetType().Name + ": " + ex.Message + " @ " + ex.StackTrace);
                 Fail("trv04book"); _trvbState = 99;
+            }
+        }
+
+        // ======================= AUD-15 (aud15deny) =======================
+        // The native terrain-tool denied sound. Verified native law
+        // (EXP-12 T3 + the 2026-09-25 review): cTool::DoDeniedSound 0x192070
+        // fires HIT event 0x4D35A, 400-tick rate-limited; the port's terrain
+        // tools now fire the same LOGICAL event by its CONTENT name
+        // ('denied', SimsSound.hot [EventMapping] denied=kSndobPlay,1284 ->
+        // patch 1283 = sounddata\sfx\denied.xa) with the same per-tool
+        // 400-VM-tick limiter. This check proves the registration (the name
+        // resolves in the TS1 event table with the expected track) and the
+        // audible law (firing it queues notes through the NoteQueued rail,
+        // the aud13vox/type53 idiom). The tool-instance limiter itself is
+        // UI-drag code — not exercisable headless; reviewed at the source
+        // level (disclosed).
+        private static int _aud15State; // 0 init, 1 fire-watch, 99 done
+        private static int _aud15Settle, _aud15Frame, _aud15Notes;
+
+        private static void Aud15OnNote(FSO.HIT.HITNoteEntry note)
+        {
+            _aud15Notes++;
+        }
+
+        private static void Aud15Init()
+        {
+            if (++_aud15Settle < 90) return;
+            // the registration law: the denied event resolves in the TS1
+            // event table
+            var evts = Content.Get().Audio?.Events;
+            if (evts == null || !evts.ContainsKey("denied"))
+            {
+                Log("AUTOTEST aud15deny: 'denied' NOT registered in the TS1 event table — content census failed");
+                Fail("aud15deny"); _aud15State = 99; return;
+            }
+            var reg = evts["denied"];
+            Log("AUTOTEST aud15deny: registered name='denied' eventType=" + reg.EventType
+                + " trackID=" + reg.TrackID + " (content law: kSndobPlay,1284)");
+            if ((uint)reg.EventType != (uint)FSO.Files.HIT.HITEvents.kSoundobPlay || reg.TrackID != 1284)
+            {
+                Log("AUTOTEST aud15deny: registration payload mismatch — expected kSndobPlay/1284");
+                Fail("aud15deny"); _aud15State = 99; return;
+            }
+            FSO.HIT.HITVM.NoteQueued += Aud15OnNote;
+            _aud15Notes = 0;
+            HITVM.Get().PlaySoundEvent("denied");
+            Log("AUTOTEST aud15deny: fired 'denied' at " + Sim3Clock());
+            _aud15State = 1; _aud15Frame = 0;
+        }
+
+        private static void Aud15Tick()
+        {
+            try
+            {
+                if (_aud15State == 0) { Aud15Init(); return; }
+                if (_aud15State == 99) return;
+                _aud15Frame++;
+                if (_aud15Frame == 120)
+                {
+                    Log("AUTOTEST aud15deny: notes=" + _aud15Notes + " at f=120");
+                    FSO.HIT.HITVM.NoteQueued -= Aud15OnNote;
+                    if (_aud15Notes >= 1)
+                    {
+                        Log("AUTOTEST aud15deny verdict legs REGISTRATION(kSndobPlay/1284) + AUDIBLE(notes=" + _aud15Notes + ") = ok");
+                        Pass("aud15deny");
+                    }
+                    else
+                    {
+                        Log("AUTOTEST aud15deny: no notes queued from 'denied' — the patch/track chain is silent (honest FAIL; sound-enabled boot required)");
+                        Fail("aud15deny");
+                    }
+                    _aud15State = 99;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST aud15deny EXC " + ex.GetType().Name + ": " + ex.Message + " @ " + ex.StackTrace);
+                try { FSO.HIT.HITVM.NoteQueued -= Aud15OnNote; } catch { }
+                Fail("aud15deny"); _aud15State = 99;
             }
         }
 
