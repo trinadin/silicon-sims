@@ -845,7 +845,22 @@ namespace FSO.SimAntics.Utils
                 if (!exists)
                 {
                     // Spawn missing controller at OUT_OF_WORLD
-                    VM.Context.CreateObjectInstance(controller, LotTilePos.OUT_OF_WORLD, Direction.NORTH);
+                    var group = VM.Context.CreateObjectInstance(controller, LotTilePos.OUT_OF_WORLD, Direction.NORTH);
+                    // TRV-04: a phone plugin registers in object category 1. Every shipped
+                    // lot's plugin instances carry ObjectData[59]=1, and the phone's
+                    // 'Call Plugin' check (PhoneGlobals 8308) enumerates category-SP0(=1)
+                    // objects to build its menu, running each one's 'CT - Phone Plugin
+                    // Menu' tree (global STR#303[67]), which adds the pie entry with
+                    // Param0 = its object id. A controller is a phone plugin iff its
+                    // resource carries that named tree — the marker the check itself
+                    // invokes, so no GUID list or name heuristic is needed.
+                    var plugin = group?.BaseObject;
+                    var pluginResource = plugin?.Object?.Resource;
+                    if (pluginResource?.TreeByName != null
+                        && pluginResource.TreeByName.ContainsKey("CT - Phone Plugin Menu"))
+                    {
+                        plugin.SetValue(VMStackObjectVariable.Category, 1);
+                    }
                 }
             }
 
