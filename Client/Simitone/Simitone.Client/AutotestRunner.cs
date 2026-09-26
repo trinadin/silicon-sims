@@ -25411,6 +25411,57 @@ namespace Simitone.Client
                 }
                 if (anyBs != null && !anyBs.Responded)
                 {
+                    // TRV-04 negatives extension: while a trv04book phase is live,
+                    // answer under the probe's explicit policy instead of the
+                    // vacation/hpparty law. Policy 0 keeps the validated booking
+                    // behavior byte-for-byte (ResponseCode 0 = yes/ok, text "0");
+                    // 1 = decline YesNos (code 1 = no); 2 = cancel the vacation
+                    // picker (unparseable ResponseText -> the NumericEntry
+                    // primitive's GOTO_FALSE decline branch). The blocked frame's
+                    // routine@IP is logged so each dialog is position-identified.
+                    if (_trvbState == 1 && _trvbPhase <= 5)
+                    {
+                        anyBs.Responded = true;
+                        var trvbOwner = dlg;
+                        if (trvbOwner == null)
+                        {
+                            foreach (var ent in _vm.Entities)
+                            {
+                                if (ent?.Thread?.BlockingState == anyBs) { trvbOwner = ent; break; }
+                            }
+                        }
+                        var trvbFrm = trvbOwner?.Thread?.Stack?.LastOrDefault();
+                        var trvbPos = trvbFrm == null ? "?"
+                            : ((trvbFrm.Routine?.Chunk?.ChunkLabel ?? ("tree" + trvbFrm.Routine?.ID)) + "@" + trvbFrm.InstructionPointer);
+                        if (_trvbAnswerPolicy == 1 && anyBs.Type == FSO.SimAntics.Primitives.VMDialogType.YesNo)
+                        {
+                            anyBs.ResponseCode = 1; // the VMDialogResult law: 1 = no
+                            anyBs.ResponseText = "1";
+                        }
+                        else if (_trvbAnswerPolicy == 2
+                            && (anyBs.Type == FSO.SimAntics.Primitives.VMDialogType.TS1Vacation
+                                || anyBs.Type == FSO.SimAntics.Primitives.VMDialogType.NumericEntry))
+                        {
+                            anyBs.ResponseCode = 0;
+                            anyBs.ResponseText = ""; // unparseable -> the picker's decline branch
+                        }
+                        else
+                        {
+                            anyBs.ResponseCode = 0; // 0 = yes/ok — the validated booking law
+                            anyBs.ResponseText = "0";
+                        }
+                        if (anyBs.Type == FSO.SimAntics.Primitives.VMDialogType.TS1Vacation
+                            || anyBs.Type == FSO.SimAntics.Primitives.VMDialogType.NumericEntry) _trvbPickerSeen = true;
+                        _trvbDialogs++;
+                        _vm.GlobalBlockingDialog = null;
+                        if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
+                        else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+                        Log("AUTOTEST trv04book: dialog answered (type=" + anyBs.Type
+                            + " policy=" + _trvbAnswerPolicy + " ans='" + anyBs.ResponseText + "'"
+                            + " blockedAt=" + trvbPos
+                            + " phase=" + _trvbPhase + " pf=" + _trvbPhaseFrame + ") at " + Sim3Clock());
+                        return;
+                    }
                     anyBs.Responded = true;
                     // run-73 (V1.1): the booking ask is a YesNo — run 72 answered
                     // the fixed "0" (No) and the tree parked at plugin BHAV
@@ -26169,6 +26220,24 @@ namespace Simitone.Client
         // 'CT - Plugin Call' (4134) -> 4098 cab -> 4100 books. NO plugin
         // creation, NO attr arms, NO NotifyIdle/op-49 emulation, NO phone
         // recreation; dialogs answered by the production-semantics responder.
+        //
+        // 2026-09-26 negatives extension (the review's named residual rows),
+        // appended as phases after the validated BOOK row — each phase is its
+        // own bounded window with an explicit verdict leg:
+        //   RESET       — the booking tree's tail (4100 @116 attr[0]=0) clears
+        //                 the plugin's busy flag, re-offering the menu entry.
+        //   REPEAT      — the Vacation entry re-offered after booking; a second
+        //                 push through the SAME real path re-fires the chain.
+        //   CATERER-NEG — the Caterer entry (p249, a service plugin) must book
+        //                 a caterer, NOT a trip: no departure tokens (7/8), no
+        //                 LotTransitInfo move.
+        //   CANCEL      — canceling the vacation lot picker must not book:
+        //                 the picker primitives take ResponseText through
+        //                 int.TryParse (VMDialogPrivateStrings NumericEntry
+        //                 law) — an unparseable answer returns GOTO_FALSE, the
+        //                 native decline branch; assert no NEW tokens banked.
+        // Responder law used throughout (VMDialogResult.ResponseCode):
+        // 0 = yes/ok, 1 = no, 2 = cancel.
         private static int _trvbState; // 0 init, 1 watch, 99 done
         private static int _trvbSettle, _trvbFrame;
         private static VMAvatar _trvbHost;
@@ -26177,12 +26246,94 @@ namespace Simitone.Client
         private static VMEntity _trvbPlugin; // the Vacation phone-plugin entity
         private static VMPieMenuInteraction _trvbEntry; // the pie entry we drove
 
+        // negatives-phase state
+        private static int _trvbPhase; // 0 book, 1 reset watch, 2 repeat, 3 reset watch, 4 caterer, 5 cancel
+        private static int _trvbPhaseFrame;
+        private static string _trvbTokensSnap; // departure-token snapshot at phase start
+        private static int _trvbDialogs; // dialogs answered this phase
+        private static bool _trvbPickerSeen; // a picker-type dialog raised this phase
+        private static int _trvbAnswerPolicy; // 0 = yes/ok (validated law), 1 = decline YesNos, 2 = cancel the picker
+        private static int _trvbEntCount0; // entity census at caterer-phase start
+        private static short _trvbAttr1Snap; // plugin attr[1] at phase start (a re-fired chain re-arms it with the new cab id)
+        private const int TRVB_RESET_TIMEOUT = 2500;
+        private const int TRVB_REPEAT_TIMEOUT = 12000;
+        private const int TRVB_CATERER_WINDOW = 5000;
+        private const int TRVB_CANCEL_TIMEOUT = 12000;
+
         private static string TrvbTokens()
         {
             var inv = Content.Get().Neighborhood.GetInventoryByNID(_trvbHostNid);
             return inv == null ? "none" : string.Join(",", inv
                 .Where(x => x.Type == 2 && (x.GUID == 7 || x.GUID == 8))
                 .Select(x => x.GUID + ":" + x.Count));
+        }
+
+        private static VMEntity TrvbPluginByGuid(uint guid)
+        {
+            foreach (var e in _vm.Entities)
+            {
+                if (e.Object?.OBJ == null) continue;
+                if (e.Object.OBJ.GUID == guid) return e;
+            }
+            return null;
+        }
+
+        private static VMPieMenuInteraction TrvbFindEntry(VMEntity plugin)
+        {
+            var phone = HPFindPhone();
+            if (phone == null || plugin == null) return null;
+            var pie = phone.GetPieMenu(_vm, _trvbHost, false, true);
+            return pie.FirstOrDefault(x => x.Param0 == plugin.ObjectID);
+        }
+
+        private static void TrvbPush(VMPieMenuInteraction entry, string tag)
+        {
+            var phone = HPFindPhone();
+            _trvbEntry = entry;
+            phone.PushUserInteraction(entry.ID, _trvbHost, _vm.Context, entry.Global,
+                new short[] { entry.Param0, 0, 0, 0 });
+            var aa0 = _trvbHost.Thread.Queue.LastOrDefault();
+            _trvbUid = aa0?.UID ?? 0;
+            _trvbDialogs = 0; _trvbPickerSeen = false;
+            Log("AUTOTEST trv04book " + tag + " PUSH pie-row=" + entry.ID + " '" + entry.Name
+                + "' param0=" + entry.Param0 + " uid=" + _trvbUid
+                + " pluginAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _trvbPlugin.GetAttribute((short)i))) + "]"
+                + " at " + Sim3Clock());
+        }
+
+        private static void TrvbPhaseGoto(int phase, string why)
+        {
+            _trvbPhase = phase; _trvbPhaseFrame = 0;
+            _trvbTokensSnap = TrvbTokens();
+            _trvbAttr1Snap = _trvbPlugin.GetAttribute((short)1);
+            if (phase == 4) _trvbEntCount0 = _vm.Entities.Count;
+            Log("AUTOTEST trv04book phase->" + phase + " (" + why + ") tokens=" + _trvbTokensSnap
+                + " transit=" + (Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1)
+                + " pluginAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _trvbPlugin.GetAttribute((short)i))) + "]");
+        }
+
+        // periodic per-phase status + the honest per-phase timeout
+        private static bool TrvbPhaseTimeout(string leg, int timeout, string diag)
+        {
+            var transit = Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1;
+            if (_trvbPhaseFrame % 60 == 0)
+            {
+                var aa = _trvbHost.Thread.ActiveAction;
+                Log("AUTOTEST trv04book p" + _trvbPhase + " f=" + _trvbPhaseFrame + " clock=" + Sim3Clock()
+                    + " q=" + _trvbHost.Thread.Queue.Count
+                    + " aa=" + (aa == null ? "none" : "'" + aa.Name + "' uid" + aa.UID)
+                    + " (pushed uid" + _trvbUid + ")"
+                    + " transit=" + transit + " tokens=" + TrvbTokens()
+                    + " pluginAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _trvbPlugin.GetAttribute((short)i))) + "]");
+            }
+            if (_trvbPhaseFrame >= timeout)
+            {
+                Log("AUTOTEST trv04book TIMEOUT phase=" + _trvbPhase + " (" + leg + ") f=" + _trvbPhaseFrame
+                    + " transit=" + transit + " tokens=" + TrvbTokens() + " " + diag
+                    + " — honest FAIL: phase did not complete");
+                Fail("trv04book"); _trvbState = 99; return true;
+            }
+            return false;
         }
 
         private static void TrvBookInit()
@@ -26218,6 +26369,18 @@ namespace Simitone.Client
                 Fail("trv04book"); _trvbState = 99; return;
             }
 
+            // (1b) the review's cheap add, pinned as an observation: Animal
+            // Control is a REGISTERED plugin whose menu entry is state-gated
+            // (it is menu-less on a petless lot — not a registration miss).
+            var animalCtl = TrvbPluginByGuid(0x2D0E6578u);
+            if (animalCtl != null)
+            {
+                var acCat = animalCtl.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.Category);
+                var acEntry = TrvbFindEntry(animalCtl);
+                Log("AUTOTEST trv04book ANIMALCTL-STATE obj" + animalCtl.ObjectID + " cat=" + acCat
+                    + " inMenu=" + (acEntry != null) + " (registered-but-menu-less expected on a petless lot)");
+            }
+
             // (2) MENU OBSERVABLE: the phone pie (the real GetPieMenu the client
             // renders) contains the plugin's entry with Param0 = plugin oid.
             var phone = HPFindPhone();
@@ -26241,14 +26404,9 @@ namespace Simitone.Client
             // entry's Param0 in Args[0]). This is the true user-click shape.
             var fam5 = Content.Get().Neighborhood.GetFamilyForHouse(5);
             Log("AUTOTEST trv04book: fam5 budget=" + (fam5?.Budget ?? -1) + " (no fixture write; 4141's $500 JustTest must pass on real funds)");
-            phone.PushUserInteraction(_trvbEntry.ID, _trvbHost, _vm.Context, _trvbEntry.Global,
-                new short[] { _trvbEntry.Param0, 0, 0, 0 });
-            var aa0 = _trvbHost.Thread.Queue.LastOrDefault();
-            _trvbUid = aa0?.UID ?? 0;
-            Log("AUTOTEST trv04book PUSH pie-row=" + _trvbEntry.ID + " '" + _trvbEntry.Name
-                + "' param0=" + _trvbEntry.Param0 + " uid=" + _trvbUid
-                + " pluginAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _trvbPlugin.GetAttribute((short)i))) + "]"
-                + " at " + Sim3Clock());
+            TrvbPush(_trvbEntry, "BOOK");
+            _trvbPhase = 0; _trvbPhaseFrame = 0; _trvbAnswerPolicy = 0;
+            _trvbTokensSnap = "none";
             _trvbState = 1; _trvbFrame = 0;
         }
 
@@ -26258,37 +26416,90 @@ namespace Simitone.Client
             {
                 if (_trvbState == 0) { TrvBookInit(); return; }
                 if (_trvbState == 2 || _trvbState == 99) return;
-                _trvbFrame++;
+                _trvbFrame++; _trvbPhaseFrame++;
                 HPAnswerDialogs(); // production-semantics dialog responder only
                 var transit = Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1;
                 var tokens = TrvbTokens();
-                var tokened = tokens != "none" && tokens.Length > 0;
-                if (transit >= 1 || tokened)
+                var a0 = _trvbPlugin.GetAttribute((short)0);
+                var attrs = "[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _trvbPlugin.GetAttribute((short)i))) + "]";
+
+                switch (_trvbPhase)
                 {
-                    Log("AUTOTEST trv04book BOOKED f=" + _trvbFrame + " transit=" + transit
-                        + " tokens=" + tokens + " clock=" + Sim3Clock()
-                        + " pluginAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _trvbPlugin.GetAttribute((short)i))) + "]");
-                    Log("AUTOTEST trv04book verdict legs REGISTRATION(cat=1) + MENU(pie-entry p" + _trvbEntry.Param0 + ") + BOOK(chain) = ok");
-                    Pass("trv04book"); _trvbState = 99; return;
-                }
-                if (_trvbFrame % 60 == 0)
-                {
-                    var aa = _trvbHost.Thread.ActiveAction;
-                    Log("AUTOTEST trv04book f=" + _trvbFrame + " clock=" + Sim3Clock()
-                        + " q=" + _trvbHost.Thread.Queue.Count
-                        + " aa=" + (aa == null ? "none" : "'" + aa.Name + "' uid" + aa.UID)
-                        + " (pushed uid" + _trvbUid + ")"
-                        + " transit=" + transit + " tokens=" + tokens
-                        + " phoneAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => HPFindPhone()?.GetAttribute((short)i) ?? -999)) + "]"
-                        + " pluginAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _trvbPlugin.GetAttribute((short)i))) + "]");
-                }
-                if (_trvbFrame >= 15000)
-                {
-                    Log("AUTOTEST trv04book TIMEOUT f=" + _trvbFrame
-                        + " transit=" + transit + " tokens=" + tokens
-                        + " pluginAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _trvbPlugin.GetAttribute((short)i))) + "]"
-                        + " — honest FAIL: booking did not complete via the real pie-entry path");
-                    Fail("trv04book"); _trvbState = 99; return;
+                    case 0: // BOOK — the validated row: verdict = departure tokens / transit
+                        if (transit >= 1 || (tokens != "none" && tokens.Length > 0))
+                        {
+                            Log("AUTOTEST trv04book BOOKED f=" + _trvbFrame + " transit=" + transit
+                                + " tokens=" + tokens + " clock=" + Sim3Clock() + " pluginAttrs=" + attrs);
+                            Log("AUTOTEST trv04book leg BOOK ok");
+                            TrvbPhaseGoto(1, "post-book attr0-reset watch (4100 tail re-offer law)");
+                        }
+                        else if (TrvbPhaseTimeout("BOOK", 15000, "pluginAttrs=" + attrs)) return;
+                        break;
+                    case 1: // RESET — the booking tree's tail must clear attr0 (menu re-offer)
+                        if (a0 == 0)
+                        {
+                            Log("AUTOTEST trv04book ATTR0-RESET f=" + _trvbFrame + " pluginAttrs=" + attrs
+                                + " — the 4100-tail busy-flag clear observed (menu re-offer law)");
+                            Log("AUTOTEST trv04book leg RESET ok");
+                            TrvbBeginRepeat();
+                        }
+                        else if (TrvbPhaseTimeout("RESET", TRVB_RESET_TIMEOUT, "attr0 stuck at 1 — re-offer law violated")) return;
+                        break;
+                    case 2: // REPEAT — second booking through the same real path
+                        if (_trvbPickerSeen && (transit >= 1 || (tokens != "none" && tokens != _trvbTokensSnap)
+                            || _trvbPlugin.GetAttribute((short)1) != _trvbAttr1Snap))
+                        {
+                            Log("AUTOTEST trv04book REPEAT-BOOKED f=" + _trvbFrame + " transit=" + transit
+                                + " tokens=" + tokens + " (snap=" + _trvbTokensSnap + ") attr1=" + _trvbPlugin.GetAttribute((short)1)
+                                + " (snap=" + _trvbAttr1Snap + ") dialogs=" + _trvbDialogs
+                                + " clock=" + Sim3Clock() + " pluginAttrs=" + attrs);
+                            Log("AUTOTEST trv04book leg REPEAT ok");
+                            TrvbPhaseGoto(3, "post-repeat attr0-reset watch");
+                        }
+                        else if (TrvbPhaseTimeout("REPEAT", TRVB_REPEAT_TIMEOUT,
+                            "pickerSeen=" + _trvbPickerSeen + " tokens=" + tokens + " (snap=" + _trvbTokensSnap + ")")) return;
+                        break;
+                    case 3: // RESET-2 — attr0 must clear again after the repeat booking
+                        if (a0 == 0)
+                        {
+                            Log("AUTOTEST trv04book ATTR0-RESET-2 f=" + _trvbFrame + " pluginAttrs=" + attrs);
+                            TrvbBeginCaterer();
+                        }
+                        else if (TrvbPhaseTimeout("RESET2", TRVB_RESET_TIMEOUT, "attr0 stuck at 1 after repeat")) return;
+                        break;
+                    case 4: // CATERER-NEG — the service entry must not book a trip
+                        if (_trvbPhaseFrame >= TRVB_CATERER_WINDOW)
+                        {
+                            var grew = tokens != _trvbTokensSnap;
+                            var newEnts = _vm.Entities.Skip(_trvbEntCount0).Take(8)
+                                .Select(e => "obj" + e.ObjectID + (e.Object?.OBJ != null ? "/0x" + e.Object.OBJ.GUID.ToString("X8") : "")).ToList();
+                            if (transit >= 1 || grew)
+                            {
+                                Log("AUTOTEST trv04book CATERER-NEG VIOLATED f=" + _trvbFrame + " transit=" + transit
+                                    + " tokens=" + tokens + " (snap=" + _trvbTokensSnap + ") newEntities=[" + string.Join(" | ", newEnts) + "]"
+                                    + " — the Caterer entry booked a TRIP");
+                                Fail("trv04book"); _trvbState = 99; return;
+                            }
+                            Log("AUTOTEST trv04book CATERER-NEG observed f=" + _trvbFrame + " transit=" + transit
+                                + " tokens unchanged (" + tokens + ") newEntities=[" + string.Join(" | ", newEnts) + "]"
+                                + " catererAttrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => (TrvbPluginByGuid(0x813C0B24u)?.GetAttribute((short)i) ?? 0))) + "]");
+                            Log("AUTOTEST trv04book leg CATERER-NEG ok (no departure tokens, no transit move)");
+                            TrvbBeginCancel();
+                        }
+                        break;
+                    case 5: // CANCEL — canceling the vacation lot picker must not book
+                        if (_trvbPickerSeen && tokens == _trvbTokensSnap && transit < 1)
+                        {
+                            Log("AUTOTEST trv04book CANCEL-AT-PICKER f=" + _trvbFrame + " picker seen + canceled (unparseable response)"
+                                + " tokens unchanged (" + tokens + ") transit=" + transit + " pluginAttrs=" + attrs);
+                            Log("AUTOTEST trv04book leg CANCEL ok");
+                            Log("AUTOTEST trv04book verdict legs REGISTRATION + MENU + BOOK + RESET + REPEAT + CATERER-NEG + CANCEL = ok");
+                            Pass("trv04book"); _trvbState = 99; return;
+                        }
+                        else if (TrvbPhaseTimeout("CANCEL", TRVB_CANCEL_TIMEOUT,
+                            "pickerSeen=" + _trvbPickerSeen + " tokens=" + tokens + " (snap=" + _trvbTokensSnap + ") transit=" + transit
+                            + " — cancel-at-picker not reached or a canceled picker still booked")) return;
+                        break;
                 }
             }
             catch (Exception ex)
@@ -26297,6 +26508,56 @@ namespace Simitone.Client
                 Fail("trv04book"); _trvbState = 99;
             }
         }
+
+        private static void TrvbBeginRepeat()
+        {
+            var entry = TrvbFindEntry(_trvbPlugin);
+            if (entry == null)
+            {
+                Log("AUTOTEST trv04book REPEAT entry missing after attr0 reset — the menu re-offer failed"
+                    + " (8308 menu build or 'CT - Phone Plugin Menu' gate diverged on second build)");
+                Fail("trv04book"); _trvbState = 99; return;
+            }
+            Log("AUTOTEST trv04book REPEAT entry re-offered '" + entry.Name + "' param0=" + entry.Param0);
+            TrvbPhaseGoto(2, "repeat booking (validated law, second push)");
+            TrvbPush(entry, "REPEAT");
+        }
+
+        private static void TrvbBeginCaterer()
+        {
+            var caterer = TrvbPluginByGuid(0x813C0B24u);
+            if (caterer == null)
+            {
+                Log("AUTOTEST trv04book CATERER plugin entity (0x813C0B24) NOT on lot — census/registration diverged");
+                Fail("trv04book"); _trvbState = 99; return;
+            }
+            var cCat = caterer.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.Category);
+            var cEntry = TrvbFindEntry(caterer);
+            Log("AUTOTEST trv04book CATERER obj" + caterer.ObjectID + " cat=" + cCat
+                + " registered=" + (_vm.Context.ObjectQueries.GetObjectsByCategory(1)?.Contains(caterer) == true)
+                + " inMenu=" + (cEntry != null));
+            if (cEntry == null)
+            {
+                Log("AUTOTEST trv04book CATERER entry missing from the phone pie — the menu law diverged for service plugins");
+                Fail("trv04book"); _trvbState = 99; return;
+            }
+            TrvbPhaseGoto(4, "caterer-negative watch");
+            TrvbPush(cEntry, "CATERER");
+        }
+
+        private static void TrvbBeginCancel()
+        {
+            var entry = TrvbFindEntry(_trvbPlugin);
+            if (entry == null)
+            {
+                Log("AUTOTEST trv04book CANCEL entry missing after the caterer phase — Vacation not re-offered; cancel-at-picker undrivable on this state");
+                Fail("trv04book"); _trvbState = 99; return;
+            }
+            TrvbPhaseGoto(5, "cancel-at-picker (picker answered with an unparseable response)");
+            _trvbAnswerPolicy = 2;
+            TrvbPush(entry, "CANCEL");
+        }
+
 
         // ======================= AUD-15 (aud15deny) =======================
         // The native terrain-tool denied sound. Verified native law
@@ -26583,6 +26844,7 @@ namespace Simitone.Client
 
 
         private static void VacInit()
+
         {
             if (++_vacSettle < 90) return;
             // run-97 (V4.4): a stale arm from any earlier window must not
