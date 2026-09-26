@@ -682,18 +682,20 @@ namespace FSO.SimAntics.Primitives
             _fameTablesTried = true;
             try
             {
-                var files = Content.Content.Get().TS1AllFiles;
+                // Resolve via the TS1 base path — the established idiom for
+                // GameData lookups (HITTVOn.cs, IDETester.cs). Content's
+                // TS1AllFiles scan list is never populated in the Simitone
+                // boot (LoadingScreen constructs the singleton through
+                // Content.InitBasic, whose constructor skips the full Init;
+                // the later full Init early-returns on INSTANCE != null), so
+                // a scan-list lookup would silently find nothing.
                 string path = null;
-                if (files != null)
+                var content = Content.Content.Get();
+                var ts1Base = content?.TS1BasePath;
+                if (!string.IsNullOrEmpty(ts1Base))
                 {
-                    foreach (var f in files)
-                    {
-                        var norm = f.Replace('\\', '/');
-                        if (norm.EndsWith("/GameData/fame.iff", StringComparison.OrdinalIgnoreCase))
-                        {
-                            path = f; break;
-                        }
-                    }
+                    path = Path.Combine(ts1Base, "GameData", "fame.iff");
+                    if (!File.Exists(path)) path = null;
                 }
                 if (path == null) return null;
                 var iff = new IffFile(path);
