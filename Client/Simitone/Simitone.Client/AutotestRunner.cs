@@ -26248,7 +26248,7 @@ namespace Simitone.Client
         private static VMPieMenuInteraction _trvbEntry; // the pie entry we drove
 
         // negatives-phase state
-        private static int _trvbPhase; // 0 book, 1 reset watch, 2 repeat, 3 reset watch, 4 caterer, 5 cancel
+        private static int _trvbPhase; // 0 book, 1 reset watch, 2 repeat, 3 reset watch, 4 caterer, 5 cancel, 6 book-after-cancel
         private static int _trvbPhaseFrame;
         private static string _trvbTokensSnap; // departure-token snapshot at phase start
         private static int _trvbDialogs; // dialogs answered this phase
@@ -26546,6 +26546,7 @@ namespace Simitone.Client
                                 + " pluginAttrs=" + attrs);
                             if (entry != null)
                             {
+                                _trvbAnswerPolicy = 0; // review P2: the cancel-mode policy must not ride the BOOK-2 chain (phases 1/2 would decline its picker)
                                 TrvbPhaseGoto(6, "booking after a canceled picker (validated law)");
                                 TrvbPush(entry, "BOOK-2");
                             }
