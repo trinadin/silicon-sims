@@ -38588,10 +38588,21 @@ namespace Simitone.Client
                         foreach (var cat in FS_SKILL_CATS)
                             _fsAv.SetPersonData((VMPersonDataVariable)cat, 1000);
                         _fsDump.Add("skills maxed probe-side");
-                        if (_fsAv.GetPersonData(VMPersonDataVariable.JobType) != 0)
+                        var fsJob = _fsAv.GetPersonData(VMPersonDataVariable.JobType);
+                        if (fsJob > 0)
                         {
-                            FameSessFail("probe sim is on a job (PD[56]=" + _fsAv.GetPersonData(VMPersonDataVariable.JobType) + "); #485 gate would eat every #484 call");
+                            FameSessFail("probe sim is on a job (PD[56]=" + fsJob + "); #485 gate would eat every #484 call");
                             return;
+                        }
+                        if (fsJob < 0)
+                        {
+                            // run-2 law: the traveled sim's PD[56] reads -1 (the corpus's
+                            // unemployed/uninitialized representation, seen on home obj16
+                            // too); the #485 fame-track gate reads ==0 — normalize to the
+                            // canonical unemployed marker, disclosed (same bootstrap class
+                            // as the skills maxing above).
+                            _fsAv.SetPersonData(VMPersonDataVariable.JobType, 0);
+                            Log("AUTOTEST famesess: normalized PD[56] " + fsJob + " -> 0 (unemployed representation; #485 gate reads ==0; disclosed)");
                         }
                         // find a set piece for the #8197 bootstrap (session fame write)
                         _fsPiece = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && FS_SET_GUIDS.Contains(e.Object.OBJ.GUID));
