@@ -683,12 +683,13 @@ namespace FSO.SimAntics.Primitives
             try
             {
                 // Resolve via the TS1 base path — the established idiom for
-                // GameData lookups (HITTVOn.cs, IDETester.cs). Content's
-                // TS1AllFiles scan list is never populated in the Simitone
-                // boot (LoadingScreen constructs the singleton through
-                // Content.InitBasic, whose constructor skips the full Init;
-                // the later full Init early-returns on INSTANCE != null), so
-                // a scan-list lookup would silently find nothing.
+                // GameData lookups (HITTVOn.cs, IDETester.cs). A TS1AllFiles
+                // scan-list lookup is not viable here: the launcher
+                // normalizes -path with a trailing slash, so _ScanFiles
+                // stores base-relative entries ('GameData/fame.iff') that
+                // can never satisfy an EndsWith("/GameData/fame.iff") test,
+                // and _fameTablesTried below would permanently cache any
+                // null read before the background scan completes.
                 string path = null;
                 var content = Content.Content.Get();
                 var ts1Base = content?.TS1BasePath;
