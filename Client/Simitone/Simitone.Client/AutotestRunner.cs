@@ -38359,6 +38359,7 @@ namespace Simitone.Client
         private static bool _fsSelectorDone;
         private static bool _fsNotifyArmed;
         private static int _fsArrivedFrame = -1;
+        private static int _fsArrivalSettle; // run-1 finding: the arrival lot's avatars/global[3] populate a beat AFTER the VM replacement — poll, don't sample
         private static int _fsAnswered;
         private static bool _fsVerifyPass = true;
         private static string _fsVerifyFail = "";
@@ -38532,25 +38533,41 @@ namespace Simitone.Client
                     if (mainPanel != null && mainPanel.Mode != Simitone.Client.UI.Panels.UIMainPanelMode.LIVE)
                         mainPanel.SetMode(Simitone.Client.UI.Panels.UIMainPanelMode.LIVE);
 
-                    // arrival detector (the ss-book orphaning law: TS1GameScreen REPLACES its vm)
+                    // arrival detector (the ss-book orphaning law: TS1GameScreen REPLACES its vm).
+                    // run-1 law: the arrival lot's avatars and global[3] populate a beat AFTER
+                    // the replacement (the run-1 sample at the replacement tick read
+                    // avatars=0 global3=0 on a house-81 VM) — rebind, then POLL for the
+                    // arrival population before the census and the Studio-lot assertion.
                     var screenVm = _screen?.vm;
                     if (screenVm != null && !ReferenceEquals(screenVm, _vm))
                     {
                         _vm = screenVm;
                         _fsArrivedFrame = _fsFrame;
+                        _fsArrivalSettle = 0;
                         Log("AUTOTEST famesess VM REPLACED (lot switch landed) at f=" + _fsFrame
                             + " entities=" + _vm.Entities.Count);
-                        FameSessCensus("arrival");
+                        return;
+                    }
+                    if (_fsArrivedFrame >= 0)
+                    {
+                        _fsArrivalSettle++;
                         var g3 = _vm.GetGlobalValue(3);
                         _fsAv = _vm.Entities.OfType<VMAvatar>().FirstOrDefault(a => a.ObjectID == g3);
-                        if (_fsAv == null || _vm.GetGlobalValue(10) < 81 || _vm.GetGlobalValue(10) > 89)
+                        if (_fsAv != null && _vm.GetGlobalValue(10) >= 81 && _vm.GetGlobalValue(10) <= 89)
                         {
-                            FameSessFail("arrival did not land on a Studio lot or selected sim missing (house="
-                                + _vm.GetGlobalValue(10) + " global3=" + g3 + ")");
+                            FameSessCensus("arrival");
+                            Log("AUTOTEST famesess probe sim obj=" + _fsAv.ObjectID + " " + FSPD(_fsAv)
+                                + " (arrival settled after " + _fsArrivalSettle + " frames)");
+                            _fsStage = 1; _fsStep = 0; _fsStageFrame = 0;
                             return;
                         }
-                        Log("AUTOTEST famesess probe sim obj=" + (_fsAv?.ObjectID ?? 0) + " " + (_fsAv != null ? FSPD(_fsAv) : ""));
-                        _fsStage = 1; _fsStep = 0; _fsStageFrame = 0;
+                        if (_fsArrivalSettle > 900)
+                        {
+                            FameSessFail("arrival lot never populated its avatars/global[3] within the settle window (house="
+                                + _vm.GetGlobalValue(10) + " global3=" + g3 + " avatars="
+                                + _vm.Entities.OfType<VMAvatar>().Count() + ")");
+                            return;
+                        }
                         return;
                     }
                     if (_fsFrame > 7000) { FameSessFail("no lot switch to 81 within window (dialogs=" + _fsAnswered + ")"); }
