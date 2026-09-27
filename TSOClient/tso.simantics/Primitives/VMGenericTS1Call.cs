@@ -483,6 +483,8 @@ namespace FSO.SimAntics.Primitives
                 // 36. DemoteFameIfNeeded (implemented above with mode 34)
                 // 37. CancelPieMenu
                 // 38. GetTokensFromString (MM)
+                case VMGenericTS1CallMode.GetTokensFromString:
+                    return GetTokensFromString(context);
                 // 39. ChildToAdult (let's make this at least keep their skin colour, maybe)
                 // 40. PetToAdult
                 // 41. HeadFlush
@@ -508,6 +510,64 @@ namespace FSO.SimAntics.Primitives
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 // 43. FamilySpellsIntoController
             }
+            return VMPrimitiveExitCode.GOTO_TRUE;
+        }
+
+        /// <summary>
+        /// EXP-07 (MM recipe scan): generic TS1 call 38 GetTokensFromString.
+        /// Contract CORRECTED per the independent review
+        /// (indep-review-mode38-20260927.md — REJECT of the first attempt,
+        /// which mis-decoded a PersonData surface): every consumer
+        /// (MagicMasterSpells 4104 'Get Recipe From Ingredients', MMS 4103
+        /// 'Get Ingredients for PressOven', MMS 4098 'Get Spell From
+        /// Ingredients', MMS 4099 'Get Ingredients for Spell' (fourth
+        /// consumer, per the v2 review); press/oven tables STR#5/STR#6,
+        /// spell tables STR#3/STR#4) drives a STATELESS Temp protocol:
+        ///   - inputs: Temp[0] = STR# table id, Temp[1] = entry index
+        ///     (direct array index — entry 0 is a 'not used' sentinel; the
+        ///     tree owns the counter and re-feeds it each iteration),
+        ///   - outputs: Temp[1..n] = comma-split tokens, Temp[0] = token
+        ///     count on success, -1 when the index is past the table
+        ///     (the trees test Temp[0] == -1 to end the scan, and
+        ///     Temp[0] != 3 to skip short entries).
+        /// No PersonData, no scope-19 — the stack object is the Magic
+        /// Controller, a VMGameObject (the review's finding 2: the cast
+        /// throws and RunInMyStack's empty catch converts it into a stale
+        /// TRUE exit — the first implementation's runs were a false green).
+        /// The tree reads the matched entry index from Temp[0] after TRUE
+        /// (4104 @15) and maps it to the product (NectarPress 4103
+        /// @71-@73/@40: entries 1..3 -> Tuning[512..514], else Tuning[515]).
+        /// Runtime probe: unl-magic5 run 12 stocks (2,2,25) expecting
+        /// matched entry 1 -> product 1 (Tuning[512]) — a case the stale-
+        /// TRUE artifact path cannot produce (it always defaults to 4).
+        /// </summary>
+        private static VMPrimitiveExitCode GetTokensFromString(VMStackFrame context)
+        {
+            var so = context.StackObject;
+            if (so == null) return VMPrimitiveExitCode.GOTO_FALSE;
+            var res = so.Object?.Resource;
+            if (res == null) return VMPrimitiveExitCode.GOTO_FALSE;
+            var temps = context.Thread.TempRegisters;
+            var table = res.Get<FSO.Files.Formats.IFF.Chunks.STR>((ushort)temps[0]);
+            if (table == null) return VMPrimitiveExitCode.GOTO_FALSE;
+            var str = table.GetString(temps[1]);
+            if (str == null)
+            {
+                temps[0] = -1; // past the table: the caller's scan-exit marker
+                return VMPrimitiveExitCode.GOTO_TRUE;
+            }
+            var parts = str.Split(',');
+            short n = 0;
+            for (int i = 0; i < parts.Length && i + 1 < temps.Length; i++)
+            {
+                short v;
+                if (short.TryParse(parts[i].Trim(), out v))
+                {
+                    temps[i + 1] = v;
+                    n++;
+                }
+            }
+            temps[0] = n;
             return VMPrimitiveExitCode.GOTO_TRUE;
         }
 
