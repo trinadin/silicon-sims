@@ -15094,22 +15094,61 @@ namespace Simitone.Client
 
         private static void CheckUIPalette()
         {
-            // The ORIGINAL Sims UI palette (byte-faithful, UIGraphics.far) is dark NAVY
-            // (#000029..#001868 anchors, steel-blue #73739C highlights) with a CYAN #00FFFF
-            // accent - not black, not green. UIStyle.Current is aligned to it (R67).
+            // UI-33 'uipal' UPGRADE — the palette is now BYTE-PINNED, closing
+            // the audit's "uipal is a range-check, not a byte-pin" finding.
+            // The five original UIGraphics.far anchor members must mount 1:1
+            // (raw FAR stored name + byte length + sha256, the uicur idiom);
+            // the R67-era UIStyle alignment checks sit on top of that
+            // byte-verified base. Canon: tools/iff-dump/make_uipal_canon.py
+            // (FAR1 byte-verbatim + per-member BMP histograms incl. RLE8;
+            // 14/14 anchor colors re-derived from original pixels — including
+            // the corrected 0x72729E/0x7474A0 attribution to the catalog
+            // sheet). The old range-check-on-hardcoded-13-array form is
+            // superseded.
             try
             {
-                var canon = AutotestCatalogCanon.OriginalUIPalette;
+                var ts1 = Content.Get()?.TS1Global;
+                if (ts1 == null) { Log("AUTOTEST uipal: no TS1Global"); Fail("uipal"); return; }
                 var st = Simitone.Client.UI.Model.UIStyle.Current;
                 var bg = st.Bg; var tb = st.TitleBg; var sec = st.SecondaryText;
                 bool navyBg = bg.R < 10 && bg.G < 10 && bg.B >= 20 && bg.B <= 45; // ~#000029*0.75
                 bool navyTitle = tb.R < 8 && tb.G < 8 && tb.B >= 20;
                 bool cyanAccent = sec.R == 0 && sec.G == 255 && sec.B == 255;
-                Log("AUTOTEST uipal canon=" + canon.Length + " hex=" + string.Join(",", canon.Take(3).Select(c => c.ToString("X6")))
-                    + " UIStyle bg=" + bg.R + "," + bg.G + "," + bg.B + " title=" + tb.R + "," + tb.G + "," + tb.B
-                    + " accent=" + sec.R + "," + sec.G + "," + sec.B
-                    + " navyBg=" + navyBg + " navyTitle=" + navyTitle + " cyanAccent=" + cyanAccent);
-                if (navyBg && navyTitle && cyanAccent && canon.Length == 13) Pass("uipal");
+                bool ok = navyBg && navyTitle && cyanAccent;
+                string info = "style bg=" + bg.R + "," + bg.G + "," + bg.B + " title=" + tb.R + "," + tb.G + "," + tb.B
+                    + " accent=" + sec.R + "," + sec.G + "," + sec.B;
+                var entries = ts1.GetFarEntries(".bmp");
+                using (var sha = System.Security.Cryptography.SHA256.Create())
+                {
+                    foreach (var canon in AutotestCatalogCanon.UIPaletteCanon)
+                    {
+                        FSO.Content.Framework.Far1ProviderEntry<object> e = null;
+                        foreach (var en in entries)
+                        {
+                            if (en != null && en.FarEntry != null && en.FarEntry.Filename == canon.Name) { e = en; break; }
+                        }
+                        bool present = e != null;
+                        bool len = present && e.FarEntry.DataLength == canon.Bytes;
+                        bool raw = false;
+                        if (present)
+                        {
+                            try
+                            {
+                                var b = e.Archive.GetEntry(e.FarEntry);
+                                raw = b != null && b.Length == canon.Bytes && ByteHash256(b, sha) == canon.Sha256;
+                            }
+                            catch { }
+                        }
+                        if (!(present && len && raw))
+                        {
+                            ok = false;
+                            info += " " + canon.Name + ":p=" + present + " l=" + len + " r=" + raw;
+                        }
+                    }
+                }
+                Log("AUTOTEST uipal byte-pinned members=" + AutotestCatalogCanon.UIPaletteCanon.Length
+                    + " anchors=" + AutotestCatalogCanon.UIPaletteAnchors.Length + info);
+                if (ok) Pass("uipal");
                 else Fail("uipal");
             }
             catch (Exception pe) { Log("AUTOTEST uipal EXC " + pe.GetType().Name + " " + pe.Message); Fail("uipal"); }

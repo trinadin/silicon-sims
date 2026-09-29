@@ -1,0 +1,372 @@
+{
+ "far": "game-data/The Sims/UIGraphics/UIGraphics.far",
+ "members": {
+  "cpanel\\Backgrounds\\CreateACharBack.BMP": {
+   "bytes": 312210,
+   "sha256": "03b018df76cbc208b787029bf6bbac66a8d30699d6c0f66ae061a6b7a9999d8c",
+   "pixels": 480000,
+   "distinct": 248,
+   "top": [
+    {
+     "rgb": "000039",
+     "n": 119648
+    },
+    {
+     "rgb": "001063",
+     "n": 37899
+    },
+    {
+     "rgb": "00186B",
+     "n": 37255
+    },
+    {
+     "rgb": "00106B",
+     "n": 35793
+    },
+    {
+     "rgb": "001873",
+     "n": 31933
+    },
+    {
+     "rgb": "00085A",
+     "n": 26951
+    },
+    {
+     "rgb": "00217B",
+     "n": 21044
+    },
+    {
+     "rgb": "000863",
+     "n": 16001
+    },
+    {
+     "rgb": "002984",
+     "n": 10933
+    },
+    {
+     "rgb": "000052",
+     "n": 9417
+    },
+    {
+     "rgb": "002173",
+     "n": 9173
+    },
+    {
+     "rgb": "00005A",
+     "n": 7840
+    }
+   ]
+  },
+  "cpanel\\Backgrounds\\PanelBack.bmp": {
+   "bytes": 25122,
+   "sha256": "b96367fd6cc5f7b6feb6866fea4e469e9d6671cdac743a957185448b714a8aff",
+   "pixels": 80400,
+   "distinct": 85,
+   "top": [
+    {
+     "rgb": "000052",
+     "n": 45860
+    },
+    {
+     "rgb": "181863",
+     "n": 2038
+    },
+    {
+     "rgb": "636394",
+     "n": 1967
+    },
+    {
+     "rgb": "10105A",
+     "n": 1791
+    },
+    {
+     "rgb": "29296B",
+     "n": 1778
+    },
+    {
+     "rgb": "4A4A84",
+     "n": 1737
+    },
+    {
+     "rgb": "313173",
+     "n": 1731
+    },
+    {
+     "rgb": "42427B",
+     "n": 1726
+    },
+    {
+     "rgb": "080852",
+     "n": 1644
+    },
+    {
+     "rgb": "00004A",
+     "n": 1625
+    },
+    {
+     "rgb": "73739C",
+     "n": 1506
+    },
+    {
+     "rgb": "000029",
+     "n": 1506
+    }
+   ]
+  },
+  "cpanel\\Buttons\\JobFriendSmiley.bmp": {
+   "bytes": 1554,
+   "sha256": "e2a995c8c895e51fe7b4896a559f579c796e737cc773fd435df2f1c0b212e4b7",
+   "pixels": 440,
+   "distinct": 135,
+   "top": [
+    {
+     "rgb": "FF00FF",
+     "n": 92
+    },
+    {
+     "rgb": "00FFFF",
+     "n": 32
+    },
+    {
+     "rgb": "E6E6E6",
+     "n": 16
+    },
+    {
+     "rgb": "FFFFFF",
+     "n": 16
+    },
+    {
+     "rgb": "000014",
+     "n": 12
+    },
+    {
+     "rgb": "00000F",
+     "n": 12
+    },
+    {
+     "rgb": "00003C",
+     "n": 12
+    },
+    {
+     "rgb": "000041",
+     "n": 8
+    },
+    {
+     "rgb": "009FBD",
+     "n": 6
+    },
+    {
+     "rgb": "00BFD2",
+     "n": 6
+    },
+    {
+     "rgb": "00AFAF",
+     "n": 6
+    },
+    {
+     "rgb": "ADADAE",
+     "n": 5
+    }
+   ]
+  },
+  "cpanel\\Buttons\\Mood.bmp": {
+   "bytes": 5846,
+   "sha256": "a75482e1930bfd4d5c256134441f32e45f3b45143d0b5116c1b9b7a6d7c74050",
+   "pixels": 4992,
+   "distinct": 256,
+   "top": [
+    {
+     "rgb": "212166",
+     "n": 499
+    },
+    {
+     "rgb": "191961",
+     "n": 465
+    },
+    {
+     "rgb": "1E1E64",
+     "n": 399
+    },
+    {
+     "rgb": "252569",
+     "n": 289
+    },
+    {
+     "rgb": "CCD3D8",
+     "n": 197
+    },
+    {
+     "rgb": "00FFFF",
+     "n": 197
+    },
+    {
+     "rgb": "FFFFFF",
+     "n": 197
+    },
+    {
+     "rgb": "7575A0",
+     "n": 188
+    },
+    {
+     "rgb": "1C1C63",
+     "n": 175
+    },
+    {
+     "rgb": "71719D",
+     "n": 148
+    },
+    {
+     "rgb": "000000",
+     "n": 99
+    },
+    {
+     "rgb": "232368",
+     "n": 99
+    }
+   ]
+  },
+  "cpanel\\Catalog\\BuySTDining.bmp": {
+   "bytes": 6408,
+   "sha256": "188a2f76a6359356f9e3c8b93d9c295797d1571235980a8b678d1285aab990b7",
+   "pixels": 5184,
+   "distinct": 253,
+   "top": [
+    {
+     "rgb": "6A6A99",
+     "n": 275
+    },
+    {
+     "rgb": "696998",
+     "n": 257
+    },
+    {
+     "rgb": "6E6E9B",
+     "n": 239
+    },
+    {
+     "rgb": "686897",
+     "n": 230
+    },
+    {
+     "rgb": "71719E",
+     "n": 214
+    },
+    {
+     "rgb": "72729E",
+     "n": 213
+    },
+    {
+     "rgb": "6B6B99",
+     "n": 209
+    },
+    {
+     "rgb": "676797",
+     "n": 198
+    },
+    {
+     "rgb": "70709D",
+     "n": 191
+    },
+    {
+     "rgb": "666696",
+     "n": 186
+    },
+    {
+     "rgb": "6D6D9B",
+     "n": 176
+    },
+    {
+     "rgb": "656595",
+     "n": 160
+    }
+   ]
+  }
+ },
+ "verified": [
+  {
+   "claim": "PanelBack navy anchors",
+   "rgb": "000029",
+   "member": "cpanel\\Backgrounds\\PanelBack.bmp",
+   "pixels": 1506
+  },
+  {
+   "claim": "PanelBack navy anchors",
+   "rgb": "000052",
+   "member": "cpanel\\Backgrounds\\PanelBack.bmp",
+   "pixels": 45860
+  },
+  {
+   "claim": "PanelBack navy anchors",
+   "rgb": "00004A",
+   "member": "cpanel\\Backgrounds\\PanelBack.bmp",
+   "pixels": 1625
+  },
+  {
+   "claim": "PanelBack navy anchors",
+   "rgb": "080852",
+   "member": "cpanel\\Backgrounds\\PanelBack.bmp",
+   "pixels": 1644
+  },
+  {
+   "claim": "PanelBack steel-blue highlights",
+   "rgb": "73739C",
+   "member": "cpanel\\Backgrounds\\PanelBack.bmp",
+   "pixels": 1506
+  },
+  {
+   "claim": "PanelBack steel-blue highlights",
+   "rgb": "636394",
+   "member": "cpanel\\Backgrounds\\PanelBack.bmp",
+   "pixels": 1967
+  },
+  {
+   "claim": "PanelBack steel-blue highlights",
+   "rgb": "5A5A8C",
+   "member": "cpanel\\Backgrounds\\PanelBack.bmp",
+   "pixels": 1503
+  },
+  {
+   "claim": "CreateACharBack anchors",
+   "rgb": "00186B",
+   "member": "cpanel\\Backgrounds\\CreateACharBack.BMP",
+   "pixels": 37255
+  },
+  {
+   "claim": "CreateACharBack anchors",
+   "rgb": "00106B",
+   "member": "cpanel\\Backgrounds\\CreateACharBack.BMP",
+   "pixels": 35793
+  },
+  {
+   "claim": "CreateACharBack anchors",
+   "rgb": "001063",
+   "member": "cpanel\\Backgrounds\\CreateACharBack.BMP",
+   "pixels": 37899
+  },
+  {
+   "claim": "Steel-blue backing tones (R67 said 'motive-bar backing (PersBkg)'; the re-derivation locates both colors ONLY in the catalog sheet \u2014 attribution corrected)",
+   "rgb": "72729E",
+   "member": "cpanel\\Catalog\\BuySTDining.bmp",
+   "pixels": 213
+  },
+  {
+   "claim": "Steel-blue backing tones (R67 said 'motive-bar backing (PersBkg)'; the re-derivation locates both colors ONLY in the catalog sheet \u2014 attribution corrected)",
+   "rgb": "7474A0",
+   "member": "cpanel\\Catalog\\BuySTDining.bmp",
+   "pixels": 142
+  },
+  {
+   "claim": "Cyan accent",
+   "rgb": "00FFFF",
+   "member": "cpanel\\Buttons\\Mood.bmp",
+   "pixels": 197
+  },
+  {
+   "claim": "Cyan accent",
+   "rgb": "00FFFF",
+   "member": "cpanel\\Buttons\\JobFriendSmiley.bmp",
+   "pixels": 32
+  }
+ ],
+ "misses": []
+}

@@ -1,0 +1,33 @@
+uipal byte-pin canon (make_uipal_canon.py; game-data/The Sims/UIGraphics/UIGraphics.far)
+
+cpanel\Backgrounds\CreateACharBack.BMP
+  bytes=312210 sha256=03b018df76cbc208b787029bf6bbac66a8d30699d6c0f66ae061a6b7a9999d8c pixels=480000 distinct=248
+  top: 000039 x119648, 001063 x37899, 00186B x37255, 00106B x35793, 001873 x31933, 00085A x26951, 00217B x21044, 000863 x16001
+cpanel\Backgrounds\PanelBack.bmp
+  bytes=25122 sha256=b96367fd6cc5f7b6feb6866fea4e469e9d6671cdac743a957185448b714a8aff pixels=80400 distinct=85
+  top: 000052 x45860, 181863 x2038, 636394 x1967, 10105A x1791, 29296B x1778, 4A4A84 x1737, 313173 x1731, 42427B x1726
+cpanel\Buttons\JobFriendSmiley.bmp
+  bytes=1554 sha256=e2a995c8c895e51fe7b4896a559f579c796e737cc773fd435df2f1c0b212e4b7 pixels=440 distinct=135
+  top: FF00FF x92, 00FFFF x32, E6E6E6 x16, FFFFFF x16, 000014 x12, 00000F x12, 00003C x12, 000041 x8
+cpanel\Buttons\Mood.bmp
+  bytes=5846 sha256=a75482e1930bfd4d5c256134441f32e45f3b45143d0b5116c1b9b7a6d7c74050 pixels=4992 distinct=256
+  top: 212166 x499, 191961 x465, 1E1E64 x399, 252569 x289, CCD3D8 x197, 00FFFF x197, FFFFFF x197, 7575A0 x188
+cpanel\Catalog\BuySTDining.bmp
+  bytes=6408 sha256=188a2f76a6359356f9e3c8b93d9c295797d1571235980a8b678d1285aab990b7 pixels=5184 distinct=253
+  top: 6A6A99 x275, 696998 x257, 6E6E9B x239, 686897 x230, 71719E x214, 72729E x213, 6B6B99 x209, 676797 x198
+
+VERIFIED anchors (>= 16 px):
+  PanelBack navy anchors             000029 in cpanel\Backgrounds\PanelBack.bmp x1506
+  PanelBack navy anchors             000052 in cpanel\Backgrounds\PanelBack.bmp x45860
+  PanelBack navy anchors             00004A in cpanel\Backgrounds\PanelBack.bmp x1625
+  PanelBack navy anchors             080852 in cpanel\Backgrounds\PanelBack.bmp x1644
+  PanelBack steel-blue highlights    73739C in cpanel\Backgrounds\PanelBack.bmp x1506
+  PanelBack steel-blue highlights    636394 in cpanel\Backgrounds\PanelBack.bmp x1967
+  PanelBack steel-blue highlights    5A5A8C in cpanel\Backgrounds\PanelBack.bmp x1503
+  CreateACharBack anchors            00186B in cpanel\Backgrounds\CreateACharBack.BMP x37255
+  CreateACharBack anchors            00106B in cpanel\Backgrounds\CreateACharBack.BMP x35793
+  CreateACharBack anchors            001063 in cpanel\Backgrounds\CreateACharBack.BMP x37899
+  Steel-blue backing tones (R67 said 'motive-bar backing (PersBkg)'; the re-derivation locates both colors ONLY in the catalog sheet — attribution corrected) 72729E in cpanel\Catalog\BuySTDining.bmp x213
+  Steel-blue backing tones (R67 said 'motive-bar backing (PersBkg)'; the re-derivation locates both colors ONLY in the catalog sheet — attribution corrected) 7474A0 in cpanel\Catalog\BuySTDining.bmp x142
+  Cyan accent                        00FFFF in cpanel\Buttons\Mood.bmp x197
+  Cyan accent                        00FFFF in cpanel\Buttons\JobFriendSmiley.bmp x32
