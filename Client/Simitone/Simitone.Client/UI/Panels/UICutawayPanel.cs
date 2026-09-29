@@ -1,3 +1,4 @@
+// Modern panel chrome hosting the DECODED cutaway/PIP behavior (UI-25, r240 contract); the panel's own layout values are port-authored disclosures.
 ﻿using FSO.Client;
 using FSO.Client.UI.Framework;
 using FSO.Common.Utils;

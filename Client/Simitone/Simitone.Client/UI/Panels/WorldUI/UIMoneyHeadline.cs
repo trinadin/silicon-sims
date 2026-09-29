@@ -1,3 +1,4 @@
+// Carried over from the FreeSO TSO client (TSO-era surface); no TS1 counterpart — port-authored values, not decoded.
 ﻿using FSO.SimAntics.Model;
 using System;
 using System.Collections.Generic;
