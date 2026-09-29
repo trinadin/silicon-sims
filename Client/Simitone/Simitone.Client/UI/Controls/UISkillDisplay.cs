@@ -66,7 +66,7 @@ namespace Simitone.Client.UI.Controls
                 float alpha;
                 if (i < Value) { color = Color.White; alpha = 1f; }
                 else if (i < Needed) { color = Color.White; alpha = 0.45f; }
-                else { color = new Color(30, 34, 66); alpha = 1f; }
+                else { color = new Color(30, 34, 66); alpha = 1f; } // DISCLOSED: empty-pip silhouette tint, port-derived against SkillsHilite.bmp (not engine-decoded)
                 if (HiliteTexture != null)
                     DrawLocalTexture(batch, HiliteTexture, null, new Microsoft.Xna.Framework.Vector2(i * 8, 0), Vector2.One, color * alpha);
                 else

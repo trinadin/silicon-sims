@@ -213,6 +213,9 @@ namespace Simitone.Client.UI.Panels
                 // cell face (navy plate, ThumbTemplate frame-0 family colors).
                 DrawLocalTexture(batch, FSO.Common.Utils.TextureGenerator.GetPxWhite(GameFacade.GraphicsDevice), null,
                     Vector2.Zero, new Vector2(45, 45), new Color(0x00, 0x08, 0x52, 0xFF));
+                // steel-blue face: PORT-AUTHORED fallback hue (only the navy
+                // plate is ThumbTemplate frame-0 anchored; the face hue is
+                // undecoded private-surface chrome)
                 DrawLocalTexture(batch, FSO.Common.Utils.TextureGenerator.GetPxWhite(GameFacade.GraphicsDevice), null,
                     new Vector2(3, 3), new Vector2(39, 39), new Color(0x6b, 0xa5, 0xbd, 0xFF));
             }

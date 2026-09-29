@@ -1455,6 +1455,9 @@ namespace Simitone.Client.UI.Panels
         // R93: when set, the panel mounts the ENGINE nessie cheat layer
         // (Community/UL) — dormant until the cheat bar submits "nessie".
         public NeighborhoodImageAnim Nessie;
+        // DISCLOSED port default frame duration for the generic animation
+        // layers; the ENGINE-decoded families pass their own timing (the
+        // 160ms law, R89/R92) and never read this default.
         public int FrameDuration = 15;
         public bool Pulsate = true;
         public string Music = "bkground_nhood1";
@@ -1489,7 +1492,10 @@ namespace Simitone.Client.UI.Panels
         private bool Hovered;
         private THMB Offsets;
         public float AlphaTime { get; set; }
-        public const float NativeHoverRampSeconds = 0.300f;
+        // DISCLOSED port hover-fade duration — no engine decode backs it
+        // (cWinLotBtn's hover law decodes COLORS at 0x25d6b4, r143; the ramp
+        // timing is unrecovered). Formerly misnamed "Native".
+        public const float HoverRampSeconds = 0.300f;
         // cWinLotBtn's zero-delay shared cWinLotPopup hooks.
         public Action<int, UINeighborhoodHouseButton, UpdateState> HoverNotify;
         public Action HoverLeave;
@@ -1573,7 +1579,7 @@ namespace Simitone.Client.UI.Panels
         public override void Update(UpdateState state)
         {
             base.Update(state);
-            float step = (float)(state.Time.ElapsedGameTime.TotalSeconds / NativeHoverRampSeconds);
+            float step = (float)(state.Time.ElapsedGameTime.TotalSeconds / HoverRampSeconds);
             if (Hovered) AlphaTime = Math.Min(1f, AlphaTime + step);
             else AlphaTime = Math.Max(0f, AlphaTime - step);
         }

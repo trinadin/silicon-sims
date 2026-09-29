@@ -332,7 +332,11 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
     {
         public string Text = "";
         public OriginalGlyphFont Font;
-        public Color Color = new Color(0xFF, 0xFF, 0xF0, 0xFF);
+        // Ink = the decoded ordinary original-text ink (r240 slot12 / R175:
+        // RGB 195,205,205). The report card's own engine ink slot was not
+        // separately decoded; the ordinary-text law is the applied value
+        // (disclosed — was the port-invented #FFFFF0).
+        public Color Color = new Color(0xC3, 0xCD, 0xCD, 0xFF);
         public Action Activated;
         // UI-27: visible phase of the native failing-grade flash, driven by
         // UIJobSubpanel.GradeFlashVisible. Separate from Visible, which

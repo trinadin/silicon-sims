@@ -177,10 +177,12 @@ namespace Simitone.Client.UI.Panels
             if (Thumb3D != null && Visible) Invalidate();
             base.Update(state);
             // the paragraph builds plain-colored lines; keep them fading with the
-            // panel opacity like every other label
+            // panel opacity like every other label. The tint tracks the
+            // paragraph's own ink (the decoded #C3CDCD) instead of a hardcoded
+            // copy of the retired #FFFFF0 default.
             if (Description != null && Opacity < 1)
             {
-                Description.TintLines(new Color(0xFF, 0xFF, 0xF0) * Opacity);
+                Description.TintLines(Description.TextColor * Opacity);
             }
         }
 

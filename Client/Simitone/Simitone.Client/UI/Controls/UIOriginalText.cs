@@ -370,7 +370,13 @@ namespace Simitone.Client.UI.Controls
 
         public string Text;
         public OriginalGlyphFont Font;
-        public Color Color = new Color(0xFF, 0xFF, 0xF0, 0xFF);
+        // The ordinary original-text ink: InitSimsColors 0x25d680..6a0 builds
+        // RGB 195,205,205 and the font-table init loop applies it to slot12
+        // (r240 caption-skeptical-review; R175 system-slot decode agrees).
+        // UIOriginalLotPopup.NativeTextColor already used the recovered ink;
+        // this default completes the same decode for the shared classes
+        // (was the port-invented #FFFFF0 the r240 decode refuted).
+        public Color Color = new Color(0xC3, 0xCD, 0xCD, 0xFF);
         private Vector2 _size;
 
         // UIElement's default Size setter is intentionally a no-op. Original
@@ -435,7 +441,9 @@ namespace Simitone.Client.UI.Controls
         public float MaxWidth = 300f;
         public bool RightAlign = false;
         public bool BottomAnchor = false;
-        public Color TextColor = new Color(0xFF, 0xFF, 0xF0, 0xFF);
+        // Decoded ordinary ink (r240 slot12 / R175: RGB 195,205,205) — was the
+        // port-invented #FFFFF0 the r240 decode explicitly refuted.
+        public Color TextColor = new Color(0xC3, 0xCD, 0xCD, 0xFF);
 
         private string LastKey;
 

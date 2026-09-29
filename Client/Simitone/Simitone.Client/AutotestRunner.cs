@@ -16170,7 +16170,11 @@ namespace Simitone.Client
                         == Simitone.Client.UI.Panels.UIOriginalLotPopup.NativeTextColor * 0.5f);
                 popupProbe.SetRampOpacity(0f);
                 int transparentPopupPixels = RenderElementAlphaPixels(popupProbe);
-                bool popupRamp = Simitone.Client.UI.Panels.UINeighborhoodHouseButton.NativeHoverRampSeconds == 0.300f
+                // HoverRampSeconds (formerly "Native") is a DISCLOSED port
+                // value — the engine decode covers hover colors, not the ramp
+                // timing; this pin guards the disclosed choice against silent
+                // drift, it does not certify a native law.
+                bool popupRamp = Simitone.Client.UI.Panels.UINeighborhoodHouseButton.HoverRampSeconds == 0.300f
                     && opaquePopupPixels > 0 && halfRamp && transparentPopupPixels == 0;
                 popupProbe.SetRampOpacity(1f);
                 string popupGeomInfo = " tiler=" + (popupProbe.Tiler == null ? "null" : popupProbe.Tiler.Width + "x" + popupProbe.Tiler.Height)
@@ -16504,7 +16508,11 @@ namespace Simitone.Client
                         var font8 = Simitone.Client.UI.Controls.OriginalGlyphFont.LoadByIndex(8, gd);
                         var font11 = Simitone.Client.UI.Controls.OriginalGlyphFont.LoadByIndex(11, gd);
                         var font12 = Simitone.Client.UI.Controls.OriginalGlyphFont.LoadByIndex(12, gd);
-                        var titleColor = new Color(0xFF, 0xFF, 0xF0, 0xFF);
+                        // r240: the 23-slot font-table init loop (0x25d9cc..da78)
+                        // applies the ordinary ink (RGB 195,205,205) to every
+                        // slot via font virtual+28 — titles included. The old
+                        // #FFFFF0 expectation here pinned the refuted default.
+                        var titleColor = new Color(0xC3, 0xCD, 0xCD, 0xFF);
                         var captionColor = new Color(0xC3, 0xCD, 0xCD, 0xFF);
 
                         // Force an adult-human pass first. This mounts the human

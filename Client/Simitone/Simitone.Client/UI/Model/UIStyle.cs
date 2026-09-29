@@ -41,6 +41,10 @@ namespace Simitone.Client.UI.Model
         public Color GreenBtnTxt = new Color(0, 63, 16);
         public Color BtnTxtShadow = Color.White * 0.5f;
 
+        // DISCLOSED port colors: the ±money floater is a port addition (the
+        // original corpus has no matching floater composition — see the
+        // UIMoneyPanel disclosure), so these hues are port-authored, not
+        // decoded.
         public Color PosMoney = new Color(0, 255, 128, 255);
         public Color NegMoney = new Color(255, 128, 0, 255);
 
