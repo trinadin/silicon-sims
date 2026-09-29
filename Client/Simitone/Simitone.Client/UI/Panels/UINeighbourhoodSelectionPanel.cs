@@ -1455,9 +1455,12 @@ namespace Simitone.Client.UI.Panels
         // R93: when set, the panel mounts the ENGINE nessie cheat layer
         // (Community/UL) — dormant until the cheat bar submits "nessie".
         public NeighborhoodImageAnim Nessie;
-        // DISCLOSED port default frame duration for the generic animation
-        // layers; the ENGINE-decoded families pass their own timing (the
-        // 160ms law, R89/R92) and never read this default.
+        // DISCLOSED port default frame cadence for the animation layers —
+        // port-authored, not engine-decoded. Only the discrete Old Town waves
+        // family bypasses it (its decoded CounterIntervalMilliseconds=160,
+        // r173); the car-lane/cloud/balloon/nessie layers consume this value
+        // as their frame step. (Review note 1, indep-review-ui33-20260929:
+        // the original "never read this default" wording was overbroad.)
         public int FrameDuration = 15;
         public bool Pulsate = true;
         public string Music = "bkground_nhood1";
