@@ -98,6 +98,14 @@ re-audited before reuse (runtime-confirmed laws stand). Authoritative notes:
 §0, [`tools/iff-dump/cas02-casframe/frame-law.md`](tools/iff-dump/cas02-casframe/frame-law.md)
 §0, and [`tools/iff-dump/r258-pef-revisit/`](tools/iff-dump/r258-pef-revisit/)
 (e.g. r258-initclouds-subfic.txt for the missing subfic).
+**SWEEP COMPLETE (UI-34, 2026-09-29):** the blanket re-audit this erratum
+promised is now DONE —
+[`coordination/evidence/UI-34/RESULT.md`](../coordination/evidence/UI-34/RESULT.md)
+classifies every conclusion in all 26 citing docs (the ~20 rounds with inline
+PARITY corrections + the three authoritative notes + the seven remaining docs
+conclusion-by-conclusion): every branch-sense-dependent item is
+runtime-gate-pinned, corrected post-fix, or immune arithmetic; UNCOVERED =
+empty (two benign unused doc-level residues named there).
 
 ## R248 FAM import consumer
 
