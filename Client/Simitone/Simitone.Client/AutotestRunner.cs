@@ -3204,12 +3204,23 @@ namespace Simitone.Client
         private static short[] _unlmg5Recipe;
 
         // ---- EXP-07 duels leg ('unl-magic6', opt-in): the MagicArena duel
-        // chain. Verified law (verify-v3-glm): init = 4 stones per duelist —
-        // 4110 'Set Spells' sets flags 1-5 on attr[7] AND attr[8], then
-        // clears EXACTLY ONE per side; round winner = 4121 motive[3] of the
-        // persons on the slot tiles; outcome codes 97..101 -> arena attr[5];
-        // Currency token (0x99E81BEC) count delta = the reward assert (never
-        // the budget: pd[1] gets the raw -(amount+20000) word).
+        // chain. Verified law (verify-v3-glm + this leg's arena decode): init
+        // = 4 stones per duelist — 4110 'Set Spells' sets flags 1-5 on
+        // attr[7] AND attr[8], then clears EXACTLY ONE per side; the native
+        // ENTRY is the 'Duel' row (4105) pushed on the challenger with
+        // Param[0]=challengee — 4105 runs 4110 itself, records attr[17]=
+        // challengee, routes itself (goto_rel_pos + snap onto the Challenger
+        // marker slot), sets attr[5]=1 and pushes 'Defend' (4106) on the
+        // challengee (its attr[17] gate); rounds 4107/4108 alternate on
+        // attr[5] 2/3 with attr[6] handshakes + notify wakeups; the
+        // stones-run-out endgame (4105 @47-@64) sets attr[5]=97..101 and pays
+        // the Currency token (0x99E81BEC, sized BCON4097[0..2] x defender
+        // pd[18]/100). Every group tile's attr[0]/attr[3] point to the duel
+        // state tile (guid 0xD19F6584 — attr[1]=Challenger marker 0xF62846FA,
+        // attr[2]=Defender marker 0x3C9C028F; 4102 init law). 4121/'Cast'/
+        // timer trees read the markers' ROUTING SLOT 0 occupants
+        // (slot[stack][0]) — the slot-sitter law. Never assert the budget:
+        // pd[1] gets the raw -(amount+20000) word.
         private static int _unlmg6State, _unlmg6Settle, _unlmg6Frame;
         private static VMAvatar _unlmg6A, _unlmg6B;
         private static VMEntity _unlmg6Arena;
@@ -3218,6 +3229,76 @@ namespace Simitone.Client
         private static int _unlmg6PushF = -1;
 
         private static VMEntity _unlmg6DuelTile;
+        private static VMEntity _unlmg6ChallMarker, _unlmg6DefMarker;
+        private static VMQueuedAction _unlmg6Act;
+        private static bool _unlmg6Started;
+        private static int _unlmg6LastPushF, _unlmg6Pushes;
+        private static int _unlmg6DuelRow = -1;
+        private static bool _unlmg6ExitLogged;
+        private static bool _unlmg6ObsArmed;
+        private static bool _unlmg6WasInQ;
+        private static bool _unlmg6DeathLogged;
+
+        private static void Unlmg6ArmObservers()
+        {
+            // run-8 law: the engine's static queue events name the exact
+            // removal site/reason for our uid (AttemptPush check-drop,
+            // dead-callee, cancel, interrupt, end-interaction = ran+finished).
+            if (_unlmg6ObsArmed) return;
+            _unlmg6ObsArmed = true;
+            FSO.SimAntics.Engine.VMThread.QueueDrop += (ent, act) =>
+            {
+                try
+                {
+                    if (act != null && _unlmg6Act != null && act.UID == _unlmg6Act.UID)
+                        Log("AUTOTEST unl-magic6 QDROP site=AttemptPush-check uid=" + act.UID + " f=" + _unlmg6Frame
+                            + " (CheckAction returned null at queue pickup)");
+                }
+                catch { }
+            };
+            FSO.SimAntics.Engine.VMThread.QueueRemoveAny += (reason, ent, act) =>
+            {
+                try
+                {
+                    if (act != null && _unlmg6Act != null && act.UID == _unlmg6Act.UID)
+                    {
+                        var t8 = Unlmg6Tile();
+                        Log("AUTOTEST unl-magic6 QREMOVE reason=" + reason + " uid=" + act.UID + " f=" + _unlmg6Frame
+                            + " started=" + _unlmg6Started
+                            + " attr9=" + (t8?.GetAttribute(9) ?? -1) + " attr17=" + (t8?.GetAttribute(17) ?? -1)
+                            + (reason == "end-interaction"
+                                ? " (the tree RAN and finished — early-exit gate inside 4105 if attr9=0)"
+                                : ""));
+                    }
+                }
+                catch { }
+            };
+        }
+
+        private static bool Unlmg6InFlight()
+        {
+            // the magic4 run-2 law: a pushed action lives in Thread.Queue for a
+            // while, may be dropped by scheduler/free-will competition, and is
+            // in-flight while present in the stack (by routine), the queue, or
+            // as the ActiveAction — by UID.
+            try
+            {
+                if (_unlmg6Act == null) return false;
+                var th = _unlmg6A?.Thread;
+                if (th?.Stack != null)
+                    foreach (var fr in th.Stack)
+                    {
+                        try { if (fr.Routine == _unlmg6Act.ActionRoutine) { _unlmg6Started = true; return true; } }
+                        catch { }
+                    }
+                try { if (th?.Queue != null && th.Queue.Any(q => q != null && q.UID == _unlmg6Act.UID)) return true; }
+                catch { }
+                try { if (th?.ActiveAction != null && th.ActiveAction.UID == _unlmg6Act.UID) return true; }
+                catch { }
+                return false;
+            }
+            catch { return false; }
+        }
 
         private static VMEntity Unlmg6Tile()
         {
@@ -3247,17 +3328,58 @@ namespace Simitone.Client
                 {
                     if (++_unlmg6Settle < 90) return;
                     _unlmg6Settle = 0;
-                    Log("AUTOTEST unl-magic6 DUEL-MODE (EXP-07 T2 duels: place MagicArena; 4110 init law = 4 stones/side; push row 3; outcome 97..101 + currency)");
+                    Log("AUTOTEST unl-magic6 DUEL-MODE run-6 (EXP-07 T2 duels: native entry — push arena 'Duel' 4105 on the challenger, Param[0]=challengee; full chain to attr[5] 97..101 + Currency reward)");
+                    Unlmg6ArmObservers();
                     var avs = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
                         .Where(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD).ToList();
-                    _unlmg6A = avs.FirstOrDefault();
-                    _unlmg6B = avs.Skip(1).FirstOrDefault();
+                    // 4104's native gate scans pd[58] (PersonsAge) > 17 — prefer
+                    // two adults so the duel keeps native semantics (the magic4
+                    // age-census law; child households exist on this lot).
+                    var adults = avs.Where(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18).ToList();
+                    if (adults.Count >= 2) { _unlmg6A = adults[0]; _unlmg6B = adults[1]; }
+                    else { _unlmg6A = avs.FirstOrDefault(); _unlmg6B = avs.Skip(1).FirstOrDefault(); }
+                    Log("AUTOTEST unl-magic6 AVATAR-AGES [" + string.Join(", ",
+                        avs.Select(a => a.ObjectID + ":" + a.GetPersonData(VMPersonDataVariable.PersonsAge))) + "]"
+                        + (adults.Count >= 2 ? " (two adults selected)" : " (adult-pair unavailable, first two used)"));
                     if (_unlmg6A == null || _unlmg6B == null)
                     {
                         Log("AUTOTEST unl-magic6 verdict duel-needs-two-sims: avatars on lot=" + avs.Count
                             + " (challenger + challengee required; spawn/NPC-adoption is a named follow-up)");
                         Fail("unl-magic6"); _unlmg6State = 99; return;
                     }
+                    // run-11: ITRACE the duel trees (band 4096-4113 admits
+                    // 4105/4106/4107/4108) — the Defender NRE's entry point needs
+                    // instruction-level attribution; A/B unbudgeted so the lot
+                    // swarm cannot eat the trace budget first.
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = (System.Action<string>)(s =>
+                    {
+                        if (string.IsNullOrEmpty(s) || _unlmg6A == null || _unlmg6B == null) return;
+                        if (s.Contains("ent=" + _unlmg6A.ObjectID + " ") || s.Contains("ent=" + _unlmg6B.ObjectID + " "))
+                        {
+                            // run-12: for the duel trees also dump the live top
+                            // frame's stack-object state — the Defender NRE needs
+                            // its nulling point pinned (entry vs @0's set vs later)
+                            if (s.Contains(" 4105@") || s.Contains(" 4106@") || s.Contains(" 4107@") || s.Contains(" 4108@"))
+                            {
+                                try
+                                {
+                                    var th = s.Contains("ent=" + _unlmg6B.ObjectID + " ") ? _unlmg6B.Thread : _unlmg6A.Thread;
+                                    var fr = th?.Stack?.LastOrDefault();
+                                    if (fr != null)
+                                        s = s + " so=" + (fr.StackObject?.ObjectID.ToString() ?? "NULL")
+                                            + "/sid=" + fr.StackObjectID
+                                            + "/call=" + (fr.Caller?.ObjectID.ToString() ?? "NULL")
+                                            + "/cal=" + (fr.Callee?.ObjectID.ToString() ?? "NULL");
+                                }
+                                catch { }
+                            }
+                            Log("AUTOTEST unl-magic6 " + s);
+                        }
+                    });
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = true;
+                    FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 240;
+                    FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Add(_unlmg6A.ObjectID);
+                    FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Add(_unlmg6B.ObjectID);
                     // place the arena (20-tile master; the disclosed height-bit
                     // lever, the magic4/5 law)
                     var cands = new System.Collections.Generic.List<short[]>();
@@ -3302,6 +3424,58 @@ namespace Simitone.Client
                         Log("AUTOTEST unl-magic6 verdict arena-unplaceable: no candidate accepted the 20-tile master");
                         Fail("unl-magic6"); _unlmg6State = 99; return;
                     }
+                    // the routing-slot markers (4102 init law: attr[1]=Challenger
+                    // marker, attr[2]=Defender marker; 4121/4127/4114 read their
+                    // SLOT 0 occupants)
+                    _unlmg6ChallMarker = _unlmg6Arena.MultitileGroup.Objects
+                        .FirstOrDefault(o => o.Object?.OBJ?.GUID == 0xF62846FAu);
+                    _unlmg6DefMarker = _unlmg6Arena.MultitileGroup.Objects
+                        .FirstOrDefault(o => o.Object?.OBJ?.GUID == 0x3C9C028Fu);
+                    Log("AUTOTEST unl-magic6 MARKERS challenger=" + (_unlmg6ChallMarker == null ? "MISSING"
+                        : "obj" + _unlmg6ChallMarker.ObjectID + "/guid=0x" + _unlmg6ChallMarker.Object.OBJ.GUID.ToString("X8"))
+                        + " defender=" + (_unlmg6DefMarker == null ? "MISSING"
+                        : "obj" + _unlmg6DefMarker.ObjectID + "/guid=0x" + _unlmg6DefMarker.Object.OBJ.GUID.ToString("X8")));
+                    Log("AUTOTEST unl-magic6 ARENA-STATE firstDead=" + _unlmg6Arena.Dead
+                        + " baseOid=" + (_unlmg6Arena.MultitileGroup?.BaseObject?.ObjectID.ToString() ?? "?")
+                        + " baseDead=" + (_unlmg6Arena.MultitileGroup?.BaseObject?.Dead.ToString() ?? "?"));
+                    // run-10 law: the tiles' 4102 'init' SET-TO-NEXT pointer scans
+                    // (attr[0]/[3]=duel tile, [1]=Challenger marker, [2]=Defender
+                    // marker) run at CREATE time (OOW) — before the marker tiles
+                    // exist — so they can leave attrs unset; 4106 then NREs at
+                    // attr[stack] reads (run-9: SimAnticsExc VMMemory.cs:46,
+                    // Defender@48, StackObject null) and 4105's route steps no-op
+                    // (attr[5] never set). Native buy-flow runs init at PLACEMENT
+                    // (all tiles exist) — re-run 4102 per tile now, disclosed.
+                    Action<VMEntity, string> dumpPtr = (o, tag) =>
+                    {
+                        try
+                        {
+                            Log("AUTOTEST unl-magic6 PTR-" + tag + " obj" + o.ObjectID + " guid=0x"
+                                + (o.Object?.OBJ?.GUID.ToString("X8") ?? "?")
+                                + " a0=" + o.GetAttribute(0) + " a1=" + o.GetAttribute(1)
+                                + " a2=" + o.GetAttribute(2) + " a3=" + o.GetAttribute(3) + " a4=" + o.GetAttribute(4));
+                        }
+                        catch (Exception dex) { Log("AUTOTEST unl-magic6 PTR-" + tag + " EXC " + dex.GetType().Name); }
+                    };
+                    foreach (var o in _unlmg6Arena.MultitileGroup.Objects) dumpPtr(o, "BEFORE");
+                    var rtInit = _unlmg6Arena.Object.Resource.GetRoutine((ushort)4102) as VMRoutine;
+                    if (rtInit != null)
+                    {
+                        int initOk = 0;
+                        foreach (var o in _unlmg6Arena.MultitileGroup.Objects)
+                        {
+                            try
+                            {
+                                var rinit = _unlmg6A.Thread.RunInMyStack(rtInit, _unlmg6Arena.Object, new short[4], o);
+                                if (rinit) initOk++;
+                            }
+                            catch (Exception iex) { Log("AUTOTEST unl-magic6 INIT-RERUN EXC obj" + o.ObjectID + " " + iex.GetType().Name); }
+                        }
+                        Log("AUTOTEST unl-magic6 INIT-RERUN 4102 x" + _unlmg6Arena.MultitileGroup.Objects.Count
+                            + " ok=" + initOk + " (native placement-time init semantics)");
+                        foreach (var o in _unlmg6Arena.MultitileGroup.Objects) dumpPtr(o, "AFTER");
+                    }
+                    else Log("AUTOTEST unl-magic6 INIT-RERUN missing 4102 on the arena resource");
                     // PHASE A: the init law, synchronous (the hd4-proven
                     // RunInMyStack idiom) — 4110 'Set Spells' with the arena
                     // as CodeOwner and the challenger as stack object.
@@ -3365,23 +3539,62 @@ namespace Simitone.Client
                         _unlmg6CurB = FSO.Content.Content.Get().Neighborhood.GetInventoryByNID(
                             _unlmg6B.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.NeighborId))?
                             .Where(x => x.GUID == 0x99E81BECu).Sum(x => (int)x.Count) ?? 0;
-                        // PHASE B: the challengee push (arena TTAB row 3, Param[0]=challengee)
+                        // PHASE B (run-6 law): the NATIVE entry — push the arena's
+                        // 'Duel' row (action 4105 'Interaction - Duel') on the
+                        // CHALLENGER with Param[0]=challengee. 4105 then runs the
+                        // whole chain itself: re-init 4110, attr[17]=challengee,
+                        // self-routing (goto_rel_pos + snap onto the Challenger
+                        // marker slot), attr[5]=1, and the native push of 'Defend'
+                        // (4106) on the challengee. Run 5's row-3-only push idled
+                        // because 4106's first gate is attr[17]==MyObj[11] — only
+                        // 4105 sets attr[17].
+                        var tt6 = _unlmg6Arena.Object.Resource?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                        var ttas6 = _unlmg6Arena.Object.Resource?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                        int duelRow = -1;
+                        if (tt6 != null)
+                        {
+                            foreach (var r in tt6.Interactions)
+                            {
+                                Log("AUTOTEST unl-magic6 ARENA-ROW ttaidx=" + r.TTAIndex + " action=" + r.ActionFunction
+                                    + " test=" + r.TestFunction + " name='" + (ttas6?.GetString((int)r.TTAIndex) ?? "?") + "'");
+                                if (r.ActionFunction == 4105 && duelRow < 0) duelRow = (int)r.TTAIndex;
+                            }
+                        }
+                        if (duelRow < 0)
+                        {
+                            Log("AUTOTEST unl-magic6 verdict duel-row-missing: arena TTAB carries no action=4105 row"
+                                + (tt6 == null ? " (TTAB 129 unresolved)" : " (rows=" + tt6.Interactions.Length + ")"));
+                            Fail("unl-magic6"); _unlmg6State = 99; return;
+                        }
                         VMQueuedAction p6 = null;
-                        try { p6 = _unlmg6Arena.GetAction(3, _unlmg6A, _vm.Context, false); } catch { }
+                        try { p6 = _unlmg6Arena.GetAction((short)duelRow, _unlmg6A, _vm.Context, false); } catch { }
                         if (p6 == null)
                         {
-                            Log("AUTOTEST unl-magic6 verdict duel-row-unavailable: arena TTAB row 3 GetAction null (init law"
-                                + " already banked; the push leg needs the row resolution decode)");
-                            Pass("unl-magic6"); _unlmg6State = 99; Finish(); return;
+                            Log("AUTOTEST unl-magic6 verdict duel-row-unavailable: TTAB census found 'Duel' at ttaidx="
+                                + duelRow + " but GetAction returned null");
+                            Fail("unl-magic6"); _unlmg6State = 99; return;
                         }
                         p6.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
                         p6.CheckRoutine = null;
+                        // run-9 law: RunImmediately bypasses AttemptPush's
+                        // priority/pickup path (TryRunImmediate injects it at the
+                        // next QueueDirty processing; a failing check names itself
+                        // via the tryrunimmediately-checknull QREMOVE event)
+                        p6.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.RunImmediately;
                         p6.Args = new short[] { (short)_unlmg6B.ObjectID, 0, 0, 0 };
+                        // pre-push stone baseline (4105 re-inits 4110 itself, so
+                        // the PHASE-A readings are informational; this is the
+                        // consumption reference for the endgame assert)
+                        var preT = Unlmg6Tile();
+                        _unlmg6A7 = preT?.GetAttribute(7) ?? _unlmg6Arena.GetAttribute(7);
+                        _unlmg6A8 = preT?.GetAttribute(8) ?? _unlmg6Arena.GetAttribute(8);
+                        _unlmg6Act = p6; _unlmg6Started = false;
+                        _unlmg6LastPushF = _unlmg6Frame; _unlmg6Pushes = 1; _unlmg6DuelRow = duelRow;
                         _unlmg6A.Thread.EnqueueAction(p6);
                         _unlmg6PushF = _unlmg6Frame;
-                        Log("AUTOTEST unl-magic6 pushed arena row 3 '" + p6.Name + "' uid=" + p6.UID
+                        Log("AUTOTEST unl-magic6 pushed arena 'Duel' row " + duelRow + " '" + p6.Name + "' uid=" + p6.UID
                             + " challenger=obj" + _unlmg6A.ObjectID + " challengee(obj param0)=" + _unlmg6B.ObjectID
-                            + " curA=" + _unlmg6CurA + " curB=" + _unlmg6CurB + " — outcome soak open (1800f)");
+                            + " curA=" + _unlmg6CurA + " curB=" + _unlmg6CurB + " — native-chain soak open (3600f)");
                         _unlmg6State = 1;
                         return;
                     }
@@ -3394,13 +3607,126 @@ namespace Simitone.Client
                 {
                     var tileS = Unlmg6Tile() ?? _unlmg6Arena;
                     var o5 = tileS.GetAttribute(5);
+                    var o6 = tileS.GetAttribute(6);
+                    var o9 = tileS.GetAttribute(9);
+                    var o13 = tileS.GetAttribute(13);
+                    var o17 = tileS.GetAttribute(17);
                     var a7 = tileS.GetAttribute(7);
                     var a8 = tileS.GetAttribute(8);
-                    if (_unlmg6Frame % 300 == 0)
+                    // the slot-sitter family (4121/4127/4114 read law): who
+                    // occupies each marker's ROUTING SLOT 0 right now
+                    var slotA = _unlmg6ChallMarker?.GetSlot(0);
+                    var slotB = _unlmg6DefMarker?.GetSlot(0);
+                    var inFl = Unlmg6InFlight();
+                    // run-14: the duel-tile LIVENESS law — 4096 'main' self-removes
+                    // the arena unless the lot is a MAGIC lot (residential ->
+                    // remove_object_instance); track Dead + map membership to pin
+                    // the removal tick live (the null-StackObject NRE is the
+                    // downstream symptom: GetObjectById(deadId) = null)
+                    var livenessT = Unlmg6Tile();
+                    if (livenessT != null && _unlmg6Frame % 60 == 0)
+                    {
+                        bool inMap = false;
+                        try { inMap = (_vm.GetObjectById((short)livenessT.ObjectID) != null); } catch { }
+                        if (!inMap || livenessT.Dead)
+                        {
+                            if (!_unlmg6DeathLogged)
+                            {
+                                _unlmg6DeathLogged = true;
+                                Log("AUTOTEST unl-magic6 TILE-DEAD-LAW-LIVE: duel tile obj" + livenessT.ObjectID
+                                    + " Dead=" + livenessT.Dead + " inObjectsById=" + inMap
+                                    + " at f=" + _unlmg6Frame + " (+push" + (_unlmg6Frame - _unlmg6PushF) + ")"
+                                    + " — MagicArena 4096 'main' self-removes on non-MAGIC lots (global 321 residential ->"
+                                    + " remove_object_instance; 492 magic keeps it): the duel row natively exists ONLY on"
+                                    + " Magic Town lots; the residential-lot NRE (Defender@48 null StackObject) is the"
+                                    + " downstream symptom, not a port defect");
+                            }
+                        }
+                    }
+                    // run-9: per-tick queue watch — catch the EXACT tick our uid
+                    // leaves the queue, with the surrounding thread state (the
+                    // 150f polling missed the transition; no QREMOVE/QDROP fired)
+                    if (_unlmg6Act != null && !_unlmg6Started)
+                    {
+                        bool nowInQ = false;
+                        try { nowInQ = _unlmg6A.Thread?.Queue?.Any(q => q != null && q.UID == _unlmg6Act.UID) ?? false; } catch { }
+                        if (nowInQ) _unlmg6WasInQ = true;
+                        else if (_unlmg6WasInQ)
+                        {
+                            _unlmg6WasInQ = false;
+                            string q0 = "-", topR = "-";
+                            try { q0 = _unlmg6A.Thread.Queue.Count > 0 ? ("obj" + (_unlmg6A.Thread.Queue[0].Callee?.ObjectID ?? -1)
+                                + "/" + (_unlmg6A.Thread.Queue[0].Name ?? "?") + "/dead=" + (_unlmg6A.Thread.Queue[0].Callee?.Dead ?? true)) : "empty"; } catch { }
+                            try
+                            {
+                                var top = _unlmg6A.Thread.Stack.LastOrDefault();
+                                topR = top == null ? "none" : ("actionTree=" + top.ActionTree + " r=" + (top.Routine?.ToString() ?? "?"));
+                            }
+                            catch { }
+                            Log("AUTOTEST unl-magic6 QWATCH-VANISH uid=" + _unlmg6Act.UID + " f=" + _unlmg6Frame
+                                + " Aactive='" + (_unlmg6A.Thread?.ActiveAction?.Name ?? "-") + "'"
+                                + " Adead=" + _unlmg6A.Dead + " arenaDead=" + (_unlmg6Arena?.Dead.ToString() ?? "?")
+                                + " Q0=[" + q0 + "] top=[" + topR + "]");
+                        }
+                    }
+                    if (_unlmg6Frame % 150 == 0)
+                    {
+                        string queue6 = "-";
+                        try
+                        {
+                            queue6 = string.Join("|", (_unlmg6A.Thread?.Queue ?? new System.Collections.Generic.List<VMQueuedAction>())
+                                .Select(q => q?.Name ?? "?").Take(4));
+                        }
+                        catch { }
                         Log("AUTOTEST unl-magic6 soak f=" + _unlmg6Frame + " (+push" + (_unlmg6Frame - _unlmg6PushF) + ")"
-                            + " outcome=" + o5 + " stones 7/8=" + Unlmg6Stones(a7) + "/" + Unlmg6Stones(a8)
+                            + " state5=" + o5 + " hs6=" + o6 + " inprog9=" + o9 + " rounds13=" + o13 + " defender17=" + o17
+                            + " stones 7/8=" + Unlmg6Stones(a7) + "/" + Unlmg6Stones(a8)
+                            + " slots ch/def=" + (slotA == null ? "-" : "obj" + slotA.ObjectID) + "/"
+                            + (slotB == null ? "-" : "obj" + slotB.ObjectID)
+                            + " inFlight=" + inFl + " started=" + _unlmg6Started + " pushes=" + _unlmg6Pushes
+                            + " Aq=[" + queue6 + "]"
                             + " Aactive='" + (_unlmg6A.Thread?.ActiveAction?.Name ?? "-") + "'"
                             + " Bactive='" + (_unlmg6B.Thread?.ActiveAction?.Name ?? "-") + "'");
+                    }
+                    // vanish-gated re-push (magic4 law): a queued push can be
+                    // dropped by scheduler/free-will competition before it ever
+                    // starts — re-push when gone, settled, and budget remains
+                    if (!inFl && _unlmg6Pushes < 8 && _unlmg6Frame - _unlmg6LastPushF > 240)
+                    {
+                        Log("AUTOTEST unl-magic6 PUSH-GONE uid=" + (_unlmg6Act?.UID ?? -1) + " started=" + _unlmg6Started
+                            + " f=" + _unlmg6Frame + " attr9=" + o9 + " attr17=" + o17 + " — re-push #" + (_unlmg6Pushes + 1));
+                        VMQueuedAction rp6 = null;
+                        try { rp6 = _unlmg6Arena.GetAction((short)_unlmg6DuelRow, _unlmg6A, _vm.Context, false); } catch { }
+                        if (rp6 != null)
+                        {
+                            rp6.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                            rp6.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.RunImmediately;
+                            rp6.CheckRoutine = null;
+                            rp6.Args = new short[] { (short)_unlmg6B.ObjectID, 0, 0, 0 };
+                            _unlmg6Act = rp6;
+                            _unlmg6LastPushF = _unlmg6Frame; _unlmg6Pushes++;
+                            _unlmg6A.Thread.EnqueueAction(rp6);
+                        }
+                        else Log("AUTOTEST unl-magic6 RE-PUSH null GetAction row=" + _unlmg6DuelRow);
+                    }
+                    // started-then-exited with NO chain markers = an early gate
+                    // refusal inside 4105 (@5 'In Use?' T:255 silent no-op, @83
+                    // mood refuse, or @1/@142 person gates) — record once
+                    if (_unlmg6Started && !inFl && o9 == 0 && !_unlmg6ExitLogged)
+                    {
+                        _unlmg6ExitLogged = true;
+                        string stack6 = "-";
+                        try
+                        {
+                            stack6 = string.Join("|", (_unlmg6A.Thread?.Stack ?? new System.Collections.Generic.List<VMStackFrame>())
+                                .Select(fr => fr.Routine?.ToString() ?? "?").Take(6));
+                        }
+                        catch { }
+                        Log("AUTOTEST unl-magic6 TREE-EXITED-EARLY: the Duel routine ran in A's stack then left with"
+                            + " attr[9]=0 (never past the early gates; suspects: @5 'In Use?' silent no-op, @83 mood"
+                            + " refuse, @1/@142 person gates) Astack=[" + stack6 + "]"
+                            + " Apos=" + _unlmg6A.Position.x + "," + _unlmg6A.Position.y);
+                    }
                     if (o5 >= 97 && o5 <= 101)
                     {
                         var curA2 = FSO.Content.Content.Get().Neighborhood.GetInventoryByNID(
@@ -3409,18 +3735,41 @@ namespace Simitone.Client
                         var curB2 = FSO.Content.Content.Get().Neighborhood.GetInventoryByNID(
                             _unlmg6B.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.NeighborId))?
                             .Where(x => x.GUID == 0x99E81BECu).Sum(x => (int)x.Count) ?? 0;
-                        Log("AUTOTEST unl-magic6 verdict DUEL-OUTCOME-LIVE: arena attr[5]=" + o5
-                            + " (terminal 97..101) after +" + (_unlmg6Frame - _unlmg6PushF) + "f; stones now "
-                            + Unlmg6Stones(a7) + "/" + Unlmg6Stones(a8)
-                            + "; currency A " + _unlmg6CurA + "->" + curA2 + " B " + _unlmg6CurB + "->" + curB2);
-                        Pass("unl-magic6"); _unlmg6State = 99; Finish(); return;
+                        var dA = curA2 - _unlmg6CurA; var dB = curB2 - _unlmg6CurB;
+                        var stonesAte = (Unlmg6Stones(_unlmg6A7) - Unlmg6Stones(a7)) + (Unlmg6Stones(_unlmg6A8) - Unlmg6Stones(a8));
+                        Log("AUTOTEST unl-magic6 verdict DUEL-OUTCOME-LIVE: duel-tile attr[5]=" + o5
+                            + " (terminal 97..101) after +" + (_unlmg6Frame - _unlmg6PushF) + "f; stones "
+                            + Unlmg6Stones(_unlmg6A7) + "/" + Unlmg6Stones(_unlmg6A8) + " -> "
+                            + Unlmg6Stones(a7) + "/" + Unlmg6Stones(a8) + " (consumed " + stonesAte + ")"
+                            + "; currency A " + _unlmg6CurA + "->" + curA2 + " B " + _unlmg6CurB + "->" + curB2
+                            + "; final slots ch/def=" + (slotA == null ? "-" : "obj" + slotA.ObjectID) + "/"
+                            + (slotB == null ? "-" : "obj" + slotB.ObjectID));
+                        if (dA + dB > 0)
+                        {
+                            Log("AUTOTEST unl-magic6 REWARD-OK: op-51 Currency AddToken landed (A " + dA + " / B " + dB
+                                + "; winner = obj" + (dA > 0 ? _unlmg6A.ObjectID : _unlmg6B.ObjectID)
+                                + ") — the full native duel chain (entry 4105 -> routing/snap -> Defend push ->"
+                                + " rounds 4107/4108 -> stones endgame -> reward) is LIVE");
+                            Pass("unl-magic6"); _unlmg6State = 99; Finish(); return;
+                        }
+                        Log("AUTOTEST unl-magic6 verdict DUEL-OUTCOME-NOREWARD: terminal outcome reached with ZERO"
+                            + " Currency delta (A " + dA + " / B " + dB + ") — the 4105 @73 AddToken leg did not pay;"
+                            + " located for the next increment");
+                        Fail("unl-magic6"); _unlmg6State = 99; Finish(); return;
                     }
-                    if (_unlmg6PushF > 0 && _unlmg6Frame >= _unlmg6PushF + 1800)
+                    if (_unlmg6PushF > 0 && _unlmg6Frame >= _unlmg6LastPushF + 2400)
                     {
-                        Log("AUTOTEST unl-magic6 verdict DUEL-CHAIN-PARTIAL: the init law is LIVE (banked) but the autonomous"
-                            + " push never reached a terminal outcome in 1800f (outcome=" + o5 + ", stones "
-                            + Unlmg6Stones(a7) + "/" + Unlmg6Stones(a8) + "; slot-tile routing/winner 4121 = the named"
-                            + " next decode: duelists must reach their slot tiles for 4121 to read motive[3])");
+                        Log("AUTOTEST unl-magic6 verdict DUEL-CHAIN-PARTIAL: no terminal outcome (2400f past the last of "
+                            + _unlmg6Pushes + " pushes) —"
+                            + " attr[5]=" + o5 + " attr[6]=" + o6 + " attr[9]=" + o9 + " attr[13]=" + o13 + " attr[17]=" + o17
+                            + " stones " + Unlmg6Stones(a7) + "/" + Unlmg6Stones(a8)
+                            + " started=" + _unlmg6Started + " inFlight=" + inFl
+                            + " slots ch/def=" + (slotA == null ? "-" : "obj" + slotA.ObjectID) + "/"
+                            + (slotB == null ? "-" : "obj" + slotB.ObjectID)
+                            + " Aactive='" + (_unlmg6A.Thread?.ActiveAction?.Name ?? "-") + "'"
+                            + " Bactive='" + (_unlmg6B.Thread?.ActiveAction?.Name ?? "-") + "'"
+                            + " — the stuck attr[5] value names the parked stage (1=self-route/defender-wait,"
+                            + " 2=challenger-round wait, 3=defender-round wait, 4=endgame; 0=entry never started)");
                         Pass("unl-magic6"); _unlmg6State = 99; Finish(); return;
                     }
                 }
