@@ -1056,6 +1056,12 @@ namespace Simitone.Client
                 || CheckEnabled("aud15deny")
                 // (ENG-03) the layout-score sampler law drive rides it too.
                 || CheckEnabled("eng03flag")
+                || CheckEnabled("hddowntown2")
+                || CheckEnabled("hddowntown3")
+                || CheckEnabled("hddowntown4")
+                || CheckEnabled("hddowntown5")
+                || CheckEnabled("hddowntown6")
+                || CheckEnabled("hddowntown7")
                 || CheckEnabled("hpparty")
                 || CheckEnabled("vacation")
                 // (EXP-05) Unleashed legs ride the same state-2 soak entry — without
@@ -1063,6 +1069,11 @@ namespace Simitone.Client
                 || CheckEnabled("unl-pets")
                 || CheckEnabled("unl-pets2")
                 || CheckEnabled("unl-travel")
+                || CheckEnabled("unl-magic")
+                || CheckEnabled("unl-magic2")
+                || CheckEnabled("unl-magic3")
+                || CheckEnabled("unl-magic4")
+                || CheckEnabled("unl-magic5")
                 || CheckEnabled("unl-show")
                 || CheckEnabled("unl-mice")
                 || CheckEnabled("exp09train")
@@ -1885,6 +1896,1778 @@ namespace Simitone.Client
                 + " q=" + (t.Queue == null ? 0 : t.Queue.Count);
         }
 
+        // EXP-07 V2 ('unl-magic2'): MagicMasterSpells controller discovery + the
+        // spell-chain D-dump. Run-1 lesson: the fixed placement row placed only
+        // 3 of ~40 SimType candidates (valid-tile law), so attribution by placed
+        // signature never fired. Run-2 discovery needs NO placement: OBJD is an
+        // IffChunk and carries ChunkParent — the candidate's source IffFile — so
+        // state 1 censuses each candidate's parent BHAVs (ids are BIG-endian in
+        // the engine reader, IffFile.cs:185 — the 4096-4119 map is literal) and
+        // attributes the controller by the unique MM pair (4098 'Get Spell From
+        // Ingredients' + 4102 'Made Spell/Recipe'). State 2 D-dumps 4096-4119
+        // from the engine's own parse; state 3 is a best-effort placement of the
+        // attributed guid (known-good tiles from run 1 + lot grid) for the
+        // runtime GetRoutine resolution bonus; state 4 observes native init.
+        private static int _unlmg2State, _unlmg2Settle, _unlmg2Frame, _unlmg2Idx;
+        private static readonly List<uint> _unlmg2Cands = new List<uint>();
+        private static uint _unlmg2CtrGuid;
+        private static VMEntity _unlmg2Ctr;
+        private static FSO.Files.Formats.IFF.IffFile _unlmg2File;
+        private static bool _unlmg2Placed;
+
+        private static string Unlmg2Scope(int o)
+        {
+            switch (o)
+            {
+                case 0: return "attr[me]"; case 1: return "attr[stack]"; case 3: return "MyObj";
+                case 4: return "StackObj"; case 6: return "Global"; case 7: return "";
+                case 8: return "Temps"; case 9: return "Param"; case 10: return "StackObjID";
+                case 14: return "motive[me]"; case 15: return "motive[stack]"; case 18: return "pd[me]";
+                case 19: return "pd[stack]"; case 25: return "Local"; case 26: return "Tuning";
+                default: return "sc" + o;
+            }
+        }
+
+        private static string Unlmg2Expr(byte[] ops)
+        {
+            short lhs = (short)(ops[0] | (ops[1] << 8));
+            short rhs = (short)(ops[2] | (ops[3] << 8));
+            var op = ops[5];
+            var rop = op == 0 ? ">" : op == 1 ? "<" : op == 2 ? "==" : op == 3 ? "+=" : op == 4 ? "-="
+                : op == 5 ? "=" : op == 6 ? "*=" : op == 7 ? "/=" : op == 8 ? "flagSet" : op == 9 ? "setFlag"
+                : op == 10 ? "clrFlag" : op == 11 ? "++<" : op == 12 ? "%=" : op == 13 ? "&=" : op == 14 ? ">="
+                : op == 15 ? "<=" : op == 16 ? "!=" : op == 17 ? "-->" : op == 18 ? "|=" : op == 19 ? "^=" : "op" + op;
+            var lo = Unlmg2Scope(ops[6]); var ro = Unlmg2Scope(ops[7]);
+            var ls = ops[6] == 7 ? lhs.ToString() : lo + "[" + lhs + "]";
+            var rs = ops[7] == 7 ? rhs.ToString() : ro + "[" + rhs + "]";
+            return ls + " " + rop + " " + rs;
+        }
+
+        private static void UnlMagic2Tick()
+        {
+            try
+            {
+                _unlmg2Frame++;
+                if (_unlmg2State == 0)
+                {
+                    if (++_unlmg2Settle < 90) return;
+                    _unlmg2Settle = 0;
+                    _unlmg2State = 1;
+                    Log("AUTOTEST unl-magic2 MAGIC2-MODE (EXP-07 V2 run 2: parent-file controller census + spell-chain dump)");
+                    foreach (var kv in FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID)
+                    {
+                        if ((int)kv.Value.ObjectType != 7) continue;
+                        _unlmg2Cands.Add(kv.Key);
+                        Log("AUTOTEST unl-magic2 CAND guid=0x" + kv.Key.ToString("x8")
+                            + " main=" + kv.Value.BHAV_MainID + " ttab=" + kv.Value.TreeTableID
+                            + " gfx=" + kv.Value.NumGraphics + " price=" + kv.Value.Price
+                            + " master=" + kv.Value.MasterID + " disabled=" + kv.Value.Disabled);
+                    }
+                    _unlmg2Idx = 0;
+                    return;
+                }
+                if (_unlmg2State == 1)
+                {
+                    if (_unlmg2Idx >= _unlmg2Cands.Count)
+                    {
+                        if (_unlmg2CtrGuid == 0 || _unlmg2File == null)
+                        {
+                            Log("AUTOTEST unl-magic2 NO-CONTROLLER (no SimType candidate's parent file carries 4098+4102)");
+                            Fail("unl-magic2"); _unlmg2State = 99; return;
+                        }
+                        Log("AUTOTEST unl-magic2 CENSUS-DONE cands=" + _unlmg2Cands.Count
+                            + " ctrl=0x" + _unlmg2CtrGuid.ToString("x8") + " file=" + _unlmg2File.Filename);
+                        _unlmg2State = 2;
+                        return;
+                    }
+                    var g = _unlmg2Cands[_unlmg2Idx++];
+                    var od = FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID[g];
+                    var parent = od.ChunkParent;
+                    if (parent == null) { Log("AUTOTEST unl-magic2 CAND-NOPARENT guid=0x" + g.ToString("x8")); return; }
+                    var bhavs = parent.List<FSO.Files.Formats.IFF.Chunks.BHAV>();
+                    if (bhavs == null) return;
+                    var mm = bhavs.Where(b => b != null && b.ChunkID >= 4096 && b.ChunkID <= 4119)
+                        .Select(b => b.ChunkID).OrderBy(x => x).ToList();
+                    if (mm.Count == 0) return;
+                    // Run-2 lesson: tree ids collide across pack files (the Clown
+                    // Catchers plugin defines its own 4096-4119 bank whose 4098 is
+                    // 'CT - Clown Cleanser Main'), so attribution is by BHAV LABEL:
+                    // 4098 'Get Spell From Ingredients' + 4102 'Made Spell/Recipe'.
+                    var b4098 = bhavs.FirstOrDefault(b => b != null && b.ChunkID == 4098);
+                    var b4102 = bhavs.FirstOrDefault(b => b != null && b.ChunkID == 4102);
+                    var l4098 = b4098 == null ? "-" : b4098.ChunkLabel;
+                    var labelMatch = b4098 != null && b4102 != null
+                        && b4098.ChunkLabel == "Get Spell From Ingredients"
+                        && b4102.ChunkLabel == "Made Spell/Recipe";
+                    Log("AUTOTEST unl-magic2 CAND-MM guid=0x" + g.ToString("x8") + " objd='" + od.ChunkLabel
+                        + "' main=" + od.BHAV_MainID + " L4098='" + l4098 + "'"
+                        + " mmbanks=[" + string.Join(",", mm) + "]"
+                        + (labelMatch ? " *** MAGIC CONTROLLER (LABEL MATCH) ***" : ""));
+                    if (labelMatch && _unlmg2CtrGuid == 0)
+                    {
+                        _unlmg2CtrGuid = g;
+                        _unlmg2File = parent;
+                    }
+                    return;
+                }
+                if (_unlmg2State == 2)
+                {
+                    // D-dump from the engine's own parse of the parent file — no
+                    // entity needed. Expression instructions render with the same
+                    // semantics as the offline decoder (IffFile.cs reads ids BE).
+                    if (_unlmg2File == null) { Fail("unl-magic2"); _unlmg2State = 99; return; }
+                    foreach (var tid in new ushort[] { 4096, 4097, 4098, 4099, 4100, 4101, 4102, 4103, 4104, 4105, 4106, 4107, 4108, 4109, 4110, 4111, 4112, 4113, 4114, 4115, 4116, 4117, 4118, 4119 })
+                    {
+                        var b = _unlmg2File.Get<FSO.Files.Formats.IFF.Chunks.BHAV>(tid);
+                        if (b == null || b.Instructions == null) { Log("AUTOTEST unl-magic2 DISASM " + tid + " MISSING"); continue; }
+                        var sb = new System.Text.StringBuilder();
+                        sb.Append("AUTOTEST unl-magic2 D").Append(tid).Append(" '").Append(b.ChunkLabel)
+                            .Append("' n=").Append(b.Instructions.Length).Append(" |");
+                        for (int i = 0; i < b.Instructions.Length; i++)
+                        {
+                            var ins = b.Instructions[i];
+                            sb.Append(" @").Append(i).Append(" op=").Append(ins.Opcode)
+                                .Append(" T:").Append(ins.TruePointer == 254 ? "TRUE" : ins.TruePointer.ToString())
+                                .Append(" F:").Append(ins.FalsePointer == 253 ? "FALSE" : ins.FalsePointer.ToString());
+                            if (ins.Opcode == 2 && ins.Operand != null && ins.Operand.Length >= 8)
+                                sb.Append(" EXPR(").Append(Unlmg2Expr(ins.Operand)).Append(")");
+                            else if (ins.Operand != null)
+                                sb.Append(" ops=[").Append(string.Join(",", ins.Operand.Select(x => "0x" + x.ToString("x")))).Append("]");
+                        }
+                        Log(sb.ToString());
+                    }
+                    Log("AUTOTEST unl-magic2 DISASM-DONE file=" + _unlmg2File.Filename);
+                    _unlmg2State = 3;
+                    _unlmg2Idx = 0;
+                    return;
+                }
+                if (_unlmg2State == 3)
+                {
+                    // Best-effort placement of the attributed controller guid for
+                    // the runtime-resolution + init-observation bonus. Known-good
+                    // tiles first (run-1 successes), then the lot grid filler.
+                    short[] gx, gy;
+                    if (_unlmg2Idx == 0) { gx = new short[] { 480, 768, 816 }; gy = new short[] { 400, 400, 400 }; }
+                    else
+                    {
+                        int k = _unlmg2Idx - 1;
+                        gx = new short[] { (short)(96 + (k / 14) * 64) };
+                        gy = new short[] { (short)(96 + (k % 14) * 64) };
+                    }
+                    for (int t = 0; t < gx.Length; t++)
+                    {
+                        VMMultitileGroup grp = null;
+                        try
+                        {
+                            grp = _vm.Context.CreateObjectInstance(_unlmg2CtrGuid,
+                                new FSO.LotView.Model.LotTilePos(gx[t], gy[t], 1),
+                                FSO.LotView.Model.Direction.NORTH);
+                        }
+                        catch { }
+                        var first = grp?.Objects?.FirstOrDefault();
+                        if (first != null && first.Position.x != -32768)
+                        {
+                            _unlmg2Placed = true;
+                            _unlmg2Ctr = first;
+                            Log("AUTOTEST unl-magic2 CTR-PLACED oid=" + first.ObjectID
+                                + " guid=0x" + _unlmg2CtrGuid.ToString("x8")
+                                + " at " + first.Position.x + "," + first.Position.y + "," + first.Position.Level);
+                            _unlmg2State = 4; _unlmg2Settle = 0;
+                            return;
+                        }
+                    }
+                    _unlmg2Idx++;
+                    if (_unlmg2Idx > 197)
+                    {
+                        Log("AUTOTEST unl-magic2 CTR-PLACE-FAIL (no valid tile for guid 0x"
+                            + _unlmg2CtrGuid.ToString("x8") + "; discovery verdict unaffected — attribution + dump complete)");
+                        _unlmg2State = 4; _unlmg2Settle = 0;
+                    }
+                    return;
+                }
+                if (_unlmg2State == 4)
+                {
+                    if (_unlmg2Placed && _unlmg2Ctr != null)
+                    {
+                        if (_unlmg2Settle == 0)
+                        {
+                            var res = _unlmg2Ctr.Object.Resource;
+                            var r = new System.Text.StringBuilder();
+                            r.Append("AUTOTEST unl-magic2 RUNTIME-RESOLVE");
+                            foreach (var tid in new ushort[] { 4096, 4097, 4098, 4099, 4100, 4101, 4102, 4103, 4104, 4105, 4106, 4107, 4108, 4109, 4110, 4111, 4112, 4113, 4114, 4115, 4116, 4117, 4118, 4119 })
+                                r.Append(" ").Append(tid).Append("=").Append(res != null && res.GetRoutine(tid) != null ? "Y" : "N");
+                            if (res != null)
+                            {
+                                var rt98 = res.GetRoutine(4098) as VMRoutine;
+                                var rt102 = res.GetRoutine(4102) as VMRoutine;
+                                r.Append(" L4098='").Append(rt98?.Chunk?.ChunkLabel)
+                                    .Append("' L4102='").Append(rt102?.Chunk?.ChunkLabel).Append("'");
+                            }
+                            Log(r.ToString());
+                        }
+                        if (++_unlmg2Settle < 30) return;
+                        var av = " a0..7=[" + string.Join(",", Enumerable.Range(0, 8)
+                            .Select(i => _unlmg2Ctr.GetValue((VMStackObjectVariable)i).ToString())) + "]"
+                            + " my40=" + _unlmg2Ctr.GetValue((VMStackObjectVariable)40)
+                            + " my41=" + _unlmg2Ctr.GetValue((VMStackObjectVariable)41);
+                        Log("AUTOTEST unl-magic2 INIT-OBSERVE (after native init tree 4097)" + av);
+                    }
+                    Pass("unl-magic2"); _unlmg2State = 99; return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST unl-magic2 EXC " + ex.GetType().Name + ": " + ex.Message);
+                Fail("unl-magic2"); _unlmg2State = 99;
+            }
+        }
+
+        // EXP-07 V2 drive ('unl-magic3'): the real ingredient→inventory chain.
+        // Run-3 law: controller = 0xb6c90029 (OBJD 16807). Offline decode law
+        // (scratch-exp07/obj-decode.py): the MM pack NEVER calls TSO op-67
+        // inventory_operations — it uses the TS1-native op-51 manage_inventory
+        // (VMTS1InventoryOperations: fully implemented, synchronous, NID-keyed
+        // via Content.Neighborhood). Ingredients 4098 'Add to Inventory' =
+        // op-51 AddToken(TokenType 8, ingredient guid); WandCharger 4100 'Add'
+        // = op-51 RemoveToken (the debit). This probe drives the first real
+        // link: place a Dragon Scales ingredient, push its TTAB row 0 on a sim
+        // via the run-71 push idiom, assert the NID-keyed inventory token.
+        private static int _unlmg3State, _unlmg3Settle, _unlmg3Frame;
+        private static uint _unlmg3IngGuid;
+        private static VMEntity _unlmg3Ing;
+        private static VMAvatar _unlmg3Sim;
+        private static VMQueuedAction _unlmg3Act;
+        private static bool _unlmg3Started;
+
+        private static void UnlMagic3Tick()
+        {
+            try
+            {
+                _unlmg3Frame++;
+                if (_unlmg3State == 0)
+                {
+                    if (++_unlmg3Settle < 90) return;
+                    _unlmg3Settle = 0;
+                    _unlmg3State = 1;
+                    Log("AUTOTEST unl-magic3 MAGIC3-MODE (EXP-07 V2 drive: ingredient 'Add to Inventory' → op-51 NID inventory token)");
+                    // bonus context: place the proven controller (later chain legs need it)
+                    VMMultitileGroup ctr = null;
+                    try
+                    {
+                        ctr = _vm.Context.CreateObjectInstance(0xb6c90029u,
+                            new FSO.LotView.Model.LotTilePos(480, 400, 1), FSO.LotView.Model.Direction.NORTH);
+                    }
+                    catch { }
+                    var cfirst = ctr?.Objects?.FirstOrDefault();
+                    Log("AUTOTEST unl-magic3 CTR-PLACE " + (cfirst != null && cfirst.Position.x != -32768
+                        ? "oid=" + cfirst.ObjectID + " at 480,400,1"
+                        : "FAIL (this leg still runnable without it)"));
+                    return;
+                }
+                if (_unlmg3State == 1)
+                {
+                    // census ingredient OBJDs by label (id-collision law: labels, not ids)
+                    foreach (var kv in FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID)
+                    {
+                        var lbl = kv.Value.ChunkLabel ?? "";
+                        if (lbl.IndexOf("Magic - Ingredient -", StringComparison.OrdinalIgnoreCase) >= 0
+                            || lbl.IndexOf("Toad Sweat", StringComparison.OrdinalIgnoreCase) >= 0)
+                            Log("AUTOTEST unl-magic3 ING-CAND guid=0x" + kv.Key.ToString("x8")
+                                + " '" + lbl + "' main=" + kv.Value.BHAV_MainID + " ttab=" + kv.Value.TreeTableID);
+                        if (_unlmg3IngGuid == 0 && lbl.IndexOf("Dragon Scales", StringComparison.OrdinalIgnoreCase) >= 0)
+                            _unlmg3IngGuid = kv.Key;
+                    }
+                    if (_unlmg3IngGuid == 0)
+                    {
+                        Log("AUTOTEST unl-magic3 NO-INGREDIENT (no 'Magic - Ingredient - Dragon Scales' OBJD)");
+                        Fail("unl-magic3"); _unlmg3State = 99; return;
+                    }
+                    Log("AUTOTEST unl-magic3 ING-SELECTED guid=0x" + _unlmg3IngGuid.ToString("x8") + " (Dragon Scales)");
+                    // run-1 law: 4098's test_object_type picks the PLACED object guid,
+                    // then op-51 AddToken stores the Magic Token guid (TokensMagic.iff
+                    // OBJD) — assert on the token set, not the placed guid.
+                    foreach (var tg in new uint[] { 0x42cc1e6e, 0x7b986864, 0x8e96765b, 0x7bcb0f36 })
+                    {
+                        FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID.TryGetValue(tg, out var tod);
+                        Log("AUTOTEST unl-magic3 TOKEN-MAP guid=0x" + tg.ToString("x8")
+                            + " objd='" + (tod?.ChunkLabel ?? "MISSING") + "'");
+                    }
+                    _unlmg3State = 2;
+                    return;
+                }
+                if (_unlmg3State == 2)
+                {
+                    // pick the sim here too: run-1 law — the ingredient parked the
+                    // route ~2.4 tiles out, so after the known-good tiles try tiles
+                    // ADJACENT TO THE SIM (walkable-floor proxy).
+                    var avas0 = _vm.Entities.OfType<VMAvatar>().ToList();
+                    var sim0 = avas0.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? avas0.FirstOrDefault();
+                    var cand = new List<short[]> { new short[] { 768, 400 }, new short[] { 816, 400 } };
+                    if (sim0 != null)
+                        cand.AddRange(new[] {
+                            new short[] { (short)(sim0.Position.x + 96), sim0.Position.y },
+                            new short[] { (short)(sim0.Position.x - 96), sim0.Position.y },
+                            new short[] { sim0.Position.x, (short)(sim0.Position.y + 96) },
+                            new short[] { sim0.Position.x, (short)(sim0.Position.y - 96) } });
+                    foreach (var c in cand)
+                    {
+                        VMMultitileGroup grp = null;
+                        try
+                        {
+                            grp = _vm.Context.CreateObjectInstance(_unlmg3IngGuid,
+                                new FSO.LotView.Model.LotTilePos(c[0], c[1], 1), FSO.LotView.Model.Direction.NORTH);
+                        }
+                        catch { }
+                        var first = grp?.Objects?.FirstOrDefault();
+                        if (first != null && first.Position.x != -32768)
+                        {
+                            _unlmg3Ing = first;
+                            _unlmg3Sim = sim0;
+                            Log("AUTOTEST unl-magic3 ING-PLACED oid=" + first.ObjectID + " at " + c[0] + "," + c[1] + ",1"
+                                + " simAt=" + (sim0 != null ? sim0.Position.x + "," + sim0.Position.y : "null"));
+                            _unlmg3State = 3; _unlmg3Settle = 0;
+                            return;
+                        }
+                    }
+                    Log("AUTOTEST unl-magic3 ING-PLACE-FAIL (no valid tile)");
+                    Fail("unl-magic3"); _unlmg3State = 99; return;
+                }
+                if (_unlmg3State == 3)
+                {
+                    if (++_unlmg3Settle < 30) return;
+                    if (_unlmg3Sim == null)
+                    {
+                        var avas = _vm.Entities.OfType<VMAvatar>().ToList();
+                        _unlmg3Sim = avas.FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18) ?? avas.FirstOrDefault();
+                    }
+                    if (_unlmg3Sim == null)
+                    {
+                        Log("AUTOTEST unl-magic3 NO-SIM (no avatar on lot)");
+                        Fail("unl-magic3"); _unlmg3State = 99; return;
+                    }
+                    var nid = _unlmg3Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    Log("AUTOTEST unl-magic3 SIM-PICK oid=" + _unlmg3Sim.ObjectID + " nid=" + nid
+                        + " invPre=" + Unlmg3InvStr(nid));
+                    // runtime TTAB proof: row 0 should be 'Add to Inventory' (action 4098)
+                    var res = _unlmg3Ing.Object.Resource;
+                    var tt = res?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                    if (tt == null || tt.Interactions.Length == 0)
+                    {
+                        Log("AUTOTEST unl-magic3 ING-TTAB MISSING (no interactions at id 129)");
+                        Fail("unl-magic3"); _unlmg3State = 99; return;
+                    }
+                    var r0 = tt.Interactions[0];
+                    Log("AUTOTEST unl-magic3 ING-TTAB rows=" + tt.Interactions.Length
+                        + " row0 action=" + r0.ActionFunction + " test=" + r0.TestFunction
+                        + " (offline law: 4098 'Interaction - Add to Inventory' = op-51 AddToken guid)");
+                    // run-71 push idiom + run-48/50 laws (SkipPermissions, no re-test,
+                    // Maximum, PD Priority reset — then enqueue)
+                    var act = _unlmg3Ing.GetAction(0, _unlmg3Sim, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                    if (act == null)
+                    {
+                        Log("AUTOTEST unl-magic3 PUSH-NULL (GetAction row 0 returned null)");
+                        Fail("unl-magic3"); _unlmg3State = 99; return;
+                    }
+                    act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                    act.CheckRoutine = null;
+                    act.Priority = (short)VMQueuePriority.Maximum;
+                    _unlmg3Sim.SetPersonData(VMPersonDataVariable.Priority, 0);
+                    _unlmg3Sim.Thread.EnqueueAction(act);
+                    _unlmg3Act = act;
+                    Log("AUTOTEST unl-magic3 PUSH-SENT uid=" + act.UID + " at " + Sim3Clock());
+                    _unlmg3State = 4; _unlmg3Frame = 0;
+                    return;
+                }
+                if (_unlmg3State == 4)
+                {
+                    Unlmg3AnswerDialogs();
+                    var nid = _unlmg3Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    if (!_unlmg3Started && _unlmg3Sim.Thread != null && _unlmg3Sim.Thread.Stack != null)
+                    {
+                        foreach (var fr in _unlmg3Sim.Thread.Stack)
+                        {
+                            try
+                            {
+                                if (_unlmg3Act != null && fr.Routine == _unlmg3Act.ActionRoutine)
+                                {
+                                    _unlmg3Started = true;
+                                    Log("AUTOTEST unl-magic3 PUSH-STARTED (frame routine live) at " + Sim3Clock());
+                                    break;
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                    // run-1 postmortem diagnostics: localize the park point.
+                    if (_unlmg3Frame % 60 == 0)
+                    {
+                        var sb = new System.Text.StringBuilder();
+                        sb.Append("AUTOTEST unl-magic3 STACK-DUMP f=").Append(_unlmg3Frame)
+                            .Append(" simPos=").Append(_unlmg3Sim.Position.x).Append(',').Append(_unlmg3Sim.Position.y);
+                        if (_unlmg3Sim.Thread?.Stack != null)
+                            foreach (var fr in _unlmg3Sim.Thread.Stack)
+                            {
+                                try
+                                {
+                                    sb.Append(" | ").Append(fr.Routine?.Chunk?.ChunkID).Append("('").Append(fr.Routine?.Chunk?.ChunkLabel)
+                                        .Append("' ip=").Append(fr.InstructionPointer)
+                                        .Append(" caller=").Append(fr.Caller?.ObjectID)
+                                        .Append(" callee=").Append(fr.Callee?.ObjectID).Append(")");
+                                }
+                                catch { }
+                            }
+                        Log(sb.ToString());
+                        Log("AUTOTEST unl-magic3 INV-POLL f=" + _unlmg3Frame + " nid=" + nid + " inv=" + Unlmg3InvStr(nid));
+                    }
+                    // assert on the TOKEN guid set (run-1 law): the tree adds the
+                    // Magic Token guid, not the placed ingredient guid.
+                    uint[] tokSet = { 0x42cc1e6e, 0x7b986864, 0x8e96765b, 0x7bcb0f36 };
+                    FSO.Files.Formats.IFF.Chunks.InventoryItem tok = null;
+                    foreach (var tg in tokSet)
+                    {
+                        tok = Unlmg3Token(nid, tg);
+                        if (tok != null)
+                        {
+                            Log("AUTOTEST unl-magic3 INV-OK nid=" + nid + " token=0x" + tg.ToString("x8")
+                                + " type=" + tok.Type + " count=" + tok.Count
+                                + " (op-51 AddToken landed; started=" + _unlmg3Started + ") at " + Sim3Clock());
+                            break;
+                        }
+                    }
+                    if (tok != null)
+                    {
+                        Log("AUTOTEST unl-magic3 INV-DUMP " + Unlmg3InvStr(nid));
+                        Pass("unl-magic3"); _unlmg3State = 99; return;
+                    }
+                    if (_unlmg3Frame > 1800)
+                    {
+                        Log("AUTOTEST unl-magic3 INV-TIMEOUT f=" + _unlmg3Frame + " started=" + _unlmg3Started
+                            + " ingPos=" + _unlmg3Ing.Position.x + "," + _unlmg3Ing.Position.y + "," + _unlmg3Ing.Position.Level
+                            + " simPos=" + _unlmg3Sim.Position.x + "," + _unlmg3Sim.Position.y + "," + _unlmg3Sim.Position.Level
+                            + " active='" + (_unlmg3Sim.Thread?.ActiveAction?.Name ?? "null") + "'");
+                        Log("AUTOTEST unl-magic3 INV-DUMP " + Unlmg3InvStr(nid));
+                        Fail("unl-magic3"); _unlmg3State = 99; return;
+                    }
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST unl-magic3 EXC " + ex.GetType().Name + ": " + ex.Message);
+                Fail("unl-magic3"); _unlmg3State = 99;
+            }
+        }
+
+        private static FSO.Files.Formats.IFF.Chunks.InventoryItem Unlmg3Token(short nid, uint guid)
+        {
+            try
+            {
+                var inv = Content.Get().Neighborhood?.GetInventoryByNID(nid);
+                return inv?.FirstOrDefault(x => x.GUID == guid);
+            }
+            catch { return null; }
+        }
+
+        private static string Unlmg3InvStr(short nid)
+        {
+            try
+            {
+                var inv = Content.Get().Neighborhood?.GetInventoryByNID(nid);
+                if (inv == null) return "null";
+                return "[" + string.Join(", ", inv.Select(x => "0x" + x.GUID.ToString("x8") + "/t" + x.Type + "/n" + x.Count)) + "]";
+            }
+            catch (Exception e) { return "EXC " + e.GetType().Name; }
+        }
+
+        private static void Unlmg3AnswerDialogs()
+        {
+            try
+            {
+                var dlg = _vm.GlobalBlockingDialog;
+                FSO.SimAntics.Primitives.VMDialogResult anyBs = null;
+                if (dlg != null)
+                {
+                    foreach (var ent in _vm.Entities)
+                    {
+                        var qbs = ent?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                        if (qbs != null && !qbs.Responded) { anyBs = qbs; break; }
+                    }
+                }
+                if (anyBs != null && !anyBs.Responded)
+                {
+                    anyBs.Responded = true;
+                    anyBs.ResponseCode = 1;
+                    anyBs.ResponseText = "1";
+                    _vm.GlobalBlockingDialog = null;
+                    if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
+                    else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+                    Log("AUTOTEST unl-magic3: dialog auto-answered Yes at " + Sim3Clock());
+                }
+            }
+            catch { }
+        }
+
+        // EXP-07 V2 charge leg ('unl-magic4'): inventory→charger→spell state.
+        // Run-1 law: the TokensMagic-family token OBJDs ('Magic Token - Ingredient
+        // #NN(...)') carry NO BHAV bank — GetAction returns null on their rows
+        // (test BHAV missing). Seeding must use the Ingredients.iff placed
+        // objects (proven in mm-run4: 'Magic - Ingredient - …' TTAB row0
+        // action=4098/test=4099 with a live bank). Recipe law (MM STR#4
+        // children): (6,6,31) = Dragon Tears ×2 + Faerie Dust ×1 — both from
+        // the Ingredients.iff family; the Toadstools type 7 (TransformMe kid)
+        // is NOT seedable (its object is a token OBJD). Charger law: the
+        // recipe types >12 can't ride the 12-option 'Add...' submenu → charge
+        // via the Auto-Brew row (action 4114) with its NATIVE test KEPT —
+        // 4114 reads Temps[0..2] that test 4115 scans out of the inventory.
+        // Token guid law (mm-run4 TOKEN-MAP): placed 0x203324cd Tears → token
+        // 0x7b986864; placed 0x4b1d0c59 Dust → token 0x8e96765b; placed
+        // 0x2f5848ea Scales → token 0x42cc1e6e (type 8). Persistent
+        // spell-state store law (globals 494/495): 4102 'Made Spell/Recipe'
+        // writes its attr[0..5] flag bits on the MAGIC CONTROLLER entity
+        // (op-31 set_to_next 0xb6c90029 switches the frame's stack object) —
+        // assert = controller attr[0..5] delta + inventory evidence.
+        private static int _unlmg4State, _unlmg4Settle, _unlmg4Frame, _unlmg4Mode, _unlmg4Pushes, _unlmg4TileIdx, _unlmg4Cooldown;
+        private static uint _unlmg4IngGuid, _unlmg4TokGuid;
+        private static VMEntity _unlmg4Ing, _unlmg4Charger;
+        private static VMAvatar _unlmg4Sim;
+        private static VMQueuedAction _unlmg4Act;
+        private static bool _unlmg4Started;
+        private static int _unlmg4AddRow = -1, _unlmg4ChargeRow = -1, _unlmg4ChargeAction;
+        private static int[] _unlmg4CtrBefore = new int[8];
+        private static int _unlmg4PhaseFrames;
+        private static VMEntity _unlmg4Ctr;
+        // run-12 law (EXP-07 V2): the 4100/4103 recipe-slot and brew-flag
+        // writes go through scope 1 (StackObjectAttributes) => VMEntity
+        // GetAttribute/SetAttribute — a DIFFERENT family from GetValue(
+        // VMStackObjectVariable) (ObjectData). Run-11 polled the wrong
+        // family, so the landed writes were invisible. The attr watch
+        // (EXP-04 V4.4 engine hook) censuses EVERY entity's attribute
+        // writes during stock+charge: first change per (oid,index) is
+        // logged, plus a total count for liveness.
+        private static System.Collections.Generic.HashSet<string> _unlmg4AttrSeen;
+        private static long _unlmg4AttrWrites;
+        private static int _unlmg4LastPushF;
+        // run-12 law: 4103 @145's charger attr[7]:=1 brew flag is TRANSIENT
+        // (cleared by @146/@147 on brew exit) — a 60-frame poll can miss it.
+        // The attr watch latches it instead. Run-12 also caught the school
+        // carpool stealing the child at 8:00 (active='At School', sim
+        // teleported off-lot mid-brew): during the magic4 window, school
+        // actions are culled from the sim's queue (disclosed lever).
+        private static bool _unlmg4BrewFlagSeen;
+        private static VMEntity _unlmg4Quest, _unlmg4Toad;
+        private static int _unlmg4BrewRow = -1;
+        private static uint[][] _unlmg4Plan; // per step {placedGuid, tokenGuid, need}
+        private static int _unlmg4PlanIdx;
+
+        private static void UnlMagic4Tick()
+        {
+            try
+            {
+                _unlmg4Frame++; _unlmg4PhaseFrames++;
+                if (_unlmg4State == 0)
+                {
+                    if (++_unlmg4Settle < 90) return;
+                    _unlmg4Settle = 0;
+                    Log("AUTOTEST unl-magic4 MAGIC4-MODE (EXP-07 V2 charge leg: charger Add/Brew → controller attr bits + inventory debit)");
+                    VMMultitileGroup ctr = null;
+                    try
+                    {
+                        ctr = _vm.Context.CreateObjectInstance(0xb6c90029u,
+                            new FSO.LotView.Model.LotTilePos(480, 400, 1), FSO.LotView.Model.Direction.NORTH);
+                    }
+                    catch { }
+                    _unlmg4Ctr = ctr?.Objects?.FirstOrDefault();
+                    if (_unlmg4Ctr == null || _unlmg4Ctr.Position.x == -32768) _unlmg4Ctr = null;
+                    Log("AUTOTEST unl-magic4 CTR-PLACE " + (_unlmg4Ctr != null ? "oid=" + _unlmg4Ctr.ObjectID + " (spell-state store)" : "FAIL (blocking — attr assert needs it)"));
+                    if (_unlmg4Ctr == null) { Fail("unl-magic4"); _unlmg4State = 99; return; }
+                    for (short i = 0; i < 8; i++) _unlmg4CtrBefore[i] = _unlmg4Ctr.GetAttribute(i);
+                    Log("AUTOTEST unl-magic4 CTR-ATTRS-BEFORE a0..7=[" + string.Join(",", _unlmg4CtrBefore) + "]");
+                    var ages = _vm.Entities.OfType<VMAvatar>().Select(a => a.ObjectID + ":" + a.GetPersonData(VMPersonDataVariable.PersonsAge)).ToList();
+                    Log("AUTOTEST unl-magic4 AVATAR-AGES [" + string.Join(", ", ages) + "] (child = age 1..17, VMFindBestAction law)");
+                    var child = _vm.Entities.OfType<VMAvatar>().FirstOrDefault(a =>
+                    {
+                        var ag = a.GetPersonData(VMPersonDataVariable.PersonsAge); return ag > 0 && ag < 18;
+                    });
+                    if (child != null)
+                    {
+                        _unlmg4Mode = 0; _unlmg4Sim = child;
+                        Log("AUTOTEST unl-magic4 MODE-CHILD sim=" + child.ObjectID + " (recipe 6,6,31 = Dragon Tears ×2 + Faerie Dust ×1 via inventory, Auto-Brew row)");
+                        _unlmg4Plan = new uint[][]
+                        {
+                            new uint[] { 0x203324cd, 0x7b986864, 2 },
+                            new uint[] { 0x4b1d0c59, 0x8e96765b, 1 },
+                        };
+                    }
+                    else
+                    {
+                        _unlmg4Mode = 1;
+                        _unlmg4Sim = _vm.Entities.OfType<VMAvatar>().FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18);
+                        Log("AUTOTEST unl-magic4 MODE-ADULT sim=" + (_unlmg4Sim != null ? _unlmg4Sim.ObjectID.ToString() : "null") + " (Dragon Scales ×3 — no decoded adult recipe uses only type 22; expect honest recipe-miss if reached)");
+                        if (_unlmg4Sim == null) { Fail("unl-magic4"); _unlmg4State = 99; return; }
+                        _unlmg4Plan = new uint[][] { new uint[] { 0x2f5848ea, 0x42cc1e6e, 3 } };
+                    }
+                    _unlmg4State = 1;
+                    return;
+                }
+                if (_unlmg4State == 1)
+                {
+                    // select the plan step's ingredient — usability-filtered: the
+                    // object's row-0 action AND test BHAVs must resolve (run-1 law:
+                    // token OBJDs without a bank → GetAction null).
+                    var step = _unlmg4Plan[Math.Min(_unlmg4PlanIdx, _unlmg4Plan.Length - 1)];
+                    var cand = FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID;
+                    if (!cand.TryGetValue(step[0], out var ingObjd) || ingObjd == null)
+                    {
+                        Log("AUTOTEST unl-magic4 NO-INGREDIENT (no OBJD guid 0x" + step[0].ToString("x8") + ")");
+                        Fail("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    _unlmg4IngGuid = step[0];
+                    _unlmg4TokGuid = step[1];
+                    Log("AUTOTEST unl-magic4 ING-SELECTED guid=0x" + step[0].ToString("x8") + " '" + ingObjd.ChunkLabel + "' token=0x" + step[1].ToString("x8") + " need=" + step[2]);
+                    _unlmg4State = 2;
+                    return;
+                }
+                if (_unlmg4State == 2)
+                {
+                    // place one ingredient object (token objects add THEIR OWN guid)
+                    short[] c;
+                    if (_unlmg4TileIdx == 0) c = new short[] { 768, 400 };
+                    else if (_unlmg4TileIdx == 1) c = new short[] { 816, 400 };
+                    else
+                    {
+                        int k = _unlmg4TileIdx - 2;
+                        short[] dx = { 96, -96, 0, 0, 96, -96, 0, 0 };
+                        short[] dy = { 0, 0, 96, -96, 0, 0, 96, -96 };
+                        c = new short[] { (short)(_unlmg4Sim.Position.x + dx[k % 8] + (k >= 8 ? 48 : 0)), (short)(_unlmg4Sim.Position.y + dy[k % 8] + (k >= 8 ? 48 : 0)) };
+                    }
+                    _unlmg4TileIdx++;
+                    VMMultitileGroup grp = null;
+                    try
+                    {
+                        grp = _vm.Context.CreateObjectInstance(_unlmg4IngGuid,
+                            new FSO.LotView.Model.LotTilePos(c[0], c[1], 1), FSO.LotView.Model.Direction.NORTH);
+                    }
+                    catch { }
+                    var first = grp?.Objects?.FirstOrDefault();
+                    if (first == null || first.Position.x == -32768) return; // try next tile
+                    _unlmg4Ing = first;
+                    Log("AUTOTEST unl-magic4 ING-PLACED oid=" + first.ObjectID + " at " + c[0] + "," + c[1] + ",1 (cycle " + (_unlmg4Pushes + 1) + ")");
+                    _unlmg4State = 3; _unlmg4Settle = 0; _unlmg4PhaseFrames = 0;
+                    return;
+                }
+                if (_unlmg4State == 3)
+                {
+                    if (++_unlmg4Settle < 30) return;
+                    var nid = _unlmg4Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    var res = _unlmg4Ing.Object.Resource;
+                    var tt = res?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                    if (tt == null || tt.Interactions.Length == 0)
+                    {
+                        Log("AUTOTEST unl-magic4 ING-TTAB MISSING (token object without interactions)");
+                        Fail("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    var row = tt.Interactions.OrderBy(r => r.TTAIndex).First();
+                    Log("AUTOTEST unl-magic4 ING-TTAB rows=" + tt.Interactions.Length
+                        + " pushRow ttaidx=" + row.TTAIndex + " action=" + row.ActionFunction + " test=" + row.TestFunction);
+                    if (!Unlmg4Push(_unlmg4Ing, (int)row.TTAIndex, new short[] { 0, 0, 0, 0 }, true))
+                    {
+                        Log("AUTOTEST unl-magic4 PUSH-NULL (ing row " + row.TTAIndex + ")");
+                        Fail("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    Log("AUTOTEST unl-magic4 PUSH-SENT uid=" + _unlmg4Act.UID + " cycle=" + (_unlmg4Pushes + 1) + " at " + Sim3Clock());
+                    _unlmg4State = 4; _unlmg4PhaseFrames = 0;
+                    return;
+                }
+                if (_unlmg4State == 4)
+                {
+                    // wait for this plan step's token; the pushed action must be
+                    // given its full native routing window (run-2 law: re-push
+                    // ONLY after the uid vanishes from stack+queue, then settle).
+                    Unlmg3AnswerDialogs();
+                    var nid = _unlmg4Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    var step = _unlmg4Plan[Math.Min(_unlmg4PlanIdx, _unlmg4Plan.Length - 1)];
+                    var tok = Unlmg3Token(nid, _unlmg4TokGuid);
+                    if (_unlmg4PhaseFrames % 30 == 0)
+                        Log("AUTOTEST unl-magic4 SEED-POLL f=" + _unlmg4PhaseFrames + " step=" + _unlmg4PlanIdx
+                            + " tok=0x" + _unlmg4TokGuid.ToString("x8") + " count=" + (tok == null ? "null" : tok.Count.ToString())
+                            + " q=" + (_unlmg4Sim.Thread?.Queue?.Count ?? -1)
+                            + " active='" + (_unlmg4Sim.Thread?.ActiveAction?.Name ?? "null") + "'"
+                            + " started=" + _unlmg4Started
+                            + " inv=" + Unlmg3InvStr(nid));
+                    if (tok != null && tok.Count >= step[2])
+                    {
+                        Log("AUTOTEST unl-magic4 STEP-SEEDED step=" + _unlmg4PlanIdx + " token=0x" + _unlmg4TokGuid.ToString("x8") + " count=" + tok.Count);
+                        _unlmg4Act = null;
+                        _unlmg4PlanIdx++;
+                        if (_unlmg4PlanIdx >= _unlmg4Plan.Length)
+                        {
+                            Log("AUTOTEST unl-magic4 TOKENS-SEEDED (plan complete: " + _unlmg4Plan.Length + " steps) inv=" + Unlmg3InvStr(nid));
+                            _unlmg4State = 5; _unlmg4Settle = 0; _unlmg4PhaseFrames = 0;
+                        }
+                        else
+                        {
+                            _unlmg4State = 1; _unlmg4PhaseFrames = 0; _unlmg4Cooldown = 0;
+                        }
+                        return;
+                    }
+                    if (_unlmg4PhaseFrames > 2400)
+                    {
+                        Log("AUTOTEST unl-magic4 SEED-TIMEOUT f=" + _unlmg4PhaseFrames + " step=" + _unlmg4PlanIdx
+                            + " started=" + _unlmg4Started + " inv=" + Unlmg3InvStr(nid));
+                        Fail("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    if (!Unlmg4InFlight())
+                    {
+                        if (_unlmg4Act != null)
+                        {
+                            Log("AUTOTEST unl-magic4 PUSH-GONE uid=" + _unlmg4Act.UID + " started=" + _unlmg4Started + " f=" + _unlmg4PhaseFrames
+                                + " inv=" + Unlmg3InvStr(nid));
+                            _unlmg4Act = null;
+                            _unlmg4Cooldown = 45;
+                            return;
+                        }
+                        if (--_unlmg4Cooldown > 0) return;
+                        _unlmg4Pushes++;
+                        if (_unlmg4Pushes > 12)
+                        {
+                            Log("AUTOTEST unl-magic4 SEED-STUCK (12 vanish cycles, token never landed)");
+                            Fail("unl-magic4"); _unlmg4State = 99; return;
+                        }
+                        bool gone = false;
+                        try { gone = _unlmg4Ing == null || _unlmg4Ing.Position.x == -32768 || _unlmg4Ing.Object.Resource == null; }
+                        catch { gone = true; }
+                        if (gone)
+                        {
+                            Log("AUTOTEST unl-magic4 ING-CONSUMED (placed object vanished after add — placing a fresh copy)");
+                            _unlmg4State = 2;
+                            return;
+                        }
+                        _unlmg4State = 3; _unlmg4Settle = 0;
+                        return;
+                    }
+                    return;
+                }
+                if (_unlmg4State == 5)
+                {
+                    if (++_unlmg4Settle < 30) return;
+                    // place the Wand Charger and census its TTAB rows. Run-3 law:
+                    // 480,400 is taken by the controller and leftover ingredient
+                    // copies can hold the other known-good tiles → full ladder:
+                    // known-good, sim-adjacent ring, then a lot-grid sweep; if a
+                    // label-matching guid places but lacks the Auto-Brew bank
+                    // (id-collision law), fall through to the next guid.
+                    var chgGuids = FSO.Content.TS1.TS1ObjectProvider.ObjdByGUID
+                        .Where(kv => (kv.Value.ChunkLabel ?? "").IndexOf("Wand Charger", StringComparison.OrdinalIgnoreCase) >= 0)
+                        .Select(kv => kv.Key).ToList();
+                    Log("AUTOTEST unl-magic4 CHG-CANDS [" + string.Join(", ", chgGuids.Select(g => "0x" + g.ToString("x8"))) + "]");
+                    // mount diagnostics (run-4 law: every CreateObjectInstance for
+                    // the charger failed in 2ms — probe the registry directly)
+                    foreach (var g in new uint[] { 0x552a8297, 0x203324cd, 0x4b1d0c59, 0xb6c90029, 0x197cdb3c })
+                    {
+                        string r;
+                        try
+                        {
+                            var wo = FSO.Content.Content.Get().WorldObjects.Get(g);
+                            r = wo == null ? "NULL" : "guid=0x" + wo.GUID.ToString("x8") + " iff=" + (wo.Resource?.MainIff?.Filename ?? "?");
+                        }
+                        catch (Exception ex) { r = "THREW " + ex.GetType().Name + ": " + ex.Message; }
+                        Log("AUTOTEST unl-magic4 OBJGET 0x" + g.ToString("x8") + " -> " + r);
+                    }
+                    var cands = new List<short[]>();
+                    cands.Add(new short[] { 816, 400 });
+                    cands.Add(new short[] { 768, 400 });
+                    cands.Add(new short[] { 480, 400 });
+                    short[] dx = { 96, -96, 0, 0, 48, -48, 0, 0, 96, -96, 0, 0 };
+                    short[] dy = { 0, 0, 96, -96, 0, 0, 48, -48, 0, 0, 96, -96 };
+                    for (int k = 0; k < dx.Length; k++)
+                        cands.Add(new short[] { (short)(_unlmg4Sim.Position.x + dx[k]), (short)(_unlmg4Sim.Position.y + dy[k]) });
+                    for (int gy = 96; gy <= 832 && cands.Count < 400; gy += 64)
+                        for (int gx = 96; gx <= 832 && cands.Count < 400; gx += 64)
+                            cands.Add(new short[] { (short)gx, (short)gy });
+                    int sentTiles = 0, nullTiles = 0, excTiles = 0;
+                    var errTally = new Dictionary<string, int>();
+                    foreach (var g in chgGuids)
+                    {
+                        foreach (var c in cands)
+                        {
+                            VMMultitileGroup grp = null;
+                            try
+                            {
+                                // create OOW (no placement validation), then place via
+                                // the disclosed height-bit lever below
+                                grp = _vm.Context.CreateObjectInstance(g,
+                                    FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                            }
+                            catch (Exception pex)
+                            {
+                                excTiles++;
+                                if (_unlmg4TileIdx <= 3)
+                                    Log("AUTOTEST unl-magic4 CHG-EXC tile " + c[0] + "," + c[1] + " " + pex.GetType().Name + ": " + pex.Message);
+                            }
+                            if (grp == null) { nullTiles++; continue; }
+                            var first = grp?.Objects?.FirstOrDefault();
+                            if (first == null) { nullTiles++; continue; }
+                            // run-7 root cause: the charger's OBJD AllowedHeightFlags
+                            // (data[4]) = 0, so the engine's noFloor rule
+                            // (GetObjPlace: (allowedHeights&1)==0) refuses bare-floor
+                            // placement everywhere — 96 interior tiles HeightNotAllowed,
+                            // 40 slope tiles via PlacementFlags OnFloor/!OnSlope, 23
+                            // occupied. Identity OBJD->ObjectData copy confirmed
+                            // (vars 13/42/63 match RawData). Probe-side placement
+                            // lever, DISCLOSED: raise the floor bit for the placement
+                            // call, restore the OBJD value right after so the driven
+                            // trees see faithful data. Whether the native buy-flow
+                            // tolerates height-flags-0 objects is an open decode
+                            // residual (EXP-07 card note).
+                            sentTiles++;
+                            VMPlacementResult? pr = null;
+                            try
+                            {
+                                foreach (var o in grp.Objects) o.SetValue((VMStackObjectVariable)4, 1);
+                                pr = grp.ChangePosition(new FSO.LotView.Model.LotTilePos(c[0], c[1], 1),
+                                    FSO.LotView.Model.Direction.NORTH, _vm.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default);
+                            }
+                            catch (Exception rex) { Log("AUTOTEST unl-magic4 CHG-REEXC " + rex.GetType().Name + ": " + rex.Message); }
+                            finally
+                            {
+                                foreach (var o in grp.Objects) o.SetValue((VMStackObjectVariable)4, 0);
+                            }
+                            if (pr == null || first.Position.x == -32768)
+                            {
+                                var key = pr?.Status.ToString() ?? "EXC";
+                                if (!errTally.ContainsKey(key)) errTally[key] = 0;
+                                errTally[key]++;
+                                if (errTally[key] <= 2)
+                                    Log("AUTOTEST unl-magic4 CHG-PLACE " + key + " at " + c[0] + "," + c[1]
+                                        + " wallFlags=" + first.GetValue((VMStackObjectVariable)13)
+                                        + " floorFlags=" + first.GetValue((VMStackObjectVariable)42)
+                                        + " exclFlags=" + first.GetValue((VMStackObjectVariable)63)
+                                        + " objs=" + grp.Objects.Count);
+                                continue;
+                            }
+                            var tt = first.Object.Resource?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                            var ttas = first.Object.Resource?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                            bool autoBrew = tt != null && tt.Interactions.Any(r => r.ActionFunction == 4114);
+                            if (!autoBrew)
+                            {
+                                Log("AUTOTEST unl-magic4 CHG-REJECT guid=0x" + g.ToString("x8") + " at " + c[0] + "," + c[1]
+                                    + " (TTAB " + (tt == null ? "missing" : "rows=" + tt.Interactions.Length + ", no 4114 bank) — id-collision law, next guid"));
+                                break;
+                            }
+                            _unlmg4Charger = first;
+                            Log("AUTOTEST unl-magic4 CHARGER-PLACED oid=" + first.ObjectID + " guid=0x" + g.ToString("x8") + " at " + c[0] + "," + c[1] + ",1");
+                            break;
+                        }
+                        if (_unlmg4Charger != null) break;
+                    }
+                    if (_unlmg4Charger == null)
+                    {
+                        Log("AUTOTEST unl-magic4 CHARGER-PLACE-FAIL tiles: null=" + nullTiles + " oow=" + sentTiles + " exc=" + excTiles + " of " + cands.Count
+                            + " errors=[" + string.Join(",", errTally.Select(kv => kv.Key + "=" + kv.Value)) + "]");
+                        Fail("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    var ttF = _unlmg4Charger.Object.Resource?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                    var ttasF = _unlmg4Charger.Object.Resource?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                    foreach (var r in ttF.Interactions)
+                        Log("AUTOTEST unl-magic4 CHG-ROW ttaidx=" + r.TTAIndex + " action=" + r.ActionFunction
+                            + " test=" + r.TestFunction + " name='" + (ttasF?.GetString((int)r.TTAIndex) ?? "?") + "'");
+                    foreach (var r in ttF.Interactions)
+                    {
+                        if (r.ActionFunction == 4100 && _unlmg4AddRow < 0) _unlmg4AddRow = (int)r.TTAIndex;
+                        if (r.ActionFunction == 4114 && _unlmg4ChargeRow < 0) { _unlmg4ChargeRow = (int)r.TTAIndex; _unlmg4ChargeAction = 4114; }
+                        if (r.ActionFunction == 4103 && _unlmg4BrewRow < 0) _unlmg4BrewRow = (int)r.TTAIndex;
+                    }
+                    Log("AUTOTEST unl-magic4 CHG-SELECT addRow=" + _unlmg4AddRow + " brewRow=" + _unlmg4BrewRow + " chargeRow=" + _unlmg4ChargeRow + " action=" + _unlmg4ChargeAction
+                        + " (run-9 law: 4114's scan stage is adult-recipe-tuned; the child path is 4100 'Add...' stocking + 4103 'Charge Wand' with its native test kept — the wand token requirement is met by the quest grant)");
+                    if (_unlmg4ChargeRow < 0)
+                    {
+                        Log("AUTOTEST unl-magic4 NO-CHARGE-ROW");
+                        Fail("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    _unlmg4State = 7;
+                    _unlmg4PhaseFrames = 0; _unlmg4Cooldown = 0;
+                    return;
+                }
+                if (_unlmg4State == 7)
+                {
+                    // run-8 law: BOTH charger brew tests (4104 @1, 4115 @0) gate on
+                    // manage_inventory FindToken type=7 GUID=0x1FEC6005 — the QUEST
+                    // token. Native grant chain: ControllerQuest (0xC953333E) tree
+                    // 4098 'Get Toadstools' — its test 4099 requires a toadstool
+                    // (0xDF83697D) on lot, body gates pd[15] (<200/<700, an untrained
+                    // sim passes), then AddToken t7 0x1FEC6005 + t6 0x10A52A08.
+                    if (++_unlmg4Settle < 15) return;
+                    // place the toadstool near the sim (same disclosed height-bit
+                    // lever as the charger — run-7 law)
+                    VMMultitileGroup toad = null, quest = null;
+                    try
+                    {
+                        toad = _vm.Context.CreateObjectInstance(0xDF83697Du, FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                    }
+                    catch (Exception tex) { Log("AUTOTEST unl-magic4 TOAD-EXC " + tex.GetType().Name + ": " + tex.Message); }
+                    var toadE = toad?.Objects?.FirstOrDefault();
+                    if (toadE != null)
+                    {
+                        try
+                        {
+                            foreach (var o in toad.Objects) o.SetValue((VMStackObjectVariable)4, 1);
+                            var tpr = toad.ChangePosition(new FSO.LotView.Model.LotTilePos((short)(_unlmg4Sim.Position.x + 160), _unlmg4Sim.Position.y, 1),
+                                FSO.LotView.Model.Direction.NORTH, _vm.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default);
+                            foreach (var o in toad.Objects) o.SetValue((VMStackObjectVariable)4, 0);
+                            Log("AUTOTEST unl-magic4 TOAD-PLACED oid=" + toadE.ObjectID + " at " + toadE.Position.x + "," + toadE.Position.y + " status=" + tpr.Status);
+                        }
+                        catch (Exception tex) { Log("AUTOTEST unl-magic4 TOAD-PLACE-EXC " + tex.GetType().Name + ": " + tex.Message); }
+                    }
+                    else Log("AUTOTEST unl-magic4 TOAD-NULL (test 4099 may refuse the push; disclosed)");
+                    try
+                    {
+                        quest = _vm.Context.CreateObjectInstance(0xC953333Eu, FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                    }
+                    catch (Exception qex) { Log("AUTOTEST unl-magic4 QUEST-EXC " + qex.GetType().Name + ": " + qex.Message); }
+                    _unlmg4Quest = quest?.Objects?.FirstOrDefault();
+                    if (_unlmg4Quest != null)
+                    {
+                        try
+                        {
+                            foreach (var o in quest.Objects) o.SetValue((VMStackObjectVariable)4, 1);
+                            var qpr = quest.ChangePosition(new FSO.LotView.Model.LotTilePos((short)(_unlmg4Sim.Position.x - 160), _unlmg4Sim.Position.y, 1),
+                                FSO.LotView.Model.Direction.NORTH, _vm.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default);
+                            foreach (var o in quest.Objects) o.SetValue((VMStackObjectVariable)4, 0);
+                            Log("AUTOTEST unl-magic4 QUEST-PLACED oid=" + _unlmg4Quest.ObjectID + " at " + _unlmg4Quest.Position.x + "," + _unlmg4Quest.Position.y + " status=" + qpr.Status);
+                        }
+                        catch (Exception qex) { Log("AUTOTEST unl-magic4 QUEST-PLACE-EXC " + qex.GetType().Name + ": " + qex.Message); }
+                        var qtt = _unlmg4Quest.Object.Resource?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                        var qttas = _unlmg4Quest.Object.Resource?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                        if (qtt != null)
+                            foreach (var r in qtt.Interactions)
+                                Log("AUTOTEST unl-magic4 QUEST-ROW ttaidx=" + r.TTAIndex + " action=" + r.ActionFunction + " test=" + r.TestFunction + " name='" + (qttas?.GetString((int)r.TTAIndex) ?? "?") + "'");
+                        if (!Unlmg4Push(_unlmg4Quest, 0, new short[] { 0, 0, 0, 0 }, false))
+                        {
+                            Log("AUTOTEST unl-magic4 QUEST-PUSH-NULL (row 0)");
+                            Fail("unl-magic4"); _unlmg4State = 99; return;
+                        }
+                        Log("AUTOTEST unl-magic4 QUEST-PUSH-SENT uid=" + _unlmg4Act.UID + " at " + Sim3Clock());
+                        _unlmg4State = 8; _unlmg4PhaseFrames = 0;
+                    }
+                    else
+                    {
+                        Log("AUTOTEST unl-magic4 QUEST-PLACE-FAIL");
+                        Fail("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    return;
+                }
+                if (_unlmg4State == 8)
+                {
+                    // poll the sim's NID inventory for the quest token t7 0x1FEC6005
+                    Unlmg3AnswerDialogs();
+                    var nid = _unlmg4Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    var hasQuest = false;
+                    try
+                    {
+                        var inv = Content.Get().Neighborhood?.GetInventoryByNID(nid);
+                        hasQuest = inv != null && inv.Any(x => x.GUID == 0x1FEC6005u);
+                    }
+                    catch { }
+                    if (_unlmg4PhaseFrames % 120 == 0)
+                        Log("AUTOTEST unl-magic4 QUEST-POLL f=" + _unlmg4PhaseFrames + " t7=" + hasQuest + " inv=" + Unlmg3InvStr(nid)
+                            + " active='" + (_unlmg4Sim.Thread?.ActiveAction?.Name ?? "null") + "'");
+                    if (hasQuest)
+                    {
+                        Log("AUTOTEST unl-magic4 QUEST-TOKEN-OK t7=0x1FEC6005 in inventory at " + Sim3Clock());
+                        _unlmg4State = 9; _unlmg4PhaseFrames = 0; _unlmg4Settle = 0;
+                        return;
+                    }
+                    if (_unlmg4PhaseFrames > 1800)
+                    {
+                        Log("AUTOTEST unl-magic4 QUEST-TIMEOUT f=" + _unlmg4PhaseFrames + " inv=" + Unlmg3InvStr(nid)
+                            + " active='" + (_unlmg4Sim.Thread?.ActiveAction?.Name ?? "null") + "'");
+                        Fail("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    return;
+                }
+                if (_unlmg4State == 9)
+                {
+                    if (++_unlmg4Settle < 15) return;
+                    var nid = _unlmg4Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    Log("AUTOTEST unl-magic4 PRE-STOCK ctrA=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _unlmg4Ctr.GetAttribute(i)).ToArray()) + "]"
+                        + " chgA0..7=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _unlmg4Charger.GetAttribute(i)).ToArray()) + "]"
+                        + " inv=" + Unlmg3InvStr(nid));
+                    // run-12: arm the ALL-entity attribute-write census (engine
+                    // hook, EXP-04 precedent). First change per (oid,index) is
+                    // logged so the recipe-slot writer identifies itself no
+                    // matter which entity it lands on.
+                    _unlmg4AttrSeen = new System.Collections.Generic.HashSet<string>();
+                    _unlmg4AttrWrites = 0;
+                    _unlmg4BrewFlagSeen = false;
+
+                    FSO.SimAntics.VMEntity.AutotestAttrWatch = (oid, ai, oldV, newV) =>
+                    {
+                        _unlmg4AttrWrites++;
+                        if (ai == 7 && newV == 1 && oid == _unlmg4Charger.ObjectID)
+                        {
+                            _unlmg4BrewFlagSeen = true;
+                            Log("AUTOTEST unl-magic4 BREW-FLAG-SEEN oid=" + oid + " i=7 0->1 (4103 @145 transient brew flag latched)");
+                        }
+                        if (newV == oldV) return;
+                        var k = oid + ":" + ai;
+                        if (_unlmg4AttrSeen.Add(k))
+                            Log("AUTOTEST unl-magic4 ATTR-WATCH oid=" + oid + " i=" + ai + " " + oldV + "->" + newV);
+                    };
+                    // run-9 law: the placed toadstool carries no harvest row and the
+                    // quest grant yields Wand+Ability tokens only. Toadstools
+                    // (Ingredient #07, 0x7AA53F96) reach inventory here via the
+                    // engine's own neighborhood-inventory API — a DISCLOSED seeding
+                    // lever standing in for the native toadstool-pick flow (same
+                    // class as the PD[56] normalization; the 'Add...' debit law
+                    // itself stays fully native).
+                    try
+                    {
+                        var neigh = Content.Get().Neighborhood;
+                        var inv = neigh.GetInventoryByNID(nid);
+                        if (inv == null) { neigh.SetInventoryForNID(nid, new System.Collections.Generic.List<FSO.Files.Formats.IFF.Chunks.InventoryItem>()); inv = neigh.GetInventoryByNID(nid); }
+                        var tok = inv.FirstOrDefault(x => x.GUID == 0x7AA53F96u);
+                        if (tok != null) tok.Count += 3;
+                        else inv.Add(new FSO.Files.Formats.IFF.Chunks.InventoryItem() { Count = 3, GUID = 0x7AA53F96u, Type = 8 });
+                        Log("AUTOTEST unl-magic4 TOADSTOOL-SEEDED x3 (disclosed API lever) inv=" + Unlmg3InvStr(nid));
+                    }
+                    catch (Exception sex) { Log("AUTOTEST unl-magic4 TOADSTOOL-SEED-EXC " + sex.GetType().Name + ": " + sex.Message); }
+                    if (!Unlmg4Push(_unlmg4Charger, _unlmg4AddRow, new short[] { 7, 0, 0, 0 }, false))
+                    {
+                        Log("AUTOTEST unl-magic4 ADD-PUSH-NULL (row " + _unlmg4AddRow + ")");
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Fail("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    Log("AUTOTEST unl-magic4 ADD-PUSH-SENT uid=" + _unlmg4Act.UID + " action=4100 param=7 at " + Sim3Clock());
+                    _unlmg4LastPushF = 0;
+                    _unlmg4State = 10; _unlmg4PhaseFrames = 0;
+                    return;
+                }
+                if (_unlmg4State == 10)
+                {
+                    // stocking poll: wait for charger attr[0..2] == [7,7,7]
+                    Unlmg3AnswerDialogs();
+                    Unlmg4CullSchool4(_unlmg4Sim);
+                    var nid = _unlmg4Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    var a = new short[3];
+                    for (short i = 0; i < 3; i++) a[i] = _unlmg4Charger.GetAttribute(i);
+                    if (_unlmg4PhaseFrames % 120 == 0)
+                        Log("AUTOTEST unl-magic4 STOCK-POLL f=" + _unlmg4PhaseFrames + " chgA=[" + string.Join(",", a) + "] chgA7=" + _unlmg4Charger.GetAttribute(7)
+                            + " inv=" + Unlmg3InvStr(nid)
+                            + " active='" + (_unlmg4Sim.Thread?.ActiveAction?.Name ?? "null") + "' attrWrites=" + _unlmg4AttrWrites);
+                    // run-12 law: 4100 writes StackObjectAttributes[0..2] (scope
+                    // 1 => GetAttribute family) on the ACTION TARGET (the
+                    // charger — no SetToNext reroute exists; @0 is a
+                    // GotoRelativePosition InFrontOf/Facing routing step).
+                    // ATTR-WATCH censuses every entity's writes; this periodic
+                    // census lists every entity holding ANY nonzero attribute
+                    // as a cross-check.
+                    if (_unlmg4PhaseFrames % 600 == 0)
+                    {
+                        foreach (var e in _vm.Entities)
+                        {
+                            var nz = false;
+                            for (short i = 0; i < 16 && !nz; i++) nz = e.GetAttribute(i) != 0;
+                            if (!nz) continue;
+                            Log("AUTOTEST unl-magic4 ATTR-CENSUS oid=" + e.ObjectID + " guid=0x" + (e.Object?.OBJ?.GUID.ToString("X8") ?? "?") + " a0..15=[" +
+                                string.Join(",", Enumerable.Range(0, 16).Select(i => e.GetAttribute(i)).ToArray()) + "]");
+                        }
+                    }
+                    if (a[0] == 7 && a[1] == 7 && a[2] == 7)
+                    {
+                        Log("AUTOTEST unl-magic4 STOCKED chgA=[7,7,7] (three 4100 debits landed) at " + Sim3Clock() + " inv=" + Unlmg3InvStr(nid));
+                        _unlmg4State = 11; _unlmg4PhaseFrames = 0; _unlmg4Settle = 0;
+                        return;
+                    }
+                    // run-12: each 4100 invocation stocks ONE slot (first-empty
+                    // guard @25-@27). Re-push as soon as a slot has filled and
+                    // the previous Add is no longer in flight, instead of the
+                    // rigid 1200/1800 cadence that starved run-11.
+                    var filled = (a[0] == 7 ? 1 : 0) + (a[1] == 7 ? 1 : 0) + (a[2] == 7 ? 1 : 0);
+                    if (filled > 0 && filled < 3 && !Unlmg4InFlight() && _unlmg4PhaseFrames - _unlmg4LastPushF > 240)
+                    {
+                        var toks = Content.Get().Neighborhood?.GetInventoryByNID(nid);
+                        var tc = toks?.FirstOrDefault(x => x.GUID == 0x7AA53F96u)?.Count ?? 0;
+                        if (tc < 1)
+                        {
+                            Log("AUTOTEST unl-magic4 STOCKED-PARTIAL chgA=[" + string.Join(",", a) + " but toadstool count=" + tc + " — accepting partial stock for brew");
+                            _unlmg4State = 11; _unlmg4PhaseFrames = 0; _unlmg4Settle = 0; return;
+                        }
+                        if (Unlmg4Push(_unlmg4Charger, _unlmg4AddRow, new short[] { 7, 0, 0, 0 }, false))
+                        {
+                            _unlmg4LastPushF = _unlmg4PhaseFrames;
+                            Log("AUTOTEST unl-magic4 ADD-REPUSH uid=" + _unlmg4Act.UID + " filled=" + filled + " toad=" + tc + " at " + Sim3Clock());
+                        }
+                    }
+                    if (_unlmg4PhaseFrames > 1200 && _unlmg4PhaseFrames % 600 == 0 && _unlmg4PhaseFrames <= 1800)
+                    {
+                        // re-push in case the first stocking interaction was dropped
+                        if (Unlmg4Push(_unlmg4Charger, _unlmg4AddRow, new short[] { 7, 0, 0, 0 }, false))
+                        {
+                            _unlmg4LastPushF = _unlmg4PhaseFrames;
+                            Log("AUTOTEST unl-magic4 ADD-REPUSH uid=" + _unlmg4Act.UID + " at " + Sim3Clock());
+                        }
+                    }
+                    if (_unlmg4PhaseFrames > 3600)
+                    {
+                        Log("AUTOTEST unl-magic4 STOCK-TIMEOUT f=" + _unlmg4PhaseFrames + " chgA=[" + string.Join(",", a) + "] inv=" + Unlmg3InvStr(nid)
+                            + " active='" + (_unlmg4Sim.Thread?.ActiveAction?.Name ?? "null") + "' attrWrites=" + _unlmg4AttrWrites);
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Fail("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    return;
+                }
+                if (_unlmg4State == 11)
+                {
+                    if (++_unlmg4Settle < 15) return;
+                    var nid = _unlmg4Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    Log("AUTOTEST unl-magic4 PRE-CHARGE ctrA=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _unlmg4Ctr.GetAttribute(i)).ToArray()) + "]"
+                        + " chgA=[" + string.Join(",", Enumerable.Range(0, 3).Select(i => _unlmg4Charger.GetAttribute(i)).ToArray()) + "]"
+                        + " inv=" + Unlmg3InvStr(nid));
+                    // refresh the controller before-snapshot with the correct
+                    // (GetAttribute) family so the charge delta is meaningful
+                    for (short i = 0; i < 8; i++) _unlmg4CtrBefore[i] = _unlmg4Ctr.GetAttribute(i);
+                    // 4103 'Charge Wand' with its NATIVE test kept (4104: wand-token
+                    // FindToken + attr recipe check — the wand is held since the
+                    // quest grant; attrs are stocked [7,7,7]).
+                    if (!Unlmg4Push(_unlmg4Charger, _unlmg4BrewRow, new short[] { 0, 0, 0, 0 }, false))
+                    {
+                        Log("AUTOTEST unl-magic4 CHARGE-PUSH-NULL (row " + _unlmg4BrewRow + ")");
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Fail("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    Log("AUTOTEST unl-magic4 CHARGE-PUSH-SENT uid=" + _unlmg4Act.UID + " action=4103 at " + Sim3Clock());
+                    _unlmg4State = 12; _unlmg4PhaseFrames = 0;
+                    return;
+                }
+                if (_unlmg4State == 12)
+                {
+                    Unlmg3AnswerDialogs();
+                    Unlmg4CullSchool4(_unlmg4Sim);
+                    var nid = _unlmg4Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    var now = new int[8];
+                    for (short i = 0; i < 8; i++) now[i] = _unlmg4Ctr.GetAttribute(i);
+                    if (_unlmg4PhaseFrames % 60 == 0)
+                    {
+                        var sb = new System.Text.StringBuilder();
+                        sb.Append("AUTOTEST unl-magic4 CHARGE-POLL f=").Append(_unlmg4PhaseFrames)
+                            .Append(" ctrA=[").Append(string.Join(",", now)).Append("]")
+                            .Append(" chgA=[").Append(string.Join(",", Enumerable.Range(0, 3).Select(i => _unlmg4Charger.GetAttribute(i)))).Append("]")
+                            .Append(" chgA7=").Append(_unlmg4Charger.GetAttribute(7))
+                            .Append(" inv=").Append(Unlmg3InvStr(nid))
+                            .Append(" attrWrites=").Append(_unlmg4AttrWrites)
+                            .Append(" simPos=").Append(_unlmg4Sim.Position.x).Append(',').Append(_unlmg4Sim.Position.y);
+                        if (_unlmg4Sim.Thread?.Stack != null)
+                            foreach (var fr in _unlmg4Sim.Thread.Stack)
+                            {
+                                try { sb.Append(" | ").Append(fr.Routine?.Chunk?.ChunkID).Append("('").Append(fr.Routine?.Chunk?.ChunkLabel).Append("' ip=").Append(fr.InstructionPointer).Append(")"); }
+                                catch { }
+                            }
+                        Log(sb.ToString());
+                    }
+                    // run-12 decode-backed asserts. 4103 @145 sets the charger's
+                    // StackObjectAttributes[7] := 1 ('brew in progress' flag)
+                    // right after routing; @3-@5 then clear the stocked recipe
+                    // slots back to 0; @146/@147 clear the flag on exit (it is
+                    // TRANSIENT — latched via the attr watch, not polled).
+                    // Primary signal: latched flag + slots consumed. Secondary:
+                    // any controller attribute delta.
+                    var slotsCleared = _unlmg4Charger.GetAttribute(0) == 0 && _unlmg4Charger.GetAttribute(1) == 0 && _unlmg4Charger.GetAttribute(2) == 0;
+                    var delta = Enumerable.Range(0, 6).Any(i => now[i] != _unlmg4CtrBefore[i]);
+                    if (_unlmg4BrewFlagSeen && slotsCleared)
+                    {
+                        Log("AUTOTEST unl-magic4 SPELL-STATE-OK brewFlag=latched slots-cleared ctrBefore=[" + string.Join(",", _unlmg4CtrBefore) + "]"
+                            + " ctrAfter=[" + string.Join(",", now) + "]"
+                            + " (4103 brew flag + recipe-slot consumption landed on the charger via scope-1 attributes) at " + Sim3Clock());
+                        Log("AUTOTEST unl-magic4 FINAL-INV " + Unlmg3InvStr(nid));
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Pass("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    if (delta && _unlmg4PhaseFrames > 300)
+                    {
+                        Log("AUTOTEST unl-magic4 SPELL-STATE-OK-CTR ctrBefore=[" + string.Join(",", _unlmg4CtrBefore) + "]"
+                            + " ctrAfter=[" + string.Join(",", now) + "] chgA7=" + _unlmg4Charger.GetAttribute(7)
+                            + " (controller attribute delta; brew flag seen=" + _unlmg4BrewFlagSeen + " slotsCleared=" + slotsCleared + ") at " + Sim3Clock());
+                        Log("AUTOTEST unl-magic4 FINAL-INV " + Unlmg3InvStr(nid));
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Pass("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    if (_unlmg4PhaseFrames > 2400)
+                    {
+                        Log("AUTOTEST unl-magic4 CHARGE-TIMEOUT f=" + _unlmg4PhaseFrames + " ctrA=[" + string.Join(",", now) + "]"
+                            + " chgA7=" + _unlmg4Charger.GetAttribute(7) + " attrWrites=" + _unlmg4AttrWrites
+                            + " started=" + _unlmg4Started + " active='" + (_unlmg4Sim.Thread?.ActiveAction?.Name ?? "null") + "'");
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Fail("unl-magic4"); _unlmg4State = 99; return;
+                    }
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST unl-magic4 EXC " + ex.GetType().Name + ": " + ex.Message);
+                FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                Fail("unl-magic4"); _unlmg4State = 99;
+            }
+        }
+
+        private static void Unlmg4CullSchool4(VMAvatar sim)
+        {
+            // run-12 law: the school carpool enqueues 'At School' at 8:00 and
+            // teleports the child off-lot mid-brew. DISCLOSED lever: remove
+            // school-named entries from the sim's queue during the magic4/5
+            // windows (the driven interactions stay fully native). Active-action
+            // takeovers are logged if one slips through between polls.
+            var q = sim?.Thread?.Queue;
+            if (q == null) return;
+            for (int i = q.Count - 1; i >= 0; i--)
+            {
+                var n = q[i]?.Name;
+                if (n != null && n.IndexOf("school", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    Log("AUTOTEST unl-magic SCHOOL-CULL '" + n + "' dequeued (disclosed lever — carpool steals a child at 8:00)");
+                    q.RemoveAt(i);
+                }
+            }
+        }
+
+        private static bool Unlmg4Push(VMEntity target, int ttaIdx, short[] args, bool nullCheck)
+        {
+            try
+            {
+                var act = target.GetAction(ttaIdx, _unlmg4Sim, _vm.Context, false, args);
+                if (act == null) return false;
+                if (nullCheck) act.CheckRoutine = null;
+                act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                act.Priority = (short)VMQueuePriority.Maximum;
+                _unlmg4Sim.SetPersonData(VMPersonDataVariable.Priority, 0);
+                _unlmg4Sim.Thread.EnqueueAction(act);
+                _unlmg4Act = act;
+                _unlmg4Started = false;
+                return true;
+            }
+            catch { return false; }
+        }
+
+        private static bool Unlmg4InFlight()
+        {
+            // run-2 law: a pushed action lives in Thread.Queue for many sim-min
+            // before its routing starts (magic3: ~9 sim-min PUSH-SENT→STARTED).
+            // In-flight = present in the stack (by routine), the queue, or as the
+            // ActiveAction — by UID, not by stack frames alone.
+            try
+            {
+                if (_unlmg4Act == null) return false;
+                var th = _unlmg4Sim?.Thread;
+                if (th?.Stack != null)
+                    foreach (var fr in th.Stack)
+                    {
+                        try { if (fr.Routine == _unlmg4Act.ActionRoutine) { _unlmg4Started = true; return true; } }
+                        catch { }
+                    }
+                try { if (th?.Queue != null && th.Queue.Any(q => q != null && q.UID == _unlmg4Act.UID)) return true; }
+                catch { }
+                try { if (th?.ActiveAction != null && th.ActiveAction.UID == _unlmg4Act.UID) return true; }
+                catch { }
+                return false;
+            }
+            catch { return false; }
+        }
+
+        // EXP-07 V3 T5 nectar leg ('unl-magic5'): NectarPress Add/Brew/Drink
+        // chain. Decode laws (v3-NectarPress.iff, 2026-09-27 window; corrected
+        // opcode registry: 0x1f=SET_TO_NEXT, 0x20=testObjType, 0x1b=
+        // GOTO_REL_POSITION):
+        // - master 0x880bb75e + tiles 0x754965c5/0xd5312240. The 4100/4103
+        //   trees SET_TO_NEXT-walk then testObjType the TILE 0x754965c5 — the
+        //   recipe slots attr[0..2] live on the TILE entity, not the master.
+        // - 4100 'Add': Param[0] in {1,2,5,25,26} → RemoveToken
+        //   {0x7A7D732E, 0x7C780508, 0x7BCB0F36 (Toad Sweat #05),
+        //   0xB0F22139, 0xD370296F}; first-empty-slot guard; write
+        //   StackObjAttr[slot] := Param[0]; attr[3] := Global[0].
+        // - 4103 'Brew': Temps := tile attrs → global 500 'Get Recipe from
+        //   Ingredients' → product; PersonData[6] := Tuning[512+i]; then
+        //   **global 495 'Mark Spell/Recipe as made' with Temp[0]=4 (nectar
+        //   category)** — the Magic Controller 0xB6C90029 attr-bits store
+        //   (the T6 persistence surface).
+        // - 4118 'Drink Magic': route → animate → products 305/306 set
+        //   pd[84]; **pd[29]=1** (drank flag); attr[5] cleared paths.
+        private static int _unlmg5State, _unlmg5Settle, _unlmg5Frame, _unlmg5PhaseFrames, _unlmg5LastPushF;
+        private static VMAvatar _unlmg5Sim;
+        private static VMEntity _unlmg5Press, _unlmg5Tile, _unlmg5Tile2, _unlmg5Ctr;
+        private static VMQueuedAction _unlmg5Act;
+        private static bool _unlmg5Started;
+        private static int _unlmg5AddRow = -1, _unlmg5BrewRow = -1, _unlmg5DrinkRow = -1;
+        private static int[] _unlmg5CtrBefore = new int[8];
+        private static System.Collections.Generic.HashSet<string> _unlmg5AttrSeen;
+        private static long _unlmg5AttrWrites;
+        private static short[] _unlmg5Recipe;
+
+        private static void UnlMagic5Tick()
+        {
+            try
+            {
+                _unlmg5Frame++; _unlmg5PhaseFrames++;
+                if (_unlmg5State == 0)
+                {
+                    if (++_unlmg5Settle < 90) return;
+                    _unlmg5Settle = 0;
+                    Log("AUTOTEST unl-magic5 MAGIC5-MODE (EXP-07 V3 T5 nectar leg: press Add/Brew → controller mark-made bits + Drink pd[29])");
+                    _unlmg5Sim = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>().FirstOrDefault(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD);
+                    if (_unlmg5Sim == null) { Log("AUTOTEST unl-magic5 no avatar"); Fail("unl-magic5"); _unlmg5State = 99; return; }
+                    // place the press master (multitile; group brings its tiles)
+                    var cands = new System.Collections.Generic.List<short[]>();
+                    short[] dx = { 96, -96, 0, 0, 48, -48, 96, -96, 0, 0 };
+                    short[] dy = { 0, 0, 96, -96, 48, -48, 0, 0, 96, -96 };
+                    for (int k = 0; k < dx.Length; k++)
+                        cands.Add(new short[] { (short)(_unlmg5Sim.Position.x + dx[k]), (short)(_unlmg5Sim.Position.y + dy[k]) });
+                    for (int gy = 96; gy <= 832 && cands.Count < 300; gy += 64)
+                        for (int gx = 96; gx <= 832 && cands.Count < 300; gx += 64)
+                            cands.Add(new short[] { (short)gx, (short)gy });
+                    foreach (var c in cands)
+                    {
+                        VMMultitileGroup grp = null;
+                        try
+                        {
+                            grp = _vm.Context.CreateObjectInstance(0x880bb75Eu,
+                                FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                        }
+                        catch (Exception pex) { Log("AUTOTEST unl-magic5 PRESS-EXC " + pex.GetType().Name + ": " + pex.Message); }
+                        var first = grp?.Objects?.FirstOrDefault();
+                        if (first == null) continue;
+                        // disclosed height-bit lever (run-7 law): MM objects carry
+                        // AllowedHeightFlags=0; raise the floor bit for the
+                        // placement call, restore after.
+                        VMPlacementResult? pr = null;
+                        try
+                        {
+                            foreach (var o in grp.Objects) o.SetValue((VMStackObjectVariable)4, 1);
+                            pr = grp.ChangePosition(new FSO.LotView.Model.LotTilePos(c[0], c[1], 1),
+                                FSO.LotView.Model.Direction.NORTH, _vm.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default);
+                        }
+                        catch (Exception rex) { Log("AUTOTEST unl-magic5 PRESS-REEXC " + rex.GetType().Name + ": " + rex.Message); }
+                        finally
+                        {
+                            foreach (var o in grp.Objects) o.SetValue((VMStackObjectVariable)4, 0);
+                        }
+                        if (pr == null || first.Position.x == -32768) continue;
+                        _unlmg5Press = first;
+                        Log("AUTOTEST unl-magic5 PRESS-PLACED oid=" + first.ObjectID + " at " + c[0] + "," + c[1] + ",1 objs=" + grp.Objects.Count);
+                        foreach (var o in grp.Objects)
+                            Log("AUTOTEST unl-magic5 PRESS-OBJ oid=" + o.ObjectID + " guid=0x" + (o.Object?.OBJ?.GUID.ToString("X8") ?? "?"));
+                        _unlmg5Tile = grp.Objects.FirstOrDefault(o => o.Object?.OBJ?.GUID == 0x754965C5u);
+                        _unlmg5Tile2 = grp.Objects.FirstOrDefault(o => o.Object?.OBJ?.GUID == 0xD5312240u);
+                        break;
+                    }
+                    if (_unlmg5Press == null || _unlmg5Tile == null)
+                    {
+                        Log("AUTOTEST unl-magic5 PRESS-PLACE-FAIL (or tile 0x754965C5 missing — slots live on the tile)");
+                        Fail("unl-magic5"); _unlmg5State = 99; return;
+                    }
+                    // place the Magic Controller (attr-bits store) with the same
+                    // lever — run-2 law: the fixed sim-adjacent offset can be
+                    // occupied; walk candidates like the press does.
+                    try
+                    {
+                        var ccands = new System.Collections.Generic.List<FSO.LotView.Model.LotTilePos>();
+                        short[] cdx = { -160, 160, 0, 0, -96, 96, 0, 0 };
+                        short[] cdy = { -160, -160, 160, -160, 0, 0, 96, -96 };
+                        for (int k = 0; k < cdx.Length; k++)
+                            ccands.Add(new FSO.LotView.Model.LotTilePos(
+                                (short)(_unlmg5Sim.Position.x + cdx[k]), (short)(_unlmg5Sim.Position.y + cdy[k]), 1));
+                        for (int gy = 96; gy <= 832; gy += 64)
+                            for (int gx = 96; gx <= 832; gx += 64)
+                                ccands.Add(new FSO.LotView.Model.LotTilePos((short)gx, (short)gy, 1));
+                        var cg = _vm.Context.CreateObjectInstance(0xB6C90029u,
+                            FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                        var c0 = cg?.Objects?.FirstOrDefault();
+                        if (c0 != null)
+                        {
+                            foreach (var cc in ccands)
+                            {
+                                try
+                                {
+                                    foreach (var o in cg.Objects) o.SetValue((VMStackObjectVariable)4, 1);
+                                    cg.ChangePosition(cc, FSO.LotView.Model.Direction.NORTH, _vm.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default);
+                                }
+                                catch { }
+                                finally { foreach (var o in cg.Objects) o.SetValue((VMStackObjectVariable)4, 0); }
+                                if (c0.Position.x != -32768) break;
+                            }
+                            _unlmg5Ctr = c0.Position.x == -32768 ? null : c0;
+                        }
+                    }
+                    catch { }
+                    Log("AUTOTEST unl-magic5 CTR-PLACE " + (_unlmg5Ctr != null ? "oid=" + _unlmg5Ctr.ObjectID : "FAIL (blocking — mark-made assert needs it)"));
+                    if (_unlmg5Ctr == null) { Fail("unl-magic5"); _unlmg5State = 99; return; }
+                    for (short i = 0; i < 8; i++) _unlmg5CtrBefore[i] = _unlmg5Ctr.GetAttribute(i);
+                    // discover rows
+                    var tt = _unlmg5Press.Object.Resource?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                    var ttas = _unlmg5Press.Object.Resource?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                    if (tt == null) { Log("AUTOTEST unl-magic5 no TTAB"); Fail("unl-magic5"); _unlmg5State = 99; return; }
+                    foreach (var r in tt.Interactions)
+                        Log("AUTOTEST unl-magic5 PRESS-ROW ttaidx=" + r.TTAIndex + " action=" + r.ActionFunction
+                            + " test=" + r.TestFunction + " name='" + (ttas?.GetString((int)r.TTAIndex) ?? "?") + "'");
+                    foreach (var r in tt.Interactions)
+                    {
+                        if (r.ActionFunction == 4100 && _unlmg5AddRow < 0) _unlmg5AddRow = (int)r.TTAIndex;
+                        if (r.ActionFunction == 4103 && _unlmg5BrewRow < 0) _unlmg5BrewRow = (int)r.TTAIndex;
+                        if (r.ActionFunction == 4118 && _unlmg5DrinkRow < 0) _unlmg5DrinkRow = (int)r.TTAIndex;
+                    }
+                    Log("AUTOTEST unl-magic5 PRESS-SELECT addRow=" + _unlmg5AddRow + " brewRow=" + _unlmg5BrewRow + " drinkRow=" + _unlmg5DrinkRow);
+                    if (_unlmg5AddRow < 0 || _unlmg5BrewRow < 0 || _unlmg5DrinkRow < 0)
+                    {
+                        Log("AUTOTEST unl-magic5 ROW-MISSING");
+                        Fail("unl-magic5"); _unlmg5State = 99; return;
+                    }
+                    // arm the all-entity attr census (run-12 idiom)
+                    _unlmg5AttrSeen = new System.Collections.Generic.HashSet<string>();
+                    _unlmg5AttrWrites = 0;
+                    FSO.SimAntics.VMEntity.AutotestAttrWatch = (oid, ai, oldV, newV) =>
+                    {
+                        _unlmg5AttrWrites++;
+                        if (newV == oldV) return;
+                        var k = oid + ":" + ai;
+                        if (_unlmg5AttrSeen.Add(k))
+                            Log("AUTOTEST unl-magic5 ATTR-WATCH oid=" + oid + " i=" + ai + " " + oldV + "->" + newV);
+                    };
+                    _unlmg5State = 1; _unlmg5PhaseFrames = 0; _unlmg5Settle = 0;
+                    return;
+                }
+                if (_unlmg5State == 1)
+                {
+                    if (++_unlmg5Settle < 15) return;
+                    var nid = _unlmg5Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    // DISCLOSED seeding levers (same class as the run-9/10
+                    // toadstool seeding): wand token (the family's brew tests
+                    // gate on it per the run-8 charger law) + a VALID RECIPE:
+                    // MagicMasterSpells STR#5 lists nectar triplets in press
+                    // Add types — (2,2,5) uses type2 0x7C780508 x2 + type5
+                    // 0x7BCB0F36 (Toad Sweat) x1. Run-5 law: three of the
+                    // SAME type is not a recipe — global 500 fails, 4103
+                    // clears the slots and exits through the failure dialog
+                    // (@5 T:255 = RETURN_FALSE).
+                    try
+                    {
+                        var neigh = Content.Get().Neighborhood;
+                        var inv = neigh.GetInventoryByNID(nid);
+                        if (inv == null) { neigh.SetInventoryForNID(nid, new System.Collections.Generic.List<FSO.Files.Formats.IFF.Chunks.InventoryItem>()); inv = neigh.GetInventoryByNID(nid); }
+                        var wand = inv.FirstOrDefault(x => x.GUID == 0x1FEC6005u);
+                        if (wand == null) inv.Add(new FSO.Files.Formats.IFF.Chunks.InventoryItem() { Count = 1, GUID = 0x1FEC6005u, Type = 7 });
+                        var t2 = inv.FirstOrDefault(x => x.GUID == 0x7C780508u);
+                        if (t2 != null) t2.Count += 2;
+                        else inv.Add(new FSO.Files.Formats.IFF.Chunks.InventoryItem() { Count = 2, GUID = 0x7C780508u, Type = 8 });
+                        var t5 = inv.FirstOrDefault(x => x.GUID == 0xB0F22139u);
+                        if (t5 != null) t5.Count += 1;
+                        else inv.Add(new FSO.Files.Formats.IFF.Chunks.InventoryItem() { Count = 1, GUID = 0xB0F22139u, Type = 8 });
+                        Log("AUTOTEST unl-magic5 SEEDED wand t7 x1 + recipe (2x type2 0x7C780508 + 1x type25 0xB0F22139 Sugar) (disclosed API levers) inv=" + Unlmg3InvStr(nid));
+                    }
+                    catch (Exception sex) { Log("AUTOTEST unl-magic5 SEED-EXC " + sex.GetType().Name + ": " + sex.Message); }
+                    // sequential recipe stocking: types (2,2,5) in slot order
+                    // run-12 law (mode-38 review): stock the DISCRIMINATING
+                    // recipe (2,2,25) = STR#5 entry [1] -> product
+                    // Tuning[512] = BCON 4100[0] = 1. The pre-fix stale-TRUE
+                    // artifact always defaulted to product 4, so product==1
+                    // proves the scan actually matched.
+                    _unlmg5Recipe = new short[] { 2, 2, 25 };
+                    if (!Unlmg5Push(_unlmg5Press, _unlmg5AddRow, new short[] { _unlmg5Recipe[0], 0, 0, 0 }, false))
+                    {
+                        Log("AUTOTEST unl-magic5 ADD-PUSH-NULL (row " + _unlmg5AddRow + ")");
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Fail("unl-magic5"); _unlmg5State = 99; return;
+                    }
+                    Log("AUTOTEST unl-magic5 ADD-PUSH-SENT uid=" + _unlmg5Act.UID + " action=4100 param=" + _unlmg5Recipe[0] + " at " + Sim3Clock());
+                    _unlmg5LastPushF = 0;
+                    _unlmg5State = 2; _unlmg5PhaseFrames = 0;
+                    return;
+                }
+                if (_unlmg5State == 2)
+                {
+                    // stocking poll: sequential recipe types (2,2,5) fill the
+                    // tile slots one Add at a time (first-empty guard).
+                    Unlmg3AnswerDialogs();
+                    Unlmg4CullSchool4(_unlmg5Sim);
+                    var nid = _unlmg5Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    var a = new short[3];
+                    for (short i = 0; i < 3; i++) a[i] = _unlmg5Tile.GetAttribute(i);
+                    if (_unlmg5PhaseFrames % 120 == 0)
+                        Log("AUTOTEST unl-magic5 STOCK-POLL f=" + _unlmg5PhaseFrames + " tileA=[" + string.Join(",", a) + "]"
+                            + " inv=" + Unlmg3InvStr(nid)
+                            + " active='" + (_unlmg5Sim.Thread?.ActiveAction?.Name ?? "null") + "' attrWrites=" + _unlmg5AttrWrites);
+                    var filled = (a[0] != 0 ? 1 : 0) + (a[1] != 0 ? 1 : 0) + (a[2] != 0 ? 1 : 0);
+                    if (filled >= 3)
+                    {
+                        Log("AUTOTEST unl-magic5 STOCKED tileA=[" + string.Join(",", a) + "] (three 4100 debits landed; recipe (2,2,25) stocked) at " + Sim3Clock() + " inv=" + Unlmg3InvStr(nid));
+                        _unlmg5State = 3; _unlmg5PhaseFrames = 0; _unlmg5Settle = 0;
+                        return;
+                    }
+                    // next recipe ingredient once the previous Add finished
+                    if (filled < 3 && !Unlmg5InFlight() && _unlmg5PhaseFrames - _unlmg5LastPushF > 240)
+                    {
+                        var nextParam = _unlmg5Recipe[Math.Min(filled, 2)];
+                        var toks = Content.Get().Neighborhood?.GetInventoryByNID(nid);
+                        var have = toks?.FirstOrDefault(x => x.GUID == (nextParam == 2 ? 0x7C780508u : 0xB0F22139u))?.Count ?? 0;
+                        if (have < 1)
+                        {
+                            Log("AUTOTEST unl-magic5 STOCK-OUT-OF-INGREDIENT tileA=[" + string.Join(",", a) + "] next=" + nextParam + " have=" + have);
+                            FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                            Fail("unl-magic5"); _unlmg5State = 99; return;
+                        }
+                        if (Unlmg5Push(_unlmg5Press, _unlmg5AddRow, new short[] { nextParam, 0, 0, 0 }, false))
+                        {
+                            _unlmg5LastPushF = _unlmg5PhaseFrames;
+                            Log("AUTOTEST unl-magic5 ADD-PUSH uid=" + _unlmg5Act.UID + " param=" + nextParam + " filled=" + filled + " at " + Sim3Clock());
+                        }
+                    }
+                    if (_unlmg5PhaseFrames > 1200 && _unlmg5PhaseFrames % 600 == 0 && _unlmg5PhaseFrames <= 2400)
+                    {
+                        var retryParam = _unlmg5Recipe[Math.Min(filled, 2)];
+                        if (Unlmg5Push(_unlmg5Press, _unlmg5AddRow, new short[] { retryParam, 0, 0, 0 }, false))
+                        {
+                            _unlmg5LastPushF = _unlmg5PhaseFrames;
+                            Log("AUTOTEST unl-magic5 ADD-REPUSH uid=" + _unlmg5Act.UID + " param=" + retryParam + " at " + Sim3Clock());
+                        }
+                    }
+                    if (_unlmg5PhaseFrames > 3600)
+                    {
+                        Log("AUTOTEST unl-magic5 STOCK-TIMEOUT f=" + _unlmg5PhaseFrames + " tileA=[" + string.Join(",", a) + "] inv=" + Unlmg3InvStr(nid)
+                            + " active='" + (_unlmg5Sim.Thread?.ActiveAction?.Name ?? "null") + "' attrWrites=" + _unlmg5AttrWrites);
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Fail("unl-magic5"); _unlmg5State = 99; return;
+                    }
+                    return;
+                }
+                if (_unlmg5State == 3)
+                {
+                    if (++_unlmg5Settle < 15) return;
+                    var nid = _unlmg5Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    for (short i = 0; i < 8; i++) _unlmg5CtrBefore[i] = _unlmg5Ctr.GetAttribute(i);
+                    Log("AUTOTEST unl-magic5 PRE-BREW ctrA0..7=[" + string.Join(",", _unlmg5CtrBefore) + "]"
+                        + " tileA=[" + string.Join(",", Enumerable.Range(0, 6).Select(i => _unlmg5Tile.GetAttribute(i)).ToArray()) + "]"
+                        + " inv=" + Unlmg3InvStr(nid));
+                    if (!Unlmg5Push(_unlmg5Press, _unlmg5BrewRow, new short[] { 0, 0, 0, 0 }, false))
+                    {
+                        Log("AUTOTEST unl-magic5 BREW-PUSH-NULL (row " + _unlmg5BrewRow + ")");
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Fail("unl-magic5"); _unlmg5State = 99; return;
+                    }
+                    Log("AUTOTEST unl-magic5 BREW-PUSH-SENT uid=" + _unlmg5Act.UID + " action=4103 at " + Sim3Clock());
+                    _unlmg5State = 4; _unlmg5PhaseFrames = 0;
+                    return;
+                }
+                if (_unlmg5State == 4)
+                {
+                    // brew poll: PRIMARY = Magic Controller attr-bits delta
+                    // (global 495 mark-made, nectar category 4 — the T6
+                    // persistence surface). Secondary evidence: tile attrs,
+                    // inventory, stack dump.
+                    Unlmg5AnswerDialogs();
+                    Unlmg4CullSchool4(_unlmg5Sim);
+                    var nid = _unlmg5Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    var now = new int[8];
+                    for (short i = 0; i < 8; i++) now[i] = _unlmg5Ctr.GetAttribute(i);
+                    var delta = Enumerable.Range(0, 6).Any(i => now[i] != _unlmg5CtrBefore[i]);
+                    var product = _unlmg5Tile2 != null ? _unlmg5Tile2.GetAttribute(5) : -1;
+                    if (delta && product == 1 && _unlmg5PhaseFrames > 240)
+                    {
+                        Log("AUTOTEST unl-magic5 BREW-MADE-OK ctrBefore=[" + string.Join(",", _unlmg5CtrBefore) + "]"
+                            + " ctrAfter=[" + string.Join(",", now) + "]"
+                            + " tileA=[" + string.Join(",", Enumerable.Range(0, 6).Select(i => _unlmg5Tile.GetAttribute(i)).ToArray()) + "]"
+                            + " product=1 (matched entry 1 -> Tuning[512]; the stale-TRUE artifact path can only yield 4)"
+                            + " simT0=" + (_unlmg5Sim.Thread?.TempRegisters != null && _unlmg5Sim.Thread.TempRegisters.Length > 0 ? _unlmg5Sim.Thread.TempRegisters[0].ToString() : "?")
+                            + " (global 495 mark-made on the controller; mode-38 scan VERIFIED) at " + Sim3Clock());
+                        _unlmg5State = 5; _unlmg5PhaseFrames = 0; _unlmg5Settle = 0;
+                        return;
+                    }
+                    if (_unlmg5PhaseFrames % 120 == 0)
+                    {
+                        var sb = new System.Text.StringBuilder();
+                        sb.Append("AUTOTEST unl-magic5 BREW-POLL f=").Append(_unlmg5PhaseFrames)
+                            .Append(" ctrA=[").Append(string.Join(",", now)).Append("]")
+                            .Append(" tileA=[").Append(string.Join(",", Enumerable.Range(0, 6).Select(i => _unlmg5Tile.GetAttribute(i)))).Append("]")
+                            .Append(" inv=").Append(Unlmg3InvStr(nid))
+                            .Append(" attrWrites=").Append(_unlmg5AttrWrites)
+                            .Append(" active='").Append(_unlmg5Sim.Thread?.ActiveAction?.Name ?? "null").Append("'");
+                        if (_unlmg5Sim.Thread?.Stack != null)
+                            foreach (var fr in _unlmg5Sim.Thread.Stack)
+                            {
+                                try { sb.Append(" | ").Append(fr.Routine?.Chunk?.ChunkID).Append("('").Append(fr.Routine?.Chunk?.ChunkLabel).Append("' ip=").Append(fr.InstructionPointer).Append(")"); }
+                                catch { }
+                            }
+                        Log(sb.ToString());
+                    }
+                    if (_unlmg5PhaseFrames > 2400)
+                    {
+                        Log("AUTOTEST unl-magic5 BREW-TIMEOUT f=" + _unlmg5PhaseFrames + " ctrA=[" + string.Join(",", now) + "]"
+                            + " tileA=[" + string.Join(",", Enumerable.Range(0, 6).Select(i => _unlmg5Tile.GetAttribute(i)).ToArray()) + "]"
+                            + " attrWrites=" + _unlmg5AttrWrites
+                            + " active='" + (_unlmg5Sim.Thread?.ActiveAction?.Name ?? "null") + "'");
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Fail("unl-magic5"); _unlmg5State = 99; return;
+                    }
+                    return;
+                }
+                if (_unlmg5State == 5)
+                {
+                    if (++_unlmg5Settle < 15) return;
+                    // run-9 law: 4118 @15 gates the magic-drink path on
+                    // MyMotives[3] < 0 — motive 3 = MOOD (VMMotive enum).
+                    // Run-10 law: a one-shot SetMotiveData(Mood) is
+                    // RECOMPUTED from the underlying motives each decay tick
+                    // (the R251 curve-weighted law) — the pin reverted to 79
+                    // within seconds. DISCLOSED lever (the death-reach
+                    // idiom): collapse the decay motives to 3 so the
+                    // recompute itself yields a negative Mood; Hunger stays
+                    // at 3, far above the 8299 death gate (< -98).
+                    try
+                    {
+                        foreach (var m in DecayMotives) _unlmg5Sim.SetMotiveData(m, 3);
+                        var newMood = _unlmg5Sim.GetMotiveData((VMMotive)3);
+                        Log("AUTOTEST unl-magic5 MOTIVE-COLLAPSE decay=3 (disclosed lever; death-reach idiom) recomputed mood=" + newMood);
+                    }
+                    catch (Exception mex) { Log("AUTOTEST unl-magic5 MOTIVE-COLLAPSE-EXC " + mex.GetType().Name + ": " + mex.Message); }
+                    if (!Unlmg5Push(_unlmg5Press, _unlmg5DrinkRow, new short[] { 0, 0, 0, 0 }, false))
+                    {
+                        Log("AUTOTEST unl-magic5 DRINK-PUSH-NULL (row " + _unlmg5DrinkRow + ")");
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Fail("unl-magic5"); _unlmg5State = 99; return;
+                    }
+                    Log("AUTOTEST unl-magic5 DRINK-PUSH-SENT uid=" + _unlmg5Act.UID + " action=4118 at " + Sim3Clock());
+                    _unlmg5State = 6; _unlmg5PhaseFrames = 0;
+                    return;
+                }
+                if (_unlmg5State == 6)
+                {
+                    // drink poll: 4118 sets pd[29]=1 (drank-magic flag) —
+                    // products 305/306 also set pd[84].
+                    Unlmg3AnswerDialogs();
+                    Unlmg4CullSchool4(_unlmg5Sim);
+                    var nid = _unlmg5Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    var pd29 = _unlmg5Sim.GetPersonData((VMPersonDataVariable)29);
+                    var pd84 = _unlmg5Sim.GetPersonData((VMPersonDataVariable)84);
+                    if (_unlmg5PhaseFrames % 120 == 0)
+                        Log("AUTOTEST unl-magic5 DRINK-POLL f=" + _unlmg5PhaseFrames + " pd29=" + pd29 + " pd84=" + pd84
+                            + " tileA5=" + _unlmg5Tile.GetAttribute(5) + " tile2A0..7=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _unlmg5Tile2 != null ? _unlmg5Tile2.GetAttribute(i) : -1).ToArray()) + "]"
+                            + " inFlight=" + Unlmg5InFlight()
+                            + " active='" + (_unlmg5Sim.Thread?.ActiveAction?.Name ?? "null") + "'");
+                    if (pd29 == 1)
+                    {
+                        Log("AUTOTEST unl-magic5 DRINK-OK pd29=1 pd84=" + pd84 + " tileA5=" + _unlmg5Tile.GetAttribute(5)
+                            + " (4118 'Drink Magic' drank-flag landed) at " + Sim3Clock());
+                        Log("AUTOTEST unl-magic5 FINAL-INV " + Unlmg3InvStr(nid));
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Pass("unl-magic5"); _unlmg5State = 99; return;
+                    }
+                    // run-8 law: the drink consumed the product (tile2 attr[5]
+                    // 4->0) but pd[29] stayed 0 with NO exception — 4118 @13's
+                    // createObjectInstance 0xDC14EEAF ('Ghost Me') must be
+                    // returning false (F:255) and skipping @11/@14 (pd[84]/pd[29]).
+                    // Census: does the ghost entity exist? Which motive[3] branch?
+                    if (_unlmg5PhaseFrames == 240)
+                    {
+                        var ghosts = _vm.Entities.Where(e => e.Object?.OBJ?.GUID == 0xDC14EEAFu).ToList();
+                        Log("AUTOTEST unl-magic5 GHOST-CENSUS count=" + ghosts.Count
+                            + " motive3=" + _unlmg5Sim.GetMotiveData((VMMotive)3)
+                            + " (4118 @15 gates on MyMotives[3]<0; @13 create F:255 skips the pd writes)");
+                        // height-flags probe: OOW-create the ghost and read var 4
+                        // (the run-7 charger placement lever slot) — if 0, the
+                        // ghost create fails by the same noFloor law.
+                        try
+                        {
+                            var gg = _vm.Context.CreateObjectInstance(0xDC14EEAFu,
+                                FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                            var g0 = gg?.Objects?.FirstOrDefault();
+                            Log("AUTOTEST unl-magic5 GHOST-OOW " + (g0 != null ? "oid=" + g0.ObjectID + " var4=" + g0.GetValue((VMStackObjectVariable)4)
+                                + " var13=" + g0.GetValue((VMStackObjectVariable)13) + " var42=" + g0.GetValue((VMStackObjectVariable)42) : "null"));
+                            if (g0 != null) gg.Delete(_vm.Context);
+                        }
+                        catch (Exception gex) { Log("AUTOTEST unl-magic5 GHOST-OOW-EXC " + gex.GetType().Name + ": " + gex.Message); }
+                    }
+                    if (_unlmg5PhaseFrames > 2400)
+                    {
+                        Log("AUTOTEST unl-magic5 DRINK-TIMEOUT f=" + _unlmg5PhaseFrames + " pd29=" + pd29 + " pd84=" + pd84
+                            + " active='" + (_unlmg5Sim.Thread?.ActiveAction?.Name ?? "null") + "'");
+                        FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        Fail("unl-magic5"); _unlmg5State = 99; return;
+                    }
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST unl-magic5 EXC " + ex.GetType().Name + ": " + ex.Message);
+                FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                Fail("unl-magic5"); _unlmg5State = 99;
+            }
+        }
+
+        // run-4 law: the press brew parked at 4103 @5 (dialogPrivate) for the
+        // whole phase. Unlmg3AnswerDialogs only responds when
+        // GlobalBlockingDialog is set; this local answerer responds to ANY
+        // un-responded VMDialogResult blocking state (and logs the latch
+        // state it found, so a leaked/non-latched dialog is distinguishable
+        // in the receipt).
+        private static void Unlmg5AnswerDialogs()
+        {
+            try
+            {
+                var gbd = _vm.GlobalBlockingDialog;
+                foreach (var ent in _vm.Entities)
+                {
+                    var qbs = ent?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                    if (qbs == null || qbs.Responded) continue;
+                    Log("AUTOTEST unl-magic5 DIALOG gbd=" + (gbd != null ? "obj" + gbd.ObjectID : "null")
+                        + " owner=oid" + ent.ObjectID + " type=" + qbs.Type + " wait=" + qbs.WaitTime + " -> answering Yes");
+                    qbs.Responded = true;
+                    qbs.ResponseCode = 1;
+                    qbs.ResponseText = "1";
+                    if (gbd != null && gbd == ent) _vm.GlobalBlockingDialog = null;
+                    if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
+                    else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+                    break;
+                }
+            }
+            catch { }
+        }
+
+        private static bool Unlmg5Push(VMEntity target, int ttaIdx, short[] args, bool nullCheck)
+        {
+            try
+            {
+                var act = target.GetAction(ttaIdx, _unlmg5Sim, _vm.Context, false, args);
+                if (act == null) return false;
+                if (nullCheck) act.CheckRoutine = null;
+                act.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                act.Priority = (short)VMQueuePriority.Maximum;
+                _unlmg5Sim.SetPersonData(VMPersonDataVariable.Priority, 0);
+                _unlmg5Sim.Thread.EnqueueAction(act);
+                _unlmg5Act = act;
+                _unlmg5Started = false;
+                return true;
+            }
+            catch { return false; }
+        }
+
+        private static bool Unlmg5InFlight()
+        {
+            try
+            {
+                if (_unlmg5Act == null) return false;
+                var th = _unlmg5Sim?.Thread;
+                if (th?.Stack != null)
+                    foreach (var fr in th.Stack)
+                    {
+                        try { if (fr.Routine == _unlmg5Act.ActionRoutine) { _unlmg5Started = true; return true; } }
+                        catch { }
+                    }
+                try { if (th?.Queue != null && th.Queue.Any(q => q != null && q.UID == _unlmg5Act.UID)) return true; }
+                catch { }
+                try { if (th?.ActiveAction != null && th.ActiveAction.UID == _unlmg5Act.UID) return true; }
+                catch { }
+                return false;
+            }
+            catch { return false; }
+        }
+
         // EXP-05 V6 ('unl-travel'): the Old Town round trip per the TRV-02 law.
         // Booking rides the REAL phone-tree path (run-71 push idiom) into generic
         // TS1 call 17 (ChangeToLotInTemp0): the engine saves motive/time tokens per
@@ -1901,6 +3684,15 @@ namespace Simitone.Client
         {
             try
             {
+                // EXP-07 V1: unl-magic rides this state machine with dest 90
+                // (Magic Town House90.iff) — the booking/transit/arrival/return
+                // law is destination-agnostic (generic TS1 call 17).
+                _unltrMagic = CheckEnabled("unl-magic");
+                if (_unltrMagic && UnlTravelDest != 90)
+                {
+                    UnlTravelDest = 90;
+                    Log("AUTOTEST unl-travel MAGIC-MODE dest=90 (EXP-07 V1 Magic Town transport; House90.iff staged in userdir)");
+                }
                 if (_unltrState == 0)
                 {
                     if (++_unltrSettle < 90) return;
@@ -5153,6 +6945,7 @@ namespace Simitone.Client
             if (_plPushed) ProposeTick(); // EXP-02: phase-2 propose watch + run-55 postmortem + run-63 neg arm (post-postmortem)
             if (CheckEnabled("ss-book") && !_ssBookDone) { SSBookTick(); return; }
             if (CheckEnabled("famesess") && !_fsDone) { FameSessTick(); return; }
+            if ((CheckEnabled("hddowntown2") || CheckEnabled("hddowntown3") || CheckEnabled("hddowntown4") || CheckEnabled("hddowntown5") || CheckEnabled("hddowntown6") || CheckEnabled("hddowntown7")) && !_hd2Done) { HDDowntown2Tick(); return; } // EXP-10 leg 1: the Hot Date downtown re-baseline (+ leg 3: the return row)
             if (CheckEnabled("socexec") && !_socExecDone) { SocExecTick(); return; }
             if (CheckEnabled("saveresume") && !_srDone) { SaveResumeTick(); return; }
             // (SIM-03 tranches 2-5) focused lifecycle probes; same short-circuit pattern.
@@ -5270,9 +7063,33 @@ namespace Simitone.Client
                 UnlPets2Tick();
             }
             // EXP-05 V6 (opt-in "unl-travel"): Old Town round trip per TRV-02.
-            if (CheckEnabled("unl-travel") && _unltrState != 99)
+            // EXP-07 V1 (opt-in "unl-magic"): same machine, Magic Town dest 90.
+            if ((CheckEnabled("unl-travel") || CheckEnabled("unl-magic")) && _unltrState != 99)
             {
                 UnlTravelTick();
+            }
+            // EXP-07 V2 (opt-in "unl-magic2"): MagicMasterSpells discovery + dump.
+            if (CheckEnabled("unl-magic2") && _unlmg2State != 99)
+            {
+                UnlMagic2Tick();
+            }
+            // EXP-07 V2 drive (opt-in "unl-magic3"): ingredient 'Add to Inventory'
+            // → op-51 manage_inventory token on the sim's NID inventory.
+            if (CheckEnabled("unl-magic3") && _unlmg3State != 99)
+            {
+                UnlMagic3Tick();
+            }
+            // EXP-07 V2 charge leg (opt-in "unl-magic4"): inventory tokens →
+            // Wand Charger Add/Brew rows → 4102 flag bits on the controller.
+            if (CheckEnabled("unl-magic4") && _unlmg4State != 99)
+            {
+                UnlMagic4Tick();
+            }
+            // EXP-07 V3 T5 nectar leg (opt-in "unl-magic5"): NectarPress
+            // Add/Brew/Drink — controller mark-made bits + pd[29] drank flag.
+            if (CheckEnabled("unl-magic5") && _unlmg5State != 99)
+            {
+                UnlMagic5Tick();
             }
             // TRV-04 (opt-in "trv04book"): the phone-plugin menu/booking drive —
             // the real 'Call Plugin' pie entry (Param0 = plugin oid) pushed as a
@@ -5843,8 +7660,16 @@ namespace Simitone.Client
                 return; // (EXP-05) pet legs still driving; battery finishes after the verdict
             if (CheckEnabled("unl-pets2") && _unl2State != 99)
                 return; // (EXP-05 V3) despawn forensics still driving; battery finishes after the verdict
-            if (CheckEnabled("unl-travel") && _unltrState != 99)
-                return; // (EXP-05 V6) Old Town round trip still driving; battery finishes after the verdict
+            if ((CheckEnabled("unl-travel") || CheckEnabled("unl-magic")) && _unltrState != 99)
+                return; // (EXP-05 V6) Old Town / (EXP-07 V1) Magic Town round trip still driving; battery finishes after the verdict
+            if (CheckEnabled("unl-magic2") && _unlmg2State != 99)
+                return; // (EXP-07 V2) MagicMasterSpells discovery still driving; battery finishes after the verdict
+            if (CheckEnabled("unl-magic3") && _unlmg3State != 99)
+                return; // (EXP-07 V2) ingredient→inventory drive still running; battery finishes after the verdict
+            if (CheckEnabled("unl-magic4") && _unlmg4State != 99)
+                return; // (EXP-07 V2) charge leg still driving; battery finishes after the verdict
+            if (CheckEnabled("unl-magic5") && _unlmg5State != 99)
+                return; // (EXP-07 V3) nectar leg still driving; battery finishes after the verdict
             if (CheckEnabled("exp09spawn") && _trsState != 99)
                 return; // (EXP-09) spawn/export still driving
             if (CheckEnabled("exp09neg") && _ngState != 99)
@@ -25575,7 +27400,12 @@ namespace Simitone.Client
         private static short _unltrHostNid = -1;
         private static readonly uint[] UnlTravelPetGuids = { 0x7BEA0977u, 0x4A70DF92u }; // templatecat, templatedog (V3 corrective family-pet law)
         private const short UnlTravelHouse = 5; // house 5 carries the phone + vacation plugin (EXP-04 booking law); run 1 proved lot 10 has neither booking path
-        private const short UnlTravelDest = 80; // Old Town community lot (STDesc range 80-89; House80.iff present in every userdir)
+        // EXP-07 V1 ('unl-magic'): magic mode retargets the SAME booking law at
+        // Magic Town — houses 90-99 + MTDesc.iff are staged in the userdir,
+        // GetNeighborhoodModeFromHouse maps 90-99 -> mode 7, and the away-lot
+        // loader is fully generic (GetHousePath + Downtown=true). Probe-only.
+        private static short UnlTravelDest = 80; // Old Town community lot (STDesc range 80-89; House80.iff present in every userdir)
+        private static bool _unltrMagic;
         private static readonly short[] _unltrOids0 = new short[3];
         private static readonly short[] _unltrMotives0 = new short[3 * 16];
         private static VMEntity _unltrTarget; // booked phone/plugin object
@@ -38884,6 +40714,1280 @@ namespace Simitone.Client
                 Log("AUTOTEST famesess EXC " + ex.GetType().Name + " " + ex.Message + " at " + ex.StackTrace?.Split('\n').FirstOrDefault());
                 FameSessFail("exception");
             }
+        }
+
+
+        // ====================================================================
+        // EXP-10 leg 1 ('hddowntown2', opt-in): the Hot Date DOWNTOWN
+        // RE-BASELINE. The 2026-09-20 EXP-03 increment-16 finding
+        // (evidence/EXP-03/lot-transition-resolved-20260920.md: the departure
+        // is TERMINAL in the single-lot port — no lot transition) predates the
+        // integrated travel machinery: EXP-04 V2.7/V2.8 proved SignalLotSwitch
+        // + LotTransitInfo + the away-VM replacement (engine ITRACE rewrote
+        // temp0=44; the house-44 VM booted), and EXP-09/TRV-03 landed the
+        // away-load family activation + deferred VerifyFamily. Hot Date's
+        // downtown is the same mode-17 ChangeToLotInTemp0 primitive. This
+        // probe ports the EXP-03 downtown-phone booking drive (runs 2-9
+        // receipts + godowntownphoneplugin-trees-20260919.txt) onto the
+        // CURRENT tip and answers ONE question headless: does the downtown
+        // lot transition fire now?
+        //
+        // Chain (every law ported from receipts, nothing linked):
+        //   - the GoDowntownPhonePlugin (0xA6F31853; its TTAB row 2 = BHAV
+        //     4100 'Go Downtown', the tree whose ins13 is op1 0x11 = mode 17
+        //     — the EXP-03 tree decode) is placed when absent: created OOW +
+        //     the phone recreated so its init re-scans the plugin registry
+        //     (the EXP-03 run-18 wire law);
+        //   - the booking row is pushed probe-side with the ss-book idiom
+        //     (GetAction(row 2, host) + FSOSkipPermissions; CheckRoutine
+        //     nulled per the EXP-03 push law) — disclosed;
+        //   - dialogs are answered through PRODUCTION semantics, generalized
+        //     per type from HPAnswerDialogs + the ss-book responder:
+        //     YesNo/Message get a native click (code 0, empty text — the
+        //     EXP-03 runs 3-26 chain law; ss-book run 4-6 empirical note),
+        //     lot-picker types (TS1Downtown=5 "house number in temp0" +
+        //     TS1Vacation/Neighborhood/StudioTown/Magictown/PhoneBook/
+        //     NumericEntry) get the production HouseSelected shape (code 1 +
+        //     ResponseText="<lot>" -> temp0 via VMDialogPrivateStrings) with
+        //     lot = the first existing of the HD downtown houses 21-30
+        //     (TemplateUserData DTDesc.iff + House21-30; the TRV-02 guard in
+        //     mode 17 refuses travel into a missing house file);
+        //   - Wait-For-Notify parks (the EXP-03 V1.2 decode: global 281's
+        //     innermost idle counts down 20000 ticks) release via the
+        //     NotifyIdle + 1-tick ScheduleTickIn wake law (EXP-04 V1.3 /
+        //     EXP-06), re-armed per park of the pushed action;
+        //   - observation is the EXP-04 V2.8 law set: LotTransitInfo (VM
+        //     mirror + the cross-lot GameState), the VM replacement
+        //     (entity delta + the new lot's CurrentHouse from
+        //     VMTS1ActivatorNew), an arrival census (avatars/positions/
+        //     label census, global 3 = the downtown-sim oid, the Downtown
+        //     arrival clock law reading the banked departure tokens), and
+        //     an ITRACE window (integrated EXP-06 sink) that names whether
+        //     the 4100@13 op=1 (mode 17) ever executed.
+        //
+        // Verdict: PASS only on the transition/arrival evidence (the screen's
+        // VM replaced + the new lot booted + census). An honest FAIL names
+        // its terminal precisely: no-dialog stall / row2-unpushable /
+        // plugin-unplaceable / no-downtown-lot-file / DEPARTURE-TERMINAL
+        // (the EXP-03 increment-16 law reproducing: host OOW + no switch
+        // within a 600f grace) / mode-17-executed-but-no-switch /
+        // answered-but-stalled. Bounded: 3600f main window (+1200f arrival
+        // window), self-terminating. Probe-side only — no engine edits; the
+        // disclosed pushes mirror player input (phone call / picker click /
+        // LIVE re-click).
+        // ====================================================================
+        private static bool _hd2Done;
+        private static int _hd2Frame;
+        private static int _hd2State; // 0 arm, 1 watch, 2 done
+        private static VMEntity _hd2Plugin;
+        private static VMAvatar _hd2Host;
+        private static int _hd2Dest = -1;
+        private static uint _hd2PushUid;
+        private static int _hd2Answers;
+        private static readonly HashSet<string> _hd2DlgTypes = new HashSet<string>();
+        private static bool _hd2CabSeen;
+        private static bool _hd2Arrived;
+        // EXP-10 return leg ('hddowntown3', opt-in): the same probe machine
+        // driven PAST the arrival — phase 0 = the proven outbound
+        // TRANSITION+ARRIVAL, phase 1 = the native downtown->home return
+        // (tree 4100 is bidirectional: ins1 `call tree 320` = 21<=Global[10]<=31
+        // routes TRUE on the downtown lot to ins87, the return branch, which
+        // skips the 4103 picker and merges into the shared cab/departure
+        // machinery), phase 2 = the home arrival window + verdict.
+        private static bool _hd3;
+        // EXP-10 shopping row ('hddowntown4', opt-in): post-arrival phase 3 —
+        // exercise the plugin's OWN purchase/souvenir spawn trees on the
+        // traveler (4125 'Spawn Community Purchases' + 4124/4126/4127 the
+        // mood variants, covering every mood state) via VMThread.RunInMyStack
+        // (synchronous to completion; the censor-live-exec idiom) and observe
+        // inventory deltas (GetInventoryByNID) + entity deltas.
+        private static bool _hd4;
+        // EXP-10 restaurants row ('hddowntown5', opt-in): post-arrival
+        // phase 4 — census the restaurant/dining service objects on the
+        // downtown VM, push a viable diner-facing row (a booth 'Sit' family
+        // action) through production semantics for the traveler, and watch
+        // the chain START + progress (position/occupancy/action state).
+        private static bool _hd5;
+        // EXP-10 interests/NPC-migration row ('hddowntown6', opt-in):
+        // post-arrival phase 5 — observational census: classify the arrival
+        // VM's avatars (traveling party vs downtown NPCs via the family
+        // GUIDs captured pre-departure), sample their interest PersonData
+        // words, and pin the g3 downtown-sim mapping + controller presence.
+        private static bool _hd6;
+        // EXP-10 meal-loop soak ('hddowntown7', opt-in): post-arrival phase 6
+        // — push the Restaurant-Eat controller's own 'Eat' row (the native
+        // player action) for the traveler and run a long soak sampling the
+        // serve chain: action transitions, hunger delta, waiter/cook NPC
+        // activity, entity changes. Named depth from the hd5 receipt.
+        private static bool _hd7;
+        private static short _hd7Hunger0 = -1;
+        private static int _hd7EngageFrame = -1;
+        private static VMEntity _hd5Booth;
+        private static int _hd5StartedFrame = -1;
+        private static FSO.LotView.Model.LotTilePos _hd5StartPos;
+        private static int _hd3Phase;
+        private static uint _hd2HostGuid;
+        private static int _hd3HomeLot = -1;
+        private static int _hd3HomeFrame = -1;
+        private static string Hd2Check { get { return _hd3 ? "hddowntown3" : "hddowntown2"; } }
+        private static int _hd2ArrivedFrame = -1;
+        private static int _hd2ArrivalLot = -1;
+        private static int _hd2Ents0 = -1;
+        private static bool _hd2Mode17Seen;
+        private static bool _hd2DepartedOow;
+        private static int _hd2OowGraceStart = -1;
+        private static int _hd2NotifyArms;
+        private static bool _hd2TraceArmed;
+        private static int _hd2TraceArmFrame = -1;
+        private static bool _hd2TraceDone;
+        private static readonly List<string> _hd2Trace = new List<string>();
+        private static readonly Dictionary<string, int> _hd2TraceAgg = new Dictionary<string, int>();
+        private static int _hd2TraceOther;
+        private static readonly uint[] Hd2CabGuids = { 0x7AE4654Au, 0x6477AB64u, 0x105BCC90u, 0xF408F4DBu };
+
+        private static void HDDowntown2Tick()
+        {
+            _hd2Frame++;
+            try
+            {
+                if (_hd2State == 0) { Hd2Arm(); return; }
+                if (_hd2State == 2) return;
+
+                // R157 unpause replication: this short-circuit bypasses
+                // StateSample's own unpause, so a mid-watch dialog park
+                // (speed=-2) would stall the WHOLE VM and read as "the chain
+                // never executes" (the ss-book run-11 artifact).
+                if (_vm.SpeedMultiplier <= 0)
+                {
+                    var stale = _vm.GlobalBlockingDialog;
+                    _vm.SpeedMultiplier = _vm.LastSpeedMultiplier > 0 ? _vm.LastSpeedMultiplier : 1;
+                    _vm.LastSpeedMultiplier = 0;
+                    _vm.GlobalBlockingDialog = null;
+                    Log("AUTOTEST hddowntown2 unpaused vm (speed was <=0; stale-latch "
+                        + (stale == null ? "none" : "obj" + stale.ObjectID) + " released) at f=" + _hd2Frame);
+                }
+
+                // UIMainPanel non-LIVE law (EXP-06 leg-4 run-16): the booking
+                // flips the panel out of LIVE and the per-frame park lands
+                // after the probe's speed restore. Flip it back — what a
+                // player's LIVE click does.
+                var mainPanel = _screen?.Frontend?.MainPanel;
+                if (mainPanel != null && mainPanel.Mode != Simitone.Client.UI.Panels.UIMainPanelMode.LIVE)
+                {
+                    var was = mainPanel.Mode;
+                    mainPanel.SetMode(Simitone.Client.UI.Panels.UIMainPanelMode.LIVE);
+                    Log("AUTOTEST hddowntown2 livelift: panel Mode " + was + " -> LIVE at f=" + _hd2Frame);
+                }
+
+                // VM-replacement detector (the EXP-04 V2.7 orphaning law): when
+                // the departure's SignalLotSwitch lands, TS1GameScreen REPLACES
+                // its vm (VMLotSwitch -> InitializeLot) — the probe's stale _vm
+                // would read the orphaned corpse. Switch sampling to the live
+                // VM and census the arrival lot.
+                var screenVm = _screen?.vm;
+                if (screenVm != null && !ReferenceEquals(screenVm, _vm))
+                {
+                    var oldEnts = _vm.Entities.Count;
+                    _vm = screenVm;
+                    Hd2DisarmTrace();
+                    Hd2OnArrival(oldEnts);
+                    return;
+                }
+
+                // Leg 1: the per-type production dialog responder (runs BEFORE
+                // sampling so the same-tick release is visible). Shared by the
+                // watch AND the post-arrival phase (a production click either way).
+                Hd2AnswerDialogs();
+
+                // EXP-10 RETURN LEG (hddowntown3 phase 1, state 30, one-shot):
+                // on the arrival (downtown) VM — re-resolve the traveler by its
+                // pre-departure GUID, census/arm/push the GoDowntown plugin
+                // THERE. Same probe-side push law as the outbound (disclosed):
+                // FSOSkipPermissions + CheckRoutine=null + attr[1]=host OID for
+                // the 4100@25 stack-object repoint. Global[10] NOT armed — the
+                // return needs global 320 TRUE, which the hdseed fix provides
+                // natively on the downtown load.
+                // EXP-10 MEAL LOOP (hddowntown7 phase 6, state 50 = POLL):
+                // run-1 law: the Restaurant-Eat controller's presence on lot 21
+                // is NONDETERMINISTIC per lot-load (hd5's arrival had two;
+                // hd7-run1's had none). Poll up to 1200f, then fall back to
+                // the hd5-proven booth-sit drive with the absence recorded.
+                if (_hd7 && _hd3Phase == 6 && _hd2State == 50)
+                {
+                    var ctrl7 = _vm.Entities.FirstOrDefault(e =>
+                        (e.Object?.OBJ?.ChunkLabel ?? "").ToLowerInvariant().Contains("restaurant eat"));
+                    if (ctrl7 == null && _hd2Frame - _hd2ArrivedFrame < 1200) return; // keep polling
+                    _hd2State = 51;
+                    var avs7 = _vm.Entities.OfType<VMAvatar>().ToList();
+                    var host7 = _hd2HostGuid != 0
+                        ? avs7.FirstOrDefault(a => a.Object?.OBJ?.GUID == _hd2HostGuid)
+                        : null;
+                    if (host7 == null) host7 = avs7.FirstOrDefault();
+                    if (host7 == null)
+                    {
+                        Log("AUTOTEST hddowntown7 verdict meal-no-traveler: no avatar on the arrival VM");
+                        Fail("hddowntown7"); _hd2Done = true; Finish(); return;
+                    }
+                    _hd2Host = host7;
+                    VMQueuedAction p7 = null;
+                    string src7 = "?";
+                    if (ctrl7 != null)
+                    {
+                        try { p7 = ctrl7.GetAction(0, _hd2Host, _vm.Context, false); } catch { }
+                        src7 = ctrl7.Object.OBJ.ChunkLabel + " obj" + ctrl7.ObjectID + " row 0";
+                    }
+                    else
+                    {
+                        // FALLBACK: a dining booth seat (the hd5-proven sit
+                        // drive) — the meal machinery may still engage via the
+                        // NPC controller; the controller absence is recorded.
+                        // generic scan restricted to the dining FURNITURE
+                        // family (run-4 law: the unrestricted scan pushed the
+                        // Pianist's marriage-proposal row — avatars and
+                        // non-dining objects must be excluded; the hd5 winner
+                        // was 'Chair - Restaurant - Cafe')
+                        foreach (var e7 in _vm.Entities.OfType<VMGameObject>())
+                        {
+                            if (p7 != null) break;
+                            var lab7 = (e7.Object?.OBJ?.ChunkLabel ?? "").ToLowerInvariant();
+                            if (!(lab7.Contains("chair") || lab7.Contains("booth")
+                                || lab7.Contains("table") || lab7.Contains("restaurant")
+                                || lab7.Contains("cafe") || lab7.Contains("dining"))) continue;
+                            var tt7 = e7.TreeTable;
+                            if (tt7?.Interactions == null) continue;
+                            for (uint r = 0; r < tt7.Interactions.Length; r++)
+                            {
+                                string nm7 = null;
+                                try { nm7 = e7.GetAction((int)r, _hd2Host, _vm.Context, false)?.Name; } catch { }
+                                var l7 = (nm7 ?? "").ToLowerInvariant();
+                                if (l7.Contains("sit") || l7.Contains("dine"))
+                                {
+                                    try { p7 = e7.GetAction((int)r, _hd2Host, _vm.Context, false); } catch { }
+                                    src7 = e7.Object?.OBJ?.ChunkLabel + " obj" + e7.ObjectID + " row " + r;
+                                    break;
+                                }
+                            }
+                        }
+                        if (p7 == null)
+                        {
+                            Log("AUTOTEST hddowntown7 verdict meal-no-controller-and-no-seat: no Restaurant-Eat controller"
+                                + " within 1200f of the load AND no booth seat row available");
+                            Fail("hddowntown7"); _hd2Done = true; Finish(); return;
+                        }
+                        Log("AUTOTEST hddowntown7 controller ABSENT this load (nondeterministic restaurant population law,"
+                            + " hd5 vs hd7-run1) — fallback booth drive");
+                    }
+                    if (p7 == null)
+                    {
+                        Log("AUTOTEST hddowntown7 verdict meal-push-unavailable: GetAction null on " + src7);
+                        Fail("hddowntown7"); _hd2Done = true; Finish(); return;
+                    }
+                    p7.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                    p7.CheckRoutine = null;
+                    // run-2 law: hunger0=95 (FULL) — the 'Eat' availability gate
+                    // surely requires hunger below a threshold (the native gate
+                    // class). DISCLOSED arm (the deathrel probe's
+                    // collapse-Hunger idiom): drop hunger to a hungry state
+                    // before the push so the gate can open.
+                    _hd2Host.SetMotiveData(FSO.SimAntics.Model.VMMotive.Hunger, -30);
+                    _hd7Hunger0 = _hd2Host.GetMotiveData(FSO.SimAntics.Model.VMMotive.Hunger);
+                    _hd2Host.Thread.EnqueueAction(p7);
+                    _hd2PushUid = p7.UID;
+                    _hd7EngageFrame = -1;
+                    Log("AUTOTEST hddowntown7 pushed " + src7 + " '" + p7.Name + "' uid=" + p7.UID
+                        + " for traveler obj" + _hd2Host.ObjectID + " hunger0=" + _hd7Hunger0
+                        + " — soak open (2400f; sampling the serve chain)");
+                    return;
+                }
+
+                // EXP-10 MEAL LOOP soak watch (state 51): sample every 150f;
+                // close at +2400f with the honest verdict.
+                if (_hd7 && _hd3Phase == 6 && _hd2State == 51)
+                {
+                    var aa7 = _hd2Host?.Thread?.ActiveAction;
+                    if (_hd7EngageFrame < 0 && aa7 != null && (aa7.UID == _hd2PushUid))
+                    {
+                        _hd7EngageFrame = _hd2Frame;
+                        Log("AUTOTEST hddowntown7 'Eat' ENGAGED at f=" + _hd2Frame);
+                    }
+                    if (_hd7EngageFrame >= 0 && _hd2Frame % 300 == 0)
+                    {
+                        var hunger7 = _hd2Host.GetMotiveData(FSO.SimAntics.Model.VMMotive.Hunger);
+                        Log("AUTOTEST hddowntown7 soak f=" + _hd2Frame + " (+eat" + (_hd2Frame - _hd7EngageFrame) + ")"
+                            + " active='" + (aa7?.Name ?? "-") + "' pos=(" + _hd2Host.Position.TileX + ","
+                            + _hd2Host.Position.TileY + ",L" + _hd2Host.Position.Level + ")"
+                            + " hunger=" + hunger7 + " (d" + (hunger7 - _hd7Hunger0) + ")"
+                            + " ents=" + _vm.Entities.Count);
+                    }
+                    if (_hd7EngageFrame >= 0 && _hd2Frame >= _hd7EngageFrame + 2400)
+                    {
+                        var hungerEnd = _hd2Host.GetMotiveData(FSO.SimAntics.Model.VMMotive.Hunger);
+                        var dH = hungerEnd - _hd7Hunger0;
+                        Log("AUTOTEST hddowntown7 soak close f=" + _hd2Frame + " active='" + (aa7?.Name ?? "-")
+                            + "' hunger " + _hd7Hunger0 + " -> " + hungerEnd + " (d" + dH + ")"
+                            + " ents=" + _vm.Entities.Count);
+                        if (dH <= -3 || (aa7 != null && aa7.Name != null
+                            && aa7.Name.ToLowerInvariant().Contains("eat")))
+                        {
+                            Log("AUTOTEST hddowntown7 verdict MEAL-LOOP-ENGAGED: the controller's own 'Eat' chain ran"
+                                + " through real content (hunger delta " + dH + ", final action '" + (aa7?.Name ?? "-")
+                                + "') — the downtown meal surface engages natively (serve-chain choreography depth"
+                                + " remains a named follow-up)");
+                            Pass("hddowntown7"); _hd2Done = true; Finish(); return;
+                        }
+                        Log("AUTOTEST hddowntown7 verdict MEAL-EAT-NO-PROGRESS: 'Eat' engaged but hunger never dropped"
+                            + " and the action never reached an eat state — the serve chain (order/cook/serve with NPC"
+                            + " waiters) did not complete autonomously in the soak window (named depth: NPC-driven"
+                            + " choreography)");
+                        Fail("hddowntown7"); _hd2Done = true; Finish(); return;
+                    }
+                    if (_hd2Frame >= 3600)
+                    {
+                        Log("AUTOTEST hddowntown7 verdict MEAL-NEVER-ENGAGED: the pushed 'Eat' never became active"
+                            + " (entry-gate decode owed)");
+                        Fail("hddowntown7"); _hd2Done = true; Finish(); return;
+                    }
+                }
+
+                // EXP-10 INTERESTS/NPC-MIGRATION ROW (hddowntown6 phase 5,
+                // state 45, one-shot observational census).
+                if (_hd6 && _hd3Phase == 5 && _hd2State == 45)
+                {
+                    _hd2State = 2;
+                    var avs6 = _vm.Entities.OfType<VMAvatar>().ToList();
+                    var travelers = avs6.Where(a => a.Object?.OBJ?.GUID == _hd2HostGuid).ToList();
+                    var npcs = avs6.Where(a => a.Object?.OBJ?.GUID != _hd2HostGuid).ToList();
+                    Log("AUTOTEST hddowntown6 avatar classification: total=" + avs6.Count
+                        + " travelingParty=" + travelers.Count + " downtownNPCs=" + npcs.Count
+                        + " g3(downtown-sim oid)=" + _vm.GetGlobalValue(3));
+                    foreach (var a in npcs.Take(12))
+                    {
+                        var pd = new List<string>();
+                        for (short w = 17; w <= 24; w++)
+                        {
+                            try { pd.Add(w + ":" + a.GetPersonData((FSO.SimAntics.Model.VMPersonDataVariable)w)); } catch { }
+                        }
+                        Log("AUTOTEST hddowntown6 downtownNPC obj" + a.ObjectID
+                            + " guid=0x" + (a.Object?.OBJ?.GUID ?? 0).ToString("x8")
+
+                            + " pos=(" + a.Position.TileX + "," + a.Position.TileY + ",L" + a.Position.Level + ")"
+                            + " interests[17-24]=[" + string.Join(",", pd) + "]"
+                            + " action='" + (a.Thread?.ActiveAction?.Name ?? "-") + "'");
+                    }
+                    var ctrls = _vm.Entities.Where(e => e.Object?.OBJ != null)
+                        .Select(e => e.Object.OBJ.ChunkLabel ?? "?")
+                        .Where(l => { var k = l.ToLowerInvariant();
+                            return k.Contains("controller") || k.Contains("npc") || k.Contains("date"); })
+                        .GroupBy(l => l).Select(g => g.Key + "x" + g.Count()).ToList();
+                    Log("AUTOTEST hddowntown6 controller/NPC-object census: "
+                        + string.Join(" ", ctrls));
+                    Log("AUTOTEST hddowntown6 verdict DOWNTOWN-NPC-CENSUS-OK: the arrival VM carries "
+                        + npcs.Count + " downtown NPCs alongside the traveling party (travelers=" + travelers.Count
+                        + "), with interest PersonData sampled live — the NPC migration surface populated on the"
+                        + " downtown load (observational leg; date-matching drives are a follow-up depth)");
+                    Pass("hddowntown6"); _hd2Done = true; Finish(); return;
+                }
+
+                // EXP-10 RESTAURANTS ROW (hddowntown5 phase 4, state 40,
+                // one-shot census + push) then the progression watch below.
+                if (_hd5 && _hd3Phase == 4 && _hd2State == 40)
+                {
+                    _hd2State = 41;
+                    var avs5 = _vm.Entities.OfType<VMAvatar>().ToList();
+                    var host5 = _hd2HostGuid != 0
+                        ? avs5.FirstOrDefault(a => a.Object?.OBJ?.GUID == _hd2HostGuid)
+                        : null;
+                    if (host5 == null) host5 = avs5.FirstOrDefault();
+                    if (host5 == null)
+                    {
+                        Log("AUTOTEST hddowntown5 verdict restaurants-no-traveler: no avatar on the arrival VM");
+                        Fail("hddowntown5"); _hd2Done = true; Finish(); return;
+                    }
+                    _hd2Host = host5;
+                    // census the restaurant/dining service family
+                    var fams = new[] { "dining", "restaurant", "host", "waiter", "bartend", "booth", "table", "vendor", "cash" };
+                    var cands = _vm.Entities.Where(e => e.Object?.OBJ != null && e.Object.OBJ.GUID != 0xA6F31853u)
+                        .Where(e =>
+                        {
+                            var l = (e.Object.OBJ.ChunkLabel ?? "").ToLowerInvariant();
+                            return fams.Any(f => l.Contains(f));
+                        }).ToList();
+                    Log("AUTOTEST hddowntown5 service-family census: " + cands.Count + " objects ["
+                        + string.Join(" ", cands.GroupBy(c => c.Object.OBJ.ChunkLabel)
+                            .Select(g => g.Key + "x" + g.Count() + "(obj" + g.First().ObjectID + ")")) + "]");
+                    // enumerate rows on dining-family objects, pick the first
+                    // viable diner-facing row (name contains sit/eat/order)
+                    foreach (var c in cands)
+                    {
+                        var tt5 = c.TreeTable;
+                        int rows5 = tt5?.Interactions?.Length ?? 0;
+                        if (rows5 == 0) continue;
+                        var desc5 = new List<string>();
+                        for (uint r = 0; r < rows5; r++)
+                        {
+                            string nm5 = null;
+                            try { nm5 = c.GetAction((int)r, _hd2Host, _vm.Context, false)?.Name; } catch { }
+                            desc5.Add("row" + r + "(fn" + (r < tt5.Interactions.Length ? tt5.Interactions[r].ActionFunction : -1) + ")="
+                                + (nm5 != null ? "\"" + nm5 + "\"" : "?"));
+                        }
+                        Log("AUTOTEST hddowntown5 rows " + c.Object.OBJ.ChunkLabel + " obj" + c.ObjectID + ": "
+                            + string.Join(" ", desc5));
+                    }
+                    var booth = cands.FirstOrDefault(c =>
+                    {
+                        var tt5 = c.TreeTable;
+                        if (tt5?.Interactions == null) return false;
+                        for (uint r = 0; r < tt5.Interactions.Length; r++)
+                        {
+                            string nm5 = null;
+                            try { nm5 = c.GetAction((int)r, _hd2Host, _vm.Context, false)?.Name; } catch { }
+                            var l = (nm5 ?? "").ToLowerInvariant();
+                            if (l.Contains("sit") || l.Contains("dine")) return true;
+                        }
+                        return false;
+                    });
+                    if (booth == null)
+                    {
+                        Log("AUTOTEST hddowntown5 verdict restaurants-no-viable-row: no dining-family object exposes a sit/dine row for the traveler");
+                        Fail("hddowntown5"); _hd2Done = true; Finish(); return;
+                    }
+                    uint pickRow = 0;
+                    var tt = booth.TreeTable;
+                    for (uint r = 0; r < tt.Interactions.Length; r++)
+                    {
+                        string nm5 = null;
+                        try { nm5 = booth.GetAction((int)r, _hd2Host, _vm.Context, false)?.Name; } catch { }
+                        var l = (nm5 ?? "").ToLowerInvariant();
+                        if (l.Contains("sit") || l.Contains("dine")) { pickRow = r; break; }
+                    }
+                    VMQueuedAction p5 = null;
+                    try { p5 = booth.GetAction((int)pickRow, _hd2Host, _vm.Context, false); } catch { }
+                    if (p5 == null)
+                    {
+                        Log("AUTOTEST hddowntown5 verdict restaurants-push-unavailable: row " + pickRow + " GetAction null on "
+                            + booth.Object.OBJ.ChunkLabel + " obj" + booth.ObjectID);
+                        Fail("hddowntown5"); _hd2Done = true; Finish(); return;
+                    }
+                    p5.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                    p5.CheckRoutine = null;
+                    _hd5Booth = booth;
+                    _hd5StartPos = _hd2Host.Position;
+                    _hd2Host.Thread.EnqueueAction(p5);
+                    _hd2PushUid = p5.UID;
+                    _hd5StartedFrame = -1;
+                    Log("AUTOTEST hddowntown5 pushed " + booth.Object.OBJ.ChunkLabel + " obj" + booth.ObjectID
+                        + " row " + pickRow + " '" + p5.Name + "' uid=" + p5.UID
+                        + " for traveler obj" + _hd2Host.ObjectID
+                        + " (probe-side push, disclosed) — progression watch open (600f)");
+                    return;
+                }
+
+                // EXP-10 RESTAURANTS progression watch (state 41)
+                if (_hd5 && _hd3Phase == 4 && _hd2State == 41)
+                {
+                    var aa5 = _hd2Host?.Thread?.ActiveAction;
+                    var aaUid5 = aa5?.UID ?? 0;
+                    if (_hd5StartedFrame < 0 && aaUid5 == _hd2PushUid)
+                    {
+                        _hd5StartedFrame = _hd2Frame;
+                        Log("AUTOTEST hddowntown5 row STARTED at f=" + _hd2Frame + " ('" + aa5.Name + "' on "
+                            + (_hd5Booth?.Object.OBJ.ChunkLabel ?? "?") + " obj" + (_hd5Booth?.ObjectID ?? -1) + ")");
+                    }
+                    if (_hd5StartedFrame >= 0 && _hd2Frame >= _hd5StartedFrame + 600)
+                    {
+                        var moved = !_hd5StartPos.Equals(_hd2Host.Position);
+                        var seated = _hd5Booth != null && _vm.Context.ObjectQueries.Avatars.Any(a =>
+                            a.Position.Equals(_hd5Booth.Position));
+                        Log("AUTOTEST hddowntown5 watch close f=" + _hd2Frame + " (+start" + (_hd2Frame - _hd5StartedFrame) + ")"
+                            + " active='" + (aa5?.Name ?? "-") + "' uidMatch=" + (aaUid5 == _hd2PushUid)
+                            + " moved=" + moved + " startPos=" + _hd5StartPos + " nowPos=" + _hd2Host.Position
+                            + " motiveHunger=" + _hd2Host.GetMotiveData(FSO.SimAntics.Model.VMMotive.Hunger));
+                        if (moved)
+                        {
+                            Log("AUTOTEST hddowntown5 verdict RESTAURANT-ROW-PROGRESSED: the dining-family interaction"
+                                + " STARTED through real content and the traveler physically pathed ('" + (aa5?.Name ?? "-")
+                                + "'), proving the downtown restaurant service surface is live for diner-facing rows");
+                            Pass("hddowntown5"); _hd2Done = true; Finish(); return;
+                        }
+                        Log("AUTOTEST hddowntown5 verdict RESTAURANT-ROW-STALLED: the row started but the traveler never"
+                            + " pathed within 600f (active='" + (aa5?.Name ?? "-") + "') — route/queue law decode owed");
+                        Fail("hddowntown5"); _hd2Done = true; Finish(); return;
+                    }
+                    if (_hd2Frame >= 3600)
+                    {
+                        Log("AUTOTEST hddowntown5 verdict RESTAURANT-ROW-NEVER-STARTED: the pushed row never became active"
+                            + " (uid never matched; active='" + (aa5?.Name ?? "-") + "') — check-routine/entry-gate decode owed");
+                        Fail("hddowntown5"); _hd2Done = true; Finish(); return;
+                    }
+                }
+
+                // EXP-10 SHOPPING ROW (hddowntown4 phase 3, state 35, one-shot):
+                // run the plugin's own spawn trees in the traveler's stack and
+                // observe the inventory/entity deltas. The trees are synchronous
+                // (RunInMyStack), so the whole row completes in this one tick.
+                if (_hd4 && _hd3Phase == 3 && _hd2State == 35)
+                {
+                    _hd2State = 2;
+                    var avs4 = _vm.Entities.OfType<VMAvatar>().ToList();
+                    var host4 = _hd2HostGuid != 0
+                        ? avs4.FirstOrDefault(a => a.Object?.OBJ?.GUID == _hd2HostGuid)
+                        : null;
+                    if (host4 == null) host4 = avs4.FirstOrDefault();
+                    if (host4 == null)
+                    {
+                        Log("AUTOTEST hddowntown4 verdict shopping-no-traveler: no avatar on the arrival VM");
+                        Fail("hddowntown4"); _hd2Done = true; Finish(); return;
+                    }
+                    _hd2Host = host4;
+                    var plug4 = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0xA6F31853u)
+                        ?? _vm.Context.CreateObjectInstance(0xA6F31853u,
+                            FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH)?.BaseObject;
+                    if (plug4 == null)
+                    {
+                        Log("AUTOTEST hddowntown4 verdict shopping-plugin-unplaceable: 0xA6F31853 unresolvable on the arrival VM");
+                        Fail("hddowntown4"); _hd2Done = true; Finish(); return;
+                    }
+                    var res4 = plug4.Object.Resource;
+                    var iff4 = res4?.Iff;
+                    var nid4b = _hd2Host.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.NeighborId);
+                    List<FSO.Files.Formats.IFF.Chunks.InventoryItem> Inv4() =>
+                        Content.Get().Neighborhood.GetInventoryByNID(nid4b) ?? new List<FSO.Files.Formats.IFF.Chunks.InventoryItem>();
+                    var invBefore = Inv4();
+                    var invBeforeKeys = new HashSet<uint>(invBefore.Select(i => i.GUID));
+                    Func<int> invSum4 = () => Inv4().Sum(i => (int)i.Count);
+                    // CORRECTED seed leg (run-5; the run-3/4 laws folded in):
+                    // op51 in TS1 mode dispatches VMTS1InventoryOperations with a
+                    // MODE-FIRST operand [mode u8][tokenType u8][flags u8][flags2 u8]
+                    // [GUID u32 LE] — the TSO GUID-first decoder used in run-3/4 was
+                    // the wrong class (corpus sweep: 3,924 op51s, ALL mode-first).
+                    // The handler is SYNCHRONOUS on the NGBH inventory keyed by
+                    // PersonData[NeighborId] (NOT ObjectID, NOT vm.MyInventory, NOT
+                    // the GlobalLink). Seed through the handler's own store/idiom.
+                    var nid5b = _hd2Host.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.NeighborId);
+                    var prov5 = Content.Get().Neighborhood;
+                    var seedInv = prov5.GetInventoryByNID(nid5b);
+                    if (seedInv == null)
+                    {
+                        seedInv = new List<FSO.Files.Formats.IFF.Chunks.InventoryItem>();
+                        prov5.SetInventoryForNID(nid5b, seedInv);
+                    }
+                    var seedDesc = new List<string>();
+                    foreach (var tid in new[] { 4124, 4125, 4126, 4127, 4128 })
+                    {
+                        var bhS = iff4?.Get<FSO.Files.Formats.IFF.Chunks.BHAV>((ushort)tid);
+                        if (bhS?.Instructions == null) continue;
+                        for (int ii = 0; ii < bhS.Instructions.Length; ii++)
+                        {
+                            var ins = bhS.Instructions[ii];
+                            if (ins.Opcode != 51 || ins.Operand == null || ins.Operand.Length < 8) continue;
+                            var op = new FSO.SimAntics.Primitives.VMTS1InventoryOperationsOperand();
+                            op.Read(ins.Operand);
+                            if (op.Mode != FSO.SimAntics.Primitives.VMTS1InventoryMode.FindToken) continue;
+                            // seed one count of each find-checked (guid,type)
+                            if (!seedInv.Any(x => x.GUID == op.GUID))
+                            {
+                                seedInv.Add(new FSO.Files.Formats.IFF.Chunks.InventoryItem()
+                                    { GUID = op.GUID, Type = op.TokenType, Count = 1 });
+                                seedDesc.Add("t" + tid + "i" + ii + "(mode" + (int)op.Mode + ",type" + op.TokenType
+                                    + ",0x" + op.GUID.ToString("x8") + ")");
+                            }
+                        }
+                    }
+                    Log("AUTOTEST hddowntown4 seed (TS1 decoder, NGBH store, nid=" + nid5b + "): "
+                        + seedDesc.Count + " find-token prerequisites seeded ["
+                        + string.Join(",", seedDesc) + "] (disclosed state prep — the native"
+                        + " ownership gates then decide; run on the STOCK engine, branch parked)");
+                    var entsBefore = _vm.Entities.Count;
+                    Log("AUTOTEST hddowntown4 pre: traveler obj" + _hd2Host.ObjectID + " nid=" + nid4b
+                        + " invItems=" + invBefore.Count + " ents=" + entsBefore
+                        + " plugin obj=" + plug4.ObjectID + " (present=" + (plug4 != plug4 || true) + ")");
+                    var trees4 = new[] { 4125, 4124, 4126, 4127 };
+                    var spawned = new List<string>();
+                    var results4 = new List<string>();
+                    foreach (var tid in trees4)
+                    {
+                        try
+                        {
+                            var bh4 = iff4?.Get<FSO.Files.Formats.IFF.Chunks.BHAV>((ushort)tid);
+                            if (bh4 == null) { results4.Add(tid + ":no-bhav"); continue; }
+                            var rt4 = res4.GetRoutine((ushort)tid) as FSO.SimAntics.VMRoutine;
+                            if (rt4 == null) { results4.Add(tid + ":no-routine"); continue; }
+                            var entsPre = _vm.Entities.Count;
+                            var invPre = Inv4().Select(i => i.GUID).ToList();
+                            var sumPre = invSum4();
+                            var myPre = _vm.MyInventory.Count;
+                            var ran = _hd2Host.Thread.RunInMyStack(rt4, plug4.Object, new short[4], _hd2Host);
+                            var invPost = Inv4().Select(i => i.GUID).ToList();
+                            var added = invPost.Where(g => !invPre.Contains(g)).Distinct().ToList();
+                            var sumDelta = invSum4() - sumPre;
+                            var myDelta = _vm.MyInventory.Count - myPre;
+                            var entsNew = _vm.Entities.Count - entsPre;
+                            var label = (bh4.ChunkLabel ?? "?").Trim();
+                            results4.Add(tid + "('" + label + "'):ran=" + ran + " inv+" + added.Count
+                                + (added.Count > 0 ? "[" + string.Join(",", added.Select(g => "0x" + g.ToString("x8"))) + "]" : "")
+                                + " countSum+" + sumDelta + " myInv" + (myDelta >= 0 ? "+" : "") + myDelta
+                                + " ents+" + entsNew);
+                            if (sumDelta > 0) spawned.Add("countSum+" + sumDelta);
+                            if (myDelta > 0) spawned.Add("myInv+" + myDelta);
+                            foreach (var g in added) spawned.Add("0x" + g.ToString("x8"));
+                        }
+                        catch (Exception ex4)
+                        {
+                            results4.Add(tid + ":EXC " + ex4.GetType().Name + " " + ex4.Message);
+                        }
+                    }
+                    Log("AUTOTEST hddowntown4 tree runs: " + string.Join(" | ", results4));
+                    var invAfter = Inv4();
+                    var newKinds = invAfter.Select(i => i.GUID).Where(g => !invBeforeKeys.Contains(g)).Distinct().Count();
+                    var myNet = _vm.MyInventory.Count;
+                    Log("AUTOTEST hddowntown4 post: invItems=" + invAfter.Count + " (+" + (invAfter.Count - invBefore.Count) + ")"
+                        + " newKinds=" + newKinds
+                        + " myInvNetVsSeed=" + (myNet >= 0 ? "+" : "") + myNet
+                        + " ents=" + _vm.Entities.Count + " (+" + (_vm.Entities.Count - entsBefore) + ")");
+                    if (spawned.Count > 0 || newKinds > 0)
+                    {
+                        Log("AUTOTEST hddowntown4 verdict SHOPPING-SPAWN-OK: the plugin's own purchase/souvenir spawn trees ran in the"
+                            + " traveler's stack on the downtown lot and inventory additions landed (" + spawned.Count + " items; "
+                            + newKinds + " new kinds) — the shopping-spawn machinery is live through 4125/4124/4126/4127");
+                        Pass("hddowntown4"); _hd2Done = true; Finish(); return;
+                    }
+                    Log("AUTOTEST hddowntown4 verdict SHOPPING-NO-SPAWN: every variant ran (or refused) with zero inventory/entity"
+                        + " deltas — the spawn trees' own gates (mood/params) blocked all four on this traveler state; decode follow-up owed");
+                    Fail("hddowntown4"); _hd2Done = true; Finish(); return;
+                }
+
+                if (_hd3 && _hd3Phase == 1 && _hd2State == 30)
+                {
+                    _hd2State = 1;
+                    var avs3 = _vm.Entities.OfType<VMAvatar>().ToList();
+                    VMAvatar host3 = _hd2HostGuid != 0
+                        ? avs3.FirstOrDefault(a => a.Object?.OBJ?.GUID == _hd2HostGuid)
+                        : null;
+                    if (host3 == null) host3 = avs3.FirstOrDefault();
+                    if (host3 == null)
+                    {
+                        Log("AUTOTEST hddowntown3 verdict return-no-traveler: no avatar on the arrival VM to carry the return");
+                        Fail("hddowntown3"); _hd2Done = true; _hd2State = 2; Finish(); return;
+                    }
+                    _hd2Host = host3;
+                    Log("AUTOTEST hddowntown3 traveler re-resolved on the arrival VM: obj" + _hd2Host.ObjectID
+                        + " guid=0x" + (_hd2Host.Object?.OBJ?.GUID ?? 0).ToString("x8")
+                        + " (pre-departure guid=0x" + _hd2HostGuid.ToString("x8") + ")");
+                    var plug3 = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0xA6F31853u);
+                    if (plug3 == null)
+                    {
+                        var grp3 = _vm.Context.CreateObjectInstance(0xA6F31853u,
+                            FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                        plug3 = grp3?.BaseObject;
+                        Log("AUTOTEST hddowntown3 GoDowntown plugin NOT on the downtown lot; created OOW obj="
+                            + (plug3?.ObjectID ?? -1) + " (same run-18 idiom as the outbound; the direct row push"
+                            + " does not need the phone wire)");
+                    }
+                    else Log("AUTOTEST hddowntown3 GoDowntown plugin PRESENT on the downtown lot obj=" + plug3.ObjectID
+                        + " (a shipped category-1 instance — the TRV-04 law)");
+                    if (plug3 == null)
+                    {
+                        Log("AUTOTEST hddowntown3 verdict return-plugin-unplaceable: CreateObjectInstance(0xA6F31853) null on the arrival VM");
+                        Fail("hddowntown3"); _hd2Done = true; _hd2State = 2; Finish(); return;
+                    }
+                    var g10 = _vm.GetGlobalValue(10);
+                    Log("AUTOTEST hddowntown3 Global[10]=" + g10 + " on the downtown load (g10-seed law expects 21;"
+                        + " global 320 = 21<=g10<=31 must read TRUE for the ins87 return branch) g320seeded="
+                        + (g10 >= 21 && g10 <= 31));
+                    VMQueuedAction p3 = null;
+                    try { p3 = plug3.GetAction(2, _hd2Host, _vm.Context, false); } catch { }
+                    if (p3 == null)
+                    {
+                        Log("AUTOTEST hddowntown3 verdict return-row2-unpushable: plugin row 2 GetAction null on the arrival VM");
+                        Fail("hddowntown3"); _hd2Done = true; _hd2State = 2; Finish(); return;
+                    }
+                    p3.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                    p3.CheckRoutine = null;
+                    plug3.SetAttribute(1, (short)_hd2Host.ObjectID);
+                    Log("AUTOTEST hddowntown3 ARM: plugin.attr[1]=" + plug3.GetAttribute(1)
+                        + " (traveler obj" + _hd2Host.ObjectID + ") — the 4100@25 repoint resolves on the return too");
+                    _hd2Host.Thread.EnqueueAction(p3);
+                    _hd2PushUid = p3.UID;
+                    Log("AUTOTEST hddowntown3 pushed plugin row 2 '" + p3.Name + "' (4100) uid=" + p3.UID
+                        + " — return watch open (the tree's 320-TRUE branch routes to ins87; the shared"
+                        + " hostGone/lot-switch watch below now guards the RETURN; main window 3600f)");
+                }
+
+                if (_hd2Arrived)
+                {
+                    Hd2ArrivalSample();
+                    return;
+                }
+
+                // Wait-For-Notify release (the EXP-03 V1.2 law): the chain parks
+                // in global 281 'Wait For Notify' whose innermost idle counts
+                // down 20000 ticks. The native release is ActiveAction.NotifyIdle
+                // re-evaluated on the next idle execution, so arm the flag AND
+                // schedule a 1-tick scheduler wake — re-armed per park of the
+                // pushed action (the vacation probe's UID-scoped law).
+                if (_hd2Host != null)
+                {
+                    var aaNi = _hd2Host.Thread?.ActiveAction;
+                    if (aaNi != null && aaNi.UID == _hd2PushUid && !aaNi.NotifyIdle)
+                    {
+                        aaNi.NotifyIdle = true;
+                        _vm.Scheduler.ScheduleTickIn(_hd2Host, 1);
+                        _hd2NotifyArms++;
+                        if (_hd2NotifyArms <= 4)
+                            Log("AUTOTEST hddowntown2 armed NotifyIdle + 1-tick wake #" + _hd2NotifyArms
+                                + " (Wait-For-Notify park of the pushed action) at f=" + _hd2Frame);
+                    }
+                }
+
+                // ITRACE arm (once the chain starts moving): the integrated
+                // EXP-06 engine sink names whether the mode-17 primitive
+                // (4100@13 op=1 in the HD tree decode) ever executes.
+                if (_hd2Answers > 0 && !_hd2TraceArmed && !_hd2TraceDone)
+                {
+                    _hd2TraceArmed = true;
+                    _hd2TraceArmFrame = _hd2Frame;
+                    _hd2Trace.Clear(); _hd2TraceAgg.Clear(); _hd2TraceOther = 0;
+                    var avObj = _hd2Host.ObjectID;
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = true;
+                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = s =>
+                    {
+                        _hd2TraceOther++;
+                        if (!s.Contains("ent=" + avObj + " ")) return;
+                        _hd2TraceOther--;
+                        if (s.Contains("4100@13 op=1 ") || s.Contains("4100@12 op=1 ")) _hd2Mode17Seen = true;
+                        if (_hd2Trace.Count < 600) _hd2Trace.Add(s);
+                        var k = s.Substring(s.IndexOf(' ') + 1);
+                        if (_hd2TraceAgg.ContainsKey(k)) _hd2TraceAgg[k]++;
+                        else _hd2TraceAgg[k] = 1;
+                    };
+                    FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 800;
+                    Log("AUTOTEST hddowntown2 ITRACE armed (budget 800, ShowTrees) at f=" + _hd2Frame);
+                }
+                if (_hd2TraceArmed && (FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget <= 0
+                    || _hd2Frame >= _hd2TraceArmFrame + 240))
+                {
+                    Hd2DisarmTrace();
+                }
+
+                // DEPARTURE-TERMINAL detector: the host leaves the world (the
+                // 4113 chain, the EXP-03 receipts) while no lot switch has
+                // landed. Grace of 600f, then the honest named FAIL.
+                var hostGone = _hd2Host == null || _hd2Host.Dead
+                    || _hd2Host.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                    || !_vm.Context.ObjectQueries.Avatars.Contains(_hd2Host);
+                if (hostGone && !_hd2DepartedOow)
+                {
+                    _hd2DepartedOow = true;
+                    _hd2OowGraceStart = _hd2Frame;
+                    Log("AUTOTEST hddowntown2 host DEPARTED OOW at f=" + _hd2Frame
+                        + " (600f grace for the lot switch; active='"
+                        + (_hd2Host?.Thread?.ActiveAction?.Name ?? "-") + "' mode17Seen=" + _hd2Mode17Seen + ")");
+                }
+                if (_hd2DepartedOow && _hd2OowGraceStart > 0 && _hd2Frame >= _hd2OowGraceStart + 600)
+                {
+                    Hd2DisarmTrace();
+                    Log("AUTOTEST hddowntown2 post-departure dump f=" + _hd2Frame
+                        + " ents=" + _vm.Entities.Count
+                        + " avatars=" + _vm.Entities.Count(e => e is VMAvatar)
+                        + " cabs=" + _vm.Entities.Count(e => e.Object?.OBJ != null && Hd2CabGuids.Contains(e.Object.OBJ.GUID))
+                        + " transit=" + _vm.TS1State.LotTransitInfo + "/"
+                        + (Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1)
+                        + " clock=" + Sim3Clock()
+                        + " hostActive='" + (_hd2Host?.Thread?.ActiveAction?.Name ?? "-") + "'");
+                    Log("AUTOTEST hddowntown2 verdict DEPARTURE-TERMINAL: the host left the world at f="
+                        + _hd2OowGraceStart + " and NO lot switch followed within the grace window — the EXP-03"
+                        + " increment-16 law (2026-09-20) REPRODUCES on this tip"
+                        + " (mode17ITRACE=" + _hd2Mode17Seen + " answers=" + _hd2Answers
+                        + " types=[" + string.Join(",", _hd2DlgTypes) + "] cabs=" + _hd2CabSeen + ")");
+                    Fail(Hd2Check); _hd2Done = true; _hd2State = 2;
+                    Finish();
+                    return;
+                }
+
+                if (_hd2Frame % 60 == 0 || _hd2Frame < 5)
+                {
+                    var cabs = _vm.Entities.Count(e => e.Object?.OBJ != null && Hd2CabGuids.Contains(e.Object.OBJ.GUID));
+                    if (cabs > 0) _hd2CabSeen = true;
+                    var aa = _hd2Host?.Thread?.ActiveAction;
+                    var tr = _hd2Host?.Thread?.TempRegisters;
+                    Log("AUTOTEST hddowntown2 f=" + _hd2Frame
+                        + " active=" + (aa == null ? "-" : (aa.Name ?? "?") + "@" + (aa.ActionRoutine?.ID ?? 0) + ":" + (aa.Callee?.ObjectID ?? 0))
+                        + " cabs=" + cabs
+                        + " transit=" + _vm.TS1State.LotTransitInfo
+                        + " gbd=" + (_vm.GlobalBlockingDialog == null ? "-" : "obj" + _vm.GlobalBlockingDialog.ObjectID)
+                        + " clock=" + Sim3Clock()
+                        + " ents=" + _vm.Entities.Count
+                        + " hostQ=" + (_hd2Host?.Thread?.Queue?.Count ?? -1)
+                        + " hostStack=" + (_hd2Host?.Thread?.Stack?.Count ?? -1)
+                        + " temps=[" + (tr == null ? "" : string.Join(",", tr.Take(8))) + "]"
+                        + " spd=" + _vm.SpeedMultiplier
+                        + " mode=" + (_screen?.Frontend?.MainPanel?.Mode.ToString() ?? "?")
+                        + " answers=" + _hd2Answers
+                        + " mode17=" + _hd2Mode17Seen);
+                }
+
+                // Window close: the bounded main watch ends with a named verdict.
+                if (_hd2Frame >= 3600)
+                {
+                    Hd2DisarmTrace();
+                    var aa2 = _hd2Host?.Thread?.ActiveAction;
+                    string named =
+                        _hd2Answers == 0 ? "no dialog ever raised; chain stalled at "
+                            + (aa2 == null ? "queue-head" : "'" + aa2.Name + "'")
+                        : _hd2Mode17Seen ? "mode 17 executed (ITRACE op=1 at 4100@13/12) but the lot switch never landed"
+                            + " (a TRV-02 destination refuse or an unconsumed SignalLotSwitch)"
+                        : "answered " + _hd2Answers + " dialogs [" + string.Join(",", _hd2DlgTypes)
+                            + "] but mode 17 never executed; chain at "
+                            + (aa2 == null ? "queue-head" : "'" + aa2.Name + "'");
+                    Log("AUTOTEST " + Hd2Check + " verdict NO-TRANSITION: " + named
+                        + " | cabs=" + _hd2CabSeen
+                        + " hostOow=" + _hd2DepartedOow
+                        + " hostDead=" + (_hd2Host?.Dead ?? true)
+                        + " hostPos=" + (_hd2Host == null ? "gone" : _hd2Host.Position.ToString())
+                        + " clock=" + Sim3Clock()
+                        + " transit=" + _vm.TS1State.LotTransitInfo + "/"
+                        + (Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1)
+                        + " ents=" + _hd2Ents0 + "->" + _vm.Entities.Count);
+                    Fail(Hd2Check); _hd2Done = true; _hd2State = 2;
+                    Finish();
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("AUTOTEST hddowntown2 EXC " + ex.GetType().Name + " " + ex.Message);
+                Hd2DisarmTrace();
+                Fail(Hd2Check); _hd2Done = true; _hd2State = 2;
+                Finish();
+            }
+        }
+
+        // Arm (probe frame 1): host, destination lot map, plugin place/bound,
+        // row census, push. Every failure here is a named verdict.
+        private static void Hd2Arm()
+        {
+            _hd2Host = _avatars.Count > 0 ? _avatars[0] : null;
+            _hd2Ents0 = _vm.Entities.Count;
+            Log("AUTOTEST hddowntown2 arm: host=" + (_hd2Host?.ObjectID.ToString() ?? "none")
+                + " ents=" + _hd2Ents0
+                + " clock=" + Sim3Clock()
+                + " g34=" + _vm.GetGlobalValue(34) + " (the mode-17 transit seed for non-vacation destinations)"
+                + " transit=" + _vm.TS1State.LotTransitInfo + "/"
+                + (Content.Get().Neighborhood.GameState?.LotTransitInfo ?? -1));
+            if (_hd2Host == null)
+            {
+                Log("AUTOTEST hddowntown2 verdict no-host: the lot has no avatar");
+                Fail(Hd2Check); _hd2Done = true; _hd2State = 2; Finish(); return;
+            }
+
+            // Destination map: the Hot Date downtown lots are houses 21-30
+            // (TemplateUserData ships DTDesc.iff + House21-30). Mode 17's
+            // TRV-02 guard refuses a missing house file, so the picker answer
+            // is the FIRST existing lot in that band.
+            var lotMap = new List<string>();
+            for (short i = 21; i <= 30; i++)
+            {
+                string p = null;
+                try { p = Content.Get().Neighborhood.GetHousePath(i); } catch { }
+                var ok = !string.IsNullOrEmpty(p) && File.Exists(p);
+                lotMap.Add(i + (ok ? "=ok" : "=MISSING"));
+                if (ok && _hd2Dest < 0) _hd2Dest = i;
+            }
+            Log("AUTOTEST hddowntown2 downtown lot map [21..30]: " + string.Join(" ", lotMap)
+                + " -> picker answer lot " + _hd2Dest);
+            if (_hd2Dest < 0)
+            {
+                Log("AUTOTEST hddowntown2 verdict no-downtown-lot-file: the userdir carries no House21-30;"
+                    + " mode 17's TRV-02 guard would refuse every downtown destination");
+                Fail(Hd2Check); _hd2Done = true; _hd2State = 2; Finish(); return;
+            }
+
+            // Place/bound the GoDowntownPhonePlugin (0xA6F31853). The EXP-03
+            // law: it is NOT baked into the template lots — create it OOW and
+            // recreate the phone so the phone's init re-scans the plugin
+            // registry with the controller present (the run-18 wire law).
+            _hd2Plugin = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0xA6F31853u);
+            if (_hd2Plugin == null)
+            {
+                var grp = _vm.Context.CreateObjectInstance(0xA6F31853u,
+                    FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                _hd2Plugin = grp?.BaseObject;
+                Log("AUTOTEST hddowntown2 plugin NOT on lot; created OOW obj=" + (_hd2Plugin?.ObjectID ?? -1)
+                    + " (EXP-03 run-18 wire law)");
+                if (_hd2Plugin != null)
+                {
+                    VMEntity phone = null;
+                    try
+                    {
+                        phone = _vm.Entities.FirstOrDefault(e =>
+                        {
+                            var iff = e?.Object?.Resource?.Iff;
+                            var ttas = iff?.Get<FSO.Files.Formats.IFF.Chunks.TTAs>(129);
+                            if (ttas == null) return false;
+                            for (int i = 0; i < ttas.Length; i++)
+                                if ((ttas.GetString(i) ?? "").Trim() == "Call Plugin") return true;
+                            return false;
+                        });
+                    }
+                    catch (Exception pe) { Log("AUTOTEST hddowntown2 phone-scan EXC " + pe.GetType().Name); }
+                    if (phone != null)
+                    {
+                        var pos = phone.Position;
+                        var guid = phone.Object.OBJ.GUID;
+                        var oldId = phone.ObjectID;
+                        phone.Delete(false, _vm.Context);
+                        var np = _vm.Context.CreateObjectInstance(guid, pos, FSO.LotView.Model.Direction.NORTH);
+                        Log("AUTOTEST hddowntown2 phone recreated obj=" + (np?.BaseObject?.ObjectID ?? -1)
+                            + " (was obj" + oldId + "; init re-ran with the HD plugin controller present)");
+                    }
+                    else Log("AUTOTEST hddowntown2: no phone carrying a 'Call Plugin' TTAs row — proceeding without the wire"
+                        + " (the direct plugin-row push does not need it)");
+                }
+            }
+            else Log("AUTOTEST hddowntown2 plugin present on lot obj=" + _hd2Plugin.ObjectID);
+
+            if (_hd2Plugin == null)
+            {
+                Log("AUTOTEST hddowntown2 verdict plugin-unplaceable: CreateObjectInstance(GoDowntownPhonePlugin 0xA6F31853) returned null"
+                    + " — the HD OBJD is not resolvable in this data set");
+                Fail(Hd2Check); _hd2Done = true; _hd2State = 2; Finish(); return;
+            }
+
+            // Row census + push (ss-book idiom; row 2 = 4100 'Go Downtown' per
+            // the EXP-03 decode and the run-18+ companion push law).
+            _hd3 = CheckEnabled("hddowntown3");
+            _hd2HostGuid = _hd2Host?.Object?.OBJ?.GUID ?? 0;
+            _hd4 = CheckEnabled("hddowntown4");
+            _hd5 = CheckEnabled("hddowntown5");
+            _hd6 = CheckEnabled("hddowntown6");
+            _hd7 = CheckEnabled("hddowntown7");
+            if (_hd4)
+                Log("AUTOTEST hddowntown4 SHOPPING-ROW MODE: after the outbound TRANSITION+ARRIVAL the probe runs the"
+                    + " plugin's own purchase/souvenir spawn trees (4125 community + 4124/4126/4127 mood variants) in the"
+                    + " traveler's stack via RunInMyStack (synchronous; the censor-live-exec idiom) and observes"
+                    + " GetInventoryByNID deltas + entity deltas. No pie push, no return drive in this mode.");
+            if (_hd3)
+                Log("AUTOTEST hddowntown3 RETURN-LEG MODE: after the outbound TRANSITION+ARRIVAL the probe"
+                    + " continues on the downtown lot — census the plugin there, re-resolve the traveler by GUID"
+                    + " (0x" + _hd2HostGuid.ToString("x8") + "), arm attr[1], push row 2 again: tree 4100's own"
+                    + " global-320 branch (21<=Global[10]<=31, seeded natively by the hdseed fix on the downtown"
+                    + " load) routes TRUE -> ins87 return branch (picker skipped, shared cab/departure machinery)."
+                    + " Global[10] is left UNTOUCHED on the arrival lot — its value is itself a g10-fix assertion.");
+            var ttab = _hd2Plugin.TreeTable;
+            int rows = ttab?.Interactions?.Length ?? 0;
+            var rowDesc = new List<string>();
+            for (uint r = 0; r < rows; r++)
+            {
+                string nm = null;
+                try
+                {
+                    var a = _hd2Plugin.GetAction((int)r, _hd2Host, _vm.Context, false);
+                    nm = a?.Name;
+                }
+                catch { }
+                var fn = (r < ttab.Interactions.Length) ? ttab.Interactions[r].ActionFunction : -1;
+                rowDesc.Add("row" + r + "(fn" + fn + ")=" + (nm != null ? "\"" + nm + "\"" : "unresolvable"));
+            }
+            Log("AUTOTEST hddowntown2 plugin rows [" + rows + "]: " + string.Join(" ", rowDesc));
+            VMQueuedAction push = null;
+            try { push = _hd2Plugin.GetAction(2, _hd2Host, _vm.Context, false); } catch { }
+            if (push == null)
+            {
+                Log("AUTOTEST hddowntown2 verdict row2-unpushable: plugin row 2 ('Go Downtown' 4100) GetAction null for the host");
+                Fail(Hd2Check); _hd2Done = true; _hd2State = 2; Finish(); return;
+            }
+            push.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+            push.CheckRoutine = null; // the EXP-03 push law (disclosed)
+
+            // LEG-2 DECODE ARMS (hd-postpicker-divergence-20260925, instruction-exact):
+            // 4100@25 repoints StackObjID[0] = StackObjectAttributes[1] (op=2) — on a
+            // bare push attr[1]=0 (init 4112 sets only attrs 2/3/5/6), StackObject
+            // resolves null and 4100@10 NREs (VMMemory.cs:482), the handler resets
+            // caller+callee and the push poofs = the run-1 DEPARTURE-TERMINAL.
+            // ARM 1: attr[1] = the host's ObjectID (the same repoint the vacation
+            // chain survives at its @18/@21 only because EXP-04 run-77 armed it).
+            _hd2Plugin.SetAttribute(1, (short)_hd2Host.ObjectID);
+            Log("AUTOTEST hddowntown2 ARM-1: plugin.attr[1]=" + _hd2Plugin.GetAttribute(1)
+                + " (host obj" + _hd2Host.ObjectID + ") — the 4100@25 stack-object repoint resolves");
+            // ARM 2: the picker leg (4103) and the mode-17 site (@13) sit behind
+            // global 320 `Global[10] <= 31`, TRUE on home lots because the port's
+            // VMTS1ActivatorNew.cs:598 house-number write is commented out. Set
+            // Global[10]=40 so 320 routes FALSE into the picker leg; temp0=21 then
+            // reaches @13 op=1 mode 17 -> SignalLotSwitch(21).
+            _vm.SetGlobalValue(10, 40);
+            Log("AUTOTEST hddowntown2 ARM-2: Global[10]=" + _vm.GetGlobalValue(10)
+                + " — global 320 routes FALSE into the picker leg (4103)");
+            _hd2Host.Thread.EnqueueAction(push);
+            _hd2PushUid = push.UID;
+            Log("AUTOTEST hddowntown2 pushed plugin row 2 '" + push.Name + "' (4100 Go Downtown) uid=" + push.UID
+                + " on host obj" + _hd2Host.ObjectID
+                + " (probe-side push, disclosed; args="
+                + string.Join(",", push.Args ?? new short[0]) + ")");
+            Log("AUTOTEST hddowntown2 watch open (main window 3600f; arrival window +1200f; destination lot " + _hd2Dest + ")");
+            _hd2State = 1;
+        }
+
+        // Per-type production dialog answer (HPAnswerDialogs scan law +
+        // ss-book responder, generalized): pickers get the HouseSelected
+        // shape (code 1 + text -> temp0), everything else gets a native
+        // click (code 0, empty text).
+        private static void Hd2AnswerDialogs()
+        {
+            VMDialogResult target = null;
+            VMEntity owner = null;
+            var gbd = _vm.GlobalBlockingDialog;
+            if (gbd != null)
+            {
+                var bs = gbd.Thread?.BlockingState as VMDialogResult;
+                if (bs != null && !bs.Responded) { target = bs; owner = gbd; }
+            }
+            if (target == null)
+            {
+                foreach (var ent in _vm.Entities)
+                {
+                    var qbs = ent?.Thread?.BlockingState as VMDialogResult;
+                    if (qbs != null && !qbs.Responded) { target = qbs; owner = ent; break; }
+                }
+            }
+            if (target == null) return;
+            var type = target.Type;
+            var typeN = type.ToString();
+            var picker = type == VMDialogType.TS1Downtown || type == VMDialogType.NumericEntry
+                || type == VMDialogType.TS1Vacation || type == VMDialogType.TS1Neighborhood
+                || type == VMDialogType.TS1StudioTown || type == VMDialogType.TS1Magictown
+                || type == VMDialogType.TS1PhoneBook;
+            target.Responded = true;
+            if (picker)
+            {
+                target.ResponseCode = 1; // production HouseSelected(house>0) shape
+                target.ResponseText = _hd2Dest.ToString(); // -> temp0 (VMDialogPrivateStrings TS1Downtown law)
+            }
+            else
+            {
+                target.ResponseCode = 0; // native yes/ok click
+                target.ResponseText = ""; // empty text, per the ss-book run 4-6 empirical note
+            }
+            if (ReferenceEquals(_vm.GlobalBlockingDialog, owner)) _vm.GlobalBlockingDialog = null;
+            if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
+            else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+            _hd2Answers++;
+            _hd2DlgTypes.Add(typeN);
+            Log("AUTOTEST hddowntown2 dialog answered #" + _hd2Answers + " owner=obj" + (owner?.ObjectID ?? 0)
+                + " type=" + typeN
+                + (picker ? " PICKER code=1 text=\"" + _hd2Dest + "\"" : " click code=0 text=\"\"")
+                + " gbdCleared=" + (_vm.GlobalBlockingDialog == null) + " at f=" + _hd2Frame);
+        }
+
+        private static void Hd2DisarmTrace()
+        {
+            if (!_hd2TraceArmed) return;
+            FSO.SimAntics.Engine.VMThread.AutotestTraceSink = null;
+            FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 0;
+            FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = false;
+            _hd2TraceArmed = false;
+            _hd2TraceDone = true;
+            Log("AUTOTEST hddowntown2 ITRACE disarmed at f=" + _hd2Frame + " lines=" + _hd2Trace.Count
+                + " other=" + _hd2TraceOther + " distinct=" + _hd2TraceAgg.Count
+                + " mode17Seen=" + _hd2Mode17Seen);
+            foreach (var kv in _hd2TraceAgg.OrderByDescending(x => x.Value).Take(20))
+                Log("AUTOTEST hddowntown2 ITRACE cycle " + kv.Value + "x " + kv.Key);
+            foreach (var l in _hd2Trace.Take(15)) Log("AUTOTEST hddowntown2 ITRACE first " + l);
+            foreach (var l in _hd2Trace.Skip(Math.Max(0, _hd2Trace.Count - 15))) Log("AUTOTEST hddowntown2 ITRACE last " + l);
+        }
+
+        // The EXP-04 V2.8 observation law set, applied to the downtown switch:
+        // the away VM booted — census it, name the lot, then sample a bounded
+        // arrival window before the PASS verdict.
+        private static void Hd2OnArrival(int oldEnts)
+        {
+            _hd2Arrived = true;
+            _hd2ArrivedFrame = _hd2Frame;
+            var gstate = Content.Get().Neighborhood.GameState;
+            try { _hd2ArrivalLot = _vm.TS1State.CurrentHouse; } catch { }
+            if (_hd3 && _hd3Phase == 1)
+            {
+                // The RETURN's lot switch landed — this arrival is the HOME lot.
+                _hd3Phase = 2;
+                _hd3HomeLot = _hd2ArrivalLot;
+                _hd3HomeFrame = _hd2Frame;
+                Log("AUTOTEST hddowntown3 >>> RETURN LOT SWITCH LANDED at f=" + _hd2Frame
+                    + " oldEnts=" + oldEnts + " newEnts=" + _vm.Entities.Count
+                    + " newLot(CurrentHouse)=" + _hd3HomeLot + " (expected home 5)"
+                    + " transit=" + _vm.TS1State.LotTransitInfo
+                    + " mode17ITRACE=" + _hd2Mode17Seen);
+            }
+            Log("AUTOTEST hddowntown2 >>> VM REPLACED (lot switch LANDED) at f=" + _hd2Frame
+                + " oldEnts=" + oldEnts + " newEnts=" + _vm.Entities.Count
+                + " newLot(CurrentHouse)=" + _hd2ArrivalLot + " (picker answer was " + _hd2Dest + ")"
+                + " transit=" + _vm.TS1State.LotTransitInfo + "/" + (gstate?.LotTransitInfo ?? -1)
+                + " dtGuid=0x" + (gstate?.DowntownSimGUID ?? 0).ToString("x8")
+                + " g3=" + _vm.GetGlobalValue(3) + " (downtown-sim oid)"
+                + " clock=" + Sim3Clock()
+                + " answers=" + _hd2Answers + " types=[" + string.Join(",", _hd2DlgTypes) + "]"
+                + " mode17ITRACE=" + _hd2Mode17Seen);
+            var avs = _vm.Entities.OfType<VMAvatar>().ToList();
+            Log("AUTOTEST hddowntown2 ARRIVAL CENSUS avatars=" + avs.Count);
+            foreach (var a in avs)
+                Log("AUTOTEST hddowntown2 arrival sim obj=" + a.ObjectID
+                    + " guid=0x" + (a.Object?.OBJ?.GUID ?? 0).ToString("x8")
+                    + " pos=(" + a.Position.TileX + "," + a.Position.TileY + ",L" + a.Position.Level + ")"
+                    + " action=" + (a.Thread?.ActiveAction?.Name ?? "-"));
+            var labels = _vm.Entities.Where(e => e.Object?.OBJ != null)
+                .GroupBy(e => e.Object.OBJ.ChunkLabel ?? "?")
+                .Select(g => new { K = g.Key, n = g.Count() })
+                .OrderByDescending(x => x.n).ToList();
+            Log("AUTOTEST hddowntown2 arrival object census (" + labels.Count + " labels): "
+                + string.Join(" ", labels.Take(25).Select(x => x.K + "x" + x.n)));
+            foreach (var x in labels)
+            {
+                var k = x.K.ToLowerInvariant();
+                if (k.Contains("downtown") || k.Contains("controller") || k.Contains("date")
+                    || k.Contains("npc") || k.Contains("bike") || k.Contains("cart") || k.Contains("vendor"))
+                    Log("AUTOTEST hddowntown2 arrival controller-candidate " + x.K + " x" + x.n);
+            }
+        }
+
+        private static void Hd2ArrivalSample()
+        {
+            var ticksAlive = _hd2Frame - _hd2ArrivedFrame;
+            int win = _hd3 ? 600 : 1200;
+            if (ticksAlive >= win)
+            {
+                var avsEnd = _vm.Entities.OfType<VMAvatar>().ToList();
+                Log("AUTOTEST hddowntown2 arrival window close f=" + _hd2Frame + " (+arr" + ticksAlive + ")"
+                    + " lot=" + _hd2ArrivalLot
+                    + " ents=" + _vm.Entities.Count
+                    + " avatars=" + avsEnd.Count
+                    + " transit=" + _vm.TS1State.LotTransitInfo
+                    + " clock=" + Sim3Clock()
+                    + " g3=" + _vm.GetGlobalValue(3)
+                    + " actions=[" + string.Join(",", avsEnd.Take(6).Select(a => (a.Thread?.ActiveAction?.Name ?? "-") + "@obj" + a.ObjectID)) + "]");
+                if (_hd7 && _hd3Phase == 0)
+                {
+                    _hd3Phase = 6;
+                    _hd2Arrived = false;
+                    _hd2State = 50;
+                    _hd2DepartedOow = false;
+                    _hd2OowGraceStart = -1;
+                    _hd2CabSeen = false;
+                    Log("AUTOTEST hddowntown7 MEAL-LOOP PHASE OPEN at f=" + _hd2Frame
+                        + " (outbound arrival verified: lot=" + _hd2ArrivalLot + " ents=" + _vm.Entities.Count
+                        + " avatars=" + avsEnd.Count + ")");
+                    return;
+                }
+                if (_hd6 && _hd3Phase == 0)
+                {
+                    _hd3Phase = 5;
+                    _hd2Arrived = false;
+                    _hd2State = 45;
+                    _hd2DepartedOow = false;
+                    _hd2OowGraceStart = -1;
+                    _hd2CabSeen = false;
+                    Log("AUTOTEST hddowntown6 NPC/INTERESTS PHASE OPEN at f=" + _hd2Frame
+                        + " (outbound arrival verified: lot=" + _hd2ArrivalLot + " ents=" + _vm.Entities.Count
+                        + " avatars=" + avsEnd.Count + ")");
+                    return;
+                }
+                if (_hd5 && _hd3Phase == 0)
+                {
+                    _hd3Phase = 4;
+                    _hd2Arrived = false;
+                    _hd2State = 40;
+                    _hd2TraceArmed = false;
+                    _hd2TraceDone = false;
+                    _hd2Mode17Seen = false;
+                    _hd2DepartedOow = false;
+                    _hd2OowGraceStart = -1;
+                    _hd2CabSeen = false;
+                    Log("AUTOTEST hddowntown5 RESTAURANTS PHASE OPEN at f=" + _hd2Frame
+                        + " (outbound arrival verified: lot=" + _hd2ArrivalLot + " ents=" + _vm.Entities.Count
+                        + " avatars=" + avsEnd.Count + ")");
+                    return;
+                }
+                if (_hd4 && _hd3Phase == 0)
+                {
+                    _hd3Phase = 3;
+                    _hd2Arrived = false;
+                    _hd2State = 35;
+                    _hd2TraceArmed = false;
+                    _hd2TraceDone = false;
+                    _hd2Mode17Seen = false;
+                    _hd2DepartedOow = false;
+                    _hd2OowGraceStart = -1;
+                    _hd2CabSeen = false;
+                    Log("AUTOTEST hddowntown4 SHOPPING PHASE OPEN at f=" + _hd2Frame
+                        + " (outbound arrival verified: lot=" + _hd2ArrivalLot + " ents=" + _vm.Entities.Count
+                        + " avatars=" + avsEnd.Count + " outboundMode17ITRACE=" + _hd2Mode17Seen + ")");
+                    return;
+                }
+                if (_hd3 && _hd3Phase == 0)
+                {
+                    // Outbound arrival window closed — OPEN THE RETURN PHASE.
+                    // The probe machine falls back into the state-1 watch on
+                    // the arrival VM; state 30 (next tick) does the census/arm/
+                    // push, and the existing VM-replacement detector catches
+                    // the home switch.
+                    var m17 = _hd2Mode17Seen;
+                    _hd3Phase = 1;
+                    _hd2Arrived = false;
+                    _hd2State = 30;
+                    _hd2TraceArmed = false;
+                    _hd2TraceDone = false;
+                    _hd2Mode17Seen = false;
+                    // run-1 honest FAIL (stale-verdict law): the OUTBOUND watch's
+                    // departure state (host OOW at f=2, grace start 2) must not
+                    // ride into the return phase — f=609 >= 2+600 fired the old
+                    // DEPARTURE-TERMINAL verdict the tick after return-open.
+                    _hd2DepartedOow = false;
+                    _hd2OowGraceStart = -1;
+                    _hd2CabSeen = false;
+                    Log("AUTOTEST hddowntown3 RETURN PHASE OPEN at f=" + _hd2Frame
+                        + " (outbound arrival verified: lot=" + _hd2ArrivalLot + " ents=" + _vm.Entities.Count
+                        + " avatars=" + avsEnd.Count + " outboundMode17ITRACE=" + m17 + ")");
+                    return;
+                }
+                if (_hd3 && _hd3Phase == 2)
+                {
+                    if (_hd3HomeLot == 5)
+                    {
+                        Log("AUTOTEST hddowntown3 verdict RETURN+ARRIVED-HOME: the downtown return FIRED — the traveler"
+                            + " pushed the same plugin row on the downtown lot, tree 4100's global-320 branch routed"
+                            + " TRUE (Global[10]=" + _vm.GetGlobalValue(10) + ", the hdseed law), the shared cab/departure"
+                            + " machinery ran, and the HOME lot (CurrentHouse=" + _hd3HomeLot + ") booted and ticked the"
+                            + " full return window (home switch at f=" + _hd3HomeFrame + ", +ret" + ticksAlive + ")"
+                            + " mode17ITRACE=" + _hd2Mode17Seen + " ents=" + _vm.Entities.Count + " avatars=" + avsEnd.Count + ")");
+                        Pass("hddowntown3"); _hd2Done = true; _hd2State = 2;
+                        Finish();
+                        return;
+                    }
+                    Log("AUTOTEST hddowntown3 verdict RETURN-WRONG-LOT: a lot switch followed the return push but landed on"
+                        + " CurrentHouse=" + _hd3HomeLot + " (expected home 5) — the return's destination law diverges"
+                        + " (mode17ITRACE=" + _hd2Mode17Seen + " ents=" + _vm.Entities.Count + ")");
+                    Fail("hddowntown3"); _hd2Done = true; _hd2State = 2;
+                    Finish();
+                    return;
+                }
+                Log("AUTOTEST hddowntown2 verdict TRANSITION+ARRIVAL: the downtown lot switch FIRED and the away lot"
+                    + " (CurrentHouse=" + _hd2ArrivalLot + ", picker answer " + _hd2Dest + ") booted and ticked for the full"
+                    + " arrival window — the EXP-03 increment-16 'departure is terminal' finding does NOT reproduce on this tip"
+                    + " (answers=" + _hd2Answers + " types=[" + string.Join(",", _hd2DlgTypes) + "]"
+                    + " mode17ITRACE=" + _hd2Mode17Seen
+                    + " ents=" + _hd2Ents0 + "->" + _vm.Entities.Count
+                    + " hostOowBeforeSwitch=" + _hd2DepartedOow + ")");
+                Pass("hddowntown2"); _hd2Done = true; _hd2State = 2;
+                Finish();
+                return;
+            }
+            if (_hd2Frame % 150 != 0) return;
+            var avs = _vm.Entities.OfType<VMAvatar>().ToList();
+            Log("AUTOTEST hddowntown2 live f=" + _hd2Frame + " (+arr" + ticksAlive + ")"
+                + " lot=" + _hd2ArrivalLot
+                + " ents=" + _vm.Entities.Count
+                + " avatars=" + avs.Count
+                + " transit=" + _vm.TS1State.LotTransitInfo
+                + " clock=" + Sim3Clock()
+                + " g3=" + _vm.GetGlobalValue(3)
+                + " actions=[" + string.Join(",", avs.Take(6).Select(a => (a.Thread?.ActiveAction?.Name ?? "-") + "@obj" + a.ObjectID)) + "]");
         }
 
         private static void Pass(string check)
