@@ -3217,6 +3217,18 @@ namespace Simitone.Client
         private static int _unlmg6CurA, _unlmg6CurB;
         private static int _unlmg6PushF = -1;
 
+        private static VMEntity _unlmg6DuelTile;
+
+        private static VMEntity Unlmg6Tile()
+        {
+            if (_unlmg6DuelTile != null) return _unlmg6DuelTile;
+            var grp = _unlmg6Arena?.MultitileGroup;
+            if (grp == null) return null;
+            _unlmg6DuelTile = grp.Objects.FirstOrDefault(o => o.Object?.OBJ?.GUID == 0xD19F6584u)
+                ?? grp.Objects.FirstOrDefault(o => o.GetAttribute(7) != 0 || o.GetAttribute(8) != 0);
+            return _unlmg6DuelTile;
+        }
+
         private static int Unlmg6Stones(short v)
         {
             int n = 0;
@@ -3317,8 +3329,9 @@ namespace Simitone.Client
                     // OBJECT — the native duel push carries the ARENA (not the
                     // duelist) as stack object; pass the arena entity.
                     var ran = _unlmg6A.Thread.RunInMyStack(rt6, _unlmg6Arena.Object, new short[4], _unlmg6Arena);
-                    var a7 = _unlmg6Arena.GetAttribute(7);
-                    var a8 = _unlmg6Arena.GetAttribute(8);
+                    var tile6 = Unlmg6Tile();
+                    var a7 = tile6?.GetAttribute(7) ?? _unlmg6Arena.GetAttribute(7);
+                    var a8 = tile6?.GetAttribute(8) ?? _unlmg6Arena.GetAttribute(8);
                     Log("AUTOTEST unl-magic6 INIT-A ran=" + ran + " attr[7] 0x" + a7.ToString("X4") + " (" + Unlmg6Stones(a7)
                         + " stones) attr[8] 0x" + a8.ToString("X4") + " (" + Unlmg6Stones(a8) + " stones)"
                         + " (pre: 0x" + _unlmg6A7.ToString("X4") + "/0x" + _unlmg6A8.ToString("X4") + ")");
@@ -3326,8 +3339,8 @@ namespace Simitone.Client
                     // per-side reads in the native drive; verify the same law
                     // holds on a re-run)
                     var ran2 = _unlmg6B.Thread.RunInMyStack(rt6, _unlmg6Arena.Object, new short[4], _unlmg6Arena);
-                    var b7 = _unlmg6Arena.GetAttribute(7);
-                    var b8 = _unlmg6Arena.GetAttribute(8);
+                    var b7 = tile6?.GetAttribute(7) ?? _unlmg6Arena.GetAttribute(7);
+                    var b8 = tile6?.GetAttribute(8) ?? _unlmg6Arena.GetAttribute(8);
                     foreach (var o in _unlmg6Arena.MultitileGroup.Objects)
                     {
                         var v7 = o.GetAttribute(7); var v8 = o.GetAttribute(8);
@@ -3377,9 +3390,10 @@ namespace Simitone.Client
                 }
                 if (_unlmg6State == 1)
                 {
-                    var o5 = _unlmg6Arena.GetAttribute(5);
-                    var a7 = _unlmg6Arena.GetAttribute(7);
-                    var a8 = _unlmg6Arena.GetAttribute(8);
+                    var tileS = Unlmg6Tile() ?? _unlmg6Arena;
+                    var o5 = tileS.GetAttribute(5);
+                    var a7 = tileS.GetAttribute(7);
+                    var a8 = tileS.GetAttribute(8);
                     if (_unlmg6Frame % 300 == 0)
                         Log("AUTOTEST unl-magic6 soak f=" + _unlmg6Frame + " (+push" + (_unlmg6Frame - _unlmg6PushF) + ")"
                             + " outcome=" + o5 + " stones 7/8=" + Unlmg6Stones(a7) + "/" + Unlmg6Stones(a8)
