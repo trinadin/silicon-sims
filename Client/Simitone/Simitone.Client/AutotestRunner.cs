@@ -3300,6 +3300,17 @@ namespace Simitone.Client
                         Log("AUTOTEST unl-magic6 verdict no-4110: 'Set Spells' not resolvable on the arena resource");
                         Fail("unl-magic6"); _unlmg6State = 99; return;
                     }
+                    // run-2 instrumentation: dump 4110's raw instructions
+                    // (decode-driven iteration) + the whole group's attr[7]/[8]
+                    // so we learn WHERE any write lands in the 18-object group.
+                    var bhDump = bh6;
+                    for (int di = 0; di < bhDump.Instructions.Length && di < 40; di++)
+                    {
+                        var ins = bhDump.Instructions[di];
+                        Log("AUTOTEST unl-magic6 4110 ins" + di + " op=" + ins.Opcode
+                            + " t=" + ins.TruePointer + " f=" + ins.FalsePointer
+                            + " opd=" + BitConverter.ToString(ins.Operand).Replace("-", ""));
+                    }
                     _unlmg6A7 = _unlmg6Arena.GetAttribute(7);
                     _unlmg6A8 = _unlmg6Arena.GetAttribute(8);
                     // run-1 law fix: the attr writes resolve against the STACK
@@ -3317,6 +3328,14 @@ namespace Simitone.Client
                     var ran2 = _unlmg6B.Thread.RunInMyStack(rt6, _unlmg6Arena.Object, new short[4], _unlmg6Arena);
                     var b7 = _unlmg6Arena.GetAttribute(7);
                     var b8 = _unlmg6Arena.GetAttribute(8);
+                    foreach (var o in _unlmg6Arena.MultitileGroup.Objects)
+                    {
+                        var v7 = o.GetAttribute(7); var v8 = o.GetAttribute(8);
+                        if (v7 != 0 || v8 != 0)
+                            Log("AUTOTEST unl-magic6 GROUP-ATTR obj" + o.ObjectID + " guid=0x"
+                                + (o.Object?.OBJ?.GUID.ToString("X8") ?? "?") + " attr7=0x" + v7.ToString("X4")
+                                + " attr8=0x" + v8.ToString("X4"));
+                    }
                     Log("AUTOTEST unl-magic6 INIT-B ran=" + ran2 + " attr[7] 0x" + b7.ToString("X4") + " (" + Unlmg6Stones(b7)
                         + " stones) attr[8] 0x" + b8.ToString("X4") + " (" + Unlmg6Stones(b8) + " stones)");
                     if (Unlmg6Stones(a7) == 4 && Unlmg6Stones(a8) == 4)
