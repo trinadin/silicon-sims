@@ -3231,8 +3231,10 @@ namespace Simitone.Client
 
         private static int Unlmg6Stones(short v)
         {
+            // flags are 1-BASED bit-indices (the EXP-05 IsFlagSet law,
+            // VMExpression.cs:189): flags 1-5 = bits 0-4.
             int n = 0;
-            for (int b = 1; b <= 5; b++) if ((v & (1 << b)) != 0) n++;
+            for (int b = 0; b <= 4; b++) if ((v & (1 << b)) != 0) n++;
             return n;
         }
 
