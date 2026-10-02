@@ -3302,7 +3302,10 @@ namespace Simitone.Client
                     }
                     _unlmg6A7 = _unlmg6Arena.GetAttribute(7);
                     _unlmg6A8 = _unlmg6Arena.GetAttribute(8);
-                    var ran = _unlmg6A.Thread.RunInMyStack(rt6, _unlmg6Arena.Object, new short[4], _unlmg6A);
+                    // run-1 law fix: the attr writes resolve against the STACK
+                    // OBJECT — the native duel push carries the ARENA (not the
+                    // duelist) as stack object; pass the arena entity.
+                    var ran = _unlmg6A.Thread.RunInMyStack(rt6, _unlmg6Arena.Object, new short[4], _unlmg6Arena);
                     var a7 = _unlmg6Arena.GetAttribute(7);
                     var a8 = _unlmg6Arena.GetAttribute(8);
                     Log("AUTOTEST unl-magic6 INIT-A ran=" + ran + " attr[7] 0x" + a7.ToString("X4") + " (" + Unlmg6Stones(a7)
@@ -3311,7 +3314,7 @@ namespace Simitone.Client
                     // second init for the challengee side (the arena attrs are
                     // per-side reads in the native drive; verify the same law
                     // holds on a re-run)
-                    var ran2 = _unlmg6B.Thread.RunInMyStack(rt6, _unlmg6Arena.Object, new short[4], _unlmg6B);
+                    var ran2 = _unlmg6B.Thread.RunInMyStack(rt6, _unlmg6Arena.Object, new short[4], _unlmg6Arena);
                     var b7 = _unlmg6Arena.GetAttribute(7);
                     var b8 = _unlmg6Arena.GetAttribute(8);
                     Log("AUTOTEST unl-magic6 INIT-B ran=" + ran2 + " attr[7] 0x" + b7.ToString("X4") + " (" + Unlmg6Stones(b7)
