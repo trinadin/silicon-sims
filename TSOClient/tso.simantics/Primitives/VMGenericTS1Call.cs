@@ -20,6 +20,12 @@ namespace FSO.SimAntics.Primitives
         public static string G6AddToFamilyGate = "";
 
         /// <summary>
+        /// ENG-05 modes 39/40 in-flight transforms, keyed by the executing
+        /// frame (see the Eng05Transform class below for the native law).
+        /// </summary>
+        public static readonly Dictionary<VMStackFrame, Eng05Transform> Eng05Transforms = new Dictionary<VMStackFrame, Eng05Transform>();
+
+        /// <summary>
         /// Reproduces cXObject::TryGenericSimCall mode 12. The original
         /// BuildRotationLookup uses a fixed 64 by 64 tile domain rather than
         /// the current lot dimensions.
@@ -212,21 +218,24 @@ namespace FSO.SimAntics.Primitives
                     context.VM.SetGlobalValue(31, context.Thread.TempRegisters[0]);
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 case VMGenericTS1CallMode.MyRoutingFootprintEqualsTemp0: //15
-                    // ENG-05 decode (§mode-15, PPC 0x0f2754): writes the resolved
-                    // STACK OBJECT's footprint-type field (+1564 := Temp0, +1566 := 0)
-                    // and, when Temp0 != 0, recomputes its tile rect
-                    // (cXObject::ComputeRect). NOT the caller — the enum name is a
-                    // misnomer. 202 corpus sites (sleep-in-bed / sit / wash trees
-                    // changing the object's blocking footprint). Port: the field is
-                    // VMEntity.RoutingFootprintType and the rect recompute +
-                    // obstacle re-register ride UpdateFootprint(); the type→mask
-                    // selection is the named residual (the port recomputes from the
-                    // object's current footprint mask).
+                    // ENG-05 decode + addendum (PPC 0x0f2754, polarity CORRECTED):
+                    // writes the resolved STACK OBJECT's footprint-type field
+                    // (+1564 := Temp0, +1566 := 0) ALWAYS; when Temp0 != 0 returns
+                    // TRUE (r3 = Temp0) WITHOUT recomputing; when Temp0 == 0
+                    // recomputes the tile rect (cXObject::ComputeRect) and returns
+                    // its result. NOT the caller — the enum name is a misnomer.
+                    // 202 corpus sites (sleep/sit/wash trees changing the object's
+                    // blocking footprint). Port: the field is
+                    // VMEntity.RoutingFootprintType; the rect recompute + obstacle
+                    // re-register ride UpdateFootprint(); the type→mask selection is
+                    // the named residual (the port recomputes from the object's
+                    // current footprint mask).
                     var fpObj = context.StackObject;
                     if (fpObj == null) return VMPrimitiveExitCode.GOTO_FALSE; // resolver err-28 law
-                    fpObj.RoutingFootprintType = context.Thread.TempRegisters[0];
-                    if (fpObj.RoutingFootprintType == 0) return VMPrimitiveExitCode.GOTO_FALSE;
-                    fpObj.UpdateFootprint();
+                    var fpType = context.Thread.TempRegisters[0];
+                    fpObj.RoutingFootprintType = fpType;
+                    if (fpType != 0) return VMPrimitiveExitCode.GOTO_TRUE; // r3 = Temp0 != 0
+                    fpObj.UpdateFootprint(); // Temp0 == 0: ComputeRect + re-register
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 // 16. Change Normal Outfit
                 case VMGenericTS1CallMode.ChangeToLotInTemp0: //17
@@ -534,16 +543,77 @@ namespace FSO.SimAntics.Primitives
                 // 38. GetTokensFromString (MM)
                 case VMGenericTS1CallMode.GetTokensFromString:
                     return GetTokensFromString(context);
-                // 39. ChildToAdult (two-phase transform — pending the decode's
-                // return-contract addendum before landing)
+                // 39/40. ChildToAdult / PetToAdult — the shared two-phase transform
+                // (ENG-05 decode + the return-contract addendum, PPC 0x0f3fb8 with
+                // 0x0f3ff4 = BNE retranscribed): BOTH modes RequestTransform and
+                // poll identically; the flag differs (0 = Neighborhood::ChildToAdult
+                // = mode 39; 1 = Neighborhood::AnyoneToAdult = the pet variant,
+                // mode 40 — NOT a stub; the first edition's FALSE reading was a
+                // 0x4082/0x4182 transcription slip). Native contract: first visit
+                // enqueues {a := Temp0, b := 0, flag} and returns 2 (yield — the
+                // modal cWinTransformMeDlg); every re-entry polls
+                // RetrieveDoneTransform: pending/no-match -> return 2; retrieved
+                // state 2 (SUCCESS) -> Temp0 := out.a, Temp1 := out.b, return TRUE;
+                // retrieved state 3 (DECLINED — e.g. the target is not on the lot)
+                // -> Temp0 := out.a (unchanged), Temp1 := 0, ALSO TRUE (the failure
+                // signal is Temp1 == 0, not the branch). Entries vanish after 100
+                // unretrieved passes (the native wedge edge case — mirrored).
+                // PORT (named divergence): the native converts asynchronously in
+                // cSimulator::ExecuteTransforms off the sim tick with a modal
+                // wizard; the port converts on the FIRST poll synchronously — age
+                // + person-data on the in-lot target avatar (out.b := the
+                // converted avatar's object id; the native b's content is not
+                // fully decoded, disclosed). The child-body -> adult-body OUTFIT
+                // rebuild is the named residual (needs the port's mid-session
+                // person-rebuild surface — its own bounded card).
+                case VMGenericTS1CallMode.ChildToAdult: //39
                 case VMGenericTS1CallMode.PetToAdult: //40
-                    // ENG-05 decode (§modes-39/40, PPC 0x0f3fb8): the shared native
-                    // body re-reads the mode; mode 40 hits `addi r3,r0,0; b 0xf4120`
-                    // — an UNCONDITIONAL FALSE stub. The one real caller
-                    // (SocialsMagic 4210 'Magic - Pet to Adult - Person B' @10,
-                    // f=253) therefore always fails in the Complete build. This IS
-                    // the whole native law: no state, no cookie.
-                    return VMPrimitiveExitCode.GOTO_FALSE;
+                {
+                    Eng05Transform t39;
+                    if (!Eng05Transforms.TryGetValue(context, out t39))
+                    {
+                        // first visit: enqueue + yield
+                        t39 = new Eng05Transform
+                        {
+                            A = context.Thread.TempRegisters[0],
+                            B = 0,
+                            Flag = (byte)(operand.Call == VMGenericTS1CallMode.PetToAdult ? 1 : 0),
+                            State = 0,
+                        };
+                        Eng05Transforms[context] = t39;
+                        return VMPrimitiveExitCode.CONTINUE_NEXT_TICK; // native return 2
+                    }
+                    // poll: the port converts now (state 0 -> 2 or 3)
+                    if (t39.State == 0)
+                    {
+                        var target39 = context.VM.Context.ObjectQueries.Avatars
+                            .OfType<VMAvatar>()
+                            .FirstOrDefault(p => p.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                                && p.GetPersonData(VMPersonDataVariable.NeighborId) == t39.A);
+                        if (target39 == null)
+                        {
+                            // Neighborhood::ChildToAdult's not-found path: returns 0
+                            // without touching a/b -> state 3 (declined)
+                            t39.State = 3;
+                        }
+                        else
+                        {
+                            var adultAge = (t39.Flag == 1) ? (short)30 : (short)18; // pet-adult / person-adult
+                            target39.SetPersonData(VMPersonDataVariable.PersonsAge, adultAge);
+                            var rec39 = Content.Content.Get().Neighborhood.GetNeighborByID(t39.A);
+                            if (rec39 != null && rec39.PersonData != null && rec39.PersonData.Length > (int)VMPersonDataVariable.PersonsAge)
+                                rec39.PersonData[(int)VMPersonDataVariable.PersonsAge] = adultAge;
+                            t39.B = (short)target39.ObjectID; // out.b := the converted avatar (disclosed)
+                            t39.State = 2; // service success latch
+                        }
+                    }
+                    if (++t39.Polls >= 100) { Eng05Transforms.Remove(context); return VMPrimitiveExitCode.CONTINUE_NEXT_TICK; } // the native's stale-entry erase -> poll-no-match -> yield forever
+                    if (t39.State == 0) return VMPrimitiveExitCode.CONTINUE_NEXT_TICK; // still busy (not reachable port-side; kept for law-shape)
+                    context.Thread.TempRegisters[0] = t39.A;
+                    context.Thread.TempRegisters[1] = (t39.State == 3) ? (short)0 : t39.B;
+                    Eng05Transforms.Remove(context); // the native's retrieve erases the entry
+                    return VMPrimitiveExitCode.GOTO_TRUE; // state 2 AND state 3 both take the TRUE branch
+                }
                 // 41. HeadFlush — ENG-05 decode (§mode-41): the native table entry
                 // IS the shared return tail (0x0f411c); r3 = this != 0 → a no-op
                 // TRUE. All 10 real callers (Karaoke/OpenMic 'Watch',
@@ -956,6 +1026,20 @@ namespace FSO.SimAntics.Primitives
             }
             return count;
         }
+    }
+
+    /// <summary>
+    /// ENG-05 modes 39/40: the in-flight transform request keyed by the
+    /// executing frame (the native queues it on the simulator keyed by the
+    /// StackElem request id; entries are erased on retrieval or after 100
+    /// unretrieved passes). Static per process — TS1 runs one VM.
+    /// </summary>
+    public class Eng05Transform
+    {
+        public short A, B;
+        public byte Flag;   // 0 = ChildToAdult (mode 39), 1 = AnyoneToAdult/pet (mode 40)
+        public byte State;  // 0 pending, 2 success, 3 declined
+        public int Polls;
     }
 
     public class VMGenericTS1CallOperand : VMPrimitiveOperand

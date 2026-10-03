@@ -194,7 +194,9 @@ namespace FSO.SimAntics.Primitives
         {
             get
             {
-                return (Flags >> 2) & 3;
+                // ENG-06 (divergence 2): the native count-SOURCE selector is
+                // (op[3].0x0C)>>2 = Flags2 bits.
+                return (Flags2 >> 2) & 3;
             }
         }
 
@@ -226,12 +228,17 @@ namespace FSO.SimAntics.Primitives
         {
             get
             {
-                return (Flags & 2) > 0;
+                // ENG-06 (divergence 2): the native count-enable is op[3].0x02 =
+                // Flags2.0x02. All 16 corpus sites carry Flags2=0xFD (bit1 clear)
+                // — native count = 1 everywhere; the old Flags.0x02 reading made
+                // 3 mode-2 sites (Guitar 4097, Souvenir 4179, Newspaper 4097)
+                // read a Temp count instead.
+                return (Flags2 & 2) > 0;
             }
             set
             {
-                Flags &= unchecked((byte)(~2));
-                if (value) Flags |= 2;
+                Flags2 &= unchecked((byte)(~2));
+                if (value) Flags2 |= 2;
             }
         }
 
@@ -239,12 +246,18 @@ namespace FSO.SimAntics.Primitives
         {
             get
             {
-                return (Flags2 & 32) > 0;
+                // ENG-06 (inventory-dispatch-decode divergence 1): the native
+                // owner gate is op[2].0x20 = Flags.0x20 (PPC prologue 0xebcc0,
+                // capstone-verified rlwinm). The old Flags2.0x20 reading put ALL
+                // 16 corpus sites on the Temp[4]-owner path; natively only 6
+                // (Flags in {0x22,0x23,0x2f,0x33}) use it — the other 10 use the
+                // CALLER's inventory.
+                return (Flags & 32) > 0;
             }
             set
             {
-                Flags2 &= unchecked((byte)(~32));
-                if (value) Flags2 |= 32;
+                Flags &= unchecked((byte)(~32));
+                if (value) Flags |= 32;
             }
         }
 
