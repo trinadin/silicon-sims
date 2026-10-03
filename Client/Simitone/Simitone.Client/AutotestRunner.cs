@@ -16958,6 +16958,7 @@ namespace Simitone.Client
             8225, 8230, 8277, 8284, 8285, 8286, 8293, 8294, 8295, 8301, 8317, 8353,
             8371, 8390, 8451, 8473
         };
+        private static int _fmGreetRePushes;
         private static int _fmPushLogs;
         private static int _fmDropLogs;
 
@@ -16981,6 +16982,7 @@ namespace Simitone.Client
             _fmGreetUid = -1;
             _fmGreetPushMin = -1;
             _fmGreetPushes = 0;
+            _fmGreetRePushes = 0;
             _fmPhase = 0;
             _fmPhaseStart = DateTime.UtcNow;
             try { short.TryParse(_houses[Math.Min(_houseIdx, _houses.Length - 1)], out _fmHouse); } catch { }
@@ -17619,21 +17621,46 @@ namespace Simitone.Client
                     }
                     if (!_fmGreeted || Sim3PushState() == 2)
                     {
+                        // fm-drive run-1 law (2026-10-03): the greet halves sit queued on
+                        // the guest awaiting idle promotion — an unconditional RE-push
+                        // floods fresh 8451 pairs (8557 re-pushes in run 1), each
+                        // invalidating the previous 'Be Greeted' before the guest's idle
+                        // can promote it, so gs never reaches 1 and 8390/8230 hide the
+                        // move-in row forever. Only re-arm when NO greet half is queued
+                        // or active on EITHER thread, and never more than 5 total.
+                        bool fmGreetInFlight = false;
+                        try
+                        {
+                            Func<FSO.SimAntics.Engine.VMThread, bool> hasGreet = (t2) =>
+                                t2 != null && t2.Queue != null && t2.Queue.Any(a2 => a2 != null && a2.Name != null && a2.Name.IndexOf("Greet", StringComparison.OrdinalIgnoreCase) >= 0);
+                            var gTh = FmGuestAvatar()?.Thread;
+                            fmGreetInFlight = hasGreet(actor.Thread) || hasGreet(gTh)
+                                || ((actor.Thread?.ActiveAction?.Name ?? "").IndexOf("Greet", StringComparison.OrdinalIgnoreCase) >= 0)
+                                || ((gTh?.ActiveAction?.Name ?? "").IndexOf("Greet", StringComparison.OrdinalIgnoreCase) >= 0);
+                        }
+                        catch { }
                         // no move-in entry yet: greet (first time) or re-greet once the
                         // previous attempt left the queue
-                        var greet = Sim3PickPie(guest, actor, new[] { "Greet.../Shake Hands", "Greet.../Wave", "Greet.../Suave Kiss", "Greet" }, true);
-                        if (greet != null && Sim3Push(guest, actor, greet))
+                        if (!fmGreetInFlight && _fmGreetRePushes < 5)
                         {
-                            _fmStallLogged = false;
-                            if (!_fmGreeted)
+                            var greet = Sim3PickPie(guest, actor, new[] { "Greet.../Shake Hands", "Greet.../Wave", "Greet.../Suave Kiss", "Greet" }, true);
+                            if (greet != null && Sim3Push(guest, actor, greet))
                             {
-                                _fmGreeted = true;
-                                Log("AUTOTEST familymerge: greet pushed '" + greet.Name + "' at " + Sim3Clock());
+                                _fmStallLogged = false;
+                                if (!_fmGreeted)
+                                {
+                                    _fmGreeted = true;
+                                    Log("AUTOTEST familymerge: greet pushed '" + greet.Name + "' at " + Sim3Clock());
+                                }
+                                else
+                                {
+                                    _fmGreetRePushes++;
+                                    Log("AUTOTEST familymerge: greet RE-pushed '" + greet.Name + "' #" + _fmGreetRePushes
+                                        + "/5 at " + Sim3Clock() + " (no half queued/active — promotion window closed)");
+                                }
                             }
-                            else Log("AUTOTEST familymerge: greet RE-pushed '" + greet.Name + "' at " + Sim3Clock());
-                        }
-                        else
-                        {
+                            else
+                            {
                             // revival8 instrumentation (2026-09-20 diagnosis): pie
                             // candidates + guest gs/pt dumped on the first three
                             // misses, then a heartbeat every 300th miss — the
@@ -17661,6 +17688,7 @@ namespace Simitone.Client
                                     + " at " + Sim3Clock() + pieDump);
                             }
                         }
+                    }
                     }
                     else if (Sim3PushState() == 1 && (Sim3ClockMinute() - _sim3PushSimMinute + 1440) % 1440 > 30)
                     {
