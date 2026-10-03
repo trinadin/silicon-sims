@@ -57,6 +57,12 @@ namespace FSO.SimAntics.Primitives
             //types:
             // SKILL   SOUVENIR    PURCHASE    SIMDATA     DATE    INGREDIENT  MAGIC   GIFT
 
+            // ENG-06 review delta-accept P3 note, LANDED: the >6 no-op tail is
+            // dispatched BEFORE the owner resolution — the native never reads past
+            // the mode byte there (SetDirty + TRUE), and those callers are game
+            // objects (Campfire/BeeHive/dart_board), which the avatar guard would
+            // have wrongly refused.
+            if ((byte)operand.Mode > 6) return VMPrimitiveExitCode.GOTO_TRUE;
             var neighbourhood = Content.Content.Get().Neighborhood;
             var inTarget = (operand.UseObjectInTemp4) ? context.VM.GetObjectById(context.Thread.TempRegisters[4]) : context.Caller;
             // ENG-06 review P2-3: with the owner gate corrected to Flags.0x20, the
