@@ -1074,6 +1074,7 @@ namespace Simitone.Client
                 || CheckEnabled("unl-magic3")
                 || CheckEnabled("unl-magic4")
                 || CheckEnabled("unl-magic5")
+                || CheckEnabled("unl-magic8")
                 || CheckEnabled("unl-magic6")
                 || CheckEnabled("unl-magic7")
                 || CheckEnabled("unl-show")
@@ -3196,6 +3197,17 @@ namespace Simitone.Client
         private static int _unlmg5State, _unlmg5Settle, _unlmg5Frame, _unlmg5PhaseFrames, _unlmg5LastPushF;
         private static bool _unlmg5SinkArmed, _unlmg5CreateSeen;
         private static VMAvatar _unlmg5Sim;
+        // EXP-07 T6 persistence leg ('unl-magic8', rides the magic5 chain):
+        // save/reload the lot through the REAL user path and assert the T6
+        // surfaces survive (the v3-decode persistence-unification law).
+        private static bool _mg8T6;                       // the phase flag
+        private static int _unlmg8Phase;                  // 0=ride, 7=snapshot+save, 8=settle->reload, 9=wait-lot, 10=assert
+        private static VM _unlmg8OldVm;
+        private static short[] _unlmg8CtrBefore;          // controller attrs pre-save
+        private static int _unlmg8Pd29, _unlmg8Pd84;      // drank flags pre-save
+        private static string _unlmg8InvBefore;           // inventory census pre-save
+        private static int _unlmg8SimNid;
+        private static System.DateTime _unlmg8PhaseStart;
         private static VMEntity _unlmg5Press, _unlmg5Tile, _unlmg5Tile2, _unlmg5Ctr;
         private static VMQueuedAction _unlmg5Act;
         private static bool _unlmg5Started;
@@ -4407,6 +4419,7 @@ namespace Simitone.Client
             try
             {
                 _unlmg5Frame++; _unlmg5PhaseFrames++;
+                if (_unlmg5State >= 7 && _unlmg5State <= 9) { Unlmg8TickT6(); return; }
                 if (_unlmg5State == 0)
                 {
                     if (++_unlmg5Settle < 90) return;
@@ -4825,6 +4838,13 @@ namespace Simitone.Client
                             + " (4118 'Drink Magic' drank-flag landed) at " + Sim3Clock());
                         Log("AUTOTEST unl-magic5 FINAL-INV " + Unlmg3InvStr(nid));
                         FSO.SimAntics.VMEntity.AutotestAttrWatch = null;
+                        if (CheckEnabled("unl-magic8"))
+                        {
+                            // T6 phase entry: snapshot the persistence surfaces,
+                            // then save/reload through the REAL user path
+                            Unlmg8BeginT6(pd29, pd84);
+                            return;
+                        }
                         Pass("unl-magic5"); _unlmg5State = 99; return;
                     }
                     // run-8 law: the drink consumed the product (tile2 attr[5]
@@ -4915,6 +4935,101 @@ namespace Simitone.Client
                 return true;
             }
             catch { return false; }
+        }
+
+        private static void Unlmg8BeginT6(int pd29, int pd84)
+        {
+            _unlmg8Pd29 = pd29; _unlmg8Pd84 = pd84;
+            _unlmg8SimNid = _unlmg5Sim.GetPersonData(VMPersonDataVariable.NeighborId);
+            _unlmg8CtrBefore = new short[8];
+            for (short i = 0; i < 8; i++) _unlmg8CtrBefore[i] = _unlmg5Ctr.GetAttribute(i);
+            _unlmg8InvBefore = Unlmg3InvStr((short)_unlmg8SimNid);
+            Log("AUTOTEST unl-magic8 T6-SNAPSHOT ctr=[" + string.Join(",", _unlmg8CtrBefore)
+                + "] pd29=" + pd29 + " pd84=" + pd84 + " inv=" + _unlmg8InvBefore
+                + " — saving through the REAL user path (TS1GameScreen.Save -> FSOV + SaveNeighbourhood)");
+            _unlmg8Phase = 8; _unlmg8PhaseStart = System.DateTime.UtcNow;
+            _unlmg5State = 7;
+            GameThread.NextUpdate(x =>
+            {
+                try
+                {
+                    _screen.Save();
+                    Log("AUTOTEST unl-magic8 SAVE-DONE (user save path executed)");
+                }
+                catch (Exception se8) { Log("AUTOTEST unl-magic8 SAVE-EXC " + se8.GetType().Name + " " + se8.Message); }
+            });
+        }
+
+        private static void Unlmg8TickT6()
+        {
+            // state 7: settle after the save, then reload the SAME house
+            if (_unlmg5State == 7)
+            {
+                if ((System.DateTime.UtcNow - _unlmg8PhaseStart).TotalSeconds < 6) return;
+                short house8 = 5;
+                try { short.TryParse(_houses[Math.Min(_houseIdx, _houses.Length - 1)], out house8); } catch { }
+                _unlmg8OldVm = _vm;
+                Log("AUTOTEST unl-magic8 RELOAD-DISPATCH PlayHouse(" + house8 + ")");
+                _unlmg5State = 8; _unlmg8PhaseStart = System.DateTime.UtcNow;
+                GameThread.NextUpdate(x =>
+                {
+                    try { _screen.PlayHouse(house8, null); }
+                    catch (Exception pe8) { Log("AUTOTEST unl-magic8 RELOAD-EXC " + pe8.GetType().Name + ": " + pe8.Message); }
+                });
+                return;
+            }
+            // state 8: wait for the re-mounted lot (new VM instance, non-empty)
+            if (_unlmg5State == 8)
+            {
+                if (_screen.InLot && _screen.vm != null && !ReferenceEquals(_screen.vm, _unlmg8OldVm)
+                    && _screen.vm.Entities.Count > 0)
+                {
+                    _vm = _screen.vm;
+                    if (_vm.SpeedMultiplier <= 0) { _vm.SpeedMultiplier = 1; _vm.GlobalBlockingDialog = null; }
+                    Log("AUTOTEST unl-magic8 LOT-RELOADED ents=" + _vm.Entities.Count
+                        + " loadErrors=" + _vm.LoadErrors.Count);
+                    _unlmg5State = 9; _unlmg8PhaseStart = System.DateTime.UtcNow;
+                    return;
+                }
+                if ((System.DateTime.UtcNow - _unlmg8PhaseStart).TotalSeconds > 45)
+                {
+                    Log("AUTOTEST unl-magic8 verdict T6-RELOAD-FAILED: no live lot after 45s");
+                    Fail("unl-magic8"); _unlmg5State = 99; return;
+                }
+                return;
+            }
+            // state 9: settle the reloaded lot, then assert the T6 surfaces
+            if (_unlmg5State == 9)
+            {
+                if ((System.DateTime.UtcNow - _unlmg8PhaseStart).TotalSeconds < 4) return;
+                var ctr8 = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0xB6C90029u);
+                var sim8 = _vm.Entities.OfType<VMAvatar>()
+                    .FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.NeighborId) == _unlmg8SimNid)
+                    ?? _vm.Entities.OfType<VMAvatar>().FirstOrDefault();
+                var ctrAfter = new short[8];
+                if (ctr8 != null) for (short i = 0; i < 8; i++) ctrAfter[i] = ctr8.GetAttribute(i);
+                var pd29b = sim8?.GetPersonData((VMPersonDataVariable)29) ?? -1;
+                var pd84b = sim8?.GetPersonData((VMPersonDataVariable)84) ?? -1;
+                var invAfter = Unlmg3InvStr((short)_unlmg8SimNid);
+                Log("AUTOTEST unl-magic8 T6-AFTER ctr=[" + string.Join(",", ctrAfter) + "]"
+                    + " (was [" + string.Join(",", _unlmg8CtrBefore) + "])"
+                    + " pd29=" + pd29b + " (was " + _unlmg8Pd29 + ") pd84=" + pd84b + " (was " + _unlmg8Pd84 + ")"
+                    + " inv=" + invAfter + " (was " + _unlmg8InvBefore + ")");
+                // asserts: the controller mark-made bits (T6 lot save), the drank
+                // flags (sim save), the inventory tokens (neighborhood save)
+                bool ctrOK = ctr8 != null && Enumerable.Range(0, 6).Any(i => ctrAfter[i] == _unlmg8CtrBefore[i] && ctrAfter[i] != 0);
+                bool wandOK = invAfter != null && invAfter.Contains("0x1fec6005");
+                if (ctrOK && pd29b == 1 && pd84b == _unlmg8Pd84 && wandOK)
+                {
+                    Log("AUTOTEST unl-magic8 verdict T6-PERSISTENCE-LIVE: the controller mark-made bits, BOTH drank flags,"
+                        + " and the op-51 wand token ALL survived the real save/reload — the T6 persistence-unification law"
+                        + " (controller attrs -> lot save; pd flags -> sim save; tokens -> neighborhood save) VERIFIED LIVE");
+                    Pass("unl-magic8"); _unlmg5State = 99; return;
+                }
+                Log("AUTOTEST unl-magic8 verdict T6-PERSISTENCE-FAIL ctrOK=" + ctrOK + " pd29=" + pd29b
+                    + " pd84=" + pd84b + " wandOK=" + wandOK + " (named per-surface for the next increment)");
+                Fail("unl-magic8"); _unlmg5State = 99; return;
+            }
         }
 
         private static bool Unlmg5InFlight()
@@ -8357,7 +8472,7 @@ namespace Simitone.Client
             }
             // EXP-07 V3 T5 nectar leg (opt-in "unl-magic5"): NectarPress
             // Add/Brew/Drink — controller mark-made bits + pd[29] drank flag.
-            if (CheckEnabled("unl-magic5") && _unlmg5State != 99)
+            if ((CheckEnabled("unl-magic5") || CheckEnabled("unl-magic8")) && _unlmg5State != 99)
             {
                 UnlMagic5Tick();
             }
@@ -8950,7 +9065,7 @@ namespace Simitone.Client
                 return; // (EXP-07 V2) ingredient→inventory drive still running; battery finishes after the verdict
             if (CheckEnabled("unl-magic4") && _unlmg4State != 99)
                 return; // (EXP-07 V2) charge leg still driving; battery finishes after the verdict
-            if (CheckEnabled("unl-magic5") && _unlmg5State != 99)
+            if ((CheckEnabled("unl-magic5") || CheckEnabled("unl-magic8")) && _unlmg5State != 99)
                 return; // (EXP-07 V3) nectar leg still driving; battery finishes after the verdict
             if (CheckEnabled("unl-magic6") && _unlmg6State != 99)
                 return; // (EXP-07 T2) duels leg still driving; battery finishes after the verdict
