@@ -236,6 +236,8 @@ namespace FSO.SimAntics.Primitives
                     fpObj.RoutingFootprintType = fpType;
                     if (fpType != 0) return VMPrimitiveExitCode.GOTO_TRUE; // r3 = Temp0 != 0
                     fpObj.UpdateFootprint(); // Temp0 == 0: ComputeRect + re-register
+                    // P3-1 disclosure (review): the native returns ComputeRect's r3
+                    // (undecoded) on this path; the port assumes success -> TRUE.
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 // 16. Change Normal Outfit
                 case VMGenericTS1CallMode.ChangeToLotInTemp0: //17
@@ -598,6 +600,12 @@ namespace FSO.SimAntics.Primitives
                         }
                         else
                         {
+                            // P3-1 disclosures (review): the adult-age constants are
+                            // port-judged (18 matches the port's child<18 law; the native
+                            // ChildToAdult/AnyoneToAdult age writes are not decoded); on the
+                            // success path out.a is assumed unchanged from the request (a is
+                            // by-reference into the service like b — only b's under-decode
+                            // was originally disclosed).
                             var adultAge = (t39.Flag == 1) ? (short)30 : (short)18; // pet-adult / person-adult
                             target39.SetPersonData(VMPersonDataVariable.PersonsAge, adultAge);
                             var rec39 = Content.Content.Get().Neighborhood.GetNeighborByID(t39.A);

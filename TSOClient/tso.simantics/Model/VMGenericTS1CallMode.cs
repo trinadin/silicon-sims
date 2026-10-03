@@ -5,7 +5,7 @@
         HouseTutorialComplete = 0,
         SwapMyAndStackObjectsSlots = 1,
         SetActionIconToStackObject = 2,
-        PullDownTaxiDialog = 3, // ENG-05: native = cSimsApp::RemoveTaxiDialog (0x24bdc0); no-window path returns FALSE
+        PullDownTaxiDialog = 3, // ENG-05: native = cSimsApp::RemoveTaxiDialog (0x24bdc0); no-window path returns FALSE (the addendum-corrected law)
         AddToFamily = 4,
         CombineAssetsOfFamilyInTemp0 = 5,
         RemoveFromFamily = 6,
@@ -17,7 +17,7 @@
         GetDistanceToCameraInTemp0 = 12,
         AbortInteractions = 13, //abort all interactions associated with the stack object
         HouseRadioStationEqualsTemp0 = 14,
-        MyRoutingFootprintEqualsTemp0 = 15, // ENG-05: misnomer — native writes the STACK OBJECT's footprint-type field (+1564:=Temp0, +1566:=0) + ComputeRect when nonzero
+        MyRoutingFootprintEqualsTemp0 = 15, // ENG-05 (addendum-corrected): misnomer — native writes the STACK OBJECT's footprint-type field (+1564:=Temp0, +1566:=0) ALWAYS; recompute happens when Temp0 == 0 (not nonzero)
         ChangeNormalOutfit = 16, //changes the normal outfit of the sim to the next available suit — ENG-05: DEAD in the shipped corpus (0 real callers; law decoded 0x0f27b8)
         ChangeToLotInTemp0 = 17,
         BuildTheDowntownSimAndPlaceObjIDInTemp0 = 18, 
@@ -42,7 +42,7 @@
         CancelPieMenu = 37, // ENG-05: DEAD in the shipped corpus (vestigial existence-check body, 0 real callers)
         GetTokensFromString = 38,
         ChildToAdult = 39,
-        PetToAdult = 40, // ENG-05: native STUB — unconditional FALSE (0xf4004)
+        PetToAdult = 40, // ENG-05 (addendum-corrected): NOT a stub — the pet-variant (flag 1, AnyoneToAdult) two-phase transform sharing mode 39's law
         HeadFlush = 41, // ENG-05: native no-body — table entry IS the return tail; r3=this!=0 → no-op TRUE
         MakeTemp0SelectedSim = 42,
         FamilySpellsIntoController = 43 // ENG-05: Family::LoadSpellsForFamily (0x75b70), current-family-gated
