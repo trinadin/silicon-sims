@@ -1118,7 +1118,8 @@ namespace Simitone.Client
             else if (CheckEnabled("socexec") || CheckEnabled("saveresume")
                 || CheckEnabled("svccycle") || CheckEnabled("billtxn")
                 || CheckEnabled("marrytrace") || CheckEnabled("birthtrace")
-                || CheckEnabled("familymerge"))
+                || CheckEnabled("familymerge")
+                || CheckEnabled("eng05modes"))
             {
                 // (SIM-03) socexec: keep the lot alive so a pushed social can run to
                 // completion; pair pick is lazy (first ticks) so restore-time queues drain.
@@ -9892,6 +9893,8 @@ namespace Simitone.Client
             // assigns signed Temp0 to global 31 and returns true. It does not
             // compare values or inspect Stack Object despite the enum name.
             if (CheckEnabled("genericcall14")) CheckGenericCall14();
+            // ENG-05 (opt-in "eng05modes"): the newly wired generic-call modes.
+            if (CheckEnabled("eng05modes")) CheckGenericCallEng05();
             // CALLGRAPH IFF-LITERAL (Round 44): the ORIGINAL object scripting surface stays IFF-
             // literal - aggregate opcode histogram over the 20 fixture objects (engine-independent raw
             // census r44: 747 BHAVs / 7767 instr; op2=4035, op44=475, op23=433, op32=157, op31=152,
@@ -19621,6 +19624,103 @@ namespace Simitone.Client
         // CTilePt::BuildRotationLookup's fixed 64x64 table, then writes -(x+y) to Temp0.
         // The table is independent of current lot dimensions. The owned corpus has 47 call
         // instances across taxi/carpool/school/vacation/studio/NPC vehicle routines.
+        // ENG-05 ('eng05modes', opt-in): live direct-drive of the newly wired
+        // generic-call modes per genericcall-dispatch-decode.md — mode 3
+        // (RemoveTaxiDialog no-window path -> FALSE), mode 40 (the native
+        // unconditional-FALSE stub), mode 41 (the no-body no-op TRUE), mode 43
+        // (FamilySpellsIntoController: family-gated latch), mode 15 (the
+        // stack-object footprint-type write + rect recompute contract).
+        private static void CheckGenericCallEng05()
+        {
+            try
+            {
+                var caller = (_avatars == null) ? null : _avatars.FirstOrDefault(a => a.Thread != null);
+                var target = _vm?.Entities?.FirstOrDefault(e => e != null && e is VMGameObject
+                    && e.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD);
+                if (caller == null || target == null || _vm?.TS1State == null)
+                {
+                    Log("AUTOTEST eng05modes live fixture unavailable (caller/target/TS1State)");
+                    Fail("eng05modes");
+                    return;
+                }
+                var thread = caller.Thread;
+                var prevTemp0 = thread.TempRegisters[0];
+                var results = new List<string>();
+                bool ok = true;
+                try
+                {
+                    Func<VMGenericTS1CallMode, FSO.SimAntics.Engine.VMPrimitiveExitCode> drive = (mode) =>
+                    {
+                        var frame = new FSO.SimAntics.Engine.VMStackFrame
+                        {
+                            Thread = thread,
+                            Caller = caller,
+                            Callee = caller,
+                            StackObject = target,
+                        };
+                        return new FSO.SimAntics.Primitives.VMGenericTS1Call().Execute(
+                            frame,
+                            new FSO.SimAntics.Primitives.VMGenericTS1CallOperand { Call = mode });
+                    };
+
+                    // mode 3: RemoveTaxiDialog, no-window path -> FALSE (decode §mode-3)
+                    var e3 = drive(VMGenericTS1CallMode.PullDownTaxiDialog);
+                    ok &= e3 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_FALSE;
+                    results.Add("m3=" + e3 + "(want GOTO_FALSE)");
+
+                    // mode 40: the native unconditional-FALSE stub (decode §modes-39/40)
+                    var e40 = drive(VMGenericTS1CallMode.PetToAdult);
+                    ok &= e40 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_FALSE;
+                    results.Add("m40=" + e40 + "(want GOTO_FALSE)");
+
+                    // mode 41: no-body no-op TRUE (decode §mode-41) — the fall-through
+                    var e41 = drive(VMGenericTS1CallMode.HeadFlush);
+                    ok &= e41 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE;
+                    results.Add("m41=" + e41 + "(want GOTO_TRUE)");
+
+                    // mode 43: family-gated latch (decode §mode-43)
+                    var fam = _vm.TS1State.CurrentFamily;
+                    var e43 = drive(VMGenericTS1CallMode.FamilySpellsIntoController);
+                    var latch43 = _vm.TS1State.FamilySpellsLoadedFor;
+                    if (fam != null)
+                    {
+                        ok &= e43 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && latch43 == fam.ChunkID;
+                        results.Add("m43=" + e43 + "(want GOTO_TRUE) latch=" + latch43 + "==fam" + fam.ChunkID);
+                    }
+                    else
+                    {
+                        ok &= e43 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_FALSE;
+                        results.Add("m43=" + e43 + "(want GOTO_FALSE, family-null) latch=" + latch43);
+                    }
+
+                    // mode 15: stack-object footprint-type write (decode §mode-15)
+                    thread.TempRegisters[0] = 1;
+                    var e15a = drive(VMGenericTS1CallMode.MyRoutingFootprintEqualsTemp0);
+                    var type15 = target.RoutingFootprintType;
+                    ok &= e15a == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && type15 == 1;
+                    results.Add("m15(t1)=" + e15a + "(want GOTO_TRUE) type=" + type15 + "(want 1)");
+                    thread.TempRegisters[0] = 0;
+                    var e15b = drive(VMGenericTS1CallMode.MyRoutingFootprintEqualsTemp0);
+                    var type15b = target.RoutingFootprintType;
+                    ok &= e15b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_FALSE && type15b == 0;
+                    results.Add("m15(t0)=" + e15b + "(want GOTO_FALSE) type=" + type15b + "(want 0, restored)");
+                }
+                finally
+                {
+                    target.RoutingFootprintType = 0; // fixture hygiene: restore the native default
+                    thread.TempRegisters[0] = prevTemp0;
+                }
+                Log("AUTOTEST eng05modes " + (ok ? "ALL-OK" : "MISMATCH") + " [" + string.Join(" ", results) + "]");
+                if (ok) { Pass("eng05modes"); return; }
+                Fail("eng05modes");
+            }
+            catch (Exception error)
+            {
+                Log("AUTOTEST eng05modes EXC " + error.GetType().Name + " " + error.Message);
+                Fail("eng05modes");
+            }
+        }
+
         private static void CheckGenericCall12()
         {
             try
