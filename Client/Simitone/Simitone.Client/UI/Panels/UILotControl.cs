@@ -300,6 +300,33 @@ namespace Simitone.Client.UI.Panels
                     };
                     break;
                 case VMDialogType.TextEntry:
+                    // EXP-08 fix card 1: the original single-line editor on
+                    // desktop (the CAS-02 idiom) — the pet pen's adoption
+                    // names the pet through this path (TextEntry writes the
+                    // StackObject name; make_new_character copies it). Touch
+                    // keeps the generic text-entry alert.
+                    if (Parent is Simitone.Client.UI.Screens.TS1GameScreen tgsName && tgsName.Desktop
+                        && IsOriginalObjectDialog(info))
+                    {
+                        var nameDlg = new Simitone.Client.UI.Panels.UIOriginalNameEntryDialog(
+                            info.Title, info.Message, info.Yes, info.Cancel);
+                        var nameCaller = info.Caller;
+                        UIScreen.GlobalShowDialog(nameDlg, true);
+                        nameDlg.OnResult += (text) =>
+                        {
+                            // native ObjectDialog: OK is the default command;
+                            // cancel answers with code 2 (the engine's
+                            // TextEntry case treats empty text as no-rename)
+                            vm.SendCommand(new VMNetDialogResponseCmd
+                            {
+                                ActorUID = nameCaller.PersistID,
+                                ResponseCode = (byte)(text == null ? 2 : 0),
+                                ResponseText = text ?? ""
+                            });
+                            BlockingDialog = null;
+                        };
+                        return;
+                    }
                     options.Buttons = new UIAlertButton[] { new UIAlertButton(UIAlertButtonType.OK, b0Event, info.Yes) };
                     options.TextEntry = true;
                     break;

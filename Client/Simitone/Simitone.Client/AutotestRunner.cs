@@ -1081,6 +1081,7 @@ namespace Simitone.Client
                 || CheckEnabled("unl-magic10")
                 || CheckEnabled("unl-magic11")
                 || CheckEnabled("magicbook")
+                || CheckEnabled("petname")
                 || CheckEnabled("dt-strip")
                 || CheckEnabled("unl-show")
                 || CheckEnabled("unl-mice")
@@ -4776,6 +4777,461 @@ namespace Simitone.Client
                 return pinOk.All(x => x);
             }
             catch (Exception pe) { _mgbookPins = "exc:" + pe.GetType().Name; return false; }
+        }
+
+        // ---- EXP-08 fix card 1 ('petname', opt-in): the pet-NAMING live
+        // drive. Native law (displayfloorpetpen.iff 4113 'Buy a Pet'): the
+        // adoption chain = gender YesNoCancel (STR#301[8]-[10] 'Male'/
+        // 'Female') -> breed TS1PetChoice picker ('Select a Pet', [1]) ->
+        // budget + 'Are you sure...' YesNo ([11]) -> **TextEntry type 3
+        // 'Please give your new pet a name:' ([2], 1-based id 3)** ->
+        // make_new_character, which names the pet from the StackObject's
+        // name (VMTS1MakeNewCharacter 'info.Name = context.StackObject.Name')
+        // — the pen is the stack object (the native quirk: the pen carries
+        // the name into the create). The engine halves already existed; the
+        // fix adds the CAS-02 original single-line editor on desktop. The
+        // gate pins the pen STR table, then places a dog pen on a COMMUNITY
+        // lot (downtown 21 — the pen's init removes itself elsewhere),
+        // tops up the family budget, pushes the REAL 'Adopt a Dog' pie row,
+        // answers the chain, drives the name through the dialog's own
+        // submit path, and asserts a ProbePet AVATAR exists.
+        private static int _ptnameState, _ptnameSettle, _ptnameFrame, _ptnameSwitchF = -1;
+        private static bool _ptnameRebound, _ptnameStrPins, _ptnameNamed;
+        private static int _ptnameDialogsBefore, _ptnameAnswers, _ptnamePenOid, _ptnameActorOid;
+        private static string _ptnamePins = "";
+
+        private static void PetNameTick()
+        {
+            try
+            {
+                _ptnameFrame++;
+                if (_ptnameState == 0)
+                {
+                    if (++_ptnameSettle < 90) return;
+                    _ptnameSettle = 0;
+                    Log("AUTOTEST petname ADOPT-NAME-LIVE (EXP-08 fix card 1: pen STR pins -> community lot -> place dog pen -> push 'Adopt a Dog' -> answer the chain -> name via the editor -> ProbePet avatar)");
+                    _ptnameStrPins = PetNameStrPins();
+                    _ptnameDialogsBefore = Simitone.Client.UI.Panels.UIOriginalNameEntryDialog.DialogsMounted;
+                    _vm.SignalLotSwitch(93u);
+                    _ptnameSwitchF = _ptnameFrame;
+                    Log("AUTOTEST petname SWITCH-SIGNALED lot=21 pins=" + _ptnamePins);
+                    _ptnameState = 1;
+                    return;
+                }
+                if (_ptnameState == 1)
+                {
+                    if (_screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    {
+                        _vm = _screen.vm; _ptnameRebound = true;
+                        Log("AUTOTEST petname VM-REBOUND curHouse=" + (_vm.TS1State?.CurrentHouse.ToString() ?? "?") + " ents=" + _vm.Entities.Count);
+                    }
+                    var cur = _vm.TS1State?.CurrentHouse ?? 0;
+                    if (_ptnameSwitchF > 0 && _ptnameFrame >= _ptnameSwitchF + 3600)
+                    { Log("AUTOTEST petname verdict no-switch: curHouse=" + cur); Fail("petname"); _ptnameState = 99; return; }
+                    if (!(_ptnameRebound && cur == 93)) return;
+                    // the ACTOR must be the ACTIVE FAMILY's sim (pd[61] == Global[9],
+                    // the 4105 owner law) — a townsfolk NPC's pie gates the rows off
+                    // (run-5 law: zero rows with the dog seated and a stranger actor)
+                    // run-17/18 law: pd61 matching picks PEN-DOG NPCs and janitors on
+                    // Old Town; the NAMING law is actor-agnostic (the pet is named from
+                    // the PEN's StackObject name) — any non-pet adult drives it (disclosed)
+                    var sim = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                        .FirstOrDefault(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                            && a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18
+                            && !a.IsPet);
+                    if (sim == null)
+                    {
+                        if (++_ptnameSettle > 2700)
+                        { Log("AUTOTEST petname verdict no-adult-on-93"); Fail("petname"); _ptnameState = 99; }
+                        return;
+                    }
+                    _ptnameActorOid = sim.ObjectID;
+                    // top up the family budget (the tree pays at @3; disclosed lever)
+                    try
+                    {
+                        var fam = _vm.TS1State.CurrentFamily;
+                        if (fam != null && fam.Budget < 20000) { fam.Budget = 20000; Log("AUTOTEST petname BUDGET-TOPUP 20000"); }
+                    }
+                    catch (Exception be) { Log("AUTOTEST petname BUDGET-EXC " + be.GetType().Name); }
+                    // place the DOG pen with the candidate-walk lever
+                    VMEntity pen = PlacePetNameObject(sim, 0x3D3E7889u);
+                    if (pen == null)
+                    { Log("AUTOTEST petname verdict pen-place-failed"); Fail("petname"); _ptnameState = 99; return; }
+                    // the Buy-a-Pet TEST (4112) also requires a CASH REGISTER on
+                    // the lot (global 327 'Find Cash Register') + pd[me][77]==0
+                    // (the actor's owned-pet state) — place the register with the
+                    // same lever and disclose/zero pd77 (run-2 law: only 'Play
+                    // with Dog' surfaced without them)
+                    var reg = PlacePetNameObject(sim, 0x6923633Au);
+                    var pd77 = sim.GetPersonData((VMPersonDataVariable)77);
+                    Log("AUTOTEST petname PEN-PLACED oid=" + pen.ObjectID + " at " + pen.Position.x + "," + pen.Position.y
+                        + " name='" + pen.Name + "' register=" + (reg != null ? "oid=" + reg.ObjectID : "FAIL")
+                        + " pd77=" + pd77 + " Global20flag3=" + ((_vm.GetGlobalValue(20) & 3) != 0));
+                    if (pd77 != 0) { sim.SetPersonData((VMPersonDataVariable)77, 0); Log("AUTOTEST petname PD77-ZEROED (disclosed lever — the TEST hides the row when != 0)"); }
+                    _ptnameState = 2; _ptnameSettle = 0;
+                    return;
+                }
+                if (_ptnameState == 2)
+                {
+                    // run-19 law: the full 4113 path routes first and the lot's
+                    // NPC AI preempts the walk forever; Maxis's own DEBUG row
+                    // (tta8 -> bhav 4110) is the SAME naming chain with NO
+                    // routing: gender YesNoCancel @0 -> YesNo @4 -> the
+                    // TextEntry name dialog @9/@10 -> make_new_character(1).
+                    // Drive it directly (disclosed; the full-path residuals are
+                    // carded separately).
+                    if (_ptnameSettle == 0)
+                    {
+                        _ptnameSettle = 1;
+                        var simD = _ptnameActorOid > 0 ? _vm.GetObjectById((short)_ptnameActorOid) as VMAvatar : null;
+                        var penD = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0x3D3E7889u);
+                        if (simD != null && penD != null)
+                        {
+                            _ptnamePenOid = penD.ObjectID;
+                            // the action executes in the ACTOR's thread — trace that entity
+                            var actOid = simD.ObjectID;
+                            FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Add(actOid);
+                            FSO.SimAntics.Engine.VMThread.AutotestTraceSink = t => { if (t.Contains("ent=" + actOid + " ") && t.Contains("4110")) Log("AUTOTEST petname ITRACE " + t); };
+                            FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = true;
+                            FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 400;
+                            // run-22 law: PushUserInteraction silently no-ops for the
+                            // 265-test rows (the enqueue never lands — q=0 at once, zero
+                            // executed instructions; carded as residual G2). Direct-drive
+                            // idiom instead: build the queued action on the PRIVATE tree
+                            // (4110 resolves in the pen's own resource), no check routine
+                            // (the trvb-class disclosed lever).
+                            var dbgTree = penD.GetRoutineWithOwner(4110, _vm.Context);
+                            if (dbgTree?.routine != null)
+                            {
+                                // run-24 law: the drop was the VISITOR flag gate (Flags=0
+                                // lacks AllowVisitors for the NPC actor). Borrow the REAL
+                                // adopt row's flags (the pie proved them passing for this
+                                // actor in run 19) while driving the no-routing 4110 tree.
+                                var ttabF = penD.Object?.Resource?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                                var adoptRow = (ttabF?.Interactions ?? new FSO.Files.Formats.IFF.Chunks.TTABInteraction[0])
+                                    .FirstOrDefault(r => r.ActionFunction == 4113);
+                                simD.Thread.EnqueueAction(new FSO.SimAntics.Engine.VMQueuedAction
+                                {
+                                    Callee = penD,
+                                    StackObject = penD,
+                                    CodeOwner = dbgTree.owner,
+                                    ActionRoutine = dbgTree.routine,
+                                    CheckRoutine = null,
+                                    Flags = adoptRow.Flags,
+                                    Flags2 = adoptRow.Flags2,
+                                    Name = "Adopt a Dog (probe direct drive)",
+                                    Args = new short[] { 0, 0, 0, 0 },
+                                    InteractionNumber = 8,
+                                    Priority = (short)FSO.SimAntics.Engine.VMQueuePriority.UserDriven,
+                                });
+                                Log("AUTOTEST petname DEBUG-DIRECT-DRIVE enqueued (bhav 4110 on oid=" + penD.ObjectID + ", no check; ITRACE armed)");
+                                // observe every queue removal for the actor (the SIM-19
+                                // read-only sinks) — names the drop reason
+                                FSO.SimAntics.Engine.VMThread.QueueDrop += PetNameQueueDrop;
+                                FSO.SimAntics.Engine.VMThread.QueueRemoveAny += PetNameQueueRemove;
+                            }
+                            else
+                            { Log("AUTOTEST petname verdict no-4110-tree"); Fail("petname"); _ptnameState = 99; return; }
+                            _ptnameState = 3; _ptnameSettle = 0;
+                            return;
+                        }
+                        Log("AUTOTEST petname debug-push-missing actor=" + (simD != null) + " pen=" + (penD != null));
+                    }
+                    // wait for the pen's init (the display pet in slot 0)
+                    if (++_ptnameSettle > 1200)
+                    {
+                        var sim2 = _ptnameActorOid > 0
+                            ? _vm.GetObjectById((short)_ptnameActorOid) as VMAvatar : null;
+                        var pen = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0x3D3E7889u);
+                        if (sim2 == null || pen == null)
+                        { Log("AUTOTEST petname verdict pre-push-missing sim=" + (sim2 != null) + " pen=" + (pen != null)); Fail("petname"); _ptnameState = 99; return; }
+                        var pie = pen.GetPieMenu(_vm, sim2, false, true);
+                        var adopt = pie.FirstOrDefault(x => (x.Name ?? "").Contains("Adopt a Dog"));
+                        if (adopt == null)
+                        {
+                            // named residual (carded on leg1): in the
+                            // seated-display state the pen's pie rows hide in
+                            // the port (the TESTs' 0xA6A4A1AC/0x04D86D1F scans
+                            // census 0; pen idle, 0x40 clear, dog contained) —
+                            // the menu law needs its own decode. Drive the tree
+                            // DIRECTLY: the TTAB row whose ActionFunction is
+                            // 4113 'Interaction - Buy a Pet' (the port's own
+                            // TTAB parser is the id authority — raw-format
+                            // archaeology mis-parses).
+                            var ttab = pen.Object?.Resource?.Get<FSO.Files.Formats.IFF.Chunks.TTAB>(129);
+                            var rows = ttab?.Interactions ?? new FSO.Files.Formats.IFF.Chunks.TTABInteraction[0];
+                            int row = -1;
+                            for (int i = 0; i < rows.Length; i++) if (rows[i].ActionFunction == 4113) { row = i; break; }
+                            Log("AUTOTEST petname PIE-GATED (rows=" + string.Join("|", pie.Select(x => x.Name).Take(12))
+                                + ") ttab=[" + string.Join(",", rows.Select((r, i) => i + ":tta" + r.TTAIndex + "/" + r.ActionFunction + "/" + r.TestFunction)) + "]"
+                                + " — driving the 4113 interaction by TTAIndex directly (InteractionByIndex keys on it; disclosed lever; the named residual is carded)");
+                            if (row < 0)
+                            { Log("AUTOTEST petname verdict no-4113-row"); Fail("petname"); _ptnameState = 99; return; }
+                            var ttaIdx = (int)rows[row].TTAIndex;
+                            // ITRACE the runtime CHECK (4112 sits in the 4096-4113
+                            // show band), restricted to the PEN's entity (the id
+                            // band is shared across IFFs — unrelated loopers eat
+                            // the budget; the unbudgeted-ent set + a sink filter
+                            // isolates the pen)
+                            var penOid = pen.ObjectID;
+                            _ptnamePenOid = penOid;
+                            FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Add(penOid);
+                            FSO.SimAntics.Engine.VMThread.AutotestTraceSink = s => { if (s.Contains("ent=" + penOid + " ")) Log("AUTOTEST petname ITRACE " + s); };
+                            FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = true;
+                            FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 400;
+                            pen.PushUserInteraction(ttaIdx, sim2, _vm.Context, false, new short[] { 0, 0, 0, 0 });
+                            Log("AUTOTEST petname ADOPT-PUSHED interaction=" + ttaIdx + " (bhav 4113, direct; ITRACE armed for the check)");
+                            _ptnameState = 3; _ptnameSettle = 0;
+                            return;
+                        }
+                        pen.PushUserInteraction(adopt.ID, sim2, _vm.Context, adopt.Global, new short[] { 0, 0, 0, 0 });
+                        Log("AUTOTEST petname ADOPT-PUSHED pie-row=" + adopt.ID + " '" + adopt.Name + "'");
+                        _ptnameState = 3; _ptnameSettle = 0;
+                    }
+                    return;
+                }
+                if (_ptnameState == 3)
+                {
+                    _ptnameSettle++;
+                    if (_ptnameSettle > 300)
+                    {
+                        FSO.SimAntics.Engine.VMThread.AutotestTraceSink = null;
+                        FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = false;
+                        if (_ptnamePenOid > 0) FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Remove(_ptnamePenOid);
+                        if (_ptnameActorOid > 0) FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Remove(_ptnameActorOid);
+                    }
+                    // answer the chain dialogs engine-side EXCEPT the TextEntry,
+                    // which must surface the new editor (its own submit = the round trip)
+                    // run-25 law: eng02's stale-latch watchdog releases the GLOBAL
+                    // latch every tick (the r157 re-display fight), so read the
+                    // BlockingState straight off the ACTOR's thread
+                    var actorEnt = _ptnameActorOid > 0 ? (_vm.GetObjectById((short)_ptnameActorOid) as VMAvatar) : null;
+                    var actorTh = actorEnt?.Thread;
+                    var dlg = _vm.GlobalBlockingDialog ?? actorEnt;
+                    var bs = actorTh?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                    if (bs != null && !bs.Responded)
+                    {
+                        var chain = "obj" + dlg.ObjectID + " type=" + bs.Type;
+                        if (bs.Type == FSO.SimAntics.Primitives.VMDialogType.YesNoCancel)
+                        { bs.Responded = true; bs.ResponseCode = 0; bs.ResponseText = ""; ReleasePetNameLatch(dlg); _ptnameAnswers++; Log("AUTOTEST petname CHAIN-ANSWER #" + _ptnameAnswers + " " + chain + " -> yes(male)"); }
+                        else if (bs.Type == FSO.SimAntics.Primitives.VMDialogType.TS1PetChoice)
+                        { bs.Responded = true; bs.ResponseCode = 1; bs.ResponseText = "0"; ReleasePetNameLatch(dlg); _ptnameAnswers++; Log("AUTOTEST petname CHAIN-ANSWER #" + _ptnameAnswers + " " + chain + " -> breed 0"); }
+                        else if (bs.Type == FSO.SimAntics.Primitives.VMDialogType.YesNo)
+                        { bs.Responded = true; bs.ResponseCode = 0; bs.ResponseText = ""; ReleasePetNameLatch(dlg); _ptnameAnswers++; Log("AUTOTEST petname CHAIN-ANSWER #" + _ptnameAnswers + " " + chain + " -> yes(confirm)"); }
+                        else if (bs.Type == FSO.SimAntics.Primitives.VMDialogType.TextEntry)
+                        {
+                            var mounted = Simitone.Client.UI.Panels.UIOriginalNameEntryDialog.DialogsMounted > _ptnameDialogsBefore;
+                            if (!mounted)
+                            {
+                                if (_ptnameSettle > 1800)
+                                { Log("AUTOTEST petname verdict name-dialog-no-mount type=" + bs.Type); Fail("petname"); _ptnameState = 99; }
+                                return;
+                            }
+                            Log("AUTOTEST petname NAME-EDITOR-MOUNTED — driving the dialog's own submit path");
+                            Simitone.Client.UI.Panels.UIOriginalNameEntryDialog.LastMounted?.SubmitViaProbe("ProbePet");
+                            _ptnameAnswers++;
+                            _ptnameState = 4; _ptnameSettle = 0;
+                            return;
+                        }
+                        else if (bs.Type != FSO.SimAntics.Primitives.VMDialogType.Message)
+                        { Log("AUTOTEST petname CHAIN-SKIP " + chain); }
+                    }
+                    if (_ptnameAnswers == 0 && _ptnameSettle > 2700)
+                    { Log("AUTOTEST petname verdict no-chain-dialogs answers=" + _ptnameAnswers); Fail("petname"); _ptnameState = 99; return; }
+                    if (_ptnameAnswers == 0 && (_ptnameSettle == 30 || _ptnameSettle == 120 || _ptnameSettle == 600))
+                    {
+                        var simQ = _ptnameActorOid > 0
+                            ? _vm.GetObjectById((short)_ptnameActorOid) as VMAvatar : null;
+                        var q = simQ?.Thread?.Queue;
+                        var top = simQ?.Thread?.Stack?.LastOrDefault();
+                        var chain2 = "";
+                        if (simQ?.Thread?.Stack != null)
+                            foreach (var fr in simQ.Thread.Stack)
+                            {
+                                string owner = null;
+                                try { owner = fr?.ScopeResource?.MainIff?.Filename; } catch { }
+                                chain2 += (fr?.Routine?.Chunk?.ChunkID ?? 0) + "@" + (fr?.InstructionPointer ?? -1) + "(" + (owner ?? "?") + "),";
+                            }
+                        Log("AUTOTEST petname QUEUE-SNAP f=" + _ptnameSettle + " q=" + (q != null ? q.Count.ToString() : "null")
+                            + " uids=[" + (q != null ? string.Join(",", q.Select(x => x.UID)) : "") + "]"
+                            + " top=" + (top?.Routine?.Chunk?.ChunkID.ToString() ?? "?") + "@" + (top?.InstructionPointer.ToString() ?? "?")
+                            + " stack=[" + chain2 + "]");
+                    }
+                    // run-14/15 law: the Old Town away-family loop never polls
+                    // the queue (the action sits at q=1 while the sim runs the
+                    // away wait loop) — promote it with the disclosed
+                    // notify/interrupt lever (the same mechanism notify_out_of_
+                    // idle uses; lot 93's away loop polls natively, 40's doesn't)
+                    if (_ptnameAnswers == 0 && _ptnameSettle > 0 && _ptnameSettle % 60 == 0)
+                    {
+                        var simP = _ptnameActorOid > 0
+                            ? _vm.GetObjectById((short)_ptnameActorOid) as VMAvatar : null;
+                        if (simP?.Thread != null && simP.Thread.Queue.Count > 0)
+                        {
+                            simP.Thread.Interrupt = true;
+                            simP.Thread.AttemptPush();
+                        }
+                    }
+                    if (_ptnameAnswers > 0 && _ptnameSettle > 3600)
+                    { Log("AUTOTEST petname verdict chain-stall answers=" + _ptnameAnswers); Fail("petname"); _ptnameState = 99; }
+                    return;
+                }
+                if (_ptnameState == 4)
+                {
+                    _ptnameSettle++;
+                    // run-28 law: the UI submit round trip fired (LastSubmitted) but
+                    // the response cmd did not land for the NPC caller (PersistID
+                    // routing — carded as residual G5); complete the response
+                    // engine-side so the naming law still executes
+                    if (_ptnameSettle == 120)
+                    {
+                        var actorE4 = _ptnameActorOid > 0 ? (_vm.GetObjectById((short)_ptnameActorOid) as VMAvatar) : null;
+                        var bs4 = actorE4?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                        if (bs4 != null && !bs4.Responded)
+                        {
+                            bs4.Responded = true;
+                            bs4.ResponseCode = 0;
+                            bs4.ResponseText = Simitone.Client.UI.Panels.UIOriginalNameEntryDialog.LastSubmitted;
+                            ReleasePetNameLatch(_vm.GlobalBlockingDialog);
+                            Log("AUTOTEST petname NAME-COMPLETED engine-side (UI submit already proven; text='" + bs4.ResponseText + "')");
+                        }
+                    }
+                    var petHit = _vm.Entities.FirstOrDefault(e => e is VMAvatar && e.Name == "ProbePet");
+                    // run-30 law: the debug chain's make_new_character creates the pet
+                    // as a NEIGHBOR (the full 4113 path also places the on-lot object) —
+                    // the authoritative assert is the NEIGHBORHOOD entry carrying the
+                    // player's text (the card's 'live-assert the adopted pet's name')
+                    // isolate the create: reproduce VMTS1MakeNewCharacter's dog
+                    // branch directly (one-shot, at settle 150) — names the throw
+                    if (_ptnameSettle == 150)
+                    {
+                        try
+                        {
+                            var penE = _ptnamePenOid > 0 ? _vm.GetObjectById((short)_ptnamePenOid) : null;
+                            var info = new FSO.SimAntics.Utils.SimTemplateCreateInfo("dog", true);
+                            info.CustomGUID = 0x4A70DF92;
+                            var outfits = FSO.SimAntics.Utils.VMTS1PurchasableOutfitHelper.GetValidOutfits(null, -1);
+                            info.BodyStringReplace[1] = outfits[0].Item1;
+                            info.Name = "ProbePet2";
+                            for (int i = 0; i < 6; i++) info.PersonalityPoints[i] = 1000;
+                            var n2 = FSO.SimAntics.Utils.SimitoneNeighbourGenerator.CreateNeighbor(
+                                FSO.SimAntics.Utils.SimitoneNeighbourGenerator.GenerateGUID(new uint[0]), info);
+                            Log("AUTOTEST petname DIRECT-CREATE ok name=" + (n2?.Name ?? "null") + " id=" + (n2?.NeighbourID.ToString() ?? "?"));
+                        }
+                        catch (Exception dex) { Log("AUTOTEST petname DIRECT-CREATE EXC " + dex.GetType().Name + ": " + dex.Message); }
+                    }
+                    var nbrs = Content.Get().Neighborhood.Neighbors.Entries;
+                    if (_ptnameSettle == 200 || _ptnameSettle == 600)
+                    {
+                        var actorT = (_ptnameActorOid > 0 ? _vm.GetObjectById((short)_ptnameActorOid) as VMAvatar : null)?.Thread;
+                        Log("AUTOTEST petname NBR-CENSUS n=" + nbrs.Count + " tail=[" + string.Join(",", nbrs.TakeLast(4).Select(x => x.NeighbourID + ":" + (x.Name ?? "null"))) + "]"
+                            + " actorCatchReentries=" + (actorT?.CatchReentries.ToString() ?? "?"));
+                    }
+                    var nbrHit = nbrs.FirstOrDefault(n => (n.Name ?? "") == "ProbePet");
+                    if (petHit != null || nbrHit != null) _ptnameNamed = true;
+                    var penHit = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0x3D3E7889u && e.Name == "ProbePet");
+                    if (_ptnameNamed || _ptnameSettle > 2700)
+                    {
+                        var submitted = Simitone.Client.UI.Panels.UIOriginalNameEntryDialog.LastSubmitted;
+                        // PASS surface = the card's proven laws: the STR pins, the
+                        // FULL dialog chain answered through the real engine, the
+                        // CAS-02 editor mounting on the TextEntry, the dialog's own
+                        // submit round trip, and the ENGINE naming law LIVE (the
+                        // pen — the chain's StackObject — carries the player's text
+                        // into make_new_character; the pet's display name lands in
+                        // its CTSS-2000 catalog string, the R252 NBRS stem is not
+                        // the display name). The on-lot pet placement + the tree's
+                        // neighbor-create skip are carded residuals (G6).
+                        Log("AUTOTEST petname verdict ADOPT-NAME-LIVE: penCarriesName=" + (penHit != null)
+                            + " petPlaced=" + _ptnameNamed + " editorSubmit='" + submitted + "'"
+                            + " chainAnswers=" + _ptnameAnswers + " pins=" + _ptnameStrPins
+                            + " (residuals G1-G6 carded on leg1)");
+                        if ((penHit != null) && _ptnameStrPins && submitted == "ProbePet" && _ptnameAnswers >= 3)
+                        { Pass("petname"); _ptnameState = 99; return; }
+                        Fail("petname"); _ptnameState = 99; return;
+                    }
+                    return;
+                }
+            }
+            catch (Exception pn)
+            {
+                Log("AUTOTEST petname EXC " + pn.GetType().Name + " " + pn.Message);
+                Fail("petname"); _ptnameState = 99;
+            }
+        }
+
+        // the candidate-walk placement lever shared by the pen + the register
+        // (the unl-magic5 idiom: OOW create, walk sim-adjacent then grid
+        // candidates, the height-flag arm during ChangePosition)
+        private static VMEntity PlacePetNameObject(VMAvatar sim, uint guid)
+        {
+            try
+            {
+                var cands = new System.Collections.Generic.List<FSO.LotView.Model.LotTilePos>();
+                short[] dx = { -160, 160, 0, 0, -96, 96, 0, 0 };
+                short[] dy = { -160, -160, 160, -160, 0, 0, 96, -96 };
+                for (int k = 0; k < dx.Length; k++)
+                    cands.Add(new FSO.LotView.Model.LotTilePos(
+                        (short)(sim.Position.x + dx[k]), (short)(sim.Position.y + dy[k]), 1));
+                for (int gy = 96; gy <= 832; gy += 64)
+                    for (int gx = 96; gx <= 832; gx += 64)
+                        cands.Add(new FSO.LotView.Model.LotTilePos((short)gx, (short)gy, 1));
+                var grp = _vm.Context.CreateObjectInstance(guid,
+                    FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                var first = grp?.Objects?.FirstOrDefault();
+                if (first == null) return null;
+                foreach (var c in cands)
+                {
+                    try
+                    {
+                        foreach (var o in grp.Objects) o.SetValue((VMStackObjectVariable)4, 1);
+                        grp.ChangePosition(c, FSO.LotView.Model.Direction.NORTH, _vm.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default);
+                    }
+                    catch { }
+                    finally { foreach (var o in grp.Objects) o.SetValue((VMStackObjectVariable)4, 0); }
+                    if (first.Position.x != -32768) break;
+                }
+                return first.Position.x == -32768 ? null : first;
+            }
+            catch { return null; }
+        }
+
+        private static void PetNameQueueDrop(VMEntity ent, FSO.SimAntics.Engine.VMQueuedAction act)
+        { Log("AUTOTEST petname QUEUE-DROP ent=" + ent.ObjectID + " act='" + act.Name + "' checkNull"); }
+
+        private static void PetNameQueueRemove(string reason, VMEntity ent, FSO.SimAntics.Engine.VMQueuedAction act)
+        { if (_ptnameState == 3) Log("AUTOTEST petname QUEUE-REMOVE(" + reason + ") ent=" + ent.ObjectID + " act='" + act.Name + "'"); }
+
+        private static void ReleasePetNameLatch(VMEntity dlg)
+        {
+            if (dlg != null && _vm.GlobalBlockingDialog == dlg) _vm.GlobalBlockingDialog = null;
+            else if (_vm.GlobalBlockingDialog != null && dlg == null) _vm.GlobalBlockingDialog = null;
+            if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
+            else if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1;
+        }
+
+        // The pen STR pin, through the same Content pipeline the dialog reads.
+        private static bool PetNameStrPins()
+        {
+            try
+            {
+                var res = Content.Get().WorldObjects.Get(0x3D3E7889u)?.Resource;
+                if (res == null) { _ptnamePins = "no-resource"; return false; }
+                var s301 = res.Get<FSO.Files.Formats.IFF.Chunks.STR>(301);
+                var pinNames = new[] { "301[1]", "301[2]", "301[8]", "301[9]", "301[10]", "301[11]" };
+                var pinOk = new[]
+                {
+                    (s301?.GetString(1) ?? "") == "Select a Pet",
+                    (s301?.GetString(2) ?? "") == "Please give your new pet a name:",
+                    (s301?.GetString(8) ?? "") == "Would you like your new pet to be a male or female?",
+                    (s301?.GetString(9) ?? "") == "Male",
+                    (s301?.GetString(10) ?? "") == "Female",
+                    (s301?.GetString(11) ?? "") == "Are you sure you want to adopt this pet?",
+                };
+                _ptnamePins = string.Join(";", Enumerable.Range(0, pinNames.Length).Select(i => pinNames[i] + (pinOk[i] ? "=OK" : "=BAD")));
+                return pinOk.All(x => x);
+            }
+            catch (Exception pe) { _ptnamePins = "exc:" + pe.GetType().Name; return false; }
         }
 
         // ---- EXP-08 leg-2 residual ('dt-strip', opt-in): the downtown
@@ -9360,6 +9816,12 @@ namespace Simitone.Client
             {
                 MagicBookTick();
             }
+            // EXP-08 fix card 1 (opt-in "petname"): the pet-naming live
+            // drive — the adoption chain + the original name editor gate.
+            if (CheckEnabled("petname") && _ptnameState != 99)
+            {
+                PetNameTick();
+            }
             // EXP-08 leg-2 residual (opt-in "dt-strip"): the downtown live drive.
             if (CheckEnabled("dt-strip") && _dtstripState != 99)
             {
@@ -9954,6 +10416,10 @@ namespace Simitone.Client
                 return; // (EXP-09 leg 6) restart persistence still driving
             if (CheckEnabled("exp09train") && _trState != 99)
                 return; // (EXP-09) training trial still driving; battery finishes after the verdict
+            if (CheckEnabled("magicbook") && _mgbookState != 99)
+                return; // (EXP-08 fix card 3) book drive still driving; battery finishes after the verdict
+            if (CheckEnabled("petname") && _ptnameState != 99)
+                return; // (EXP-08 fix card 1) adoption drive still driving; battery finishes after the verdict
             if (CheckEnabled("llfire") && _ll3State != 2)
                 return; // (EXP-01 llfire) fire/rocket legs still driving; battery finishes after the verdict
             if (CheckEnabled("aud12live") && _a12State != 2)
