@@ -5594,6 +5594,10 @@ namespace Simitone.Client
                     var bs = dlg?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
                     if (dlg != null && bs != null && !bs.Responded)
                     { bs.Responded = true; bs.ResponseCode = 0; bs.ResponseText = ""; ReleasePetNameLatch(dlg); Log("AUTOTEST awarddrive DIALOG-ANSWERED type=" + bs.Type); }
+                    // wait for the 4128's end-interaction (the @13 remove-cleanup law:
+                    // a piece placed while 4128 runs gets eaten)
+                    if (!_awdrv4128Done) { if (_awdrvSettle > 3600) { Log("AUTOTEST awarddrive verdict 4128-never-ended"); Fail("awarddrive"); _awdrvState = 99; } return; }
+                    var settleIn = _awdrvSettle - _awdrv4128Frame;
                     var ladderHit = _vm.Entities.FirstOrDefault(e => e.Object != null && AwdrvLadder.Contains(e.Object.OBJ.GUID));
                     if (ladderHit != null)
                     {
@@ -5604,110 +5608,44 @@ namespace Simitone.Client
                         _awdrvState = 3; _awdrvSettle = 0;
                         return;
                     }
-                    if (false)
-                    {
-                        // the 4118 trophy drive: StackObject=the cabinet
-                        var sim2 = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
-                            .FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.NeighborId) == _awdrvNid);
-                        // run-8 law: the CABINET self-removes (~5s post-placement — its
-                        // own context law); the 4118's attr writes target the SET PIECE
-                        // (the ceremony podium) — use the placed level-9 piece
-                        var cab2 = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0x88734CE8u)
-                            ?? _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0xA5B9515Au);
-                        var ctrl2 = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0x6A75FC81u);
-                        if (sim2 != null && cab2 != null && ctrl2 != null)
-                        {
-                            var tree2 = ctrl2.GetRoutineWithOwner(4118, _vm.Context);
-                            if (tree2?.routine != null)
-                            {
-                                sim2.Thread.EnqueueAction(new FSO.SimAntics.Engine.VMQueuedAction
-                                {
-                                    Callee = cab2, StackObject = cab2, IconOwner = cab2,
-                                    CodeOwner = tree2.owner, ActionRoutine = tree2.routine, CheckRoutine = null,
-                                    Name = "Get Award (probe direct drive)",
-                                    Args = new short[] { 0, 0, 0, 0 }, InteractionNumber = 0,
-                                    Priority = (short)FSO.SimAntics.Engine.VMQueuePriority.UserDriven,
-                                    Flags = FSO.Files.Formats.IFF.Chunks.TTABFlags.AllowVisitors,
-                                });
-                                Log("AUTOTEST awarddrive 4118-PUSHED (the trophy drive; the presenter handshake may park it)");
-                            }
-                        }
-                        _awdrvState = 3; _awdrvSettle = 0;
-                        return;
-                    }
-                    if (_awdrvSettle == 120 || _awdrvSettle == 600)
-                    {
-                        var simQ = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
-                            .FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.NeighborId) == _awdrvNid);
-                        var q = simQ?.Thread?.Queue;
-                        var top = simQ?.Thread?.Stack?.LastOrDefault();
-                        var chainS = "";
-                        if (simQ?.Thread?.Stack != null)
-                            foreach (var fr in simQ.Thread.Stack)
-                            { string own = null; try { own = fr?.ScopeResource?.MainIff?.Filename; } catch { }
-                                chainS += (fr?.Routine?.Chunk?.ChunkID ?? 0) + "@" + (fr?.InstructionPointer ?? -1) + "(" + (own ?? "?") + "),"; }
-                        Log("AUTOTEST awarddrive 4128-SNAP f=" + _awdrvSettle + " q=" + (q?.Count.ToString() ?? "?")
-                            + " top=" + (top?.Routine?.Chunk?.ChunkID.ToString() ?? "none") + "@" + (top?.InstructionPointer.ToString() ?? "?")
-                            + " stack=[" + chainS + "] catches=" + (simQ?.Thread?.CatchReentries.ToString() ?? "?")
-                            + " pd81=" + (simQ?.GetPersonData(VMPersonDataVariable.TS1FameStarPower).ToString() ?? "?")
-                            + " pd80=" + (simQ?.GetPersonData(VMPersonDataVariable.TS1FameScore).ToString() ?? "?"));
-                    }
-                    // run-6 law: the 4128 RAN — its mode-36 recompute rewrites the fame
-                    // FIRST (a fresh sim's low friends demote to 0), so no ladder case
-                    // matches (the recompute-first law; the native flow expects an
-                    // ESTABLISHED famous sim). The reward asserts proceed directly:
-                    // place the level-9 piece (0x88734CE8, the 4128@27 map) + push
-                    // 4118 for the TROPHY (the actual reward).
-                    // run-10 law: the still-running 4128's @13 remove_object cleanup
-                    // EATS a freshly-placed piece — wait for its end-interaction first
-                    if (!_awdrv4128Done) { if (_awdrvSettle > 3600) { Log("AUTOTEST awarddrive verdict 4128-never-ended"); Fail("awarddrive"); _awdrvState = 99; } return; }
-                    var settleIn = _awdrvSettle - _awdrv4128Frame;
                     if (settleIn == 60)
                     {
+                        // the 4115 ceremony drive (runs 8-12's laws: the pieces live
+                        // ~2s outside the ceremony — CREATE + the var-11 link + the push
+                        // must land in ONE probe tick; 4115 then owns the piece)
                         var simL = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
                             .FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.NeighborId) == _awdrvNid);
-                        if (simL != null)
+                        var ctrlC = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0x6A75FC81u);
+                        var treeC = ctrlC?.GetRoutineWithOwner(4115, _vm.Context);
+                        if (simL != null && ctrlC != null && treeC?.routine != null)
                         {
                             simL.SetPersonData(VMPersonDataVariable.TS1FameScore, 1000);
                             simL.SetPersonData(VMPersonDataVariable.TS1FameStarPower, 9);
                             simL.SetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark, 9);
                             simL.SetPersonData((VMPersonDataVariable)56, 0);
-                            // run-9 law: the candidate-walk placement is flaky (busy tiles);
-                            // the 4118 attr writes only need the ENTITY — create OOW
                             var pieceGrp = _vm.Context.CreateObjectInstance(0x88734CE8u,
                                 FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
                             var piece = pieceGrp?.Objects?.FirstOrDefault();
-                            Log("AUTOTEST awarddrive V5-SET-PIECE level9=0x88734CE8 " + (piece != null ? "oid=" + piece.ObjectID + " (OOW)" : "CREATE-FAIL")
-                                + " pd re-armed [1000,9,9] (post-recompute)");
-                        }
-                    }
-                    if (settleIn == 180)
-                    {
-                        var sim2 = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
-                            .FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.NeighborId) == _awdrvNid);
-                        var cab2 = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0xA5B9515Au);
-                        var ctrl2 = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0x6A75FC81u);
-                        if (sim2 != null && cab2 != null && ctrl2 != null)
-                        {
-                            var tree2 = ctrl2.GetRoutineWithOwner(4118, _vm.Context);
-                            if (tree2?.routine != null)
+                            if (piece != null)
                             {
-                                sim2.Thread.EnqueueAction(new FSO.SimAntics.Engine.VMQueuedAction
+                                ctrlC.SetValue((VMStackObjectVariable)11, (short)piece.ObjectID);
+                                ctrlC.Thread.EnqueueAction(new FSO.SimAntics.Engine.VMQueuedAction
                                 {
-                                    Callee = cab2, StackObject = cab2, IconOwner = cab2,
-                                    CodeOwner = tree2.owner, ActionRoutine = tree2.routine, CheckRoutine = null,
-                                    Name = "Get Award (probe direct drive)",
+                                    Callee = ctrlC, StackObject = ctrlC, IconOwner = ctrlC,
+                                    CodeOwner = treeC.owner, ActionRoutine = treeC.routine, CheckRoutine = null,
+                                    Name = "Award - Ceremony (probe direct drive)",
                                     Args = new short[] { 0, 0, 0, 0 }, InteractionNumber = 0,
                                     Priority = (short)FSO.SimAntics.Engine.VMQueuePriority.UserDriven,
-                                    Flags = FSO.Files.Formats.IFF.Chunks.TTABFlags.AllowVisitors,
                                 });
-                                Log("AUTOTEST awarddrive 4118-PUSHED (the trophy drive; the presenter handshake may park it)");
+                                Log("AUTOTEST awarddrive 4115-CEREMONY-PUSHED ctrl=oid" + ctrlC.ObjectID
+                                    + " piece=oid" + piece.ObjectID + " (SAME-TICK create+link var-11+push; pd=[1000,9,9] re-armed)");
+                                _awdrvState = 3; _awdrvSettle = 0;
+                                return;
                             }
-                            else Log("AUTOTEST awarddrive no-4118-tree");
+                            Log("AUTOTEST awarddrive piece-CREATE-FAIL");
                         }
-                        else Log("AUTOTEST awarddrive 4118-pre-missing sim=" + (sim2 != null) + " cab=" + (cab2 != null) + " ctrl=" + (ctrl2 != null));
-                        _awdrvState = 3; _awdrvSettle = 0;
-                        return;
+                        else Log("AUTOTEST awarddrive 4115-pre-missing sim=" + (simL != null) + " ctrl=" + (ctrlC != null)
+                            + " tree=" + (treeC?.routine != null));
                     }
                     if (settleIn > 2700)
                     { Log("AUTOTEST awarddrive verdict stuck-pre-4118"); Fail("awarddrive"); _awdrvState = 99; }
