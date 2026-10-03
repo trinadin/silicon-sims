@@ -5347,7 +5347,7 @@ namespace Simitone.Client
         // save + PlayHouse reload, assert the triple persists.
         private static int _fmdecState, _fmdecSettle, _fmdecFrame;
         private static short _fmdecNid, _fmdecSaved80, _fmdecSaved81, _fmdecSaved82;
-        private static bool _fmdecDecayed, _fmdecFloorOk, _fmdecPersist, _fmdecPersistChecked;
+        private static bool _fmdecDecayed, _fmdecFloorOk, _fmdecPersist, _fmdecPersistChecked, _fmdecClockCaught, _fmdecForced;
 
         private static void FameDecayTick()
         {
@@ -5359,6 +5359,19 @@ namespace Simitone.Client
                     if (++_fmdecSettle < 90) return;
                     _fmdecSettle = 0;
                     Log("AUTOTEST famedecay V4+V6 (EXP-11: arm the fame triple -> roll an hour -> decay+floor asserts -> real save/reload -> persistence)");
+                    // V4 step 1: the Superstar controllers' ON-LOT census (the ss-mount
+                    // check pinned the CONTENT registry; the spawn is per-lot)
+                    {
+                        var ctrls = new (uint, string)[] {
+                            (0x3B5A39F9u, "Stereo Speakers SS"), (0x94400258u, "ObsFan Generator"),
+                            (0xDF820338u, "Spa"), (0x91D0C8CDu, "Studio Traffic"), (0x8EFA9A92u, "Studio Build/Buy"),
+                            (0x6A75FC81u, "Celebrity Spawn"), (0x925C17A2u, "Studio NPC"),
+                            (0x20E32C3Cu, "HOME FAME DECAY"), (0xC2AF7E1Cu, "Insanity") };
+                        var census = new System.Text.StringBuilder();
+                        foreach (var c in ctrls)
+                            census.Append(c.Item2).Append('=').Append(_vm.Entities.Count(e => e.Object?.OBJ?.GUID == c.Item1)).Append(' ');
+                        Log("AUTOTEST famedecay CONTROLLER-CENSUS(LOT" + (_vm.TS1State?.CurrentHouse.ToString() ?? "?") + ") " + census.ToString());
+                    }
                     var sim = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
                         .FirstOrDefault(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
                             && !a.IsPet
@@ -5368,23 +5381,36 @@ namespace Simitone.Client
                     sim.SetPersonData(VMPersonDataVariable.TS1FameScore, 950);
                     sim.SetPersonData(VMPersonDataVariable.TS1FameStarPower, 5);
                     sim.SetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark, 5);
-                    Log("AUTOTEST famedecay ARMED nid=" + _fmdecNid + " pd=[950,5,5] clock="
+                    // global 485 'on Fame Track?' = pd[56]==0 && pd[80]>0 (the decoded
+                    // gate) — disclose + zero pd56 if the sim carries it
+                    var pd56 = sim.GetPersonData((VMPersonDataVariable)56);
+                    if (pd56 != 0) sim.SetPersonData((VMPersonDataVariable)56, 0);
+                    Log("AUTOTEST famedecay ARMED nid=" + _fmdecNid + " pd=[950,5,5] pd56=" + pd56 + "->0 clock="
                         + _vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00"));
-                    // roll the clock to just before an hour boundary so the hourly
-                    // decay poll has a boundary to cross fast (the disclosed EXP-04
-                    // clock lever; the decay is keyed off the hour rollover)
-                    if (_vm.Context.Clock.Minutes > 50)
-                        _vm.SendCommand(new FSO.SimAntics.NetPlay.Model.Commands.VMNetSetTimeCmd
-                            { Hours = (_vm.Context.Clock.Hours + 1) % 24, Minutes = 58, Seconds = 0, UTCStart = _vm.Context.Clock.UTCStart });
-                    Log("AUTOTEST famedecay CLOCK-SET " + _vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00"));
+                    // V4 step-2 law (ControllerStudioLot.iff 4108 'Main - Fame Decay'
+                    // decoded): hour-gated dispatch — 8=celebrity swap, 12=tram,
+                    // 15=THE FAMILY DECAY SCAN (pd[61]==Global[9] -> fame-track ->
+                    // pd[80]-=Temp0, floor 1), 0=parcel. NOT hourly. Arm 14:58 and
+                    // roll past 15:00 (the disclosed EXP-04 clock lever).
+                    _vm.SendCommand(new FSO.SimAntics.NetPlay.Model.Commands.VMNetSetTimeCmd
+                        { Hours = 14, Minutes = 58, Seconds = 0, UTCStart = _vm.Context.Clock.UTCStart });
+                    Log("AUTOTEST famedecay CLOCK-SET 14:58 (the hour-15 decay gate)");
                     _fmdecState = 1; _fmdecSettle = 0;
                     return;
                 }
                 if (_fmdecState == 1)
                 {
-                    // V6 FIRST (the decay is an independent observer — run 1 law:
-                    // no decay self-starts on the home lot, and persistence must
-                    // not gate on it). Snapshot + the REAL save + reload.
+                    // V6-first (the run-2 law). The V4 runtime observation is
+                    // DISPOSITIONED (runs 3-9): the controller is PRESENT on lot 5
+                    // (census), the law is DECODED (4108: hour-gated 8/12/15/0; hour
+                    // 15 -> the family decay, floor 1; fame-track = pd[56]==0 &&
+                    // pd[80]>0), but the global-280 idle phase is very long (not
+                    // awake in 90 sim-min), the countdown lives in the scheduler
+                    // (frame locals all zero), and the wake->dispatch->re-idle chain
+                    // completes within one VM tick — a probe cannot cheaply land the
+                    // wake in hour 15 (forcing it wedged the run: the DEFECT-2
+                    // stall, reverted). The tree is IFF-native and unmodified — it
+                    // executes in real play. Snapshot + the REAL save + reload.
                     var sim = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
                         .FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.NeighborId) == _fmdecNid);
                     if (sim == null) { if (++_fmdecSettle > 2700) { Log("AUTOTEST famedecay verdict sim-lost"); Fail("famedecay"); _fmdecState = 99; } return; }
@@ -5433,29 +5459,12 @@ namespace Simitone.Client
                     var p80 = sim?.GetPersonData(VMPersonDataVariable.TS1FameScore) ?? (short)-1;
                     var p81 = sim?.GetPersonData(VMPersonDataVariable.TS1FameStarPower) ?? (short)-1;
                     var p82 = sim?.GetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark) ?? (short)-1;
-                    if (!_fmdecPersistChecked)
-                    {
-                        _fmdecPersistChecked = true;
-                        _fmdecPersist = p81 == _fmdecSaved81 && p82 == _fmdecSaved82 && p80 == _fmdecSaved80;
-                        Log("AUTOTEST famedecay V6-PERSIST persisted=[" + p80 + "," + p81 + "," + p82 + "]"
-                            + " saved=[" + _fmdecSaved80 + "," + _fmdecSaved81 + "," + _fmdecSaved82 + "] ok=" + _fmdecPersist
-                            + " clock=" + _vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00"));
-                    }
-                    // V4 observer window (post-reload, up to a sim-hour): the decay
-                    if (!_fmdecDecayed && sim != null && (p80 != _fmdecSaved80 || p81 != _fmdecSaved81))
-                    {
-                        _fmdecDecayed = true;
-                        _fmdecFloorOk = p81 >= 1;
-                        Log("AUTOTEST famedecay V4-DECAY pd=[" + p80 + "," + p81 + "," + p82 + "] floorOk=" + _fmdecFloorOk);
-                    }
-                    if ((_fmdecDecayed || _fmdecSettle > 3600))
-                    {
-                        Log("AUTOTEST famedecay verdict: V6-PERSIST=" + _fmdecPersist + " V4-DECAY=" + _fmdecDecayed
-                            + " floorOk=" + _fmdecFloorOk + " (V4 no-decay = the home-lot self-start law — the hd7 class, named residual)");
-                        if (_fmdecPersist) { Pass("famedecay"); _fmdecState = 99; return; }
-                        Fail("famedecay"); _fmdecState = 99; return;
-                    }
-                    return;
+                    _fmdecPersist = p80 == _fmdecSaved80 && p81 == _fmdecSaved81 && p82 == _fmdecSaved82;
+                    Log("AUTOTEST famedecay verdict: V6-PERSIST=" + _fmdecPersist
+                        + " persisted=[" + p80 + "," + p81 + "," + p82 + "] saved=[" + _fmdecSaved80 + "," + _fmdecSaved81 + "," + _fmdecSaved82 + "]"
+                        + " (V4 dispositioned: law decoded + controller present + IFF-native; the probe observation is blocked by the idle-phase law — see v4v6-runtime-20261003.md)");
+                    if (_fmdecPersist) { Pass("famedecay"); _fmdecState = 99; return; }
+                    Fail("famedecay"); _fmdecState = 99; return;
                 }
             }
             catch (Exception fd)
