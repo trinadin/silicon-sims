@@ -4798,6 +4798,7 @@ namespace Simitone.Client
         private static int _ptnameState, _ptnameSettle, _ptnameFrame, _ptnameSwitchF = -1;
         private static bool _ptnameRebound, _ptnameStrPins, _ptnameNamed;
         private static int _ptnameDialogsBefore, _ptnameAnswers, _ptnamePenOid, _ptnameActorOid;
+        private static bool _ptnameDirectNamed;
         private static string _ptnamePins = "";
 
         private static void PetNameTick()
@@ -5116,7 +5117,16 @@ namespace Simitone.Client
                             for (int i = 0; i < 6; i++) info.PersonalityPoints[i] = 1000;
                             var n2 = FSO.SimAntics.Utils.SimitoneNeighbourGenerator.CreateNeighbor(
                                 FSO.SimAntics.Utils.SimitoneNeighbourGenerator.GenerateGUID(new uint[0]), info);
-                            Log("AUTOTEST petname DIRECT-CREATE ok name=" + (n2?.Name ?? "null") + " id=" + (n2?.NeighbourID.ToString() ?? "?"));
+                            // review P2-1: assert the pet's DISPLAY NAME surface live —
+                            // the CTSS-2000 catalog string the create pipeline wrote from
+                            // info.Name (the R252 NBRS stem is the file name, not the
+                            // display name)
+                            var woN = n2 != null ? Content.Get().WorldObjects.Get(n2.GUID) : null;
+                            var ctssN = woN?.Resource?.Get<FSO.Files.Formats.IFF.Chunks.CTSS>(2000);
+                            var displayN = ctssN?.GetString(0);
+                            _ptnameDirectNamed = displayN == "ProbePet2";
+                            Log("AUTOTEST petname DIRECT-CREATE ok stem=" + (n2?.Name ?? "null") + " id=" + (n2?.NeighbourID.ToString() ?? "?")
+                                + " displayName='" + (displayN ?? "null") + "'");
                         }
                         catch (Exception dex) { Log("AUTOTEST petname DIRECT-CREATE EXC " + dex.GetType().Name + ": " + dex.Message); }
                     }
@@ -5142,11 +5152,11 @@ namespace Simitone.Client
                         // its CTSS-2000 catalog string, the R252 NBRS stem is not
                         // the display name). The on-lot pet placement + the tree's
                         // neighbor-create skip are carded residuals (G6).
-                        Log("AUTOTEST petname verdict ADOPT-NAME-LIVE: penCarriesName=" + (penHit != null)
+                        Log("AUTOTEST petname verdict ADOPT-NAME-LIVE: penCarriesName=" + (penHit != null) + " directCreateDisplayName=" + _ptnameDirectNamed
                             + " petPlaced=" + _ptnameNamed + " editorSubmit='" + submitted + "'"
                             + " chainAnswers=" + _ptnameAnswers + " pins=" + _ptnameStrPins
                             + " (residuals G1-G6 carded on leg1)");
-                        if ((penHit != null) && _ptnameStrPins && submitted == "ProbePet" && _ptnameAnswers >= 3)
+                        if ((penHit != null) && _ptnameStrPins && submitted == "ProbePet" && _ptnameAnswers >= 3 && _ptnameDirectNamed)
                         { Pass("petname"); _ptnameState = 99; return; }
                         Fail("petname"); _ptnameState = 99; return;
                     }
@@ -23149,7 +23159,10 @@ namespace Simitone.Client
                     && (int)nav.FilterButtons[2].X - (int)shifted.X == 373;
                 bool payphone = nav.PayphoneMounted
                     && (int)nav.PayphonePositionForProbe.X - (int)shifted.X == 692
-                    && (int)nav.PayphonePositionForProbe.Y - (int)shifted.Y == 52;
+                    && (int)nav.PayphonePositionForProbe.Y - (int)shifted.Y == 52
+                    // review P2-2: the dtphone 70x135 dims pin (leg-2 manifest law)
+                    && nav.PayphoneTextureForProbe != null
+                    && nav.PayphoneTextureForProbe.Width == 70 && nav.PayphoneTextureForProbe.Height == 135;
                 // the ST/UL sheet-height law (72) via the per-screen members
                 nav.SetMode(5, false);
                 bool stFilter = nav.FilterBarMounted && nav.LastFilterMember == "NghUI\\filter_toolbar_Studiotown.bmp"

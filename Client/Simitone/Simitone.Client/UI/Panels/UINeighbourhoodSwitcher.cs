@@ -118,6 +118,8 @@ namespace Simitone.Client.UI.Panels
         public bool FilterBarMounted, PayphoneMounted;
         public string LastFilterMember;
         public Vector2 PayphonePositionForProbe;
+        // review P2-2: the dtphone art dims pin (70x135, the leg-2 manifest law)
+        public Microsoft.Xna.Framework.Graphics.Texture2D PayphoneTextureForProbe => _payphoneButton?.Texture;
         private UIOriginalNavbarButton _payphoneButton;
         public readonly List<string> LastMembers = new List<string>();
 
