@@ -19840,6 +19840,52 @@ namespace Simitone.Client
                     ok &= eD == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && cA == 1;
                     results.Add("count(F.0x02 only)=" + eD + " count=" + cA + "(want 1 — the enable is Flags2)");
                     Wipe(G);
+
+                    // --- review P2-2: the count SOURCE selector (nonzero drive) ---
+                    // Flags2 = 0x02 | (1<<2): count from Temp[1] (selector 1); Temp[1]=3
+                    var prevT1 = thread.TempRegisters[1];
+                    thread.TempRegisters[1] = 3;
+                    var eE = Drive(0, 7, 0x00, 0x06, G);
+                    cA = InvCount(nidA, G);
+                    ok &= eE == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && cA == 3;
+                    results.Add("count(F2.0x02|sel1,T1=3)=" + eE + " count=" + cA + "(want 3 — the selector reads Temp[1])");
+                    thread.TempRegisters[1] = prevT1;
+                    Wipe(G);
+
+                    // --- review P2-4: the mode 5 -> generic-19 reader round trip ---
+                    // mode 5 writes {Type 1, GUID = neighbor(Temp[0]).GUID, Count 1};
+                    // generic call 19 (SpawnDowntownDate) consumes the FIRST type-1
+                    // token and spawns BY ITS GUID, leaving Temp[0] = the new oid.
+                    var nidBrec = nb.GetNeighborByID(nidB);
+                    var guidB = nidBrec?.GUID ?? 0;
+                    Wipe(guidB);
+                    thread.TempRegisters[0] = nidB;
+                    var eW = Drive(5, 0, 0x00, 0x00, 0);
+                    var tokW = nb.GetInventoryByNID(nidA)?.FirstOrDefault(x => x.Type == 1);
+                    ok &= eW == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
+                        && tokW != null && tokW.GUID == guidB && tokW.Count == 1;
+                    results.Add("m5write=" + eW + " token=" + (tokW != null ? ("t1:0x" + tokW.GUID.ToString("X8") + ":" + tokW.Count) : "none") + "(want 0x" + guidB.ToString("X8") + ":1)");
+                    if (tokW != null)
+                    {
+                        thread.TempRegisters[0] = (short)avA.ObjectID;
+                        var frame19 = new FSO.SimAntics.Engine.VMStackFrame
+                        {
+                            Thread = thread, Caller = avA, Callee = avA, StackObject = avA,
+                        };
+                        var e19 = new FSO.SimAntics.Primitives.VMGenericTS1Call().Execute(frame19,
+                            new FSO.SimAntics.Primitives.VMGenericTS1CallOperand { Call = VMGenericTS1CallMode.SpawnDowntownDateOfPersonInTemp0 });
+                        var spawnedOid = thread.TempRegisters[0];
+                        var tokGone = nb.GetInventoryByNID(nidA)?.FirstOrDefault(x => x.Type == 1) == null;
+                        var spawned = _vm.GetObjectById(spawnedOid);
+                        var spawnedGuid = (uint)(_vm.Entities.FirstOrDefault(e => e != null && e.ObjectID == spawnedOid)?.Object?.OBJ.GUID ?? 0);
+                        ok &= e19 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
+                            && spawnedOid > 0 && tokGone && spawnedGuid == guidB;
+                        results.Add("m19read=" + e19 + " spawned=oid" + spawnedOid + " guid=0x" + spawnedGuid.ToString("X8") + "(want 0x" + guidB.ToString("X8") + ") token-consumed=" + tokGone);
+                        // cleanup: delete the spawned avatar + any stray token
+                        try { spawned?.Delete(true, _vm.Context); } catch { }
+                        Wipe(guidB);
+                    }
+                    Wipe(G);
                 }
                 finally
                 {
