@@ -4110,10 +4110,13 @@ namespace Simitone.Client
                     var nest = _unlmg9Nest;
                     nest.SetAttribute((ushort)9, (short)1);      // hatch-ready countdown
                     nest.SetAttribute((ushort)14, (short)-1);    // force a "new day" (never == Global[1])
+                    // residual drive (natural-Purple): run 1's sum-14 steering
+                    // computed Red (attr15=2) — raise the care sum clear of the
+                    // Tuning[644] threshold: turn=7 rock=7 music=7 -> sum 21.
                     nest.SetAttribute((ushort)10, (short)7);     // Turn care
                     nest.SetAttribute((ushort)12, (short)7);     // Rock care
-                    nest.SetAttribute((ushort)11, (short)0);     // no Music
-                    Log("AUTOTEST unl-magic9 SEED attr9=1 attr14=-1 care(turn=7,rock=7,music=0) -> expected PURPLE (sum 14 >= 14, turn>0)");
+                    nest.SetAttribute((ushort)11, (short)7);     // Music care
+                    Log("AUTOTEST unl-magic9 SEED attr9=1 attr14=-1 care(turn=7,rock=7,music=7) -> expected PURPLE (sum 21 > threshold, turn>0)");
                     var rtHatch = nest.Object.Resource.GetRoutine((ushort)4172) as VMRoutine;
                     var rtType = nest.Object.Resource.GetRoutine((ushort)4174) as VMRoutine;
                     if (rtHatch == null || rtType == null)
@@ -4143,6 +4146,7 @@ namespace Simitone.Client
                     // nest (the same call main 4096 @13/@22/@29 makes)
                     var nest = _unlmg9Nest;
                     var natType = nest.GetAttribute(15);
+                    Log("AUTOTEST unl-magic9 NATURAL-TYPE attr15=" + natType + " (1=Purple expected from sum-21 steering; 2=Red; 3 unreachable natively)");
                     nest.SetAttribute((ushort)15, (short)3); // forced GOLD (disclosed steering)
                     uint goldGuid = 0x2CFB155Au, purpleGuid = 0xA489640Du, redGuid = 0xECADC9FDu;
                     var np = nest.Position;
@@ -4171,12 +4175,15 @@ namespace Simitone.Client
                     var pets = _vm.Entities.Where(e => e is VMAvatar &&
                         (e.Object?.OBJ?.GUID == 0x2CFB155Au || e.Object?.OBJ?.GUID == 0xA489640Du || e.Object?.OBJ?.GUID == 0xECADC9FDu)).ToList();
                     var byGuid = string.Join(",", pets.Select(e => "0x" + e.Object.OBJ.GUID.ToString("X8")));
+                    var natPurple = pets.Any(e => e.Object.OBJ.GUID == 0xA489640Du);
                     Log("AUTOTEST unl-magic9 PET-CENSUS count=" + pets.Count + " [" + byGuid + "]"
                         + " nest attrs 9/13/15=" + nest.GetAttribute(9) + "/" + nest.GetAttribute(13) + "/" + nest.GetAttribute(15));
                     if (pets.Count >= 2 && pets.All(e => !e.Dead))
                     {
-                        Log("AUTOTEST unl-magic9 verdict DRAGON-ROW-LIVE: 4172 hatch gate + 4174 Determine Type (natural "
-                            + (nest.GetAttribute(15) == 3 ? "forced-Gold" : "type") + ") + BOTH pet NPCs spawned as live persons"
+                        Log("AUTOTEST unl-magic9 verdict DRAGON-ROW-LIVE" + (natPurple ? "-NATURAL-PURPLE" : "")
+                            + ": 4172 hatch gate + 4174 Determine Type (natural type computed"
+                            + (natPurple ? " = PURPLE natively from the care sum" : "")
+                            + ") + BOTH pet NPCs spawned as live persons"
                             + " (the natural type computed + the verify-corrected forced-Gold attr[15]=3 steering); the nest"
                             + " attr state post-hatch banked above. Residual: the main-loop idle-hours create cadence"
                             + " (find_location_for) unexercised — named follow-up");
