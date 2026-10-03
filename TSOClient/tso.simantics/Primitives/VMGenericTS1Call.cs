@@ -357,6 +357,15 @@ namespace FSO.SimAntics.Primitives
                 case VMGenericTS1CallMode.BuildVacationFamilyPutFamilyNumInTemp0: //26
                     //in our implementation, vacation lots build the family in the same way as normal lots.
                     var crossData2 = Content.Content.Get().Neighborhood.GameState;
+                    // EXP-07 spellbound decode: with no active family (direct
+                    // lot loads / autotest boots), the PedMarkersMagic mains'
+                    // per-tick family bootstrap NRE'd here (null ActiveFamily)
+                    // and the suppressed-exception handler DELETED the ped
+                    // markers at boot — killing every magic-lot marker before
+                    // any content could scan for them. Natively unreachable
+                    // (arrivals always carry a family); fail soft like the
+                    // other unavailable-state modes.
+                    if (crossData2.ActiveFamily == null) return VMPrimitiveExitCode.GOTO_FALSE;
                     if (crossData2.LotTransitInfo >= 1)
                     {
                         crossData2.ActiveFamily.SelectWholeFamily();
