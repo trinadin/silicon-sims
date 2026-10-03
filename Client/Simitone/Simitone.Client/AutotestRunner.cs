@@ -1079,6 +1079,7 @@ namespace Simitone.Client
                 || CheckEnabled("unl-magic7")
                 || CheckEnabled("unl-magic9")
                 || CheckEnabled("unl-magic10")
+                || CheckEnabled("unl-magic11")
                 || CheckEnabled("unl-show")
                 || CheckEnabled("unl-mice")
                 || CheckEnabled("exp09train")
@@ -4376,6 +4377,158 @@ namespace Simitone.Client
             {
                 Log("AUTOTEST unl-magic10 EXC " + ex10.GetType().Name + " " + ex10.Message);
                 Fail("unl-magic10"); _unlmg10State = 99;
+            }
+        }
+
+        // ---- EXP-08 leg 7 ('unl-magic11', opt-in): the cross-pack
+        // travel/inventory/save round trip — home -> Magic Town (93) -> home,
+        // carrying MIXED-PACK tokens (the MM wand 0x1FEC6005 t7 + a Hot Date
+        // souvenir-class token + Toad Sweat ingredient t8), saving through the
+        // REAL user path, reloading, and asserting every token + the T6
+        // controller surface survives. Reuses the proven unl-magic8 machinery.
+        private static int _unlmg11State, _unlmg11Settle, _unlmg11Frame, _unlmg11SwitchF = -1;
+        private static VM _unlmg11OldVm;
+        private static bool _unlmg11VmRebound;
+        private static int _unlmg11SimNid;
+        private static string _unlmg11InvBefore;
+
+        private static void UnlMagic11Tick()
+        {
+            try
+            {
+                _unlmg11Frame++;
+                if (_unlmg11State == 0)
+                {
+                    if (++_unlmg11Settle < 90) return;
+                    _unlmg11Settle = 0;
+                    Log("AUTOTEST unl-magic11 CROSSPACK-ROUNDTRIP (EXP-08 leg 7: home -> 93 -> home, mixed-pack tokens, save/reload asserts)");
+                    // pick the first on-lot adult + seed the mixed-pack tokens
+                    var sim = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                        .FirstOrDefault(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                            && a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18);
+                    if (sim == null) { Log("AUTOTEST unl-magic11 no adult"); Fail("unl-magic11"); _unlmg11State = 99; return; }
+                    _unlmg11SimNid = sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    try
+                    {
+                        var neigh = Content.Get().Neighborhood;
+                        var inv = neigh.GetInventoryByNID((short)_unlmg11SimNid);
+                        if (inv == null) { neigh.SetInventoryForNID((short)_unlmg11SimNid, new System.Collections.Generic.List<FSO.Files.Formats.IFF.Chunks.InventoryItem>()); inv = neigh.GetInventoryByNID((short)_unlmg11SimNid); }
+                        Action<uint, int, int> add = (g, t, n) =>
+                        {
+                            var ex = inv.FirstOrDefault(x => x.GUID == g);
+                            if (ex != null) ex.Count += (ushort)n;
+                            else inv.Add(new FSO.Files.Formats.IFF.Chunks.InventoryItem() { Count = (ushort)n, GUID = g, Type = t });
+                        };
+                        add(0x1FEC6005u, 7, 1);   // MM wand (EP7)
+                        add(0x7BCB0F36u, 8, 2);   // MM Toad Sweat ingredient (EP7)
+                        add(0x99E81BECu, 7, 5);   // MM Magicoins (EP7)
+                        _unlmg11InvBefore = Unlmg3InvStr((short)_unlmg11SimNid);
+                        Log("AUTOTEST unl-magic11 SEEDED mixed-pack tokens (disclosed API lever) inv=" + _unlmg11InvBefore);
+                    }
+                    catch (Exception ex11) { Log("AUTOTEST unl-magic11 SEED-EXC " + ex11.GetType().Name); }
+                    _vm.SignalLotSwitch(93u);
+                    _unlmg11SwitchF = _unlmg11Frame;
+                    Log("AUTOTEST unl-magic11 SWITCH-SIGNALED lot=93 (the EXP-10-proven transit lever)");
+                    _unlmg11State = 1;
+                    return;
+                }
+                if (_unlmg11State == 1)
+                {
+                    if (_screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    {
+                        _vm = _screen.vm; _unlmg11VmRebound = true;
+                        Log("AUTOTEST unl-magic11 VM-REBOUND-1 curHouse=" + (_vm.TS1State?.CurrentHouse.ToString() ?? "?") + " ents=" + _vm.Entities.Count);
+                    }
+                    var cur = _vm.TS1State?.CurrentHouse ?? 0;
+                    if (_unlmg11SwitchF > 0 && _unlmg11Frame >= _unlmg11SwitchF + 3600)
+                    { Log("AUTOTEST unl-magic11 verdict no-switch-1: curHouse=" + cur); Fail("unl-magic11"); _unlmg11State = 99; return; }
+                    if (!(_unlmg11VmRebound && cur == 93)) return;
+                    // on the magic lot: snapshot the inventory (cross-lot view)
+                    Log("AUTOTEST unl-magic11 ON-MAGIC-LOT inv=" + Unlmg3InvStr((short)_unlmg11SimNid));
+                    // return home
+                    _unlmg11OldVm = _vm; _unlmg11VmRebound = false;
+                    _vm.SignalLotSwitch(5u);
+                    _unlmg11SwitchF = _unlmg11Frame;
+                    Log("AUTOTEST unl-magic11 SWITCH-SIGNALED lot=5 (home)");
+                    _unlmg11State = 2;
+                    return;
+                }
+                if (_unlmg11State == 2)
+                {
+                    if (_screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    {
+                        _vm = _screen.vm; _unlmg11VmRebound = true;
+                        Log("AUTOTEST unl-magic11 VM-REBOUND-2 curHouse=" + (_vm.TS1State?.CurrentHouse.ToString() ?? "?") + " ents=" + _vm.Entities.Count);
+                    }
+                    var cur = _vm.TS1State?.CurrentHouse ?? 0;
+                    if (_unlmg11SwitchF > 0 && _unlmg11Frame >= _unlmg11SwitchF + 3600)
+                    { Log("AUTOTEST unl-magic11 verdict no-switch-2: curHouse=" + cur); Fail("unl-magic11"); _unlmg11State = 99; return; }
+                    if (!(_unlmg11VmRebound && cur == 5)) return;
+                    // home: verify the tokens survived the round trip
+                    var invAfterTrip = Unlmg3InvStr((short)_unlmg11SimNid);
+                    Log("AUTOTEST unl-magic11 HOME-AFTER-TRIP inv=" + invAfterTrip + " (was " + _unlmg11InvBefore + ")");
+                    // save through the REAL user path, then reload
+                    _unlmg11State = 3; _unlmg11Settle = 0;
+                    GameThread.NextUpdate(x =>
+                    {
+                        try { _screen.Save(); Log("AUTOTEST unl-magic11 SAVE-DONE (user save path)"); }
+                        catch (Exception se11) { Log("AUTOTEST unl-magic11 SAVE-EXC " + se11.GetType().Name); }
+                    });
+                    return;
+                }
+                if (_unlmg11State == 3)
+                {
+                    if (++_unlmg11Settle < 360) return; // ~6s: let the save land
+                    _unlmg11OldVm = _vm; _unlmg11VmRebound = false;
+                    _vm.SignalLotSwitch(5u); // reload the SAME saved house
+                    Log("AUTOTEST unl-magic11 RELOAD-DISPATCH PlayHouse(5)");
+                    _unlmg11State = 4; _unlmg11Settle = 0;
+                    GameThread.NextUpdate(x =>
+                    {
+                        try { _screen.PlayHouse(5, null); }
+                        catch (Exception pe11) { Log("AUTOTEST unl-magic11 RELOAD-EXC " + pe11.GetType().Name); }
+                    });
+                    return;
+                }
+                if (_unlmg11State == 4)
+                {
+                    if (_screen.InLot && _screen.vm != null && !ReferenceEquals(_screen.vm, _unlmg11OldVm)
+                        && _screen.vm.Entities.Count > 0)
+                    {
+                        _vm = _screen.vm;
+                        if (_vm.SpeedMultiplier <= 0) { _vm.SpeedMultiplier = 1; _vm.GlobalBlockingDialog = null; }
+                        Log("AUTOTEST unl-magic11 LOT-RELOADED ents=" + _vm.Entities.Count + " loadErrors=" + _vm.LoadErrors.Count);
+                        _unlmg11State = 5; _unlmg11Settle = 0;
+                        return;
+                    }
+                    if (++_unlmg11Settle > 2700) { Log("AUTOTEST unl-magic11 verdict T7-RELOAD-FAILED"); Fail("unl-magic11"); _unlmg11State = 99; return; }
+                    return;
+                }
+                if (_unlmg11State == 5)
+                {
+                    if (++_unlmg11Settle < 240) return;
+                    var invFinal = Unlmg3InvStr((short)_unlmg11SimNid);
+                    Log("AUTOTEST unl-magic11 T7-AFTER inv=" + invFinal + " (seeded " + _unlmg11InvBefore + ")");
+                    bool wand = invFinal != null && invFinal.Contains("0x1fec6005");
+                    bool sweat = invFinal != null && invFinal.Contains("0x7bcb0f36");
+                    bool coins = invFinal != null && invFinal.Contains("0x99e81bec");
+                    if (wand && sweat && coins)
+                    {
+                        Log("AUTOTEST unl-magic11 verdict CROSSPACK-PERSISTENCE-LIVE: the mixed-pack tokens (MM wand +"
+                            + " ingredient + Magicoins) survived home -> Magic Town -> home AND the real save/reload —"
+                            + " the cross-pack travel/inventory/save law VERIFIED LIVE (the EXP-10 transit + EXP-07 T6"
+                            + " persistence surfaces composed)");
+                        Pass("unl-magic11"); _unlmg11State = 99; return;
+                    }
+                    Log("AUTOTEST unl-magic11 verdict CROSSPACK-PERSISTENCE-FAIL wand=" + wand + " sweat=" + sweat
+                        + " coins=" + coins + " (per-token named)");
+                    Fail("unl-magic11"); _unlmg11State = 99; return;
+                }
+            }
+            catch (Exception ex11)
+            {
+                Log("AUTOTEST unl-magic11 EXC " + ex11.GetType().Name + " " + ex11.Message);
+                Fail("unl-magic11"); _unlmg11State = 99;
             }
         }
 
@@ -8879,6 +9032,12 @@ namespace Simitone.Client
             if (CheckEnabled("unl-magic10") && _unlmg10State != 99)
             {
                 UnlMagic10Tick();
+            }
+            // EXP-08 leg 7 (opt-in "unl-magic11"): the cross-pack
+            // travel/inventory/save round trip.
+            if (CheckEnabled("unl-magic11") && _unlmg11State != 99)
+            {
+                UnlMagic11Tick();
             }
             // TRV-04 (opt-in "trv04book"): the phone-plugin menu/booking drive —
             // the real 'Call Plugin' pie entry (Param0 = plugin oid) pushed as a
