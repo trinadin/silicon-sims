@@ -43108,16 +43108,22 @@ namespace Simitone.Client
                 avatar.Thread.TempRegisters[0] = neighborIds[1];
                 handler.Execute(frame, home);
 
-                var autos = scratch.Where(x => x.Type == 2 && x.GUID == 10).ToList();
-                var homes = scratch.Where(x => x.Type == 2 && x.GUID == 11).ToList();
+                // ENG-06: the native record shape — {Type 1|3, GUID = the latest
+                // Temp[0] neighbor's GUID, Count 1} after RemoveAllTokensOfType; the
+                // replacement law is unchanged (the LAST write wins), only the token
+                // shape is native now (consumers spawn the token's GUID).
+                var guidOf = neighborhood.GetNeighborByID;
+                var autos = scratch.Where(x => x.Type == 1).ToList();
+                var homes = scratch.Where(x => x.Type == 3).ToList();
+                var wantGuid = guidOf(neighborIds[1])?.GUID ?? 0u;
                 bool replacement = scratch.Count == 2 && autos.Count == 1 && homes.Count == 1
-                    && autos[0].Count == (ushort)neighborIds[1]
-                    && homes[0].Count == (ushort)neighborIds[1];
+                    && autos[0].GUID == wantGuid && homes[0].GUID == wantGuid
+                    && autos[0].Count == 1 && homes[0].Count == 1;
                 Log("AUTOTEST travelinv PhoneGlobals-mode5-sites=" + iffAnchor +
                     " sequence=" + neighborIds[0] + "->" + neighborIds[1] +
-                    " scratch=[" + string.Join(",", scratch.Select(x => x.Type + ":" + x.GUID + ":" + x.Count)) + "]" +
-                    " replace-guid10/11=" + replacement +
-                    " (Count is latest Temp0 neighbor; consumers spawn GUID 10/11 then remove)");
+                    " scratch=[" + string.Join(",", scratch.Select(x => x.Type + ":0x" + x.GUID.ToString("X8") + ":" + x.Count)) + "]" +
+                    " replace-native-neighbor-guid=" + replacement +
+                    " (want type1+type3 tokens carrying the latest neighbor's GUID, count 1)");
                 if (iffAnchor && replacement) Pass("travelinv"); else Fail("travelinv");
             }
             catch (Exception te)
