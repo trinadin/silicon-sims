@@ -1086,6 +1086,7 @@ namespace Simitone.Client
                 || CheckEnabled("awarddrive")
                 || CheckEnabled("rel05integ")
                 || CheckEnabled("rel05integ2")
+                || CheckEnabled("rel07soak")
                 || CheckEnabled("dt-strip")
                 || CheckEnabled("unl-show")
                 || CheckEnabled("unl-mice")
@@ -5777,6 +5778,151 @@ namespace Simitone.Client
             {
                 Log("AUTOTEST rel05integ2 EXC " + r5b.GetType().Name + " " + r5b.Message);
                 Fail("rel05integ2"); _rel05bState = 99;
+            }
+        }
+
+        // ---- REL-07 ('rel07soak', opt-in): the bounded long-play soak. Boots
+        // lot 5, runs at speed 3 for ~25 wall minutes, logs METRICS lines
+        // every ~10s (wall/frame/sim-clock/entities/avatars/GC/working-set/
+        // handles/threads/load-errors), performs periodic real saves + in-run
+        // PlayHouse reloads, and verdicts: zero NEW load errors, bounded
+        // handle/thread growth, the memory curve REPORTED (the budget
+        // agreement itself is the user-gated half), ticker advancing (the
+        // METRICS cadence is the no-stall evidence).
+        private static int _rel07State, _rel07Settle, _rel07Frame, _rel07Saves, _rel07Reloads;
+        private static long _rel07BaseWs, _rel07BaseGc, _rel07EndWs, _rel07EndGc;
+        private static int _rel07BaseHandles, _rel07EndHandles, _rel07BaseThreads, _rel07EndThreads, _rel07BaseLoadErrs, _rel07EndLoadErrs, _rel07BaseEnts;
+        private static System.Diagnostics.Stopwatch _rel07Watch;
+        private static bool _rel07ReboundPending;
+        private const int Rel07SoakSeconds = 1500;   // 25 min wall (fits the 2100s default wall budget)
+        private const int Rel07MetricsEvery = 600;   // probe ticks between METRICS lines
+        private const int Rel07SaveEverySec = 600;   // one real user save every 10 min
+        private const int Rel07ReloadEverySec = 1200; // one PlayHouse reload every 20 min
+
+        private static void Rel07Metrics(string tag)
+        {
+            try
+            {
+                var proc = System.Diagnostics.Process.GetCurrentProcess();
+                var vm = _vm;
+                Log("AUTOTEST rel07soak " + tag
+                    + " wall=" + (int)(_rel07Watch.ElapsedMilliseconds / 1000) + "s"
+                    + " frame=" + _rel07Frame
+                    + " clock=" + Sim3Clock()
+                    + " ents=" + (vm != null ? vm.Entities.Count : -1)
+                    + " avatars=" + (vm != null ? vm.Context.ObjectQueries.Avatars.Count : -1)
+                    + " gcMB=" + (GC.GetTotalMemory(false) / 1048576)
+                    + " wsMB=" + (proc.WorkingSet64 / 1048576)
+                    + " handles=" + proc.HandleCount
+                    + " threads=" + proc.Threads.Count
+                    + " loadErrs=" + (vm != null ? vm.LoadErrors.Count : -1)
+                    + " saves=" + _rel07Saves + " reloads=" + _rel07Reloads);
+            }
+            catch (Exception me) { Log("AUTOTEST rel07soak METRICS-EXC " + me.GetType().Name); }
+        }
+
+        private static void Rel07SoakTick()
+        {
+            try
+            {
+                _rel07Frame++;
+                if (_rel07State == 0)
+                {
+                    if (++_rel07Settle < 90) return;
+                    if (!(_screen != null && _screen.InLot && _screen.vm != null && _screen.vm.Entities.Count > 0))
+                    {
+                        if (_rel07Settle > 2700) { Log("AUTOTEST rel07soak verdict boot-timeout"); Fail("rel07soak"); _rel07State = 99; }
+                        return;
+                    }
+                    if (!ReferenceEquals(_screen.vm, _vm)) _vm = _screen.vm;
+                    var famNum = _vm.GetGlobalValue(9);
+                    if (famNum <= 0 && (_vm.TS1State?.CurrentHouse ?? 0) != 5)
+                    {
+                        if (_rel07Settle > 2700) { Log("AUTOTEST rel07soak verdict no-family-lot fam=" + famNum); Fail("rel07soak"); _rel07State = 99; }
+                        return;
+                    }
+                    _rel07Settle = 0;
+                    _rel07Watch = System.Diagnostics.Stopwatch.StartNew();
+                    var proc = System.Diagnostics.Process.GetCurrentProcess();
+                    _rel07BaseGc = GC.GetTotalMemory(false);
+                    _rel07BaseWs = proc.WorkingSet64;
+                    _rel07BaseHandles = proc.HandleCount;
+                    _rel07BaseThreads = proc.Threads.Count;
+                    _rel07BaseLoadErrs = _vm.LoadErrors.Count;
+                    _rel07BaseEnts = _vm.Entities.Count;
+                    if (_vm.SpeedMultiplier != 3) _vm.SpeedMultiplier = 3;
+                    _vm.GlobalBlockingDialog = null;
+                    Rel07Metrics("SOAK-START");
+                    _rel07State = 1;
+                    return;
+                }
+                if (_rel07State == 1)
+                {
+                    var wall = (int)(_rel07Watch.ElapsedMilliseconds / 1000);
+                    if (_rel07Frame % Rel07MetricsEvery == 0) Rel07Metrics("METRICS");
+                    if (_rel07Reloads == _rel07Saves && _rel07Saves > 0 && _rel07Reloads < (wall / Rel07ReloadEverySec))
+                    {
+                        // reload cycle: in-run lot reload (the REL-05 in-process law)
+                        _rel07ReboundPending = true;
+                        _rel07Reloads++;
+                        try { _screen.PlayHouse(5, null); Log("AUTOTEST rel07soak RELOAD-DISPATCH " + _rel07Reloads); } catch (Exception pe) { Log("AUTOTEST rel07soak RELOAD-EXC " + pe.GetType().Name); }
+                        _rel07State = 2; _rel07Settle = 0;
+                        return;
+                    }
+                    if (_rel07Saves < (wall / Rel07SaveEverySec))
+                    {
+                        _rel07Saves++;
+                        try { _screen.Save(); Log("AUTOTEST rel07soak SAVE-DONE " + _rel07Saves); } catch (Exception se) { Log("AUTOTEST rel07soak SAVE-EXC " + se.GetType().Name); }
+                        return;
+                    }
+                    if (wall >= Rel07SoakSeconds)
+                    {
+                        var proc = System.Diagnostics.Process.GetCurrentProcess();
+                        _rel07EndGc = GC.GetTotalMemory(false);
+                        _rel07EndWs = proc.WorkingSet64;
+                        _rel07EndHandles = proc.HandleCount;
+                        _rel07EndThreads = proc.Threads.Count;
+                        _rel07EndLoadErrs = _vm.LoadErrors.Count;
+                        Rel07Metrics("SOAK-END");
+                        var loadErrDelta = _rel07EndLoadErrs - _rel07BaseLoadErrs;
+                        var handleDelta = _rel07EndHandles - _rel07BaseHandles;
+                        var threadDelta = _rel07EndThreads - _rel07BaseThreads;
+                        var wsGrowth = _rel07BaseWs > 0 ? (100 * (_rel07EndWs - _rel07BaseWs) / _rel07BaseWs) : 0;
+                        var gcGrowth = _rel07BaseGc > 0 ? (100 * (_rel07EndGc - _rel07BaseGc) / _rel07BaseGc) : 0;
+                        var ents = _vm.Entities.Count;
+                        var ok = loadErrDelta == 0 && handleDelta < 40 && threadDelta < 20 && wsGrowth < 100;
+                        Log("AUTOTEST rel07soak verdict: SOAK-COMPLETE wall=" + wall + "s"
+                            + " loadErrDelta=" + loadErrDelta + " handleDelta=" + handleDelta + " threadDelta=" + threadDelta
+                            + " wsGrowth=" + wsGrowth + "% gcGrowth=" + gcGrowth + "%"
+                            + " ents=" + _rel07BaseEnts + "->" + ents
+                            + " saves=" + _rel07Saves + " reloads=" + _rel07Reloads
+                            + " (memory curve REPORTED for the budget decision; multi-day/multi-hardware = the user-gated half)");
+                        if (ok) { Pass("rel07soak"); } else { Fail("rel07soak"); }
+                        Finish();
+                        _rel07State = 99;
+                        return;
+                    }
+                    return;
+                }
+                if (_rel07State == 2)
+                {
+                    if (_screen != null && _screen.InLot && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm) && _screen.vm.Entities.Count > 0)
+                    {
+                        _vm = _screen.vm;
+                        if (_vm.SpeedMultiplier != 3) _vm.SpeedMultiplier = 3;
+                        _vm.GlobalBlockingDialog = null;
+                        Log("AUTOTEST rel07soak LOT-RELOADED ents=" + _vm.Entities.Count + " loadErrors=" + _vm.LoadErrors.Count);
+                        _rel07State = 1; _rel07Settle = 0;
+                        return;
+                    }
+                    if (++_rel07Settle > 2700) { Log("AUTOTEST rel07soak verdict reload-timeout"); Fail("rel07soak"); _rel07State = 99; }
+                    return;
+                }
+            }
+            catch (Exception r7)
+            {
+                Log("AUTOTEST rel07soak EXC " + r7.GetType().Name + " " + r7.Message);
+                Fail("rel07soak"); _rel07State = 99;
             }
         }
 
@@ -10593,6 +10739,11 @@ namespace Simitone.Client
             {
                 Rel05bTick();
             }
+            // REL-07 (opt-in "rel07soak"): the bounded long-play soak.
+            if (CheckEnabled("rel07soak") && _rel07State != 99)
+            {
+                Rel07SoakTick();
+            }
             // EXP-08 leg-2 residual (opt-in "dt-strip"): the downtown live drive.
             if (CheckEnabled("dt-strip") && _dtstripState != 99)
             {
@@ -11199,6 +11350,8 @@ namespace Simitone.Client
                 return; // (REL-05 P1) the integrity drive still running; battery finishes after the verdict
             if (CheckEnabled("rel05integ2") && _rel05bState != 99)
                 return; // (REL-05 P2) the cold-boot asserts still running; battery finishes after the verdict
+            if (CheckEnabled("rel07soak") && _rel07State != 99)
+                return; // (REL-07) the soak still running; battery finishes after the verdict
             if (CheckEnabled("llfire") && _ll3State != 2)
                 return; // (EXP-01 llfire) fire/rocket legs still driving; battery finishes after the verdict
             if (CheckEnabled("aud12live") && _a12State != 2)
