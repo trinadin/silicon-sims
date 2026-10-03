@@ -59,11 +59,20 @@ namespace FSO.SimAntics.Primitives
 
             var neighbourhood = Content.Content.Get().Neighborhood;
             var inTarget = (operand.UseObjectInTemp4) ? context.VM.GetObjectById(context.Thread.TempRegisters[4]) : context.Caller;
-            if (inTarget is VMGameObject) { }
+            // ENG-06 review P2-3: with the owner gate corrected to Flags.0x20, the
+            // CALLER path (and a stale Temp[4] object id on re-entered frames) can
+            // resolve null or to a non-avatar — the native has a null-owner debug-report
+            // path here (decode §2.1); the port returns FALSE instead of throwing
+            // (observed live: HD 4119 'Spawn Downtown Purchases - TEST' on the
+            // post-return re-entry).
+            if (!(inTarget is VMAvatar)) return VMPrimitiveExitCode.GOTO_FALSE;
             var target = (VMAvatar)(inTarget);
             var neighbour = target.GetPersonData(Model.VMPersonDataVariable.NeighborId);
             var inventory = neighbourhood.GetInventoryByNID(neighbour);
-            var count = (operand.CountInTemp) ? context.Thread.TempRegisters[0] : 1;
+            // ENG-06 review P2-2: the count SOURCE selector is the corrected CountTemp
+            // ((Flags2.0x0C)>>2) — the old Temp[0] hardcode contradicted the corrected
+            // property when the selector was nonzero.
+            var count = (operand.CountInTemp) ? context.Thread.TempRegisters[operand.CountTemp] : 1;
             var type = operand.TokenType; //type 0 on find of type indicates "any type".
             var index = context.Thread.TempRegisters[operand.IndexTemp];
             
@@ -125,18 +134,21 @@ namespace FSO.SimAntics.Primitives
                     //return (itemcount >= count)? VMPrimitiveExitCode.GOTO_TRUE : VMPrimitiveExitCode.GOTO_FALSE;
 
                 case VMTS1InventoryMode.SetToNextTokenOfType: //ignores guid
-                    // ENG-06 (decode mode-4 law): SetToNextToken(type, &Temp[Flags2&3])
-                    // — the NEXT INDEX is written to Temp[Flags2 & 3] unconditionally;
-                    // no next token -> FALSE (the old NextIndexIntoTemp gate +
-                    // CountTemp write were the port's guess; zero corpus callers —
-                    // latent; the type-count write below kept as disclosed behavior).
+                    // ENG-06 (decode §3 mode 4, review P2-1 CORRECTED): the INDEX
+                    // passed in is Temp[Flags2 & 3] (the source selector — the shared
+                    // `index` read above); the NEXT INDEX is written to
+                    // Temp[(Flags.0x18)>>3] (the same index-DST selector mode 3 uses)
+                    // and the service's count result to Temp[(Flags2.0x60)>>5];
+                    // no next token -> FALSE. Zero corpus callers — latent. The value
+                    // written to the count-dst is the FOUND TOKEN's Count (the native
+                    // r's exact content is not decoded further — disclosed).
                     if (inventory == null) return VMPrimitiveExitCode.GOTO_FALSE;
                     var items2 = inventory.Where(x => x.Type == type).ToList();
-                    context.Thread.TempRegisters[operand.CountTemp] = (short)items2.Sum(x => x.Count);
                     var next = items2.FirstOrDefault(x => inventory.IndexOf(x) > index);
                     if (next == null) return VMPrimitiveExitCode.GOTO_FALSE;
                     foundindex = inventory.IndexOf(next);
-                    context.Thread.TempRegisters[operand.Flags2 & 3] = (short)foundindex;
+                    context.Thread.TempRegisters[(operand.Flags & 0x18) >> 3] = (short)foundindex;
+                    context.Thread.TempRegisters[(operand.Flags2 & 0x60) >> 5] = (short)next.Count;
                     return VMPrimitiveExitCode.GOTO_TRUE;
 
                 case VMTS1InventoryMode.Temp0NeighborAsAutofollow: //5
