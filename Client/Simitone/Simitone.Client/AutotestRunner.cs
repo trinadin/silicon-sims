@@ -4798,7 +4798,7 @@ namespace Simitone.Client
         private static int _ptnameState, _ptnameSettle, _ptnameFrame, _ptnameSwitchF = -1;
         private static bool _ptnameRebound, _ptnameStrPins, _ptnameNamed;
         private static int _ptnameDialogsBefore, _ptnameAnswers, _ptnamePenOid, _ptnameActorOid;
-        private static bool _ptnameDirectNamed, _ptnameTreeNamed;
+        private static bool _ptnameDirectNamed, _ptnameTreeNamed, _ptnameFamilyJoined;
         private static string _ptnamePins = "";
 
         private static void PetNameTick()
@@ -4994,6 +4994,26 @@ namespace Simitone.Client
                 if (_ptnameState == 3)
                 {
                     _ptnameSettle++;
+                    if (_ptnameSettle == 1 && _vm.TS1State?.CurrentFamily == null)
+                    {
+                        // the family-null gate (the g6 residual): the away lot never
+                        // activates the traveling family into TS1State (the TRV-03
+                        // lineage activated the NEIGHBORHOOD side only) — apply the
+                        // established ActivateFamily lever (disclosed) so the tree's
+                        // mode-4 AddToFamily can run
+                        try
+                        {
+                            FSO.Files.Formats.IFF.Chunks.FAMI famAct = null;
+                            if (Content.Get().Neighborhood.FamilyForHouse.TryGetValue(5, out var famTry)) famAct = famTry;
+                            if (famAct != null)
+                            {
+                                _vm.TS1State.ActivateFamily(_vm, famAct);
+                                Log("AUTOTEST petname FAMILY-ACTIVATED (disclosed lever; fam=" + famAct.ChunkID + " members=" + famAct.FamilyGUIDs.Length + ")");
+                            }
+                            else Log("AUTOTEST petname FAMILY-ACTIVATE-MISS (no family for house 5)");
+                        }
+                        catch (Exception fa) { Log("AUTOTEST petname FAMILY-ACTIVATE-EXC " + fa.GetType().Name); }
+                    }
                     if (_ptnameSettle > 300)
                     {
                         FSO.SimAntics.Engine.VMThread.AutotestTraceSink = null;
@@ -5113,6 +5133,46 @@ namespace Simitone.Client
                     // END-TO-END naming assert: the TREE-created pet's CTSS-2000
                     // display name must carry the player's text (TextEntry → pen
                     // name → make_new_character info.Name → the catalog string).
+                    // G1 census: which actor classes see the Adopt row (the scan law
+                    // was never the gate — run 19's pie showed it with a valid actor)
+                    if (_ptnameSettle == 140)
+                    {
+                        var census = new System.Text.StringBuilder();
+                        foreach (var av in _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>())
+                        {
+                            if (av.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD) continue;
+                            var res = (av.Object?.Resource?.MainIff?.Filename ?? "?");
+                            bool npc = res.StartsWith("npc_", true, null) || res.StartsWith("NPC_", true, null);
+                            bool fam = false;
+                            try { fam = av.GetPersonData(VMPersonDataVariable.TS1FamilyNumber) == _vm.GetGlobalValue(9); } catch { }
+                            bool row = false;
+                            try
+                            {
+                                var penC = _ptnamePenOid > 0 ? _vm.GetObjectById((short)_ptnamePenOid) : null;
+                                if (penC != null) row = penC.GetPieMenu(_vm, av, false, true).Any(x => (x.Name ?? "").Contains("Adopt a Dog"));
+                            }
+                            catch { }
+                            census.Append(av.ObjectID).Append(':').Append(av.Name ?? "?").Append("/")
+                                .Append(fam ? "fam" : npc ? "npc" : av.IsPet ? "pet" : "other")
+                                .Append(row ? "+ROW" : "-row").Append(' ');
+                        }
+                        Log("AUTOTEST petname G1-PIE-CENSUS " + census.ToString());
+                    }
+                    // the family-join assert (the family-null gate's payoff)
+                    if (_ptnameSettle == 135)
+                    {
+                        var gate = FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate;
+                        var famNow = _vm.TS1State?.CurrentFamily;
+                        var primID2 = FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6CreatedID;
+                        var joinedPet = false;
+                        if (gate == "ok" && famNow != null && primID2 >= 0)
+                        {
+                            var pn = Content.Get().Neighborhood.GetNeighborByID((short)primID2);
+                            joinedPet = pn != null && famNow.FamilyGUIDs.Contains(pn.GUID);
+                        }
+                        _ptnameFamilyJoined = joinedPet;
+                        Log("AUTOTEST petname G6-FAMILY-JOIN gate='" + gate + "' family=" + (famNow?.ChunkID.ToString() ?? "null") + " petJoined=" + joinedPet);
+                    }
                     if (_ptnameSettle == 130)
                     {
                         var primT = FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6CreateDoneCount;
@@ -5184,11 +5244,11 @@ namespace Simitone.Client
                         // its CTSS-2000 catalog string, the R252 NBRS stem is not
                         // the display name). The on-lot pet placement + the tree's
                         // neighbor-create skip are carded residuals (G6).
-                        Log("AUTOTEST petname verdict ADOPT-NAME-LIVE: penCarriesName=" + (penHit != null) + " directCreateDisplayName=" + _ptnameDirectNamed + " treeCreateDisplayName=" + _ptnameTreeNamed
+                        Log("AUTOTEST petname verdict ADOPT-NAME-LIVE: penCarriesName=" + (penHit != null) + " directCreateDisplayName=" + _ptnameDirectNamed + " treeCreateDisplayName=" + _ptnameTreeNamed + " familyJoined=" + _ptnameFamilyJoined
                             + " petPlaced=" + _ptnameNamed + " editorSubmit='" + submitted + "'"
                             + " chainAnswers=" + _ptnameAnswers + " pins=" + _ptnameStrPins
                             + " (residuals G1-G6 carded on leg1)");
-                        if ((penHit != null) && _ptnameStrPins && submitted == "ProbePet" && _ptnameAnswers >= 3 && _ptnameDirectNamed && _ptnameTreeNamed)
+                        if ((penHit != null) && _ptnameStrPins && submitted == "ProbePet" && _ptnameAnswers >= 3 && _ptnameDirectNamed && _ptnameTreeNamed && _ptnameFamilyJoined)
                         { Pass("petname"); _ptnameState = 99; return; }
                         Fail("petname"); _ptnameState = 99; return;
                     }
