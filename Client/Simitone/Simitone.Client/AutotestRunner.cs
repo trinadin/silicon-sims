@@ -22440,6 +22440,25 @@ namespace Simitone.Client
                 nav.SetMode(7, false);
                 bool magicStrip = nav.LastBannerMember == "NghUI\\banner_neighborhood.bmp" && nav.Buttons.Count == 9;
 
+                // EXP-08 leg-2 fix card (approved): the DT FILTER bar + PAYPHONE
+                nav.SetMode(2, false);
+                bool filterBar = nav.FilterBarMounted && nav.FilterButtons.Count == 3
+                    && nav.LastFilterMember == "NghUI\\filter_toolbar.bmp"
+                    && nav.FilterButtons.TrueForAll(b => b.Texture != null && b.Texture.Width == 800 && b.Texture.Height == 62)
+                    && (int)nav.FilterButtons[0].X - (int)shifted.X == 323
+                    && (int)nav.FilterButtons[1].X - (int)shifted.X == 422
+                    && (int)nav.FilterButtons[2].X - (int)shifted.X == 373;
+                bool payphone = nav.PayphoneMounted
+                    && (int)nav.PayphonePositionForProbe.X - (int)shifted.X == 692
+                    && (int)nav.PayphonePositionForProbe.Y - (int)shifted.Y == 52;
+                // the ST/UL sheet-height law (72) via the per-screen members
+                nav.SetMode(5, false);
+                bool stFilter = nav.FilterBarMounted && nav.LastFilterMember == "NghUI\\filter_toolbar_Studiotown.bmp"
+                    && nav.FilterButtons.TrueForAll(b => b.Texture != null && b.Texture.Height == 72);
+                nav.SetMode(3, false);
+                bool ulFilter = nav.FilterBarMounted && nav.LastFilterMember == "NghUI\\filter_toolbar_Unleashed.bmp"
+                    && nav.FilterButtons.TrueForAll(b => b.Texture != null && b.Texture.Height == 72);
+
                 nav.SetMode(4, true);
                 bool moveInLock = !nav.LastMembers.Contains("NghUI\\MoveIn.bmp")
                     && !nav.LastMembers.Contains("NghUI\\Downtown.bmp")
@@ -22454,11 +22473,14 @@ namespace Simitone.Client
                     + " lotClip=" + lotClip
                     + " homeStrip=" + homeStrip + " dtStrip=" + dtStrip
                     + " vstBanner=" + (vStrip && stStrip) + " magicBanner=" + magicStrip
+                    + " filterBar=" + filterBar + " payphone=" + payphone
+                    + " stFilter=" + stFilter + " ulFilter=" + ulFilter
                     + " returnBtn=" + returnBtn + " moveInLock=" + moveInLock
                     + " strips=" + Simitone.Client.UI.Panels.UINeighbourhoodSwitcher.StripsMounted
                     + " buttons=" + Simitone.Client.UI.Panels.UINeighbourhoodSwitcher.ButtonsMounted);
                 if (tipsCanon && returnTips && art && surround && mountedSurround && lawOk && lotClip && homeStrip && dtStrip
-                    && vStrip && stStrip && magicStrip && returnBtn && moveInLock) { Pass("uinav"); return; }
+                    && vStrip && stStrip && magicStrip && returnBtn && moveInLock
+                    && filterBar && payphone && stFilter && ulFilter) { Pass("uinav"); return; }
                 Log("AUTOTEST uinav: the navbar and production surround must mount the recovered engine law (centered banner children + clipped lots + no synthetic title + destination Return)");
                 Fail("uinav");
             }

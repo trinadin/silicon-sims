@@ -113,6 +113,12 @@ namespace Simitone.Client.UI.Panels
         // R160 gate evidence: every mounted strip registers its law snapshot.
         public static int StripsMounted, ButtonsMounted, BannersMounted;
         public string LastBannerMember, LastTitleText;
+        // EXP-08 leg-2 (the approved DT toolbars): filter bar + payphone probes
+        public readonly List<UIOriginalNavbarButton> FilterButtons = new List<UIOriginalNavbarButton>();
+        public bool FilterBarMounted, PayphoneMounted;
+        public string LastFilterMember;
+        public Vector2 PayphonePositionForProbe;
+        private UIOriginalNavbarButton _payphoneButton;
         public readonly List<string> LastMembers = new List<string>();
 
         public UINeighborhoodSelectionPanel Panel;
@@ -246,6 +252,9 @@ namespace Simitone.Client.UI.Panels
             Mode = mode;
             foreach (var child in new List<UIElement>(Children)) Remove(child);
             Buttons.Clear();
+            FilterButtons.Clear();
+            FilterBarMounted = PayphoneMounted = false;
+            LastFilterMember = null;
             LastMembers.Clear();
             BaseAnchors.Clear();
             ArtboardAnchors.Clear();
@@ -402,6 +411,54 @@ namespace Simitone.Client.UI.Panels
                 }
             }
 
+            // EXP-08 leg-2 fix card (the approved DT toolbars): the 5-button
+            // FILTER bar + the PAYPHONE on the destination screens. Native law
+            // (cWinDowntown::Init 0x3ffd78-0x3ffee8 + the static-init writer at
+            // 0x400420): five anchor slots with xs [323, 30000=SENTINEL,
+            // 5=spacer, 422, 373] ys 0 — the three VISIBLE anchors are 323/422/
+            // 373; i==2 is the single-state cell (SetImage(art,1,1)); tooltips
+            // via the 0x87f60/0x25f440 mechanism into set 169. Per-screen sheet
+            // heights: DT 62, ST/UL 72. The payphone (kDTPhone 5426,
+            // dtphone.bmp 70x135) is the DT leave-town control (leg 2's decode).
+            if (mode == 2 || mode == 3 || mode == 5 || mode == 7)
+            {
+                var filterMember = (mode == 2) ? "NghUI\\filter_toolbar.bmp"
+                    : (mode == 5) ? "NghUI\\filter_toolbar_Studiotown.bmp"
+                    : "NghUI\\filter_toolbar_Unleashed.bmp";
+                // visible slots: [0]=323, [3]=422, [4]=373 (slots 1/2 are the
+                // sentinel/spacer; the subf local-centering rides fixed cells)
+                var filterAnchors = new int[] { 323, 422, 373 };
+                for (int fi = 0; fi < 3; fi++)
+                {
+                    var fbtn = new UIOriginalNavbarButton(filterMember, 4, 1, null)
+                    { ForceState = 0 };
+                    RegisterAnchor(fbtn, new Vector2(filterAnchors[fi], 62), true);
+                    Add(fbtn);
+                    FilterButtons.Add(fbtn);
+                }
+                FilterBarMounted = FilterButtons.Count == 3
+                    && FilterButtons.TrueForAll(b => b.OriginalMounted);
+                LastFilterMember = filterMember;
+
+                // the payphone: the DT leave-town control (70x135 art)
+                if (mode == 2)
+                {
+                    var phone = new UIOriginalNavbarButton("Downtown\\dtphone.bmp", 1, 1,
+                        GameFacade.Strings.GetString("169", "0"))
+                    { ForceState = 0 };
+                    RegisterAnchor(phone, new Vector2(762 - 70, 52), true);
+                    phone.OnButtonClick += (btn) =>
+                    {
+                        SetBulldozeArmed(false);
+                        SetRezoneArmed(false);
+                        PopMode(4);
+                    };
+                    Add(phone);
+                    PayphoneMounted = phone.OriginalMounted;
+                    _payphoneButton = phone;
+                }
+            }
+
             // The engine emits this from PostChildDraw, after the banner and
             // Prev/Next children. Mount it last so those overlapping cells do
             // not cover the centered decimal.
@@ -410,6 +467,8 @@ namespace Simitone.Client.UI.Panels
             StripsMounted++;
             ButtonsMounted += Buttons.Count;
             ApplyAnchors();
+            // post-ApplyAnchors so the probe carries the artboard shift
+            if (_payphoneButton != null) PayphonePositionForProbe = _payphoneButton.Position;
         }
 
         private void RegisterAnchor(UIElement element, Vector2 anchor, bool followsArtboard)
