@@ -259,10 +259,15 @@ namespace Simitone.Client.UI.Panels
             RezoneButtonForProbe = null;
             CreditsButtonForProbe = null;
 
-            // Banner: kNghBarBkg (5420) on the neighborhood screens, kDTBarBkg (5422)
-            // on Downtown; Vacation/Studio/Magic have no dedicated banner in
-            // Res_Nbhd — banner_neighborhood (disclosed).
-            var bannerMember = (mode == 2) ? "NghUI\\banner_downtown.bmp" : "NghUI\\banner_neighborhood.bmp";
+            // Banner: kNghBarBkg (5420) on the neighborhood screens, kDTBarBkg
+            // (5422) on the DESTINATION screens — the EXP-08 leg-5 PPC law:
+            // cWinVacation::Init (0x4420e4) and cWinStudiotown::Init
+            // (0x47b024) load 5422 natively (V/ST carry the Downtown
+            // banner); cWinNeighborhoodUL/VC load 5420. Magic (mode 7) keeps
+            // banner_neighborhood pending a cMagicland load-site scan (none
+            // in the 5420/5422 sweep — leg 5's card note).
+            var bannerMember = (mode == 2 || mode == 3 || mode == 5)
+                ? "NghUI\\banner_downtown.bmp" : "NghUI\\banner_neighborhood.bmp";
             Banner = new UIOriginalNavbarButton(bannerMember, 1, 1, null);
             RegisterAnchor(Banner, Vector2.Zero, true);
             Banner.OnButtonClick += (btn) =>

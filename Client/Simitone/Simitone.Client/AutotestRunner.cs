@@ -22431,6 +22431,15 @@ namespace Simitone.Client
                     && (int)ret.Y == (int)shifted.Y && ret.CellWidth == 53
                     && ret.Tooltip == GameFacade.Strings.GetString("169", "0");
 
+                // EXP-08 leg-5 fix card (approved): V (3) / ST (5) natively
+                // carry the DOWNTOWN banner (the PPC load-site law)
+                nav.SetMode(3, false);
+                bool vStrip = nav.LastBannerMember == "NghUI\\banner_downtown.bmp" && nav.Buttons.Count == 9;
+                nav.SetMode(5, false);
+                bool stStrip = nav.LastBannerMember == "NghUI\\banner_downtown.bmp" && nav.Buttons.Count == 9;
+                nav.SetMode(7, false);
+                bool magicStrip = nav.LastBannerMember == "NghUI\\banner_neighborhood.bmp" && nav.Buttons.Count == 9;
+
                 nav.SetMode(4, true);
                 bool moveInLock = !nav.LastMembers.Contains("NghUI\\MoveIn.bmp")
                     && !nav.LastMembers.Contains("NghUI\\Downtown.bmp")
@@ -22444,10 +22453,12 @@ namespace Simitone.Client
                     + " lawOk=" + lawOk + " layoutOk=" + layoutOk + " off=" + (int)shifted.X + "," + (int)shifted.Y
                     + " lotClip=" + lotClip
                     + " homeStrip=" + homeStrip + " dtStrip=" + dtStrip
+                    + " vstBanner=" + (vStrip && stStrip) + " magicBanner=" + magicStrip
                     + " returnBtn=" + returnBtn + " moveInLock=" + moveInLock
                     + " strips=" + Simitone.Client.UI.Panels.UINeighbourhoodSwitcher.StripsMounted
                     + " buttons=" + Simitone.Client.UI.Panels.UINeighbourhoodSwitcher.ButtonsMounted);
-                if (tipsCanon && returnTips && art && surround && mountedSurround && lawOk && lotClip && homeStrip && dtStrip && returnBtn && moveInLock) { Pass("uinav"); return; }
+                if (tipsCanon && returnTips && art && surround && mountedSurround && lawOk && lotClip && homeStrip && dtStrip
+                    && vStrip && stStrip && magicStrip && returnBtn && moveInLock) { Pass("uinav"); return; }
                 Log("AUTOTEST uinav: the navbar and production surround must mount the recovered engine law (centered banner children + clipped lots + no synthetic title + destination Return)");
                 Fail("uinav");
             }
