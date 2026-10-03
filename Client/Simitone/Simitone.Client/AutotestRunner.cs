@@ -5860,7 +5860,11 @@ namespace Simitone.Client
                 {
                     var wall = (int)(_rel07Watch.ElapsedMilliseconds / 1000);
                     if (_rel07Frame % Rel07MetricsEvery == 0) Rel07Metrics("METRICS");
-                    if (_rel07Reloads == _rel07Saves && _rel07Saves > 0 && _rel07Reloads < (wall / Rel07ReloadEverySec))
+                    // run-1 law: the saves-vs-reloads serialization conjunct made the
+                    // reload unreachable (saves always runs ahead) — the reload fires
+                    // on its own wall cadence; the save branch returns on its own tick
+                    // so the two can never collide
+                    if (_rel07Reloads < (wall / Rel07ReloadEverySec))
                     {
                         // reload cycle: in-run lot reload (the REL-05 in-process law)
                         _rel07ReboundPending = true;
