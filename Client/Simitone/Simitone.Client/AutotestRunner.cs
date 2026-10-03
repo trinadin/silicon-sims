@@ -19649,29 +19649,43 @@ namespace Simitone.Client
                 bool ok = true;
                 try
                 {
-                    Func<VMGenericTS1CallMode, FSO.SimAntics.Engine.VMPrimitiveExitCode> drive = (mode) =>
+                    // one frame per DRIVE for stateless modes; the two-phase modes
+                    // (39/40) need the SAME frame across their yield+poll (the engine
+                    // reuses the frame object while the instruction re-executes —
+                    // the transform cookie keys on it)
+                    FSO.SimAntics.Engine.VMStackFrame mkframe() => new FSO.SimAntics.Engine.VMStackFrame
                     {
-                        var frame = new FSO.SimAntics.Engine.VMStackFrame
-                        {
-                            Thread = thread,
-                            Caller = caller,
-                            Callee = caller,
-                            StackObject = target,
-                        };
-                        return new FSO.SimAntics.Primitives.VMGenericTS1Call().Execute(
+                        Thread = thread,
+                        Caller = caller,
+                        Callee = caller,
+                        StackObject = target,
+                    };
+                    Func<VMGenericTS1CallMode, FSO.SimAntics.Engine.VMPrimitiveExitCode> drive = (mode) =>
+                        new FSO.SimAntics.Primitives.VMGenericTS1Call().Execute(
+                            mkframe(),
+                            new FSO.SimAntics.Primitives.VMGenericTS1CallOperand { Call = mode });
+                    Func<FSO.SimAntics.Engine.VMStackFrame, VMGenericTS1CallMode, FSO.SimAntics.Engine.VMPrimitiveExitCode> driveOn = (frame, mode) =>
+                        new FSO.SimAntics.Primitives.VMGenericTS1Call().Execute(
                             frame,
                             new FSO.SimAntics.Primitives.VMGenericTS1CallOperand { Call = mode });
-                    };
 
                     // mode 3: RemoveTaxiDialog, no-window path -> FALSE (decode §mode-3)
                     var e3 = drive(VMGenericTS1CallMode.PullDownTaxiDialog);
                     ok &= e3 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_FALSE;
                     results.Add("m3=" + e3 + "(want GOTO_FALSE)");
 
-                    // mode 40: the native unconditional-FALSE stub (decode §modes-39/40)
-                    var e40 = drive(VMGenericTS1CallMode.PetToAdult);
-                    ok &= e40 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_FALSE;
-                    results.Add("m40=" + e40 + "(want GOTO_FALSE)");
+                    // mode 40: NOT a stub (addendum retranscription) — the pet-variant
+                    // two-phase transform. First visit yields; with a bogus target the
+                    // poll declines: Temp1 == 0 + TRUE.
+                    FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
+                    thread.TempRegisters[0] = -7; // no such neighbor id -> state 3 (declined)
+                    var f40 = mkframe();
+                    var e40a = driveOn(f40, VMGenericTS1CallMode.PetToAdult);
+                    var e40b = driveOn(f40, VMGenericTS1CallMode.PetToAdult);
+                    var t1_40 = thread.TempRegisters[1];
+                    ok &= e40a == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
+                        && e40b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && t1_40 == 0;
+                    results.Add("m40=" + e40a + "->" + e40b + "(want CONTINUE->TRUE declined) temp1=" + t1_40 + "(want 0)");
 
                     // mode 41: no-body no-op TRUE (decode §mode-41) — the fall-through
                     var e41 = drive(VMGenericTS1CallMode.HeadFlush);
@@ -19693,21 +19707,36 @@ namespace Simitone.Client
                         results.Add("m43=" + e43 + "(want GOTO_FALSE, family-null) latch=" + latch43);
                     }
 
-                    // mode 15: stack-object footprint-type write (decode §mode-15)
+                    // mode 15 (addendum polarity): the write happens ALWAYS;
+                    // Temp0 != 0 -> TRUE with NO recompute; Temp0 == 0 -> recompute + TRUE
                     thread.TempRegisters[0] = 1;
                     var e15a = drive(VMGenericTS1CallMode.MyRoutingFootprintEqualsTemp0);
                     var type15 = target.RoutingFootprintType;
                     ok &= e15a == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && type15 == 1;
-                    results.Add("m15(t1)=" + e15a + "(want GOTO_TRUE) type=" + type15 + "(want 1)");
+                    results.Add("m15(t1)=" + e15a + "(want GOTO_TRUE no-recompute) type=" + type15 + "(want 1)");
                     thread.TempRegisters[0] = 0;
                     var e15b = drive(VMGenericTS1CallMode.MyRoutingFootprintEqualsTemp0);
                     var type15b = target.RoutingFootprintType;
-                    ok &= e15b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_FALSE && type15b == 0;
-                    results.Add("m15(t0)=" + e15b + "(want GOTO_FALSE) type=" + type15b + "(want 0, restored)");
+                    ok &= e15b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && type15b == 0;
+                    results.Add("m15(t0)=" + e15b + "(want GOTO_TRUE recompute) type=" + type15b + "(want 0)");
+                    // mode 39: the person variant — first visit yields, poll succeeds on an
+                    // in-lot target (the caller itself: age already adult -> idempotent write)
+                    FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
+                    var nid39 = caller.GetPersonData(VMPersonDataVariable.NeighborId);
+                    thread.TempRegisters[0] = nid39;
+                    var f39 = mkframe();
+                    var e39a = driveOn(f39, VMGenericTS1CallMode.ChildToAdult);
+                    var e39b = driveOn(f39, VMGenericTS1CallMode.ChildToAdult);
+                    var t0_39 = thread.TempRegisters[0]; var t1_39 = thread.TempRegisters[1];
+                    ok &= e39a == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
+                        && e39b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
+                        && t0_39 == nid39 && t1_39 == caller.ObjectID;
+                    results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "==" + nid39 + " temp1=" + t1_39 + "==oid" + caller.ObjectID);
                 }
                 finally
                 {
                     target.RoutingFootprintType = 0; // fixture hygiene: restore the native default
+                    FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
                     thread.TempRegisters[0] = prevTemp0;
                 }
                 Log("AUTOTEST eng05modes " + (ok ? "ALL-OK" : "MISMATCH") + " [" + string.Join(" ", results) + "]");
