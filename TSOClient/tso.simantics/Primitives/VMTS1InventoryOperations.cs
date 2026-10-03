@@ -115,42 +115,56 @@ namespace FSO.SimAntics.Primitives
                     if (foundindex == -1) return VMPrimitiveExitCode.GOTO_FALSE;
                     var items = inventory[foundindex];
                     var itemcount = (short)(items.Count);
-                    context.Thread.TempRegisters[operand.CountTemp] = itemcount;
-                    if (operand.FoundIndexIntoTemp) context.Thread.TempRegisters[operand.IndexTemp] = (short)foundindex;
+                    // ENG-06 (decode mode-3 law): count-dst = Temp[(Flags2.0x60)>>5],
+                    // index-dst = Temp[(Flags.0x18)>>3], BOTH written unconditionally on
+                    // success (the old FoundIndexIntoTemp gate + the shared selectors
+                    // were the port's guess; zero corpus callers — latent)
+                    context.Thread.TempRegisters[(operand.Flags2 & 0x60) >> 5] = itemcount;
+                    context.Thread.TempRegisters[(operand.Flags & 0x18) >> 3] = (short)foundindex;
                     return (itemcount > 0) ? VMPrimitiveExitCode.GOTO_TRUE : VMPrimitiveExitCode.GOTO_FALSE;
                     //return (itemcount >= count)? VMPrimitiveExitCode.GOTO_TRUE : VMPrimitiveExitCode.GOTO_FALSE;
 
                 case VMTS1InventoryMode.SetToNextTokenOfType: //ignores guid
+                    // ENG-06 (decode mode-4 law): SetToNextToken(type, &Temp[Flags2&3])
+                    // — the NEXT INDEX is written to Temp[Flags2 & 3] unconditionally;
+                    // no next token -> FALSE (the old NextIndexIntoTemp gate +
+                    // CountTemp write were the port's guess; zero corpus callers —
+                    // latent; the type-count write below kept as disclosed behavior).
                     if (inventory == null) return VMPrimitiveExitCode.GOTO_FALSE;
                     var items2 = inventory.Where(x => x.Type == type).ToList();
                     context.Thread.TempRegisters[operand.CountTemp] = (short)items2.Sum(x => x.Count);
                     var next = items2.FirstOrDefault(x => inventory.IndexOf(x) > index);
                     if (next == null) return VMPrimitiveExitCode.GOTO_FALSE;
                     foundindex = inventory.IndexOf(next);
-                    if (operand.NextIndexIntoTemp) context.Thread.TempRegisters[operand.IndexTemp] = (short)foundindex;
+                    context.Thread.TempRegisters[operand.Flags2 & 3] = (short)foundindex;
                     return VMPrimitiveExitCode.GOTO_TRUE;
 
-                case VMTS1InventoryMode.Temp0NeighborAsAutofollow:
-                    inventory = InitInventory(neighbour, inventory);
-                    //if we have an existing item replace it
-                    aitem = inventory.FirstOrDefault(x => x.GUID == 10 && x.Type == 2);
-
-                    if (aitem == null)
-                        inventory.Add(new InventoryItem() { Count = (ushort)context.Thread.TempRegisters[0], GUID = 10, Type = 2 });
-                    else
-                        aitem.Count = (ushort)context.Thread.TempRegisters[0];
-                    return VMPrimitiveExitCode.GOTO_TRUE;
-                case VMTS1InventoryMode.Temp0NeighborAsFollowHome:
-                    inventory = InitInventory(neighbour, inventory);
-                    //if we have an existing item replace it
-                    aitem = inventory.FirstOrDefault(x => x.GUID == 11 && x.Type == 2);
-
-                    if (aitem == null)
-                        inventory.Add(new InventoryItem() { Count = (ushort)context.Thread.TempRegisters[0], GUID = 11, Type = 2 });
-                    else
-                        aitem.Count = (ushort)context.Thread.TempRegisters[0];
-                    return VMPrimitiveExitCode.GOTO_TRUE;
+                case VMTS1InventoryMode.Temp0NeighborAsAutofollow: //5
+                case VMTS1InventoryMode.Temp0NeighborAsFollowHome: //6
+                    // ENG-06 (inventory-dispatch-decode divergence 4): the native stores
+                    // the NEIGHBOR'S GUID as a real token — RemoveAllTokensOfType(1|3)
+                    // then AddToken(type 1|3, guid = GetGUID(FindNeighborByID(Temp[0])),
+                    // count = 1); TokenType operand ignored. The old port shape (magic
+                    // GUID 10|11, Type 2, Count := the nid) was a stand-in whose readers
+                    // (generic calls 19/20) are corrected with it — the token's GUID is
+                    // now consumed directly by the spawn. Port guard: an unknown nid
+                    // returns FALSE (the native's null-neighbor path is undecoded).
+                    {
+                        var nType = (operand.Mode == VMTS1InventoryMode.Temp0NeighborAsAutofollow) ? (ushort)1 : (ushort)3;
+                        var nRec = neighbourhood.GetNeighborByID(context.Thread.TempRegisters[0]);
+                        if (nRec == null) return VMPrimitiveExitCode.GOTO_FALSE;
+                        inventory = InitInventory(neighbour, inventory);
+                        inventory.RemoveAll(x => x.Type == nType);
+                        inventory.Add(new InventoryItem() { Count = 1, GUID = nRec.GUID, Type = nType });
+                        return VMPrimitiveExitCode.GOTO_TRUE;
+                    }
                 default:
+                    // ENG-06 (decode): the native TryInventoryAction dispatch ends at
+                    // mode 6; every mode > 6 is the common tail — CPState::SetDirty
+                    // (0x04000000) + return TRUE, no inventory access. The corpus's
+                    // 24/27/32 sites (Masseur/Masseuse/Director/Campfire mains,
+                    // dart_board, BeeHive) are intentional native no-ops; this
+                    // fall-through IS the law.
                     return VMPrimitiveExitCode.GOTO_TRUE;
             }
         }

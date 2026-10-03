@@ -322,8 +322,13 @@ namespace FSO.SimAntics.Primitives
                     context.Thread.TempRegisters[0] = context.VM.GetGlobalValue(3);
                     if (VM.UseWorld) context.VM.Context.World.CenterTo((AvatarComponent)(context.VM.GetObjectById(context.VM.GetGlobalValue(3))?.WorldUI));
                     break;
-                case VMGenericTS1CallMode.SpawnDowntownDateOfPersonInTemp0: //18
-                    //spawn our autofollow sim
+                case VMGenericTS1CallMode.SpawnDowntownDateOfPersonInTemp0: //19
+                    // spawn our autofollow sim. ENG-06: the token consumed is the
+                    // NATIVE shape — generic inventory call 5/6 writes
+                    // {Type 1|3, GUID = the neighbor's GUID, Count 1}; the reader
+                    // takes the FIRST token of that type and spawns its GUID directly
+                    // (the old magic-GUID-10/11 + nid-in-Count stand-in is retired
+                    // with its writer).
                     var neighbourhood = Content.Content.Get().Neighborhood;
                     var ntarget = (VMAvatar)context.VM.GetObjectById(context.Thread.TempRegisters[0]);
                     context.Thread.TempRegisters[0] = -1;
@@ -332,17 +337,17 @@ namespace FSO.SimAntics.Primitives
                     var inventory = neighbourhood.GetInventoryByNID(neighbour);
                     if (inventory != null)
                     {
-                        var toSpawn = inventory.FirstOrDefault(x => x.Type == 2 && x.GUID == inventoryInd)?.Count;
-                        if (toSpawn != null)
+                        var invType = (inventoryInd == 11) ? (ushort)3 : (ushort)1;
+                        var token = inventory.FirstOrDefault(x => x.Type == invType);
+                        if (token != null)
                         {
-                            var spawntarg = neighbourhood.GetNeighborByID((short)toSpawn);
-                            var autofollow = context.VM.Context.CreateObjectInstance(spawntarg.GUID, LotTilePos.OUT_OF_WORLD, Direction.NORTH)?.BaseObject;
+                            var autofollow = context.VM.Context.CreateObjectInstance(token.GUID, LotTilePos.OUT_OF_WORLD, Direction.NORTH)?.BaseObject;
                             context.Thread.TempRegisters[0] = autofollow.ObjectID;
-                            inventory.RemoveAll(x => x.Type == 2 && x.GUID == inventoryInd);
+                            inventory.RemoveAll(x => x.Type == invType);
                         }
                     }
                     break;
-                case VMGenericTS1CallMode.SpawnTakeBackHomeDataOfPersonInTemp0:
+                case VMGenericTS1CallMode.SpawnTakeBackHomeDataOfPersonInTemp0: //20
                     inventoryInd = 11;
                     goto case VMGenericTS1CallMode.SpawnDowntownDateOfPersonInTemp0;
                 case VMGenericTS1CallMode.SpawnInventorySimDataEffects:
