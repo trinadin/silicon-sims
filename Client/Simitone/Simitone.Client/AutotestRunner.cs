@@ -1082,6 +1082,7 @@ namespace Simitone.Client
                 || CheckEnabled("unl-magic11")
                 || CheckEnabled("magicbook")
                 || CheckEnabled("petname")
+                || CheckEnabled("famedecay")
                 || CheckEnabled("dt-strip")
                 || CheckEnabled("unl-show")
                 || CheckEnabled("unl-mice")
@@ -5334,6 +5335,134 @@ namespace Simitone.Client
                 return pinOk.All(x => x);
             }
             catch (Exception pe) { _ptnamePins = "exc:" + pe.GetType().Name; return false; }
+        }
+
+        // ---- EXP-11 V4+V6 ('famedecay', opt-in): the Home Fame Decay runtime
+        // drive + the fame save/reload persistence. Native law (the EXP-11
+        // decode): fame IS person data — score=PD[80], level=PD[81] (0..10),
+        // peak=PD[82]; the Home Fame Decay controller decays hourly keyed off
+        // person[81] with floor 1 (celebrity swap at 8:00). V4: set the fame
+        // triple via the disclosed levers, roll the clock across an hour
+        // boundary, assert the decay fired + the floor. V6: the REAL user
+        // save + PlayHouse reload, assert the triple persists.
+        private static int _fmdecState, _fmdecSettle, _fmdecFrame;
+        private static short _fmdecNid, _fmdecSaved80, _fmdecSaved81, _fmdecSaved82;
+        private static bool _fmdecDecayed, _fmdecFloorOk, _fmdecPersist, _fmdecPersistChecked;
+
+        private static void FameDecayTick()
+        {
+            try
+            {
+                _fmdecFrame++;
+                if (_fmdecState == 0)
+                {
+                    if (++_fmdecSettle < 90) return;
+                    _fmdecSettle = 0;
+                    Log("AUTOTEST famedecay V4+V6 (EXP-11: arm the fame triple -> roll an hour -> decay+floor asserts -> real save/reload -> persistence)");
+                    var sim = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                        .FirstOrDefault(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                            && !a.IsPet
+                            && a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18);
+                    if (sim == null) { Log("AUTOTEST famedecay verdict no-adult"); Fail("famedecay"); _fmdecState = 99; return; }
+                    _fmdecNid = sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    sim.SetPersonData(VMPersonDataVariable.TS1FameScore, 950);
+                    sim.SetPersonData(VMPersonDataVariable.TS1FameStarPower, 5);
+                    sim.SetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark, 5);
+                    Log("AUTOTEST famedecay ARMED nid=" + _fmdecNid + " pd=[950,5,5] clock="
+                        + _vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00"));
+                    // roll the clock to just before an hour boundary so the hourly
+                    // decay poll has a boundary to cross fast (the disclosed EXP-04
+                    // clock lever; the decay is keyed off the hour rollover)
+                    if (_vm.Context.Clock.Minutes > 50)
+                        _vm.SendCommand(new FSO.SimAntics.NetPlay.Model.Commands.VMNetSetTimeCmd
+                            { Hours = (_vm.Context.Clock.Hours + 1) % 24, Minutes = 58, Seconds = 0, UTCStart = _vm.Context.Clock.UTCStart });
+                    Log("AUTOTEST famedecay CLOCK-SET " + _vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00"));
+                    _fmdecState = 1; _fmdecSettle = 0;
+                    return;
+                }
+                if (_fmdecState == 1)
+                {
+                    // V6 FIRST (the decay is an independent observer — run 1 law:
+                    // no decay self-starts on the home lot, and persistence must
+                    // not gate on it). Snapshot + the REAL save + reload.
+                    var sim = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                        .FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.NeighborId) == _fmdecNid);
+                    if (sim == null) { if (++_fmdecSettle > 2700) { Log("AUTOTEST famedecay verdict sim-lost"); Fail("famedecay"); _fmdecState = 99; } return; }
+                    _fmdecSaved80 = sim.GetPersonData(VMPersonDataVariable.TS1FameScore);
+                    _fmdecSaved81 = sim.GetPersonData(VMPersonDataVariable.TS1FameStarPower);
+                    _fmdecSaved82 = sim.GetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark);
+                    _fmdecState = 2; _fmdecSettle = 0;
+                    GameThread.NextUpdate(x =>
+                    {
+                        try { _screen.Save(); Log("AUTOTEST famedecay SAVE-DONE (user path) saved=[" + _fmdecSaved80 + "," + _fmdecSaved81 + "," + _fmdecSaved82 + "]"); }
+                        catch (Exception se) { Log("AUTOTEST famedecay SAVE-EXC " + se.GetType().Name); }
+                    });
+                    return;
+                }
+                if (_fmdecState == 2)
+                {
+                    if (++_fmdecSettle < 360) return; // let the save land
+                    var oldVm = _vm;
+                    GameThread.NextUpdate(x =>
+                    {
+                        try { _screen.PlayHouse(5, null); Log("AUTOTEST famedecay RELOAD-DISPATCH PlayHouse(5)"); }
+                        catch (Exception pe) { Log("AUTOTEST famedecay RELOAD-EXC " + pe.GetType().Name); }
+                    });
+                    _fmdecState = 3; _fmdecSettle = 0;
+                    return;
+                }
+                if (_fmdecState == 3)
+                {
+                    if (_screen.InLot && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm)
+                        && _screen.vm.Entities.Count > 0)
+                    {
+                        _vm = _screen.vm;
+                        if (_vm.SpeedMultiplier <= 0) { _vm.SpeedMultiplier = 1; _vm.GlobalBlockingDialog = null; }
+                        Log("AUTOTEST famedecay LOT-RELOADED ents=" + _vm.Entities.Count + " loadErrors=" + _vm.LoadErrors.Count);
+                        _fmdecState = 4; _fmdecSettle = 0;
+                        return;
+                    }
+                    if (++_fmdecSettle > 2700) { Log("AUTOTEST famedecay verdict T6-RELOAD-FAILED"); Fail("famedecay"); _fmdecState = 99; return; }
+                    return;
+                }
+                if (_fmdecState == 4)
+                {
+                    if (++_fmdecSettle < 240) return;
+                    var sim = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                        .FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.NeighborId) == _fmdecNid);
+                    var p80 = sim?.GetPersonData(VMPersonDataVariable.TS1FameScore) ?? (short)-1;
+                    var p81 = sim?.GetPersonData(VMPersonDataVariable.TS1FameStarPower) ?? (short)-1;
+                    var p82 = sim?.GetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark) ?? (short)-1;
+                    if (!_fmdecPersistChecked)
+                    {
+                        _fmdecPersistChecked = true;
+                        _fmdecPersist = p81 == _fmdecSaved81 && p82 == _fmdecSaved82 && p80 == _fmdecSaved80;
+                        Log("AUTOTEST famedecay V6-PERSIST persisted=[" + p80 + "," + p81 + "," + p82 + "]"
+                            + " saved=[" + _fmdecSaved80 + "," + _fmdecSaved81 + "," + _fmdecSaved82 + "] ok=" + _fmdecPersist
+                            + " clock=" + _vm.Context.Clock.Hours + ":" + _vm.Context.Clock.Minutes.ToString("00"));
+                    }
+                    // V4 observer window (post-reload, up to a sim-hour): the decay
+                    if (!_fmdecDecayed && sim != null && (p80 != _fmdecSaved80 || p81 != _fmdecSaved81))
+                    {
+                        _fmdecDecayed = true;
+                        _fmdecFloorOk = p81 >= 1;
+                        Log("AUTOTEST famedecay V4-DECAY pd=[" + p80 + "," + p81 + "," + p82 + "] floorOk=" + _fmdecFloorOk);
+                    }
+                    if ((_fmdecDecayed || _fmdecSettle > 3600))
+                    {
+                        Log("AUTOTEST famedecay verdict: V6-PERSIST=" + _fmdecPersist + " V4-DECAY=" + _fmdecDecayed
+                            + " floorOk=" + _fmdecFloorOk + " (V4 no-decay = the home-lot self-start law — the hd7 class, named residual)");
+                        if (_fmdecPersist) { Pass("famedecay"); _fmdecState = 99; return; }
+                        Fail("famedecay"); _fmdecState = 99; return;
+                    }
+                    return;
+                }
+            }
+            catch (Exception fd)
+            {
+                Log("AUTOTEST famedecay EXC " + fd.GetType().Name + " " + fd.Message);
+                Fail("famedecay"); _fmdecState = 99;
+            }
         }
 
         // ---- EXP-08 leg-2 residual ('dt-strip', opt-in): the downtown
@@ -9924,6 +10053,12 @@ namespace Simitone.Client
             {
                 PetNameTick();
             }
+            // EXP-11 V4+V6 (opt-in "famedecay"): the Home Fame Decay drive +
+            // the fame save/reload persistence.
+            if (CheckEnabled("famedecay") && _fmdecState != 99)
+            {
+                FameDecayTick();
+            }
             // EXP-08 leg-2 residual (opt-in "dt-strip"): the downtown live drive.
             if (CheckEnabled("dt-strip") && _dtstripState != 99)
             {
@@ -10522,6 +10657,8 @@ namespace Simitone.Client
                 return; // (EXP-08 fix card 3) book drive still driving; battery finishes after the verdict
             if (CheckEnabled("petname") && _ptnameState != 99)
                 return; // (EXP-08 fix card 1) adoption drive still driving; battery finishes after the verdict
+            if (CheckEnabled("famedecay") && _fmdecState != 99)
+                return; // (EXP-11 V4+V6) the decay/reload drive still running; battery finishes after the verdict
             if (CheckEnabled("llfire") && _ll3State != 2)
                 return; // (EXP-01 llfire) fire/rocket legs still driving; battery finishes after the verdict
             if (CheckEnabled("aud12live") && _a12State != 2)
