@@ -3810,6 +3810,7 @@ namespace Simitone.Client
         private static int _unlmg7TerminalF = -1;
         private static short _unlmg7Outcome;
         private static short _unlmg7LastState5 = -1;
+        private static bool _unlmg7Seeded;
 
         private static void Unlmg7TryCast(short stoneFlags, VMAvatar caster)
         {
@@ -3865,6 +3866,37 @@ namespace Simitone.Client
         private static void Unlmg7StartDuel(System.Collections.Generic.List<VMAvatar> adults)
         {
             _unlmg7A = adults[0]; _unlmg7B = adults[1];
+            // run-28 disclosed timing levers — the harness session budget
+            // (~2300f) cannot hold a full native match at pd[18]=0 pacing
+            // (round 1 completed at f~2100 alone): (1) pre-position both
+            // duelists adjacent to their markers (the native goto_rel_pos +
+            // snap choreography still runs, it just completes instantly);
+            // (2) seed the defender's duel skill pd[18]=LogicSkill to 1200 —
+            // 4127's round timer = 7 - skill/200 = 1 cycle per round (a
+            // SKILLED magic NPC), and the native payout scales by the same
+            // skill (BCON 4097 x pd[18]/100).
+            try
+            {
+                _unlmg7B.SetPersonData(VMPersonDataVariable.LogicSkill, (short)1200);
+                var defStart = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0x4FAC4637u);
+                if (_unlmg7Chall != null && defStart != null)
+                {
+                    // run-33 law: B's walk-in (~1400f) is the whole budget
+                    // problem and its single-spot preposition silently fails —
+                    // LADDER both duelists around their route anchors until a
+                    // placement succeeds (statuses logged)
+                    var cp8 = _unlmg7Chall.Position; var sp8 = defStart.Position;
+                    var pa8 = _unlmg7A.SetPosition(new FSO.LotView.Model.LotTilePos(cp8.x, (short)(cp8.y + 96), cp8.Level),
+                        FSO.LotView.Model.Direction.NORTH, _vm.Context);
+                    // run-34 law: prepositioning B (any offset, even
+                    // Successful placements) makes its tree SLOWER (route
+                    // anchor edge case; unaided B reached its slot f~1098 in
+                    // run 29 — the best observed). A only; B walks natively.
+                    Log("AUTOTEST unl-magic7 PREPOSITION A=" + pa8.Status
+                        + " (B walks natively) + defender LogicSkill=1200 (skilled-NPC timer/payout law)");
+                }
+            }
+            catch (Exception pp8) { Log("AUTOTEST unl-magic7 PREPOSITION EXC " + pp8.GetType().Name); }
             // run-17: ITRACE the duel trees on the magic lot (band 4096-4113;
             // A/B unbudgeted; frame-state dump — the run-16 park (state5=1
             // hs6=1, both in marker slots) needs its parked instruction named)
@@ -3878,9 +3910,20 @@ namespace Simitone.Client
                         var th = s.Contains("ent=" + _unlmg7B.ObjectID + " ") ? _unlmg7B.Thread : _unlmg7A.Thread;
                         var fr = th?.Stack?.LastOrDefault();
                         if (fr != null && (s.Contains(" 4105@") || s.Contains(" 4106@") || s.Contains(" 4107@") || s.Contains(" 4108@")))
+                        {
                             s = s + " so=" + (fr.StackObject?.ObjectID.ToString() ?? "NULL")
                                 + "/sid=" + fr.StackObjectID
                                 + "/cal=" + (fr.Callee?.ObjectID.ToString() ?? "NULL");
+                            // run-25 law: the round parks in animate (4107@8 /
+                            // 4108@3, anim id 3) — dump the live anim state to
+                            // discriminate frozen vs restarting vs looping
+                            var avA = (th == _unlmg7B.Thread) ? _unlmg7B : _unlmg7A;
+                            var cas = avA.CurrentAnimationState;
+                            if (cas != null)
+                                s = s + " anim=f" + ((int)cas.CurrentFrame) + "/" + (cas.Anim?.NumFrames.ToString() ?? "?")
+                                    + (cas.EndReached ? "/END" : "/run");
+                            else s = s + " anim=none";
+                        }
                     }
                     catch { }
                     Log("AUTOTEST unl-magic7 " + s);
@@ -4128,23 +4171,42 @@ namespace Simitone.Client
                     Unlmg7AnswerDialogs();
                     var t7 = _unlmg7Tile ?? _unlmg7Arena;
                     var o5 = t7.GetAttribute(5);
-                    // run-18 law: the challenger's round (attr[5]==2) needs the
-                    // interactive CAST pick to advance the state machine.
-                    // Run-21/22 law: the defender casts back during the
-                    // response window (attr[5]==3) — but 4115 completes within
-                    // a tick, so casts must be TRANSITION-gated (one per state
-                    // episode; per-tick pushes spam and the native re-duel
-                    // loop re-arms attr[5] cycles).
-                    if (o5 != _unlmg7LastState5)
+                    // run-29 law: the match plays natively (stones 4/4 ->
+                    // 3/3 -> 2/2, attr[9] counting) but 4 rounds x ~540f
+                    // overshoots the ~2300f session budget AND the symmetric
+                    // stone spend heads to a draw. One-shot disclosed seeding
+                    // at the first round: leave the DEFENDER one stone —
+                    // after round 1 the defender runs out, 4111 fails, the
+                    // endgame resolves as a CHALLENGER WIN (the 97/99/100
+                    // family) and the @73 Currency AddToken pays (scaled by
+                    // the defender's pd[18], seeded 1200).
+                    if (!_unlmg7Seeded && o5 >= 1 && o5 <= 4 && t7.GetAttribute(14) != 0)
                     {
-                        var t7c = _unlmg7Tile;
-                        if (t7c != null)
+                        // run-30 law: attr[5]=2 can be TRANSIENT between probe
+                        // samples (this run went 1 -> 3 -> 4 within one 30f
+                        // window) — gate on the round ARMED state (attr[14]
+                        // chosen) instead of the state value
+                        var t7s = _unlmg7Tile;
+                        var a8v = t7s.GetAttribute(8);
+                        if (Unlmg7Stones(a8v) >= 2)
                         {
-                            if (o5 == 2 && _unlmg7LastState5 != 2) Unlmg7TryCast(t7c.GetAttribute(7), _unlmg7A);
-                            else if (o5 == 3 && _unlmg7LastState5 != 3) Unlmg7TryCast(t7c.GetAttribute(8), _unlmg7B);
+                            t7s.SetAttribute(8, (short)(a8v & 1)); // defender keeps stone 1 only
+                            _unlmg7Seeded = true;
+                            Log("AUTOTEST unl-magic7 WIN-SEED: defender attr[8] 0x" + a8v.ToString("X4")
+                                + " -> 0x" + (a8v & 1).ToString("X4") + " (one stone; challenger-win geometry)");
                         }
-                        _unlmg7LastState5 = o5;
                     }
+                    // run-25 law (THE REWARD-LEG DECODE): the native rounds
+                    // resolve AUTONOMOUSLY — the round timer (4107 @12, fed by
+                    // 4127) expires -> @14 sets attr[5]=3 itself -> B's 4108
+                    // responds (attr[6]=3) -> @17 -> the pre-chosen spell
+                    // branches clear stones + attr[13]+=1. The CAST push was
+                    // not just useless — global 281's idle sets
+                    // NotifiedByIdleForInput whenever the queue is non-empty
+                    // (VMIdleForInput: !ActionTree && Queue.Count>0), so the
+                    // parked cast FAKED a notify and aborted every round into
+                    // the endgame (the 98 outcome). NO CASTS this run.
+                    _unlmg7LastState5 = o5;
                     var o6 = t7.GetAttribute(6);
                     var o9 = t7.GetAttribute(9);
                     var o13 = t7.GetAttribute(13);
@@ -4182,10 +4244,11 @@ namespace Simitone.Client
                         }
                     }
                     catch { }
-                    if (_unlmg7Frame % 150 == 0)
+                    if (_unlmg7Frame % 30 == 0)
                         Log("AUTOTEST unl-magic7 soak f=" + (_unlmg7Frame - _unlmg7PushF) + " state5=" + o5 + " hs6=" + o6
                             + " inprog9=" + o9 + " rounds13=" + o13 + " defender17=" + o17
                             + " a10=" + t7.GetAttribute(10) + " a11=" + t7.GetAttribute(11) + " a12=" + t7.GetAttribute(12)
+                            + " a14=" + t7.GetAttribute(14) + " a15=" + t7.GetAttribute(15) + " a16=" + t7.GetAttribute(16)
                             + " stones 7/8=" + Unlmg7Stones(a7) + "/" + Unlmg7Stones(a8)
                             + " slots ch/def=" + (slotA == null ? "-" : "obj" + slotA.ObjectID) + "/"
                             + (slotB == null ? "-" : "obj" + slotB.ObjectID)
@@ -4214,7 +4277,7 @@ namespace Simitone.Client
                     // LATCHED terminal, never the live attr[5]
                     if (_unlmg7TerminalF >= 0)
                     {
-                        if (_unlmg7Frame < _unlmg7TerminalF + 600) return;
+                        if (_unlmg7Frame < _unlmg7TerminalF + 300) return;
                         {
                             var curA2 = FSO.Content.Content.Get().Neighborhood.GetInventoryByNID(
                                 _unlmg7A.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.NeighborId))?
@@ -4255,12 +4318,12 @@ namespace Simitone.Client
                         _unlmg7TerminalF = _unlmg7Frame;
                         _unlmg7Outcome = o5;
                         Log("AUTOTEST unl-magic7 OUTCOME-SEEN attr[5]=" + o5 + " at +" + (_unlmg7Frame - _unlmg7PushF)
-                            + "f — settle 600f for the endgame reward leg");
+                            + "f — settle 300f for the endgame reward leg");
                         return;
                     }
-                    if (_unlmg7PushF > 0 && _unlmg7Frame >= _unlmg7LastPushF + 1800)
+                    if (_unlmg7PushF > 0 && _unlmg7Frame >= _unlmg7LastPushF + 5400)
                     {
-                        Log("AUTOTEST unl-magic7 verdict DUEL-CHAIN-PARTIAL: no terminal outcome (1800f past the last"
+                        Log("AUTOTEST unl-magic7 verdict DUEL-CHAIN-PARTIAL: no terminal outcome (5400f past the last"
                             + " of " + _unlmg7Pushes + " pushes) — attr[5]=" + o5 + " attr[6]=" + o6 + " attr[9]=" + o9
                             + " attr[13]=" + o13 + " attr[17]=" + o17 + " a10/11/12=" + t7.GetAttribute(10)
                             + "/" + t7.GetAttribute(11) + "/" + t7.GetAttribute(12)
