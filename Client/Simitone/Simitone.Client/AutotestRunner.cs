@@ -4798,7 +4798,7 @@ namespace Simitone.Client
         private static int _ptnameState, _ptnameSettle, _ptnameFrame, _ptnameSwitchF = -1;
         private static bool _ptnameRebound, _ptnameStrPins, _ptnameNamed;
         private static int _ptnameDialogsBefore, _ptnameAnswers, _ptnamePenOid, _ptnameActorOid;
-        private static bool _ptnameDirectNamed;
+        private static bool _ptnameDirectNamed, _ptnameTreeNamed;
         private static string _ptnamePins = "";
 
         private static void PetNameTick()
@@ -5097,6 +5097,38 @@ namespace Simitone.Client
                             Log("AUTOTEST petname NAME-COMPLETED engine-side (UI submit already proven; text='" + bs4.ResponseText + "')");
                         }
                     }
+                    // EXP-13 G6 instrumentation read (entry/branch/create counters)
+                    if (_ptnameSettle == 125 || _ptnameSettle == 400)
+                        Log("AUTOTEST petname G6-COUNTERS enter=" + FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6EnterCount
+                            + " human=" + FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6BranchHuman
+                            + " animal=" + FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6BranchAnimal
+                            + " preCreate=" + FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6PreCreateCount
+                            + " createDone=" + FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6CreateDoneCount
+                            + " createdID=" + FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6CreatedID
+                            + " postCreateEntries=" + FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6PostCreateEntries
+                            + " addToFamilyGate='" + FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate + "'"
+                            + " lastStop='" + FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6LastStop + "'");
+                    // G6 RESOLVED (g6-run2): the tree's create runs+succeeds
+                    // (createdID pinned, entries grow, persists). The full
+                    // END-TO-END naming assert: the TREE-created pet's CTSS-2000
+                    // display name must carry the player's text (TextEntry → pen
+                    // name → make_new_character info.Name → the catalog string).
+                    if (_ptnameSettle == 130)
+                    {
+                        var primT = FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6CreateDoneCount;
+                        var primID = FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6CreatedID;
+                        if (primT > 0 && primID >= 0)
+                        {
+                            var tn = Content.Get().Neighborhood.GetNeighborByID((short)primID);
+                            var two = tn != null ? Content.Get().WorldObjects.Get(tn.GUID) : null;
+                            var tctss = two?.Resource?.Get<FSO.Files.Formats.IFF.Chunks.CTSS>(2000);
+                            var tdisplay = tctss?.GetString(0);
+                            _ptnameTreeNamed = tdisplay == "ProbePet";
+                            Log("AUTOTEST petname G6-TREE-CREATE id=" + primID
+                                + " stem='" + (tn?.Name ?? "null") + "' displayName='" + (tdisplay ?? "null") + "'"
+                                + " gate='" + FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate + "'");
+                        }
+                    }
                     var petHit = _vm.Entities.FirstOrDefault(e => e is VMAvatar && e.Name == "ProbePet");
                     // run-30 law: the debug chain's make_new_character creates the pet
                     // as a NEIGHBOR (the full 4113 path also places the on-lot object) —
@@ -5152,11 +5184,11 @@ namespace Simitone.Client
                         // its CTSS-2000 catalog string, the R252 NBRS stem is not
                         // the display name). The on-lot pet placement + the tree's
                         // neighbor-create skip are carded residuals (G6).
-                        Log("AUTOTEST petname verdict ADOPT-NAME-LIVE: penCarriesName=" + (penHit != null) + " directCreateDisplayName=" + _ptnameDirectNamed
+                        Log("AUTOTEST petname verdict ADOPT-NAME-LIVE: penCarriesName=" + (penHit != null) + " directCreateDisplayName=" + _ptnameDirectNamed + " treeCreateDisplayName=" + _ptnameTreeNamed
                             + " petPlaced=" + _ptnameNamed + " editorSubmit='" + submitted + "'"
                             + " chainAnswers=" + _ptnameAnswers + " pins=" + _ptnameStrPins
                             + " (residuals G1-G6 carded on leg1)");
-                        if ((penHit != null) && _ptnameStrPins && submitted == "ProbePet" && _ptnameAnswers >= 3 && _ptnameDirectNamed)
+                        if ((penHit != null) && _ptnameStrPins && submitted == "ProbePet" && _ptnameAnswers >= 3 && _ptnameDirectNamed && _ptnameTreeNamed)
                         { Pass("petname"); _ptnameState = 99; return; }
                         Fail("petname"); _ptnameState = 99; return;
                     }
