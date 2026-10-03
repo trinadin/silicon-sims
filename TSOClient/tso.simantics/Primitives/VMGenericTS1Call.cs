@@ -263,10 +263,15 @@ namespace FSO.SimAntics.Primitives
                     return VMPrimitiveExitCode.GOTO_TRUE_NEXT_TICK;
                 case VMGenericTS1CallMode.BuildTheDowntownSimAndPlaceObjIDInTemp0: //18
                     //spawn downtown sim out of world
-
                     var crossDataDT = Content.Content.Get().Neighborhood.GameState;
+                    // P3-1 (indep-review-mode26): the mode-26 twin — a null
+                    // ActiveFamily or a failed create (unresolvable
+                    // DowntownSimGUID) NREs below with the same
+                    // entity-deletion consequence; soft-fail like mode 26
+                    if (crossDataDT.ActiveFamily == null) return VMPrimitiveExitCode.GOTO_FALSE;
 
                     var control = context.VM.Context.CreateObjectInstance(crossDataDT.DowntownSimGUID, LotTilePos.OUT_OF_WORLD, Direction.NORTH)?.BaseObject;
+                    if (control == null) return VMPrimitiveExitCode.GOTO_FALSE; // P3-1: the create-deref twin
                     ((VMAvatar)control).AvatarState.Permissions = Model.TSOPlatform.VMTSOAvatarPermissions.Owner;
                     context.VM.SetGlobalValue(3, control.ObjectID);
                     context.VM.SendCommand(new VMNetChangeControlCmd() { TargetID = control.ObjectID });
@@ -382,6 +387,10 @@ namespace FSO.SimAntics.Primitives
                     else
                     {
                         var control2 = context.VM.Context.CreateObjectInstance(crossData2.DowntownSimGUID, LotTilePos.OUT_OF_WORLD, Direction.NORTH)?.BaseObject;
+                        // P3-4 (indep-review-mode26): an unresolvable DowntownSimGUID
+                        // (a save whose sim template no longer resolves) makes the
+                        // create return null — the same soft-fail as the family guard
+                        if (control2 == null) return VMPrimitiveExitCode.GOTO_FALSE;
                         ((VMAvatar)control2).AvatarState.Permissions = Model.TSOPlatform.VMTSOAvatarPermissions.Owner;
                         context.VM.SetGlobalValue(3, control2.ObjectID);
                         context.VM.SendCommand(new VMNetChangeControlCmd() { TargetID = control2.ObjectID });
@@ -427,6 +436,7 @@ namespace FSO.SimAntics.Primitives
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 // 32. CreatePurchasedPetsNearOwner
                 case VMGenericTS1CallMode.CreatePurchasedPetsNearOwner:
+                    if (context.VM.TS1State.CurrentFamily == null) return VMPrimitiveExitCode.GOTO_FALSE; // P3-2 (indep-review-mode26): nullable invariant (see VMTS1GlobalLinkStub.cs:66-74)
                     context.VM.TS1State.CurrentFamily.SelectWholeFamily();
                     context.VM.TS1State.VerifyFamily(context.VM);
                     return VMPrimitiveExitCode.GOTO_TRUE;
