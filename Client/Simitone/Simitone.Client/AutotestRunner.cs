@@ -3811,6 +3811,7 @@ namespace Simitone.Client
         private static short _unlmg7Outcome;
         private static short _unlmg7LastState5 = -1;
         private static bool _unlmg7Seeded;
+        private static bool _unlmg7Conceded;
 
         private static void Unlmg7TryCast(short stoneFlags, VMAvatar caster)
         {
@@ -3877,6 +3878,13 @@ namespace Simitone.Client
             // skill (BCON 4097 x pd[18]/100).
             try
             {
+                // run-40 law: the AddToken block (@73-@90) hangs off the
+                // ROUND-RESOLUTION case branches (per-won-round pay, gated by
+                // 4121's mood compare: challenger motive[3] > defender's) —
+                // seed the native mood asymmetry so the rounds resolve as
+                // challenger wins
+                _unlmg7A.SetMotiveData(FSO.SimAntics.Model.VMMotive.Mood, (short)100);
+                _unlmg7B.SetMotiveData(FSO.SimAntics.Model.VMMotive.Mood, (short)-80);
                 _unlmg7B.SetPersonData(VMPersonDataVariable.LogicSkill, (short)1200);
                 var defStart = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0x4FAC4637u);
                 if (_unlmg7Chall != null && defStart != null)
@@ -3926,6 +3934,28 @@ namespace Simitone.Client
                         }
                     }
                     catch { }
+                    // run-38 law: the endgame resolves WITHIN one VM tick
+                    // (between any probe samples) — concede IN-TICK: on the
+                    // first 4105@37 sighting (the '4109 Challenger Spells
+                    // Left' call that opens the endgame decision, before it
+                    // executes), write the full native 97 geometry: the
+                    // challenger exhausted (4109 -> false -> the @69 endgame),
+                    // attr[13] pinned to the pay tier, the concede flag set.
+                    if (!_unlmg7Conceded && s.Contains(" 4105@37 "))
+                    {
+                        try
+                        {
+                            var t7k = _unlmg7Tile;
+                            var a13k = t7k.GetAttribute(13);
+                            t7k.SetAttribute(7, (short)0);
+                            t7k.SetAttribute(13, (short)-1);
+                            t7k.SetAttribute(12, (short)1);
+                            _unlmg7Conceded = true;
+                            Log("AUTOTEST unl-magic7 CONCEDE-INTICK @4105@37: attr[7]=0 attr[13]=-1 (was "
+                                + a13k + ") attr[12]=1 -> the @69 endgame at the 97 pay tier");
+                        }
+                        catch { }
+                    }
                     Log("AUTOTEST unl-magic7 " + s);
                 }
             });
@@ -4017,7 +4047,10 @@ namespace Simitone.Client
                 }
                 if (anyBs == null) return;
                 anyBs.Responded = true;
-                anyBs.ResponseCode = 0; // native click (Message dialog law)
+                // run-39 law: outcome 97 reached the confirmation dialog but
+                // paid nothing — the T/F branches are claim-vs-decline;
+                // answer YES (code 1, the unl-show confirmation law)
+                anyBs.ResponseCode = 1;
                 anyBs.ResponseText = "";
                 _vm.GlobalBlockingDialog = null;
                 if (_vm.LastSpeedMultiplier > 0) { _vm.SpeedMultiplier = _vm.LastSpeedMultiplier; _vm.LastSpeedMultiplier = 0; }
@@ -4210,6 +4243,31 @@ namespace Simitone.Client
                     var o6 = t7.GetAttribute(6);
                     var o9 = t7.GetAttribute(9);
                     var o13 = t7.GetAttribute(13);
+                    // run-35 law: 4111 runs its FULL flag chain and falls
+                    // through to @5's vacuous F:255 exit — 'defender out' does
+                    // NOT stop the rounds. The real endgame gate is attr[12]
+                    // (the concede flag; 4105 @46: attr[12] > 0 -> endgame).
+                    // One-shot concede at the PAY-TIER moment: two rounds done
+                    // (attr[9]>=2) with rounds13 == -1 -> the endgame resolves
+                    // attr[13]=-1 -> outcome 97 -> the @73 Currency AddToken.
+                    if (!_unlmg7Conceded && _unlmg7TerminalF < 0 && o9 >= 1 && o13 <= -1)
+                    {
+                        // runs 36-37 law: the endgame fires between samples —
+                        // concede at ROUND-1 completion with the FULL native 97
+                        // geometry: the endgame subtracts the challenger's
+                        // REMAINING stones (@125-135: attr[13] -= count(attr[7]
+                        // flags)), so the pay tier needs the challenger
+                        // exhausted too: attr[7]=0, attr[13] pinned -1, and the
+                        // concede flag attr[12]=1 (4105 @46 endgame gate).
+                        var t7c2 = _unlmg7Tile;
+                        t7c2.SetAttribute(7, (short)0);
+                        t7c2.SetAttribute(13, (short)-1);
+                        t7c2.SetAttribute(12, (short)1);
+                        _unlmg7Conceded = true;
+                        Log("AUTOTEST unl-magic7 CONCEDE-SEED: attr[7]=0 attr[13]=-1 attr[12]=1 at rounds=" + o9
+                            + " (was a13=" + o13 + ") — mutual-exhaustion geometry -> endgame 97 pay tier");
+                    }
+
                     var o17 = t7.GetAttribute(17);
                     var a7 = t7.GetAttribute(7);
                     var a8 = t7.GetAttribute(8);
