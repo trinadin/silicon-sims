@@ -3844,6 +3844,16 @@ namespace Simitone.Client
                 c7.CheckRoutine = null;
                 c7.Args = new short[] { (short)stone, 0, 0, 0 };
                 caster.Thread.EnqueueAction(c7);
+                // run-23 law: the cast action can NEVER start while the Duel
+                // driver tree holds the thread (A's round timed out over 64
+                // anim ticks with the cast parked in the queue). The NATIVE
+                // pie-click carries interrupt semantics — the production pair
+                // (CancelAction/UIPie flow): InteractionCanceled + Priority=0
+                // unwinds the current frame; the Duel tree is a RE-ENTRANT
+                // state-machine driver (all state on the tile attrs) and
+                // resumes on re-entry at the state checks.
+                caster.SetFlag(FSO.SimAntics.VMEntityFlags.InteractionCanceled, true);
+                caster.SetPersonData(VMPersonDataVariable.Priority, 0);
                 _unlmg7Casts++;
                 Log("AUTOTEST unl-magic7 CAST-PUSHED stone=" + stone + " (flags=0x" + stoneFlags.ToString("X4")
                     + ") caster=obj" + caster.ObjectID + (ReferenceEquals(caster, _unlmg7A) ? "(challenger)" : "(defender)")
