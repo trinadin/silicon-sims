@@ -16,6 +16,9 @@ namespace FSO.SimAntics.Primitives
 {
     public class VMGenericTS1Call : VMPrimitiveHandler
     {
+        // EXP-13 G6 probe surface (autotest-only reads; inert otherwise)
+        public static string G6AddToFamilyGate = "";
+
         /// <summary>
         /// Reproduces cXObject::TryGenericSimCall mode 12. The original
         /// BuildRotationLookup uses a fixed 64 by 64 tile domain rather than
@@ -77,10 +80,14 @@ namespace FSO.SimAntics.Primitives
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 // 3. PullDownTaxiDialog
                 case VMGenericTS1CallMode.AddToFamily: //4
-                    if (context.VM.TS1State.CurrentFamily == null || context.VM.TS1State.CurrentFamily.FamilyGUIDs.Length >= 8)
+                    // EXP-13 G6 probe surface: name the failing gate
+                    G6AddToFamilyGate = (context.VM.TS1State.CurrentFamily == null) ? "family-null"
+                        : (context.VM.TS1State.CurrentFamily.FamilyGUIDs.Length >= 8) ? "family-full" : null;
+                    if (G6AddToFamilyGate != null)
                         return VMPrimitiveExitCode.GOTO_FALSE;
                     var fneigh = Content.Content.Get().Neighborhood.GetNeighborByID(context.StackObjectID);
-                    if (fneigh == null) return VMPrimitiveExitCode.GOTO_FALSE;
+                    if (fneigh == null) { G6AddToFamilyGate = "neighbor-null id=" + context.StackObjectID; return VMPrimitiveExitCode.GOTO_FALSE; }
+                    G6AddToFamilyGate = "ok";
                     AddToFamily(context.VM.TS1State.CurrentFamily, fneigh, context.VM);
                     var runtime = context.VM.TS1State.CurrentFamily.RuntimeSubset.ToList();
                     runtime.Add(fneigh.GUID);

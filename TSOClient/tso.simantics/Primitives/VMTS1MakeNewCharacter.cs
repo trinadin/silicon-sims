@@ -16,10 +16,20 @@ namespace FSO.SimAntics.Primitives
             "med",
             "drk"
         };
+
+        // EXP-13 G6 probe surface (autotest-only reads; inert otherwise): the
+        // adoption tree's 4110@1 "executes TRUE" without creating a neighbour
+        // (NBRS flat, CatchReentries=0) — these counters name whether Execute
+        // is even reached and how far it gets.
+        public static int G6EnterCount, G6BranchHuman, G6BranchAnimal, G6PreCreateCount, G6CreateDoneCount;
+        public static int G6CreatedID = -1, G6PostCreateEntries = -1;
+        public static string G6LastStop = "";
+
         public override VMPrimitiveExitCode Execute(VMStackFrame context, VMPrimitiveOperand args)
         {
             //make the character iff, save it, and return their new neighbour id.
 
+            G6EnterCount++;
             var operand = (VMTS1MakeNewCharacterOperand)args;
             var guid = SimitoneNeighbourGenerator.GenerateGUID(new uint[0]);
 
@@ -33,6 +43,8 @@ namespace FSO.SimAntics.Primitives
 
             if (operand.AvatarType == 0)
             {
+                G6BranchHuman++;
+                G6LastStop = "human";
                 var simtype = ((gender > 0) ? "f" : "m") + ((age < 18) ? "c" : "m");
                 var skin = ColorNames[color];
                 var code = simtype;
@@ -92,6 +104,8 @@ namespace FSO.SimAntics.Primitives
                 info.BodyStringReplace[22] = "H" + hand + "RC,HAND=" + "huao" + hg;
             } else
             {
+                G6BranchAnimal++;
+                G6LastStop = "animal";
                 //index
                 var index = context.StackObject.GetAttribute(8);
 
@@ -122,7 +136,14 @@ namespace FSO.SimAntics.Primitives
             for (int i = 0; i < 6; i++)
                 info.PersonalityPoints[i] = 1000;
 
+            G6PreCreateCount++;
+            G6LastStop = "pre-create";
             var n = SimitoneNeighbourGenerator.CreateNeighbor(guid, info);
+            G6CreateDoneCount++;
+            G6LastStop = "done";
+            G6CreatedID = n.NeighbourID;
+            try { G6PostCreateEntries = FSO.Content.Content.Get().Neighborhood.Neighbors.Entries.Count; }
+            catch (Exception g6e) { G6PostCreateEntries = -1; G6LastStop = "post-create-read-ex:" + g6e.GetType().Name; }
 
             context.StackObjectID = n.NeighbourID;
             return VMPrimitiveExitCode.GOTO_TRUE;
