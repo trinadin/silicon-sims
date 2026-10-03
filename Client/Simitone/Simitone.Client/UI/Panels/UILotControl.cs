@@ -347,6 +347,31 @@ namespace Simitone.Client.UI.Panels
                     return;
                 }
 
+                case VMDialogType.TS1Spellbook:
+                case VMDialogType.TS1Cookbook:
+                    // CWinMagicBook law (native TryDialog 0xf1c7c/0xf1ce8): the
+                    // modal book browser's result is discarded and the primitive
+                    // returns TRUE. Desktop mounts the recovered original window;
+                    // touch keeps the plain alert below.
+                    if (Parent is Simitone.Client.UI.Screens.TS1GameScreen tgsBook && tgsBook.Desktop)
+                    {
+                        var book = new Simitone.Client.UI.Panels.UIOriginalMagicBookDialog();
+                        var bookCaller = info.Caller;
+                        UIScreen.GlobalShowDialog(book, true);
+                        book.OnResult += (_) =>
+                        {
+                            vm.SendCommand(new VMNetDialogResponseCmd
+                            {
+                                ActorUID = bookCaller.PersistID,
+                                ResponseCode = 0,
+                                ResponseText = ""
+                            });
+                            BlockingDialog = null;
+                        };
+                        return;
+                    }
+                    break; // generic alert path (message + OK)
+
                 case VMDialogType.TS1PetChoice:
                 case VMDialogType.TS1Clothes:
                     var ts1categories = new string[] { "b", "f", "s", "l", "w", "h" };

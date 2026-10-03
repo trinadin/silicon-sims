@@ -1080,6 +1080,7 @@ namespace Simitone.Client
                 || CheckEnabled("unl-magic9")
                 || CheckEnabled("unl-magic10")
                 || CheckEnabled("unl-magic11")
+                || CheckEnabled("magicbook")
                 || CheckEnabled("dt-strip")
                 || CheckEnabled("unl-show")
                 || CheckEnabled("unl-mice")
@@ -4549,6 +4550,232 @@ namespace Simitone.Client
                 Log("AUTOTEST unl-magic11 EXC " + ex11.GetType().Name + " " + ex11.Message);
                 Fail("unl-magic11"); _unlmg11State = 99;
             }
+        }
+
+        // ---- EXP-08 fix card 3 ('magicbook', opt-in): the TS1Spellbook
+        // (dialog type 12) live drive — the CWinMagicBook recovery gate. Pins
+        // the STR surfaces verbatim through the SAME Content pipeline the new
+        // UIOriginalMagicBookDialog reads (SpellBook.iff STR#301/302 +
+        // MagicMasterSpells STR#2/3/5/6/15/16), then travels to Magic Town
+        // (lot 93), places the Start Here Spellbook (0x8EC5750D) with the
+        // disclosed placement lever, seeds the wand token, pushes the REAL
+        // 'Look Up Spells' pie row, and asserts the recovered book window
+        // mounts (art + table binding + per-page rows), then closes it through
+        // the dialog's own OnResult path (the UI -> VMNetDialogResponseCmd ->
+        // engine round trip) and asserts the blocking slot is released and the
+        // interaction completes — the native discards the book's result and
+        // returns TRUE (TryDialog 0xf1c7c).
+        private static int _mgbookState, _mgbookSettle, _mgbookFrame, _mgbookSwitchF = -1;
+        private static bool _mgbookRebound, _mgbookStrPins, _mgbookMounted, _mgbookReleased, _mgbookDrained;
+        private static int _mgbookDialogsBefore, _mgbookActionUid = -1;
+        private static string _mgbookPins = "";
+
+        private static void MagicBookTick()
+        {
+            try
+            {
+                _mgbookFrame++;
+                if (_mgbookState == 0)
+                {
+                    if (++_mgbookSettle < 90) return;
+                    _mgbookSettle = 0;
+                    Log("AUTOTEST magicbook SPELLBOOK-LIVE (EXP-08 fix card 3: STR pins -> lot 93 -> place book -> push Read -> mount + round-trip close)");
+                    _mgbookStrPins = MagicBookStrPins();
+                    _mgbookDialogsBefore = Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.DialogsMounted;
+                    _vm.SignalLotSwitch(93u);
+                    _mgbookSwitchF = _mgbookFrame;
+                    Log("AUTOTEST magicbook SWITCH-SIGNALED lot=93 pins=" + _mgbookPins);
+                    _mgbookState = 1;
+                    return;
+                }
+                if (_mgbookState == 1)
+                {
+                    if (_screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    {
+                        _vm = _screen.vm; _mgbookRebound = true;
+                        Log("AUTOTEST magicbook VM-REBOUND curHouse=" + (_vm.TS1State?.CurrentHouse.ToString() ?? "?") + " ents=" + _vm.Entities.Count);
+                    }
+                    var cur = _vm.TS1State?.CurrentHouse ?? 0;
+                    if (_mgbookSwitchF > 0 && _mgbookFrame >= _mgbookSwitchF + 3600)
+                    { Log("AUTOTEST magicbook verdict no-switch: curHouse=" + cur); Fail("magicbook"); _mgbookState = 99; return; }
+                    if (!(_mgbookRebound && cur == 93)) return;
+                    // on the magic lot: wait for the family to arrive (community
+                    // lot — sims route in after the switch; run-1 law: the
+                    // rebound tick itself has no in-world avatars yet)
+                    var sim = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                        .FirstOrDefault(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                            && a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18);
+                    if (sim == null)
+                    {
+                        if (++_mgbookSettle > 2700)
+                        { Log("AUTOTEST magicbook verdict no-adult-on-93 (30s)"); Fail("magicbook"); _mgbookState = 99; }
+                        return;
+                    }
+                    try
+                    {
+                        var neigh = Content.Get().Neighborhood;
+                        var nid = (short)sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                        var inv = neigh.GetInventoryByNID(nid);
+                        if (inv == null) { neigh.SetInventoryForNID(nid, new System.Collections.Generic.List<FSO.Files.Formats.IFF.Chunks.InventoryItem>()); inv = neigh.GetInventoryByNID(nid); }
+                        if (inv.All(x => x.GUID != 0x1FEC6005u))
+                            inv.Add(new FSO.Files.Formats.IFF.Chunks.InventoryItem() { Count = 1, GUID = 0x1FEC6005u, Type = 7 });
+                        Log("AUTOTEST magicbook WAND-SEEDED inv=" + Unlmg3InvStr(nid));
+                    }
+                    catch (Exception ws) { Log("AUTOTEST magicbook WAND-SEED-EXC " + ws.GetType().Name); }
+                    // place the Start Here Spellbook with the unl-magic5 candidate-walk lever
+                    VMEntity bookObj = null;
+                    try
+                    {
+                        var bcands = new System.Collections.Generic.List<FSO.LotView.Model.LotTilePos>();
+                        short[] bdx = { -160, 160, 0, 0, -96, 96, 0, 0 };
+                        short[] bdy = { -160, -160, 160, -160, 0, 0, 96, -96 };
+                        for (int k = 0; k < bdx.Length; k++)
+                            bcands.Add(new FSO.LotView.Model.LotTilePos(
+                                (short)(sim.Position.x + bdx[k]), (short)(sim.Position.y + bdy[k]), 1));
+                        for (int gy = 96; gy <= 832; gy += 64)
+                            for (int gx = 96; gx <= 832; gx += 64)
+                                bcands.Add(new FSO.LotView.Model.LotTilePos((short)gx, (short)gy, 1));
+                        var bg = _vm.Context.CreateObjectInstance(0x8EC5750Du,
+                            FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                        var b0 = bg?.Objects?.FirstOrDefault();
+                        if (b0 != null)
+                        {
+                            foreach (var bc in bcands)
+                            {
+                                try
+                                {
+                                    foreach (var o in bg.Objects) o.SetValue((VMStackObjectVariable)4, 1);
+                                    bg.ChangePosition(bc, FSO.LotView.Model.Direction.NORTH, _vm.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default);
+                                }
+                                catch { }
+                                finally { foreach (var o in bg.Objects) o.SetValue((VMStackObjectVariable)4, 0); }
+                                if (b0.Position.x != -32768) break;
+                            }
+                            if (b0.Position.x != -32768) bookObj = b0;
+                        }
+                    }
+                    catch { }
+                    if (bookObj == null)
+                    { Log("AUTOTEST magicbook verdict book-place-failed"); Fail("magicbook"); _mgbookState = 99; return; }
+                    Log("AUTOTEST magicbook BOOK-PLACED oid=" + bookObj.ObjectID + " at " + bookObj.Position.x + "," + bookObj.Position.y);
+                    var pie = bookObj.GetPieMenu(_vm, sim, false, true);
+                    var read = pie.FirstOrDefault(x => (x.Name ?? "").Contains("Look Up Spells"));
+                    if (read == null)
+                    { Log("AUTOTEST magicbook verdict no-read-entry rows=" + string.Join("|", pie.Select(x => x.Name))); Fail("magicbook"); _mgbookState = 99; return; }
+                    bookObj.PushUserInteraction(read.ID, sim, _vm.Context, read.Global, new short[] { 0, 0, 0, 0 });
+                    _mgbookActionUid = sim.Thread.Queue.LastOrDefault()?.UID ?? -1;
+                    Log("AUTOTEST magicbook READ-PUSHED pie-row=" + read.ID + " '" + read.Name + "' uid=" + _mgbookActionUid);
+                    _mgbookState = 2; _mgbookSettle = 0;
+                    return;
+                }
+                if (_mgbookState == 2)
+                {
+                    var mounted = Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.DialogsMounted > _mgbookDialogsBefore;
+                    if (!mounted)
+                    {
+                        if (++_mgbookSettle > 2700)
+                        {
+                            Log("AUTOTEST magicbook verdict no-mount: dialogs=" + Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.DialogsMounted
+                                + " blocked=" + (_vm.GlobalBlockingDialog != null));
+                            Fail("magicbook"); _mgbookState = 99;
+                        }
+                        return;
+                    }
+                    _mgbookMounted = true;
+                    var arts = Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.ArtsMounted;
+                    var tables = Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.BoundTables;
+                    var rows = Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.RowsPerPage;
+                    var first = Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.FirstWandTitle;
+                    var pages = Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.PagesWithRows;
+                    // 'blocked' is read post-eng02's same-tick stale-latch watchdog
+                    // (run-2 law: the latch DID engage — eng02 logged spd 1 -> -2
+                    // gbd=True — then its force-release raced this read; the latch
+                    // law is proven instead by the close round trip below).
+                    Log("AUTOTEST magicbook BOOK-MOUNTED arts=" + arts + "/5 tables=[" + tables + "] rows=["
+                        + string.Join(",", rows) + "] pages=" + pages + " firstTitle='" + first + "'");
+                    // close through the dialog's own OnResult (the real round trip)
+                    Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.LastMounted?.CloseViaProbe();
+                    Log("AUTOTEST magicbook CLOSE-SENT (OnResult -> VMNetDialogResponseCmd)");
+                    _mgbookState = 3; _mgbookSettle = 0;
+                    return;
+                }
+                if (_mgbookState == 3)
+                {
+                    _mgbookSettle++;
+                    if (_vm.GlobalBlockingDialog == null) _mgbookReleased = true;
+                    var sim = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                        .FirstOrDefault(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                            && a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18);
+                    var stillQueued = _mgbookActionUid > 0 && sim != null && sim.Thread.Queue.Any(q => q.UID == _mgbookActionUid);
+                    if (!stillQueued) _mgbookDrained = true;
+                    if (_mgbookReleased && _mgbookDrained)
+                    {
+                        bool arts = Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.ArtsMounted == 5;
+                        bool tables = Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.BoundTables == "2,3,4,5,6,15,16";
+                        var rowsP = Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.RowsPerPage;
+                        bool wandRows = rowsP.Length > 0 && rowsP[0] >= 15;
+                        bool cookRows = rowsP.Length > 4 && rowsP[3] > 0 && rowsP[4] > 0;
+                        Log("AUTOTEST magicbook verdict SPELLBOOK-LIVE: mount=" + _mgbookMounted
+                            + " closeRoundTrip=" + (_mgbookReleased && _mgbookDrained)
+                            + " pins=" + _mgbookStrPins + " arts5=" + arts + " tables=" + tables
+                            + " wandRows=" + wandRows + " cookRows=" + cookRows);
+                        if (_mgbookMounted && _mgbookReleased && _mgbookDrained && _mgbookStrPins && arts && tables && wandRows && cookRows)
+                        { Pass("magicbook"); _mgbookState = 99; return; }
+                        Fail("magicbook"); _mgbookState = 99; return;
+                    }
+                    if (_mgbookSettle > 2700)
+                    {
+                        Log("AUTOTEST magicbook verdict close-stall released=" + _mgbookReleased + " drained=" + _mgbookDrained);
+                        Fail("magicbook"); _mgbookState = 99; return;
+                    }
+                    return;
+                }
+            }
+            catch (Exception mb)
+            {
+                Log("AUTOTEST magicbook EXC " + mb.GetType().Name + " " + mb.Message);
+                Fail("magicbook"); _mgbookState = 99;
+            }
+        }
+
+        // The STR pins, read through the same Content pipeline the dialog uses
+        // (SpellBook.iff via the book's GUID; MagicMasterSpells.iff via the
+        // Magic Controller's). Verbatim laws from the leg-3 decode.
+        private static bool MagicBookStrPins()
+        {
+            try
+            {
+                var bookRes = Content.Get().WorldObjects.Get(0x8EC5750Du)?.Resource;
+                var ctrRes = Content.Get().WorldObjects.Get(0xB6C90029u)?.Resource;
+                if (bookRes == null || ctrRes == null) { _mgbookPins = "no-resource"; return false; }
+                var s301 = bookRes.Get<FSO.Files.Formats.IFF.Chunks.STR>(301);
+                var s302 = bookRes.Get<FSO.Files.Formats.IFF.Chunks.STR>(302);
+                var S2 = ctrRes.Get<FSO.Files.Formats.IFF.Chunks.STR>(2);
+                var S3 = ctrRes.Get<FSO.Files.Formats.IFF.Chunks.STR>(3);
+                var S5 = ctrRes.Get<FSO.Files.Formats.IFF.Chunks.STR>(5);
+                var S6 = ctrRes.Get<FSO.Files.Formats.IFF.Chunks.STR>(6);
+                var S15 = ctrRes.Get<FSO.Files.Formats.IFF.Chunks.STR>(15);
+                var S16 = ctrRes.Get<FSO.Files.Formats.IFF.Chunks.STR>(16);
+                var pinNames = new[] { "301[3]", "301[4]", "301[5]", "302[0]", "302[3]", "2[1]", "2[7]", "3[1]", "5[4]", "6[5]", "15[1]", "16[1]" };
+                var pinOk = new[]
+                {
+                    (s301?.GetString(3) ?? "") == "The electrical interface for this apparatus requires a genuine MagiCo Magic Wand. Please acquire one before attempting to access this terminal again.",
+                    (s301?.GetString(4) ?? "") == "The Start Here Spell Book, Version 2.0",
+                    (s301?.GetString(5) ?? "") == "The Start Here Spellbook, Original",
+                    (s302?.GetString(0) ?? "") == "Ask About.../Magic Duels",
+                    (s302?.GetString(3) ?? "") == "Ask About.../Secret Ingredients",
+                    (S2?.GetString(1) ?? "") == "Honey",
+                    (S2?.GetString(7) ?? "") == "Toadstools",
+                    (S3?.GetString(1) ?? "") == "13,13,14",
+                    (S5?.GetString(4) ?? "") == "2,2,5",
+                    (S6?.GetString(5) ?? "") == "3,11,27",
+                    (S15?.GetString(1) ?? "") == "18",
+                    (S16?.GetString(1) ?? "") == "1",
+                };
+                _mgbookPins = string.Join(";", Enumerable.Range(0, pinNames.Length).Select(i => pinNames[i] + (pinOk[i] ? "=OK" : "=BAD")));
+                return pinOk.All(x => x);
+            }
+            catch (Exception pe) { _mgbookPins = "exc:" + pe.GetType().Name; return false; }
         }
 
         // ---- EXP-08 leg-2 residual ('dt-strip', opt-in): the downtown
@@ -9126,6 +9353,12 @@ namespace Simitone.Client
             if (CheckEnabled("unl-magic11") && _unlmg11State != 99)
             {
                 UnlMagic11Tick();
+            }
+            // EXP-08 fix card 3 (opt-in "magicbook"): the TS1Spellbook
+            // (dialog type 12) live drive — the CWinMagicBook gate.
+            if (CheckEnabled("magicbook") && _mgbookState != 99)
+            {
+                MagicBookTick();
             }
             // EXP-08 leg-2 residual (opt-in "dt-strip"): the downtown live drive.
             if (CheckEnabled("dt-strip") && _dtstripState != 99)
