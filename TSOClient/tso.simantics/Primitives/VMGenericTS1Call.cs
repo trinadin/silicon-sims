@@ -78,7 +78,16 @@ namespace FSO.SimAntics.Primitives
                 case VMGenericTS1CallMode.SetActionIconToStackObject: //2
                     context.Thread.ActiveAction.IconOwner = context.StackObject;
                     return VMPrimitiveExitCode.GOTO_TRUE;
-                // 3. PullDownTaxiDialog
+                // 3. PullDownTaxiDialog — ENG-05 decode (§mode-3): the native is
+                // cSimsApp::RemoveTaxiDialog() (PPC 0x24bdc0), a VOID whose leftover
+                // r3 encodes the outcome; with no taxi dialog open the last write is
+                // lwz r3,116(this)=0 → FALSE. The 11 real callers (PedMarkers/Vacation/
+                // MGBeanstalk/ClownPortal 'pump until gone' loops, all f=253) exit on
+                // FALSE. The port has no taxi dialog UI, so the no-window path IS the
+                // exact law; if a taxi screen ever mounts, the close-then-TRUE half
+                // belongs to its UI controller.
+                case VMGenericTS1CallMode.PullDownTaxiDialog: //3
+                    return VMPrimitiveExitCode.GOTO_FALSE;
                 case VMGenericTS1CallMode.AddToFamily: //4
                     // EXP-13 G6 probe surface: name the failing gate
                     G6AddToFamilyGate = (context.VM.TS1State.CurrentFamily == null) ? "family-null"
@@ -203,8 +212,22 @@ namespace FSO.SimAntics.Primitives
                     context.VM.SetGlobalValue(31, context.Thread.TempRegisters[0]);
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 case VMGenericTS1CallMode.MyRoutingFootprintEqualsTemp0: //15
-                    //todo: change the avatar's routing footprint (need to find out how exactly this is changed in the normal game)
-                    break;
+                    // ENG-05 decode (§mode-15, PPC 0x0f2754): writes the resolved
+                    // STACK OBJECT's footprint-type field (+1564 := Temp0, +1566 := 0)
+                    // and, when Temp0 != 0, recomputes its tile rect
+                    // (cXObject::ComputeRect). NOT the caller — the enum name is a
+                    // misnomer. 202 corpus sites (sleep-in-bed / sit / wash trees
+                    // changing the object's blocking footprint). Port: the field is
+                    // VMEntity.RoutingFootprintType and the rect recompute +
+                    // obstacle re-register ride UpdateFootprint(); the type→mask
+                    // selection is the named residual (the port recomputes from the
+                    // object's current footprint mask).
+                    var fpObj = context.StackObject;
+                    if (fpObj == null) return VMPrimitiveExitCode.GOTO_FALSE; // resolver err-28 law
+                    fpObj.RoutingFootprintType = context.Thread.TempRegisters[0];
+                    if (fpObj.RoutingFootprintType == 0) return VMPrimitiveExitCode.GOTO_FALSE;
+                    fpObj.UpdateFootprint();
+                    return VMPrimitiveExitCode.GOTO_TRUE;
                 // 16. Change Normal Outfit
                 case VMGenericTS1CallMode.ChangeToLotInTemp0: //17
                     //-1 is this family's home lot
@@ -511,9 +534,21 @@ namespace FSO.SimAntics.Primitives
                 // 38. GetTokensFromString (MM)
                 case VMGenericTS1CallMode.GetTokensFromString:
                     return GetTokensFromString(context);
-                // 39. ChildToAdult (let's make this at least keep their skin colour, maybe)
-                // 40. PetToAdult
-                // 41. HeadFlush
+                // 39. ChildToAdult (two-phase transform — pending the decode's
+                // return-contract addendum before landing)
+                case VMGenericTS1CallMode.PetToAdult: //40
+                    // ENG-05 decode (§modes-39/40, PPC 0x0f3fb8): the shared native
+                    // body re-reads the mode; mode 40 hits `addi r3,r0,0; b 0xf4120`
+                    // — an UNCONDITIONAL FALSE stub. The one real caller
+                    // (SocialsMagic 4210 'Magic - Pet to Adult - Person B' @10,
+                    // f=253) therefore always fails in the Complete build. This IS
+                    // the whole native law: no state, no cookie.
+                    return VMPrimitiveExitCode.GOTO_FALSE;
+                // 41. HeadFlush — ENG-05 decode (§mode-41): the native table entry
+                // IS the shared return tail (0x0f411c); r3 = this != 0 → a no-op
+                // TRUE. All 10 real callers (Karaoke/OpenMic 'Watch',
+                // SpellGhostMe/SpellTransform) are satisfied by the port's existing
+                // fall-through GOTO_TRUE — already exact, comment-only change.
                 // 42. MakeTemp0SelectedSim,
                 case VMGenericTS1CallMode.MakeTemp0SelectedSim:
                     //right now assume there's only one ts1 client, and that's us.
@@ -535,6 +570,21 @@ namespace FSO.SimAntics.Primitives
                     
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 // 43. FamilySpellsIntoController
+                case VMGenericTS1CallMode.FamilySpellsIntoController: //43
+                    // ENG-05 decode (§mode-43, PPC 0x0f40e8): native =
+                    // Family::LoadSpellsForFamily() (0x75b70), gated on the CURRENT
+                    // family (sim->nb->16; NULL → r3=0 → FALSE), idempotently
+                    // loading the family's spell inventory into the global spell
+                    // list the spellbook reads (GetFamilySpells). Callers: MMS 4097
+                    // 'init tree' @9 + 4100 'load' @3 (both t=254/f=253 — boolean
+                    // only). Port: the family-null guard is exact; the latch
+                    // (TS1State.FamilySpellsLoadedFor) records the load; the
+                    // spell-list population into the spellbook data source is the
+                    // NAMED follow-up (the CWinMagicBook availability card).
+                    var spellsFam = context.VM.TS1State.CurrentFamily;
+                    if (spellsFam == null) return VMPrimitiveExitCode.GOTO_FALSE;
+                    context.VM.TS1State.FamilySpellsLoadedFor = spellsFam.ChunkID;
+                    return VMPrimitiveExitCode.GOTO_TRUE;
             }
             return VMPrimitiveExitCode.GOTO_TRUE;
         }

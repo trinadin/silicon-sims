@@ -14,6 +14,17 @@ namespace FSO.SimAntics.Model.TS1Platform
         public FAMI CurrentFamily;
         public short TutorialObjectID;
         /// <summary>
+        /// ENG-05 mode-43 latch: the ChunkID of the family whose spell
+        /// inventory generic call 43 (Family::LoadSpellsForFamily, PPC
+        /// 0x75b70) has loaded. The native loads idempotently into the
+        /// global spell list the spellbook reads; the port's list
+        /// population into the spellbook data source is the named follow-up
+        /// (the CWinMagicBook availability card) — the latch records the
+        /// load so the two MagicMasterSpells callers' boolean contract is
+        /// exact. Transient, never serialized.
+        /// </summary>
+        public int FamilySpellsLoadedFor = 0;
+        /// <summary>
         /// The residential house number this lot was loaded from — the port's
         /// equivalent of the native Neighborhood+0x164 "current house" field
         /// (r247). Transient: re-derived on every house load by

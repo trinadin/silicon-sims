@@ -111,6 +111,16 @@ namespace FSO.SimAntics
         public ulong DynamicSpriteFlags2;
         public VMEntityObstacle Footprint;
         public bool StaticFootprint = true;
+        /// <summary>
+        /// ENG-05 mode-15: the native cXObject routing-footprint-type field
+        /// (+1564; +1566 is the cleared secondary). generic call 15 writes
+        /// Temp0 here on the STACK OBJECT and recomputes the tile rect when
+        /// nonzero (202 corpus sites: sleep/sit trees changing the object's
+        /// blocking footprint). Runtime state like the native field — never
+        /// serialized. The type→mask selection is the named residual; the
+        /// rect recompute rides UpdateFootprint().
+        /// </summary>
+        public short RoutingFootprintType = 0;
 
         private LotTilePos _Position = new LotTilePos(LotTilePos.OUT_OF_WORLD);
         public EntityComponent WorldUI;
