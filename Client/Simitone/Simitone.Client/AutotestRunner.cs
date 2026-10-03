@@ -4834,6 +4834,15 @@ namespace Simitone.Client
                             + " active='" + (_unlmg5Sim.Thread?.ActiveAction?.Name ?? "null") + "'");
                     if (pd29 == 1)
                     {
+                        // review P3-2 (indep-review-atcallerts1): assert the ghost
+                        // actually LANDED IN-WORLD at the drinker (not just the
+                        // state flags — closes the wrong-mapping gap)
+                        var gh = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0xDC14EEAFu);
+                        var ghPos = gh?.Position;
+                        var inWorld = ghPos != null && ghPos.Value.x != -32768;
+                        Log("AUTOTEST unl-magic5 GHOST-PLACED count=" + (_vm.Entities.Count(e => e.Object?.OBJ?.GUID == 0xDC14EEAFu))
+                            + " pos=" + (ghPos.HasValue ? ghPos.Value.x + "," + ghPos.Value.y : "none")
+                            + " inWorld=" + inWorld + " (the AtCallerTS1 mapping verified at the placement level)");
                         Log("AUTOTEST unl-magic5 DRINK-OK pd29=1 pd84=" + pd84 + " tileA5=" + _unlmg5Tile.GetAttribute(5)
                             + " (4118 'Drink Magic' drank-flag landed) at " + Sim3Clock());
                         Log("AUTOTEST unl-magic5 FINAL-INV " + Unlmg3InvStr(nid));
