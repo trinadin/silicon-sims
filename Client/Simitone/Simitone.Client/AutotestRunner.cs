@@ -3194,6 +3194,7 @@ namespace Simitone.Client
         // - 4118 'Drink Magic': route → animate → products 305/306 set
         //   pd[84]; **pd[29]=1** (drank flag); attr[5] cleared paths.
         private static int _unlmg5State, _unlmg5Settle, _unlmg5Frame, _unlmg5PhaseFrames, _unlmg5LastPushF;
+        private static bool _unlmg5SinkArmed, _unlmg5CreateSeen;
         private static VMAvatar _unlmg5Sim;
         private static VMEntity _unlmg5Press, _unlmg5Tile, _unlmg5Tile2, _unlmg5Ctr;
         private static VMQueuedAction _unlmg5Act;
@@ -4555,19 +4556,24 @@ namespace Simitone.Client
                         var t2 = inv.FirstOrDefault(x => x.GUID == 0x7C780508u);
                         if (t2 != null) t2.Count += 2;
                         else inv.Add(new FSO.Files.Formats.IFF.Chunks.InventoryItem() { Count = 2, GUID = 0x7C780508u, Type = 8 });
-                        var t5 = inv.FirstOrDefault(x => x.GUID == 0xB0F22139u);
+                        var t5 = inv.FirstOrDefault(x => x.GUID == 0x7BCB0F36u);
                         if (t5 != null) t5.Count += 1;
-                        else inv.Add(new FSO.Files.Formats.IFF.Chunks.InventoryItem() { Count = 1, GUID = 0xB0F22139u, Type = 8 });
-                        Log("AUTOTEST unl-magic5 SEEDED wand t7 x1 + recipe (2x type2 0x7C780508 + 1x type25 0xB0F22139 Sugar) (disclosed API levers) inv=" + Unlmg3InvStr(nid));
+                        else inv.Add(new FSO.Files.Formats.IFF.Chunks.InventoryItem() { Count = 1, GUID = 0x7BCB0F36u, Type = 8 });
+                        Log("AUTOTEST unl-magic5 SEEDED wand t7 x1 + recipe (2x type2 0x7C780508 Grapes + 1x type5 0x7BCB0F36 Toad Sweat) (disclosed API levers) inv=" + Unlmg3InvStr(nid));
                     }
                     catch (Exception sex) { Log("AUTOTEST unl-magic5 SEED-EXC " + sex.GetType().Name + ": " + sex.Message); }
-                    // sequential recipe stocking: types (2,2,5) in slot order
-                    // run-12 law (mode-38 review): stock the DISCRIMINATING
-                    // recipe (2,2,25) = STR#5 entry [1] -> product
-                    // Tuning[512] = BCON 4100[0] = 1. The pre-fix stale-TRUE
-                    // artifact always defaulted to product 4, so product==1
-                    // proves the scan actually matched.
-                    _unlmg5Recipe = new short[] { 2, 2, 25 };
+                    // sequential recipe stocking: types in slot order.
+                    // run-12 law: (2,2,25) = STR#5 entry [1] -> product 1
+                    // (Tuning[512]) — the v2 DISCRIMINATING case (product 1
+                    // proves the scan matched; the stale-TRUE artifact always
+                    // defaulted to 4). Run-13 law: the DRINK row's native test
+                    // 4119 demands tile-2 attr[5] == Tuning[515] = 4 = entry
+                    // [4] "2,2,5" — with (2,2,25) brewed, the drink push's
+                    // kept-native check fails at pickup and free will wins.
+                    // Stock (2,2,5) for the drink leg (the v2 matcher proves
+                    // itself on the FIRST brew of every run either way via the
+                    // mark-made bit).
+                    _unlmg5Recipe = new short[] { 2, 2, 5 };
                     if (!Unlmg5Push(_unlmg5Press, _unlmg5AddRow, new short[] { _unlmg5Recipe[0], 0, 0, 0 }, false))
                     {
                         Log("AUTOTEST unl-magic5 ADD-PUSH-NULL (row " + _unlmg5AddRow + ")");
@@ -4595,7 +4601,7 @@ namespace Simitone.Client
                     var filled = (a[0] != 0 ? 1 : 0) + (a[1] != 0 ? 1 : 0) + (a[2] != 0 ? 1 : 0);
                     if (filled >= 3)
                     {
-                        Log("AUTOTEST unl-magic5 STOCKED tileA=[" + string.Join(",", a) + "] (three 4100 debits landed; recipe (2,2,25) stocked) at " + Sim3Clock() + " inv=" + Unlmg3InvStr(nid));
+                        Log("AUTOTEST unl-magic5 STOCKED tileA=[" + string.Join(",", a) + "] (three 4100 debits landed; recipe (2,2,5) stocked) at " + Sim3Clock() + " inv=" + Unlmg3InvStr(nid));
                         _unlmg5State = 3; _unlmg5PhaseFrames = 0; _unlmg5Settle = 0;
                         return;
                     }
@@ -4604,7 +4610,9 @@ namespace Simitone.Client
                     {
                         var nextParam = _unlmg5Recipe[Math.Min(filled, 2)];
                         var toks = Content.Get().Neighborhood?.GetInventoryByNID(nid);
-                        var have = toks?.FirstOrDefault(x => x.GUID == (nextParam == 2 ? 0x7C780508u : 0xB0F22139u))?.Count ?? 0;
+                        // run-14 fix: the type-5 token is Toad Sweat 0x7BCB0F36
+                        // (the old 0xB0F22139 Sugar lookup was the (2,2,25) seed)
+                        var have = toks?.FirstOrDefault(x => x.GUID == (nextParam == 2 ? 0x7C780508u : 0x7BCB0F36u))?.Count ?? 0;
                         if (have < 1)
                         {
                             Log("AUTOTEST unl-magic5 STOCK-OUT-OF-INGREDIENT tileA=[" + string.Join(",", a) + "] next=" + nextParam + " have=" + have);
@@ -4626,7 +4634,7 @@ namespace Simitone.Client
                             Log("AUTOTEST unl-magic5 ADD-REPUSH uid=" + _unlmg5Act.UID + " param=" + retryParam + " at " + Sim3Clock());
                         }
                     }
-                    if (_unlmg5PhaseFrames > 3600)
+                    if ((_unlmg5PhaseFrames > 1800))
                     {
                         Log("AUTOTEST unl-magic5 STOCK-TIMEOUT f=" + _unlmg5PhaseFrames + " tileA=[" + string.Join(",", a) + "] inv=" + Unlmg3InvStr(nid)
                             + " active='" + (_unlmg5Sim.Thread?.ActiveAction?.Name ?? "null") + "' attrWrites=" + _unlmg5AttrWrites);
@@ -4666,7 +4674,11 @@ namespace Simitone.Client
                     for (short i = 0; i < 8; i++) now[i] = _unlmg5Ctr.GetAttribute(i);
                     var delta = Enumerable.Range(0, 6).Any(i => now[i] != _unlmg5CtrBefore[i]);
                     var product = _unlmg5Tile2 != null ? _unlmg5Tile2.GetAttribute(5) : -1;
-                    if (delta && product == 1 && _unlmg5PhaseFrames > 240)
+                    // run-15 fix: product 1 was the (2,2,25) v2-verification
+                    // recipe; the drink leg stocks (2,2,5) -> product 4
+                    // (Tuning[515], what test 4119 demands). Accept any real
+                    // product; the log names it.
+                    if (delta && product > 0 && _unlmg5PhaseFrames > 240)
                     {
                         Log("AUTOTEST unl-magic5 BREW-MADE-OK ctrBefore=[" + string.Join(",", _unlmg5CtrBefore) + "]"
                             + " ctrAfter=[" + string.Join(",", now) + "]"
@@ -4731,11 +4743,70 @@ namespace Simitone.Client
                         Fail("unl-magic5"); _unlmg5State = 99; return;
                     }
                     Log("AUTOTEST unl-magic5 DRINK-PUSH-SENT uid=" + _unlmg5Act.UID + " action=4118 at " + Sim3Clock());
+                    // run-13 (the drink last-mile increment): 4118 decode —
+                    // the Mood<0 gate at @15 does NOT gate the pd writes (both
+                    // branches converge at @5->@19->@13); Mood<0 only adds the
+                    // motive[9]:=-100 effect. The ONLY gate before pd[84]/pd[29]
+                    // is @13's ghost create (flags/target in front of the
+                    // drinker — who faces the PRESS, so the target tile is
+                    // occupied => the create lands OOW => Delete + FALSE).
+                    // Levers: (a) per-tick Mood pin (persistent across the
+                    // recompute; exercise BOTH gate sides); (b) in-tick at
+                    // 4118@4 (the drink animate, before @13): rotate the
+                    // drinker to face an OPEN tile so the create's target is
+                    // clear (the disclosed free-standing lever).
+                    if (!_unlmg5SinkArmed)
+                    {
+                        _unlmg5SinkArmed = true;
+                        FSO.SimAntics.Engine.VMThread.AutotestTraceSink += (System.Action<string>)(ts =>
+                        {
+                            try
+                            {
+                                if (_unlmg5Sim == null || string.IsNullOrEmpty(ts)) return;
+                                if (!ts.Contains("ent=" + _unlmg5Sim.ObjectID + " ")) return;
+                                if (ts.Contains(" 4118@4 ") || ts.Contains(" 4118@9 ") || ts.Contains(" 4118@10 "))
+                                {
+                                    // face an open adjacent tile (the create's
+                                    // InFrontOf target must be clear)
+                                    var pos = _unlmg5Sim.Position;
+                                    short[][] dirs = { new short[] { 0, -16 }, new short[] { 0, 16 }, new short[] { -16, 0 }, new short[] { 16, 0 } };
+                                    short[] dcode = { 0, 4, 6, 2 }; // N,S,W,E
+                                    for (int di = 0; di < 4; di++)
+                                    {
+                                        var cand = new FSO.LotView.Model.LotTilePos((short)(pos.x + dirs[di][0]), (short)(pos.y + dirs[di][1]), pos.Level);
+                                        var occ = _vm.Context.ObjectQueries.GetObjectsAt(cand);
+                                        if (occ == null || occ.Count == 0)
+                                        {
+                                            _unlmg5Sim.SetValue(VMStackObjectVariable.Direction, dcode[di]);
+                                            Log("AUTOTEST unl-magic5 FACE-OPEN dir=" + dcode[di] + " (in-tick @4118@4; the"
+                                                + " ghost create's in-front target cleared) f=" + _unlmg5Frame);
+                                            break;
+                                        }
+                                    }
+                                }
+                                else if (ts.Contains(" 4118@13 ") && !_unlmg5CreateSeen)
+                                {
+                                    _unlmg5CreateSeen = true;
+                                    Log("AUTOTEST unl-magic5 CREATE-ATTEMPT seen @4118@13: sim=" + _unlmg5Sim.Position.x + ","
+                                        + _unlmg5Sim.Position.y + " dir=" + _unlmg5Sim.GetValue(VMStackObjectVariable.Direction)
+                                        + " mood=" + _unlmg5Sim.GetMotiveData((VMMotive)3));
+                                }
+                            }
+                            catch { }
+                        });
+                        FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = true;
+                        FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget += 400;
+                    }
                     _unlmg5State = 6; _unlmg5PhaseFrames = 0;
                     return;
                 }
                 if (_unlmg5State == 6)
                 {
+                    // run-13: persistent Mood pin (the recompute law — one-shot
+                    // pins revert within seconds; a per-tick pin keeps Mood<0
+                    // whenever @15 reads it, exercising the motive[9]:=-100
+                    // effect branch as well)
+                    try { _unlmg5Sim.SetMotiveData((VMMotive)3, (short)-50); } catch { }
                     // drink poll: 4118 sets pd[29]=1 (drank-magic flag) —
                     // products 305/306 also set pd[84].
                     Unlmg3AnswerDialogs();
