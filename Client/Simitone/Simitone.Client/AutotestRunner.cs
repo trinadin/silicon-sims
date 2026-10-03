@@ -17312,8 +17312,12 @@ namespace Simitone.Client
                         short actorNid;
                         try { actorNid = actor.GetPersonData(VMPersonDataVariable.NeighborId); }
                         catch { actorNid = 0; }
-                        Sim3RelSet(actorNid, _fmGuestNid, slot, 100);
-                        Sim3RelSet(_fmGuestNid, actorNid, slot, 100);
+                        // merge-write-decode-20261003 §6b: 100/100 drove the 'Visitor
+                        // Give Gift' starver that parked the host through the propose
+                        // window (fm-revival8) — seed 60 instead: above the 8353
+                        // maturity floor (>=50), below the gift-driver band
+                        Sim3RelSet(actorNid, _fmGuestNid, slot, 60);
+                        Sim3RelSet(_fmGuestNid, actorNid, slot, 60);
                     }
                     foreach (var m in new[] { VMMotive.Hunger, VMMotive.Comfort, VMMotive.Hygiene, VMMotive.Bladder, VMMotive.Energy, VMMotive.Fun, VMMotive.Social, VMMotive.Room })
                     {
@@ -17708,6 +17712,43 @@ namespace Simitone.Client
                         {
                             try { actor.SetMotiveData(m, 90); } catch { }
                         }
+                        // merge-write-decode-20261003 §6b: clear the starvers during the
+                        // propose window — 'Fire!' churn and the gift loops park the
+                        // host so the pushed halves never run (fm-revival8's park).
+                        // Cancel those actions on BOTH threads, preserving any
+                        // greet/move-in/propose action (disclosed fixture lever).
+                        try
+                        {
+                            foreach (var sim3 in new[] { actor, FmGuestAvatar() })
+                            {
+                                if (sim3?.Thread == null) continue;
+                                var q3 = sim3.Thread.Queue;
+                                if (q3 != null)
+                                {
+                                    foreach (var a3 in q3.ToList())
+                                    {
+                                        var n3 = a3?.Name ?? "";
+                                        if ((n3.IndexOf("Fire", StringComparison.OrdinalIgnoreCase) >= 0 || n3.IndexOf("Gift", StringComparison.OrdinalIgnoreCase) >= 0)
+                                            && n3.IndexOf("Move In", StringComparison.OrdinalIgnoreCase) < 0)
+                                        {
+                                            Log("AUTOTEST familymerge starver-cancel '" + n3 + "' uid=" + a3.UID
+                                                + " on obj" + sim3.ObjectID + " (disclosed; decode §6b) at " + Sim3Clock());
+                                            sim3.Thread.CancelAction(a3.UID);
+                                        }
+                                    }
+                                }
+                                var act3 = sim3.Thread.ActiveAction;
+                                var an3 = act3?.Name ?? "";
+                                if ((an3.IndexOf("Fire", StringComparison.OrdinalIgnoreCase) >= 0 || an3.IndexOf("Gift", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && an3.IndexOf("Move In", StringComparison.OrdinalIgnoreCase) < 0 && an3.IndexOf("Greet", StringComparison.OrdinalIgnoreCase) < 0)
+                                {
+                                    Log("AUTOTEST familymerge starver-cancel ACTIVE '" + an3 + "' uid=" + act3.UID
+                                        + " on obj" + sim3.ObjectID + " (disclosed; decode §6b) at " + Sim3Clock());
+                                    sim3.Thread.CancelAction(act3.UID);
+                                }
+                            }
+                        }
+                        catch (Exception sc) { Log("AUTOTEST familymerge starver-cancel EXC " + sc.GetType().Name); }
                         Log("AUTOTEST familymerge fixture: actor motives re-topped at " + Sim3Clock());
                     }
                     if ((DateTime.UtcNow - _fmPhaseStart).TotalMinutes > 6)
@@ -17806,6 +17847,7 @@ namespace Simitone.Client
                             + " in FAMI" + fam.ChunkID + " guids " + _fmFamGuidsBefore + "->" + _fmMergedGuids
                             + " pd61=" + pdFam + " runtimeFam=" + runtimeFam
                             + " budget " + _fmBudgetBefore + "->" + _fmBudgetAtMerge
+                            + " addToFamilyGate='" + (FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate ?? "") + "'"
                             + " moveInTreeBudgetEvent=" + (budgetEvent ?? "none")
                             + " sourceFamilyNow=" + (oldFam == null ? "deleted" : "guids=" + oldFam.FamilyGUIDs.Length + " budget=" + oldFam.Budget)
                             + " at " + Sim3Clock());
@@ -17816,8 +17858,12 @@ namespace Simitone.Client
                     if (_fmPushedSocial && ((Sim3ClockMinute() - _sim3PushSimMinute > 120)
                         || (DateTime.UtcNow - _fmPhaseStart).TotalMinutes > 6))
                     {
+                        // merge-write-decode-20261003 §6.2: the gate readout distinguishes
+                        // "write landed" from "never reached" — empty means mode 4 never
+                        // executed (the park is the 8390/8230/8353 eligibility check)
                         Sim3Evaluate(false, "merge-budget pushed='" + _sim3PushName + "' inFam=" + inFam
                             + " pd61=" + pdFam + " famId=" + (fam?.ChunkID ?? -3) + " runtimeFam=" + runtimeFam
+                            + " addToFamilyGate='" + (FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate ?? "") + "'"
                             + " budgetEvents=" + _sim3BudgetEvents.Count + " dialogs=" + _sim3DialogResponses);
                     }
                     else if (!_fmPushedSocial && Sim3BudgetExceeded()) Sim3Evaluate(false, "merge-budget (no push window)");
