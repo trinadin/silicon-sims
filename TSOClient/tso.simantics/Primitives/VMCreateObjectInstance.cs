@@ -42,6 +42,16 @@ namespace FSO.SimAntics.Engine.Primitives
             {
                 case VMCreateObjectPosition.UnderneathMe:
                 case VMCreateObjectPosition.OnTopOfMe:
+                case VMCreateObjectPosition.AtCallerTS1:
+                    // AtCallerTS1 (10): native TS1 position mode one past the
+                    // TSO 0-9 set — used by the 'Ghost Me' effect family
+                    // (NectarPress 4118 @13, guid 0xDC14EEAF; flags 0x21).
+                    // Semantics: the effect object appears AT the caller's
+                    // tile — same as UnderneathMe, whose OOW fallback below
+                    // re-places with intersection ignored (the appear-on-me
+                    // law). EXP-07 drink last-mile decode: the unhandled value
+                    // threw "Where do I put this??" and the suppressed
+                    // exception reset ate the whole interaction.
                     tpos = new LotTilePos(context.Caller.Position);
                     dir = context.Caller.Direction;
                     break;
@@ -159,14 +169,14 @@ namespace FSO.SimAntics.Engine.Primitives
 
             if (operand.Position == VMCreateObjectPosition.InSlot0OfStackObject) context.StackObject.PlaceInSlot(obj, 0, true, context.VM.Context);
             else if (operand.Position == VMCreateObjectPosition.InMyHand) context.Caller.PlaceInSlot(obj, 0, true, context.VM.Context);
-            else if (operand.Position == VMCreateObjectPosition.UnderneathMe && obj.Position == LotTilePos.OUT_OF_WORLD)
+            else if ((operand.Position == VMCreateObjectPosition.UnderneathMe || operand.Position == VMCreateObjectPosition.AtCallerTS1) && obj.Position == LotTilePos.OUT_OF_WORLD)
             {
                 foreach (var iobj in mobj.Objects) iobj.IgnoreIntersection = context.Caller.MultitileGroup;
                 mobj.ChangePosition(context.Caller.Position, dir, context.VM.Context, Model.VMPlaceRequestFlags.Default);
                 foreach (var iobj in mobj.Objects) iobj.IgnoreIntersection = null;
             }
 
-            if (operand.Position != VMCreateObjectPosition.OutOfWorld && obj.Position == LotTilePos.OUT_OF_WORLD && obj.Container == null)
+            if (operand.Position != VMCreateObjectPosition.OutOfWorld && operand.Position != VMCreateObjectPosition.AtCallerTS1 && obj.Position == LotTilePos.OUT_OF_WORLD && obj.Container == null)
             {
                 obj.Delete(true, context.VM.Context);
                 return VMPrimitiveExitCode.GOTO_FALSE;
@@ -363,6 +373,7 @@ namespace FSO.SimAntics.Engine.Primitives
         OutOfWorld = 6,
         BelowObjectInStackParam0 = 7,
         BelowObjectInLocal = 8,
-        NextToMeInDirectionOfLocal = 9
+        NextToMeInDirectionOfLocal = 9,
+        AtCallerTS1 = 10
     }
 }
