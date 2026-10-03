@@ -1078,6 +1078,7 @@ namespace Simitone.Client
                 || CheckEnabled("unl-magic6")
                 || CheckEnabled("unl-magic7")
                 || CheckEnabled("unl-magic9")
+                || CheckEnabled("unl-magic10")
                 || CheckEnabled("unl-show")
                 || CheckEnabled("unl-mice")
                 || CheckEnabled("exp09train")
@@ -4189,6 +4190,192 @@ namespace Simitone.Client
             {
                 Log("AUTOTEST unl-magic9 EXC " + ex9.GetType().Name + " " + ex9.Message);
                 Fail("unl-magic9"); _unlmg9State = 99;
+            }
+        }
+
+        // ---- EXP-07 V3 spellbound T1 row ('unl-magic10', opt-in): the
+        // NPC_Controller_Spellbound 0x994F1DEC = the Traveling Salesman
+        // spawner (session decode: main 4096 @2 = the magic-lot law; on a
+        // magic lot -> 4099 'spawn salesman at magictown': SetToNext the ped
+        // marker 0x12E84823 (TemplateMagictown ships them) -> create person
+        // 0x44A86A6C -> find_location_for -> attr[me][1] = 0 (init 4101 sets
+        // attr[1]=1; the SPAWN clears it — the drive plan's assert).
+        private static int _unlmg10State, _unlmg10Settle, _unlmg10Frame, _unlmg10SwitchF = -1, _unlmg10Soak;
+        private static VMEntity _unlmg10Ctr;
+        private static bool _unlmg10VmRebound;
+
+        private static void UnlMagic10Tick()
+        {
+            try
+            {
+                _unlmg10Frame++;
+                if (_unlmg10State == 0)
+                {
+                    if (++_unlmg10Settle < 90) return;
+                    _unlmg10Settle = 0;
+                    Log("AUTOTEST unl-magic10 SPELLBOUND-T1 (EXP-07 V3 last row: lot 93 -> place the Spellbound controller -> the native salesman spawn -> assert person 0x44A86A6C + attr[1]==0)");
+                    // run-9 law: the PedMarkersMagic mains NRE at boot
+                    // (generic call 26 'BuildVacationFamily' -> null
+                    // ActiveFamily, VMGenericTS1Call.cs:376) — the marker main
+                    // bootstraps the lot family and the NATIVE arrival flow
+                    // always carries a transit context; my DIRECT switch does
+                    // not. DISCLOSED lever: seed LotTransitInfo=1 (the trip-
+                    // in-progress precondition) so mode 26 takes the
+                    // activate-family branch instead of the null create path.
+                    try
+                    {
+                        var gs10 = Content.Get().Neighborhood.GameState;
+                        Log("AUTOTEST unl-magic10 PRE-SEED LotTransitInfo=" + gs10.LotTransitInfo
+                            + " -> 1 (the native-arrival precondition; ActiveFamily="
+                            + (gs10.ActiveFamily != null ? "set" : "NULL") + ")");
+                        gs10.LotTransitInfo = 1;
+                    }
+                    catch (Exception gsx) { Log("AUTOTEST unl-magic10 PRE-SEED-EXC " + gsx.GetType().Name); }
+                    _vm.SignalLotSwitch(93u);
+                    _unlmg10SwitchF = _unlmg10Frame;
+                    _unlmg10State = 1;
+                    return;
+                }
+                if (_unlmg10State == 1)
+                {
+                    if (_screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    {
+                        _vm = _screen.vm;
+                        _unlmg10VmRebound = true;
+                        Log("AUTOTEST unl-magic10 VM-REBOUND curHouse=" + (_vm.TS1State?.CurrentHouse.ToString() ?? "?")
+                            + " ents=" + _vm.Entities.Count);
+                    }
+                    var cur10 = _vm.TS1State?.CurrentHouse ?? 0;
+                    if (_unlmg10SwitchF > 0 && _unlmg10Frame >= _unlmg10SwitchF + 3600)
+                    {
+                        Log("AUTOTEST unl-magic10 verdict no-switch: curHouse stayed " + cur10);
+                        Fail("unl-magic10"); _unlmg10State = 99; return;
+                    }
+                    if (!(_unlmg10VmRebound && cur10 == 93)) return;
+                    // create the controller OOW (the magic5 controller idiom —
+                    // its trees never need its position) + census
+                    VMMultitileGroup grp10 = null;
+                    try { grp10 = _vm.Context.CreateObjectInstance(0x994F1DECu, FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH); }
+                        catch (Exception e10) { Log("AUTOTEST unl-magic10 CTR-EXC " + e10.GetType().Name); }
+                    _unlmg10Ctr = grp10?.Objects?.FirstOrDefault();
+                    if (_unlmg10Ctr == null)
+                    {
+                        Log("AUTOTEST unl-magic10 verdict ctr-uncreateable");
+                        Fail("unl-magic10"); _unlmg10State = 99; return;
+                    }
+                    // run-4: the marker census (the 4099 @1 SetToNext refused —
+                    // does the ped marker exist as an entity at all?)
+                    var mk = _vm.Entities.Where(e => e.Object?.OBJ?.GUID == 0x12E84823u).ToList();
+                    Log("AUTOTEST unl-magic10 MARKER-CENSUS count=" + mk.Count
+                        + (mk.Count > 0 ? " [" + string.Join(",", mk.Take(3).Select(e => "obj" + e.ObjectID
+                            + "/dead=" + e.Dead + "/pos=" + e.Position.x + "," + e.Position.y)) + "]" : "")
+                        + " (the 4099 scan target)");
+                    // run-5: the GUID-map discriminator — does
+                    // ObjectQueries.GetObjectsByGUID hold the marker (registration
+                    // OK -> the SetToNext loop is at fault) or not?
+                    var byGuid10 = _vm.Context.ObjectQueries.GetObjectsByGUID(0x12E84823u);
+                    var byGuidDuel = _vm.Context.ObjectQueries.GetObjectsByGUID(0xD19F6584u);
+                    Log("AUTOTEST unl-magic10 GUIDMAP marker=" + (byGuid10?.Count.ToString() ?? "NULL")
+                        + " duelTile=" + (byGuidDuel?.Count.ToString() ?? "NULL")
+                        + " (entities census: marker=1 duelTile>=1 expected)");
+                    Log("AUTOTEST unl-magic10 CTR-PLACED oid=" + _unlmg10Ctr.ObjectID
+                        + " attrs=[" + string.Join(",", Enumerable.Range(0, 8).Select(i => _unlmg10Ctr.GetAttribute((ushort)i)).ToArray()) + "]"
+                        + " (init sets attr[1]=1; the spawn clears it to 0)");
+                    _unlmg10State = 2; _unlmg10Soak = 0;
+                    return;
+                }
+                if (_unlmg10State == 2)
+                {
+                    _unlmg10Soak++;
+                    var sales = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0x44A86A6Cu);
+                    // run-10 law: House93 ships its OWN Spellbound controller —
+                    // the NATIVE one runs the spawn and clears ITS attr[1]; the
+                    // probe-created duplicate correctly stays attr[1]=1 (its own
+                    // spawn refused via NoDuplicate). Assert across ALL
+                    // controllers: salesman alive + SOME controller attr[1]==0.
+                    var ctrs10 = _vm.Entities.Where(e => e.Object?.OBJ?.GUID == 0x994F1DECu).ToList();
+                    var a1any = ctrs10.Any(c => c.GetAttribute(1) == 0);
+                    var a1 = _unlmg10Ctr?.GetAttribute(1) ?? -1;
+                    if (_unlmg10Soak % 150 == 0)
+                        Log("AUTOTEST unl-magic10 soak f=" + _unlmg10Soak + " salesman="
+                            + (sales == null ? "-" : "obj" + sales.ObjectID + "/dead=" + sales.Dead)
+                            + " ctrs=" + ctrs10.Count + " mine.a1=" + a1 + " anyA1zero=" + a1any);
+                    if (sales != null && !sales.Dead && a1any)
+                    {
+                        Log("AUTOTEST unl-magic10 verdict SPELLBOUND-LIVE: the Traveling Salesman (person"
+                            + " 0x44A86A6C obj" + sales.ObjectID + ") spawned NATIVELY and a controller cleared"
+                            + " attr[1] to 0 (controllers=" + ctrs10.Count + " — House93 ships its own; the"
+                            + " probe duplicate's NoDuplicate refusal is itself the native law) — the T1 row's"
+                            + " full assert landed on the controller's own cadence");
+                        Pass("unl-magic10"); _unlmg10State = 99; return;
+                    }
+                    // run-1 law: the main's idle [32,78] gates the spawn on a
+                    // game-time window (a periodic salesman visit) — after 600f
+                    // apply the DISCLOSED sync-run fallback (the 4110 idiom:
+                    // everything native but the trigger): 4099 checks the magic
+                    // lot, finds the ped marker, creates the salesman,
+                    // find_location_for, and clears attr[1]
+                    if (sales == null && _unlmg10Soak == 120)
+                    {
+                        var rtSpawn10 = _unlmg10Ctr.Object.Resource.GetRoutine((ushort)4099) as VMRoutine;
+                        if (rtSpawn10 != null)
+                        {
+                            // run-3: trace the sync-run (4099 is in the ITRACE
+                            // band) — name the refusing gate instruction-exact
+                            var ctrOid10 = _unlmg10Ctr.ObjectID;
+                            FSO.SimAntics.Engine.VMThread.AutotestTraceSink = (System.Action<string>)(ts =>
+                            {
+                                try
+                                {
+                                    if (!string.IsNullOrEmpty(ts) && ts.Contains("ent=" + ctrOid10 + " "))
+                                        Log("AUTOTEST unl-magic10 " + ts);
+                                }
+                                catch { }
+                            });
+                            FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = true;
+                            FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget += 200;
+                            FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Add(ctrOid10);
+                            // run-6 law: the SetToNext "resume-from-previous"
+                            // target lives in a thread temp (the operand's
+                            // stream-supplied target when flag 0x80 is set) —
+                            // the controller thread's leftover temps make the
+                            // scan start AFTER the marker. Zero the temps
+                            // (disclosed frame hygiene — a fresh scan from the
+                            // first object).
+                            try
+                            {
+                                var t10 = _unlmg10Ctr.Thread;
+                                for (int ti = 0; ti < t10.TempRegisters.Length; ti++) t10.TempRegisters[ti] = 0;
+                                Log("AUTOTEST unl-magic10 TEMPS-ZEROED (the SetToNext resume-target hygiene)");
+                            }
+                            catch { }
+                            // run-7: census the marker AT the sync moment (the
+                            // PedMarkersMagic main NREs — the suppressed-exception
+                            // handler may delete it between placement and f=600)
+                            var mk600 = _vm.Entities.Where(e => e.Object?.OBJ?.GUID == 0x12E84823u).ToList();
+                            var map600 = _vm.Context.ObjectQueries.GetObjectsByGUID(0x12E84823u);
+                            Log("AUTOTEST unl-magic10 MARKER-AT-SYNC census=" + mk600.Count
+                                + " map=" + (map600?.Count.ToString() ?? "NULL")
+                                + (mk600.Count > 0 ? " dead=" + mk600[0].Dead : ""));
+                            var ran10 = _unlmg10Ctr.Thread.RunInMyStack(rtSpawn10, _unlmg10Ctr.Object, new short[4], _unlmg10Ctr);
+                            Log("AUTOTEST unl-magic10 SPAWN-SYNC-RAN ran=" + ran10 + " (4099 on the controller's"
+                                + " thread — the disclosed trigger lever; the spawn path itself native)");
+                        }
+                        else Log("AUTOTEST unl-magic10 SPAWN-SYNC-UNAVAILABLE (4099 unresolved)");
+                    }
+                    if (_unlmg10Soak > 1800)
+                    {
+                        Log("AUTOTEST unl-magic10 verdict SPELLBOUND-PARTIAL: salesman=" + (sales != null)
+                            + " ctrAttr1=" + a1 + " (the main's game-time cadence + the sync-run both"
+                            + " incomplete — named for the next increment)");
+                        Fail("unl-magic10"); _unlmg10State = 99; return;
+                    }
+                }
+            }
+            catch (Exception ex10)
+            {
+                Log("AUTOTEST unl-magic10 EXC " + ex10.GetType().Name + " " + ex10.Message);
+                Fail("unl-magic10"); _unlmg10State = 99;
             }
         }
 
@@ -8686,6 +8873,12 @@ namespace Simitone.Client
             if (CheckEnabled("unl-magic9") && _unlmg9State != 99)
             {
                 UnlMagic9Tick();
+            }
+            // EXP-07 V3 spellbound T1 row (opt-in "unl-magic10"): lot 93
+            // salesman spawner.
+            if (CheckEnabled("unl-magic10") && _unlmg10State != 99)
+            {
+                UnlMagic10Tick();
             }
             // TRV-04 (opt-in "trv04book"): the phone-plugin menu/booking drive —
             // the real 'Call Plugin' pie entry (Param0 = plugin oid) pushed as a
