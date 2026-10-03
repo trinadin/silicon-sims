@@ -91,6 +91,12 @@ namespace FSO.SimAntics.Primitives
                         default:
                         case VMDialogType.Message:
                             return VMPrimitiveExitCode.GOTO_TRUE;
+                        case VMDialogType.TS1Spellbook:
+                        case VMDialogType.TS1Cookbook:
+                            // CWinMagicBook law (native TryDialog 0xf1c7c/0xf1ce8):
+                            // the modal book window's result is DISCARDED and the
+                            // primitive returns TRUE — no temps, no response text.
+                            return VMPrimitiveExitCode.GOTO_TRUE;
                         case VMDialogType.YesNo:
                             return (curDialog.ResponseCode == 0) ? VMPrimitiveExitCode.GOTO_TRUE : VMPrimitiveExitCode.GOTO_FALSE;
                         case VMDialogType.YesNoCancel:
