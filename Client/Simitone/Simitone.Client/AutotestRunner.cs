@@ -1080,6 +1080,7 @@ namespace Simitone.Client
                 || CheckEnabled("unl-magic9")
                 || CheckEnabled("unl-magic10")
                 || CheckEnabled("unl-magic11")
+                || CheckEnabled("dt-strip")
                 || CheckEnabled("unl-show")
                 || CheckEnabled("unl-mice")
                 || CheckEnabled("exp09train")
@@ -4437,6 +4438,7 @@ namespace Simitone.Client
                         add(0x1FEC6005u, 7, 1);   // MM wand (EP7)
                         add(0x7BCB0F36u, 8, 2);   // MM Toad Sweat ingredient (EP7)
                         add(0x99E81BECu, 7, 5);   // MM Magicoins (EP7)
+                        add(0xCA5D920Eu, 8, 1);   // UNLEASHED-family pet item (dragon treats; the review's pet-class rider)
                         _unlmg11InvBefore = Unlmg3InvStr((short)_unlmg11SimNid);
                         Log("AUTOTEST unl-magic11 SEEDED mixed-pack tokens (disclosed API lever) inv=" + _unlmg11InvBefore);
                     }
@@ -4527,12 +4529,14 @@ namespace Simitone.Client
                     bool wand = invFinal != null && invFinal.Contains("0x1fec6005");
                     bool sweat = invFinal != null && invFinal.Contains("0x7bcb0f36");
                     bool coins = invFinal != null && invFinal.Contains("0x99e81bec");
-                    if (wand && sweat && coins)
+                    bool petItem = invFinal != null && invFinal.Contains("0xca5d920e");
+                    if (wand && sweat && coins && petItem)
                     {
                         Log("AUTOTEST unl-magic11 verdict CROSSPACK-PERSISTENCE-LIVE: the mixed-pack tokens (MM wand +"
-                            + " ingredient + Magicoins) survived home -> Magic Town -> home AND the real save/reload —"
-                            + " the cross-pack travel/inventory/save law VERIFIED LIVE (the EXP-10 transit + EXP-07 T6"
-                            + " persistence surfaces composed)");
+                            + " ingredient + Magicoins + the UNLEASHED pet item) survived home -> Magic Town -> home AND"
+                            + " the real save/reload — the cross-pack travel/inventory/save law VERIFIED LIVE across"
+                            + " THREE pack families (the EXP-10 transit + EXP-07 T6 persistence surfaces composed; the"
+                            + " review's pet-class rider closed)");
                         Pass("unl-magic11"); _unlmg11State = 99; return;
                     }
                     Log("AUTOTEST unl-magic11 verdict CROSSPACK-PERSISTENCE-FAIL wand=" + wand + " sweat=" + sweat
@@ -4544,6 +4548,75 @@ namespace Simitone.Client
             {
                 Log("AUTOTEST unl-magic11 EXC " + ex11.GetType().Name + " " + ex11.Message);
                 Fail("unl-magic11"); _unlmg11State = 99;
+            }
+        }
+
+        // ---- EXP-08 leg-2 residual ('dt-strip', opt-in): the downtown
+        // LIVE DRIVE — switch to a real Downtown lot (21, the EXP-10-proven
+        // target) via the lot-switch machinery, then run the uinav DT-mode
+        // strip asserts IN that on-lot context + record the screen's own
+        // Downtown flag.
+        private static int _dtstripState, _dtstripSettle, _dtstripFrame, _dtstripSwitchF = -1;
+        private static bool _dtstripRebound;
+
+        private static void DtStripTick()
+        {
+            try
+            {
+                _dtstripFrame++;
+                if (_dtstripState == 0)
+                {
+                    if (++_dtstripSettle < 90) return;
+                    _dtstripSettle = 0;
+                    Log("AUTOTEST dt-strip DOWNTOWN-LIVE-DRIVE (EXP-08 leg-2 residual: lot 21 via the lot-switch machinery; the DT strip asserts on-lot)");
+                    _vm.SignalLotSwitch(21u);
+                    _dtstripSwitchF = _dtstripFrame;
+                    _dtstripState = 1;
+                    return;
+                }
+                if (_dtstripState == 1)
+                {
+                    if (_screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    {
+                        _vm = _screen.vm; _dtstripRebound = true;
+                        Log("AUTOTEST dt-strip VM-REBOUND curHouse=" + (_vm.TS1State?.CurrentHouse.ToString() ?? "?")
+                            + " ents=" + _vm.Entities.Count + " screen.Downtown=" + _screen.Downtown);
+                    }
+                    var cur = _vm.TS1State?.CurrentHouse ?? 0;
+                    if (_dtstripSwitchF > 0 && _dtstripFrame >= _dtstripSwitchF + 3600)
+                    { Log("AUTOTEST dt-strip verdict no-switch: curHouse=" + cur); Fail("dt-strip"); _dtstripState = 99; return; }
+                    if (!(_dtstripRebound && cur >= 21 && cur <= 31)) return;
+                    // on the DT lot: the screen-mode law + the DT strip asserts
+                    bool screenDt = _screen.Downtown;
+                    var nav = new Simitone.Client.UI.Panels.UINeighbourhoodSwitcher(null, 2, false);
+                    // mode 2's Return art is Downtown\Return.bmp (the DestReturnMember law)
+                    var retBtn = nav.Buttons.FirstOrDefault(b => b.Member == "Downtown\\Return.bmp");
+                    var artOff = Simitone.Client.UI.Panels.UINeighbourhoodSwitcher.OriginalArtboardOffset(
+                        FSO.Client.GlobalSettings.Default.GraphicsWidth,
+                        FSO.Client.GlobalSettings.Default.GraphicsHeight);
+                    int ret = (int)(retBtn?.X ?? -999);
+                    int retAnchor = ret - (int)artOff.X;   // strip anchors are artboard-relative
+                    string retTip = retBtn?.Tooltip ?? "-";
+                    Log("AUTOTEST dt-strip ON-DT-LOT screen.Downtown=" + screenDt
+                        + " banner=" + nav.LastBannerMember + " buttons=" + nav.Buttons.Count
+                        + " returnX=" + ret + " anchorX=" + retAnchor + " returnTip='" + retTip + "'"
+                        + " members=[" + string.Join(",", nav.LastMembers) + "]"
+                        + " (the uinav mode-2 law expects banner_downtown + 9 buttons + Return@(200,0))");
+                    if (screenDt && nav.LastBannerMember.EndsWith("banner_downtown.bmp") && nav.Buttons.Count == 9
+                        && retAnchor == 200 && (int)(retBtn?.Y ?? -999) - (int)artOff.Y == 0 && retTip == "Return to Neighborhood View")
+                    {
+                        Log("AUTOTEST dt-strip verdict DT-STRIP-LIVE: the downtown lot 21 switch landed (screen.Downtown=True)"
+                            + " and the DT-mode strip asserts pass in the on-lot context — the leg-2 live-drive residual CLOSED");
+                        Pass("dt-strip"); _dtstripState = 99; return;
+                    }
+                    Log("AUTOTEST dt-strip verdict DT-STRIP-FAIL screenDt=" + screenDt + " buttons=" + nav.Buttons.Count + " ret=" + ret);
+                    Fail("dt-strip"); _dtstripState = 99; return;
+                }
+            }
+            catch (Exception exd)
+            {
+                Log("AUTOTEST dt-strip EXC " + exd.GetType().Name + " " + exd.Message);
+                Fail("dt-strip"); _dtstripState = 99;
             }
         }
 
@@ -9053,6 +9126,11 @@ namespace Simitone.Client
             if (CheckEnabled("unl-magic11") && _unlmg11State != 99)
             {
                 UnlMagic11Tick();
+            }
+            // EXP-08 leg-2 residual (opt-in "dt-strip"): the downtown live drive.
+            if (CheckEnabled("dt-strip") && _dtstripState != 99)
+            {
+                DtStripTick();
             }
             // TRV-04 (opt-in "trv04book"): the phone-plugin menu/booking drive —
             // the real 'Call Plugin' pie entry (Param0 = plugin oid) pushed as a
