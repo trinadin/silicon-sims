@@ -1084,6 +1084,8 @@ namespace Simitone.Client
                 || CheckEnabled("petname")
                 || CheckEnabled("famedecay")
                 || CheckEnabled("awarddrive")
+                || CheckEnabled("rel05integ")
+                || CheckEnabled("rel05integ2")
                 || CheckEnabled("dt-strip")
                 || CheckEnabled("unl-show")
                 || CheckEnabled("unl-mice")
@@ -5473,6 +5475,308 @@ namespace Simitone.Client
             {
                 Log("AUTOTEST famedecay EXC " + fd.GetType().Name + " " + fd.Message);
                 Fail("famedecay"); _fmdecState = 99;
+            }
+        }
+
+        // ---- REL-05 ('rel05integ' + 'rel05integ2', opt-in): the save/data
+        // integrity COMPOSITE. Phase 1 (rel05integ): baseline user save -> copy
+        // the on-disk Neighborhood.iff as the differential baseline -> mutate
+        // provenance-diverse state on the ACTIVE original family (relationship
+        // slots both directions via the NBRS store, NGBH inventory tokens,
+        // family budget, a placed in-world object, person-data fame triple) ->
+        // a second real user Save() -> the in-process PlayHouse reload ->
+        // semantic persistence asserts. Phase 2 (rel05integ2): a SECOND process
+        // cold-boots the SAME userdir (the quit/relaunch boundary), re-asserts
+        // every mutation from disk-driven state, and the run's offline python
+        // pass (coordination/evidence/REL-05/) byte-compares every untouched
+        // FAMI/NBRS record between the baseline copy and the final file.
+        private static int _rel05State, _rel05Settle, _rel05Frame;
+        private static short _rel05NidA, _rel05NidB;
+        private static int _rel05BudgetSet = -1;
+        private static string _rel05BaselinePath, _rel05ExpectedPath;
+        private static bool _rel05ObjPlaced, _rel05PersistRels, _rel05PersistInv, _rel05PersistBudget, _rel05PersistFame, _rel05PersistObj;
+        private const int Rel05StrVal = 63, Rel05LtrVal = -47, Rel05Fame80 = 747, Rel05Fame81 = 6, Rel05Fame82 = 6, Rel05BudgetDelta = 4477;
+        private const uint Rel05ObjGuid = 0x8EC5750Du; // the Start Here book (the magicbook placement law)
+        private static readonly List<Tuple<uint, int, int>> Rel05Tokens = new List<Tuple<uint, int, int>>
+        {
+            Tuple.Create(0x1FEC6005u, 7, 3), // MM wand t7 (the unl-magic11 token law)
+            Tuple.Create(0x7BCB0F36u, 8, 2)  // MM toad sweat t8
+        };
+
+        private static string Rel05NbPath()
+        {
+            return Path.Combine(Content.Get().Neighborhood.UserPath, "Neighborhood.iff");
+        }
+
+        private static List<short> Rel05RelRow(short fromNid, short toNid)
+        {
+            var entry = Content.Get().Neighborhood?.Neighbors?.Entries
+                ?.FirstOrDefault(e => e != null && e.NeighbourID == fromNid);
+            if (entry == null || entry.Relationships == null) return null;
+            List<short> list;
+            if (!entry.Relationships.TryGetValue(toNid, out list) || list == null) return null;
+            return list;
+        }
+
+        private static string Rel05InvStr(short nid)
+        {
+            var inv = Content.Get().Neighborhood.GetInventoryByNID(nid);
+            if (inv == null || inv.Count == 0) return "(none)";
+            return string.Join(",", inv.Select(i => "0x" + i.GUID.ToString("X8") + "t" + i.Type + "x" + i.Count));
+        }
+
+        private static void Rel05WriteExpected()
+        {
+            var invA = Rel05InvStr(_rel05NidA);
+            File.WriteAllLines(_rel05ExpectedPath, new[]
+            {
+                "nidA=" + _rel05NidA, "nidB=" + _rel05NidB,
+                "strVal=" + Rel05StrVal, "ltrVal=" + Rel05LtrVal,
+                "fame80=" + Rel05Fame80, "fame81=" + Rel05Fame81, "fame82=" + Rel05Fame82,
+                "budget=" + _rel05BudgetSet,
+                "objGuid=0x" + Rel05ObjGuid.ToString("X8"),
+                "invA=" + invA
+            });
+        }
+
+        private static void Rel05Finish(bool pass, string phase, string detail)
+        {
+            Log("AUTOTEST rel05 " + phase + " RESULT " + detail);
+            if (pass) Pass(phase == "P1" ? "rel05integ" : "rel05integ2");
+            else Fail(phase == "P1" ? "rel05integ" : "rel05integ2");
+            Finish();
+            _rel05State = 99;
+        }
+
+        private static void Rel05Tick()
+        {
+            try
+            {
+                _rel05Frame++;
+                if (_rel05State == 0)
+                {
+                    if (++_rel05Settle < 90) return;
+                    _rel05Settle = 0;
+                    var house = _vm.TS1State?.CurrentHouse ?? 0;
+                    Log("AUTOTEST rel05integ P1 (REL-05: baseline save -> mutate rels/inventory/budget/object/fame -> save -> reload -> persist asserts)");
+                    if (house != 5) { Rel05Finish(false, "P1", "wrong-house " + house + " (needs 5)"); return; }
+                    var famNum = _vm.GetGlobalValue(9);
+                    var adults = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                        .Where(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                            && a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18 && !a.IsPet
+                            && a.GetPersonData(VMPersonDataVariable.TS1FamilyNumber) == famNum
+                            && !((a.Object?.Resource?.MainIff?.Filename ?? "").StartsWith("npc_", true, null))
+                            && !((a.Object?.Resource?.MainIff?.Filename ?? "").StartsWith("NPC_", true, null)))
+                        .ToList();
+                    if (adults.Count < 2) { Rel05Finish(false, "P1", "need-2-family-adults got=" + adults.Count); return; }
+                    _rel05NidA = adults[0].GetPersonData(VMPersonDataVariable.NeighborId);
+                    _rel05NidB = adults[1].GetPersonData(VMPersonDataVariable.NeighborId);
+                    if (_rel05NidA <= 0 || _rel05NidB <= 0 || _rel05NidA == _rel05NidB) { Rel05Finish(false, "P1", "bad-nids " + _rel05NidA + "/" + _rel05NidB); return; }
+                    _rel05BaselinePath = Path.Combine(FSOEnvironment.UserDir, "rel05-baseline-nb.iff");
+                    _rel05ExpectedPath = Path.Combine(FSOEnvironment.UserDir, "rel05-expected.txt");
+                    Log("AUTOTEST rel05integ P1 PICKED nidA=" + _rel05NidA + " nidB=" + _rel05NidB + " fam=" + famNum
+                        + " relA2B=" + (Rel05RelRow(_rel05NidA, _rel05NidB) != null)
+                        + " invA=" + Rel05InvStr(_rel05NidA));
+                    _rel05State = 1; _rel05Settle = 0;
+                    return;
+                }
+                if (_rel05State == 1)
+                {
+                    // BASELINE-SAVE: one real user save of the unmutated lot, then the differential baseline copy
+                    if (_rel05Settle == 0) { try { _screen.Save(); Log("AUTOTEST rel05integ BASELINE-SAVE-DONE"); } catch (Exception se) { Log("AUTOTEST rel05integ BASELINE-SAVE-EXC " + se.GetType().Name); } }
+                    _rel05Settle++;
+                    if (_rel05Settle < 360) return;
+                    try
+                    {
+                        var nb = Rel05NbPath();
+                        File.Copy(nb, _rel05BaselinePath, true);
+                        var fi = new FileInfo(nb);
+                        Log("AUTOTEST rel05integ BASELINE-COPIED nb=" + fi.Length + "B -> " + Path.GetFileName(_rel05BaselinePath));
+                        _rel05State = 2; _rel05Settle = 0;
+                    }
+                    catch (Exception ce) { Rel05Finish(false, "P1", "baseline-copy-EXC " + ce.GetType().Name + " " + ce.Message); }
+                    return;
+                }
+                if (_rel05State == 2)
+                {
+                    // MUTATE (all disclosed fixture levers, each the store the production paths read/write)
+                    // 1. relationships: STR/LTR both directions (the socexec NBRS store law)
+                    foreach (var pair in new[] { Tuple.Create(_rel05NidA, _rel05NidB), Tuple.Create(_rel05NidB, _rel05NidA) })
+                    {
+                        var entry = Content.Get().Neighborhood.Neighbors.Entries.FirstOrDefault(e => e != null && e.NeighbourID == pair.Item1);
+                        if (entry == null) { Rel05Finish(false, "P1", "no-NBRS-" + pair.Item1); return; }
+                        List<short> list;
+                        if (!entry.Relationships.TryGetValue(pair.Item2, out list) || list == null) { list = new List<short>(new short[8]); entry.Relationships[pair.Item2] = list; }
+                        while (list.Count < 2) list.Add(0);
+                        list[0] = (short)Rel05StrVal; list[1] = (short)Rel05LtrVal;
+                    }
+                    // 2. fame triple on nidA (person data)
+                    var simA = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                        .FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.NeighborId) == _rel05NidA);
+                    if (simA == null) { Rel05Finish(false, "P1", "simA-lost"); return; }
+                    simA.SetPersonData(VMPersonDataVariable.TS1FameScore, (short)Rel05Fame80);
+                    simA.SetPersonData(VMPersonDataVariable.TS1FameStarPower, (short)Rel05Fame81);
+                    simA.SetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark, (short)Rel05Fame82);
+                    // 3. family budget
+                    FAMI fam = null;
+                    if (!Content.Get().Neighborhood.FamilyForHouse.TryGetValue(5, out fam) || fam == null) { Rel05Finish(false, "P1", "no-FAMI-5"); return; }
+                    _rel05BudgetSet = fam.Budget + Rel05BudgetDelta;
+                    fam.Budget = _rel05BudgetSet;
+                    // 4. inventory tokens on nidA (the unl-magic11 NGBH law)
+                    var neigh = Content.Get().Neighborhood;
+                    var inv = neigh.GetInventoryByNID(_rel05NidA);
+                    if (inv == null) { neigh.SetInventoryForNID(_rel05NidA, new List<FSO.Files.Formats.IFF.Chunks.InventoryItem>()); inv = neigh.GetInventoryByNID(_rel05NidA); }
+                    foreach (var t in Rel05Tokens)
+                    {
+                        var ex = inv.FirstOrDefault(x => x.GUID == t.Item1);
+                        if (ex != null) ex.Count += (ushort)t.Item3;
+                        else inv.Add(new FSO.Files.Formats.IFF.Chunks.InventoryItem() { Count = (ushort)t.Item3, GUID = t.Item1, Type = t.Item2 });
+                    }
+                    // 5. in-world object (the placement candidate-walk law)
+                    _rel05ObjPlaced = PlacePetNameObject(simA, Rel05ObjGuid) != null;
+                    Rel05WriteExpected();
+                    Log("AUTOTEST rel05integ MUTATED rels=[" + Rel05StrVal + "," + Rel05LtrVal + "]x2 fame=[" + Rel05Fame80 + "," + Rel05Fame81 + "," + Rel05Fame82 + "]"
+                        + " budget=" + _rel05BudgetSet + " inv=" + Rel05InvStr(_rel05NidA) + " objPlaced=" + _rel05ObjPlaced);
+                    if (!_rel05ObjPlaced) { Rel05Finish(false, "P1", "object-not-placed"); return; }
+                    _rel05State = 3; _rel05Settle = 0;
+                    return;
+                }
+                if (_rel05State == 3)
+                {
+                    if (_rel05Settle == 0) { try { _screen.Save(); Log("AUTOTEST rel05integ SAVE-DONE (user path)"); } catch (Exception se) { Log("AUTOTEST rel05integ SAVE-EXC " + se.GetType().Name); } }
+                    _rel05Settle++;
+                    if (_rel05Settle < 360) return;
+                    var fi = new FileInfo(Rel05NbPath());
+                    Log("AUTOTEST rel05integ POST-SAVE nb=" + fi.Length + "B");
+                    _rel05State = 4; _rel05Settle = 0;
+                    return;
+                }
+                if (_rel05State == 4)
+                {
+                    if (_rel05Settle == 0) { try { _screen.PlayHouse(5, null); Log("AUTOTEST rel05integ RELOAD-DISPATCH PlayHouse(5)"); } catch (Exception pe) { Log("AUTOTEST rel05integ RELOAD-EXC " + pe.GetType().Name); } }
+                    _rel05Settle++;
+                    if (_screen.InLot && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm) && _screen.vm.Entities.Count > 0)
+                    {
+                        _vm = _screen.vm;
+                        if (_vm.SpeedMultiplier <= 0) { _vm.SpeedMultiplier = 1; _vm.GlobalBlockingDialog = null; }
+                        Log("AUTOTEST rel05integ LOT-RELOADED ents=" + _vm.Entities.Count + " loadErrors=" + _vm.LoadErrors.Count);
+                        _rel05State = 5; _rel05Settle = 0;
+                        return;
+                    }
+                    if (_rel05Settle > 2700) { Rel05Finish(false, "P1", "reload-failed"); return; }
+                    return;
+                }
+                if (_rel05State == 5)
+                {
+                    if (++_rel05Settle < 240) return;
+                    Rel05Asserts("P1-RELOAD");
+                    var ok = _rel05PersistRels && _rel05PersistInv && _rel05PersistBudget && _rel05PersistFame && _rel05PersistObj;
+                    Rel05Finish(ok, "P1", "rels=" + _rel05PersistRels + " inv=" + _rel05PersistInv + " budget=" + _rel05PersistBudget
+                        + " fame=" + _rel05PersistFame + " obj=" + _rel05PersistObj + " (P2 = the cold-boot disk law; offline python = the untouched-record differential)");
+                }
+            }
+            catch (Exception r5)
+            {
+                Log("AUTOTEST rel05integ EXC " + r5.GetType().Name + " " + r5.Message);
+                Fail("rel05integ"); _rel05State = 99;
+            }
+        }
+
+        private static int _rel05bState, _rel05bSettle, _rel05bFrame;
+
+        private static void Rel05Asserts(string phase)
+        {
+            // relationships (NBRS store)
+            var rAB = Rel05RelRow(_rel05NidA, _rel05NidB);
+            var rBA = Rel05RelRow(_rel05NidB, _rel05NidA);
+            _rel05PersistRels = rAB != null && rBA != null && rAB.Count >= 2 && rBA.Count >= 2
+                && rAB[0] == Rel05StrVal && rAB[1] == Rel05LtrVal && rBA[0] == Rel05StrVal && rBA[1] == Rel05LtrVal;
+            // inventory
+            var invStr = Rel05InvStr(_rel05NidA);
+            _rel05PersistInv = true;
+            foreach (var t in Rel05Tokens)
+            {
+                var it = Content.Get().Neighborhood.GetInventoryByNID(_rel05NidA)?.FirstOrDefault(x => x.GUID == t.Item1);
+                if (it == null || it.Type != t.Item2 || it.Count < t.Item3) _rel05PersistInv = false;
+            }
+            // budget
+            FAMI fam = null;
+            Content.Get().Neighborhood.FamilyForHouse.TryGetValue(5, out fam);
+            _rel05PersistBudget = fam != null && fam.Budget == _rel05BudgetSet;
+            // fame triple (VM person data)
+            var simA = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                .FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.NeighborId) == _rel05NidA);
+            _rel05PersistFame = simA != null
+                && simA.GetPersonData(VMPersonDataVariable.TS1FameScore) == Rel05Fame80
+                && simA.GetPersonData(VMPersonDataVariable.TS1FameStarPower) == Rel05Fame81
+                && simA.GetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark) == Rel05Fame82;
+            // placed object
+            _rel05PersistObj = _vm.Entities.Any(e => e != null && e.Object != null && e.Object.Resource != null
+                && e.Object.GUID == Rel05ObjGuid && e.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD);
+            Log("AUTOTEST rel05 " + phase + " ASSERT rels=" + _rel05PersistRels + " (A2B=" + (rAB != null && rAB.Count >= 2 ? rAB[0] + "," + rAB[1] : "?")
+                + " B2A=" + (rBA != null && rBA.Count >= 2 ? rBA[0] + "," + rBA[1] : "?") + ")"
+                + " inv=" + _rel05PersistInv + " [" + invStr + "]"
+                + " budget=" + _rel05PersistBudget + " (" + (fam != null ? fam.Budget.ToString() : "?") + " vs " + _rel05BudgetSet + ")"
+                + " fame=" + _rel05PersistFame + " obj=" + _rel05PersistObj);
+        }
+
+        private static void Rel05bTick()
+        {
+            try
+            {
+                _rel05bFrame++;
+                if (_rel05bState == 0)
+                {
+                    if (++_rel05bSettle < 90) return;
+                    // wait for the COLD boot to actually reach the lot (run-2 law: a
+                    // fresh process needs the in-lot signal, not just settle ticks —
+                    // CurrentHouse stays 0 until the lot driver's PlayHouse lands)
+                    if (!(_screen != null && _screen.InLot && _screen.vm != null && _screen.vm.Entities.Count > 0))
+                    {
+                        if (_rel05bSettle > 2700) { Rel05Finish(false, "P2", "cold-boot-timeout"); }
+                        return;
+                    }
+                    if (_screen.vm != null && !ReferenceEquals(_screen.vm, _vm)) _vm = _screen.vm;
+                    // run-2 law: TS1State.CurrentHouse lags InLot on a cold boot — gate on
+                    // the family-number global (the lot-identity law) instead
+                    var famNum0 = _vm.GetGlobalValue(9);
+                    var house0 = _vm.TS1State?.CurrentHouse ?? 0;
+                    if (famNum0 <= 0 && house0 != 5)
+                    {
+                        if (_rel05bSettle > 2700) { Rel05Finish(false, "P2", "no-family-lot fam=" + famNum0 + " house=" + house0); }
+                        return;
+                    }
+                    _rel05bSettle = 0;
+                    var house = _vm.TS1State?.CurrentHouse ?? 0;
+                    Log("AUTOTEST rel05integ2 P2 (REL-05: SECOND process, SAME userdir — the quit/relaunch boundary; cold-boot disk-law asserts)"
+                        + " [boot: fam=" + famNum0 + " house=" + house + "]");
+                    _rel05ExpectedPath = Path.Combine(FSOEnvironment.UserDir, "rel05-expected.txt");
+                    if (!File.Exists(_rel05ExpectedPath)) { Rel05Finish(false, "P2", "no-expected-file (phase 1 did not run in this userdir)"); return; }
+                    var map = new Dictionary<string, string>();
+                    foreach (var line in File.ReadAllLines(_rel05ExpectedPath))
+                    {
+                        var ix = line.IndexOf('=');
+                        if (ix > 0) map[line.Substring(0, ix)] = line.Substring(ix + 1);
+                    }
+                    _rel05NidA = short.Parse(map["nidA"]); _rel05NidB = short.Parse(map["nidB"]);
+                    _rel05BudgetSet = int.Parse(map["budget"]);
+                    Log("AUTOTEST rel05integ2 EXPECTED nidA=" + _rel05NidA + " nidB=" + _rel05NidB + " budget=" + _rel05BudgetSet);
+                    _rel05bState = 1; _rel05bSettle = 0;
+                    return;
+                }
+                if (_rel05bState == 1)
+                {
+                    if (++_rel05bSettle < 240) return;
+                    Rel05Asserts("P2-COLD-BOOT");
+                    var ok = _rel05PersistRels && _rel05PersistInv && _rel05PersistBudget && _rel05PersistFame && _rel05PersistObj;
+                    Rel05Finish(ok, "P2", "QUIT-RELAUNCH rels=" + _rel05PersistRels + " inv=" + _rel05PersistInv + " budget=" + _rel05PersistBudget
+                        + " fame=" + _rel05PersistFame + " obj=" + _rel05PersistObj);
+                }
+            }
+            catch (Exception r5b)
+            {
+                Log("AUTOTEST rel05integ2 EXC " + r5b.GetType().Name + " " + r5b.Message);
+                Fail("rel05integ2"); _rel05bState = 99;
             }
         }
 
@@ -10280,6 +10584,15 @@ namespace Simitone.Client
             {
                 AwardDriveTick();
             }
+            // REL-05 (opt-in "rel05integ"/"rel05integ2"): the save/data-integrity composite.
+            if (CheckEnabled("rel05integ") && _rel05State != 99)
+            {
+                Rel05Tick();
+            }
+            if (CheckEnabled("rel05integ2") && _rel05bState != 99)
+            {
+                Rel05bTick();
+            }
             // EXP-08 leg-2 residual (opt-in "dt-strip"): the downtown live drive.
             if (CheckEnabled("dt-strip") && _dtstripState != 99)
             {
@@ -10882,6 +11195,10 @@ namespace Simitone.Client
                 return; // (EXP-11 V4+V6) the decay/reload drive still running; battery finishes after the verdict
             if (CheckEnabled("awarddrive") && _awdrvState != 99)
                 return; // (EXP-11 V5) the award drive still running; battery finishes after the verdict
+            if (CheckEnabled("rel05integ") && _rel05State != 99)
+                return; // (REL-05 P1) the integrity drive still running; battery finishes after the verdict
+            if (CheckEnabled("rel05integ2") && _rel05bState != 99)
+                return; // (REL-05 P2) the cold-boot asserts still running; battery finishes after the verdict
             if (CheckEnabled("llfire") && _ll3State != 2)
                 return; // (EXP-01 llfire) fire/rocket legs still driving; battery finishes after the verdict
             if (CheckEnabled("aud12live") && _a12State != 2)
