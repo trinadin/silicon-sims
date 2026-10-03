@@ -1119,7 +1119,8 @@ namespace Simitone.Client
                 || CheckEnabled("svccycle") || CheckEnabled("billtxn")
                 || CheckEnabled("marrytrace") || CheckEnabled("birthtrace")
                 || CheckEnabled("familymerge")
-                || CheckEnabled("eng05modes"))
+                || CheckEnabled("eng05modes")
+                || CheckEnabled("eng06flags"))
             {
                 // (SIM-03) socexec: keep the lot alive so a pushed social can run to
                 // completion; pair pick is lazy (first ticks) so restore-time queues drain.
@@ -9895,6 +9896,8 @@ namespace Simitone.Client
             if (CheckEnabled("genericcall14")) CheckGenericCall14();
             // ENG-05 (opt-in "eng05modes"): the newly wired generic-call modes.
             if (CheckEnabled("eng05modes")) CheckGenericCallEng05();
+            // ENG-06 (opt-in "eng06flags"): the corrected inventory flag laws.
+            if (CheckEnabled("eng06flags")) CheckInventoryFlags();
             // CALLGRAPH IFF-LITERAL (Round 44): the ORIGINAL object scripting surface stays IFF-
             // literal - aggregate opcode histogram over the 20 fixture objects (engine-independent raw
             // census r44: 747 BHAVs / 7767 instr; op2=4035, op44=475, op23=433, op32=157, op31=152,
@@ -19747,6 +19750,117 @@ namespace Simitone.Client
             {
                 Log("AUTOTEST eng05modes EXC " + error.GetType().Name + " " + error.Message);
                 Fail("eng05modes");
+            }
+        }
+
+        // ENG-06 ('eng06flags', opt-in): direct-drive of the corrected
+        // inventory flag laws (inventory-dispatch-decode divergences 1+2):
+        // the owner gate reads Flags.0x20 (NOT Flags2.0x20) — a set bit routes
+        // the operation to the avatar whose OBJECT id is Temp[4], otherwise
+        // the CALLER's inventory; the count enable/selector read Flags2.0x02 /
+        // (Flags2.0x0C)>>2 (NOT Flags bits) — count comes from Temp[selector].
+        private static void CheckInventoryFlags()
+        {
+            try
+            {
+                var avA = (_avatars == null) ? null : _avatars.FirstOrDefault(a => a.Thread != null);
+                var avB = (_avatars == null || avA == null) ? null : _avatars.FirstOrDefault(a => a.Thread != null && a != avA);
+                if (avA == null || avB == null || _vm == null)
+                {
+                    Log("AUTOTEST eng06flags live fixture unavailable (need 2 avatars)");
+                    Fail("eng06flags");
+                    return;
+                }
+                var nb = FSO.Content.Content.Get().Neighborhood;
+                var nidA = avA.GetPersonData(VMPersonDataVariable.NeighborId);
+                var nidB = avB.GetPersonData(VMPersonDataVariable.NeighborId);
+                var thread = avA.Thread;
+                var prevT0 = thread.TempRegisters[0];
+                var prevT4 = thread.TempRegisters[4];
+                bool ok = true;
+                var results = new List<string>();
+                try
+                {
+                    FSO.SimAntics.Engine.VMPrimitiveExitCode Drive(byte mode, byte type, byte flags, byte flags2, uint guid)
+                    {
+                        var frame = new FSO.SimAntics.Engine.VMStackFrame
+                        {
+                            Thread = thread, Caller = avA, Callee = avA, StackObject = avA,
+                        };
+                        return new FSO.SimAntics.Primitives.VMTS1InventoryOperations().Execute(frame,
+                            new FSO.SimAntics.Primitives.VMTS1InventoryOperationsOperand
+                            { Mode = (FSO.SimAntics.Primitives.VMTS1InventoryMode)mode, TokenType = type, Flags = flags, Flags2 = flags2, GUID = guid });
+                    }
+                    int InvCount(short nid, uint guid)
+                    {
+                        var inv = nb.GetInventoryByNID(nid);
+                        var it = inv?.FirstOrDefault(x => x.GUID == guid);
+                        return it?.Count ?? 0;
+                    }
+                    void Wipe(uint guid)
+                    {
+                        foreach (var nid in new short[] { nidA, nidB })
+                        {
+                            var inv = nb.GetInventoryByNID(nid);
+                            var it = inv?.FirstOrDefault(x => x.GUID == guid);
+                            if (it != null) inv.Remove(it);
+                        }
+                    }
+                    const uint G = 0x1234ABCDu;
+
+                    // --- divergence 1: the owner gate (Flags.0x20) ---
+                    // Flags2 carries 0x20 (the OLD misread would route to Temp[4]);
+                    // Flags clean -> CALLER's inventory
+                    Wipe(G);
+                    var eA = Drive(0, 7, 0x00, 0x20, G); // AddToken, no owner bit anywhere
+                    var cA = InvCount(nidA, G); var cB = InvCount(nidB, G);
+                    ok &= eA == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && cA == 1 && cB == 0;
+                    results.Add("owner(F2.0x20 only)=" + eA + " A=" + cA + " B=" + cB + "(want 1/0 = caller's)");
+                    // Flags.0x20 + Temp[4] = avatar B's oid -> B's inventory
+                    Wipe(G);
+                    thread.TempRegisters[4] = (short)avB.ObjectID;
+                    var eB = Drive(0, 7, 0x20, 0x00, G);
+                    cA = InvCount(nidA, G); cB = InvCount(nidB, G);
+                    ok &= eB == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && cA == 0 && cB == 1;
+                    results.Add("owner(F.0x20+T4=B)=" + eB + " A=" + cA + " B=" + cB + "(want 0/1 = Temp4 owner's)");
+
+                    // --- divergence 2: the count law (Flags2.0x02 + selector) ---
+                    // Flags2 = 0x02 | (0<<2): count from Temp[0]; Temp[0] = 2
+                    Wipe(G);
+                    thread.TempRegisters[0] = 2;
+                    var eC = Drive(0, 7, 0x00, 0x02, G);
+                    cA = InvCount(nidA, G);
+                    ok &= eC == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && cA == 2;
+                    results.Add("count(F2.0x02,T0=2)=" + eC + " count=" + cA + "(want 2)");
+                    // the OLD misread (Flags.0x02) would have taken the count path on
+                    // Flags bit — drive Flags.0x02 + Flags2 clean: count must be 1
+                    Wipe(G);
+                    var eD = Drive(0, 7, 0x02, 0x00, G);
+                    cA = InvCount(nidA, G);
+                    ok &= eD == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && cA == 1;
+                    results.Add("count(F.0x02 only)=" + eD + " count=" + cA + "(want 1 — the enable is Flags2)");
+                    Wipe(G);
+                }
+                finally
+                {
+                    // fixture hygiene: remove the probe's token from both inventories
+                    foreach (var nid in new short[] { nidA, nidB })
+                    {
+                        var inv = nb.GetInventoryByNID(nid);
+                        var it = inv?.FirstOrDefault(x => x.GUID == 0x1234ABCDu);
+                        if (it != null) inv.Remove(it);
+                    }
+                    thread.TempRegisters[0] = prevT0;
+                    thread.TempRegisters[4] = prevT4;
+                }
+                Log("AUTOTEST eng06flags " + (ok ? "ALL-OK" : "MISMATCH") + " [" + string.Join(" ", results) + "]");
+                if (ok) { Pass("eng06flags"); return; }
+                Fail("eng06flags");
+            }
+            catch (Exception error)
+            {
+                Log("AUTOTEST eng06flags EXC " + error.GetType().Name + " " + error.Message);
+                Fail("eng06flags");
             }
         }
 
