@@ -4174,12 +4174,20 @@ namespace Simitone.Client
                     var nest = _unlmg9Nest;
                     var pets = _vm.Entities.Where(e => e is VMAvatar &&
                         (e.Object?.OBJ?.GUID == 0x2CFB155Au || e.Object?.OBJ?.GUID == 0xA489640Du || e.Object?.OBJ?.GUID == 0xECADC9FDu)).ToList();
-                    var byGuid = string.Join(",", pets.Select(e => "0x" + e.Object.OBJ.GUID.ToString("X8")));
+                    var byGuid = string.Join(",", pets.Select(e => "0x" + e.Object.OBJ.GUID.ToString("X8")
+                        + (e.Position.x == -32768 ? "@OOW" : "@" + e.Position.x + "," + e.Position.y)));
                     var natPurple = pets.Any(e => e.Object.OBJ.GUID == 0xA489640Du);
+                    var purplePlaced = pets.FirstOrDefault(e => e.Object.OBJ.GUID == 0xA489640Du);
+                    var purpleInWorld = purplePlaced != null && purplePlaced.Position.x != -32768;
                     Log("AUTOTEST unl-magic9 PET-CENSUS count=" + pets.Count + " [" + byGuid + "]"
                         + " nest attrs 9/13/15=" + nest.GetAttribute(9) + "/" + nest.GetAttribute(13) + "/" + nest.GetAttribute(15));
                     if (pets.Count >= 2 && pets.All(e => !e.Dead))
                     {
+                        if (purplePlaced != null)
+                            Log("AUTOTEST unl-magic9 MAINLOOP-CREATE-LAW: the nest's own main-loop Purple pet is "
+                                + (purpleInWorld ? "IN-WORLD at " + purplePlaced.Position.x + "," + purplePlaced.Position.y
+                                    + " — the native create flags=0x6 + find_location_for pass placed it natively (the create-cadence residual's own evidence)"
+                                : "OOW (find_location_for did not place it — the create-cadence residual stands)"));
                         Log("AUTOTEST unl-magic9 verdict DRAGON-ROW-LIVE" + (natPurple ? "-NATURAL-PURPLE" : "")
                             + ": 4172 hatch gate + 4174 Determine Type (natural type computed"
                             + (natPurple ? " = PURPLE natively from the care sum" : "")
