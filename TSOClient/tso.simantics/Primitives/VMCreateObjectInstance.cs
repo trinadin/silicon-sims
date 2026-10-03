@@ -45,13 +45,20 @@ namespace FSO.SimAntics.Engine.Primitives
                 case VMCreateObjectPosition.AtCallerTS1:
                     // AtCallerTS1 (10): native TS1 position mode one past the
                     // TSO 0-9 set — used by the 'Ghost Me' effect family
-                    // (NectarPress 4118 @13, guid 0xDC14EEAF; flags 0x21).
-                    // Semantics: the effect object appears AT the caller's
-                    // tile — same as UnderneathMe, whose OOW fallback below
-                    // re-places with intersection ignored (the appear-on-me
-                    // law). EXP-07 drink last-mile decode: the unhandled value
-                    // threw "Where do I put this??" and the suppressed
-                    // exception reset ate the whole interaction.
+                    // (NectarPress 4118 @13, guid 0xDC14EEAF; flags 0x21; the
+                    // only pos=10 site in the whole 894-create corpus — review
+                    // finding 4). Best-supported reading (review finding 5:
+                    // inference, not native-verified): the effect object
+                    // appears AT the caller's tile like UnderneathMe, whose
+                    // OOW fallback below re-places with intersection ignored —
+                    // pos 5 was walk-overable-only and the ghost is footprinted,
+                    // which is a coherent reason for a distinct late-TS1 mode.
+                    // EXP-07 drink last-mile decode: the unhandled value threw
+                    // "Where do I put this??" and the suppressed exception
+                    // reset ate the whole interaction. Review note 2 edge: a
+                    // second drink while the ghost still stands trips the
+                    // content's own NoDuplicate gate (flags 0x21 bit 0) —
+                    // native-intended, not a regression.
                     tpos = new LotTilePos(context.Caller.Position);
                     dir = context.Caller.Direction;
                     break;
@@ -176,7 +183,10 @@ namespace FSO.SimAntics.Engine.Primitives
                 foreach (var iobj in mobj.Objects) iobj.IgnoreIntersection = null;
             }
 
-            if (operand.Position != VMCreateObjectPosition.OutOfWorld && operand.Position != VMCreateObjectPosition.AtCallerTS1 && obj.Position == LotTilePos.OUT_OF_WORLD && obj.Container == null)
+            // review P2 (indep-review-atcallerts1-20261003): no exclusion here —
+            // a double placement failure deletes + returns FALSE exactly like
+            // UnderneathMe (an unowned OOW ghost has no cleanup path)
+            if (operand.Position != VMCreateObjectPosition.OutOfWorld && obj.Position == LotTilePos.OUT_OF_WORLD && obj.Container == null)
             {
                 obj.Delete(true, context.VM.Context);
                 return VMPrimitiveExitCode.GOTO_FALSE;
