@@ -1083,6 +1083,7 @@ namespace Simitone.Client
                 || CheckEnabled("magicbook")
                 || CheckEnabled("petname")
                 || CheckEnabled("famedecay")
+                || CheckEnabled("awarddrive")
                 || CheckEnabled("dt-strip")
                 || CheckEnabled("unl-show")
                 || CheckEnabled("unl-mice")
@@ -5471,6 +5472,187 @@ namespace Simitone.Client
             {
                 Log("AUTOTEST famedecay EXC " + fd.GetType().Name + " " + fd.Message);
                 Fail("famedecay"); _fmdecState = 99;
+            }
+        }
+
+        // ---- EXP-11 V5 ('awarddrive', opt-in): the Award live drive per the
+        // v5 decode (receipt v5-award-decode-20261003.md). On Studio lot 81:
+        // arm the family sim (pd[80]=1000, pd[81]=9, pd[56]=0), place the
+        // CelebAwardCabinet (0xA5B9515A), direct-drive 4128 'Promotion Check'
+        // (StackObject=the sim; the mode-36 recompute + the demote dialog +
+        // the level->set-object ladder CREATE), assert a ladder piece spawns;
+        // then the 4118 'Get Award' solo push (StackObject=the cabinet; the
+        // presenter handshake may park it — the two-actor 4115 path is the
+        // full ceremony) and assert the trophy (The Simmy / SimChoice).
+        private static int _awdrvState, _awdrvSettle, _awdrvFrame, _awdrvSwitchF = -1;
+        private static bool _awdrvRebound, _awdrvLadder, _awdrvTrophy;
+        private static short _awdrvNid;
+        private static readonly uint[] AwdrvLadder = { 0x4450E4E0u, 0x1D772052u, 0xF4126CC4u, 0x4D6DA494u, 0xAAE98936u, 0x88734CE8u };
+        private static readonly uint[] AwdrvTrophies = { 0x4B61D53Eu, 0xD8CA84BAu };
+
+        private static void AwardDriveTick()
+        {
+            try
+            {
+                _awdrvFrame++;
+                if (_awdrvState == 0)
+                {
+                    if (++_awdrvSettle < 90) return;
+                    _awdrvSettle = 0;
+                    Log("AUTOTEST awarddrive V5 (EXP-11: lot 81 -> arm pd=[1000,9,0] -> place the cabinet -> 4128 ladder drive -> 4118 trophy drive)");
+                    _vm.SignalLotSwitch(81u);
+                    _awdrvSwitchF = _awdrvFrame;
+                    _awdrvState = 1;
+                    return;
+                }
+                if (_awdrvState == 1)
+                {
+                    if (_screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    { _vm = _screen.vm; _awdrvRebound = true; }
+                    var cur = _vm.TS1State?.CurrentHouse ?? 0;
+                    if (_awdrvSwitchF > 0 && _awdrvFrame >= _awdrvSwitchF + 3600)
+                    { Log("AUTOTEST awarddrive verdict no-switch cur=" + cur); Fail("awarddrive"); _awdrvState = 99; return; }
+                    if (!(_awdrvRebound && cur == 81)) return;
+                    // the EXP-13 family-null law: the away lot never activates the
+                    // traveling family — apply the disclosed ActivateFamily lever
+                    if (_vm.TS1State?.CurrentFamily == null)
+                    {
+                        if (Content.Get().Neighborhood.FamilyForHouse.TryGetValue(5, out var fam81) && fam81 != null)
+                        {
+                            _vm.TS1State.ActivateFamily(_vm, fam81);
+                            _vm.TS1State.VerifyFamily(_vm); // the mode-17 arrival law's own spawner
+                            Log("AUTOTEST awarddrive FAMILY-ACTIVATED fam=" + fam81.ChunkID + " + VerifyFamily (members=" + fam81.FamilyGUIDs.Length + ")");
+                        }
+                    }
+                    // the G4 law (the petname runs): lot NPC staff match the loose
+                    // filter — pin the family human + exclude npc_ resources
+                    var famNum81 = _vm.GetGlobalValue(9);
+                    var sim = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                        .FirstOrDefault(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                            && a.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18 && !a.IsPet
+                            && a.GetPersonData(VMPersonDataVariable.TS1FamilyNumber) == famNum81
+                            && !((a.Object?.Resource?.MainIff?.Filename ?? "").StartsWith("npc_", true, null))
+                            && !((a.Object?.Resource?.MainIff?.Filename ?? "").StartsWith("NPC_", true, null)));
+                    if (sim == null) { if (++_awdrvSettle > 2700) { Log("AUTOTEST awarddrive verdict no-family-adult-81 fam=" + famNum81); Fail("awarddrive"); _awdrvState = 99; } return; }
+                    _awdrvNid = sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                    sim.SetPersonData(VMPersonDataVariable.TS1FameScore, 1000);
+                    sim.SetPersonData(VMPersonDataVariable.TS1FameStarPower, 9);
+                    sim.SetPersonData(VMPersonDataVariable.TS1FameStarHighWatermark, 9);
+                    sim.SetPersonData((VMPersonDataVariable)56, 0);
+                    var cab = PlacePetNameObject(sim, 0xA5B9515Au);
+                    var spawnCtrl = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0x6A75FC81u);
+                    Log("AUTOTEST awarddrive ARMED nid=" + _awdrvNid + " pd=[1000,9,9] cabinet=" + (cab != null ? "oid=" + cab.ObjectID : "FAIL")
+                        + " celebSpawnCtrl=" + (spawnCtrl != null ? "oid=" + spawnCtrl.ObjectID : "ABSENT"));
+                    if (cab == null || spawnCtrl == null)
+                    { Log("AUTOTEST awarddrive verdict setup-failed"); Fail("awarddrive"); _awdrvState = 99; return; }
+                    // the 4128 direct drive: StackObject=the sim, CodeOwner=the
+                    // controller resource (Celebrity Spawn's own IFF)
+                    var tree = spawnCtrl.GetRoutineWithOwner(4128, _vm.Context);
+                    if (tree?.routine == null) { Log("AUTOTEST awarddrive verdict no-4128-tree"); Fail("awarddrive"); _awdrvState = 99; return; }
+                    sim.Thread.EnqueueAction(new FSO.SimAntics.Engine.VMQueuedAction
+                    {
+                        Callee = sim, StackObject = sim, IconOwner = sim,
+                        CodeOwner = tree.owner, ActionRoutine = tree.routine, CheckRoutine = null,
+                        Name = "Promotion Check (probe direct drive)",
+                        Args = new short[] { 0, 0, 0, 0 }, InteractionNumber = 0,
+                        Priority = (short)FSO.SimAntics.Engine.VMQueuePriority.UserDriven,
+                        Flags = FSO.Files.Formats.IFF.Chunks.TTABFlags.AllowVisitors,
+                    });
+                    Log("AUTOTEST awarddrive 4128-PUSHED (the ladder drive)");
+                    // name any silent drop (the SIM-19 read-only sinks)
+                    FSO.SimAntics.Engine.VMThread.QueueDrop += PetNameQueueDrop;
+                    FSO.SimAntics.Engine.VMThread.QueueRemoveAny += PetNameQueueRemove;
+                    _awdrvState = 2; _awdrvSettle = 0;
+                    return;
+                }
+                if (_awdrvState == 2)
+                {
+                    _awdrvSettle++;
+                    // answer any chain dialog engine-side
+                    var dlg = _vm.GlobalBlockingDialog;
+                    var bs = dlg?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                    if (dlg != null && bs != null && !bs.Responded)
+                    { bs.Responded = true; bs.ResponseCode = 0; bs.ResponseText = ""; ReleasePetNameLatch(dlg); Log("AUTOTEST awarddrive DIALOG-ANSWERED type=" + bs.Type); }
+                    var ladderHit = _vm.Entities.FirstOrDefault(e => e.Object != null && AwdrvLadder.Contains(e.Object.OBJ.GUID));
+                    if (ladderHit != null)
+                    {
+                        _awdrvLadder = true;
+                        var guidHit = ladderHit.Object.OBJ.GUID;
+                        Log("AUTOTEST awarddrive V5-LADDER-SPAWNED guid=0x" + guidHit.ToString("X8") + " oid=" + ladderHit.ObjectID
+                            + " (the 4128 set-object law LIVE)");
+                        // the 4118 trophy drive: StackObject=the cabinet
+                        var sim2 = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                            .FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.NeighborId) == _awdrvNid);
+                        var cab2 = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0xA5B9515Au);
+                        var ctrl2 = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0x6A75FC81u);
+                        if (sim2 != null && cab2 != null && ctrl2 != null)
+                        {
+                            var tree2 = ctrl2.GetRoutineWithOwner(4118, _vm.Context);
+                            if (tree2?.routine != null)
+                            {
+                                sim2.Thread.EnqueueAction(new FSO.SimAntics.Engine.VMQueuedAction
+                                {
+                                    Callee = cab2, StackObject = cab2, IconOwner = cab2,
+                                    CodeOwner = tree2.owner, ActionRoutine = tree2.routine, CheckRoutine = null,
+                                    Name = "Get Award (probe direct drive)",
+                                    Args = new short[] { 0, 0, 0, 0 }, InteractionNumber = 0,
+                                    Priority = (short)FSO.SimAntics.Engine.VMQueuePriority.UserDriven,
+                                    Flags = FSO.Files.Formats.IFF.Chunks.TTABFlags.AllowVisitors,
+                                });
+                                Log("AUTOTEST awarddrive 4118-PUSHED (the trophy drive; the presenter handshake may park it)");
+                            }
+                        }
+                        _awdrvState = 3; _awdrvSettle = 0;
+                        return;
+                    }
+                    if (_awdrvSettle == 120 || _awdrvSettle == 600)
+                    {
+                        var simQ = _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>()
+                            .FirstOrDefault(a => a.GetPersonData(VMPersonDataVariable.NeighborId) == _awdrvNid);
+                        var q = simQ?.Thread?.Queue;
+                        var top = simQ?.Thread?.Stack?.LastOrDefault();
+                        var chainS = "";
+                        if (simQ?.Thread?.Stack != null)
+                            foreach (var fr in simQ.Thread.Stack)
+                            { string own = null; try { own = fr?.ScopeResource?.MainIff?.Filename; } catch { }
+                                chainS += (fr?.Routine?.Chunk?.ChunkID ?? 0) + "@" + (fr?.InstructionPointer ?? -1) + "(" + (own ?? "?") + "),"; }
+                        Log("AUTOTEST awarddrive 4128-SNAP f=" + _awdrvSettle + " q=" + (q?.Count.ToString() ?? "?")
+                            + " top=" + (top?.Routine?.Chunk?.ChunkID.ToString() ?? "none") + "@" + (top?.InstructionPointer.ToString() ?? "?")
+                            + " stack=[" + chainS + "] catches=" + (simQ?.Thread?.CatchReentries.ToString() ?? "?")
+                            + " pd81=" + (simQ?.GetPersonData(VMPersonDataVariable.TS1FameStarPower).ToString() ?? "?")
+                            + " pd80=" + (simQ?.GetPersonData(VMPersonDataVariable.TS1FameScore).ToString() ?? "?"));
+                    }
+                    if (_awdrvSettle > 2700)
+                    { Log("AUTOTEST awarddrive verdict no-ladder-piece (the 4128 gates — the decode's mode-36/dialog prerequisites)"); Fail("awarddrive"); _awdrvState = 99; }
+                    return;
+                }
+                if (_awdrvState == 3)
+                {
+                    _awdrvSettle++;
+                    var dlg = _vm.GlobalBlockingDialog;
+                    var bs = dlg?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                    if (dlg != null && bs != null && !bs.Responded)
+                    { bs.Responded = true; bs.ResponseCode = 0; bs.ResponseText = ""; ReleasePetNameLatch(dlg); }
+                    var trophy = _vm.Entities.FirstOrDefault(e => e.Object != null && AwdrvTrophies.Contains(e.Object.OBJ.GUID));
+                    if (trophy != null)
+                    {
+                        _awdrvTrophy = true;
+                        Log("AUTOTEST awarddrive V5-TROPHY guid=0x" + trophy.Object.OBJ.GUID.ToString("X8") + " oid=" + trophy.ObjectID);
+                    }
+                    if (_awdrvTrophy || _awdrvSettle > 2700)
+                    {
+                        Log("AUTOTEST awarddrive verdict V5-LIVE: ladderSpawned=" + _awdrvLadder + " trophyCreated=" + _awdrvTrophy
+                            + (_awdrvTrophy ? "" : " (the solo 4118 parks without the 4115 presenter handshake — the two-actor ceremony law)"));
+                        if (_awdrvLadder) { Pass("awarddrive"); _awdrvState = 99; return; }
+                        Fail("awarddrive"); _awdrvState = 99; return;
+                    }
+                    return;
+                }
+            }
+            catch (Exception ad)
+            {
+                Log("AUTOTEST awarddrive EXC " + ad.GetType().Name + " " + ad.Message);
+                Fail("awarddrive"); _awdrvState = 99;
             }
         }
 
@@ -10068,6 +10250,11 @@ namespace Simitone.Client
             {
                 FameDecayTick();
             }
+            // EXP-11 V5 (opt-in "awarddrive"): the Award live drive.
+            if (CheckEnabled("awarddrive") && _awdrvState != 99)
+            {
+                AwardDriveTick();
+            }
             // EXP-08 leg-2 residual (opt-in "dt-strip"): the downtown live drive.
             if (CheckEnabled("dt-strip") && _dtstripState != 99)
             {
@@ -10668,6 +10855,8 @@ namespace Simitone.Client
                 return; // (EXP-08 fix card 1) adoption drive still driving; battery finishes after the verdict
             if (CheckEnabled("famedecay") && _fmdecState != 99)
                 return; // (EXP-11 V4+V6) the decay/reload drive still running; battery finishes after the verdict
+            if (CheckEnabled("awarddrive") && _awdrvState != 99)
+                return; // (EXP-11 V5) the award drive still running; battery finishes after the verdict
             if (CheckEnabled("llfire") && _ll3State != 2)
                 return; // (EXP-01 llfire) fire/rocket legs still driving; battery finishes after the verdict
             if (CheckEnabled("aud12live") && _a12State != 2)
