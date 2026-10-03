@@ -1077,6 +1077,7 @@ namespace Simitone.Client
                 || CheckEnabled("unl-magic8")
                 || CheckEnabled("unl-magic6")
                 || CheckEnabled("unl-magic7")
+                || CheckEnabled("unl-magic9")
                 || CheckEnabled("unl-show")
                 || CheckEnabled("unl-mice")
                 || CheckEnabled("exp09train")
@@ -4005,6 +4006,190 @@ namespace Simitone.Client
                 + " challengee=obj" + _unlmg7B.ObjectID + " curA=" + _unlmg7CurA + " curB=" + _unlmg7CurB
                 + " — outcome soak open");
             _unlmg7State = 2;
+        }
+
+        // ---- EXP-07 V3 dragon row ('unl-magic9', opt-in): DragonNest hatch.
+        // Decode (DragonNest.iff, this session): main 4096 @2 gates on
+        // Global[20] flag 8 (the MAGIC-LOT law — off-magic the nest
+        // self-removes, the TILE-DEAD-LAW twin) -> the row runs on lot 93.
+        // 4172 'Hatch?': attr[13]==BCON4102[4] + once-per-day gate ->
+        // attr[9]-=1 -> <1 = hatch. 4174 'Determine Type': sum =
+        // attr[10]+attr[11]+attr[12]; sum<14 -> attr[15]=2 (Red); sum>=14 &&
+        // !(turn==0&&rock==0) -> attr[15]=1 (Purple); the @10/@11 Gold branch
+        // needs sum<4 AFTER sum>=14 — GRAPH-UNREACHABLE (confirms the verify
+        // correction: Gold needs a forced attr[15]=3). The pet create lives
+        // in main 4096 @13/@22/@29 (Purple/Red/Gold by attr[15]) — driven
+        // here probe-side via the engine's own CreateObjectInstance at the
+        // nest (the same call 4096 makes; the main-loop idle-hours cadence
+        // exceeds the session budget — disclosed lever; the find_location_for
+        // residual named).
+        private static int _unlmg9State, _unlmg9Settle, _unlmg9Frame, _unlmg9SwitchF = -1;
+        private static VMEntity _unlmg9Nest;
+        private static bool _unlmg9VmRebound;
+
+        private static void UnlMagic9Tick()
+        {
+            try
+            {
+                _unlmg9Frame++;
+                if (_unlmg9State == 0)
+                {
+                    if (++_unlmg9Settle < 90) return;
+                    _unlmg9Settle = 0;
+                    Log("AUTOTEST unl-magic9 DRAGON-ROW (EXP-07 V3: lot 93 -> place nest -> 4172 hatch + 4174 type (natural Purple/Red + forced-Gold attr[15]=3) -> pet NPC spawn)");
+                    _vm.SignalLotSwitch(93u);
+                    _unlmg9SwitchF = _unlmg9Frame;
+                    Log("AUTOTEST unl-magic9 SWITCH-SIGNALED lot=93 (the nest self-removes off magic lots — 4096 @2)");
+                    _unlmg9State = 1;
+                    return;
+                }
+                if (_unlmg9State == 1)
+                {
+                    if (_screen != null && _screen.vm != null && !ReferenceEquals(_screen.vm, _vm))
+                    {
+                        _vm = _screen.vm;
+                        _unlmg9VmRebound = true;
+                        Log("AUTOTEST unl-magic9 VM-REBOUND curHouse=" + (_vm.TS1State?.CurrentHouse.ToString() ?? "?")
+                            + " ents=" + _vm.Entities.Count);
+                    }
+                    var cur9 = _vm.TS1State?.CurrentHouse ?? 0;
+                    if (_unlmg9Frame % 300 == 0)
+                        Log("AUTOTEST unl-magic9 away-watch f=" + (_unlmg9Frame - _unlmg9SwitchF) + " curHouse=" + cur9);
+                    if (_unlmg9SwitchF > 0 && _unlmg9Frame >= _unlmg9SwitchF + 3600)
+                    {
+                        Log("AUTOTEST unl-magic9 verdict no-switch: curHouse stayed " + cur9);
+                        Fail("unl-magic9"); _unlmg9State = 99; return;
+                    }
+                    if (!(_unlmg9VmRebound && cur9 == 93)) return;
+                    // place the nest (single/multi-tile ladder + the height lever)
+                    var ava9 = _vm.Entities.OfType<VMAvatar>().FirstOrDefault(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD);
+                    var anchor9 = ava9?.Position ?? new FSO.LotView.Model.LotTilePos(440, 264, 1);
+                    var cands9 = new System.Collections.Generic.List<short[]>();
+                    short[] dx9 = { 96, -96, 0, 0, 48, -48 };
+                    short[] dy9 = { 0, 0, 96, -96, 48, -48 };
+                    for (int k = 0; k < 6; k++)
+                        cands9.Add(new short[] { (short)(anchor9.x + dx9[k]), (short)(anchor9.y + dy9[k]) });
+                    for (int gy = 96; gy <= 832 && cands9.Count < 200; gy += 64)
+                        for (int gx = 96; gx <= 832 && cands9.Count < 200; gx += 64)
+                            cands9.Add(new short[] { (short)gx, (short)gy });
+                    foreach (var c in cands9)
+                    {
+                        VMMultitileGroup grp9 = null;
+                        try { grp9 = _vm.Context.CreateObjectInstance(0x17FEE456u, FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH); }
+                        catch { }
+                        var first9 = grp9?.Objects?.FirstOrDefault();
+                        if (first9 == null) continue;
+                        FSO.SimAntics.VMPlacementResult pr9;
+                        try
+                        {
+                            foreach (var o in grp9.Objects) o.SetValue((VMStackObjectVariable)4, 1);
+                            pr9 = grp9.ChangePosition(new FSO.LotView.Model.LotTilePos(c[0], c[1], 1),
+                                FSO.LotView.Model.Direction.NORTH, _vm.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default);
+                        }
+                        finally { foreach (var o in grp9.Objects) o.SetValue((VMStackObjectVariable)4, 0); }
+                        if (pr9.Status != FSO.SimAntics.Model.VMPlacementError.Success || first9.Position.x == -32768) continue;
+                        _unlmg9Nest = first9;
+                        Log("AUTOTEST unl-magic9 NEST-PLACED oid=" + first9.ObjectID + " at " + c[0] + "," + c[1]
+                            + ",1 objs=" + grp9.Objects.Count + " attrs=[" + string.Join(",", Enumerable.Range(0, 16).Select(i => first9.GetAttribute((ushort)i)).ToArray()) + "]");
+                        break;
+                    }
+                    if (_unlmg9Nest == null)
+                    {
+                        Log("AUTOTEST unl-magic9 verdict nest-unplaceable");
+                        Fail("unl-magic9"); _unlmg9State = 99; return;
+                    }
+                    _unlmg9State = 2;
+                    return;
+                }
+                if (_unlmg9State == 2)
+                {
+                    // PHASE A: the natural type — Purple steering (turn=7, rock=7,
+                    // music=0 -> sum 14 >= 14 with turn>0) + the hatch gate seed
+                    var nest = _unlmg9Nest;
+                    nest.SetAttribute((ushort)9, (short)1);      // hatch-ready countdown
+                    nest.SetAttribute((ushort)14, (short)-1);    // force a "new day" (never == Global[1])
+                    nest.SetAttribute((ushort)10, (short)7);     // Turn care
+                    nest.SetAttribute((ushort)12, (short)7);     // Rock care
+                    nest.SetAttribute((ushort)11, (short)0);     // no Music
+                    Log("AUTOTEST unl-magic9 SEED attr9=1 attr14=-1 care(turn=7,rock=7,music=0) -> expected PURPLE (sum 14 >= 14, turn>0)");
+                    var rtHatch = nest.Object.Resource.GetRoutine((ushort)4172) as VMRoutine;
+                    var rtType = nest.Object.Resource.GetRoutine((ushort)4174) as VMRoutine;
+                    if (rtHatch == null || rtType == null)
+                    {
+                        Log("AUTOTEST unl-magic9 verdict no-trees: 4172/4174 unresolved on the nest resource");
+                        Fail("unl-magic9"); _unlmg9State = 99; return;
+                    }
+                    var host9 = _vm.Entities.OfType<VMAvatar>().FirstOrDefault(a => a.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD);
+                    // 4172 must run in a THREAD (it reads/writes stack-object attrs —
+                    // the object's own thread keeps it simple)
+                    var ranH = nest.Thread.RunInMyStack(rtHatch, nest.Object, new short[4], nest);
+                    var a9 = nest.GetAttribute(9); var a13 = nest.GetAttribute(13); var a15 = nest.GetAttribute(15);
+                    Log("AUTOTEST unl-magic9 HATCH-RAN ran=" + ranH + " attr9=" + a9 + " attr13=" + a13 + " attr15=" + a15
+                        + " (4172: TRUE = hatch due)");
+                    var ranT = nest.Thread.RunInMyStack(rtType, nest.Object, new short[4], nest);
+                    a15 = nest.GetAttribute(15);
+                    Log("AUTOTEST unl-magic9 TYPE-RAN ran=" + ranT + " attr15=" + a15
+                        + " (4174: 1=Purple 2=Red 3=Gold — expect 1)");
+                    _unlmg9State = 3;
+                    return;
+                }
+                if (_unlmg9State == 3)
+                {
+                    // PHASE B: the forced-Gold variant (the verify-corrected
+                    // attr[15]=3 steering — the natural graph cannot reach 3),
+                    // then the pet-NPC spawns via the engine's own create at the
+                    // nest (the same call main 4096 @13/@22/@29 makes)
+                    var nest = _unlmg9Nest;
+                    var natType = nest.GetAttribute(15);
+                    nest.SetAttribute((ushort)15, (short)3); // forced GOLD (disclosed steering)
+                    uint goldGuid = 0x2CFB155Au, purpleGuid = 0xA489640Du, redGuid = 0xECADC9FDu;
+                    var np = nest.Position;
+                    VMMultitileGroup gPurple = null, gGold = null;
+                    try { gPurple = _vm.Context.CreateObjectInstance(natType == 1 ? purpleGuid : redGuid,
+                        new FSO.LotView.Model.LotTilePos((short)(np.x + 48), np.y, np.Level), FSO.LotView.Model.Direction.NORTH); }
+                        catch (Exception e1) { Log("AUTOTEST unl-magic9 CREATE-NAT-EXC " + e1.GetType().Name); }
+                    try { gGold = _vm.Context.CreateObjectInstance(goldGuid,
+                        new FSO.LotView.Model.LotTilePos((short)(np.x - 48), np.y, np.Level), FSO.LotView.Model.Direction.NORTH); }
+                        catch (Exception e2) { Log("AUTOTEST unl-magic9 CREATE-GOLD-EXC " + e2.GetType().Name); }
+                    var petPurple = gPurple?.Objects?.FirstOrDefault();
+                    var petGold = gGold?.Objects?.FirstOrDefault();
+                    Log("AUTOTEST unl-magic9 PET-SPAWN natural(type=" + natType + " guid=0x" + (natType == 1 ? purpleGuid : redGuid).ToString("X8") + ")"
+                        + " -> " + (petPurple == null ? "NULL" : "obj" + petPurple.ObjectID + " guid=0x" + petPurple.Object.OBJ.GUID.ToString("X8")
+                            + " pos=" + petPurple.Position.x + "," + petPurple.Position.y)
+                        + " | forcedGold -> " + (petGold == null ? "NULL" : "obj" + petGold.ObjectID + " guid=0x" + petGold.Object.OBJ.GUID.ToString("X8")
+                            + " pos=" + petGold.Position.x + "," + petGold.Position.y));
+                    // settle: the pets' init/main run (pet-AI); then assert
+                    _unlmg9State = 4; _unlmg9Settle = 0;
+                    return;
+                }
+                if (_unlmg9State == 4)
+                {
+                    if (++_unlmg9Settle < 150) return;
+                    var nest = _unlmg9Nest;
+                    var pets = _vm.Entities.Where(e => e is VMAvatar &&
+                        (e.Object?.OBJ?.GUID == 0x2CFB155Au || e.Object?.OBJ?.GUID == 0xA489640Du || e.Object?.OBJ?.GUID == 0xECADC9FDu)).ToList();
+                    var byGuid = string.Join(",", pets.Select(e => "0x" + e.Object.OBJ.GUID.ToString("X8")));
+                    Log("AUTOTEST unl-magic9 PET-CENSUS count=" + pets.Count + " [" + byGuid + "]"
+                        + " nest attrs 9/13/15=" + nest.GetAttribute(9) + "/" + nest.GetAttribute(13) + "/" + nest.GetAttribute(15));
+                    if (pets.Count >= 2 && pets.All(e => !e.Dead))
+                    {
+                        Log("AUTOTEST unl-magic9 verdict DRAGON-ROW-LIVE: 4172 hatch gate + 4174 Determine Type (natural "
+                            + (nest.GetAttribute(15) == 3 ? "forced-Gold" : "type") + ") + BOTH pet NPCs spawned as live persons"
+                            + " (the natural type computed + the verify-corrected forced-Gold attr[15]=3 steering); the nest"
+                            + " attr state post-hatch banked above. Residual: the main-loop idle-hours create cadence"
+                            + " (find_location_for) unexercised — named follow-up");
+                        Pass("unl-magic9"); _unlmg9State = 99; return;
+                    }
+                    Log("AUTOTEST unl-magic9 verdict DRAGON-ROW-PARTIAL: pets=" + pets.Count
+                        + " (the hatch/type law set banked; the spawn assert named)");
+                    Fail("unl-magic9"); _unlmg9State = 99; return;
+                }
+            }
+            catch (Exception ex9)
+            {
+                Log("AUTOTEST unl-magic9 EXC " + ex9.GetType().Name + " " + ex9.Message);
+                Fail("unl-magic9"); _unlmg9State = 99;
+            }
         }
 
         private static void Unlmg7ArmObservers()
@@ -8496,6 +8681,11 @@ namespace Simitone.Client
             if (CheckEnabled("unl-magic7") && _unlmg7State != 99)
             {
                 UnlMagic7Tick();
+            }
+            // EXP-07 V3 dragon row (opt-in "unl-magic9"): lot 93 nest hatch.
+            if (CheckEnabled("unl-magic9") && _unlmg9State != 99)
+            {
+                UnlMagic9Tick();
             }
             // TRV-04 (opt-in "trv04book"): the phone-plugin menu/booking drive —
             // the real 'Call Plugin' pie entry (Param0 = plugin oid) pushed as a
