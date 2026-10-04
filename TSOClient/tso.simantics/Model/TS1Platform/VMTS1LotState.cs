@@ -242,6 +242,11 @@ namespace FSO.SimAntics.Model.TS1Platform
             }
 
             //this is really only here for future networking. families should be activated (see abover) when joining lots for the first time
+            // ENG-12: the FAMI copy serialized above is BLOCK-LESS by construction
+            // (see SerializeInto), and the reader's spell-block gate is exact
+            // (== 12 remaining), so this shared-stream read never consumes the
+            // Version-40 tail; the deserialized instance is transient — VM re-binds
+            // the live MainResource FAMI (which carries the block) via ActivateFamily.
             var famID = reader.ReadUInt16();
             if (famID < 65535)
             {

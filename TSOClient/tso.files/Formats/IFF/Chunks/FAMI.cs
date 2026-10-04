@@ -129,7 +129,8 @@ namespace FSO.Files.Formats.IFF.Chunks
 
                 // ENG-12 spell block: written ONLY when the family has one (see
                 // SpellWords) — spell-less families stay byte-identical to the R252
-                // canon. Mirrors the reader's "iff >=12 bytes remain" law.
+                // canon. Mirrors the reader's "== 12 bytes remain" law (review note:
+                // the gate is EXACT — see the Read-side comment for why).
                 if (SpellWords != null && SpellWords.Length == 6)
                 {
                     for (int i = 0; i < 6; i++) io.WriteInt16(SpellWords[i]);
