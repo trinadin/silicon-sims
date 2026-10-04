@@ -19756,7 +19756,7 @@ namespace Simitone.Client
                     // ActionTree frame on the stack — the references the dead-Callee
                     // guard consults — re-pointed by the rebind, then REAL entity
                     // ticks through the scheduler path with the tree surviving.
-                    var resume19 = false; var repoint19 = false;
+                    var resume19 = false; var repoint19 = false; var composed21 = false;
                     if (swapThreadLive)
                     {
                         var routine19 = _vm.Entities.OfType<VMAvatar>()
@@ -19769,7 +19769,7 @@ namespace Simitone.Client
                         }
                         // the fixture references the CURRENT dying entity (swap39) — the
                         // live shape: the social was pushed on the sim being transformed
-                        var qa19 = new VMQueuedAction { Callee = swap39, StackObject = swap39, ActionRoutine = routine19, Name = "eng19-probe" };
+                        var qa19 = new VMQueuedAction { Callee = swap39, StackObject = swap39, ActionRoutine = routine19, Name = "eng19-probe", IconOwner = swap39 };
                         var f19 = new FSO.SimAntics.Engine.VMStackFrame
                         {
                             Thread = thread, Caller = swap39, Callee = swap39, StackObject = swap39,
@@ -19787,6 +19787,7 @@ namespace Simitone.Client
                         repoint19 = e19 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
                             && swap2_19 != null && thread.BoundEntity == swap2_19 && swap2_19.Thread == thread
                             && qa19.Callee == swap2_19 && qa19.StackObject == swap2_19
+                            && qa19.IconOwner == swap2_19 // review N2: the queue icon follows the swap
                             && f19.Callee == swap2_19 && f19.StackObject == swap2_19 && f19.Caller == swap2_19;
                         // the dead-Callee guard evaluated DIRECTLY: an ActionTree frame
                         // + a LIVE re-pointed Callee => the RUN branch (Reset unreachable)
@@ -19803,6 +19804,55 @@ namespace Simitone.Client
                         var survived19 = thread.Stack.Count > 0 || thread.Queue.Count > 0;
                         resume19 = repoint19 && guardRuns19 && tickedA19 && tickedB19 && exc19 == "" && survived19;
                         if (exc19 != "") results.Add("m19-tick-exc=" + exc19);
+
+                        // ENG-21 N1 (the composed chain, on THIS transplant): the REAL
+                        // dialog primitive yields ON THE TRANSPLANTED THREAD (Caller =
+                        // the live replacement — the exact live post-swap shape), the
+                        // REAL VMNetDialogResponseCmd routes through the live latch, and
+                        // REAL entity ticks + the dialog's respond path complete the
+                        // cycle. The driven-dialog seam = m14dialog's accepted seam.
+                        var liveA21 = thread.BoundEntity;
+                        var handler21 = new FSO.SimAntics.Primitives.VMDialogPrivateStrings();
+                        var op21 = new FSO.SimAntics.Primitives.VMDialogOperand { Type = VMDialogType.TS1TransformMe };
+                        var table21 = liveA21.Object.Resource.Get<STR>(301) ?? target.Object.Resource.Get<STR>(301);
+                        var rt21 = routine19;
+                        if (table21 != null && rt21 != null)
+                        {
+                            var f21 = new FSO.SimAntics.Engine.VMStackFrame
+                            { Thread = thread, Caller = liveA21, Callee = liveA21, StackObject = liveA21,
+                              Routine = rt21, CodeOwner = liveA21.Object };
+                            var e21 = FSO.SimAntics.Primitives.VMDialogPrivateStrings.ExecuteGeneric(f21, op21, table21);
+                            var latch21 = _vm.GlobalBlockingDialog;
+                            var st21 = thread.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                            var yieldOk21 = e21 == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
+                                && st21 != null && !st21.Responded && latch21 == liveA21; // the LIVE latch (N1's routing core)
+                            // the REAL response command — exactly what the net tick executes
+                            var respOk21 = false;
+                            try
+                            {
+                                respOk21 = new FSO.SimAntics.NetPlay.Model.Commands.VMNetDialogResponseCmd
+                                    { ResponseCode = 0, ResponseText = "" }.Execute(_vm, null);
+                            }
+                            catch (Exception ex21) { results.Add("m21-resp-exc=" + ex21.GetType().Name); }
+                            var respState21 = thread.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                            var responded21 = respOk21 && respState21 != null && respState21.Responded
+                                && _vm.GlobalBlockingDialog == null; // the latch released (the r157 law)
+                            // REAL entity ticks post-response (the thread continues on the transplant)
+                            var tick21 = false;
+                            try { thread.TicksThisFrame = 0; liveA21.Tick(); tick21 = thread.TicksThisFrame > 0; }
+                            catch (Exception ex21b) { results.Add("m21-tick-exc=" + ex21b.GetType().Name); }
+                            // the tree's resume step: the dialog instruction re-executes on the
+                            // transplant and COMPLETES with the branch (state consumed + cleared)
+                            thread.TempRegisters[0] = 0;
+                            var e21b = FSO.SimAntics.Primitives.VMDialogPrivateStrings.ExecuteGeneric(f21, op21, table21);
+                            var branch21 = e21b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
+                                && thread.TempRegisters[0] == 0 && thread.BlockingState == null;
+                            composed21 = yieldOk21 && responded21 && tick21 && branch21;
+                            results.Add("m21composed yield=" + yieldOk21 + " resp-routed=" + responded21
+                                + " tick=" + tick21 + " resume-branch=" + branch21
+                                + " latch-was-live=" + (latch21 == liveA21));
+                        }
+                        else results.Add("m21composed=SKIPPED (table/routine)");
                     }
                     var bs39 = (swap39 ?? caller).Object.Resource.Get<STR>((swap39 ?? caller).Object.OBJ.BodyStringID);
                     var bs0_39 = bs39?.GetString(0) ?? "?";
@@ -19823,9 +19873,9 @@ namespace Simitone.Client
                     ok &= e39a == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                         && e39b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
                         && t0_39 == 0 && swap39 != null && callerIsDead && !ReferenceEquals(swap39, caller)
-                        && swapCarry && swapThreadLive && resume19 && age39 == 27 && bs0_39 == "adult" && hdOk17;
+                        && swapCarry && swapThreadLive && resume19 && composed21 && age39 == 27 && bs0_39 == "adult" && hdOk17;
                     results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "(want 0=*a) temp1=" + t1_39 + "(oid-recycled=" + (t1_39 == oid39) + ")"
-                        + " swap=(" + (swap39 != null) + " pos-carry=" + (swapCarry) + " rebind=" + swapThreadLive + " resume=" + resume19 + " repoint=" + repoint19 + ") age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) hdslots=" + (hdOk17 ? "ok" : "BAD")
+                        + " swap=(" + (swap39 != null) + " pos-carry=" + (swapCarry) + " rebind=" + swapThreadLive + " resume=" + resume19 + " repoint=" + repoint19 + " composed=" + composed21 + ") age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) hdslots=" + (hdOk17 ? "ok" : "BAD")
                         + " " + string.Join(" ", hdDesc17) + " diag=[" + (FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate ?? "") + "]");
                     // ENG-07 review P2 discriminator: a CHILD fixture must roll from the
                     // ADULT tables — set a child [1] suit + child age, transform, assert
