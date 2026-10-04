@@ -19740,7 +19740,60 @@ namespace Simitone.Client
                     ok &= e39a == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                         && e39b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
                         && t0_39 == 0 && t1_39 == oid39 && age39 == 27 && bs0_39 == "adult";
-                    results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "(want 0=*a) temp1=" + t1_39 + "==oid" + oid39 + " age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult)");
+                    results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "(want 0=*a) temp1=" + t1_39 + "==oid" + oid39 + " age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) diag=[" + (FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate ?? "") + "]");
+                    // ENG-07 review P2 discriminator: a CHILD fixture must roll from the
+                    // ADULT tables — set a child [1] suit + child age, transform, assert
+                    // the body suit no longer carries the child key, the head rolled,
+                    // and the skin carried over.
+                    if (bs39 != null)
+                    {
+                        var g39 = caller.GetPersonData(VMPersonDataVariable.Gender) & 1;
+                        var childKey39 = ((g39 > 0) ? "f" : "m") + "cchd";
+                        var childHeads39 = FSO.Content.Content.Get().BCFGlobal.CollectionsByName["c"].ClothesByAvatarType[((g39 > 0) ? "f" : "m") + "c"];
+                        var childBodies39 = FSO.Content.Content.Get().BCFGlobal.CollectionsByName["b"].ClothesByAvatarType[childKey39];
+                        // the ADULT keys the transform must roll from (the review-P2 fix's target)
+                        var adultHeadKey39 = (g39 > 0) ? "fa" : "ma";
+                        var adultBodyKey39 = (g39 > 0) ? "fa" : "ma";
+                        if (childBodies39 != null && childBodies39.Count > 0 && childHeads39 != null && childHeads39.Count > 0)
+                        {
+                            var bs1Before = bs39.GetString(1); var bs2Before = bs39.GetString(2); var bs14Before = bs39.GetString(14);
+                            var ageBefore = caller.GetPersonData(VMPersonDataVariable.PersonsAge);
+                            var fixture1_39 = childBodies39[0] + ",BODY=probechild";
+                            var fixture2_39 = childHeads39[0] + ",HEAD-HEAD=probechild";
+                            try
+                            {
+                                bs39.SetString(1, fixture1_39, STRLangCode.EnglishUS);
+                                bs39.SetString(2, fixture2_39, STRLangCode.EnglishUS);
+                                caller.SetPersonData(VMPersonDataVariable.PersonsAge, 12);
+                                FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
+                                thread.TempRegisters[0] = oid39;
+                                var f39c = mkframe();
+                                driveOn(f39c, VMGenericTS1CallMode.ChildToAdult);
+                                var e39d = driveOn(f39c, VMGenericTS1CallMode.ChildToAdult);
+                                var bs1After = bs39.GetString(1); var bs2After = bs39.GetString(2); var bs14After = bs39.GetString(14);
+                                var ageAfter = caller.GetPersonData(VMPersonDataVariable.PersonsAge);
+                                // the head-roll assert compares against the CHILD FIXTURE (the
+                                // random roll may legitimately land on the original head)
+                                var adultRolled = e39d == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
+                                    && bs1After.IndexOf("chd", StringComparison.OrdinalIgnoreCase) < 0
+                                    && bs1After != fixture1_39
+                                    && bs2After != fixture2_39
+                                    && bs2After.IndexOf(",HEAD-HEAD=") >= 0
+                                    && bs14After == bs14Before
+                                    && ageAfter == 27;
+                                ok &= adultRolled;
+                                results.Add("m39child=" + e39d + "(want TRUE) bs1-adult=" + (bs1After.IndexOf("chd", StringComparison.OrdinalIgnoreCase) < 0)
+                                    + " head-rewritten=" + (bs2After != fixture2_39) + " skin-carried=" + (bs14After == bs14Before) + " age=" + ageAfter);
+                            }
+                            finally
+                            {
+                                bs39.SetString(1, bs1Before, STRLangCode.EnglishUS);
+                                bs39.SetString(2, bs2Before, STRLangCode.EnglishUS);
+                                caller.SetPersonData(VMPersonDataVariable.PersonsAge, ageBefore);
+                            }
+                        }
+                        else results.Add("m39child=SKIPPED (child tables unavailable)");
+                    }
                 }
                 finally
                 {
