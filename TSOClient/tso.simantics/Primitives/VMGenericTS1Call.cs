@@ -617,7 +617,19 @@ namespace FSO.SimAntics.Primitives
                             var bodyStr = target39.Object.Resource.Get<STR>(target39.Object.OBJ.BodyStringID);
                             if (bodyStr != null)
                             {
-                                bodyStr.SetString(0, "adult", STRLangCode.EnglishUS); // BodyStrings [0] = the age class
+                                // [13] = the age word, person AND pet (the native
+                                // adult age is 27 for both). [0] is written in the
+                                // PERSON branch only: in this port STR#200[0] is the
+                                // SPECIES discriminator (SetAvatarType maps
+                                // "dog"/"kat" -> Dog/Cat and loads <[0]>.skel; the
+                                // world ctor derives IsPet from [0] != adult/child;
+                                // the generator writes {0, "dog"/"kat"}), and since
+                                // AvatarChanged persists the character IFF, an
+                                // "adult" write here would re-type the pet as an
+                                // adult PERSON on the next lot load. Native law:
+                                // the "adult" age-class write happens only for
+                                // species 0 (childtoadult-decode §SetBodyString);
+                                // ChangeSimBaseType §13 keeps the pet type codes.
                                 bodyStr.SetString(13, "27", STRLangCode.EnglishUS);   // the age word
                                 // ENG-10 pet leg (native ChangeSimBaseType config §13-14):
                                 // a pet target rolls a random ADULT body suit from its
@@ -637,6 +649,7 @@ namespace FSO.SimAntics.Primitives
                                 }
                                 else
                                 {
+                                bodyStr.SetString(0, "adult", STRLangCode.EnglishUS); // [0] = the PERSON age class (species-gated — see above)
                                 // ENG-07 review P2 fix (person leg): roll from the ADULT
                                 // tables — GetValidOutfits/SetSuit key off the CURRENT [1]
                                 // suit type, so a child target would roll a child suit. The
@@ -770,11 +783,17 @@ namespace FSO.SimAntics.Primitives
                     // max-merge into the live 0xB6C90029 controller's attrs 0-5.
                     // Families without a block (every original-format FAMI and
                     // spell-less port families) keep the latch-only no-op law, which
-                    // is byte-faithful (native latch=0 ⇒ return TRUE). The native's
-                    // current-family/zoning gates collapse here: the controller
-                    // entity only exists on a lot carrying it, which is the merge's
-                    // own precondition; the zoning (community-lot) skip is that same
-                    // controller-absent pass-through.
+                    // is byte-faithful (native latch=0 ⇒ return TRUE).
+                    // DISCLOSED DIVERGENCE (review P2): the native's zoning gate
+                    // (ENG-08 §1's table walk — zoning 1 = community lot ⇒ no merge)
+                    // is NOT replicated: in the port the controller is a lot entity
+                    // persisted in the FSOV, so it exists on residential lots too,
+                    // where the port merges and the native would not. Benign by
+                    // construction — the merge is a one-way max of the family's own
+                    // words into the controller, and the controller's attrs round-trip
+                    // independently in the FSOV — but it is a divergence, not a
+                    // collapsed gate. Likewise the native's controller-lookup FALSE
+                    // edge: the port still returns TRUE with a block but no controller.
                     var spellsFam = context.VM.TS1State.CurrentFamily;
                     if (spellsFam == null) return VMPrimitiveExitCode.GOTO_FALSE;
                     if (spellsFam.SpellWords != null)
