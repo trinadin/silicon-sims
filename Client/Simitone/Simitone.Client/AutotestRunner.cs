@@ -19834,6 +19834,7 @@ namespace Simitone.Client
                             caller.SetPersonData(VMPersonDataVariable.Gender, (short)(gStandin | petLeg.bit));
                             petT = caller;
                         }
+                        string bs1P = null; var bs2P = ""; short agePBefore = 0;
                         try
                         {
                             var petBs = petT.Object.Resource.Get<STR>(petT.Object.OBJ.BodyStringID);
@@ -19841,7 +19842,15 @@ namespace Simitone.Client
                             else
                             {
                                 var petSuits = new HashSet<string>(petTable.Select(s => s.Item1));
-                                var bs1P = petBs.GetString(1); var bs2P = petBs.GetString(2);
+                                bs1P = petBs.GetString(1); bs2P = petBs.GetString(2);
+                                // deterministic fixture: sentinel suit + child age, so the
+                                // rolled-suit assert can never flake on a same-suit re-roll
+                                // (the template pet's [1] may already be an adult-table
+                                // member) and the conversion is a genuine child->adult leg
+                                var fixture1P = "probepet-" + petLeg.tag;
+                                agePBefore = petT.GetPersonData(VMPersonDataVariable.PersonsAge);
+                                petBs.SetString(1, fixture1P, STRLangCode.EnglishUS);
+                                petT.SetPersonData(VMPersonDataVariable.PersonsAge, 12);
                                 FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
                                 thread.TempRegisters[0] = (short)petT.ObjectID;
                                 var fP = mkframe(); fP.StackObject = petT;
@@ -19853,7 +19862,7 @@ namespace Simitone.Client
                                 var petOk = ePa == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                                     && ePb == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
                                     && t0P == 0 && t1P == (short)petT.ObjectID
-                                    && petSuits.Contains(bs1Pa) && bs1Pa != bs1P
+                                    && petSuits.Contains(bs1Pa) && bs1Pa != fixture1P
                                     && bs2Pa == bs2P && ageP == 27;
                                 ok &= petOk;
                                 results.Add("m40" + petLeg.tag + "[" + fixture + "]=" + ePa + "->" + ePb
@@ -19864,6 +19873,16 @@ namespace Simitone.Client
                         finally
                         {
                             if (standin != null) standin.SetPersonData(VMPersonDataVariable.Gender, gStandin);
+                            else if (petT != null && bs1P != null)
+                            {
+                                try
+                                {
+                                    var petBsR = petT.Object.Resource.Get<STR>(petT.Object.OBJ.BodyStringID);
+                                    if (petBsR != null) petBsR.SetString(1, bs1P, STRLangCode.EnglishUS);
+                                    petT.SetPersonData(VMPersonDataVariable.PersonsAge, agePBefore);
+                                }
+                                catch { }
+                            }
                         }
                     }
 
@@ -19961,6 +19980,44 @@ namespace Simitone.Client
                                 for (short k = 0; k < 6; k++) ctlS.SetAttribute(k, attrBeforeS[k]);
                                 fam.SpellWords = famWordsBefore;
                             }
+                            // ENG-12 P1 regression leg: the lot-marshal round-trip
+                            // with a family that HAS a block — the marshal copy must
+                            // be written BLOCK-LESS and the Version-40 tail must stay
+                            // aligned (the pre-fix >= 12 reader desynced here).
+                            {
+                                var activePrev = FSO.SimAntics.Model.TS1Platform.VMTS1LotState.Active;
+                                try
+                                {
+                                    var stM = new FSO.SimAntics.Model.TS1Platform.VMTS1LotState(40);
+                                    stM.CurrentFamily = fam; fam.SpellWords = new short[] { 3, 0, 7, 1, 0, 5 };
+                                    stM.TutorialObjectID = 4242;
+                                    for (int i = 0; i < 8; i++) stM.TodayReport[i] = 1000 + i;
+                                    stM.HistoryReport[3] = 77;
+                                    byte[] blobM;
+                                    using (var msM = new System.IO.MemoryStream())
+                                    {
+                                        using (var wM = new System.IO.BinaryWriter(msM, System.Text.Encoding.UTF8, true)) stM.SerializeInto(wM);
+                                        blobM = msM.ToArray();
+                                    }
+                                    var stR = new FSO.SimAntics.Model.TS1Platform.VMTS1LotState(40);
+                                    using (var msR = new System.IO.MemoryStream(blobM))
+                                    using (var rR = new System.IO.BinaryReader(msR, System.Text.Encoding.UTF8, false))
+                                    {
+                                        stR.Deserialize(rR);
+                                    }
+                                    var tailOk = stR.TutorialObjectID == 4242 && stR.TodayReport[7] == 1007 && stR.HistoryReport[3] == 77;
+                                    var blocklessOk = stR.CurrentFamily != null && stR.CurrentFamily.SpellWords == null;
+                                    ok &= tailOk && blocklessOk;
+                                    results.Add("famispell-marshal=tail-aligned=" + tailOk + " copy-blockless=" + blocklessOk
+                                        + " (tut=" + stR.TutorialObjectID + " today7=" + stR.TodayReport[7] + " hist3=" + stR.HistoryReport[3] + ")");
+                                }
+                                finally
+                                {
+                                    FSO.SimAntics.Model.TS1Platform.VMTS1LotState.Active = activePrev;
+                                    fam.SpellWords = famWordsBefore;
+                                }
+                            }
+
                         }
                     }
 
