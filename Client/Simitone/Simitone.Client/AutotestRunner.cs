@@ -19794,6 +19794,175 @@ namespace Simitone.Client
                         }
                         else results.Add("m39child=SKIPPED (child tables unavailable)");
                     }
+
+                    // ENG-10 (wave 11): the PET leg of modes 39/40 — species from the
+                    // target's own gender bits (dog=8/cat=16), suit rolled from the
+                    // ADULT species table (GetValidOutfits(null,-1/-2)), STR#200[1]
+                    // ONLY (head [2] untouched), age 27 + the outputs contract.
+                    // Fixture: a real pet instance when the template GUID creates
+                    // in-world; else the gender-bit stand-in on the caller (restored).
+                    foreach (var petLeg in new[] {
+                        new { bit = (short)8,  tbl = (short)-1, tag = "dog", guid = 0x4A70DF92u },
+                        new { bit = (short)16, tbl = (short)-2, tag = "cat", guid = 0x7BEA0977u } })
+                    {
+                        VMAvatar petT = null; var fixture = "real";
+                        var petTable = FSO.SimAntics.Utils.VMTS1PurchasableOutfitHelper.GetValidOutfits(null, petLeg.tbl);
+                        if (petTable.Length == 0) { results.Add("m40" + petLeg.tag + "=SKIPPED (empty species table)"); continue; }
+                        try
+                        {
+                            var po = _vm.Context.CreateObjectInstance(petLeg.guid,
+                                FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                            if (po != null)
+                            {
+                                foreach (var gy in new short[] { 96, 160, 224, 288 })
+                                    foreach (var gx in new short[] { 96, 160, 224, 288 })
+                                    {
+                                        try { po.ChangePosition(new FSO.LotView.Model.LotTilePos(gx, gy, 1), FSO.LotView.Model.Direction.NORTH, _vm.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default); } catch { }
+                                        if (po.Objects.FirstOrDefault().Position.x != -32768) break;
+                                    }
+                                petT = po.Objects.FirstOrDefault() as VMAvatar;
+                                if (petT != null && petT.Position.x == -32768) petT = null;
+                            }
+                        }
+                        catch { petT = null; }
+                        VMAvatar standin = null; short gStandin = 0;
+                        if (petT == null)
+                        {
+                            fixture = "gender-bit";
+                            standin = caller;
+                            gStandin = caller.GetPersonData(VMPersonDataVariable.Gender);
+                            caller.SetPersonData(VMPersonDataVariable.Gender, (short)(gStandin | petLeg.bit));
+                            petT = caller;
+                        }
+                        try
+                        {
+                            var petBs = petT.Object.Resource.Get<STR>(petT.Object.OBJ.BodyStringID);
+                            if (petBs == null) { results.Add("m40" + petLeg.tag + "=SKIPPED (no body strings)"); }
+                            else
+                            {
+                                var petSuits = new HashSet<string>(petTable.Select(s => s.Item1));
+                                var bs1P = petBs.GetString(1); var bs2P = petBs.GetString(2);
+                                FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
+                                thread.TempRegisters[0] = (short)petT.ObjectID;
+                                var fP = mkframe(); fP.StackObject = petT;
+                                var ePa = driveOn(fP, VMGenericTS1CallMode.PetToAdult);
+                                var ePb = driveOn(fP, VMGenericTS1CallMode.PetToAdult);
+                                var t0P = thread.TempRegisters[0]; var t1P = thread.TempRegisters[1];
+                                var bs1Pa = petBs.GetString(1); var bs2Pa = petBs.GetString(2);
+                                var ageP = petT.GetPersonData(VMPersonDataVariable.PersonsAge);
+                                var petOk = ePa == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
+                                    && ePb == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
+                                    && t0P == 0 && t1P == (short)petT.ObjectID
+                                    && petSuits.Contains(bs1Pa) && bs1Pa != bs1P
+                                    && bs2Pa == bs2P && ageP == 27;
+                                ok &= petOk;
+                                results.Add("m40" + petLeg.tag + "[" + fixture + "]=" + ePa + "->" + ePb
+                                    + " suit-rolled=" + petSuits.Contains(bs1Pa) + " head-untouched=" + (bs2Pa == bs2P)
+                                    + " age=" + ageP + "(want 27) t0=" + t0P + "(want 0) t1=" + t1P + "==oid" + petT.ObjectID);
+                            }
+                        }
+                        finally
+                        {
+                            if (standin != null) standin.SetPersonData(VMPersonDataVariable.Gender, gStandin);
+                        }
+                    }
+
+                    // ENG-13 (wave 11): make_new_character's ADULT branch — the fa/ma
+                    // key derivation (was fm/mm -> KeyNotFoundException at the heads
+                    // lookup; latent because TS1 tree-creates are always children).
+                    // Drive the primitive with an adult age: the create must complete
+                    // and the created character's body suit must resolve from the
+                    // adult "fa" table.
+                    {
+                        var g6Pre = FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6CreateDoneCount;
+                        var fNC = new FSO.SimAntics.Engine.VMStackFrame { Thread = thread, Caller = caller, Callee = caller, StackObject = target, Locals = new short[4] };
+                        fNC.Locals[0] = 1;  // color local 0: lgt
+                        fNC.Locals[1] = 30; // age local 1: ADULT
+                        fNC.Locals[2] = 1;  // gender local 2: female -> key "fa"
+                        var eNC = new FSO.SimAntics.Primitives.VMTS1MakeNewCharacter().Execute(fNC,
+                            new FSO.SimAntics.Primitives.VMTS1MakeNewCharacterOperand { ColorLocal = 0, AgeLocal = 1, GenderLocal = 2, AvatarType = 0 });
+                        var g6Post = FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6CreateDoneCount;
+                        var nidNC = FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6CreatedID;
+                        var stopNC = FSO.SimAntics.Primitives.VMTS1MakeNewCharacter.G6LastStop;
+                        var suitNC = "?"; var suitKnown = false;
+                        var recNC = (nidNC > 0 && nidNC <= short.MaxValue) ? FSO.Content.Content.Get().Neighborhood.GetNeighborByID((short)nidNC) : null;
+                        var resNC = recNC?.GUID != null ? Content.Get().WorldObjects.Get(recNC.GUID)?.Resource : null;
+                        var bsNC = resNC?.Get<STR>(200);
+                        // the ADULT female roll table — the created suit's body entry
+                        // (the prefix before ",BODY=") must be a member
+                        var faBodies = FSO.Content.Content.Get().BCFGlobal.CollectionsByName["b"].ClothesByAvatarType["fa"];
+                        var faMember = false;
+                        if (bsNC != null)
+                        {
+                            suitNC = bsNC.GetString(1); suitKnown = true;
+                            var bodyNC = (suitNC.IndexOf(",BODY=") >= 0) ? suitNC.Substring(0, suitNC.IndexOf(",BODY=")) : suitNC;
+                            faMember = faBodies.Any(x => x == bodyNC);
+                        }
+                        var ncOk = eNC == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
+                            && g6Post == g6Pre + 1 && nidNC > 0 && stopNC == "done"
+                            && (!suitKnown || faMember);
+                        ok &= ncOk;
+                        results.Add("mncAdult=" + eNC + "(want TRUE) done=" + g6Post + ">" + g6Pre + " nid=" + nidNC
+                            + " stop='" + stopNC + "' suit='" + suitNC + "'" + (suitKnown ? (faMember ? "(fa-table member)" : "(NOT in fa table)") : "(unavailable)"));
+                    }
+
+                    // ENG-12 (wave 11): the FAMI spell block — teach the controller,
+                    // refresh (the exact method TS1GameScreen.Save calls), codec
+                    // round-trip through the real FAMI serializer, then mode 43
+                    // max-merges the block back into a zeroed controller.
+                    if (fam == null) results.Add("famispell=SKIPPED (no family)");
+                    else
+                    {
+                        var ctlS = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0xB6C90029u);
+                        if (ctlS == null)
+                        {
+                            try { ctlS = _vm.Context.CreateObjectInstance(0xB6C90029u, FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH)?.Objects?.FirstOrDefault(); } catch { }
+                        }
+                        if (ctlS == null) results.Add("famispell=SKIPPED (no controller)");
+                        else
+                        {
+                            var teach = new short[] { 3, 0, 7, 1, 0, 5 };
+                            var attrBeforeS = new short[6];
+                            for (short k = 0; k < 6; k++) { attrBeforeS[k] = ctlS.GetAttribute(k); ctlS.SetAttribute(k, teach[k]); }
+                            var famWordsBefore = fam.SpellWords;
+                            try
+                            {
+                                _vm.TS1State.RefreshSpellBlockFromController(_vm);
+                                var refreshOk = fam.SpellWords != null && teach.SequenceEqual(fam.SpellWords);
+                                using (var msS = new System.IO.MemoryStream())
+                                {
+                                    fam.Write(null, msS);
+                                    msS.Position = 0;
+                                    var famRT = new FSO.Files.Formats.IFF.Chunks.FAMI();
+                                    famRT.Read(null, msS);
+                                    var remainingS = msS.Length - msS.Position;
+                                    var rtOk = refreshOk && famRT.SpellWords != null && teach.SequenceEqual(famRT.SpellWords) && remainingS == 0;
+                                    if (rtOk)
+                                    {
+                                        for (short k = 0; k < 6; k++) ctlS.SetAttribute(k, 0);
+                                        var eS = drive(VMGenericTS1CallMode.FamilySpellsIntoController);
+                                        var merged = new short[6];
+                                        for (short k = 0; k < 6; k++) merged[k] = ctlS.GetAttribute(k);
+                                        var mergeOk = eS == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && teach.SequenceEqual(merged);
+                                        ok &= mergeOk;
+                                        results.Add("famispell=refresh=" + refreshOk + " roundtrip=OK merge=" + mergeOk
+                                            + " words=[" + string.Join(",", merged) + "](want [" + string.Join(",", teach) + "])");
+                                    }
+                                    else
+                                    {
+                                        ok &= false;
+                                        results.Add("famispell=RT-MISMATCH refresh=" + refreshOk
+                                            + " read=" + (famRT.SpellWords != null) + " remaining=" + remainingS);
+                                    }
+                                }
+                            }
+                            finally
+                            {
+                                for (short k = 0; k < 6; k++) ctlS.SetAttribute(k, attrBeforeS[k]);
+                                fam.SpellWords = famWordsBefore;
+                            }
+                        }
+                    }
                 }
                 finally
                 {

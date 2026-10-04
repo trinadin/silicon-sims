@@ -1299,6 +1299,7 @@ namespace Simitone.Client.UI.Screens
             iff.AddChunk(rPNG);
 
             Content.Get().Neighborhood.SaveHouse(vm.GetGlobalValue(10), iff);
+            vm.TS1State.RefreshSpellBlockFromController(vm); // ENG-12: refresh the FAMI spell block from the live controller before the neighborhood save
             Content.Get().Neighborhood.SaveNeighbourhood(true);
 
             // Write weather sidecar alongside the save
