@@ -19729,18 +19729,31 @@ namespace Simitone.Client
                     // age/suit writes are the assert surface).
                     FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
                     var oid39 = (short)caller.ObjectID;
+                    var pos39Before = caller.Position;
+                    var nid39Before = caller.GetPersonData(VMPersonDataVariable.NeighborId);
                     thread.TempRegisters[0] = oid39;
-                    var f39 = mkframe();
+                    var f39 = mkframe(); // Caller == target: the SELF-CAST shape — exercises the thread re-home
                     var e39a = driveOn(f39, VMGenericTS1CallMode.ChildToAdult);
                     var e39b = driveOn(f39, VMGenericTS1CallMode.ChildToAdult);
                     var t0_39 = thread.TempRegisters[0]; var t1_39 = thread.TempRegisters[1];
-                    var age39 = caller.GetPersonData(VMPersonDataVariable.PersonsAge);
-                    var bs39 = caller.Object.Resource.Get<STR>(caller.Object.OBJ.BodyStringID);
+                    // ENG-14 (wave 12): the swap — *b is the REPLACEMENT's oid (never
+                    // the old), the replacement carries position/NeighborId/age, and
+                    // the self-cast thread re-homes to it (the tree resumes there).
+                    var swap39 = _vm.GetObjectById(t1_39) as VMAvatar;
+                    var callerIsDead = caller.Dead;
+                    var swapCarry = swap39 != null
+                        && swap39.Position.x == pos39Before.x && swap39.Position.y == pos39Before.y
+                        && swap39.GetPersonData(VMPersonDataVariable.NeighborId) == nid39Before;
+                    var threadRehomed = swap39 != null && swap39.Thread == thread;
+                    var bs39 = (swap39 ?? caller).Object.Resource.Get<STR>((swap39 ?? caller).Object.OBJ.BodyStringID);
                     var bs0_39 = bs39?.GetString(0) ?? "?";
+                    var age39 = swap39?.GetPersonData(VMPersonDataVariable.PersonsAge) ?? -1;
                     ok &= e39a == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                         && e39b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
-                        && t0_39 == 0 && t1_39 == oid39 && age39 == 27 && bs0_39 == "adult";
-                    results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "(want 0=*a) temp1=" + t1_39 + "==oid" + oid39 + " age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) diag=[" + (FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate ?? "") + "]");
+                        && t0_39 == 0 && t1_39 != oid39 && swap39 != null && callerIsDead
+                        && swapCarry && threadRehomed && age39 == 27 && bs0_39 == "adult";
+                    results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "(want 0=*a) temp1=" + t1_39 + "!=oid" + oid39
+                        + " swap=(" + (swap39 != null) + " pos-carry=" + (swapCarry) + " thread-rehomed=" + threadRehomed + ") age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) diag=[" + (FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate ?? "") + "]");
                     // ENG-07 review P2 discriminator: a CHILD fixture must roll from the
                     // ADULT tables — set a child [1] suit + child age, transform, assert
                     // the body suit no longer carries the child key, the head rolled,
@@ -19756,22 +19769,24 @@ namespace Simitone.Client
                         var adultBodyKey39 = (g39 > 0) ? "fa" : "ma";
                         if (childBodies39 != null && childBodies39.Count > 0 && childHeads39 != null && childHeads39.Count > 0)
                         {
+                            var childT39 = swap39 ?? caller; // ENG-14: the swap replaced the caller — fixture the REPLACEMENT
                             var bs1Before = bs39.GetString(1); var bs2Before = bs39.GetString(2); var bs14Before = bs39.GetString(14);
-                            var ageBefore = caller.GetPersonData(VMPersonDataVariable.PersonsAge);
+                            var ageBefore = childT39.GetPersonData(VMPersonDataVariable.PersonsAge);
                             var fixture1_39 = childBodies39[0] + ",BODY=probechild";
                             var fixture2_39 = childHeads39[0] + ",HEAD-HEAD=probechild";
                             try
                             {
                                 bs39.SetString(1, fixture1_39, STRLangCode.EnglishUS);
                                 bs39.SetString(2, fixture2_39, STRLangCode.EnglishUS);
-                                caller.SetPersonData(VMPersonDataVariable.PersonsAge, 12);
+                                childT39.SetPersonData(VMPersonDataVariable.PersonsAge, 12);
                                 FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
-                                thread.TempRegisters[0] = oid39;
-                                var f39c = mkframe();
+                                thread.TempRegisters[0] = (short)childT39.ObjectID;
+                                var f39c = mkframe(); f39c.StackObject = childT39; // Caller (the dead original) != target: the NON-self shape
                                 driveOn(f39c, VMGenericTS1CallMode.ChildToAdult);
                                 var e39d = driveOn(f39c, VMGenericTS1CallMode.ChildToAdult);
                                 var bs1After = bs39.GetString(1); var bs2After = bs39.GetString(2); var bs14After = bs39.GetString(14);
-                                var ageAfter = caller.GetPersonData(VMPersonDataVariable.PersonsAge);
+                                var childSwap39 = _vm.GetObjectById(thread.TempRegisters[1]) as VMAvatar;
+                                var ageAfter = childSwap39?.GetPersonData(VMPersonDataVariable.PersonsAge) ?? -1;
                                 // the head-roll assert compares against the CHILD FIXTURE (the
                                 // random roll may legitimately land on the original head)
                                 var adultRolled = e39d == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
@@ -19789,7 +19804,8 @@ namespace Simitone.Client
                             {
                                 bs39.SetString(1, bs1Before, STRLangCode.EnglishUS);
                                 bs39.SetString(2, bs2Before, STRLangCode.EnglishUS);
-                                caller.SetPersonData(VMPersonDataVariable.PersonsAge, ageBefore);
+                                var liveChild39 = _vm.GetObjectById(thread.TempRegisters[1]) as VMAvatar; // Temp1 still holds the child swap's *b
+                                if (liveChild39 != null) liveChild39.SetPersonData(VMPersonDataVariable.PersonsAge, ageBefore);
                             }
                         }
                         else results.Add("m39child=SKIPPED (child tables unavailable)");
@@ -19862,16 +19878,21 @@ namespace Simitone.Client
                                 petBs.SetString(1, fixture1P, STRLangCode.EnglishUS);
                                 petT.SetPersonData(VMPersonDataVariable.PersonsAge, 12);
                                 FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
-                                thread.TempRegisters[0] = (short)petT.ObjectID;
-                                var fP = mkframe(); fP.StackObject = petT;
+                                var petOidP = (short)petT.ObjectID;
+                                var petPosP = petT.Position;
+                                thread.TempRegisters[0] = petOidP;
+                                var fP = mkframe(); fP.StackObject = petT; // Caller != target: the NON-self swap
                                 var ePa = driveOn(fP, VMGenericTS1CallMode.PetToAdult);
                                 var ePb = driveOn(fP, VMGenericTS1CallMode.PetToAdult);
                                 var t0P = thread.TempRegisters[0]; var t1P = thread.TempRegisters[1];
                                 var bs1Pa = petBs.GetString(1); var bs2Pa = petBs.GetString(2); var bs0Pa = petBs.GetString(0);
-                                var ageP = petT.GetPersonData(VMPersonDataVariable.PersonsAge);
+                                // ENG-14: the replacement carries the contract — NEW oid, position, age
+                                var newPet = _vm.GetObjectById(t1P) as VMAvatar;
+                                var petCarry = newPet != null && newPet.Position.x == petPosP.x && newPet.Position.y == petPosP.y;
+                                var ageP = newPet?.GetPersonData(VMPersonDataVariable.PersonsAge) ?? -1;
                                 var petOk = ePa == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                                     && ePb == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
-                                    && t0P == 0 && t1P == (short)petT.ObjectID
+                                    && t0P == 0 && t1P != petOidP && newPet != null && petCarry
                                     && petSuits.Contains(bs1Pa) && bs1Pa != fixture1P
                                     && bs0Pa == bs0P // review-1 P1-2: [0] is the port's species discriminator — "adult" here would re-type the pet on the next IFF load
                                     && bs2Pa == bs2P && ageP == 27;
@@ -19879,7 +19900,8 @@ namespace Simitone.Client
                                 results.Add("m40" + petLeg.tag + "[" + fixture + "]=" + ePa + "->" + ePb
                                     + " suit-rolled=" + petSuits.Contains(bs1Pa) + " head-untouched=" + (bs2Pa == bs2P)
                                     + " species-kept=" + (bs0Pa == bs0P) + "([" + bs0Pa + "])"
-                                    + " age=" + ageP + "(want 27) t0=" + t0P + "(want 0) t1=" + t1P + "==oid" + petT.ObjectID);
+                                    + " swap=(new=" + (newPet != null) + " pos-carry=" + petCarry + ")"
+                                    + " age=" + ageP + "(want 27) t0=" + t0P + "(want 0) t1=" + t1P + "!=oid" + petOidP);
                             }
                         }
                         finally
@@ -19901,7 +19923,8 @@ namespace Simitone.Client
                                 {
                                     var petBsR = petT.Object.Resource.Get<STR>(petT.Object.OBJ.BodyStringID);
                                     if (petBsR != null) petBsR.SetString(1, bs1P, STRLangCode.EnglishUS);
-                                    petT.SetPersonData(VMPersonDataVariable.PersonsAge, agePBefore);
+                                    var livePetR = _vm.GetObjectById(thread.TempRegisters[1]) as VMAvatar;
+                                    if (livePetR != null) livePetR.SetPersonData(VMPersonDataVariable.PersonsAge, agePBefore);
                                 }
                                 catch { }
                             }
