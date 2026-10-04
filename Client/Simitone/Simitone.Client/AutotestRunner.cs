@@ -19963,6 +19963,49 @@ namespace Simitone.Client
                             }
                         }
                     }
+
+                    // ENG-11 (wave 11): the type-14 TransformMe dialog completion law
+                    // (ENG-09 §3 instruction-exact): confirm -> TRUE + Temp0 = form;
+                    // cancel -> FALSE + Temp0 = form (both exits write the form).
+                    // Drive the real primitive twice: first visit registers the
+                    // BlockingState and yields; the simulated player response lands
+                    // via the same fields VMNetDialogResponseCmd writes.
+                    {
+                        var bsPrev = thread.BlockingState;
+                        var handlerD = new FSO.SimAntics.Primitives.VMDialogPrivateStrings();
+                        var opD = new FSO.SimAntics.Primitives.VMDialogOperand { Type = VMDialogType.TS1TransformMe };
+                        try
+                        {
+                            var fD = mkframe();
+                            var eD1 = handlerD.Execute(fD, opD);
+                            var stD = thread.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                            var registered = eD1 == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK && stD != null && stD.Type == VMDialogType.TS1TransformMe;
+                            stD.Responded = true; stD.ResponseCode = 0; stD.ResponseText = "3";
+                            thread.TempRegisters[0] = 0;
+                            var eD2 = handlerD.Execute(fD, opD);
+                            var t0D = thread.TempRegisters[0];
+                            var confirmOk = registered && eD2 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && t0D == 3;
+                            // cancel leg: re-register, answer 2 (the UIOriginalNameEntryDialog
+                            // cancel idiom) -> FALSE + Temp0 = form
+                            var fD2 = mkframe();
+                            handlerD.Execute(fD2, opD);
+                            var stD2 = thread.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                            stD2.Responded = true; stD2.ResponseCode = 2; stD2.ResponseText = "5";
+                            thread.TempRegisters[0] = 0;
+                            var eD3 = handlerD.Execute(fD2, opD);
+                            var t0D2 = thread.TempRegisters[0];
+                            var cancelOk = eD3 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_FALSE && t0D2 == 5;
+                            ok &= confirmOk && cancelOk;
+                            results.Add("m14dialog=" + eD1 + "->" + eD2 + "/" + eD3
+                                + " confirm(t0=" + t0D + ",want 3)=" + (eD2 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE)
+                                + " cancel(t0=" + t0D2 + ",want 5)=" + (eD3 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_FALSE));
+                        }
+                        finally
+                        {
+                            thread.BlockingState = bsPrev;
+                            if (_vm.GlobalBlockingDialog != null) { _vm.GlobalBlockingDialog = null; if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1; }
+                        }
+                    }
                 }
                 finally
                 {
