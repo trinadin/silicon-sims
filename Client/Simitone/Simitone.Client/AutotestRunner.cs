@@ -20023,8 +20023,31 @@ namespace Simitone.Client
                                         var merged = new short[6];
                                         for (short k = 0; k < 6; k++) merged[k] = ctlS.GetAttribute(k);
                                         var mergeOk = eS == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && teach.SequenceEqual(merged);
-                                        ok &= mergeOk;
+                                        // ENG-15: the community-zoning skip — with zoning forced to 1
+                                        // the merge must NOT run (native §1's table-walk gate), latch+TRUE still
+                                        short zoningPrev = -1;
+                                        var zGateOk = true;
+                                        var zoningDict = FSO.Content.Content.Get().Neighborhood.ZoningDictionary;
+                                        var curHouseS = _vm.TS1State.CurrentHouse;
+                                        if (zoningDict.TryGetValue(curHouseS, out zoningPrev)) zoningDict[curHouseS] = 1;
+                                        else { zoningPrev = -1; zoningDict[curHouseS] = 1; }
+                                        try
+                                        {
+                                            for (short k = 0; k < 6; k++) ctlS.SetAttribute(k, 0);
+                                            var eZ = drive(VMGenericTS1CallMode.FamilySpellsIntoController);
+                                            var skipped = true;
+                                            for (short k = 0; k < 6; k++) if (ctlS.GetAttribute(k) != 0) skipped = false;
+                                            zGateOk = eZ == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && skipped
+                                                && _vm.TS1State.FamilySpellsLoadedFor == fam.ChunkID; // latch+TRUE hold on the skip
+                                        }
+                                        finally
+                                        {
+                                            zoningDict[curHouseS] = zoningPrev;
+                                            for (short k = 0; k < 6; k++) ctlS.SetAttribute(k, merged[k]);
+                                        }
+                                        ok &= mergeOk && zGateOk;
                                         results.Add("famispell=refresh=" + refreshOk + " roundtrip=OK merge=" + mergeOk
+                                            + " zoning-skip=" + zGateOk
                                             + " words=[" + string.Join(",", merged) + "](want [" + string.Join(",", teach) + "])");
                                     }
                                     else
