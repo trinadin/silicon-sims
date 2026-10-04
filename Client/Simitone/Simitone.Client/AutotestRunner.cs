@@ -20019,6 +20019,24 @@ namespace Simitone.Client
                             if (_vm.GlobalBlockingDialog != null) { _vm.GlobalBlockingDialog = null; if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1; }
                         }
                     }
+
+                    // UI-35 (wave 11): the LookupCostume tab tables (ENG-11 §B) —
+                    // pure-function pins for all four target classes.
+                    {
+                        var tabFn = new Func<int, bool, bool, int>((i, f, c) =>
+                            Simitone.Client.UI.Panels.UIOriginalTransformMeDialog.TabOutfit(i, f, c));
+                        var maleTabs = Enumerable.Range(0, 8).Select(i => tabFn(i, false, false)).ToArray();
+                        var femaleTabs = Enumerable.Range(0, 8).Select(i => tabFn(i, true, false)).ToArray();
+                        var boyTabs = Enumerable.Range(0, 8).Select(i => tabFn(i, false, true)).ToArray();
+                        var girlTabs = Enumerable.Range(0, 8).Select(i => tabFn(i, true, true)).ToArray();
+                        var tabsOk = maleTabs.SequenceEqual(new[] { 48, 58, 44, 45, 39, 46, 47, 40 })
+                            && femaleTabs.SequenceEqual(new[] { 48, 43, 44, 49, 39, 50, 51, 52 })
+                            && boyTabs.SequenceEqual(new[] { 53, 60, 53, 60, 53, 60, 53, 60 })
+                            && girlTabs.SequenceEqual(new[] { 54, 60, 54, 60, 54, 60, 54, 60 });
+                        ok &= tabsOk;
+                        results.Add("m14tabs=" + tabsOk + " m=[" + string.Join(",", maleTabs) + "] f=[" + string.Join(",", femaleTabs)
+                            + "] boy0/girl0=" + boyTabs[0] + "/" + girlTabs[0] + " odd=" + boyTabs[1]);
+                    }
                 }
                 finally
                 {

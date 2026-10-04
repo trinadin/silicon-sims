@@ -330,6 +330,38 @@ namespace Simitone.Client.UI.Panels
                     options.Buttons = new UIAlertButton[] { new UIAlertButton(UIAlertButtonType.OK, b0Event, info.Yes) };
                     options.TextEntry = true;
                     break;
+                case VMDialogType.TS1TransformMe:
+                {
+                    // UI-35 (wave 11): the original form browser for the type-14
+                    // TransformMe dialog (ENG-11 decode). Desktop original-UI path
+                    // mounts the picker; confirm answers code 0 with the picked
+                    // SAnimator outfit enum in ResponseText, cancel answers 2 —
+                    // the engine's confirm/cancel law consumes exactly that
+                    // (Temp0 = enum on both edges). Touch keeps the OK-alert
+                    // stand-in (the confirm shape).
+                    if (Parent is Simitone.Client.UI.Screens.TS1GameScreen tgsT
+                        && tgsT.Desktop && IsOriginalObjectDialog(info))
+                    {
+                        var tDlg = new Simitone.Client.UI.Panels.UIOriginalTransformMeDialog(
+                            info.Title, info.Message, info.Yes, info.Cancel,
+                            info.Caller as FSO.SimAntics.VMAvatar);
+                        UIScreen.GlobalShowDialog(tDlg, true);
+                        var tCaller = info.Caller;
+                        tDlg.OnResult += (formEnum) =>
+                        {
+                            vm.SendCommand(new VMNetDialogResponseCmd
+                            {
+                                ActorUID = tCaller.PersistID,
+                                ResponseCode = (byte)(formEnum >= 0 ? 0 : 2),
+                                ResponseText = tDlg.CurrentEnum.ToString()
+                            });
+                            BlockingDialog = null;
+                        };
+                        return;
+                    }
+                    options.Buttons = new UIAlertButton[] { new UIAlertButton(UIAlertButtonType.OK, b0Event, info.Yes) };
+                    break;
+                }
                 case VMDialogType.NumericEntry:
                     if (!vm.TS1) goto case VMDialogType.TextEntry;
                     else goto case VMDialogType.TS1Neighborhood;
