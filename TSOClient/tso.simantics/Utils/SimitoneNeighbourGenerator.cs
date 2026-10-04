@@ -62,7 +62,7 @@ namespace FSO.SimAntics.Utils
             var bodyStrings = tempObj.Resource.Get<STR>(200);
             foreach (var item in info.BodyStringReplace)
             {
-                bodyStrings.SetString(item.Key, item.Value);
+                bodyStrings.SetStringForce(item.Key, item.Value); // ENG-17/18: the expanded slots (30-34) may need growth on truncated STRs
             }
 
             neigh.SaveNewNeighbour(tempObj);

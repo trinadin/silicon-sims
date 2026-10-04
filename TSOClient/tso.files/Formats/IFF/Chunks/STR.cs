@@ -129,6 +129,35 @@ namespace FSO.Files.Formats.IFF.Chunks
         {
             SetString(index, value, STRLangCode.Default);
         }
+
+        /// <summary>
+        /// ENG-17/ENG-18 (wave 12): SetString that GROWS the language sets when
+        /// the index is beyond the current length. Original-format STRs may carry
+        /// fewer entries than the expanded outfit slots (30-34) need — a plain
+        /// SetString silently no-ops there, which is how port-created characters
+        /// ended up with truncated expanded-slot state.
+        /// </summary>
+        public void SetStringForce(int index, string value)
+        {
+            var languageSet = GetLanguageSet(STRLangCode.Default);
+            if (index >= languageSet.Strings.Length)
+            {
+                for (int i = 0; i < LanguageSets.Length; i++)
+                {
+                    var set = LanguageSets[i];
+                    if (set.Strings.Length == 0) continue; // language not initialized
+                    if (index >= set.Strings.Length)
+                    {
+                        var grown = new STRItem[index + 1];
+                        System.Array.Copy(set.Strings, grown, set.Strings.Length);
+                        for (int j = set.Strings.Length; j <= index; j++)
+                            grown[j] = new STRItem { LanguageCode = (byte)(i + 1), Value = "", Comment = "" };
+                        set.Strings = grown;
+                    }
+                }
+            }
+            SetString(index, value, STRLangCode.Default);
+        }
         public void SetString(int index, string value, STRLangCode language)
         {
             var languageSet = GetLanguageSet(language);

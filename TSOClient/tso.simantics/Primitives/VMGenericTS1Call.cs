@@ -634,7 +634,7 @@ namespace FSO.SimAntics.Primitives
                                 // the "adult" age-class write happens only for
                                 // species 0 (childtoadult-decode §SetBodyString);
                                 // ChangeSimBaseType §13 keeps the pet type codes.
-                                bodyStr.SetString(13, "27", STRLangCode.EnglishUS);   // the age word
+                                bodyStr.SetString(13, "27");   // the age word
                                 // ENG-10 pet leg (native ChangeSimBaseType config §13-14):
                                 // a pet target rolls a random ADULT body suit from its
                                 // species table and writes STR#200[1] ONLY — the head slot,
@@ -648,12 +648,12 @@ namespace FSO.SimAntics.Primitives
                                     if (petSuits.Length > 0)
                                     {
                                         var petInd = (int)(context.VM.Context.NextRandom((ulong)petSuits.Length) % (ulong)petSuits.Length);
-                                        bodyStr.SetString(1, petSuits[petInd].Item1, STRLangCode.EnglishUS);
+                                        bodyStr.SetString(1, petSuits[petInd].Item1);
                                     }
                                 }
                                 else
                                 {
-                                bodyStr.SetString(0, "adult", STRLangCode.EnglishUS); // [0] = the PERSON age class (species-gated — see above)
+                                bodyStr.SetString(0, "adult"); // [0] = the PERSON age class (species-gated — see above)
                                 // ENG-07 review P2 fix (person leg): roll from the ADULT
                                 // tables — GetValidOutfits/SetSuit key off the CURRENT [1]
                                 // suit type, so a child target would roll a child suit. The
@@ -700,16 +700,16 @@ namespace FSO.SimAntics.Primitives
                                         {
                                             var bodyInd39 = (int)(context.VM.Context.NextRandom((ulong)bodies39.Count) % (ulong)bodies39.Count);
                                             var headInd39 = (int)(context.VM.Context.NextRandom((ulong)heads39.Count) % (ulong)heads39.Count);
-                                            bodyStr.SetString(1, bodies39[bodyInd39] + ",BODY=" + bodyTex39[bodyInd39], STRLangCode.EnglishUS);
-                                            bodyStr.SetString(2, heads39[headInd39] + ",HEAD-HEAD=" + headTex39[headInd39], STRLangCode.EnglishUS);
+                                            bodyStr.SetString(1, bodies39[bodyInd39] + ",BODY=" + bodyTex39[bodyInd39]);
+                                            bodyStr.SetString(2, heads39[headInd39] + ",HEAD-HEAD=" + headTex39[headInd39]);
                                             var hand39 = key39[0];
                                             var hg39 = hgTex39[bodyInd39];
-                                            bodyStr.SetString(17, "H" + hand39 + "LO,HAND=huao" + hg39, STRLangCode.EnglishUS);
-                                            bodyStr.SetString(18, "H" + hand39 + "RO,HAND=huao" + hg39, STRLangCode.EnglishUS);
-                                            bodyStr.SetString(19, "H" + hand39 + "LP,HAND=huao" + hg39, STRLangCode.EnglishUS);
-                                            bodyStr.SetString(20, "H" + hand39 + "RP,HAND=huao" + hg39, STRLangCode.EnglishUS);
-                                            bodyStr.SetString(21, "H" + hand39 + "LO,HAND=huao" + hg39, STRLangCode.EnglishUS);
-                                            bodyStr.SetString(22, "H" + hand39 + "RC,HAND=huao" + hg39, STRLangCode.EnglishUS);
+                                            bodyStr.SetString(17, "H" + hand39 + "LO,HAND=huao" + hg39);
+                                            bodyStr.SetString(18, "H" + hand39 + "RO,HAND=huao" + hg39);
+                                            bodyStr.SetString(19, "H" + hand39 + "LP,HAND=huao" + hg39);
+                                            bodyStr.SetString(20, "H" + hand39 + "RP,HAND=huao" + hg39);
+                                            bodyStr.SetString(21, "H" + hand39 + "LO,HAND=huao" + hg39);
+                                            bodyStr.SetString(22, "H" + hand39 + "RC,HAND=huao" + hg39);
                                         }
                                     }
                                     // ENG-17 (wave 12): SetupNewHDSkins — the native's
@@ -731,7 +731,7 @@ namespace FSO.SimAntics.Primitives
                                         if (slotSuits17.Length > 0)
                                         {
                                             var slotInd17 = (int)(context.VM.Context.NextRandom((ulong)slotSuits17.Length) % (ulong)slotSuits17.Length);
-                                            bodyStr.SetString(VMTS1PurchasableOutfitHelper.OutfitTypeToInd[t17], slotSuits17[slotInd17].Item1, STRLangCode.EnglishUS);
+                                            bodyStr.SetStringForce(VMTS1PurchasableOutfitHelper.OutfitTypeToInd[t17], slotSuits17[slotInd17].Item1);
                                         }
                                     }
                                 }
@@ -785,7 +785,7 @@ namespace FSO.SimAntics.Primitives
                             livePd39[(int)VMPersonDataVariable.PersonsAge] = 27;
                             foreach (var z in new[] { 10, 11, 12, 15, 17, 18, 56, 57 })
                                 if (livePd39.Length > z) livePd39[z] = 0;
-                            context.VM.RemoveEntity(target39); // native step 9: kill the old instance
+                            target39.Delete(false, context.VM.Context); // native step 9: kill the old instance (the full cleanup path — footprints, containers, slots; mid-frame it queues)
                             VMAvatar new39 = null;
                             try
                             {
@@ -806,7 +806,15 @@ namespace FSO.SimAntics.Primitives
                                 else for (int i39 = 0; i39 < livePd39.Length; i39++)
                                     new39.SetPersonData((VMPersonDataVariable)i39, livePd39[i39]);
                                 new39.RadianDirection = oldRadDir39;
-                                try { new39.SetPosition(oldPos39, new39.Direction, context.VM.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default); } catch { }
+                                // the TrySnap law: the exact saved spot, else the nearest
+                                // adjacent (the native's TrySnap falls back the same way —
+                                // and mid-frame kills free the tile only at frame end)
+                                var pr39 = new FSO.SimAntics.VMPlacementResult(FSO.SimAntics.Model.VMPlacementError.LocationOutOfBounds);
+                                try { pr39 = new39.SetPosition(oldPos39, new39.Direction, context.VM.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default); } catch { }
+                                if (pr39.Status != FSO.SimAntics.Model.VMPlacementError.Success)
+                                {
+                                    try { VMFindLocationFor.FindLocationFor(new39, target39, context.VM.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default); } catch { }
+                                }
                                 if (selfCast39 && oldThread39 != null)
                                 {
                                     new39.Thread = oldThread39; // the tree resumes on the replacement
