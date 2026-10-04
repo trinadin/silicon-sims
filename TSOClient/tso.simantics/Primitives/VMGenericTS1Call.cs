@@ -608,33 +608,53 @@ namespace FSO.SimAntics.Primitives
                             // SetGender/SetColor carry -> SetAge(27) -> RANDOM body+head
                             // suits from the available tables -> SetupNewHDSkins ->
                             // zero pd{10,11,12,15,17,18,56,57} -> SetName(old) ->
-                            // EndDesign(commit)) mapped onto the port's surfaces. The
-                            // pet path's record-clone/GUID-inheritance machinery
-                            // (AnyoneToAdult) is the named residual — the port applies
-                            // the same rebuild in place.
+                            // EndDesign(commit)) mapped onto the port's surfaces. ENG-10
+                            // added the pet leg below (species tables, suit-only writes).
+                            // The native's whole-record swap (new character IFF file +
+                            // selector GUID hot-swap + relationship carry) stays the named
+                            // in-place divergence: the port rewrites the strings and
+                            // re-saves the character IFF via AvatarChanged instead.
                             var bodyStr = target39.Object.Resource.Get<STR>(target39.Object.OBJ.BodyStringID);
                             if (bodyStr != null)
                             {
                                 bodyStr.SetString(0, "adult", STRLangCode.EnglishUS); // BodyStrings [0] = the age class
                                 bodyStr.SetString(13, "27", STRLangCode.EnglishUS);   // the age word
-                                // ENG-07 review P2 fix: roll from the ADULT tables —
-                                // GetValidOutfits/SetSuit key off the CURRENT [1] suit
-                                // type, so a child target would roll a child suit. The
-                                // roll mirrors make_new_character's creation pipeline
-                                // with the ADULT simtype key ("fm"/"mm"), skin [14]
-                                // carried over (the native SetColor carry), body AND
-                                // head rolled, handgroups rebuilt (hand = the gender
-                                // char for adults).
+                                // ENG-10 pet leg (native ChangeSimBaseType config §13-14):
+                                // a pet target rolls a random ADULT body suit from its
+                                // species table and writes STR#200[1] ONLY — the head slot,
+                                // handgroups and SetupNewHDSkins are person-only design
+                                // steps. Species comes from the TARGET's gender bits
+                                // (dog=8/cat=16): the native service is type-agnostic —
+                                // mode 40's Flag is corroborating, not authoritative.
+                                if (target39.IsDog || target39.IsCat)
                                 {
+                                    var petSuits = VMTS1PurchasableOutfitHelper.GetValidOutfits(null, (short)(target39.IsDog ? -1 : -2));
+                                    if (petSuits.Length > 0)
+                                    {
+                                        var petInd = (int)(context.VM.Context.NextRandom((ulong)petSuits.Length) % (ulong)petSuits.Length);
+                                        bodyStr.SetString(1, petSuits[petInd].Item1, STRLangCode.EnglishUS);
+                                    }
+                                }
+                                else
+                                {
+                                // ENG-07 review P2 fix (person leg): roll from the ADULT
+                                // tables — GetValidOutfits/SetSuit key off the CURRENT [1]
+                                // suit type, so a child target would roll a child suit. The
+                                // roll mirrors make_new_character's creation pipeline with
+                                // the ADULT simtype key ("fa"/"ma" — the base BCF roll
+                                // table; make_new_character's derivation fixed to match,
+                                // ENG-13), skin [14] carried over (the native SetColor
+                                // carry), body AND head rolled, handgroups rebuilt
+                                // (hand = the gender char for adults).
                                     Func<string, string> rmExt = (it) => { if (it == null) return null; var ix = it.LastIndexOf('.'); return (ix != -1) ? it.Substring(0, ix) : it; };
                                     Func<string, string, string> exID = (it, skn) => { var ix = it.IndexOf('_'); if (ix != -1) it = it.Substring(0, ix); return it + skn; };
                                     Func<string, string> findHG = (it) => { var ix = it.IndexOf(','); return (ix != -1) ? it.Substring(ix + 1) : ""; };
                                     var gender39 = target39.GetPersonData(VMPersonDataVariable.Gender) & 1;
                                     // the ADULT keys per the actual BCF tables ("fa"/"ma"; body
                                     // build variants fafit/faskn/fafat exist as sibling keys —
-                                    // the base key is the roll table). NOTE: make_new_character's
-                                    // adult branch derives "fm"/"mm" — a latent miss there (TS1
-                                    // tree-creates are children), observed via the eng07 diag.
+                                    // the base key is the roll table). make_new_character's
+                                    // adult branch derived "fm"/"mm" until ENG-13 fixed it to
+                                    // these same keys.
                                     var key39 = (gender39 > 0) ? "fa" : "ma";
                                     var skin39 = bodyStr.GetString(14);
                                     System.Collections.Generic.List<string> heads39, bodies39;
@@ -745,12 +765,31 @@ namespace FSO.SimAntics.Primitives
                     // spell bitmaps (Family+334..344) into the magic controller's
                     // attrs 0-5. There is NO spell list and the spellbook lists all
                     // rows natively (learned bits gate CASTING via tree 4101, which
-                    // runs in the port). The port has no FAMI spell block, so every
-                    // port family is latch=0 = the native no-op: this latch-only
-                    // shape is byte-faithful. The FAMI spell-block persistence (native
-                    // DoStream field 9) is the named SAV follow-up if ever needed.
+                    // runs in the port). ENG-12 added the port's FAMI spell block:
+                    // when the block exists (latch set), mirror §1 exactly —
+                    // max-merge into the live 0xB6C90029 controller's attrs 0-5.
+                    // Families without a block (every original-format FAMI and
+                    // spell-less port families) keep the latch-only no-op law, which
+                    // is byte-faithful (native latch=0 ⇒ return TRUE). The native's
+                    // current-family/zoning gates collapse here: the controller
+                    // entity only exists on a lot carrying it, which is the merge's
+                    // own precondition; the zoning (community-lot) skip is that same
+                    // controller-absent pass-through.
                     var spellsFam = context.VM.TS1State.CurrentFamily;
                     if (spellsFam == null) return VMPrimitiveExitCode.GOTO_FALSE;
+                    if (spellsFam.SpellWords != null)
+                    {
+                        var spellsCtl = context.VM.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0xB6C90029u);
+                        if (spellsCtl != null)
+                        {
+                            for (short k = 0; k < 6; k++)
+                            {
+                                var live43 = spellsCtl.GetAttribute(k);
+                                var blk43 = (spellsFam.SpellWords.Length > k) ? spellsFam.SpellWords[k] : (short)0;
+                                if (blk43 > live43) spellsCtl.SetAttribute(k, blk43);
+                            }
+                        }
+                    }
                     context.VM.TS1State.FamilySpellsLoadedFor = spellsFam.ChunkID;
                     return VMPrimitiveExitCode.GOTO_TRUE;
             }

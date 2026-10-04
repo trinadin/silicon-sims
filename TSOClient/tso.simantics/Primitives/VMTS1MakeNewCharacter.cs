@@ -45,7 +45,10 @@ namespace FSO.SimAntics.Primitives
             {
                 G6BranchHuman++;
                 G6LastStop = "human";
-                var simtype = ((gender > 0) ? "f" : "m") + ((age < 18) ? "c" : "m");
+                // BCF ClothesByAvatarType keys: child heads "fc"/"mc" + child bodies
+                // "fcchd"/"mcchd"; adult heads AND bodies "fa"/"ma" (fit/skn/fat are
+                // sibling build keys, not the roll table) — the adult suffix is 'a'.
+                var simtype = ((gender > 0) ? "f" : "m") + ((age < 18) ? "c" : "a");
                 var skin = ColorNames[color];
                 var code = simtype;
 

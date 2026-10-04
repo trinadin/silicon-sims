@@ -29,6 +29,23 @@ namespace FSO.Files.Formats.IFF.Chunks
 
         public uint[] FamilyGUIDs = new uint[] { };
 
+        /// <summary>
+        /// ENG-12: the family's persisted spell block — six 16-bit learned-spell
+        /// bitmaps, the port equivalent of native Family::DoStream field 9
+        /// (ENG-08 familyspells-decode.md §2: on save the six words are refreshed
+        /// from the live magic controller by max-merge, then streamed; on load
+        /// they are read back and the family->332 "persisted block" latch is
+        /// set). null = no block / latch 0 (every family without learned spells —
+        /// this keeps the R252 original-format canon byte-identical: the native
+        /// streams field 9 unconditionally, but an all-zero block plus latch is
+        /// informationally the no-op the port encodes as absent).
+        /// Serialized as six trailing LE shorts AFTER the GUID list on both the
+        /// Neighborhood.iff chunk stream and the shared lot-marshal stream
+        /// (SAV-10: the marshal's post-FAMI tail is 5 bytes when the block is
+        /// absent, so a "read iff >=12 bytes remain" reader never over-reads).
+        /// </summary>
+        public short[] SpellWords = null;
+
         public uint[] RuntimeSubset = new uint[] { }; //the members of this family currently active. don't save!
 
         public void SelectWholeFamily()
@@ -68,6 +85,17 @@ namespace FSO.Files.Formats.IFF.Chunks
                 // no trailing ints: the original FAMI chunk ends after the GUID list
                 // (R252), and this reader also runs on shared lot-marshal streams where
                 // an over-read consumes the following payload (SAV-10).
+
+                // ENG-12 spell block: read iff at least the 6 shorts remain. Safe on
+                // both stream kinds — an IFF chunk stream is chunk-sized exactly, and
+                // the lot-marshal's post-FAMI tail is 5 bytes when the block is absent
+                // (SAV-10), so this never consumes following payload.
+                if (stream.Length - stream.Position >= 12)
+                {
+                    SpellWords = new short[6];
+                    for (int i = 0; i < 6; i++) SpellWords[i] = io.ReadInt16();
+                }
+                else SpellWords = null;
             }
         }
 
@@ -91,6 +119,14 @@ namespace FSO.Files.Formats.IFF.Chunks
                 // R252: the original FAMI chunk has NO trailing zero int32s (data
                 // size is exactly 40 + 4*guidCount). The port previously wrote 4
                 // trailing zero int32s (16 bytes); that has been removed.
+
+                // ENG-12 spell block: written ONLY when the family has one (see
+                // SpellWords) — spell-less families stay byte-identical to the R252
+                // canon. Mirrors the reader's "iff >=12 bytes remain" law.
+                if (SpellWords != null && SpellWords.Length == 6)
+                {
+                    for (int i = 0; i < 6; i++) io.WriteInt16(SpellWords[i]);
+                }
             }
             return true;
         }

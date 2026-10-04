@@ -152,6 +152,34 @@ namespace FSO.SimAntics.Model.TS1Platform
         }
 
         /// <summary>
+        /// ENG-12: the save side of the native Family::SaveSpellsForFamily
+        /// (ENG-08 familyspells-decode.md §2) — refresh the current family's
+        /// six learned-bitmap words from the live magic controller
+        /// (0xB6C90029) by MAX-MERGE (the words only ever grow), run before
+        /// the neighborhood save persists the FAMI spell block. The block is
+        /// created only when the controller exists and something is learned;
+        /// otherwise SpellWords stays null (the latch-0 no-op — the native's
+        /// own new-family state).
+        /// </summary>
+        public void RefreshSpellBlockFromController(VM vm)
+        {
+            if (CurrentFamily == null) return;
+            var controller = vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0xB6C90029u);
+            if (controller == null) return;
+            var words = CurrentFamily.SpellWords ?? new short[6];
+            var any = false;
+            for (short k = 0; k < 6; k++)
+            {
+                var merged = words[k];
+                var live = controller.GetAttribute(k);
+                if (live > merged) merged = live;
+                words[k] = merged;
+                if (merged != 0) any = true;
+            }
+            CurrentFamily.SpellWords = any ? words : null;
+        }
+
+        /// <summary>
         /// Ensure all members of the family are present on the lot.
         /// Spawns missing family members at the mailbox.
         /// </summary>
