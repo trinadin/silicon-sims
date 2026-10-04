@@ -98,18 +98,25 @@ namespace FSO.SimAntics.Primitives
                             // primitive returns TRUE — no temps, no response text.
                             return VMPrimitiveExitCode.GOTO_TRUE;
                         case VMDialogType.TS1TransformMe:
-                            // ENG-09 decode (dialogs-5-14-decode.md, body 0x0f1a24):
-                            // the native registers an answer slot and yields; on
-                            // completion the state splits confirm(-2)->TRUE /
-                            // cancel->FALSE, and cWinTransformMeDlg's EndModal result
-                            // feeds it. The port's default path already answers the
-                            // dialog as an OK alert (the confirm shape), and both
-                            // corpus trees (Charms 4119 + CharmsKid 4109) only branch
-                            // on the boolean without reading Temp0 — this case pins
-                            // the confirm-law TRUE explicitly. The real form-picker
-                            // window with the cancel->FALSE edge is the named residual
-                            // for a separate scoped UI card.
-                            return VMPrimitiveExitCode.GOTO_TRUE;
+                            // ENG-09 decode (dialogs-5-14-decode.md §3, instruction-exact
+                            // 0x0f1a24): the primitive registers an answer slot and yields;
+                            // completion reads the PostSim-written pair — state -2 = CONFIRM
+                            // -> TRUE, anything else = CANCEL -> FALSE — and the form index
+                            // (the modal result's HIGH half) lands in Temp0 on BOTH exits.
+                            // The corpus trees (Charms 4119 + CharmsKid 4109) never read
+                            // Temp0, but the port writes it anyway (byte-faithful).
+                            // Port response mapping (the UIOriginalNameEntryDialog idiom):
+                            // ResponseCode 0 = OK/confirm, 2 = Cancel; ResponseText carries
+                            // the picked form index. With no picker mounted the default OK
+                            // alert answers 0 — the confirm-law stand-in ENG-09 landed.
+                            {
+                                short form14;
+                                short.TryParse(curDialog.ResponseText ?? "", out form14);
+                                context.Thread.TempRegisters[0] = form14;
+                                return (curDialog.ResponseCode == 0)
+                                    ? VMPrimitiveExitCode.GOTO_TRUE
+                                    : VMPrimitiveExitCode.GOTO_FALSE;
+                            }
                         case VMDialogType.YesNo:
                             return (curDialog.ResponseCode == 0) ? VMPrimitiveExitCode.GOTO_TRUE : VMPrimitiveExitCode.GOTO_FALSE;
                         case VMDialogType.YesNoCancel:
