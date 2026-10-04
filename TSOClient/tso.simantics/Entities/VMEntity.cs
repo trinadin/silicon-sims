@@ -556,6 +556,11 @@ namespace FSO.SimAntics
             //if an exception happens here, it will have to be fatal.
 
             if (this.Thread == null) return;
+            // ENG-19 review P2-1 fence: this entity's thread was TRANSPLANTED to
+            // a replacement (the transform instance swap) — a stale-reference
+            // Reset (the suppressed-exception path resets dead callees/callers)
+            // must not wipe the live thread's state or push a dead entity's Main.
+            if (this.Thread.BoundEntity != this) { InReset = false; return; }
             this.Thread.Stack.Clear();
             this.Thread.Queue.Clear();
             Thread.QueueDirty = true;

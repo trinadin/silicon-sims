@@ -447,8 +447,32 @@ namespace FSO.SimAntics.Engine
         public void RebindEntity(VMEntity newEntity)
         {
             if (newEntity == null || newEntity == Entity) return;
+            var old = Entity;
             Entity = newEntity;
             newEntity.Thread = this;
+            // ENG-19 review P1-1 (the resume made real): re-point the entity
+            // references the dead-Callee guard and the queue pruning consult —
+            // the port-side equivalent of the native trees' post-swap
+            // StackObjectID := Temp[1] re-bind (CharmsKid 4111 ins7). Without
+            // this, Tick's guard (Stack.Last().ActionTree && Queue[0].Callee.Dead
+            // => Entity.Reset) destroyed the tree one tick after the transplant:
+            // a live self-cast is a queued SOCIAL whose Callee IS the dying
+            // entity (VMEntity.PushInteraction cal: Callee = the clicked sim).
+            foreach (var action in Queue)
+            {
+                if (action.Callee == old) action.Callee = newEntity;
+                if (action.StackObject == old) action.StackObject = newEntity;
+            }
+            foreach (var frame in Stack)
+            {
+                if (frame.Callee == old) frame.Callee = newEntity;
+                if (frame.StackObject == old) frame.StackObject = newEntity;
+                if (frame.Caller == old) frame.Caller = newEntity;
+            }
+            // old.Thread deliberately stays pointing here: pre-re-point dialogs
+            // routed responses through GlobalBlockingDialog's (stale) entity ->
+            // Thread; VMEntity.Reset is fenced against transplanted threads, so
+            // the stale pointer is inert as a corruption channel (review P2-1/P2-2).
         }
 
         /// <summary>
