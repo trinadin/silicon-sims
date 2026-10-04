@@ -19812,11 +19812,20 @@ namespace Simitone.Client
                         // REAL entity ticks + the dialog's respond path complete the
                         // cycle. The driven-dialog seam = m14dialog's accepted seam.
                         var liveA21 = thread.BoundEntity;
-                        var handler21 = new FSO.SimAntics.Primitives.VMDialogPrivateStrings();
                         var op21 = new FSO.SimAntics.Primitives.VMDialogOperand { Type = VMDialogType.TS1TransformMe };
                         var table21 = liveA21.Object.Resource.Get<STR>(301) ?? target.Object.Resource.Get<STR>(301);
                         var rt21 = routine19;
-                        if (table21 != null && rt21 != null)
+                        if (table21 == null || rt21 == null) results.Add("m21composed=SKIPPED (table/routine)");
+                        else
+                        {
+                        // review F3 (m14dialog's cleanup, mirrored): the real response
+                        // bypasses the UI, so the yield's synchronous ShowDialog leaves
+                        // its picker mounted even on the happy path — the finally
+                        // unmounts it and, on a mid-leg exception, also releases the
+                        // latch/speed a completed cycle releases itself.
+                        var bsPrev21 = thread.BlockingState;
+                        var pickersBefore21 = Simitone.Client.UI.Panels.UIOriginalTransformMeDialog.LiveMounted.Count;
+                        try
                         {
                             var f21 = new FSO.SimAntics.Engine.VMStackFrame
                             { Thread = thread, Caller = liveA21, Callee = liveA21, StackObject = liveA21,
@@ -19852,7 +19861,22 @@ namespace Simitone.Client
                                 + " tick=" + tick21 + " resume-branch=" + branch21
                                 + " latch-was-live=" + (latch21 == liveA21));
                         }
-                        else results.Add("m21composed=SKIPPED (table/routine)");
+                        finally
+                        {
+                            thread.BlockingState = bsPrev21;
+                            if (_vm.GlobalBlockingDialog != null) { _vm.GlobalBlockingDialog = null; if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1; }
+                            try
+                            {
+                                if (Simitone.Client.UI.Panels.UIOriginalTransformMeDialog.LiveMounted.Count > pickersBefore21)
+                                {
+                                    foreach (var leak in Simitone.Client.UI.Panels.UIOriginalTransformMeDialog.LiveMounted.ToList())
+                                    { try { FSO.Client.UI.Framework.UIScreen.RemoveDialog(leak); } catch { } }
+                                    Simitone.Client.UI.Panels.UIOriginalTransformMeDialog.LiveMounted.Clear();
+                                }
+                            }
+                            catch { }
+                        }
+                        }
                     }
                     var bs39 = (swap39 ?? caller).Object.Resource.Get<STR>((swap39 ?? caller).Object.OBJ.BodyStringID);
                     var bs0_39 = bs39?.GetString(0) ?? "?";
