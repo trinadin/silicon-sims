@@ -19983,12 +19983,30 @@ namespace Simitone.Client
                             var bodyNC = (suitNC.IndexOf(",BODY=") >= 0) ? suitNC.Substring(0, suitNC.IndexOf(",BODY=")) : suitNC;
                             faMember = faBodies.Any(x => x == bodyNC);
                         }
+                        // ENG-18: the created char's HD slot [34] must be a texture-valid
+                        // h-table member for its build (was the dangling h533 literal)
+                        var hd34NC = bsNC?.GetString(34) ?? "";
+                        var hMemberNC = false;
+                        if (bsNC != null)
+                        {
+                            var codeNC = suitNC.Substring(0, suitNC.IndexOf(','));
+                            // the build key = the first 5 chars of the appearance id (e.g. "fafit")
+                            var keyNC = codeNC.Length >= 5 ? codeNC.Substring(0, 5) : codeNC;
+                            try
+                            {
+                                var hSuitsNC = FSO.SimAntics.Utils.VMTS1PurchasableOutfitHelper.GetValidOutfitsByKey("h", keyNC, bsNC.GetString(14), 5);
+                                hMemberNC = hSuitsNC.Any(s => s.Item1 == hd34NC);
+                            }
+                            catch { }
+                        }
                         var ncOk = eNC == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
                             && g6Post == g6Pre + 1 && nidNC > 0 && stopNC == "done"
-                            && suitKnown && faMember; // review-1 P3-3d: strict — an unresolvable record is a FAIL, not a silent pass
+                            && suitKnown && faMember // review-1 P3-3d: strict — an unresolvable record is a FAIL, not a silent pass
+                            && (!suitKnown || hMemberNC);
                         ok &= ncOk;
                         results.Add("mncAdult=" + eNC + "(want TRUE) done=" + g6Post + ">" + g6Pre + " nid=" + nidNC
-                            + " stop='" + stopNC + "' suit='" + suitNC + "'" + (suitKnown ? (faMember ? "(fa-table member)" : "(NOT in fa table)") : "(unavailable)"));
+                            + " stop='" + stopNC + "' suit='" + suitNC + "'" + (suitKnown ? (faMember ? "(fa-table member)" : "(NOT in fa table)") : "(unavailable)")
+                            + " hd34-member=" + hMemberNC + "('" + hd34NC + "')");
                     }
 
                     // ENG-12 (wave 11): the FAMI spell block — teach the controller,
