@@ -19748,12 +19748,26 @@ namespace Simitone.Client
                     var bs39 = (swap39 ?? caller).Object.Resource.Get<STR>((swap39 ?? caller).Object.OBJ.BodyStringID);
                     var bs0_39 = bs39?.GetString(0) ?? "?";
                     var age39 = swap39?.GetPersonData(VMPersonDataVariable.PersonsAge) ?? -1;
+                    // ENG-17: the grown adult's five expanded outfit slots must be
+                    // populated (30/34 NOT the invalid "ADDED" childhood literal; each
+                    // written slot a member of its outfit type's table)
+                    var hdOk17 = true; var hdDesc17 = new List<string>();
+                    for (short t17 = 1; t17 <= 5; t17++)
+                    {
+                        var slotVal17 = bs39?.GetString(VMTS1PurchasableOutfitHelper.OutfitTypeToInd[t17]) ?? "";
+                        var table17 = FSO.SimAntics.Utils.VMTS1PurchasableOutfitHelper.GetValidOutfits(swap39, t17);
+                        var base17 = (slotVal17.IndexOf(",BODY=") >= 0) ? slotVal17.Substring(0, slotVal17.IndexOf(",BODY=")) : slotVal17;
+                        var member17 = table17.Any(s => s.Item1 == slotVal17);
+                        if (slotVal17 == "ADDED" || slotVal17 == "" || !member17) hdOk17 = false;
+                        hdDesc17.Add("[" + VMTS1PurchasableOutfitHelper.OutfitTypeToInd[t17] + "]=" + (member17 ? "ok" : "BAD:" + base17));
+                    }
                     ok &= e39a == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                         && e39b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
                         && t0_39 == 0 && t1_39 != oid39 && swap39 != null && callerIsDead
-                        && swapCarry && threadRehomed && age39 == 27 && bs0_39 == "adult";
+                        && swapCarry && threadRehomed && age39 == 27 && bs0_39 == "adult" && hdOk17;
                     results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "(want 0=*a) temp1=" + t1_39 + "!=oid" + oid39
-                        + " swap=(" + (swap39 != null) + " pos-carry=" + (swapCarry) + " thread-rehomed=" + threadRehomed + ") age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) diag=[" + (FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate ?? "") + "]");
+                        + " swap=(" + (swap39 != null) + " pos-carry=" + (swapCarry) + " thread-rehomed=" + threadRehomed + ") age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) hdslots=" + (hdOk17 ? "ok" : "BAD")
+                        + " " + string.Join(" ", hdDesc17) + " diag=[" + (FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate ?? "") + "]");
                     // ENG-07 review P2 discriminator: a CHILD fixture must roll from the
                     // ADULT tables — set a child [1] suit + child age, transform, assert
                     // the body suit no longer carries the child key, the head rolled,
@@ -19778,6 +19792,10 @@ namespace Simitone.Client
                             {
                                 bs39.SetString(1, fixture1_39, STRLangCode.EnglishUS);
                                 bs39.SetString(2, fixture2_39, STRLangCode.EnglishUS);
+                                // ENG-17: fixture the CHILDHOOD expanded-slot state a port
+                                // child carries ({30,34}="ADDED", 31-33=child-code suits)
+                                bs39.SetString(30, "ADDED", STRLangCode.EnglishUS);
+                                bs39.SetString(34, "ADDED", STRLangCode.EnglishUS);
                                 childT39.SetPersonData(VMPersonDataVariable.PersonsAge, 12);
                                 FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
                                 thread.TempRegisters[0] = (short)childT39.ObjectID;
@@ -19789,16 +19807,19 @@ namespace Simitone.Client
                                 var ageAfter = childSwap39?.GetPersonData(VMPersonDataVariable.PersonsAge) ?? -1;
                                 // the head-roll assert compares against the CHILD FIXTURE (the
                                 // random roll may legitimately land on the original head)
+                                var hd30After = bs39.GetString(30); var hd34After = bs39.GetString(34);
                                 var adultRolled = e39d == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
                                     && bs1After.IndexOf("chd", StringComparison.OrdinalIgnoreCase) < 0
                                     && bs1After != fixture1_39
                                     && bs2After != fixture2_39
                                     && bs2After.IndexOf(",HEAD-HEAD=") >= 0
                                     && bs14After == bs14Before
-                                    && ageAfter == 27;
+                                    && ageAfter == 27
+                                    && hd30After != "ADDED" && hd34After != "ADDED"; // ENG-17: SetupNewHDSkins rewrote the childhood literals
                                 ok &= adultRolled;
                                 results.Add("m39child=" + e39d + "(want TRUE) bs1-adult=" + (bs1After.IndexOf("chd", StringComparison.OrdinalIgnoreCase) < 0)
-                                    + " head-rewritten=" + (bs2After != fixture2_39) + " skin-carried=" + (bs14After == bs14Before) + " age=" + ageAfter);
+                                    + " head-rewritten=" + (bs2After != fixture2_39) + " skin-carried=" + (bs14After == bs14Before) + " age=" + ageAfter
+                                    + " hd30/34-rewritten=" + (hd30After != "ADDED" && hd34After != "ADDED"));
                             }
                             finally
                             {
