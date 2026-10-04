@@ -19,7 +19,7 @@ namespace FSO.SimAntics.Utils
         public static Tuple<string, string>[] GetValidOutfitsByKey(string collectionType, string simtype, string skin, short outfitType)
         {
             var col = Content.Content.Get().BCFGlobal.CollectionsByName[collectionType];
-            var bodies = col.ClothesByAvatarType[simtype];
+            var bodies = col.ClothesByAvatarType[simtype].ToList(); // review P3-1: snapshot — the filter below used to mutate the SHARED list
 
             var tex = (TS1AvatarTextureProvider)Content.Content.Get().AvatarTextures;
             var texnames = tex.GetAllNames();
@@ -80,7 +80,7 @@ namespace FSO.SimAntics.Utils
             }
             
             var col = Content.Content.Get().BCFGlobal.CollectionsByName[collectionType];
-            var bodies = col.ClothesByAvatarType[simtype];
+            var bodies = col.ClothesByAvatarType[simtype].ToList(); // review P3-1: snapshot — the filter below used to mutate the SHARED list
 
             var tex = (TS1AvatarTextureProvider)Content.Content.Get().AvatarTextures;
             var texnames = tex.GetAllNames();

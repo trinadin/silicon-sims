@@ -772,8 +772,7 @@ namespace FSO.SimAntics.Primitives
                             // has no port consumer (ENG-17 verification).
                             var oldPos39 = target39.Position;
                             var oldRadDir39 = target39.RadianDirection;
-                            var oldThread39 = target39.Thread;
-                            var selfCast39 = context.Caller != null && context.Caller == target39;
+
                             // collect the live pd BEFORE the kill (native step 7's
                             // vector) — for record-less targets (no NBR record: casual
                             // instances) the carry applies directly; the native would
@@ -785,7 +784,13 @@ namespace FSO.SimAntics.Primitives
                             livePd39[(int)VMPersonDataVariable.PersonsAge] = 27;
                             foreach (var z in new[] { 10, 11, 12, 15, 17, 18, 56, 57 })
                                 if (livePd39.Length > z) livePd39[z] = 0;
-                            target39.Delete(false, context.VM.Context); // native step 9: kill the old instance (the full cleanup path — footprints, containers, slots; mid-frame it queues)
+                            // wave-12 review P1-2/P2-1 CORRECTED: create the replacement
+                            // FIRST (the native order is kill-then-realize, but the port
+                            // defers mid-frame kills — and a kill-then-failed-create
+                            // stranded the executing tree on a dead entity with no
+                            // re-bind path). Create-first eliminates the decline-after-
+                            // kill state: a failed create declines BEFORE the kill, the
+                            // native's own decline shape.
                             VMAvatar new39 = null;
                             try
                             {
@@ -797,11 +802,13 @@ namespace FSO.SimAntics.Primitives
                             if (new39 == null)
                             {
                                 // the native's engine-failed path (AnyoneToAdult zeroes
-                                // *b and returns 0) — state 3 declines the same way
+                                // *b and returns 0) — state 3 declines the same way,
+                                // with the target STILL ALIVE (pre-kill, native shape)
                                 t39.State = 3;
                             }
                             else
                             {
+                                target39.Delete(false, context.VM.Context); // native step 9: kill the old instance (full cleanup; mid-frame it queues)
                                 if (rec39 != null) new39.InheritNeighbor(rec39, context.VM.TS1State.CurrentFamily);
                                 else for (int i39 = 0; i39 < livePd39.Length; i39++)
                                     new39.SetPersonData((VMPersonDataVariable)i39, livePd39[i39]);
@@ -815,11 +822,18 @@ namespace FSO.SimAntics.Primitives
                                 {
                                     try { VMFindLocationFor.FindLocationFor(new39, target39, context.VM.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default); } catch { }
                                 }
-                                if (selfCast39 && oldThread39 != null)
-                                {
-                                    new39.Thread = oldThread39; // the tree resumes on the replacement
-                                    target39.Thread = null;
-                                }
+                                // wave-12 review P1-2: NO thread re-home. VMThread.Entity is
+                                // engine-private with no re-bind path, and VMThread.Tick
+                                // no-ops when its Entity is dead — a transplanted thread
+                                // would never resume AND the assignment orphaned the
+                                // replacement's own live thread. The replacement keeps its
+                                // OWN thread (Main/init/queue intact — probe-pinned). The
+                                // caller's tree completes its CURRENT tick (the primitive
+                                // returns TRUE and execution runs to the next yield this
+                                // tick); a yield AFTER the swap loses the tree — the
+                                // bounded gap vs the native's async design (its trees
+                                // re-bind StackObjectID := Temp[1] on resume; the port
+                                // has no thread re-bind API — disclosed on the card).
                                 t39.B = (short)new39.ObjectID; // *b = the NEW object id (the native's fresh instance)
                                 t39.A2 = 0; // *a = 0 on success
                                 t39.State = 2;
@@ -873,20 +887,18 @@ namespace FSO.SimAntics.Primitives
                     // Families without a block (every original-format FAMI and
                     // spell-less port families) keep the latch-only no-op law, which
                     // is byte-faithful (native latch=0 ⇒ return TRUE).
-                    // DISCLOSED DIVERGENCE (resolved by ENG-15, wave 12): the native's
-                    // zoning gate (ENG-08 §1's table walk — zoning 1 = community lot ⇒
-                    // no merge) is now REPLICATED via the port's ZoningDictionary
-                    // (LotZoning.iff STR#1; the NBR-03 law): a community lot skips the
-                    // merge and keeps the latch+TRUE law. Still divergent by
-                    // construction: the port's controller is a lot entity persisted in
-                    // the FSOV (it exists wherever the lot carries one), and the
-                    // native's controller-lookup FALSE edge remains TRUE here with a
-                    // block but no controller.
+                    // ENG-15 (wave-12 review P1-1 CORRECTED): the native law is the
+                    // CONVERSE of my first landing — Family::LoadSpellsForFamily
+                    // 0x6cd2c-34: `GetZoningType(lot); cmpwi 1; bne epilogue` — the
+                    // six-word merge runs ONLY ON COMMUNITY LOTS (zoning == 1; the
+                    // magic-town lots 93-98/54 are community — the merge fires exactly
+                    // when the family ENTERS the magic lot, where the controller
+                    // lives). Missing key ⇒ GetZoningType 0 ⇒ skip (both sides).
+                    // The latch+TRUE law holds on the skip either way.
                     var spellsFam = context.VM.TS1State.CurrentFamily;
                     if (spellsFam == null) return VMPrimitiveExitCode.GOTO_FALSE;
-                    var zoning43 = (short)(-1);
-                    Content.Content.Get().Neighborhood.ZoningDictionary.TryGetValue(context.VM.TS1State.CurrentHouse, out zoning43);
-                    if (spellsFam.SpellWords != null && zoning43 != 1)
+                    var zoning43 = Content.Content.Get().Neighborhood.GetZoningType(context.VM.TS1State.CurrentHouse);
+                    if (spellsFam.SpellWords != null && zoning43 == 1)
                     {
                         var spellsCtl = context.VM.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0xB6C90029u);
                         if (spellsCtl != null)
