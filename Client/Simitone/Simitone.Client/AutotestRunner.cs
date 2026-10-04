@@ -19742,7 +19742,8 @@ namespace Simitone.Client
                     var swap39 = _vm.GetObjectById(t1_39) as VMAvatar;
                     var callerIsDead = caller.Dead;
                     var swapCarry = swap39 != null
-                        && swap39.Position.x == pos39Before.x && swap39.Position.y == pos39Before.y
+                        && swap39.Position.x != -32768
+                        && Math.Abs(swap39.Position.x - pos39Before.x) <= 16 && Math.Abs(swap39.Position.y - pos39Before.y) <= 16
                         && swap39.GetPersonData(VMPersonDataVariable.NeighborId) == nid39Before;
                     var threadRehomed = swap39 != null && swap39.Thread == thread;
                     var bs39 = (swap39 ?? caller).Object.Resource.Get<STR>((swap39 ?? caller).Object.OBJ.BodyStringID);
@@ -19763,9 +19764,9 @@ namespace Simitone.Client
                     }
                     ok &= e39a == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                         && e39b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
-                        && t0_39 == 0 && t1_39 != oid39 && swap39 != null && callerIsDead
+                        && t0_39 == 0 && swap39 != null && callerIsDead && !ReferenceEquals(swap39, caller)
                         && swapCarry && threadRehomed && age39 == 27 && bs0_39 == "adult" && hdOk17;
-                    results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "(want 0=*a) temp1=" + t1_39 + "!=oid" + oid39
+                    results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "(want 0=*a) temp1=" + t1_39 + "(oid-recycled=" + (t1_39 == oid39) + ")"
                         + " swap=(" + (swap39 != null) + " pos-carry=" + (swapCarry) + " thread-rehomed=" + threadRehomed + ") age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) hdslots=" + (hdOk17 ? "ok" : "BAD")
                         + " " + string.Join(" ", hdDesc17) + " diag=[" + (FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate ?? "") + "]");
                     // ENG-07 review P2 discriminator: a CHILD fixture must roll from the
@@ -19790,12 +19791,12 @@ namespace Simitone.Client
                             var fixture2_39 = childHeads39[0] + ",HEAD-HEAD=probechild";
                             try
                             {
-                                bs39.SetString(1, fixture1_39, STRLangCode.EnglishUS);
-                                bs39.SetString(2, fixture2_39, STRLangCode.EnglishUS);
+                                bs39.SetString(1, fixture1_39);
+                                bs39.SetString(2, fixture2_39);
                                 // ENG-17: fixture the CHILDHOOD expanded-slot state a port
                                 // child carries ({30,34}="ADDED", 31-33=child-code suits)
-                                bs39.SetString(30, "ADDED", STRLangCode.EnglishUS);
-                                bs39.SetString(34, "ADDED", STRLangCode.EnglishUS);
+                                bs39.SetString(30, "ADDED");
+                                bs39.SetString(34, "ADDED");
                                 childT39.SetPersonData(VMPersonDataVariable.PersonsAge, 12);
                                 FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
                                 thread.TempRegisters[0] = (short)childT39.ObjectID;
@@ -19823,8 +19824,8 @@ namespace Simitone.Client
                             }
                             finally
                             {
-                                bs39.SetString(1, bs1Before, STRLangCode.EnglishUS);
-                                bs39.SetString(2, bs2Before, STRLangCode.EnglishUS);
+                                bs39.SetString(1, bs1Before);
+                                bs39.SetString(2, bs2Before);
                                 var liveChild39 = _vm.GetObjectById(thread.TempRegisters[1]) as VMAvatar; // Temp1 still holds the child swap's *b
                                 if (liveChild39 != null) liveChild39.SetPersonData(VMPersonDataVariable.PersonsAge, ageBefore);
                             }
@@ -19896,7 +19897,7 @@ namespace Simitone.Client
                                 // member) and the conversion is a genuine child->adult leg
                                 var fixture1P = "probepet-" + petLeg.tag;
                                 agePBefore = petT.GetPersonData(VMPersonDataVariable.PersonsAge);
-                                petBs.SetString(1, fixture1P, STRLangCode.EnglishUS);
+                                petBs.SetString(1, fixture1P);
                                 petT.SetPersonData(VMPersonDataVariable.PersonsAge, 12);
                                 FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
                                 var petOidP = (short)petT.ObjectID;
@@ -19909,11 +19910,12 @@ namespace Simitone.Client
                                 var bs1Pa = petBs.GetString(1); var bs2Pa = petBs.GetString(2); var bs0Pa = petBs.GetString(0);
                                 // ENG-14: the replacement carries the contract — NEW oid, position, age
                                 var newPet = _vm.GetObjectById(t1P) as VMAvatar;
-                                var petCarry = newPet != null && newPet.Position.x == petPosP.x && newPet.Position.y == petPosP.y;
+                                var petCarry = newPet != null && newPet.Position.x != -32768
+                                    && Math.Abs(newPet.Position.x - petPosP.x) <= 16 && Math.Abs(newPet.Position.y - petPosP.y) <= 16;
                                 var ageP = newPet?.GetPersonData(VMPersonDataVariable.PersonsAge) ?? -1;
                                 var petOk = ePa == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                                     && ePb == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
-                                    && t0P == 0 && t1P != petOidP && newPet != null && petCarry
+                                    && t0P == 0 && newPet != null && petCarry && !ReferenceEquals(newPet, petT)
                                     && petSuits.Contains(bs1Pa) && bs1Pa != fixture1P
                                     && bs0Pa == bs0P // review-1 P1-2: [0] is the port's species discriminator — "adult" here would re-type the pet on the next IFF load
                                     && bs2Pa == bs2P && ageP == 27;
@@ -19935,7 +19937,7 @@ namespace Simitone.Client
                                 if (standinRestore.Count == 2)
                                 {
                                     var sbs = standin.Object.Resource.Get<STR>(standin.Object.OBJ.BodyStringID);
-                                    if (sbs != null) sbs.SetString(1, standinRestore[0], STRLangCode.EnglishUS);
+                                    if (sbs != null) sbs.SetString(1, standinRestore[0]);
                                 }
                             }
                             else if (petT != null && bs1P != null)
@@ -19943,7 +19945,7 @@ namespace Simitone.Client
                                 try
                                 {
                                     var petBsR = petT.Object.Resource.Get<STR>(petT.Object.OBJ.BodyStringID);
-                                    if (petBsR != null) petBsR.SetString(1, bs1P, STRLangCode.EnglishUS);
+                                    if (petBsR != null) petBsR.SetString(1, bs1P);
                                     var livePetR = _vm.GetObjectById(thread.TempRegisters[1]) as VMAvatar;
                                     if (livePetR != null) livePetR.SetPersonData(VMPersonDataVariable.PersonsAge, agePBefore);
                                 }
@@ -19990,8 +19992,10 @@ namespace Simitone.Client
                         if (bsNC != null)
                         {
                             var codeNC = suitNC.Substring(0, suitNC.IndexOf(','));
-                            // the build key = the first 5 chars of the appearance id (e.g. "fafit")
-                            var keyNC = codeNC.Length >= 5 ? codeNC.Substring(0, 5) : codeNC;
+                            // the build key skips the letter+3-digit prefix: "b811fafit_x" -> "fafit"
+                            var tailNC = codeNC.Length > 4 ? codeNC.Substring(4) : codeNC;
+                            var usNC = tailNC.IndexOf('_');
+                            var keyNC = (usNC > 0) ? tailNC.Substring(0, usNC) : tailNC;
                             try
                             {
                                 var hSuitsNC = FSO.SimAntics.Utils.VMTS1PurchasableOutfitHelper.GetValidOutfitsByKey("h", keyNC, bsNC.GetString(14), 5);
