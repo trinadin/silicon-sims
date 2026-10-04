@@ -168,6 +168,12 @@ namespace FSO.SimAntics.Model.TS1Platform
         public void RefreshSpellBlockFromController(VM vm)
         {
             if (CurrentFamily == null) return;
+            // ENG-15 (wave 12): the native save-side gate stack's zoning leg
+            // (ENG-08 §2 — zoning 1 = community lot ⇒ no refresh) now replicated
+            // via the port's ZoningDictionary (LotZoning.iff STR#1; the NBR-03 law).
+            var zoningS = (short)(-1);
+            Content.Content.Get().Neighborhood.ZoningDictionary.TryGetValue(CurrentHouse, out zoningS);
+            if (zoningS == 1) return;
             var controller = vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0xB6C90029u);
             if (controller == null) return;
             var words = CurrentFamily.SpellWords ?? new short[6];

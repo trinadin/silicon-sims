@@ -133,9 +133,11 @@ namespace FSO.SimAntics.Primitives
             info.Name = context.StackObject.Name;
             info.Bio = "";
             // IFF 'init NPC' (8298) sets all six base personalities = 1000 (NPC canon, engine-driven
-            // in the original); mirror that for characters this primitive creates (was 500 placeholder,
-            // and only 5 of the 6 slots were written). Personality for playable sims is player-allocated
-            // via the original 'design a person' flow - separate PARITY gap (no personality UI in Simitone).
+            // in the original); mirror that for TREE-CREATED characters (was 500 placeholder, and only
+            // 5 of the 6 slots were written). Playable sims are NOT affected by this path: the CAS
+            // personality bars allocate them (TS1CASScreen feeds SimTemplateCreateInfo.PersonalityPoints;
+            // the ucasflow battery check pins pd[2..7] in generator order) — the earlier "no personality
+            // UI in Simitone" note here was stale, corrected by ENG-16 (wave 12).
             for (int i = 0; i < 6; i++)
                 info.PersonalityPoints[i] = 1000;
 

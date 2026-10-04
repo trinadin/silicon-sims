@@ -565,12 +565,16 @@ namespace FSO.SimAntics.Primitives
                 // -> Temp0 := out.a (unchanged), Temp1 := 0, ALSO TRUE (the failure
                 // signal is Temp1 == 0, not the branch). Entries vanish after 100
                 // unretrieved passes (the native wedge edge case — mirrored).
-                // PORT (named divergence): the native converts asynchronously in
-                // cSimulator::ExecuteTransforms off the sim tick with a modal
-                // wizard; the port converts on the FIRST poll synchronously — age
-                // + person-data on the in-lot target avatar (out.b := the
-                // converted avatar's object id; the native b's content is not
-                // fully decoded, disclosed).
+                // PORT timing law (ENG-16 update): the native enqueues the request
+                // and converts asynchronously in cSimulator::ExecuteTransforms on a
+                // LATER simulator tick — the port's cookie/poll shape IS that law:
+                // the first visit enqueues and yields (CONTINUE_NEXT_TICK), the
+                // conversion runs on the poll tick. ENG-07 divergence (a) is
+                // satisfied (one-tick queue latency); (b) the wizard is UI-35's
+                // picker; (c) the instance swap is ENG-14 below; (d) the RNG
+                // stand-in (NextRandom for cRZRandom) stands — random is random,
+                // no observable contract to mirror (ENG-16 receipt); (e) pets get
+                // age 27 (not 30) since ENG-10.
                 case VMGenericTS1CallMode.ChildToAdult: //39
                 case VMGenericTS1CallMode.PetToAdult: //40
                 {
@@ -720,21 +724,76 @@ namespace FSO.SimAntics.Primitives
                             var rec39 = Content.Content.Get().Neighborhood.GetNeighborByID(nid39);
                             if (rec39 != null && rec39.PersonData != null && rec39.PersonData.Length > (int)VMPersonDataVariable.PersonsAge)
                             {
+                                // ENG-14 (wave 12): carry the LIVE person data into the
+                                // record first (native ChangeSimBaseType step 1 — the
+                                // persistent-field snapshot; the avatar writes above have
+                                // already landed age 27 + the zero-set on the live array),
+                                // so the replacement instance inherits the full set.
+                                for (int i39 = 0; i39 < rec39.PersonData.Length; i39++)
+                                    rec39.PersonData[i39] = target39.GetPersonData((VMPersonDataVariable)i39);
                                 rec39.PersonData[(int)VMPersonDataVariable.PersonsAge] = 27;
                                 foreach (var z in new[] { 10, 11, 12, 15, 17, 18, 56, 57 })
                                     if (rec39.PersonData.Length > z) rec39.PersonData[z] = 0;
                             }
-                            // SetSuit already fired Neighborhood.AvatarChanged (the
-                            // dirty-avatar persist path); the native's immediate disk
-                            // commit rides the port's save cycle — disclosed.
-                            // NAMED divergences: the port rebuilds IN PLACE (the native
-                            // creates a replacement instance and kills the old — out.b is
-                            // the same object id here), and the player-pick wizard
-                            // (cWinTransformMeDlg) is absent — the non-modal random-roll
-                            // path IS native.
-                            t39.B = (short)target39.ObjectID;
-                            t39.A2 = 0; // *a = 0 on success
-                            t39.State = 2;
+                            // ENG-14 (wave 12): the NATIVE INSTANCE SWAP (ENG-07
+                            // §ChangeSimBaseType steps 9/16 + §divergence (c) — now
+                            // resolved): snapshot the placement, kill the old instance,
+                            // realize the replacement from the same (already-updated)
+                            // character resource, inherit the record, re-home the thread
+                            // on a self-cast (the native trees re-bind StackObjectID :=
+                            // Temp[1] themselves, e.g. CharmsKid 4111 ins7), snap to the
+                            // saved placement (the TrySnap law), and report the NEW
+                            // object id as *b. The pet's native new-character-IFF FILE
+                            // maps to the port's AvatarChanged character-IFF re-save
+                            // above (same persisted state; id/GUID/relationships already
+                            // preserved in place). The native's SetSimFlag(obj,1,false)
+                            // has no port consumer (ENG-17 verification).
+                            var oldPos39 = target39.Position;
+                            var oldRadDir39 = target39.RadianDirection;
+                            var oldThread39 = target39.Thread;
+                            var selfCast39 = context.Caller != null && context.Caller == target39;
+                            // collect the live pd BEFORE the kill (native step 7's
+                            // vector) — for record-less targets (no NBR record: casual
+                            // instances) the carry applies directly; the native would
+                            // decline those (its SEARCH 2 requires a record), the port's
+                            // acceptance predates — keep it, disclose the carry.
+                            var livePd39 = new short[rec39?.PersonData.Length ?? 80];
+                            for (int i39 = 0; i39 < livePd39.Length; i39++)
+                                livePd39[i39] = target39.GetPersonData((VMPersonDataVariable)i39);
+                            livePd39[(int)VMPersonDataVariable.PersonsAge] = 27;
+                            foreach (var z in new[] { 10, 11, 12, 15, 17, 18, 56, 57 })
+                                if (livePd39.Length > z) livePd39[z] = 0;
+                            context.VM.RemoveEntity(target39); // native step 9: kill the old instance
+                            VMAvatar new39 = null;
+                            try
+                            {
+                                var grp39 = context.VM.Context.CreateObjectInstance(target39.Object.OBJ.GUID,
+                                    FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                                new39 = grp39?.Objects?.FirstOrDefault() as VMAvatar;
+                            }
+                            catch { }
+                            if (new39 == null)
+                            {
+                                // the native's engine-failed path (AnyoneToAdult zeroes
+                                // *b and returns 0) — state 3 declines the same way
+                                t39.State = 3;
+                            }
+                            else
+                            {
+                                if (rec39 != null) new39.InheritNeighbor(rec39, context.VM.TS1State.CurrentFamily);
+                                else for (int i39 = 0; i39 < livePd39.Length; i39++)
+                                    new39.SetPersonData((VMPersonDataVariable)i39, livePd39[i39]);
+                                new39.RadianDirection = oldRadDir39;
+                                try { new39.SetPosition(oldPos39, new39.Direction, context.VM.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default); } catch { }
+                                if (selfCast39 && oldThread39 != null)
+                                {
+                                    new39.Thread = oldThread39; // the tree resumes on the replacement
+                                    target39.Thread = null;
+                                }
+                                t39.B = (short)new39.ObjectID; // *b = the NEW object id (the native's fresh instance)
+                                t39.A2 = 0; // *a = 0 on success
+                                t39.State = 2;
+                            }
                         }
                     }
                     if (++t39.Polls >= 100) { Eng05Transforms.Remove(context); return VMPrimitiveExitCode.CONTINUE_NEXT_TICK; } // the native's stale-entry erase -> poll-no-match -> yield forever
@@ -784,19 +843,20 @@ namespace FSO.SimAntics.Primitives
                     // Families without a block (every original-format FAMI and
                     // spell-less port families) keep the latch-only no-op law, which
                     // is byte-faithful (native latch=0 ⇒ return TRUE).
-                    // DISCLOSED DIVERGENCE (review P2): the native's zoning gate
-                    // (ENG-08 §1's table walk — zoning 1 = community lot ⇒ no merge)
-                    // is NOT replicated: in the port the controller is a lot entity
-                    // persisted in the FSOV, so it exists on residential lots too,
-                    // where the port merges and the native would not. Benign by
-                    // construction — the merge is a one-way max of the family's own
-                    // words into the controller, and the controller's attrs round-trip
-                    // independently in the FSOV — but it is a divergence, not a
-                    // collapsed gate. Likewise the native's controller-lookup FALSE
-                    // edge: the port still returns TRUE with a block but no controller.
+                    // DISCLOSED DIVERGENCE (resolved by ENG-15, wave 12): the native's
+                    // zoning gate (ENG-08 §1's table walk — zoning 1 = community lot ⇒
+                    // no merge) is now REPLICATED via the port's ZoningDictionary
+                    // (LotZoning.iff STR#1; the NBR-03 law): a community lot skips the
+                    // merge and keeps the latch+TRUE law. Still divergent by
+                    // construction: the port's controller is a lot entity persisted in
+                    // the FSOV (it exists wherever the lot carries one), and the
+                    // native's controller-lookup FALSE edge remains TRUE here with a
+                    // block but no controller.
                     var spellsFam = context.VM.TS1State.CurrentFamily;
                     if (spellsFam == null) return VMPrimitiveExitCode.GOTO_FALSE;
-                    if (spellsFam.SpellWords != null)
+                    var zoning43 = (short)(-1);
+                    Content.Content.Get().Neighborhood.ZoningDictionary.TryGetValue(context.VM.TS1State.CurrentHouse, out zoning43);
+                    if (spellsFam.SpellWords != null && zoning43 != 1)
                     {
                         var spellsCtl = context.VM.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0xB6C90029u);
                         if (spellsCtl != null)
