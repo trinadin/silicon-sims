@@ -97,6 +97,19 @@ namespace FSO.SimAntics.Primitives
                             // the modal book window's result is DISCARDED and the
                             // primitive returns TRUE — no temps, no response text.
                             return VMPrimitiveExitCode.GOTO_TRUE;
+                        case VMDialogType.TS1TransformMe:
+                            // ENG-09 decode (dialogs-5-14-decode.md, body 0x0f1a24):
+                            // the native registers an answer slot and yields; on
+                            // completion the state splits confirm(-2)->TRUE /
+                            // cancel->FALSE, and cWinTransformMeDlg's EndModal result
+                            // feeds it. The port's default path already answers the
+                            // dialog as an OK alert (the confirm shape), and both
+                            // corpus trees (Charms 4119 + CharmsKid 4109) only branch
+                            // on the boolean without reading Temp0 — this case pins
+                            // the confirm-law TRUE explicitly. The real form-picker
+                            // window with the cancel->FALSE edge is the named residual
+                            // for a separate scoped UI card.
+                            return VMPrimitiveExitCode.GOTO_TRUE;
                         case VMDialogType.YesNo:
                             return (curDialog.ResponseCode == 0) ? VMPrimitiveExitCode.GOTO_TRUE : VMPrimitiveExitCode.GOTO_FALSE;
                         case VMDialogType.YesNoCancel:
@@ -127,6 +140,13 @@ namespace FSO.SimAntics.Primitives
                             }
                             return VMPrimitiveExitCode.GOTO_TRUE;
                         case VMDialogType.NumericEntry: //also downtown
+                            // ENG-09 decode (body 0x0f1810): TS1Downtown IS this case —
+                            // the native is a slot poll; the chosen lot (the modal
+                            // runner's return, stored in the ObjectModule answer slot)
+                            // is read into Temp0 and the primitive returns TRUE with no
+                            // FALSE exit. The parse->Temp0->GOTO_TRUE contract below is
+                            // the native law (EXP-10's picker success was
+                            // native-correct by structure).
                         case VMDialogType.TS1Vacation:
                         case VMDialogType.TS1Neighborhood:
                         case VMDialogType.TS1StudioTown:

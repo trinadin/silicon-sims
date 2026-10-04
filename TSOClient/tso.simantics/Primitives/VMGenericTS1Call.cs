@@ -590,39 +590,68 @@ namespace FSO.SimAntics.Primitives
                         Eng05Transforms[context] = t39;
                         return VMPrimitiveExitCode.CONTINUE_NEXT_TICK; // native return 2
                     }
-                    // poll: the port converts now (state 0 -> 2 or 3)
+                    // poll: the port converts now (state 0 -> 2 or 3).
+                    // ENG-07 decode (childtoadult-decode.md) — the contract CORRECTED:
+                    // a (the request Temp0) = the target's VM OBJECT ID (both callers
+                    // assign MyObject[ObjectId]/the stack-object id), NOT a neighbor id;
+                    // success writes *a = 0 and *b = the replacement avatar's object id;
+                    // the adult age word = 27 for person AND pet (the native CAS constant).
                     if (t39.State == 0)
                     {
-                        var target39 = context.VM.Context.ObjectQueries.Avatars
-                            .OfType<VMAvatar>()
-                            .FirstOrDefault(p => p.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
-                                && p.GetPersonData(VMPersonDataVariable.NeighborId) == t39.A);
-                        if (target39 == null)
+                        var target39 = context.VM.GetObjectById(t39.A) as VMAvatar;
+                        if (target39 == null || target39.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)
                         {
-                            // Neighborhood::ChildToAdult's not-found path: returns 0
-                            // without touching a/b -> state 3 (declined)
+                            // the not-found path: return 0 without touching a/b -> state 3
                             t39.State = 3;
                         }
                         else
                         {
-                            // P3-1 disclosures (review): the adult-age constants are
-                            // port-judged (18 matches the port's child<18 law; the native
-                            // ChildToAdult/AnyoneToAdult age writes are not decoded); on the
-                            // success path out.a is assumed unchanged from the request (a is
-                            // by-reference into the service like b — only b's under-decode
-                            // was originally disclosed).
-                            var adultAge = (t39.Flag == 1) ? (short)30 : (short)18; // pet-adult / person-adult
-                            target39.SetPersonData(VMPersonDataVariable.PersonsAge, adultAge);
-                            var rec39 = Content.Content.Get().Neighborhood.GetNeighborByID(t39.A);
+                            // The native design session (BeginDesignAPerson ->
+                            // SetGender/SetColor carry -> SetAge(27) -> RANDOM body+head
+                            // suits from the available tables -> SetupNewHDSkins ->
+                            // zero pd{10,11,12,15,17,18,56,57} -> SetName(old) ->
+                            // EndDesign(commit)) mapped onto the port's surfaces. The
+                            // pet path's record-clone/GUID-inheritance machinery
+                            // (AnyoneToAdult) is the named residual — the port applies
+                            // the same rebuild in place.
+                            var bodyStr = target39.Object.Resource.Get<STR>(target39.Object.OBJ.BodyStringID);
+                            if (bodyStr != null)
+                            {
+                                bodyStr.SetString(0, "adult", STRLangCode.EnglishUS); // BodyStrings [0] = the age class
+                                bodyStr.SetString(13, "27", STRLangCode.EnglishUS);   // the age word
+                                var suits39 = VMTS1PurchasableOutfitHelper.GetValidOutfits(target39, 0);
+                                if (suits39 != null && suits39.Length > 0)
+                                    VMTS1PurchasableOutfitHelper.SetSuit(target39, 0, (short)(context.VM.Context.NextRandom((ulong)suits39.Length) % (ulong)suits39.Length));
+                                target39.SetAvatarType(bodyStr);
+                                target39.SetAvatarBodyStrings(bodyStr, context.VM.Context);
+                            }
+                            target39.SetPersonData(VMPersonDataVariable.PersonsAge, 27);
+                            foreach (var z in new[] { 10, 11, 12, 15, 17, 18, 56, 57 })
+                                target39.SetPersonData((VMPersonDataVariable)z, 0);
+                            var nid39 = target39.GetPersonData(VMPersonDataVariable.NeighborId);
+                            var rec39 = Content.Content.Get().Neighborhood.GetNeighborByID(nid39);
                             if (rec39 != null && rec39.PersonData != null && rec39.PersonData.Length > (int)VMPersonDataVariable.PersonsAge)
-                                rec39.PersonData[(int)VMPersonDataVariable.PersonsAge] = adultAge;
-                            t39.B = (short)target39.ObjectID; // out.b := the converted avatar (disclosed)
-                            t39.State = 2; // service success latch
+                            {
+                                rec39.PersonData[(int)VMPersonDataVariable.PersonsAge] = 27;
+                                foreach (var z in new[] { 10, 11, 12, 15, 17, 18, 56, 57 })
+                                    if (rec39.PersonData.Length > z) rec39.PersonData[z] = 0;
+                            }
+                            // SetSuit already fired Neighborhood.AvatarChanged (the
+                            // dirty-avatar persist path); the native's immediate disk
+                            // commit rides the port's save cycle — disclosed.
+                            // NAMED divergences: the port rebuilds IN PLACE (the native
+                            // creates a replacement instance and kills the old — out.b is
+                            // the same object id here), and the player-pick wizard
+                            // (cWinTransformMeDlg) is absent — the non-modal random-roll
+                            // path IS native.
+                            t39.B = (short)target39.ObjectID;
+                            t39.A2 = 0; // *a = 0 on success
+                            t39.State = 2;
                         }
                     }
                     if (++t39.Polls >= 100) { Eng05Transforms.Remove(context); return VMPrimitiveExitCode.CONTINUE_NEXT_TICK; } // the native's stale-entry erase -> poll-no-match -> yield forever
                     if (t39.State == 0) return VMPrimitiveExitCode.CONTINUE_NEXT_TICK; // still busy (not reachable port-side; kept for law-shape)
-                    context.Thread.TempRegisters[0] = t39.A;
+                    context.Thread.TempRegisters[0] = (t39.State == 3) ? t39.A : t39.A2; // declined: a untouched; success: *a = 0
                     context.Thread.TempRegisters[1] = (t39.State == 3) ? (short)0 : t39.B;
                     Eng05Transforms.Remove(context); // the native's retrieve erases the entry
                     return VMPrimitiveExitCode.GOTO_TRUE; // state 2 AND state 3 both take the TRUE branch
@@ -1050,6 +1079,7 @@ namespace FSO.SimAntics.Primitives
     public class Eng05Transform
     {
         public short A, B;
+        public short A2;    // ENG-07: the SUCCESS-path *a out (the native zeroes it)
         public byte Flag;   // 0 = ChildToAdult (mode 39), 1 = AnyoneToAdult/pet (mode 40)
         public byte State;  // 0 pending, 2 success, 3 declined
         public int Polls;
