@@ -263,7 +263,22 @@ namespace FSO.SimAntics.Model.TS1Platform
             MirrorLedgerIntoSIMI();
             SimulationInfo?.Write(null, writer.BaseStream);
             writer.Write(CurrentFamily?.ChunkID ?? 65535);
-            if (CurrentFamily != null) CurrentFamily.Write(null, writer.BaseStream);
+            if (CurrentFamily != null)
+            {
+                // ENG-12 P1 fix: the marshal's FAMI copy is written BLOCK-LESS —
+                // the shared stream has no chunk boundary, so a trailing block here
+                // could never be delimited safely (a ">= N bytes remain" reader
+                // eats the ~76-byte Version-40 tail on spell-less saves: the
+                // SAV-10 corruption class). The spell block's real store is the
+                // Neighborhood.iff FAMI chunk (chunk-bounded, exact), which
+                // SaveNeighbourhood writes from this same instance; this FSOV
+                // copy is transient join/networking residue anyway (see the
+                // Deserialize comment below).
+                var marshalWords = CurrentFamily.SpellWords;
+                CurrentFamily.SpellWords = null;
+                try { CurrentFamily.Write(null, writer.BaseStream); }
+                finally { CurrentFamily.SpellWords = marshalWords; }
+            }
             writer.Write(TutorialObjectID);
             if (Version >= 40)
             {

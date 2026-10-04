@@ -86,11 +86,18 @@ namespace FSO.Files.Formats.IFF.Chunks
                 // (R252), and this reader also runs on shared lot-marshal streams where
                 // an over-read consumes the following payload (SAV-10).
 
-                // ENG-12 spell block: read iff at least the 6 shorts remain. Safe on
-                // both stream kinds — an IFF chunk stream is chunk-sized exactly, and
-                // the lot-marshal's post-FAMI tail is 5 bytes when the block is absent
-                // (SAV-10), so this never consumes following payload.
-                if (stream.Length - stream.Position >= 12)
+                // ENG-12 spell block: read iff the stream is EXHAUSTED by exactly
+                // the 6 shorts. An IFF chunk stream is chunk-sized (block present
+                // -> exactly 12 remain; absent -> 0), so this is exact there.
+                // The >= 12 form of this gate was a P1 (caught in self-check
+                // before review): the lot-marshal stream (VMTS1LotState) is SHARED
+                // and its post-FAMI tail is ~76 bytes (TutorialObjectID + the
+                // Version-40 budget block) — >= 12 would consume tail bytes as a
+                // phantom block and desync every spell-less family save load (the
+                // SAV-10 corruption class). The marshal now additionally writes
+                // its FAMI copy BLOCK-LESS (see VMTS1LotState.SerializeInto), so
+                // this reader never sees a block on that stream at all.
+                if (stream.Length - stream.Position == 12)
                 {
                     SpellWords = new short[6];
                     for (int i = 0; i < 6; i++) SpellWords[i] = io.ReadInt16();
