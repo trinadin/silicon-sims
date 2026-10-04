@@ -712,6 +712,28 @@ namespace FSO.SimAntics.Primitives
                                             bodyStr.SetString(22, "H" + hand39 + "RC,HAND=huao" + hg39, STRLangCode.EnglishUS);
                                         }
                                     }
+                                    // ENG-17 (wave 12): SetupNewHDSkins — the native's
+                                    // post-roll skin-setup family (EditPerson::SetupNewSkins
+                                    // + SetupFashionSkins + SetupVacationSkins, ENG-17 §4)
+                                    // assigns best-fit AVAILABLE suits to the five expanded
+                                    // outfit slots STR#200[30..34]. Port hookup: a table-backed
+                                    // pick per outfit type from the same texture-filtered
+                                    // lists the buy surface uses (GetValidOutfits t=1..5 —
+                                    // the h table is the HD SkinsBuy.far set). The RNG-stand-in
+                                    // law applies as for the daywear roll (the native's
+                                    // RegExpBestFit scan has no port equivalent, disclosed).
+                                    // Without this a grown adult keeps childhood slot values
+                                    // (30/34 = the invalid "ADDED" literal; 31-33 = child-code
+                                    // suits on an adult skeleton). Person targets only.
+                                    for (short t17 = 1; t17 <= 5; t17++)
+                                    {
+                                        var slotSuits17 = VMTS1PurchasableOutfitHelper.GetValidOutfits(target39, t17);
+                                        if (slotSuits17.Length > 0)
+                                        {
+                                            var slotInd17 = (int)(context.VM.Context.NextRandom((ulong)slotSuits17.Length) % (ulong)slotSuits17.Length);
+                                            bodyStr.SetString(VMTS1PurchasableOutfitHelper.OutfitTypeToInd[t17], slotSuits17[slotInd17].Item1, STRLangCode.EnglishUS);
+                                        }
+                                    }
                                 }
                                 target39.SetAvatarType(bodyStr);
                                 target39.SetAvatarBodyStrings(bodyStr, context.VM.Context);
