@@ -19745,9 +19745,19 @@ namespace Simitone.Client
                         && swap39.Position.x != -32768
                         && Math.Abs(swap39.Position.x - pos39Before.x) <= 16 && Math.Abs(swap39.Position.y - pos39Before.y) <= 16
                         && swap39.GetPersonData(VMPersonDataVariable.NeighborId) == nid39Before;
-                    // review P1-2 (corrected): NO re-home exists — assert the replacement
-                    // has its OWN live thread (not the caller's transplanted one)
-                    var swapThreadLive = swap39 != null && !swap39.Dead && swap39.Thread != null && swap39.Thread != thread;
+                    // ENG-19: the self-cast RE-HOME — the caller's thread transplants to
+                    // the replacement (binding both ways), and ONE REAL entity-tick through
+                    // the scheduler path proves the transplanted thread EXECUTES
+                    // (TicksThisFrame++ per instruction; the dead-guard no-op is excluded)
+                    var swapThreadLive = swap39 != null && !swap39.Dead
+                        && swap39.Thread == thread && thread.BoundEntity == swap39;
+                    var ticked19 = false;
+                    if (swapThreadLive)
+                    {
+                        thread.TicksThisFrame = 0;
+                        try { swap39.Tick(); ticked19 = thread.TicksThisFrame > 0; }
+                        catch (Exception tickEx19) { results.Add("m39-tick-exc=" + tickEx19.GetType().Name); }
+                    }
                     var bs39 = (swap39 ?? caller).Object.Resource.Get<STR>((swap39 ?? caller).Object.OBJ.BodyStringID);
                     var bs0_39 = bs39?.GetString(0) ?? "?";
                     var age39 = swap39?.GetPersonData(VMPersonDataVariable.PersonsAge) ?? -1;
@@ -19767,9 +19777,9 @@ namespace Simitone.Client
                     ok &= e39a == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                         && e39b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
                         && t0_39 == 0 && swap39 != null && callerIsDead && !ReferenceEquals(swap39, caller)
-                        && swapCarry && swapThreadLive && age39 == 27 && bs0_39 == "adult" && hdOk17;
+                        && swapCarry && swapThreadLive && ticked19 && age39 == 27 && bs0_39 == "adult" && hdOk17;
                     results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "(want 0=*a) temp1=" + t1_39 + "(oid-recycled=" + (t1_39 == oid39) + ")"
-                        + " swap=(" + (swap39 != null) + " pos-carry=" + (swapCarry) + " own-thread-live=" + swapThreadLive + ") age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) hdslots=" + (hdOk17 ? "ok" : "BAD")
+                        + " swap=(" + (swap39 != null) + " pos-carry=" + (swapCarry) + " rebind=" + swapThreadLive + " tick-executed=" + ticked19 + ") age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) hdslots=" + (hdOk17 ? "ok" : "BAD")
                         + " " + string.Join(" ", hdDesc17) + " diag=[" + (FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate ?? "") + "]");
                     // ENG-07 review P2 discriminator: a CHILD fixture must roll from the
                     // ADULT tables — set a child [1] suit + child age, transform, assert
