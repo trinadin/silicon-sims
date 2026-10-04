@@ -570,9 +570,7 @@ namespace FSO.SimAntics.Primitives
                 // wizard; the port converts on the FIRST poll synchronously — age
                 // + person-data on the in-lot target avatar (out.b := the
                 // converted avatar's object id; the native b's content is not
-                // fully decoded, disclosed). The child-body -> adult-body OUTFIT
-                // rebuild is the named residual (needs the port's mid-session
-                // person-rebuild surface — its own bounded card).
+                // fully decoded, disclosed).
                 case VMGenericTS1CallMode.ChildToAdult: //39
                 case VMGenericTS1CallMode.PetToAdult: //40
                 {
@@ -619,11 +617,68 @@ namespace FSO.SimAntics.Primitives
                             {
                                 bodyStr.SetString(0, "adult", STRLangCode.EnglishUS); // BodyStrings [0] = the age class
                                 bodyStr.SetString(13, "27", STRLangCode.EnglishUS);   // the age word
-                                var suits39 = VMTS1PurchasableOutfitHelper.GetValidOutfits(target39, 0);
-                                if (suits39 != null && suits39.Length > 0)
-                                    VMTS1PurchasableOutfitHelper.SetSuit(target39, 0, (short)(context.VM.Context.NextRandom((ulong)suits39.Length) % (ulong)suits39.Length));
+                                // ENG-07 review P2 fix: roll from the ADULT tables —
+                                // GetValidOutfits/SetSuit key off the CURRENT [1] suit
+                                // type, so a child target would roll a child suit. The
+                                // roll mirrors make_new_character's creation pipeline
+                                // with the ADULT simtype key ("fm"/"mm"), skin [14]
+                                // carried over (the native SetColor carry), body AND
+                                // head rolled, handgroups rebuilt (hand = the gender
+                                // char for adults).
+                                {
+                                    Func<string, string> rmExt = (it) => { if (it == null) return null; var ix = it.LastIndexOf('.'); return (ix != -1) ? it.Substring(0, ix) : it; };
+                                    Func<string, string, string> exID = (it, skn) => { var ix = it.IndexOf('_'); if (ix != -1) it = it.Substring(0, ix); return it + skn; };
+                                    Func<string, string> findHG = (it) => { var ix = it.IndexOf(','); return (ix != -1) ? it.Substring(ix + 1) : ""; };
+                                    var gender39 = target39.GetPersonData(VMPersonDataVariable.Gender) & 1;
+                                    // the ADULT keys per the actual BCF tables ("fa"/"ma"; body
+                                    // build variants fafit/faskn/fafat exist as sibling keys —
+                                    // the base key is the roll table). NOTE: make_new_character's
+                                    // adult branch derives "fm"/"mm" — a latent miss there (TS1
+                                    // tree-creates are children), observed via the eng07 diag.
+                                    var key39 = (gender39 > 0) ? "fa" : "ma";
+                                    var skin39 = bodyStr.GetString(14);
+                                    System.Collections.Generic.List<string> heads39, bodies39;
+                                    var colC39 = Content.Content.Get().BCFGlobal.CollectionsByName["c"].ClothesByAvatarType;
+                                    var colB39 = Content.Content.Get().BCFGlobal.CollectionsByName["b"].ClothesByAvatarType;
+                                    if (!colC39.TryGetValue(key39, out heads39))
+                                    {
+                                        G6AddToFamilyGate = "eng07-headkey-miss:" + key39 + " avail=" + string.Join("|", colC39.Keys.Take(12));
+                                        heads39 = null;
+                                    }
+                                    if (!colB39.TryGetValue(key39, out bodies39))
+                                    {
+                                        if (G6AddToFamilyGate == null || G6AddToFamilyGate.Length == 0) G6AddToFamilyGate = "";
+                                        G6AddToFamilyGate = G6AddToFamilyGate + " eng07-bodykey-miss:" + key39 + " avail=" + string.Join("|", colB39.Keys.Take(12));
+                                        bodies39 = null;
+                                    }
+                                    var texnames39 = ((FSO.Content.TS1.TS1AvatarTextureProvider)Content.Content.Get().AvatarTextures).GetAllNames();
+                                    if (heads39 != null && bodies39 != null && heads39.Count > 0 && bodies39.Count > 0)
+                                    {
+                                        var headTex39 = heads39.Select(x => rmExt(texnames39.FirstOrDefault(y => y.StartsWith(exID(x, skin39))))).ToList();
+                                        var bodyTex39 = bodies39.Select(x => rmExt(texnames39.FirstOrDefault(y => y.StartsWith(exID(x, skin39))))).ToList();
+                                        var hgTex39 = bodies39.Select(x => (rmExt(texnames39.FirstOrDefault(y => y == "huao" + findHG(x))) ?? "huao" + skin39).Substring(4)).ToList();
+                                        for (int i39 = headTex39.Count - 1; i39 >= 0; i39--) if (headTex39[i39] == null) { headTex39.RemoveAt(i39); heads39.RemoveAt(i39); }
+                                        for (int i39 = bodyTex39.Count - 1; i39 >= 0; i39--) if (bodyTex39[i39] == null) { bodyTex39.RemoveAt(i39); bodies39.RemoveAt(i39); hgTex39.RemoveAt(i39); }
+                                        if (bodies39.Count > 0 && heads39.Count > 0)
+                                        {
+                                            var bodyInd39 = (int)(context.VM.Context.NextRandom((ulong)bodies39.Count) % (ulong)bodies39.Count);
+                                            var headInd39 = (int)(context.VM.Context.NextRandom((ulong)heads39.Count) % (ulong)heads39.Count);
+                                            bodyStr.SetString(1, bodies39[bodyInd39] + ",BODY=" + bodyTex39[bodyInd39], STRLangCode.EnglishUS);
+                                            bodyStr.SetString(2, heads39[headInd39] + ",HEAD-HEAD=" + headTex39[headInd39], STRLangCode.EnglishUS);
+                                            var hand39 = key39[0];
+                                            var hg39 = hgTex39[bodyInd39];
+                                            bodyStr.SetString(17, "H" + hand39 + "LO,HAND=huao" + hg39, STRLangCode.EnglishUS);
+                                            bodyStr.SetString(18, "H" + hand39 + "RO,HAND=huao" + hg39, STRLangCode.EnglishUS);
+                                            bodyStr.SetString(19, "H" + hand39 + "LP,HAND=huao" + hg39, STRLangCode.EnglishUS);
+                                            bodyStr.SetString(20, "H" + hand39 + "RP,HAND=huao" + hg39, STRLangCode.EnglishUS);
+                                            bodyStr.SetString(21, "H" + hand39 + "LO,HAND=huao" + hg39, STRLangCode.EnglishUS);
+                                            bodyStr.SetString(22, "H" + hand39 + "RC,HAND=huao" + hg39, STRLangCode.EnglishUS);
+                                        }
+                                    }
+                                }
                                 target39.SetAvatarType(bodyStr);
                                 target39.SetAvatarBodyStrings(bodyStr, context.VM.Context);
+                                Content.Content.Get().Neighborhood.AvatarChanged(target39.Object.OBJ.GUID); // SetSuit's persist path no longer fires — call it directly
                             }
                             target39.SetPersonData(VMPersonDataVariable.PersonsAge, 27);
                             foreach (var z in new[] { 10, 11, 12, 15, 17, 18, 56, 57 })
@@ -683,16 +738,17 @@ namespace FSO.SimAntics.Primitives
                     return VMPrimitiveExitCode.GOTO_TRUE;
                 // 43. FamilySpellsIntoController
                 case VMGenericTS1CallMode.FamilySpellsIntoController: //43
-                    // ENG-05 decode (§mode-43, PPC 0x0f40e8): native =
+                    // ENG-05 decode (§mode-43) + ENG-08's full decode
+                    // (familyspells-decode.md): native =
                     // Family::LoadSpellsForFamily() (0x75b70), gated on the CURRENT
-                    // family (sim->nb->16; NULL → r3=0 → FALSE), idempotently
-                    // loading the family's spell inventory into the global spell
-                    // list the spellbook reads (GetFamilySpells). Callers: MMS 4097
-                    // 'init tree' @9 + 4100 'load' @3 (both t=254/f=253 — boolean
-                    // only). Port: the family-null guard is exact; the latch
-                    // (TS1State.FamilySpellsLoadedFor) records the load; the
-                    // spell-list population into the spellbook data source is the
-                    // NAMED follow-up (the CWinMagicBook availability card).
+                    // family — a 6-word one-way max-merge of the family's learned
+                    // spell bitmaps (Family+334..344) into the magic controller's
+                    // attrs 0-5. There is NO spell list and the spellbook lists all
+                    // rows natively (learned bits gate CASTING via tree 4101, which
+                    // runs in the port). The port has no FAMI spell block, so every
+                    // port family is latch=0 = the native no-op: this latch-only
+                    // shape is byte-faithful. The FAMI spell-block persistence (native
+                    // DoStream field 9) is the named SAV follow-up if ever needed.
                     var spellsFam = context.VM.TS1State.CurrentFamily;
                     if (spellsFam == null) return VMPrimitiveExitCode.GOTO_FALSE;
                     context.VM.TS1State.FamilySpellsLoadedFor = spellsFam.ChunkID;
