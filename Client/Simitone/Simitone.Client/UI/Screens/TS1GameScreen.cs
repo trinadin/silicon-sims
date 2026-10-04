@@ -1264,6 +1264,7 @@ namespace Simitone.Client.UI.Screens
             //save the house first
             var iff = new IffFile();
             RefreshArchValue(); // R137: ValueInArch mirrors the SIMI snapshot
+            vm.TS1State.RefreshSpellBlockFromController(vm); // ENG-12: refresh the FAMI spell block from the live controller BEFORE any serializer touches the family (review P3: was below the marshal — the FSOV copy is block-less by design, so this is belt-and-braces ordering, but the refresh belongs first)
             vm.TS1State.UpdateSIMI(vm);
             var marshal = vm.Save();
             var fsov = new FSOV();
@@ -1299,7 +1300,6 @@ namespace Simitone.Client.UI.Screens
             iff.AddChunk(rPNG);
 
             Content.Get().Neighborhood.SaveHouse(vm.GetGlobalValue(10), iff);
-            vm.TS1State.RefreshSpellBlockFromController(vm); // ENG-12: refresh the FAMI spell block from the live controller before the neighborhood save
             Content.Get().Neighborhood.SaveNeighbourhood(true);
 
             // Write weather sidecar alongside the save

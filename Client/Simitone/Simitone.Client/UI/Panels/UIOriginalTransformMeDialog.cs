@@ -44,6 +44,8 @@ namespace Simitone.Client.UI.Panels
 
         // probe surface (UI-35 gate)
         public static int DialogsMounted, Confirms, Cancels;
+        // probe cleanup support (review-2 P2-1): every live mount, removed by Dismiss
+        public static readonly List<UIOriginalTransformMeDialog> LiveMounted = new List<UIOriginalTransformMeDialog>();
         public static int LastEnum = -1;
         public static string LastClass = "";
         public static UIOriginalTransformMeDialog LastMounted;
@@ -127,7 +129,7 @@ namespace Simitone.Client.UI.Panels
             PreviewLine = new UIOriginalText("", Font)
             { Position = new Vector2(MsgX, ArrowY + 38), Color = new Color(195, 205, 205) };
             TabLine = new UIOriginalText("", Font)
-            { Position = new Vector2(MsgX, ArrowY + 12), Color = new Color(195, 205, 205) };
+            { Position = new Vector2(PrevX + ArrowW + 18, ArrowY + 12), Color = new Color(195, 205, 205) }; // between the arrows — off the button bands (review-2 P3-4)
             Add(PreviewLine); Add(TabLine);
 
             PrevButton.OnButtonClick += _ => { Tab = (Tab <= 0) ? 7 : Tab - 1; Refresh(); }; // 0x57d7b0
@@ -138,6 +140,13 @@ namespace Simitone.Client.UI.Panels
             Refresh();
             LastMounted = this;
             DialogsMounted++;
+            LiveMounted.Add(this);
+        }
+
+        private void Dismiss()
+        {
+            UIScreen.RemoveDialog(this);
+            LiveMounted.Remove(this);
         }
 
         private void Refresh()
@@ -181,7 +190,7 @@ namespace Simitone.Client.UI.Panels
             Confirms++;
             LastEnum = TabOutfit(Tab, Female, Child);
             OnResult?.Invoke(LastEnum);
-            UIScreen.RemoveDialog(this);
+            Dismiss();
         }
 
         private void Cancel()
@@ -189,7 +198,7 @@ namespace Simitone.Client.UI.Panels
             Cancels++;
             LastEnum = TabOutfit(Tab, Female, Child); // cancel also carries the form (decode §D)
             OnResult?.Invoke(-1);
-            UIScreen.RemoveDialog(this);
+            Dismiss();
         }
 
         private List<string> Wrap(string text, int width, int maxLines)

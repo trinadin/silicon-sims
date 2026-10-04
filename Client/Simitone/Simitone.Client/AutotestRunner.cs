@@ -19826,15 +19826,24 @@ namespace Simitone.Client
                         }
                         catch { petT = null; }
                         VMAvatar standin = null; short gStandin = 0;
+                        string bs1P = null; var bs2P = ""; short agePBefore = 0;
+                        var standinRestore = new List<string>(); var standinPd = new short[8];
+                        var standinPdSlots = new int[] { 10, 11, 12, 15, 17, 18, 56, 57 };
                         if (petT == null)
                         {
                             fixture = "gender-bit";
                             standin = caller;
                             gStandin = caller.GetPersonData(VMPersonDataVariable.Gender);
                             caller.SetPersonData(VMPersonDataVariable.Gender, (short)(gStandin | petLeg.bit));
+                            // capture the full conversion surface for the stand-in restore
+                            // (the pet branch writes [1] + age 27 + zeroes the 8 pd slots)
+                            var standinBs = caller.Object.Resource.Get<STR>(caller.Object.OBJ.BodyStringID);
+                            if (standinBs != null) { standinRestore.Add(standinBs.GetString(1) ?? ""); standinRestore.Add(""); }
+                            else standinRestore.Add(null);
+                            for (int sri = 0; sri < 8; sri++) standinPd[sri] = caller.GetPersonData((VMPersonDataVariable)standinPdSlots[sri]);
+                            agePBefore = caller.GetPersonData(VMPersonDataVariable.PersonsAge);
                             petT = caller;
                         }
-                        string bs1P = null; var bs2P = ""; short agePBefore = 0;
                         try
                         {
                             var petBs = petT.Object.Resource.Get<STR>(petT.Object.OBJ.BodyStringID);
@@ -19843,6 +19852,7 @@ namespace Simitone.Client
                             {
                                 var petSuits = new HashSet<string>(petTable.Select(s => s.Item1));
                                 bs1P = petBs.GetString(1); bs2P = petBs.GetString(2);
+                                var bs0P = petBs.GetString(0); // the SPECIES string — must survive the conversion
                                 // deterministic fixture: sentinel suit + child age, so the
                                 // rolled-suit assert can never flake on a same-suit re-roll
                                 // (the template pet's [1] may already be an adult-table
@@ -19857,22 +19867,34 @@ namespace Simitone.Client
                                 var ePa = driveOn(fP, VMGenericTS1CallMode.PetToAdult);
                                 var ePb = driveOn(fP, VMGenericTS1CallMode.PetToAdult);
                                 var t0P = thread.TempRegisters[0]; var t1P = thread.TempRegisters[1];
-                                var bs1Pa = petBs.GetString(1); var bs2Pa = petBs.GetString(2);
+                                var bs1Pa = petBs.GetString(1); var bs2Pa = petBs.GetString(2); var bs0Pa = petBs.GetString(0);
                                 var ageP = petT.GetPersonData(VMPersonDataVariable.PersonsAge);
                                 var petOk = ePa == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                                     && ePb == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
                                     && t0P == 0 && t1P == (short)petT.ObjectID
                                     && petSuits.Contains(bs1Pa) && bs1Pa != fixture1P
+                                    && bs0Pa == bs0P // review-1 P1-2: [0] is the port's species discriminator — "adult" here would re-type the pet on the next IFF load
                                     && bs2Pa == bs2P && ageP == 27;
                                 ok &= petOk;
                                 results.Add("m40" + petLeg.tag + "[" + fixture + "]=" + ePa + "->" + ePb
                                     + " suit-rolled=" + petSuits.Contains(bs1Pa) + " head-untouched=" + (bs2Pa == bs2P)
+                                    + " species-kept=" + (bs0Pa == bs0P) + "([" + bs0Pa + "])"
                                     + " age=" + ageP + "(want 27) t0=" + t0P + "(want 0) t1=" + t1P + "==oid" + petT.ObjectID);
                             }
                         }
                         finally
                         {
-                            if (standin != null) standin.SetPersonData(VMPersonDataVariable.Gender, gStandin);
+                            if (standin != null)
+                            {
+                                standin.SetPersonData(VMPersonDataVariable.Gender, gStandin);
+                                standin.SetPersonData(VMPersonDataVariable.PersonsAge, agePBefore);
+                                for (int sri = 0; sri < 8; sri++) standin.SetPersonData((VMPersonDataVariable)standinPdSlots[sri], standinPd[sri]);
+                                if (standinRestore.Count == 2)
+                                {
+                                    var sbs = standin.Object.Resource.Get<STR>(standin.Object.OBJ.BodyStringID);
+                                    if (sbs != null) sbs.SetString(1, standinRestore[0], STRLangCode.EnglishUS);
+                                }
+                            }
                             else if (petT != null && bs1P != null)
                             {
                                 try
@@ -19919,7 +19941,7 @@ namespace Simitone.Client
                         }
                         var ncOk = eNC == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
                             && g6Post == g6Pre + 1 && nidNC > 0 && stopNC == "done"
-                            && (!suitKnown || faMember);
+                            && suitKnown && faMember; // review-1 P3-3d: strict — an unresolvable record is a FAIL, not a silent pass
                         ok &= ncOk;
                         results.Add("mncAdult=" + eNC + "(want TRUE) done=" + g6Post + ">" + g6Pre + " nid=" + nidNC
                             + " stop='" + stopNC + "' suit='" + suitNC + "'" + (suitKnown ? (faMember ? "(fa-table member)" : "(NOT in fa table)") : "(unavailable)"));
@@ -19933,9 +19955,10 @@ namespace Simitone.Client
                     else
                     {
                         var ctlS = _vm.Entities.FirstOrDefault(e => e.Object?.OBJ?.GUID == 0xB6C90029u);
+                        var ctlCreated = false;
                         if (ctlS == null)
                         {
-                            try { ctlS = _vm.Context.CreateObjectInstance(0xB6C90029u, FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH)?.Objects?.FirstOrDefault(); } catch { }
+                            try { ctlS = _vm.Context.CreateObjectInstance(0xB6C90029u, FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH)?.Objects?.FirstOrDefault(); ctlCreated = ctlS != null; } catch { }
                         }
                         if (ctlS == null) results.Add("famispell=SKIPPED (no controller)");
                         else
@@ -19946,6 +19969,20 @@ namespace Simitone.Client
                             var famWordsBefore = fam.SpellWords;
                             try
                             {
+                                // review-1 P3-5: the original-format no-op — a FAMI written
+                                // WITHOUT a block must read back SpellWords == null (latch 0)
+                                {
+                                    var famNo = new FSO.Files.Formats.IFF.Chunks.FAMI { HouseNumber = fam.HouseNumber, FamilyNumber = fam.FamilyNumber, Budget = fam.Budget, ValueInArch = fam.ValueInArch, FamilyFriends = fam.FamilyFriends, Unknown = fam.Unknown, FamilyGUIDs = fam.FamilyGUIDs, Version = fam.Version, SpellWords = null };
+                                    using (var msNo = new System.IO.MemoryStream())
+                                    {
+                                        famNo.Write(null, msNo); msNo.Position = 0;
+                                        var famNoR = new FSO.Files.Formats.IFF.Chunks.FAMI();
+                                        famNoR.Read(null, msNo);
+                                        var noBlockOk = famNoR.SpellWords == null && msNo.Position == msNo.Length;
+                                        ok &= noBlockOk;
+                                        results.Add("famispell-orig-noop=" + noBlockOk + " (blockless read null=" + (famNoR.SpellWords == null) + ")");
+                                    }
+                                }
                                 _vm.TS1State.RefreshSpellBlockFromController(_vm);
                                 var refreshOk = fam.SpellWords != null && teach.SequenceEqual(fam.SpellWords);
                                 using (var msS = new System.IO.MemoryStream())
@@ -19979,6 +20016,7 @@ namespace Simitone.Client
                             {
                                 for (short k = 0; k < 6; k++) ctlS.SetAttribute(k, attrBeforeS[k]);
                                 fam.SpellWords = famWordsBefore;
+                                if (ctlCreated) { try { _vm.RemoveEntity(ctlS); } catch { } } // review-1 P3-3c: never leak the probe's controller into the lot state
                             }
                             // ENG-12 P1 regression leg: the lot-marshal round-trip
                             // with a family that HAS a block — the marshal copy must
@@ -20029,6 +20067,7 @@ namespace Simitone.Client
                     // via the same fields VMNetDialogResponseCmd writes.
                     {
                         var bsPrev = thread.BlockingState;
+                        var pickersBefore = Simitone.Client.UI.Panels.UIOriginalTransformMeDialog.LiveMounted.Count;
                         var handlerD = new FSO.SimAntics.Primitives.VMDialogPrivateStrings();
                         var opD = new FSO.SimAntics.Primitives.VMDialogOperand { Type = VMDialogType.TS1TransformMe };
                         var tableD = target.Object.Resource.Get<STR>(301) ?? caller.Object.Resource.Get<STR>(301);
@@ -20074,6 +20113,18 @@ namespace Simitone.Client
                         {
                             thread.BlockingState = bsPrev;
                             if (_vm.GlobalBlockingDialog != null) { _vm.GlobalBlockingDialog = null; if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1; }
+                            // review-2 P2-1: each registration mounted a live picker via the
+                            // synchronous dialog signal — remove every one this leg mounted
+                            try
+                            {
+                                if (Simitone.Client.UI.Panels.UIOriginalTransformMeDialog.LiveMounted.Count > pickersBefore)
+                                {
+                                    foreach (var leak in Simitone.Client.UI.Panels.UIOriginalTransformMeDialog.LiveMounted.ToList())
+                                    { try { FSO.Client.UI.Framework.UIScreen.RemoveDialog(leak); } catch { } }
+                                    Simitone.Client.UI.Panels.UIOriginalTransformMeDialog.LiveMounted.Clear();
+                                }
+                            }
+                            catch { }
                         }
                     }
 
@@ -20090,6 +20141,7 @@ namespace Simitone.Client
                             && femaleTabs.SequenceEqual(new[] { 48, 43, 44, 49, 39, 50, 51, 52 })
                             && boyTabs.SequenceEqual(new[] { 53, 60, 53, 60, 53, 60, 53, 60 })
                             && girlTabs.SequenceEqual(new[] { 54, 60, 54, 60, 54, 60, 54, 60 });
+                        tabsOk &= tabFn(8, false, false) == 0 && tabFn(-1, false, false) == 0; // the >7 -> 0 guard (§B cmplwi)
                         ok &= tabsOk;
                         results.Add("m14tabs=" + tabsOk + " m=[" + string.Join(",", maleTabs) + "] f=[" + string.Join(",", femaleTabs)
                             + "] boy0/girl0=" + boyTabs[0] + "/" + girlTabs[0] + " odd=" + boyTabs[1]);
