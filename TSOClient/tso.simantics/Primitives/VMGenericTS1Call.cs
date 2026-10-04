@@ -822,18 +822,20 @@ namespace FSO.SimAntics.Primitives
                                 {
                                     try { VMFindLocationFor.FindLocationFor(new39, target39, context.VM.Context, FSO.SimAntics.Model.VMPlaceRequestFlags.Default); } catch { }
                                 }
-                                // wave-12 review P1-2: NO thread re-home. VMThread.Entity is
-                                // engine-private with no re-bind path, and VMThread.Tick
-                                // no-ops when its Entity is dead — a transplanted thread
-                                // would never resume AND the assignment orphaned the
-                                // replacement's own live thread. The replacement keeps its
-                                // OWN thread (Main/init/queue intact — probe-pinned). The
-                                // caller's tree completes its CURRENT tick (the primitive
-                                // returns TRUE and execution runs to the next yield this
-                                // tick); a yield AFTER the swap loses the tree — the
-                                // bounded gap vs the native's async design (its trees
-                                // re-bind StackObjectID := Temp[1] on resume; the port
-                                // has no thread re-bind API — disclosed on the card).
+                                // ENG-19 (wave 13): the SELF-CAST re-home, now REAL —
+                                // VMThread.RebindEntity swaps the private binding (the
+                                // scheduler keys on entities, so the binding IS the
+                                // mechanism): the caller's thread — this tree, its queue,
+                                // its Main — continues on the replacement, and a yield
+                                // AFTER the swap resumes there (the 4211 dialog casualty
+                                // closed). The replacement's own init thread is dropped
+                                // (unreferenced; never ticks). Non-self casts never touch
+                                // threads (the target's tree is not executing here).
+                                var oldThread19 = target39.Thread;
+                                if (context.Caller != null && context.Caller == target39 && oldThread19 != null)
+                                {
+                                    oldThread19.RebindEntity(new39);
+                                }
                                 t39.B = (short)new39.ObjectID; // *b = the NEW object id (the native's fresh instance)
                                 t39.A2 = 0; // *a = 0 on success
                                 t39.State = 2;

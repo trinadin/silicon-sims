@@ -426,6 +426,31 @@ namespace FSO.SimAntics.Engine
             this.Queue = new List<VMQueuedAction>();
         }
 
+        /// <summary>The entity this thread is bound to (probe surface; the
+        /// binding is otherwise private by design — ctors are its only other
+        /// writer).</summary>
+        public VMEntity BoundEntity => Entity;
+
+        /// <summary>
+        /// ENG-19: re-bind this thread to a REPLACEMENT entity — the transform
+        /// instance swap's SELF-CAST path. The scheduler keys on ENTITIES and
+        /// each entity ticks its own Thread field, so the binding swap is the
+        /// whole mechanism: the replacement's own init thread becomes
+        /// unreferenced (it never ticks; the person continues their life —
+        /// Main, action queue, this stack — on the new body), and this thread
+        /// stops being dead-bound the moment Entity points at the live
+        /// replacement. Native contract: the caller's tree survives the swap
+        /// and re-binds StackObjectID := Temp[1] itself (CharmsKid 4111 ins7);
+        /// without this, any post-swap YIELD lost the tree (the 4211
+        /// dialog_private casualty — the wave-12 review's residual).
+        /// </summary>
+        public void RebindEntity(VMEntity newEntity)
+        {
+            if (newEntity == null || newEntity == Entity) return;
+            Entity = newEntity;
+            newEntity.Thread = this;
+        }
+
         /// <summary>
         /// Checks to see if it can push an interaction, and pushes it.
         /// Returns true on success, false on failure.
