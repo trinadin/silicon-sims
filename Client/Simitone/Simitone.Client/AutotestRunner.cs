@@ -19974,10 +19974,23 @@ namespace Simitone.Client
                         var bsPrev = thread.BlockingState;
                         var handlerD = new FSO.SimAntics.Primitives.VMDialogPrivateStrings();
                         var opD = new FSO.SimAntics.Primitives.VMDialogOperand { Type = VMDialogType.TS1TransformMe };
+                        var tableD = target.Object.Resource.Get<STR>(301) ?? caller.Object.Resource.Get<STR>(301);
+                        var routineD = _vm.Entities.OfType<VMAvatar>()
+                            .SelectMany(a => new[] { a.Thread.ActiveAction?.ActionRoutine, a.Thread.Queue.LastOrDefault()?.ActionRoutine })
+                            .FirstOrDefault(r => r != null);
+                        if (routineD == null)
+                        {
+                            // every thread idle at probe time — the DialogID only needs a
+                            // real Routine.ID, so take the fixture object's first BHAV
+                            var bhavD = target.Object.Resource.List<FSO.Files.Formats.IFF.Chunks.BHAV>()?.FirstOrDefault();
+                            if (bhavD != null) routineD = (FSO.SimAntics.VMRoutine)target.Object.Resource.GetRoutine(bhavD.ChunkID);
+                        }
+                        if (tableD == null || routineD == null) results.Add("m14dialog=SKIPPED (table=" + (tableD != null) + " routine=" + (routineD != null) + ")");
+                        else
                         try
                         {
-                            var fD = mkframe();
-                            var eD1 = handlerD.Execute(fD, opD);
+                            var fD = mkframe(); fD.CodeOwner = target.Object; fD.Routine = routineD; // BuildDialogInfo reads Routine.ID for the DialogID
+                            var eD1 = FSO.SimAntics.Primitives.VMDialogPrivateStrings.ExecuteGeneric(fD, opD, tableD);
                             var stD = thread.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
                             var registered = eD1 == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK && stD != null && stD.Type == VMDialogType.TS1TransformMe;
                             stD.Responded = true; stD.ResponseCode = 0; stD.ResponseText = "3";
@@ -19987,8 +20000,8 @@ namespace Simitone.Client
                             var confirmOk = registered && eD2 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && t0D == 3;
                             // cancel leg: re-register, answer 2 (the UIOriginalNameEntryDialog
                             // cancel idiom) -> FALSE + Temp0 = form
-                            var fD2 = mkframe();
-                            handlerD.Execute(fD2, opD);
+                            var fD2 = mkframe(); fD2.CodeOwner = target.Object; fD2.Routine = routineD;
+                            FSO.SimAntics.Primitives.VMDialogPrivateStrings.ExecuteGeneric(fD2, opD, tableD);
                             var stD2 = thread.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
                             stD2.Responded = true; stD2.ResponseCode = 2; stD2.ResponseText = "5";
                             thread.TempRegisters[0] = 0;
@@ -20019,7 +20032,7 @@ namespace Simitone.Client
             }
             catch (Exception error)
             {
-                Log("AUTOTEST eng05modes EXC " + error.GetType().Name + " " + error.Message);
+                Log("AUTOTEST eng05modes EXC " + error.GetType().Name + " " + error.Message + " STACK " + (error.StackTrace ?? "").Replace("\n"," | "));
                 Fail("eng05modes");
             }
         }
