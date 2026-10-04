@@ -19751,12 +19751,58 @@ namespace Simitone.Client
                     // (TicksThisFrame++ per instruction; the dead-guard no-op is excluded)
                     var swapThreadLive = swap39 != null && !swap39.Dead
                         && swap39.Thread == thread && thread.BoundEntity == swap39;
-                    var ticked19 = false;
+                    // ENG-19 review acceptance shape: a QUEUED ACTION with Callee ==
+                    // the dying entity (the live self-cast's social shape) + an
+                    // ActionTree frame on the stack — the references the dead-Callee
+                    // guard consults — re-pointed by the rebind, then REAL entity
+                    // ticks through the scheduler path with the tree surviving.
+                    var resume19 = false; var repoint19 = false;
                     if (swapThreadLive)
                     {
-                        thread.TicksThisFrame = 0;
-                        try { swap39.Tick(); ticked19 = thread.TicksThisFrame > 0; }
-                        catch (Exception tickEx19) { results.Add("m39-tick-exc=" + tickEx19.GetType().Name); }
+                        var routine19 = _vm.Entities.OfType<VMAvatar>()
+                            .SelectMany(a => new[] { a.Thread.ActiveAction?.ActionRoutine, a.Thread.Queue.LastOrDefault()?.ActionRoutine })
+                            .FirstOrDefault(r => r != null);
+                        if (routine19 == null)
+                        {
+                            var bhav19 = target.Object.Resource.List<FSO.Files.Formats.IFF.Chunks.BHAV>()?.FirstOrDefault();
+                            if (bhav19 != null) routine19 = (FSO.SimAntics.VMRoutine)target.Object.Resource.GetRoutine(bhav19.ChunkID);
+                        }
+                        // the fixture references the CURRENT dying entity (swap39) — the
+                        // live shape: the social was pushed on the sim being transformed
+                        var qa19 = new VMQueuedAction { Callee = swap39, StackObject = swap39, ActionRoutine = routine19, Name = "eng19-probe" };
+                        var f19 = new FSO.SimAntics.Engine.VMStackFrame
+                        {
+                            Thread = thread, Caller = swap39, Callee = swap39, StackObject = swap39,
+                            Routine = routine19, ActionTree = true, CodeOwner = target.Object,
+                        };
+                        thread.Queue.Add(qa19);
+                        thread.Stack.Add(f19);
+                        // a SECOND self-cast on the REPLACEMENT — the live shape
+                        // end-to-end: enqueue -> poll swap+rebind+re-points -> resume
+                        thread.TempRegisters[0] = (short)swap39.ObjectID;
+                        var f19d = mkframe(); f19d.Caller = swap39; f19d.StackObject = swap39;
+                        driveOn(f19d, VMGenericTS1CallMode.ChildToAdult); // first visit: enqueue + yield
+                        var e19 = driveOn(f19d, VMGenericTS1CallMode.ChildToAdult); // poll: SWAP + REBIND + re-points
+                        var swap2_19 = _vm.GetObjectById(thread.TempRegisters[1]) as VMAvatar;
+                        repoint19 = e19 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
+                            && swap2_19 != null && thread.BoundEntity == swap2_19 && swap2_19.Thread == thread
+                            && qa19.Callee == swap2_19 && qa19.StackObject == swap2_19
+                            && f19.Callee == swap2_19 && f19.StackObject == swap2_19 && f19.Caller == swap2_19;
+                        // the dead-Callee guard evaluated DIRECTLY: an ActionTree frame
+                        // + a LIVE re-pointed Callee => the RUN branch (Reset unreachable)
+                        var guardRuns19 = f19.ActionTree && !qa19.Callee.Dead;
+                        var tickedA19 = false; var tickedB19 = false; var exc19 = "";
+                        try
+                        {
+                            thread.TicksThisFrame = 0; swap2_19.Tick(); tickedA19 = thread.TicksThisFrame > 0;
+                            thread.TicksThisFrame = 0; swap2_19.Tick(); tickedB19 = thread.TicksThisFrame > 0;
+                        }
+                        catch (Exception tickEx19) { exc19 = tickEx19.GetType().Name; }
+                        // the tree survived: never Reset-cleared (frames ran or completed —
+                        // the thread still holds stack/queue either way)
+                        var survived19 = thread.Stack.Count > 0 || thread.Queue.Count > 0;
+                        resume19 = repoint19 && guardRuns19 && tickedA19 && tickedB19 && exc19 == "" && survived19;
+                        if (exc19 != "") results.Add("m19-tick-exc=" + exc19);
                     }
                     var bs39 = (swap39 ?? caller).Object.Resource.Get<STR>((swap39 ?? caller).Object.OBJ.BodyStringID);
                     var bs0_39 = bs39?.GetString(0) ?? "?";
@@ -19777,9 +19823,9 @@ namespace Simitone.Client
                     ok &= e39a == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                         && e39b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
                         && t0_39 == 0 && swap39 != null && callerIsDead && !ReferenceEquals(swap39, caller)
-                        && swapCarry && swapThreadLive && ticked19 && age39 == 27 && bs0_39 == "adult" && hdOk17;
+                        && swapCarry && swapThreadLive && resume19 && age39 == 27 && bs0_39 == "adult" && hdOk17;
                     results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "(want 0=*a) temp1=" + t1_39 + "(oid-recycled=" + (t1_39 == oid39) + ")"
-                        + " swap=(" + (swap39 != null) + " pos-carry=" + (swapCarry) + " rebind=" + swapThreadLive + " tick-executed=" + ticked19 + ") age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) hdslots=" + (hdOk17 ? "ok" : "BAD")
+                        + " swap=(" + (swap39 != null) + " pos-carry=" + (swapCarry) + " rebind=" + swapThreadLive + " resume=" + resume19 + " repoint=" + repoint19 + ") age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) hdslots=" + (hdOk17 ? "ok" : "BAD")
                         + " " + string.Join(" ", hdDesc17) + " diag=[" + (FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate ?? "") + "]");
                     // ENG-07 review P2 discriminator: a CHILD fixture must roll from the
                     // ADULT tables — set a child [1] suit + child age, transform, assert
@@ -19796,7 +19842,7 @@ namespace Simitone.Client
                         var adultBodyKey39 = (g39 > 0) ? "fa" : "ma";
                         if (childBodies39 != null && childBodies39.Count > 0 && childHeads39 != null && childHeads39.Count > 0)
                         {
-                            var childT39 = swap39 ?? caller; // ENG-14: the swap replaced the caller — fixture the REPLACEMENT
+                            var childT39 = (thread.BoundEntity as VMAvatar) ?? swap39 ?? caller; // the LIVE replacement (the rebind keeps BoundEntity current through every swap)
                             var bs1Before = bs39.GetString(1); var bs2Before = bs39.GetString(2); var bs14Before = bs39.GetString(14);
                             var ageBefore = childT39.GetPersonData(VMPersonDataVariable.PersonsAge);
                             var fixture1_39 = childBodies39[0] + ",BODY=probechild";
