@@ -619,6 +619,13 @@ namespace FSO.SimAntics.Primitives
                             // in-place divergence: the port rewrites the strings and
                             // re-saves the character IFF via AvatarChanged instead.
                             var bodyStr = target39.Object.Resource.Get<STR>(target39.Object.OBJ.BodyStringID);
+                            // ENG-20: snapshot the touched slots — a failed create declines
+                            // with the target ALIVE, and the writes below would otherwise
+                            // leave a kid with an adult's strings (review N3, twice flagged)
+                            var snap20 = new Dictionary<int, string>();
+                            if (bodyStr != null)
+                                foreach (var si20 in new[] { 0, 1, 2, 13, 14, 17, 18, 19, 20, 21, 22, 30, 31, 32, 33, 34 })
+                                    snap20[si20] = bodyStr.GetString(si20);
                             if (bodyStr != null)
                             {
                                 // [13] = the age word, person AND pet (the native
@@ -803,7 +810,17 @@ namespace FSO.SimAntics.Primitives
                             {
                                 // the native's engine-failed path (AnyoneToAdult zeroes
                                 // *b and returns 0) — state 3 declines the same way,
-                                // with the target STILL ALIVE (pre-kill, native shape)
+                                // with the target STILL ALIVE (pre-kill, native shape).
+                                // ENG-20: restore the snapshot so the living target keeps
+                                // its own strings (the writes above must not persist)
+                                if (bodyStr != null)
+                                {
+                                    foreach (var sv20 in snap20)
+                                        if (sv20.Value != null) bodyStr.SetString(sv20.Key, sv20.Value);
+                                    target39.SetAvatarType(bodyStr);
+                                    target39.SetAvatarBodyStrings(bodyStr, context.VM.Context);
+                                    Content.Content.Get().Neighborhood.AvatarChanged(target39.Object.OBJ.GUID);
+                                }
                                 t39.State = 3;
                             }
                             else
