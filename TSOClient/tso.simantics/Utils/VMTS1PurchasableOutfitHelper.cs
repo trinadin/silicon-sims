@@ -11,6 +11,43 @@ namespace FSO.SimAntics.Utils
         public static string[] OutfitTypes = new string[] { "b", "f", "s", "l", "w", "h" };
         public static short[] OutfitTypeToInd = new short[] { 1, 30, 31, 32, 33, 34 };
 
+        /// <summary>
+        /// ENG-18: the same table walk as GetValidOutfits, keyed explicitly
+        /// (no avatar needed) — the creation-time default picker and other
+        /// build-code-keyed callers use this.
+        /// </summary>
+        public static Tuple<string, string>[] GetValidOutfitsByKey(string collectionType, string simtype, string skin, short outfitType)
+        {
+            var col = Content.Content.Get().BCFGlobal.CollectionsByName[collectionType];
+            var bodies = col.ClothesByAvatarType[simtype];
+
+            var tex = (TS1AvatarTextureProvider)Content.Content.Get().AvatarTextures;
+            var texnames = tex.GetAllNames();
+
+            var bodyTex = bodies.Select(x => RemoveExt(texnames.FirstOrDefault(y => y.StartsWith(ExtractID(x, skin))))).ToList();
+            var handgroupTex = bodies.Select(x => (RemoveExt(texnames.FirstOrDefault(y => y == "huao" + FindHG(x))) ?? "huao" + skin).Substring(4)).ToList();
+
+            var result = new List<Tuple<string, string>>();
+            for (int i = 0; i < bodies.Count; i++)
+            {
+                if (bodyTex[i] == null)
+                {
+                    bodyTex.RemoveAt(i);
+                    handgroupTex.RemoveAt(i);
+                    bodies.RemoveAt(i--);
+                }
+                else
+                {
+                    result.Add(new Tuple<string, string>(
+                        bodies[i] + ",BODY=" + bodyTex[i],
+                        handgroupTex[i]
+                        ));
+                }
+            }
+
+            return result.ToArray();
+        }
+
         public static Tuple<string, string>[] GetValidOutfits(VMAvatar avatar, short outfitType)
         {
             string skin = "";

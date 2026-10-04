@@ -235,7 +235,11 @@ namespace FSO.SimAntics.Utils
                 {31, "s100"+code+"_original,BODY=s100"+code+skin+"_original" },
                 {32, "l100"+code+"_original,BODY=l100"+code+skin+"_original" },
                 {33, "w100"+code+"_original,BODY=w100"+code+skin+"_original" },
-                {34, (Child)?"ADDED":("h533"+code+"_zoot,BODY=h533"+code+skin+"_zoot") },
+                // ENG-18: a table-backed HD default — the hardcoded h533<code>_zoot
+                // resolves only for mafat (ENG-17 §3: the sole h533 set in the corpus);
+                // 5 of 6 adult builds got a dangling slot-34. Deterministic first-valid
+                // pick at creation (the transform's runtime roll is ENG-17's surface).
+                {34, (Child)?"ADDED":HDSkinDefaultFor(code, skin) },
             };
 
             Gender = (short)((gender == 'f') ? 1 : 0);
@@ -346,6 +350,17 @@ namespace FSO.SimAntics.Utils
                 case 2: return 2; // Dark   -> drk=2
                 default: return 1; // Light (0) -> lgt=1
             }
+        }
+
+        private static string HDSkinDefaultFor(string code, string skin)
+        {
+            try
+            {
+                var suits = VMTS1PurchasableOutfitHelper.GetValidOutfitsByKey("h", code, skin, 5);
+                if (suits.Length > 0) return suits[0].Item1;
+            }
+            catch { }
+            return "h533" + code + "_zoot,BODY=h533" + code + skin + "_zoot"; // legacy fallback (table absent)
         }
     }
 }
