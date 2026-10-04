@@ -19722,19 +19722,25 @@ namespace Simitone.Client
                     var type15b = target.RoutingFootprintType;
                     ok &= e15b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && type15b == 0;
                     results.Add("m15(t0)=" + e15b + "(want GOTO_TRUE recompute) type=" + type15b + "(want 0)");
-                    // mode 39: the person variant — first visit yields, poll succeeds on an
-                    // in-lot target (the caller itself: age already adult -> idempotent write)
+                    // mode 39 (ENG-07-corrected contract): Temp0 = the target's VM OBJECT
+                    // id; first visit yields; poll -> SUCCESS: Temp0 := 0 (*a), Temp1 := the
+                    // converted avatar's oid (*b), and the rebuild landed (age word 27 +
+                    // BodyStrings[0] "adult"). Drive on the caller (an adult already — the
+                    // age/suit writes are the assert surface).
                     FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
-                    var nid39 = caller.GetPersonData(VMPersonDataVariable.NeighborId);
-                    thread.TempRegisters[0] = nid39;
+                    var oid39 = (short)caller.ObjectID;
+                    thread.TempRegisters[0] = oid39;
                     var f39 = mkframe();
                     var e39a = driveOn(f39, VMGenericTS1CallMode.ChildToAdult);
                     var e39b = driveOn(f39, VMGenericTS1CallMode.ChildToAdult);
                     var t0_39 = thread.TempRegisters[0]; var t1_39 = thread.TempRegisters[1];
+                    var age39 = caller.GetPersonData(VMPersonDataVariable.PersonsAge);
+                    var bs39 = caller.Object.Resource.Get<STR>(caller.Object.OBJ.BodyStringID);
+                    var bs0_39 = bs39?.GetString(0) ?? "?";
                     ok &= e39a == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                         && e39b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
-                        && t0_39 == nid39 && t1_39 == caller.ObjectID;
-                    results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "==" + nid39 + " temp1=" + t1_39 + "==oid" + caller.ObjectID);
+                        && t0_39 == 0 && t1_39 == oid39 && age39 == 27 && bs0_39 == "adult";
+                    results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "(want 0=*a) temp1=" + t1_39 + "==oid" + oid39 + " age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult)");
                 }
                 finally
                 {
