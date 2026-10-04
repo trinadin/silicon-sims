@@ -462,6 +462,7 @@ namespace FSO.SimAntics.Engine
             {
                 if (action.Callee == old) action.Callee = newEntity;
                 if (action.StackObject == old) action.StackObject = newEntity;
+                if (action.IconOwner == old) action.IconOwner = newEntity; // review N2 (queue icon parity)
             }
             foreach (var frame in Stack)
             {
