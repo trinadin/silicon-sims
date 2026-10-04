@@ -19745,7 +19745,9 @@ namespace Simitone.Client
                         && swap39.Position.x != -32768
                         && Math.Abs(swap39.Position.x - pos39Before.x) <= 16 && Math.Abs(swap39.Position.y - pos39Before.y) <= 16
                         && swap39.GetPersonData(VMPersonDataVariable.NeighborId) == nid39Before;
-                    var threadRehomed = swap39 != null && swap39.Thread == thread;
+                    // review P1-2 (corrected): NO re-home exists — assert the replacement
+                    // has its OWN live thread (not the caller's transplanted one)
+                    var swapThreadLive = swap39 != null && !swap39.Dead && swap39.Thread != null && swap39.Thread != thread;
                     var bs39 = (swap39 ?? caller).Object.Resource.Get<STR>((swap39 ?? caller).Object.OBJ.BodyStringID);
                     var bs0_39 = bs39?.GetString(0) ?? "?";
                     var age39 = swap39?.GetPersonData(VMPersonDataVariable.PersonsAge) ?? -1;
@@ -19765,9 +19767,9 @@ namespace Simitone.Client
                     ok &= e39a == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                         && e39b == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
                         && t0_39 == 0 && swap39 != null && callerIsDead && !ReferenceEquals(swap39, caller)
-                        && swapCarry && threadRehomed && age39 == 27 && bs0_39 == "adult" && hdOk17;
+                        && swapCarry && swapThreadLive && age39 == 27 && bs0_39 == "adult" && hdOk17;
                     results.Add("m39=" + e39a + "->" + e39b + "(want CONTINUE->TRUE) temp0=" + t0_39 + "(want 0=*a) temp1=" + t1_39 + "(oid-recycled=" + (t1_39 == oid39) + ")"
-                        + " swap=(" + (swap39 != null) + " pos-carry=" + (swapCarry) + " thread-rehomed=" + threadRehomed + ") age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) hdslots=" + (hdOk17 ? "ok" : "BAD")
+                        + " swap=(" + (swap39 != null) + " pos-carry=" + (swapCarry) + " own-thread-live=" + swapThreadLive + ") age=" + age39 + "(want 27) bs0='" + bs0_39 + "'(want adult) hdslots=" + (hdOk17 ? "ok" : "BAD")
                         + " " + string.Join(" ", hdDesc17) + " diag=[" + (FSO.SimAntics.Primitives.VMGenericTS1Call.G6AddToFamilyGate ?? "") + "]");
                     // ENG-07 review P2 discriminator: a CHILD fixture must roll from the
                     // ADULT tables — set a child [1] suit + child age, transform, assert
@@ -19912,10 +19914,11 @@ namespace Simitone.Client
                                 var newPet = _vm.GetObjectById(t1P) as VMAvatar;
                                 var petCarry = newPet != null && newPet.Position.x != -32768
                                     && Math.Abs(newPet.Position.x - petPosP.x) <= 16 && Math.Abs(newPet.Position.y - petPosP.y) <= 16;
+                                var genderCarryP = newPet != null && newPet.GetPersonData(VMPersonDataVariable.Gender) == petT.GetPersonData(VMPersonDataVariable.Gender); // review P3-2
                                 var ageP = newPet?.GetPersonData(VMPersonDataVariable.PersonsAge) ?? -1;
                                 var petOk = ePa == FSO.SimAntics.Engine.VMPrimitiveExitCode.CONTINUE_NEXT_TICK
                                     && ePb == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE
-                                    && t0P == 0 && newPet != null && petCarry && !ReferenceEquals(newPet, petT)
+                                    && t0P == 0 && newPet != null && petCarry && genderCarryP && !ReferenceEquals(newPet, petT)
                                     && petSuits.Contains(bs1Pa) && bs1Pa != fixture1P
                                     && bs0Pa == bs0P // review-1 P1-2: [0] is the port's species discriminator — "adult" here would re-type the pet on the next IFF load
                                     && bs2Pa == bs2P && ageP == 27;
@@ -19923,7 +19926,7 @@ namespace Simitone.Client
                                 results.Add("m40" + petLeg.tag + "[" + fixture + "]=" + ePa + "->" + ePb
                                     + " suit-rolled=" + petSuits.Contains(bs1Pa) + " head-untouched=" + (bs2Pa == bs2P)
                                     + " species-kept=" + (bs0Pa == bs0P) + "([" + bs0Pa + "])"
-                                    + " swap=(new=" + (newPet != null) + " pos-carry=" + petCarry + ")"
+                                    + " swap=(new=" + (newPet != null) + " pos-carry=" + petCarry + " gender-carry=" + genderCarryP + ")"
                                     + " age=" + ageP + "(want 27) t0=" + t0P + "(want 0) t1=" + t1P + "!=oid" + petOidP);
                             }
                         }
@@ -20033,6 +20036,14 @@ namespace Simitone.Client
                             var attrBeforeS = new short[6];
                             for (short k = 0; k < 6; k++) { attrBeforeS[k] = ctlS.GetAttribute(k); ctlS.SetAttribute(k, teach[k]); }
                             var famWordsBefore = fam.SpellWords;
+                            // review P1-1 (corrected): the native merges/refreshes ONLY on
+                            // COMMUNITY lots (zoning==1) — the probe lot is residential, so
+                            // force community for the teach/refresh/merge phases
+                            var zoningDictW = FSO.Content.Content.Get().Neighborhood.ZoningDictionary;
+                            var curHouseW = _vm.TS1State.CurrentHouse;
+                            short zoningHomeW;
+                            if (!zoningDictW.TryGetValue(curHouseW, out zoningHomeW)) zoningHomeW = -1;
+                            zoningDictW[curHouseW] = 1;
                             try
                             {
                                 // review-1 P3-5: the original-format no-op — a FAMI written
@@ -20066,26 +20077,29 @@ namespace Simitone.Client
                                         var merged = new short[6];
                                         for (short k = 0; k < 6; k++) merged[k] = ctlS.GetAttribute(k);
                                         var mergeOk = eS == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && teach.SequenceEqual(merged);
-                                        // ENG-15: the community-zoning skip — with zoning forced to 1
-                                        // the merge must NOT run (native §1's table-walk gate), latch+TRUE still
-                                        short zoningPrev = -1;
+                                        // review P1-1 (corrected): zoning gates BOTH ways — zoning 0
+                                        // (residential) SKIPS the merge; zoning 1 (community) runs it;
+                                        // latch+TRUE holds on both
                                         var zGateOk = true;
-                                        var zoningDict = FSO.Content.Content.Get().Neighborhood.ZoningDictionary;
-                                        var curHouseS = _vm.TS1State.CurrentHouse;
-                                        if (zoningDict.TryGetValue(curHouseS, out zoningPrev)) zoningDict[curHouseS] = 1;
-                                        else { zoningPrev = -1; zoningDict[curHouseS] = 1; }
                                         try
                                         {
+                                            zoningDictW[curHouseW] = 0;
                                             for (short k = 0; k < 6; k++) ctlS.SetAttribute(k, 0);
-                                            var eZ = drive(VMGenericTS1CallMode.FamilySpellsIntoController);
+                                            var eZ0 = drive(VMGenericTS1CallMode.FamilySpellsIntoController);
                                             var skipped = true;
                                             for (short k = 0; k < 6; k++) if (ctlS.GetAttribute(k) != 0) skipped = false;
-                                            zGateOk = eZ == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && skipped
-                                                && _vm.TS1State.FamilySpellsLoadedFor == fam.ChunkID; // latch+TRUE hold on the skip
+                                            zGateOk &= eZ0 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && skipped
+                                                && _vm.TS1State.FamilySpellsLoadedFor == fam.ChunkID;
+                                            zoningDictW[curHouseW] = 1;
+                                            for (short k = 0; k < 6; k++) ctlS.SetAttribute(k, 0);
+                                            var eZ1 = drive(VMGenericTS1CallMode.FamilySpellsIntoController);
+                                            var ran = true;
+                                            for (short k = 0; k < 6; k++) if (ctlS.GetAttribute(k) != teach[k]) ran = false;
+                                            zGateOk &= eZ1 == FSO.SimAntics.Engine.VMPrimitiveExitCode.GOTO_TRUE && ran;
                                         }
                                         finally
                                         {
-                                            zoningDict[curHouseS] = zoningPrev;
+                                            zoningDictW[curHouseW] = 1; // the enclosing phase holds community
                                             for (short k = 0; k < 6; k++) ctlS.SetAttribute(k, merged[k]);
                                         }
                                         ok &= mergeOk && zGateOk;
@@ -20103,6 +20117,8 @@ namespace Simitone.Client
                             }
                             finally
                             {
+                                zoningDictW[curHouseW] = (zoningHomeW == -1) ? (short)0 : zoningHomeW;
+                                if (zoningHomeW == -1) zoningDictW.Remove(curHouseW);
                                 for (short k = 0; k < 6; k++) ctlS.SetAttribute(k, attrBeforeS[k]);
                                 fam.SpellWords = famWordsBefore;
                                 if (ctlCreated) { try { _vm.RemoveEntity(ctlS); } catch { } } // review-1 P3-3c: never leak the probe's controller into the lot state

@@ -309,7 +309,7 @@ namespace Simitone.Client.UI.Panels
                         PreviewContext = ctx;
                         // the CAS staging law: the twin belongs only to the
                         // Vita surface — the lot view must not reveal it
-                        twin.WorldUI.Visible = false;
+                        try { twin.WorldUI.Visible = false; } catch { } // review P3-3: a null WorldUI (non-world session) must not strand the twin — ReleasePreview owns it from here
                     }
                 }
                 if (PreviewAvatar == null && target != null)
