@@ -982,9 +982,15 @@ namespace FSO.SimAntics.Engine
                 // opcode 0x141, unhandled natively) depends on this — control falls to
                 // instruction 7 (global 30 == free will == 1) and only there dispatches
                 // prim 3 FindBestAction at instruction 1. The port's gosub encoding
-                // (>= 256) still applies when the routine actually resolves; an
-                // unresolvable opcode in a TS1 tree is the native unknown (false), not
-                // an error-pop that kills the whole stack.
+                // (>= 256) still applies when the routine actually resolves (ENG-22:
+                // >= 0x100 is natively TreeSim::Gosub, 0x1540d0 via the DoNodeAction
+                // intercept 0x153a38 — resolvable targets gosub natively too). The
+                // UNRESOLVED corner diverges deliberately: native reports error
+                // 0x44e/0x3e8 and returns 0 with the pointer UNADVANCED (0x153a88-
+                // 0x153ad8 — a report-and-retry livelock); the port's GOTO_FALSE
+                // advance is the bounded divergence (no live TS1 path hits it — the
+                // runtime globals resolve every id the corpus calls, globalcalls r45
+                // 0 dangling).
                 if (Context.VM.TS1 && !TS1SubRoutineResolves(frame, opcode))
                 {
                     HandleResult(frame, instruction, VMPrimitiveExitCode.GOTO_FALSE);
