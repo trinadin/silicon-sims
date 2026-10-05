@@ -20381,6 +20381,180 @@ namespace Simitone.Client
                         results.Add("m14tabs=" + tabsOk + " m=[" + string.Join(",", maleTabs) + "] f=[" + string.Join(",", femaleTabs)
                             + "] boy0/girl0=" + boyTabs[0] + "/" + girlTabs[0] + " odd=" + boyTabs[1]);
                     }
+
+                    // ENG-22 (the full-tree composed leg — the TRUE composed N1
+                    // form): push the REAL SocialsMagic 4211 "Magic - Kid to
+                    // Adult" tree (18 ins: GOSUB G:280 idle(5) -> YesNo dialog
+                    // string 61 -> sound -> sparkle create -> manage-inventory
+                    // ladder -> idle(50) -> Temp0:=oid [expression] -> mode 39
+                    // [generic_sims_call] -> t=254) on a REAL child sim and drive
+                    // it through the REAL scheduler + dispatcher — no direct
+                    // primitive calls. Native law (evidence/ENG-22/native-
+                    // decode-20261005.md): opcode>=0x100 is TreeSim::Gosub;
+                    // Global 280 "idle" = sleep Arg0 ticks; the port's
+                    // resolvable-gosub law is native-correct as-is.
+                    {
+                        var fullOk22 = false; var fullDesc22 = "";
+                        var smGo22 = FSO.Content.Content.Get().WorldObjects.Get(0x9FE28884u); // SocialsMagic.iff OBJD 16807
+                        var rt4211 = smGo22?.Resource?.GetRoutine(4211) as FSO.SimAntics.VMRoutine;
+                        // run-9 diagnosis: the m39-lineage thread's BoundEntity is a DEAD
+                        // entity (a non-self fixture transform killed it without a rebind)
+                        // — Thread.Tick's !Entity.Dead guard would skip every tick. Run the
+                        // leg on a LIVE person avatar's own thread instead.
+                        var kid22 = _vm.Entities.OfType<VMAvatar>()
+                            .FirstOrDefault(a => !a.Dead && ((a.GetPersonData(VMPersonDataVariable.Gender) & 24) == 0));
+                        if (rt4211 == null || kid22 == null)
+                            results.Add("m4211=SKIPPED (rt=" + (rt4211 != null) + " kid=" + (kid22 != null) + ")");
+                        else
+                        {
+                            var thread22 = kid22.Thread;
+                            var bs22 = kid22.Object.Resource.Get<STR>(kid22.Object.OBJ.BodyStringID);
+                            // the child fixture (the m39 child-leg recipe): child
+                            // strings + age 12 so mode 39 rolls kid -> adult
+                            var g22 = kid22.GetPersonData(VMPersonDataVariable.Gender) & 1;
+                            var childHeads22 = FSO.Content.Content.Get().BCFGlobal.CollectionsByName["c"].ClothesByAvatarType[((g22 > 0) ? "f" : "m") + "c"];
+                            var childBodies22 = FSO.Content.Content.Get().BCFGlobal.CollectionsByName["b"].ClothesByAvatarType[((g22 > 0) ? "f" : "m") + "cchd"];
+                            if (bs22 == null || childHeads22 == null || childHeads22.Count == 0 || childBodies22 == null || childBodies22.Count == 0)
+                                results.Add("m4211=SKIPPED (fixture bcf)");
+                            else
+                            {
+                                var qa22 = new VMQueuedAction { Callee = kid22, StackObject = kid22, ActionRoutine = rt4211, Name = "eng22-fulltree", IconOwner = kid22 };
+                                var f22 = new FSO.SimAntics.Engine.VMStackFrame
+                                { Thread = thread, Caller = kid22, Callee = kid22, StackObject = kid22,
+                                  Routine = rt4211, CodeOwner = smGo22, ActionTree = true };
+                                var entsBefore22 = new HashSet<short>(_vm.Entities.Select(e => e.ObjectID));
+                                var bsPrev22 = thread22.BlockingState;
+                                var latch22 = false; var respOk22 = false; var ticks22 = 0;
+                                System.Action<string> sinkPrev22 = null; var budgetPrev22 = 0;
+                                var preStack22 = 0;
+                                try
+                                {
+                                    // probe-fixture hygiene: purge stale queue entries whose
+                                    // Callee died in earlier fixture legs — Thread.Tick's
+                                    // dead-owner guard consults Queue[0].Callee, and a dead
+                                    // leftover there rips the pushed tree every tick (run-2
+                                    // diagnosis: q0 dead, ran=False for 62 ticks). The live
+                                    // game never holds this state (dead sims' queues drain).
+                                    var purged22 = thread22.Queue.Where(a => a.Callee == null || a.Callee.Dead).ToList();
+                                    foreach (var stale22 in purged22) thread22.Queue.Remove(stale22);
+                                    preStack22 = thread22.Stack.Count;
+                                    bs22.SetString(1, childBodies22[0] + ",BODY=probechild22");
+                                    bs22.SetString(2, childHeads22[0] + ",HEAD-HEAD=probechild22");
+                                    bs22.SetString(30, "ADDED"); bs22.SetString(34, "ADDED");
+                                    kid22.SetPersonData(VMPersonDataVariable.PersonsAge, 12);
+                                    FSO.SimAntics.Primitives.VMGenericTS1Call.Eng05Transforms.Clear();
+                                    thread22.Queue.Add(qa22);
+                                    if (!thread22.Push(f22)) throw new Exception("push-empty-routine");
+                                    _vm.Scheduler.ScheduleTickIn(kid22, 1); // Entity.Init law: the entry that keeps the sim ticking in live play
+                                    // instruction-level trace for this leg only (the EXP-05
+                                    // ITRACE machinery, ENG-22-admitted trees, restored after)
+                                    sinkPrev22 = FSO.SimAntics.Engine.VMThread.AutotestTraceSink;
+                                    budgetPrev22 = FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget;
+                                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = (System.Action<string>)(s22t => Log("AUTOTEST m4211-trace " + s22t));
+                                    FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = true;
+                                    FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 400;
+                                    FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Add(kid22.ObjectID);
+                                    // the REAL drive: real entity ticks (Thread.Tick -> the
+                                    // genuine instruction dispatcher, the m19-proven idiom) with
+                                    // the scheduler clock advanced per pass so VMSleep's
+                                    // countdowns elapse. No RunTick calls — the game's own loop
+                                    // stays the only scheduler driver (run-2/3 diagnosis: manual
+                                    // RunTick races the live loop and flushes pending deletions
+                                    // mid-leg). The tick target is re-read per pass so the drive
+                                    // survives the transform's entity swap (the ENG-19 rebind).
+                                    var lastDepth22 = -1; var stall22 = 0; var diag22 = new List<string>();
+                                    var reentPrev22 = thread22.CatchReentries;
+                                    for (int k22 = 0; k22 < 200 && thread22.Stack.Contains(f22); k22++)
+                                    {
+                                        if (k22 == 2) thread22.CatchReentries = 99; // arm the console crumb: the next swallowed exception names its routine+instruction
+                                        _vm.Scheduler.CurrentTickID++;
+                                        var tickEnt22 = thread22.BoundEntity;
+                                        if (tickEnt22 != null) tickEnt22.Tick();
+                                        ticks22++;
+                                        if (k22 < 8 || k22 % 20 == 0)
+                                        {
+                                            if (k22 == 0) diag22.Add("kid=" + kid22.ObjectID + "/dead=" + kid22.Dead
+                                                + "/bound=" + (thread22.BoundEntity == kid22)
+                                                + "/thread-ok=" + (kid22.Thread == thread)
+                                                + "/ischeck=" + thread22.IsCheck
+                                                + " q=[" + string.Join(",", thread22.Queue.Select(a => (a.Callee?.ObjectID ?? -1) + (a.Callee?.Dead ?? true ? "D" : "L"))) + "]");
+                                            diag22.Add("k" + k22 + " d=" + thread22.Stack.Count + " ran=" + (thread22.TicksThisFrame > 0)
+                                                + " reent+" + (thread22.CatchReentries - reentPrev22)
+                                                + " top=" + (thread22.Stack.Last().Routine?.Chunk?.ChunkID ?? -1)
+                                                + "@" + thread22.Stack.Last().InstructionPointer + " latched=" + (_vm.GlobalBlockingDialog != null));
+                                        }
+                                        reentPrev22 = thread22.CatchReentries;
+                                        if (_vm.GlobalBlockingDialog != null)
+                                        {
+                                            // the YesNo at ins5 — the REAL response command
+                                            // through the live latch (the m21-proven path)
+                                            latch22 = _vm.GlobalBlockingDialog == kid22;
+                                            respOk22 = new FSO.SimAntics.NetPlay.Model.Commands.VMNetDialogResponseCmd
+                                                { ResponseCode = 0, ResponseText = "" }.Execute(_vm, null);
+                                            _vm.SignalDialog(null); // the client's own clear law (unmounts the alert)
+                                        }
+                                        var depth22 = thread22.Stack.Count;
+                                        if (depth22 == lastDepth22) stall22++; else { stall22 = 0; lastDepth22 = depth22; }
+                                        if (stall22 > 60) break; // stall discriminator (diagnostics below)
+                                    }
+                                    var treeDone22 = !thread22.Stack.Contains(f22); // t=254 popped the ActionTree
+                                    // the main's idle machinery pulls queued actions — with the
+                                    // tree driven manually AND queued, the queue would start a
+                                    // SECOND run (run-10 trace: the transplant re-entering
+                                    // 4211@0 at tick 59). The manual push was the drive.
+                                    thread22.Queue.Remove(qa22);
+                                    var newKid22 = thread22.BoundEntity as VMAvatar;
+                                    var swapOk22 = newKid22 != null && !ReferenceEquals(newKid22, kid22) && kid22.Dead
+                                        && f22.Callee == newKid22 && qa22.Callee == newKid22
+                                        && newKid22.GetPersonData(VMPersonDataVariable.PersonsAge) == 27
+                                        && bs22.GetString(0) == "adult";
+                                    // the transplant must keep executing — 3 more real entity
+                                    // ticks on the re-bound thread (the creation-scheduled
+                                    // entry drives it in live play)
+                                    var schedTick22 = false;
+                                    for (int k22b = 0; k22b < 3 && !schedTick22; k22b++)
+                                    {
+                                        _vm.Scheduler.CurrentTickID++;
+                                        var t22b = thread22.BoundEntity;
+                                        if (t22b != null) t22b.Tick();
+                                        if (thread22.TicksThisFrame > 0) schedTick22 = true;
+                                    }
+                                    fullOk22 = latch22 && respOk22 && swapOk22 && treeDone22 && schedTick22;
+                                    fullDesc22 = "ticks=" + ticks22 + " latch=" + latch22 + " resp=" + respOk22
+                                        + " tree-done=" + treeDone22 + " swap=" + swapOk22
+                                        + " age=" + (newKid22 != null ? newKid22.GetPersonData(VMPersonDataVariable.PersonsAge).ToString() : "?")
+                                        + " bs0='" + (bs22.GetString(0) ?? "?") + "' sched-tick=" + schedTick22
+                                        + " purged-q=" + purged22.Count
+                                        + " depth-now=" + thread22.Stack.Count + " blocking=" + (thread22.BlockingState?.GetType().Name ?? "null");
+                                    if (!fullOk22) fullDesc22 += " diag=[" + string.Join(";", diag22) + "]"
+                                        + " frames=[" + string.Join(",", thread22.Stack.Select(fr => (fr.Routine?.Chunk?.ChunkID ?? -1) + "@" + fr.InstructionPointer + (fr.ActionTree ? "A" : "-"))) + "]"
+                                        + " q0=" + (thread22.Queue.Count > 0 ? (thread22.Queue[0].Callee?.ObjectID.ToString() ?? "null") + "/dead=" + (thread22.Queue[0].Callee?.Dead ?? true) : "empty");
+                                }
+                                finally
+                                {
+                                    FSO.SimAntics.Engine.VMThread.AutotestTraceSink = sinkPrev22;
+                                    FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = budgetPrev22;
+                                    FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Remove(kid22.ObjectID);
+                                    if (thread22.Stack.Contains(f22)) thread22.Stack.Remove(f22);
+                                    // restore the EXACT pre-push depth: pops anything this leg's
+                                    // runs stacked above the boundary (gosub idles, a second-run
+                                    // frame the queue machinery may have pulled) — never the
+                                    // sim's own frames below it
+                                    while (thread22.Stack.Count > preStack22) thread22.Stack.RemoveAt(thread22.Stack.Count - 1);
+                                    thread22.Queue.Remove(qa22);
+                                    if (_vm.GlobalBlockingDialog != null)
+                                    { _vm.GlobalBlockingDialog = null; if (_vm.SpeedMultiplier < 0) _vm.SpeedMultiplier = 1; }
+                                    try { _vm.SignalDialog(null); } catch { }
+                                    thread22.BlockingState = bsPrev22;
+                                    // remove the sparkle objects the tree created (never the avatar)
+                                    foreach (var ent22 in _vm.Entities.Where(e => !entsBefore22.Contains(e.ObjectID)).ToList())
+                                        if (!(ent22 is VMAvatar)) { try { ent22.Delete(false, _vm.Context); } catch { } }
+                                }
+                                ok &= fullOk22;
+                                results.Add("m4211=" + (fullOk22 ? "PASS" : "FAIL") + " " + fullDesc22);
+                            }
+                        }
+                    }
                 }
                 finally
                 {
