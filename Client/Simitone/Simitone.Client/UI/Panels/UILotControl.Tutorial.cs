@@ -116,9 +116,16 @@ namespace Simitone.Client.UI.Panels
             // The native case does NOT set the consumed flag its sibling cases
             // set, so ESC still propagates: the port's own ESC consumers (the
             // build/buy tool release below, PIP hiding) stay live after this.
-            // The modal-dialog skip is the port's stand-in for the native
-            // handler head's child-window check.
-            if (BlockingDialog == null && state.NewKeys.Contains(
+            // ENG-23: the modal-dialog skip is relaxed for TUTORIAL-owned
+            // dialogs — nonmodal lesson dialogs (the NewEngageContinue shape)
+            // set BlockingDialog but never join the modal stack, so their ESC
+            // arrives HERE; skipping it stranded the tutorial (owner+latch
+            // alive, the directive arrow stuck on screen — the user's repro).
+            // The cancel itself dismisses the dialog (SetTutorialObject aborts
+            // the outstanding BlockingState; the event chain removes it).
+            var blockingIsTutorial23 = BlockingDialog is Simitone.Client.UI.Controls.UIMobileDialog bd23
+                && bd23.TutorialPresentation;
+            if ((BlockingDialog == null || blockingIsTutorial23) && state.NewKeys.Contains(
                 Microsoft.Xna.Framework.Input.Keys.Escape))
             {
                 var escOwner = vm.Context.TutorialObject;
@@ -126,6 +133,7 @@ namespace Simitone.Client.UI.Panels
                 {
                     Simitone.Client.Utils.TutorialEngine247.RequestTutorialCancel(vm.Context);
                     TutorialHighlight?.Clear();
+                    TutorialPresenter?.SetOwner(null); // ENG-23: deterministic arrow death
                 }
             }
 
@@ -203,6 +211,24 @@ namespace Simitone.Client.UI.Panels
         {
             if (previous != null) DismissTutorialDialogs(previous);
             TutorialPresenter?.SetOwner(current);
+        }
+
+        /// <summary>
+        /// ENG-23: ESC on a tutorial lesson dialog runs the native cancel law
+        /// (cDDDSimsView::TSOnKeyDown key 0x1b → CancelTutorial: the owner's
+        /// "cancel tutorial" tree, then the owner kill) instead of a bare
+        /// dialog response the content can treat as a mere lesson exit — the
+        /// old path left the owner and its latch alive and the directive
+        /// arrow stranded on screen. SetTutorialObject(null) aborts this
+        /// dialog's outstanding BlockingState and the global latch; the event
+        /// chain dismisses the tracked dialogs and re-homes the presenter.
+        /// </summary>
+        private void TutorialEscapeCancel()
+        {
+            if (vm?.Context?.TutorialObject == null) return;
+            Simitone.Client.Utils.TutorialEngine247.RequestTutorialCancel(vm.Context);
+            TutorialHighlight?.Clear();
+            TutorialPresenter?.SetOwner(null); // deterministic: the arrow dies with the cancel, not on the event chain's goodwill
         }
 
         private void TrackTutorialDialog(UIMobileAlert dialog, VMDialogInfo info)

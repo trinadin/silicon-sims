@@ -88,6 +88,12 @@ namespace Simitone.Client.UI.Panels
         internal Action<byte> TutorialKeyResponse;
         internal byte TutorialEscapeResponse;
         internal bool TutorialSpacePrimary = true;
+        // ENG-23: when set, ESC routes here instead of the dialog-response
+        // path — the native ESC case cancels the whole tutorial regardless
+        // of any lesson dialog, and a bare response code lets the content
+        // treat the key as a mere lesson exit (owner+latch survive, the
+        // directive arrow strands).
+        internal Action TutorialEscapeCancel;
 
         internal void HandleTutorialKeys(UpdateState state)
         {
@@ -98,7 +104,11 @@ namespace Simitone.Client.UI.Panels
             Microsoft.Xna.Framework.Input.Keys? selected = null;
             byte response = 0;
             if (state.NewKeys.Contains(Microsoft.Xna.Framework.Input.Keys.Escape))
-            { selected = Microsoft.Xna.Framework.Input.Keys.Escape; response = TutorialEscapeResponse; }
+            {
+                state.NewKeys.RemoveAll(x => x == Microsoft.Xna.Framework.Input.Keys.Escape);
+                if (TutorialEscapeCancel != null) { TutorialEscapeCancel(); return; }
+                selected = Microsoft.Xna.Framework.Input.Keys.Escape; response = TutorialEscapeResponse;
+            }
             else if (state.NewKeys.Contains(Microsoft.Xna.Framework.Input.Keys.Enter))
                 selected = Microsoft.Xna.Framework.Input.Keys.Enter;
             else if (TutorialSpacePrimary && state.InputManager?.GetFocus() == null && state.NewKeys.Contains(Microsoft.Xna.Framework.Input.Keys.Space))

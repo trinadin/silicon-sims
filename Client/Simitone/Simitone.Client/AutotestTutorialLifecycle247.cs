@@ -173,7 +173,9 @@ namespace Simitone.Client
         private VM _liveVm;
         private bool _engineReset;      // StageTutorialReset API present
         private int _resetCallBaseline; // StageResetCallCount before reset #2
-        private bool _seamOwner;        // cancel phase used SetTutorialObject
+        private bool _seamOwner;
+        private bool _escDialogArmed;
+        private bool _escDialogDone;        // cancel phase used SetTutorialObject
         private VMEntity _cancelOwner;
 
         // cheat-dispatch sub-phase (P_CHEAT, F1)
@@ -1126,16 +1128,21 @@ namespace Simitone.Client
                 }
                 var hl = _screen.LotControl?.TutorialHighlight;
                 Check(hl != null, "cancel-highlighter-mounted");
+                var presenter = _screen.LotControl?.TutorialPresenter;
+                Check(presenter != null, "cancel-presenter-mounted");
+                // The arrow must be in a live tutorial state before the cancel —
+                // real tier only (the seam owner has no BMP300, so no arrow can
+                // exist there; the assert would be vacuous).
+                if (!_seamOwner)
+                    Check(presenter == null || presenter.ArrowVisibleForTest
+                        || (presenter.CurrentDialog?.Visible == true), "cancel-tutorial-state-before");
                 var before = TutorialEngine247.CancelCallCount;
-                // The native ESC case sits behind the lot-view key handler's
-                // child-window guard; the port's stand-in skips while a modal
-                // dialog is tracked. A tutorial lesson dialog may legitimately
-                // be open by now — dismiss it through the production handler
-                // (DialogResponse) so the ESC law is exercised.
+                // A blocking NON-tutorial dialog still gets the legacy dismiss.
                 var blocking = _screen.LotControl?.GetType().GetField("BlockingDialog",
                     BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(_screen.LotControl)
                     as Simitone.Client.UI.Controls.UIMobileDialog;
-                if (blocking != null)
+                var blockingAlert = blocking as Simitone.Client.UI.Panels.UIMobileAlert;
+                if (blockingAlert != null && blockingAlert.TutorialEscapeCancel == null)
                 {
                     _log("AUTOTEST uitutorial-lifecycle cancel-blocking-dialog-present; dismissing "
                         + "via production DialogResponse");
@@ -1161,6 +1168,74 @@ namespace Simitone.Client
                     _log("AUTOTEST uitutorial-lifecycle PENDING-ENGINE: RequestTutorialCancel missing — "
                         + "asserting the client-side highlight half only");
                 Check(hl != null && !hl.Visible, "cancel-highlight-hidden");
+                // ENG-23 deterministic leg — the user's exact repro shape: ESC
+                // while a tutorial LESSON DIALOG is up. The poller-path law above
+                // never sees that case (HandleTutorialKeys consumed the key and
+                // answered the dialog; the old wiring let the content treat it as
+                // a mere lesson exit, stranding the arrow). Mount a blocking
+                // lesson dialog through the PRODUCTION SignalDialog path with the
+                // latched owner as Caller (vm_OnDialog wires TutorialEscapeCancel
+                // for exactly that shape); the ESC itself runs NEXT FRAME — the
+                // UI needs a frame to present the mounted dialog (run-3 diag:
+                // visible=False synchronously). Seam-tier note: the first cancel
+                // above already killed the seam owner, so re-seam a live one
+                // first (disclosed seam distortion: the owner is an avatar, not
+                // the Tutorial object).
+                _escDialogArmed = false;
+                if (TutorialEngine247.HasRequestCancel)
+                {
+                    var owner23 = _liveVm.Context.TutorialObject;
+                    if (owner23 == null || owner23.Dead)
+                    {
+                        owner23 = _liveVm.Entities.OfType<VMAvatar>().FirstOrDefault(a => !a.Dead)
+                            ?? (VMEntity)_liveVm.Entities.FirstOrDefault(e => !e.Dead);
+                        if (owner23 == null || !_liveVm.Context.SetTutorialObject(owner23)) owner23 = null;
+                    }
+                    if (owner23 != null)
+                    {
+                        var op23 = new FSO.SimAntics.Primitives.VMDialogOperand
+                        { Type = VMDialogType.Sims1Tutorial };
+                        op23.Flags = FSO.SimAntics.Primitives.VMDialogFlags.NewEngageContinue; // nonmodal + Block
+                        _liveVm.SignalDialog(new FSO.SimAntics.Model.VMDialogInfo
+                        {
+                            Operand = op23, Caller = owner23, Icon = owner23, Block = true,
+                            DialogID = 42301, Title = "ENG-23", Message = "esc cancel law", Yes = "OK"
+                        });
+                        _escDialogArmed = true;
+                    }
+                    else _log("AUTOTEST uitutorial-lifecycle esc-dialog SKIPPED (no re-seam owner)");
+                }
+                return;
+            }
+            // ENG-23 frame 2: the lesson dialog has had a frame to present.
+            // The NONMODAL lesson shape never joins the modal stack, so
+            // HandleTutorialKeys' TopVisibleDialog gate cannot fire for it —
+            // the raw ESC lands in TickTutorialPoller, whose BlockingDialog
+            // skip is now relaxed for tutorial-owned dialogs (the fix). The
+            // modal shape shares the same TutorialEscapeCancel delegate the
+            // wiring assert below pins.
+            if (_escDialogArmed && !_escDialogDone)
+            {
+                _escDialogDone = true;
+                var presenter23 = _screen.LotControl?.TutorialPresenter;
+                var lesson23 = _screen.LotControl?.GetType().GetField("BlockingDialog",
+                    BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(_screen.LotControl)
+                    as Simitone.Client.UI.Panels.UIMobileAlert;
+                Check(lesson23 != null && lesson23.TutorialEscapeCancel != null, "esc-dialog-mounted-wired");
+                if (TickPoller != null && _screen.LotControl != null && lesson23 != null)
+                {
+                    var before23 = TutorialEngine247.CancelCallCount;
+                    var escState = FreshState();
+                    escState.NewKeys = new List<Keys> { Keys.Escape };
+                    TickPoller.Invoke(_screen.LotControl, new object[] { escState });
+                    Check(TutorialEngine247.CancelCallCount == before23 + 1, "esc-dialog-cancel-dispatched");
+                    var gone23 = _screen.LotControl?.GetType().GetField("BlockingDialog",
+                        BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(_screen.LotControl) == null;
+                    Check(gone23, "esc-dialog-dismissed");
+                    Check(presenter23 == null || !presenter23.ArrowVisibleForTest, "esc-dialog-arrow-hidden");
+                    _log("AUTOTEST uitutorial-lifecycle esc-dialog law exercised (poller path, "
+                        + "tutorial-owned BlockingDialog)");
+                }
                 return;
             }
             // give the engine a tick to run the tree + kill
@@ -1174,6 +1249,11 @@ namespace Simitone.Client
                 _log("AUTOTEST uitutorial-lifecycle cancel-owner-after=" + (ownerAfter?.ObjectID ?? -1)
                     + " seam=" + _seamOwner + " (kill assert engine-gated)");
             }
+            // ENG-23: the directive arrow dies with the cancel on every path —
+            // owner null ⇒ presenter SetOwner(null) ⇒ Icon.Visible false.
+            var presenterAfter = _screen.LotControl?.TutorialPresenter;
+            if (presenterAfter != null)
+                Check(!presenterAfter.ArrowVisibleForTest, "cancel-arrow-hidden");
             if (_seamOwner) _liveVm.Context.SetTutorialObject(null);
             Advance(P_SPAWNER);
         }

@@ -33,6 +33,7 @@ namespace Simitone.Client.UI.Panels
         internal Rectangle Home { get; private set; }
         internal bool Animating => Transition != 0;
         internal UIMobileAlert CurrentDialog => Window;
+        internal bool ArrowVisibleForTest => Icon.Visible; // ENG-23 probe gate
 
         public UIOriginalTutorial(Action showInfo)
         {

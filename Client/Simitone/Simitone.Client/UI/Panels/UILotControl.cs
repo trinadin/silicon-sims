@@ -493,6 +493,11 @@ namespace Simitone.Client.UI.Panels
                     type == VMDialogType.YesNo ? (byte)1 : (byte)0;
                 alert.TutorialSpacePrimary = type != VMDialogType.YesNo && type != VMDialogType.YesNoCancel;
                 alert.TutorialKeyResponse = code => { if (info.Block) DialogResponse(code); else alert.Close(); };
+                // ENG-23: ESC on a tutorial lesson dialog runs the true cancel
+                // (the owner's "cancel tutorial" tree + the owner kill — the
+                // native cDDDSimsView::TSOnKeyDown 0x1b law), not a bare
+                // response code the content can treat as a lesson exit.
+                alert.TutorialEscapeCancel = TutorialEscapeCancel;
             }
             if (tutorialCloseBox) alert.AddTutorialCloseBox(tutorialOwner,
                 () => { if (info.Block) DialogResponse(0); else alert.Close(); });
