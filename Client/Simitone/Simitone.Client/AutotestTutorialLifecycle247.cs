@@ -1208,12 +1208,15 @@ namespace Simitone.Client
                 return;
             }
             // ENG-23 frame 2: the lesson dialog has had a frame to present.
-            // The NONMODAL lesson shape never joins the modal stack, so
-            // HandleTutorialKeys' TopVisibleDialog gate cannot fire for it —
-            // the raw ESC lands in TickTutorialPoller, whose BlockingDialog
-            // skip is now relaxed for tutorial-owned dialogs (the fix). The
-            // modal shape shares the same TutorialEscapeCancel delegate the
-            // wiring assert below pins.
+            // ROUTE CORRECTION (review P2-1): nonmodal dialogs DO share the
+            // modal Dialogs list (UILayer adds both; TopVisibleDialog filters
+            // visibility only) — so in steady state the user's ESC is consumed
+            // by the HandleTutorialKeys delegate (pieces 1-2). What the poller
+            // relaxation covers is the open-transition window (dialog mounted,
+            // BlockingDialog set, not yet visible — TopVisibleDialog gate inert)
+            // and multi-dialog orderings; this probe drives exactly that
+            // window. The commit message's earlier "never joins the modal
+            // stack" phrasing is corrected here and in the card.
             if (_escDialogArmed && !_escDialogDone)
             {
                 _escDialogDone = true;

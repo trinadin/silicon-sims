@@ -123,6 +123,15 @@ namespace Simitone.Client.UI.Panels
             // alive, the directive arrow stuck on screen — the user's repro).
             // The cancel itself dismisses the dialog (SetTutorialObject aborts
             // the outstanding BlockingState; the event chain removes it).
+            // Gate-population disclosure (review P2-2): the TutorialEscapeCancel
+            // wiring covers tutorialOwner || tutorialCloseBox dialogs, but
+            // TutorialPresentation is set only for tutorialOwner && OriginalChrome
+            // (the presenter's Open path). A tutorialCloseBox-ONLY dialog (Sims1Tutorial
+            // type, caller != the latched owner) is wired for the cancel yet not
+            // gated here — theoretical (production lesson dialogs run on the
+            // tutorial object itself => tutorialOwner => covered); widening the
+            // flag to closebox dialogs would change their animation path, so the
+            // asymmetry is accepted and documented.
             var blockingIsTutorial23 = BlockingDialog is Simitone.Client.UI.Controls.UIMobileDialog bd23
                 && bd23.TutorialPresentation;
             if ((BlockingDialog == null || blockingIsTutorial23) && state.NewKeys.Contains(
