@@ -20427,6 +20427,7 @@ namespace Simitone.Client
                                 var latch22 = false; var respOk22 = false; var ticks22 = 0;
                                 System.Action<string> sinkPrev22 = null; var budgetPrev22 = 0;
                                 var preStack22 = 0;
+                                var reentSaved22 = 0;
                                 try
                                 {
                                     // probe-fixture hygiene: purge stale queue entries whose
@@ -20464,6 +20465,7 @@ namespace Simitone.Client
                                     // survives the transform's entity swap (the ENG-19 rebind).
                                     var lastDepth22 = -1; var stall22 = 0; var diag22 = new List<string>();
                                     var reentPrev22 = thread22.CatchReentries;
+                                    reentSaved22 = thread22.CatchReentries; // review P3-2: restored in the finally
                                     for (int k22 = 0; k22 < 200 && thread22.Stack.Contains(f22); k22++)
                                     {
                                         if (k22 == 2) thread22.CatchReentries = 99; // arm the console crumb: the next swallowed exception names its routine+instruction
@@ -20475,7 +20477,7 @@ namespace Simitone.Client
                                         {
                                             if (k22 == 0) diag22.Add("kid=" + kid22.ObjectID + "/dead=" + kid22.Dead
                                                 + "/bound=" + (thread22.BoundEntity == kid22)
-                                                + "/thread-ok=" + (kid22.Thread == thread)
+                                                + "/thread-ok=" + (kid22.Thread == thread22)
                                                 + "/ischeck=" + thread22.IsCheck
                                                 + " q=[" + string.Join(",", thread22.Queue.Select(a => (a.Callee?.ObjectID ?? -1) + (a.Callee?.Dead ?? true ? "D" : "L"))) + "]");
                                             diag22.Add("k" + k22 + " d=" + thread22.Stack.Count + " ran=" + (thread22.TicksThisFrame > 0)
@@ -20532,6 +20534,7 @@ namespace Simitone.Client
                                 }
                                 finally
                                 {
+                                    thread22.CatchReentries = reentSaved22;
                                     FSO.SimAntics.Engine.VMThread.AutotestTraceSink = sinkPrev22;
                                     FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = budgetPrev22;
                                     FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Remove(kid22.ObjectID);
