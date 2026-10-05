@@ -169,11 +169,14 @@ namespace FSO.SimAntics.Engine
             // 4100 family, and the mice-park 366/280 frames over a 4104 stack.
             // Shared by BOTH loop tails through this helper (fixes the fork
             // lineage's Tick-tail asymmetry flagged in the arc review).
-            if (!((AutotestTraceShowTrees && tid >= 4096 && tid <= 4113)
+            // ENG-22: + the full-tree leg's trees (SocialsMagic 4211, and the
+            // gosub'd global "idle" 280 when running over a 4211 stack).
+            if (!((AutotestTraceShowTrees && ((tid >= 4096 && tid <= 4113) || tid == 4211))
                 || ((tid == 4100 || tid == 280 || tid == 281 || tid == 4103)
                     && Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4100))
                 || ((tid == 366 || tid == 280)
-                    && Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4104)))) return;
+                    && Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4104))
+                || (tid == 280 && Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4211)))) return;
             var tins = tf.Routine?.Instructions;
             var tci = (tins != null && tf.InstructionPointer >= 0 && tf.InstructionPointer < tins.Length)
                 ? tins[tf.InstructionPointer] : null;
