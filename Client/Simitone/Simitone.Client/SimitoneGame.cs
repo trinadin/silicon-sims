@@ -589,6 +589,10 @@ namespace Simitone.Client
                 // on IsActive edges (desktop only).
                 this.Activated += RegainFocus;
                 this.Deactivated += LostFocus;
+                // ORIG-01 D-2 boot apply: the persisted Terrain Detail choice
+                // scales the grass renderer from frame one.
+                UI.Panels.LiveSubpanels.UIOriginalOptionsPanel.ApplyTerrainDetail(
+                    GlobalSettings.Default.TS1TerrainDetail);
                 // AUD-17 F-8: enforce the native 800x600 floor at the OS level —
                 // below it the original-canvas controls (Done/Cancel at y=529,
                 // the bio field) fall outside the window and are unreachable.

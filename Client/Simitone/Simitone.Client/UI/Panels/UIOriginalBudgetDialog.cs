@@ -201,6 +201,12 @@ namespace Simitone.Client.UI.Panels
             // rows (r238-budget layout law): 3 Job, 4 Misc income, 7 Bills Paid,
             // 8 Food, 9 Repair/Cleaning/Gardening (service), 11 Household Items,
             // 12 Architecture/Landscaping, 13 Misc Expenses, 15 Cash Flow.
+            // ORIG-01 D-4 (settled): the B-12 double-count conditional is
+            // resolved — CarPortal.iff's salary writes carry ExpenseType 1
+            // (pay) and 2 (bonus), neither IncomeJob(30), so adding today's
+            // salary here does NOT double-count. Open residual: the native
+            // byte→row attribution law (1/2 currently land in Misc via
+            // VMTS1LotState) — carded.
             result[3] = todayCat(C(FSO.SimAntics.Model.TS1Platform.VMTS1LotState.BudgetCat.JobIncome)) + salary;
             result[4] = todayCat(C(FSO.SimAntics.Model.TS1Platform.VMTS1LotState.BudgetCat.MiscIncome));
             result[7] = todayCat(C(FSO.SimAntics.Model.TS1Platform.VMTS1LotState.BudgetCat.BillsExpense));

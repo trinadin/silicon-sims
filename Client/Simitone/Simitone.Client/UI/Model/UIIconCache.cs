@@ -46,12 +46,11 @@ namespace Simitone.Client.UI.Model
             {
                 if (obj.Object.OBJ.GUID == 0x000007C4)
                 {
-                    // R210: the Go Here interaction icon is a PORT addition
-                    // with no original counterpart (disclosed) — the engine
-                    // draws its ground marker, not a catalog icon.
-                    var gohere = Content.Get().CustomUI.Get("int_gohere.png").Get(GameFacade.GraphicsDevice);
-                    UIArtProvenance.NoteDisclosed(gohere);
-                    return gohere;
+                    // ORIG-01 asset audit #2: "Go Here" (0x7C4) has no original
+                    // catalog icon — the engine draws a ground marker. The R210
+                    // port PNG is retired; both consumers (interaction queue,
+                    // guid dialog icons) null-guard the icon.
+                    return null;
                 }
                 else
                 {

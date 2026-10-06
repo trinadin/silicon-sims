@@ -40,8 +40,12 @@ namespace Simitone.Client.UI.Panels.LotControls
 
         public event Action<short> OnResult;
 
-        public UISelectSkinAlert(VMAvatar target, string type, VM vm)
+        public UISelectSkinAlert(VMAvatar target, string type, VM vm) : base(true)
         {
+            // ORIG-01 asset audit #4: this was the ONLY dialog family still
+            // mounting modern chrome on desktop (the dresser "Change Clothes"
+            // / pet-choice session) — base(true) selects the original
+            // Gendlg/WinBtn chrome like every other desktop dialog.
             var pet = type == "cat" || type == "dog";
             // R115: original values — 221 'Pet Dialog Strings' [4] 'Please Select Your Pet'
             // (the port's "Adopt a Pet" has no verbatim original) and 220 'Clothing Dialog

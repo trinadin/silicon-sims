@@ -80,6 +80,15 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             FSO.Vitaboy.Avatar.DefaultTechnique = CharacterDetailTechnique(detail);
         }
 
+        // ORIG-01 D-2: 'Terrain Detail' was persistence-only — it now scales
+        // the grass renderer (GrassEffect.DetailScale; disclosed 0.45/0.725/
+        // 1.0 ladder, native one undecoded). Also applied at boot
+        // (SimitoneGame first update).
+        public static void ApplyTerrainDetail(int detail)
+        {
+            FSO.LotView.Effects.GrassEffect.DetailScale = 0.45f + 0.275f * Math.Max(0, Math.Min(2, detail));
+        }
+
         // WIRE (a): 'Lighting' — AdvancedLighting is LightingMode > 0, so the
         // toggle maps straight to 0/1 and re-applies through the live-proven
         // World.ChangedWorldConfig path (light batches rebuild from the
@@ -523,7 +532,7 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             // Executable anchors: right-aligned labels to x480; the two logical
             // 80x20 tri-radios begin at x485 with a 26px row pitch.
             AddRadioGroup(28, 29, 30, "cpanel\\PopupOptTerrainDetail.bmp", "terrain",
-                () => set.TS1TerrainDetail, (v) => set.TS1TerrainDetail = v,
+                () => set.TS1TerrainDetail, (v) => { set.TS1TerrainDetail = v; ApplyTerrainDetail(v); },
                 new Vector2(480, 30), new Vector2(485, 30));
             AddRadioGroup(31, 32, 33, "cpanel\\PopupOptCharDetail.bmp", "character",
                 () => set.TS1CharacterDetail, (v) => { set.TS1CharacterDetail = v; ApplyCharacterDetail(v); },

@@ -1,4 +1,11 @@
-// Carried over from the FreeSO TSO client (TSO-era surface); no TS1 counterpart — port-authored values, not decoded.
+// ORIG-01 asset audit #1: this surface IS TS1-triggered (205 person-data-1
+// 'MoneyAmmountOverHead' write instructions across 100+ shipped objects —
+// MailBox, Fridges, Easel, Global.iff and every expansion); the old header's
+// "no TS1 counterpart" was wrong about reachability. The original renderer
+// law is undecoded (UI-07 covers the port renderer only), so the chrome is
+// the port's most original composition: the game's own SpeechMedium.bmp
+// nine-slice behind original .ffn bold money glyphs — exactly the UCP plate
+// floater (R194). The TSO-era money_bg.png pill is gone.
 ﻿using FSO.SimAntics.Model;
 using System;
 using System.Collections.Generic;
@@ -17,8 +24,10 @@ namespace Simitone.Client.UI.Panels.WorldUI
     {
         private RenderTarget2D MoneyTarget;
         private TextStyle Style;
-        private Texture2D MoneyBG;
+        private Texture2D Tile;          // Other\SpeechMedium.bmp (16x16, 4px corners)
+        private Texture2D DeprecatedMoneyBG; // unused; kept null
         private string Text;
+        private const int Corner = 4;
 
         public UIMoneyHeadline(VMRuntimeHeadline headline) : base(headline)
         {
@@ -27,22 +36,23 @@ namespace Simitone.Client.UI.Panels.WorldUI
             var value = (int)(headline.Operand.Flags2 | (headline.Operand.Duration << 16));
             if (value < -10000)
             {
-                Text = (-10000-value).ToString();
+                Text = (-10000 - value).ToString();
                 Style.Color = Model.UIStyle.Current.SecondaryText;
             }
             else
             {
-                // AUD-17 C1-4: value<0 rendered "-§-50" (double minus) and 0
-                // rendered "-§0" — a single signed value covers every case.
+                // AUD-17 C1-4: one signed value covers every case; the color
+                // law mirrors the UCP plate floater (Text / NegMoney).
                 Text = "§" + value;
-                Style.Color = Model.UIStyle.Current.Text;
+                Style.Color = (value < 0) ? Model.UIStyle.Current.NegMoney : Model.UIStyle.Current.Text;
             }
             var measure = Style.MeasureString(Text);
-
+            Tile = Simitone.Client.UI.Model.UIOriginal.EnsureResolved("Other\\SpeechMedium.bmp")?.Get(GameFacade.GraphicsDevice);
 
             var GD = GameFacade.GraphicsDevice;
-            MoneyTarget = new RenderTarget2D(GD, (int)measure.X+10, (int)measure.Y+30);
-            MoneyBG = FSO.Content.Content.Get().CustomUI.Get("money_bg.png").Get(GD);
+            // +2*(corner+2) chrome padding; +30 headroom for the per-frame
+            // duration offset the world renderer applies inside the target.
+            MoneyTarget = new RenderTarget2D(GD, (int)measure.X + 2 * (Corner + 2), (int)measure.Y + 2 * Corner + 30);
 
             DrawNewFrame();
         }
@@ -55,17 +65,37 @@ namespace Simitone.Client.UI.Panels.WorldUI
             var batch = GameFacade.Screens.SpriteBatch;
             var opacity = (Headline.Duration / 60f);
             batch.Begin();
-            batch.Draw(MoneyBG, new Vector2(0, Headline.Duration / 2), new Rectangle(0, 0, 12, 24), Model.UIStyle.Current.Bg * opacity,
-                0, Vector2.Zero, new Vector2(0.8f, 0.8f), SpriteEffects.None, 0);
-            batch.Draw(MoneyBG, new Vector2(9.6f, Headline.Duration / 2), new Rectangle(12, 0, 12, 24), Model.UIStyle.Current.Bg * opacity,
-                0, Vector2.Zero, new Vector2(((MoneyTarget.Width-19.2f)/12f), 0.8f), SpriteEffects.None, 0);
-            batch.Draw(MoneyBG, new Vector2(MoneyTarget.Width-9.6f, Headline.Duration / 2), new Rectangle(24, 0, 12, 24), Model.UIStyle.Current.Bg * opacity,
-                0, Vector2.Zero, new Vector2(0.8f, 0.8f), SpriteEffects.None, 0);
-            Style.Color.A = (byte)(opacity*255);
+            float yOff = Headline.Duration / 2;
+            var measure = Style.MeasureString(Text);
+            int cw = (int)measure.X + 2 * (Corner + 2);
+            int ch = (int)measure.Y + 2 * Corner;
+            if (Tile != null)
+            {
+                // R194 nine-slice: corners, tiled edges, stretched center.
+                int edge = Tile.Width - 2 * Corner;
+                for (int gx = 0; gx < 3; gx++)
+                {
+                    int sx = gx * (Corner + (gx == 1 ? edge : 0));
+                    int sw = (gx == 1) ? edge : Corner;
+                    int dx = (gx == 0) ? 0 : (gx == 1 ? Corner : cw - Corner);
+                    int dw = (gx == 1) ? cw - 2 * Corner : Corner;
+                    for (int gy = 0; gy < 3; gy++)
+                    {
+                        int sy = gy * (Corner + (gy == 1 ? edge : 0));
+                        int sh = (gy == 1) ? edge : Corner;
+                        int dy = (gy == 0) ? 0 : (gy == 1 ? Corner : ch - Corner);
+                        int dh = (gy == 1) ? ch - 2 * Corner : Corner;
+                        if (dw <= 0 || dh <= 0) continue;
+                        batch.Draw(Tile, new Rectangle(dx, (int)yOff + dy, dw, dh),
+                            new Rectangle(sx, sy, sw, sh), Color.White * opacity);
+                    }
+                }
+            }
+            Style.Color.A = (byte)(opacity * 255);
 
             batch.End();
-            Style.VFont.Draw(GD, Text, new Vector2(5, Headline.Duration / 2 - 2), Style.Color, new Vector2(Style.Scale), null);
-            
+            Style.VFont.Draw(GD, Text, new Vector2(Corner + 2, yOff + Corner - 2), Style.Color, new Vector2(Style.Scale), null);
+
             GD.SetRenderTarget(null);
         }
 
