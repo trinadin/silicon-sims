@@ -159,11 +159,11 @@ namespace FSO.SimAntics.Model.TS1Platform
         /// the neighborhood save persists the FAMI spell block. The block is
         /// created only when the controller exists and something is learned;
         /// otherwise SpellWords stays null (the latch-0 no-op — the native's
-        /// own new-family state). DISCLOSED DIVERGENCE (review P3): the
-        /// native's save-side gate stack (current lot exists, family match,
-        /// zoning==1 community skip) is not replicated — this refreshes on
-        /// any lot carrying a controller. Monotone by construction, so a
-        /// refresh the native would have skipped cannot lose information.
+        /// own new-family state).
+        /// (AUD-16 F6, 2026-10-05): the divergence note here was STALE —
+        /// ENG-15 landed the zoning gate (the == 1 check in the body,
+        /// decompiler-CONFIRMED by AUD-16): the refresh runs ONLY on community
+        /// lots, matching the native save-side law. No divergence remains.
         /// </summary>
         public void RefreshSpellBlockFromController(VM vm)
         {

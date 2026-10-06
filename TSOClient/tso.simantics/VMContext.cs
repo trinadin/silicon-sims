@@ -711,23 +711,29 @@ namespace FSO.SimAntics
             if (baseInfo.Light == null) baseInfo.Light = new RoomLighting();
             else baseInfo.Light.RoomScore = 0;
 
-            // (R235) INSIDE rooms: the ORIGINAL ComputeRoom law (fully decoded from
-            // The Sims Complete PPC — tools/iff-dump/r228..r234 in the simitone repo):
+            // (R235, corrected by AUD-16/ENG-24) INSIDE rooms: the ORIGINAL
+            // ComputeRoom law — the wall/obj/t2 terms and the ±100 clamp were
+            // decompiler-CONFIRMED; t1/t3 were MISDECODED in the r228 closed form
+            // (register-tracking slips the decompiler exposed — see
+            // evidence/AUD-16/verdict-data.md, findings F1/F2):
             //   half = tile56/2 (tile56 = wall-tile +1, open tile +2)
-            //   score = clamp( (min(half,60) - 30) + (room108*40 - 20)
-            //                 + ((room60/room80)*40 - 40) + (room84*10/clamp(half,10,45))
-            //                 + (room96 ? (room96/room100)*40 - 40 : 0), -100, +100)
-            // with room60 = 2x window-ish walls, room96/100 = window/door counts
-            // (style/pattern code sets {1,7,8,9} / {3,5,6,15,23}). DISCLOSED
-            // approximations (the R234 decision): room80-inside = the room's entity
-            // count (the R231 shadow-calibrated bridge) and room108 = 1.621f (the
-            // original's light-computed phase-1 BSS value is not statically
-            // recoverable; 2.05 is fit against the unambiguous House07 fixture (Bob &
-            // Betty's engine room 3, stored 50.222); the Goth fixture is unattributable
-            // (they load outside — see r234) against the two original-save
-            // fixtures 86.333/50.222 — the same disclosure class as the censor-mosaic
-            // palette and the Vita sway amplitude). OUTSIDE rooms keep the prior port
-            // model (the original's outside path seeds per-tile maps).
+            //   t1 = (room60 / room56)·40 − 40   [tile56 UNHALVED, UNGUARDED — the
+            //        native divides by the weighted tile count, not room80/entities;
+            //        unguarded is safe because any inside room has tile56 ≥ 1]
+            //   t3 = (room96 == 0) ? −40 : (room100 / room96)·40 − 40
+            //        [96=windows, 100=doors ⇒ doors/windows; the skip value is −40
+            //        (provider+0x14 = 0.0 read from the binary), NOT 0]
+            //   score = clamp(wall + obj + t1 + t2 + t3, -100, +100)
+            // with wall = min(half,60)−30, obj = room108·40−20, t2 =
+            // room84·10/clamp(half,10,45); room60 = 2x window-pattern walls,
+            // window/door pattern code sets {1,7,8,9} / {3,5,6,15,23}; the score
+            // stores to room[104]. DISCLOSED approximations that REMAIN: the
+            // room84-bridge numerator = the room's entity count (the R231
+            // calibration; the binary confirms entities as the t2 numerator) and
+            // room108 (the light-computed phase-1 value; recalibrated against the
+            // House07 fixture under the CORRECTED law — see RoomScoreK_Room108).
+            // OUTSIDE rooms keep the prior port model (2·room80 + room84 —
+            // decompiler-confirmed).
             if (!baseInfo.Room.IsOutside && Architecture != null)
             {
                 baseInfo.Light.RoomScore = ComputeRoomScoreOriginal(baseInfo);
@@ -772,7 +778,13 @@ namespace FSO.SimAntics
         private const float RoomScoreK_DivMin = 10f;
         private const float RoomScoreK_DivMax = 45f;
         private const float RoomScoreK_T2Scale = 10f;
-        private const float RoomScoreK_Room108 = 2.05f; // DISCLOSED approximation (see RefreshRoomScore)
+        // (ENG-24) recalibrated against the House07 fixture UNDER THE CORRECTED
+        // law (the 2.05 fit had absorbed the t1/t3 misdecodes — AUD-16 F3): the
+        // engine room scores 8 at 2.05 and 50.4 at 3.11; the original stores 50
+        // (float->short truncation of 50.222). Same disclosure class as before:
+        // the native value is the runtime light-computed phase-1 stat, not
+        // statically recoverable; 3.11 is the corrected-law fit.
+        private const float RoomScoreK_Room108 = 3.11f;
 
         // (R227/r134) the original's wall-segment style/pattern code sets:
         // window-ish {1,7,8,9}, door-ish {3,5,6,15,23}.
@@ -825,11 +837,17 @@ namespace FSO.SimAntics
             var wallTerm = Math.Min(half, RoomScoreK_WallCap) + RoomScoreK_WallBase;
             var objTerm = RoomScoreK_Room108 * RoomScoreK_ObjScale + RoomScoreK_ObjBase;
             var room60 = 2 * windows;
-            var room80 = entities; // the disclosed bridge (R231 hypC)
-            var t1 = room80 > 0 ? ((float)room60 / room80) * RoomScoreK_RatioScale + RoomScoreK_RatioBase : 0f;
+            // (ENG-24, AUD-16 F1) t1 divides by tile56 UNHALVED — the native's
+            // fdivs reads the room's +0x3c (the weighted tile count), unguarded.
+            var t1 = ((float)room60 / tile56) * RoomScoreK_RatioScale + RoomScoreK_RatioBase;
             var f8 = Math.Max(RoomScoreK_DivMin, Math.Min(RoomScoreK_DivMax, half));
             var t2 = entities > 0 ? (entities * RoomScoreK_T2Scale) / f8 : 0f;
-            var t3 = (windows > 0 && doors > 0) ? ((float)windows / doors) * RoomScoreK_RatioScale + RoomScoreK_RatioBase : 0f;
+            // (ENG-24, AUD-16 F2) t3 = doors/windows with a −40 skip when windowless
+            // (the native's cmpwi guards the DENOMINATOR and the skip constant is
+            // provider+0x14 = 0.0 ⇒ 0·40−40 = −40 — NOT 0).
+            var t3 = windows == 0
+                ? RoomScoreK_RatioBase
+                : ((float)doors / windows) * RoomScoreK_RatioScale + RoomScoreK_RatioBase;
             var score = wallTerm + objTerm + t1 + t2 + t3;
             return (short)Math.Min(100, Math.Max(-100, score));
         }

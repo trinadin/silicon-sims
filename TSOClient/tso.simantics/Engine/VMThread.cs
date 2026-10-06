@@ -976,8 +976,11 @@ namespace FSO.SimAntics.Engine
                 // opcodes 3..0x2f (cXPerson::TryElement 0x10c3cc-0x10c3e8, jump table
                 // *(TOC-0x5904)) and 0..0x33 (cXObject::TryElement 0xf0444-0xf058);
                 // anything else falls into 0xf0c8c: alert via 0x590720 and return
-                // r26 = -1 — the primitive yields FALSE and the tree branches to the
-                // instruction's false pointer; the thread is NEVER aborted. The brain's
+                // r26 = -1 — DoNodeAction returns "tree done-FALSE" (return 2)
+                // immediately: the tree ends FALSE for its CALLER with no pointer
+                // move and no false-branch walk (ENG-22 §3; AUD-16 interpreter P2-3
+                // corrected this comment — the false-POINTER move is the result-0
+                // path). The thread is NEVER aborted. The brain's
                 // 'try autonomy' (PersonGlobals 8233) instruction 0 (raw 41 01 01 07:
                 // opcode 0x141, unhandled natively) depends on this — control falls to
                 // instruction 7 (global 30 == free will == 1) and only there dispatches

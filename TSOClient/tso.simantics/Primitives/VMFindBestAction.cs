@@ -415,7 +415,10 @@ namespace FSO.SimAntics.Primitives
         /// writes word 65 (character inits write only mypd[20]; EditPerson::SetGender
         /// 0x6b2e0 stores sex in the BODY STRINGS via UpdateSuits), so runtime-created
         /// residents of both sexes carry 0; 1 = NPC/special character (the shipped template
-        /// hood's maid/officer records carry 1, gated to the rare 0x400-marked entries);
+        /// hood's maid/officer records carry 1 — ENG-25/AUD-16 P2-2 CORRECTION:
+        /// word-65 = 1 sets neither bit 1 nor bit 2, so the Append gates demand
+        /// NEITHER 0x400 NOR 0x200 for class 1; it flows through the same class-0
+        /// gates (including the 0x40 NoAdult block), not a restricted funnel);
         /// 2/3 = dogs, 4/5 = cats (the EditPerson PersonGender string table
         /// {"male","female","dogmale","dogfemale","catmale","catfemale"}).
         /// The PORT stores its own sex bit (1=female) and species bits (8/16) in the same
@@ -655,23 +658,29 @@ namespace FSO.SimAntics.Primitives
                     // 0x105b6c-0x105b74: unconditional candidate skip, entry flags mask
                     // 0x80 (rlwinm 0x18/0x18; TTAB "Debug" — the native "always block" bit).
                     if ((entry.Flags & (TTABFlags)0x80) != 0) continue;
-                    // 0x105b00-0x105b28: APPEND gender gates — word-65 bit 0x1 (PersonGender
-                    // female) requires entry mask 0x400 (rlwinm 0x15/0x15), bit 0x2 (dog)
-                    // requires entry mask 0x200 (rlwinm 0x16/0x16). The word is consumed
-                    // through NativeGenderClass (the native person-class adapter).
-                    if ((gender & 1) != 0 && (entry.Flags & (TTABFlags)0x400) == 0) continue;
-                    if ((gender & 2) != 0 && (entry.Flags & (TTABFlags)0x200) == 0) continue;
+                    // 0x105b00-0x105b28: APPEND gender gates — word-65 bit 0x2 (dog)
+                    // requires entry mask 0x400 (rlwinm 0x15/0x15, raw 0x1059c0
+                    // rlwinm SH=0x1f feeds bit 1), bit 0x4 (cat) requires entry mask
+                    // 0x200 (rlwinm 0x16/0x16, 0x1059c4 bit 2). ENG-25 (AUD-16
+                    // interpreter F1): the first landing TRANSPOSED these — a
+                    // register-tracking slip the decompiler exposed; the hand-off gates
+                    // (0x106488-0x1064b8) already carried the native pairing, so the
+                    // file contradicted itself. The word is consumed through
+                    // NativeGenderClass (dogs 2/3, cats 4/5).
+                    if ((gender & 2) != 0 && (entry.Flags & (TTABFlags)0x400) == 0) continue;
+                    if ((gender & 4) != 0 && (entry.Flags & (TTABFlags)0x200) == 0) continue;
                     // 0x105b28-0x105b38: children (attr58 in 1..17) are blocked by entry
                     // mask 0x10 (TS1NoChild) — rlwinm 0x1b/0x1b.
                     if (isChild && (entry.Flags & (TTABFlags)0x10) != 0) continue;
-                    // 0x105b3c-0x105b5c: a plain APPEND person (age == 0 and word-65
-                    // bits 0x1|0x2 clear) is blocked by entry mask 0x40 (TS1NoAdult) —
-                    // rlwinm 0x19/0x19. The gate is age-conditioned: 0x105b3c-0x105b40
-                    // loads attr 58 and `bne 0x105b60` — any age != 0 (children 1..17
-                    // included) branches PAST the 0x40 test, so children skip the
-                    // NoAdult gate (their exclusion is the 0x10 gate above).
-                    var age0Gate = caller.GetPersonData(VMPersonDataVariable.PersonsAge) == 0;
-                    if (age0Gate && (gender & 3) == 0 && (entry.Flags & (TTABFlags)0x40) != 0) continue;
+                    // 0x105b3c-0x105b5c: a plain APPEND person (NOT a child, and
+                    // word-65 bits 0x2|0x4 clear) is blocked by entry mask 0x40
+                    // (TS1NoAdult) — rlwinm 0x19/0x19. ENG-25 (AUD-16 interpreter P3-5):
+                    // the native tests the precomputed CHILD register (0x105b3c
+                    // clrlwi/bne on the attr58∈[1,17] word computed at 0x105978) —
+                    // every NON-child with the pet bits clear takes the 0x40 test,
+                    // including attr58 ≥ 18 (the port's transformed adults carry
+                    // PersonsAge=27, which the old `age == 0` form wrongly exempted).
+                    if (!isChild && (gender & 6) == 0 && (entry.Flags & (TTABFlags)0x40) != 0) continue;
                     // 0x105b78-0x105bc0: visitor admission — RESIDENTIAL lots (GetZoningType
                     // != 1, the subfic/cntlzw idiom at 0x105b80-0x105b88) admit a visitor
                     // only with entry & (0x1|0x20) (0x105b90-0x105bac); downtown requires
