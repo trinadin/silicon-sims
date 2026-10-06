@@ -6,6 +6,13 @@ namespace FSO.LotView.Effects
 {
     public class GrassEffect : LightMappedEffect
     {
+        // ORIG-01 D-2: multiplier for the Options 'Terrain Detail' radio
+        // (0=low .. 2=high; default 1.0 = high). Set by the client from
+        // GlobalSettings at boot and on option change — tso.world cannot
+        // reference FSO.UI. The exact native ladder is undecoded; the
+        // 0.45/0.725/1.0 mapping is the disclosed port choice.
+        public static float DetailScale = 1.0f;
+
         protected override Type TechniqueType
         {
             get { return typeof(GrassTechniques); }

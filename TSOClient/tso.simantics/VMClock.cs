@@ -22,8 +22,11 @@ namespace FSO.SimAntics
         {
             get
             {
-                //return (Hours >= 6 && Hours < 18) ? 0 : 1;
-                return 0; //TODO: hack to make windows always cast full contribution. need to look into real patch.
+                // ORIG-01 D-5: restore the native day/night law the upstream
+                // hack disabled (its window-contribution rationale is moot —
+                // R235's t3 term reads door/window geometry, not Global 4).
+                // Night-gated BHAV logic now sees night again.
+                return (Hours >= 6 && Hours < 18) ? 0 : 1;
             }
         }
         public int Seconds

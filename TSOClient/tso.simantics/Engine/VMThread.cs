@@ -988,15 +988,21 @@ namespace FSO.SimAntics.Engine
                 // (>= 256) still applies when the routine actually resolves (ENG-22:
                 // >= 0x100 is natively TreeSim::Gosub, 0x1540d0 via the DoNodeAction
                 // intercept 0x153a38 — resolvable targets gosub natively too). The
-                // UNRESOLVED corner diverges deliberately: native reports error
-                // 0x44e/0x3e8 and returns 0 with the pointer UNADVANCED (0x153a88-
-                // 0x153ad8 — a report-and-retry livelock); the port's GOTO_FALSE
-                // advance is the bounded divergence (no live TS1 path hits it — the
-                // runtime globals resolve every id the corpus calls, globalcalls r45
-                // 0 dangling).
+                // UNRESOLVED corner — ORIG-01 D-7 restored native-exact: report
+                // errors 0x44e/0x3e8 and return 0 with the pointer UNADVANCED
+                // (0x153a88-0x153ad8): report-and-retry every tick. No live TS1
+                // path hits it (globalcalls r45: 0 dangling). The port's WEDGE-1
+                // forced-yield watchdog bounds a genuinely-forever retry, taking
+                // the place of the native livelock; the old GOTO_FALSE advance
+                // (ENG-22's documented deliberate divergence) is retired.
                 if (Context.VM.TS1 && !TS1SubRoutineResolves(frame, opcode))
                 {
-                    HandleResult(frame, instruction, VMPrimitiveExitCode.GOTO_FALSE);
+                    System.Console.WriteLine("[GosubUnresolved] 0x" + opcode.ToString("X")
+                        + " in " + (frame.Routine.Rti?.Name ?? "?") + " @" + instruction.Index
+                        + " (native report-and-retry; errors 0x44e/0x3e8)");
+                    ContinueExecution = false;
+                    Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
+                    YieldedThisTick = true;
                     return;
                 }
                 ExecuteSubRoutine(frame, opcode, (VMSubRoutineOperand)instruction.Operand);

@@ -529,6 +529,10 @@ namespace FSO.LotView.Components
                     grassDensity = 0.43f;
                     break;
             }
+            // ORIG-01 D-2: the Options 'Terrain Detail' radio now scales the
+            // grass density (GrassEffect.DetailScale, set from the options
+            // row; the exact native ladder is undecoded — disclosed mapping).
+            grassDensity *= FSO.LotView.Effects.GrassEffect.DetailScale;
 
             grassDensity *= GrassDensityScale;
             var primitives = Bp.FloorGeom.SetGrassIndices(device, Effect, world);
