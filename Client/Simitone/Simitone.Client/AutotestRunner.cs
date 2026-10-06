@@ -29243,12 +29243,12 @@ namespace Simitone.Client
         // from every user-visible surface, replaced with the original game's identity:
         // (1) Info.plist: CFBundleName = TheSims, CFBundleDisplayName = The Sims,
         //     CFBundleExecutable = TheSims, and NO 'simitone' substring anywhere;
-        // (2) the app icon is the NATIVE plumbob (generated at pack time by
-        //     tools/make_native_icon.py — the original ships no standalone plumbob
-        //     asset, so the symbol is drawn programmatically (v2 2026-10-06:
-        //     classic gradient shading, facet lights, specular glint — the
-        //     user-directed replacement for the flat v1 facets); deterministic:
-        //     sha256 019c8316…, and must NOT be the legacy Simitone icon
+        // (2) the app icon is the REAL in-game plumbob (generated at pack
+        //     time by tools/make_native_icon.py v3: the
+        //     xskin-head-arrow-ROOT-ARROW mesh + arrow texture read from the
+        //     local game data, rasterized under the PLUMB-01-decoded native
+        //     lighting laws; deterministic for this game data:
+        //     sha256 7c57edf8…, and must NOT be the legacy Simitone icon
         //     28a498e4…);
         // (3) the running executable is named TheSims;
         // (4) the window title is "The Sims" (R118 law).
@@ -29281,7 +29281,7 @@ namespace Simitone.Client
                     {
                         var hex = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
                         iconOK = bytes.Length > 4 && bytes[0] == 'i' && bytes[1] == 'c' && bytes[2] == 'n' && bytes[3] == 's'
-                            && hex == "019c831609f966dfd9b12fa39b38c3f40003b607fe3f092794bd0ad78713be0c";
+                            && hex == "7c57edf89e4a25ed6be0631665f8366a5ed561d989ad2320f56ffddd5b78a29e";
                         iconInfo = "len=" + bytes.Length + " sha=" + hex.Substring(0, 8) + "…";
                     }
                 }

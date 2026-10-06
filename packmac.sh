@@ -28,9 +28,11 @@ ln -sf libSDL2-2.0.0.dylib "$APP/Contents/MacOS/libSDL2.dylib" 2>/dev/null || tr
 cp Info.plist "$APP/Contents/Info.plist"
 # REL-09 F2: ship third-party license notices with the bundle.
 cp -n THIRD-PARTY-NOTICES.md "$APP/Contents/Resources/THIRD-PARTY-NOTICES.md" 2>/dev/null || true
-# R156: NATIVE icon — the plumbob, generated at pack time (no proprietary bytes committed;
-# falls back to the legacy icon only if generation fails).
-if python3 tools/make_native_icon.py --out build/NativeIcon.icns 2>/dev/null && [ -f build/NativeIcon.icns ]; then
+# R156: NATIVE icon — the REAL in-game plumbob (mesh + texture read from the
+# local game data at pack time, rasterized under the PLUMB-01-decoded native
+# lighting laws; no proprietary bytes committed by the repo). Falls back to
+# the drawn plumbob if the game data is missing, then to the legacy icon.
+if python3 tools/make_native_icon.py --out build/NativeIcon.icns --gamedata "game-data/The Sims" 2>/dev/null && [ -f build/NativeIcon.icns ]; then
   cp build/NativeIcon.icns "$APP/Contents/Resources/Icon.icns"
 else
   cp -n build/Icon.icns "$APP/Contents/Resources/Icon.icns" 2>/dev/null || true
