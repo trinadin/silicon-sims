@@ -36,7 +36,12 @@ namespace FSO.Client.UI.Panels.LotControls
         // AUD-15: the native per-tool denied-sound rate limit — one fire per
         // 400 VM ticks (cTool::DoDeniedSound 0x192070 keys its limiter the
         // same way: a global tick stamp vs this tool instance).
-        private long LastDeniedTick = long.MinValue;
+        // AUD-17 G-2: long.MinValue underflows the `ticks - last >= 400`
+        // limiter in unchecked arithmetic (the difference wraps to a huge
+        // negative), so the AUD-15 denied sound could never fire. Seed at
+        // -400: the first denial at clock ~0 lands exactly on the 400-tick
+        // threshold — the native `last + 400U < now` first-fire intent.
+        private long LastDeniedTick = -400;
 
         public UITerrainFlatten(VM vm, LotView.World world, ILotControl parent, List<int> parameters)
         {
