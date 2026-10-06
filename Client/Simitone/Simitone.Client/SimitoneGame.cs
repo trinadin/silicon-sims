@@ -182,7 +182,12 @@ namespace Simitone.Client
 
         void Window_ClientSizeChanged(object sender, EventArgs e)
         {
-            if (newChange || !GlobalSettings.Default.Windowed) return;
+            // AUD-17 G-4: `Windowed` is never cleared by ToggleFullScreen, so
+            // the Alt+Enter fullscreen switch itself used to land here and
+            // OVERWRITE the stored windowed resolution with the screen size
+            // (the round trip then came up screen-sized). Never remember a
+            // size change observed while fullscreen.
+            if (newChange || !GlobalSettings.Default.Windowed || Graphics.IsFullScreen) return;
             if (Window.ClientBounds.Width == 0 || Window.ClientBounds.Height == 0) return;
             newChange = true;
             try
@@ -573,6 +578,12 @@ namespace Simitone.Client
             {
                 this.IsMouseVisible = true;
                 if (!FSOEnvironment.SoftwareKeyboard) AddTextInput();
+                // AUD-17 G-1: the UI-26 focus relay existed but was never
+                // hooked to OS events, so "Sim In Background" did nothing and
+                // the sim kept running on cmd-tab. MonoGame Game raises these
+                // on IsActive edges (desktop only).
+                this.Activated += RegainFocus;
+                this.Deactivated += LostFocus;
                 // R118: original game name in the title bar (was "Simitone" - residue
                 // called out in the loader round).
                 this.Window.Title = "The Sims";

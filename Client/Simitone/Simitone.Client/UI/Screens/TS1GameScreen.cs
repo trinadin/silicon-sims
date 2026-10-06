@@ -448,9 +448,14 @@ namespace Simitone.Client.UI.Screens
 
         public void EvictLot(FAMI family, short houseID)
         {
-            family.Budget += family.ValueInArch;
-            family.ValueInArch = 0;
-            Content.Get().Neighborhood.MoveOut(houseID);
+            // AUD-17 E-3: this touch-card path used the in-memory-only MoveOut
+            // overload — the eviction silently rolled back if the player quit
+            // from the neighborhood screen (no save), and the lot tile was
+            // never repainted. Route through the armed executor so one law
+            // owns evict+save+repaint (killSims=false preserves the card's
+            // family-returns-to-bin semantics; the refund MoveOut already
+            // performs internally subsumes the old manual Budget lines).
+            ArmedEvict(houseID, family, false);
             TS1NeighPanel.SelectHouse(houseID);
         }
 
@@ -1661,7 +1666,16 @@ namespace Simitone.Client.UI.Screens
     internal const string RezoneTitle = "Rezone";
     internal const string RezoneDoneMessage = "Lot rezoned.";
     internal const string RezoneFailMessage = "Could not rezone the lot.";
-    internal const string SwitchFailTitle = "Error";
+    // AUD-17 E-6: from STR# 131[10] (the probe pins it == "Error") — keeps
+    // localization coherent with the other reused 131 strings.
+    internal static string SwitchFailTitle
+    {
+        get
+        {
+            var s = GameFacade.Strings.GetString("131", "10");
+            return (string.IsNullOrEmpty(s) || s.StartsWith("131:")) ? "Error" : s;
+        }
+    }
     internal const string SwitchFailMessage = "Could not switch neighborhood.";
 
     /// <summary>Installs the armed lot-click hook on the mounted neighborhood

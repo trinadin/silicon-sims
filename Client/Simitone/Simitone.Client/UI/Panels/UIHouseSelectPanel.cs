@@ -192,9 +192,16 @@ namespace Simitone.Client.UI.Panels
 
                 //set up the secondary text
                 var zones = neigh.ZoningDictionary;
-                short result = 1;
-                if (!zones.TryGetValue((short)houseID, out result))
-                    result = (short)((houseID >= 81 && houseID <= 89) ? 2 : 1);
+                // AUD-17 E-4: absent-from-dictionary means RESIDENTIAL (0) on
+                // every other surface (TS1GameScreen's zoning default, the lot
+                // popup, GetZoningType's decoded not-found law, and the
+                // NBR-05 probe's own construction-law comment). The old
+                // default of 1 — plus a guessed 81-89 studiotown exception —
+                // marked every vacant lot 11-49 "community" on this card and
+                // refused move-ins the desktop native gate allows. Lots that
+                // genuinely carry community zoning come from the dictionary.
+                short result;
+                if (!zones.TryGetValue((short)houseID, out result)) result = 0;
 
                 if (result > 0)
                 {

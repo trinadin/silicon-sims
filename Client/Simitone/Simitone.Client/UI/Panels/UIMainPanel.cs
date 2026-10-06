@@ -1267,9 +1267,19 @@ namespace Simitone.Client.UI.Panels
                     if (ucp != null) ucp.SetClockText(text);
                 }
                 var money = Game.ActiveFamily?.Budget ?? 0;
-                if (money != _lastMoney)
+                if (!_moneySeen)
                 {
-                    if (_lastMoney != 0 || money != 0) ucp?.DisplayChange(money - _lastMoney);
+                    // AUD-17 C1-2: seed the baseline quietly — the panel mounts
+                    // after PlayHouse sets ActiveFamily, so the first Update used
+                    // to diff 0 -> budget and fire a full-budget "+§20,000"
+                    // floater at the UCP plate (mobile UIMoneyPanel seeds its ctor).
+                    _moneySeen = true;
+                    _lastMoney = money;
+                    ucp?.SetMoneyText(money);
+                }
+                else if (money != _lastMoney)
+                {
+                    ucp?.DisplayChange(money - _lastMoney);
                     _lastMoney = money;
                     if (ucp != null) ucp.SetMoneyText(money);
                 }
@@ -1348,6 +1358,7 @@ namespace Simitone.Client.UI.Panels
         private string _lastClockText = "";
         private int _lastSpeedSel = -1;
         private int _lastMoney;
+        private bool _moneySeen;
 
         // R141: speed switching moved from the desktop UCP to the toolbar's own
         // cluster (original kPause/kSpeed1-3 semantics; sounds unchanged).

@@ -196,7 +196,19 @@ namespace Simitone.Client.UI.Panels.CAS
                 foreach (var guid in family.FamilyGUIDs)
                 {
                     if (i >= 8) break;
-                    var sim = vm.Context.CreateObjectInstance(guid, FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH).BaseObject;
+                    // AUD-17 F-2: CreateObjectInstance returns null when the
+                    // person export behind the GUID is missing (user-deleted
+                    // Export/ file, neighborhood copied from another install)
+                    // — the old deref crashed card construction and took the
+                    // whole CAS entry screen down. Skip the portrait and log.
+                    var group = vm.Context.CreateObjectInstance(guid, FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                    if (group == null)
+                    {
+                        GameLog.Write("cas: family " + family.ChunkID +
+                            " member GUID 0x" + guid.ToString("X") + " unresolvable — portrait skipped");
+                        continue;
+                    }
+                    var sim = group.BaseObject;
                     try
                     {
                         sim.Tick();
@@ -733,8 +745,11 @@ namespace Simitone.Client.UI.Panels.CAS
             Add(PointsBar);
 
             // zodiac points button (129,290)-(249,310): invisible, tooltip 130:27
+            // AUD-17 F-9: the comment promised the native tooltip; it was never
+            // attached (the in-game personality subpanel's zodiac carries it).
             ZodiacButton = new UIContainer() { Position = new Vector2(POINTS_BTN_RECT.X, POINTS_BTN_RECT.Y) };
             ZodiacButton.ListenForMouse(new Rectangle(0, 0, POINTS_BTN_RECT.Width, POINTS_BTN_RECT.Height), (t, s) => { });
+            ZodiacButton.Tooltip = GameFacade.Strings.GetString("130", "27") ?? "Astrological Sign";
             Add(ZodiacButton);
             ZodiacText = new Simitone.Client.UI.Controls.UIOriginalText("", labelFont) { Y = POINTS_BTN_RECT.Y, Color = Color.White };
             Add(ZodiacText);

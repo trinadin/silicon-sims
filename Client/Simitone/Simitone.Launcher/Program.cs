@@ -12,8 +12,10 @@ if (string.IsNullOrEmpty(exePath))
 string baseDir = Path.GetDirectoryName(exePath) ?? ".";
 string libDir = Path.Combine(baseDir, "lib");
 
-// Determine the target executable name based on platform
-string targetExeName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Simitone.exe" : "Simitone";
+// Determine the target executable name based on platform.
+// AUD-17 G-8: the non-Windows binary was renamed to TheSims (R156) — the
+// launcher still looked for "Simitone" and always failed on macOS/Linux.
+string targetExeName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Simitone.exe" : "TheSims";
 string targetExePath = Path.Combine(libDir, targetExeName);
 
 // Verify the target executable exists

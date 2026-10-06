@@ -32,7 +32,9 @@ namespace Simitone.Client.UI.Panels.WorldUI
             }
             else
             {
-                Text = (value > 0) ? ("§" + value) : ("-§" + value);
+                // AUD-17 C1-4: value<0 rendered "-§-50" (double minus) and 0
+                // rendered "-§0" — a single signed value covers every case.
+                Text = "§" + value;
                 Style.Color = Model.UIStyle.Current.Text;
             }
             var measure = Style.MeasureString(Text);
@@ -75,6 +77,9 @@ namespace Simitone.Client.UI.Panels.WorldUI
 
         public override void Dispose()
         {
+            // AUD-17 C1-4: the per-headline render target was never disposed
+            // (sibling UIHeadlineRenderer disposes its texture).
+            MoneyTarget?.Dispose();
             base.Dispose();
         }
     }

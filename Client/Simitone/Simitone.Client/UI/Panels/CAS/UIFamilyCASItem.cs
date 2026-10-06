@@ -93,7 +93,9 @@ namespace Simitone.Client.UI.Panels.CAS
             var baseX = MaxWidth / 2 - (guids.Length-1) * 50;
             foreach (var sim in guids)
             {
-                var fam = vm.Context.CreateObjectInstance(sim, LotTilePos.OUT_OF_WORLD, Direction.NORTH).BaseObject;
+                var grp = vm.Context.CreateObjectInstance(sim, LotTilePos.OUT_OF_WORLD, Direction.NORTH);
+                if (grp == null) continue; // AUD-17 F-2: unresolvable member GUID — skip, don't crash the CAS list
+                var fam = grp.BaseObject;
                 fam.Tick();
                 var btn = new UIAvatarSelectButton(UIIconCache.GetObject(fam));
                 btn.Opacity = 1f;

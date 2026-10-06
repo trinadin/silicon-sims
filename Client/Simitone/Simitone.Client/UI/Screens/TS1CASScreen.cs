@@ -777,6 +777,8 @@ namespace Simitone.Client.UI.Screens
                     break;
                 case UICASMode.FamilyEdit:
                     if (WIPFamily.Count == 0) return;
+                    if ((Original ? DesktopFamily.FamilyNameBox.CurrentText
+                        : FamilyPanel.SecondName.CurrentText).Length == 0) return; // AUD-17 F-1: never save a blank family name
                     ShowConfirmation(GameFacade.Strings.GetString("129", "13"),
                         GameFacade.Strings.GetString("129", "14"),
                         () => { SaveFamily(); SetMode(UICASMode.FamilySelect); });
@@ -934,7 +936,12 @@ namespace Simitone.Client.UI.Screens
                     if ((Original ? DesktopFamilies.GetSelection() : FamiliesPanel.Selection) == -1) disableAccept = true;
                     break;
                 case UICASMode.FamilyEdit:
-                    if (WIPFamily.Count == 0) disableAccept = true;
+                    // AUD-17 F-1: the empty-family-NAME guard existed only on
+                    // Add — Done accepted a blank last name and permanently
+                    // wrote it into the neighborhood FAMs table. Gate Done the
+                    // same way (both chrome paths).
+                    if (WIPFamily.Count == 0 || (Original ? DesktopFamily.FamilyNameBox.CurrentText
+                        : FamilyPanel.SecondName.CurrentText).Length == 0) disableAccept = true;
                     break;
             }
 

@@ -354,15 +354,17 @@ namespace Simitone.Client.UI.Panels
                     if (individualParameter.Contains(' '))
                     {
                         individualParameter = individualParameter.Substring(0, individualParameter.IndexOf(' '));
-                        parameters[i] = individualParameter;
+                        parameters[i] = trimRepetitions(individualParameter); // AUD-17 B-5: "on!" -> "on"
                         parameterString = parameterString.Substring(parameterString.IndexOf(' ') + 1);
                         continue;
-                    }                    
-                    parameters[i] = individualParameter;
+                    }
+                    parameters[i] = trimRepetitions(individualParameter);
                     break;
                 }
             }
-            trimRepetitions(baseCmd);
+            // AUD-17 B-5: the trimmed result was discarded — "moveobjects;" /
+            // "moveobjects!" never resolved (the preset switch above trims).
+            baseCmd = trimRepetitions(baseCmd);
             if (!cheatDefinitions.TryGetValue(baseCmd, out VMCheatContext.VMCheatType cheatType))
             {
                 // cheat not defined in cheatDefinitions

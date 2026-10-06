@@ -683,14 +683,19 @@ namespace Simitone.Client.UI.Panels.Desktop
 
         private void UpdateWallsViewKeyHandler(int type)
         {
+            // AUD-17 C1-3: Home/End used to bump WallsMode directly — the
+            // renderer gates roofs on World.State.DrawRoofs, which only SetCut
+            // writes, so the key path desynced from the buttons (Roof selected
+            // with no roofs drawn, or roofs left over walls-up). Route through
+            // SetCut so both stay atomic.
             var mode = Game.LotControl.WallsMode;
             switch (type)
             {
                 case 0:
-                    if (mode > 0) Game.LotControl.WallsMode -= 1;
+                    if (mode > 0) SetCut(mode - 1);
                     break;
                 case 1:
-                    if (mode < 3) Game.LotControl.WallsMode += 1;
+                    if (mode < 3) SetCut(mode + 1);
                     break;
             }
         }

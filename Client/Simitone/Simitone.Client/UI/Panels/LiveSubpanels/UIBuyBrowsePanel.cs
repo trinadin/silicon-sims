@@ -1068,6 +1068,11 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
 
         public void InitCategory(sbyte category, bool build)
         {
+            // AUD-17 C2-2: the filter below swaps FilterCategory — a stale
+            // ItemID from the old list made shift-place put a DIFFERENT item
+            // (or throw past the new list's end). Same reset in
+            // InitSubcategory / SetRoofPage / ApplyNameFilter.
+            ItemID = -1;
             //start by populating with entries from the catalog
             if (!build) ((UIMainPanel)Parent)?.Switcher?.MainButton?.RestoreImage();
             var catalog = Content.Get().WorldCatalog;
@@ -1545,6 +1550,7 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
         public void SetRoofPage(int page)
         {
             if (RoofPitchItems == null || RoofPatternItems == null) return;
+            ItemID = -1; // AUD-17 C2-2: FilterCategory swaps below — see InitCategory
             RoofPage = Math.Max(0, Math.Min(1, page));
             FilterCategory = (RoofPage == 0) ? (IEnumerable<UICatalogElement>)RoofPitchItems : RoofPatternItems;
             if (RoofPageTitle != null)
@@ -1557,9 +1563,28 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
         private void UpdateRoofPagerVisibility(bool on)
         {
             if (RoofPageTitle == null) return;
+            PositionRoofPager();
             RoofPageTitle.Visible = on;
             if (RoofPrevBtn != null) RoofPrevBtn.Visible = on;
             if (RoofNextBtn != null) RoofNextBtn.Visible = on;
+        }
+
+        /// <summary>AUD-17 C2-3: the pager's mobile coordinates (y=106..135)
+        /// sit BELOW the desktop band's 100px cached-RT — the controls were
+        /// rendered into the RT clip (invisible) yet still mouse-hit-tested:
+        /// two ~40x38 ghost zones over the 3D view silently flipped the roof
+        /// page. In BandMode, remount the pager INSIDE the band instead —
+        /// BUILD roofs draw a single 45px cell row (y=5..50), so the lower
+        /// band strip is free; R131's two-page model stays visible and
+        /// clickable. Mobile keeps its decoded coordinates.</summary>
+        private void PositionRoofPager()
+        {
+            if (!BandMode) return;
+            float w = Size.X > 0 ? Size.X :
+                FSO.Client.GameFacade.Screens.CurrentUIScreen.ScreenWidth - 220;
+            if (RoofPrevBtn != null) RoofPrevBtn.Position = new Vector2(w - 130, 64);
+            RoofPageTitle.Position = new Vector2(w - 88, 66);
+            if (RoofNextBtn != null) RoofNextBtn.Position = new Vector2(w - 46, 64);
         }
 
         public static short[] WallStyleIDs =
@@ -1691,6 +1716,13 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
         public override void GameResized()
         {
             base.GameResized();
+            // AUD-17 C2-1: base.GameResized applies the pre-R145 people-width
+            // law (ScreenWidth - 520 on desktop). This panel mounts FULL-BAND
+            // in BUILD/BUY (UIMainPanel.SetSubpanel: mountX 0, width
+            // ScreenWidth - 220, height 100) — restore that, or a window
+            // resize with the catalog open shrank the band by 300 logical px
+            // and re-paged the grid.
+            if (Game.Desktop) Size = new Vector2(Math.Max(0, Game.ScreenWidth - 220), 100);
             CatContainer.Size = new Vector2(Size.X, 128);
             if (NoResultsLabel != null)
                 NoResultsLabel.Size = new Vector2(Size.X, 25);
@@ -1822,6 +1854,9 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                 HideBandPopup();
             }
             SyncBandSelection();
+            // AUD-17 C2-3 tail: keep the in-band roof pager anchored to the
+            // band's right edge across resizes (RebuildBand is the resize path).
+            if (RoofPageTitle != null && RoofPageTitle.Visible) PositionRoofPager();
         }
 
         private void HideBandPopup()
@@ -2013,6 +2048,7 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
 
         public void ApplyNameFilter(string term)
         {
+            ItemID = -1; // AUD-17 C2-2: FilterCategory swaps below — see InitCategory
             // In Build mode, FullCategory contains wrong (buy-mode) items until a subcategory
             // is chosen, so skip filtering. In Buy mode, FullCategory is valid immediately.
             if (ChoosingSub && Mode == UICatalogMode.Build) return;
@@ -2051,11 +2087,15 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                 .ToList();
 
             NoResultsLabel.Visible = !FilterCategory.Any();
+            // AUD-17 C2-8: the band grid ignores CatContainer — page it the
+            // band's own way if search ever runs on desktop.
+            if (BandMode) { BandPage = 0; RebuildBand(); return; }
             CatContainer.Reset();
         }
 
         public void InitSubcategory(UICatalogSubcat cat)
         {
+            ItemID = -1; // AUD-17 C2-2: FilterCategory swaps below — see InitCategory
             var index = cat.MaskBit;
             // R146: the filter ALWAYS re-runs — sub-plaque clicks land here
             // repeatedly on the same panel (ChoosingSub only gates the mobile

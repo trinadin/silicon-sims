@@ -93,9 +93,13 @@ namespace Simitone.Client.UI.Panels
             // A nonzero duration owns the window, including native negative
             // durations (which never subscribe a timer).
             if (OwnerDuration != 0 && Target != request.Target) return;
+            // AUD-17 D-2: validate FIRST — these resets used to run before the
+            // gate, so an invalid follow-up for the owned target stripped the
+            // duration ownership (auto-close timer gone, other targets no
+            // longer excluded) while the old request stayed mounted.
+            if (!Valid(request.Target) || request.ZoomIndex > 3) return;
             Deadline = 0;
             OwnerDuration = 0;
-            if (!Valid(request.Target) || request.ZoomIndex > 3) return;
             Request = request;
             OwnerDuration = request.DurationMilliseconds;
             SnapshotPending = request.AutoSnapshot && settings.TS1AutoSnapshot;

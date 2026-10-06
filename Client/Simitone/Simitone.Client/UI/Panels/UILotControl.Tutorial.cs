@@ -44,7 +44,10 @@ namespace Simitone.Client.UI.Panels
             }
             TutorialPresenter?.SetOwner(vm.Context.TutorialObject);
             if (TutorialPresenter != null) TutorialPresenter.Visible = Visible;
-            if (TutorialHighlight != null) TutorialHighlight.Visible = TutorialHighlight.Visible && Visible;
+            // AUD-17 D-5: mirror the presenter's two-way assignment — the old
+            // one-way AND latched the highlight invisible after any lot-control
+            // hide (e.g. the neighborhood-selector dialog) until the next Flash.
+            if (TutorialHighlight != null) TutorialHighlight.Visible = Visible;
             if (TutorialContext == vm.Context) return;
             if (TutorialContext != null)
             {
@@ -132,9 +135,18 @@ namespace Simitone.Client.UI.Panels
             // tutorial object itself => tutorialOwner => covered); widening the
             // flag to closebox dialogs would change their animation path, so the
             // asymmetry is accepted and documented.
-            var blockingIsTutorial23 = BlockingDialog is Simitone.Client.UI.Controls.UIMobileDialog bd23
-                && bd23.TutorialPresentation;
-            if ((BlockingDialog == null || blockingIsTutorial23) && state.NewKeys.Contains(
+            // AUD-17 B-2: BlockingDialog is set only by the generic-alert path
+            // — with the phone book / name entry / transform-me / magic book
+            // (or any UI-level modal like budget/scrapbook/help) on top, ESC
+            // used to run the full tutorial cancel in the same frame the
+            // dialog itself closed. Gate on the layer's actual topmost
+            // VISIBLE dialog instead: ESC reaches the cancel only when
+            // nothing is on top or the top dialog is the tutorial's own
+            // presentation (route 1 consumes ESC first when it applies).
+            var topDialog = FSO.Client.GameFacade.Screens.TopVisibleDialog;
+            var topIsTutorial23 = topDialog is Simitone.Client.UI.Controls.UIMobileDialog td23
+                && td23.TutorialPresentation;
+            if ((topDialog == null || topIsTutorial23) && state.NewKeys.Contains(
                 Microsoft.Xna.Framework.Input.Keys.Escape))
             {
                 var escOwner = vm.Context.TutorialObject;
@@ -146,14 +158,16 @@ namespace Simitone.Client.UI.Panels
                 }
             }
 
-            if (!poller.IsReentrancyBlocked) poller.Poll();
-
             // DoModalWin window (skeptic C2/C3): the tracked blocking dialog
             // both auto-hides the highlight and blocks nested polls.
             var modal = BlockingDialog != null;
             poller.ModalDialogTracked = modal;
             TutorialHighlight?.SetModalObscured(modal);
 
+            // AUD-17 D-1: once per view update (the pinned TutorialEventPoller
+            // law) — a second Poll above ran every condition twice per tick,
+            // letting a lesson advance two steps in one frame. Poll after the
+            // modal-tracking update so the flag is current.
             if (!poller.IsReentrancyBlocked) poller.Poll();
         }
 

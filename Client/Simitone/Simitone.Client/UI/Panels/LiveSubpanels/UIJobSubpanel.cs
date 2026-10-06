@@ -983,6 +983,8 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             }
             else
             {
+                if (level < 0 || level >= job.JobLevels.Length)
+                    level = 0; // AUD-17 C2-6: out-of-range JobPromotionLevel in a save threw here (mobile branch; desktop guards this)
                 var myLevel = job.JobLevels[level];
 
                 if (myLevel != LastJobLevel)

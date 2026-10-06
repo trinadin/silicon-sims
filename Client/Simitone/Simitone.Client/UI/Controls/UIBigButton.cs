@@ -79,8 +79,12 @@ namespace Simitone.Client.UI.Controls
             var x = (b.Width - w) / 2f;
             var y = (b.Height - 13) / 2f;
             float cx = 0;
-            foreach (var ch in Caption)
+            foreach (var ch0 in Caption)
             {
+                // AUD-17 A-3: apply the CP1252 mapping every other glyph path
+                // uses (UIOriginalText/OriginalVectorFont) — a curly quote in
+                // a caption drew blank with zero advance.
+                var ch = OriginalGlyphFont.MapChar(ch0);
                 OriginalGlyphFont.Glyph g;
                 if (font.ByChar.TryGetValue(ch, out g) && g.W > 1)
                 {

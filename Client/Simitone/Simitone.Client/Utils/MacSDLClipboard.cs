@@ -26,7 +26,14 @@ namespace Simitone.Client.Utils
         {
             IntPtr pointer = SDL_GetClipboardText();
             if(pointer==IntPtr.Zero) throw new InvalidOperationException("SDL clipboard read failed: "+Marshal.PtrToStringUTF8(SDL_GetError()));
-            try { return Marshal.PtrToStringUTF8(pointer) ?? ""; }
+            try
+            {
+                // AUD-17 G-3: the input manager inserts the clipboard verbatim
+                // (upstream TODO) — a multi-megabyte paste stalled frames in
+                // every text edit. Cap at a sane payload.
+                var text = Marshal.PtrToStringUTF8(pointer) ?? "";
+                return text.Length <= 4096 ? text : text.Substring(0, 4096);
+            }
             finally { SDL_free(pointer); }
         }
         public override void Set(string text)

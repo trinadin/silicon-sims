@@ -182,9 +182,17 @@ namespace Simitone.Client.UI.Controls
             {
                 int direction = state.NewKeys.Contains(Keys.Delete) ? 1 : -1;
                 int target = inputStart;
-                while (target + (direction < 0 ? -1 : 0) >= 0
-                    && target + (direction < 0 ? -1 : 0) < Buffer.Length
-                    && !char.IsWhiteSpace(Buffer[target + (direction < 0 ? -1 : 0)])) target += direction;
+                // AUD-17 A-2: word-delete crosses the adjacent whitespace run
+                // first, then the word (macOS Option+Delete semantics — "foo |"
+                // deletes "foo "). The old single loop stopped dead when the
+                // char at the caret's edge was whitespace, handing the input
+                // manager a zero-length range: Ctrl+Backspace after a space
+                // was a silent no-op, forever.
+                int step = direction < 0 ? -1 : 0; // back: the char before the caret; del: at it
+                while (target + step >= 0 && target + step < Buffer.Length
+                    && char.IsWhiteSpace(Buffer[target + step])) target += direction;
+                while (target + step >= 0 && target + step < Buffer.Length
+                    && !char.IsWhiteSpace(Buffer[target + step])) target += direction;
                 inputEnd = target;
             }
             var result = state.InputManager.ApplyKeyboardInput(Buffer, input,

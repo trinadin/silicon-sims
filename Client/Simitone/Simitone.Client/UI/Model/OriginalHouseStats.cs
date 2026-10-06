@@ -157,8 +157,13 @@ namespace Simitone.Client.UI.Model
         /// </summary>
         public static int ComputeFurnishingsScore(int movableObjectValue, int fixedArchitectureValue)
         {
+            // AUD-17 C1-5: the header law substitutes the DENOMINATOR with
+            // 100 when the movable value is zero (native x = fixed/100) — the
+            // old code substituted the whole QUOTIENT with 100, discarding
+            // the fixed value and returning 0 for an unfurnished minimal lot
+            // where the curve should yield a partial score.
             float x = movableObjectValue == 0
-                ? 100.0f
+                ? (float)fixedArchitectureValue / 100.0f
                 : (float)fixedArchitectureValue / (float)movableObjectValue;
             if (x <= 0f) return 100;
             if (x >= 5f) return 0;

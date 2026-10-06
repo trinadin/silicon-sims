@@ -455,7 +455,10 @@ namespace Simitone.Client.UI.Controls
         public void WrapIfNeeded()
         {
             if (Font == null || Font.Atlas == null) return;
-            var key = MaxWidth + "|" + RightAlign + "|" + BottomAnchor + "|" + Text;
+            // AUD-17 A-4: LineHeight participates in the wrapped-row Y layout —
+            // mutating it after the first render used to keep stale Ys until
+            // the text itself changed.
+            var key = MaxWidth + "|" + RightAlign + "|" + BottomAnchor + "|" + LineHeight + "|" + Text;
             if (key == LastKey) return;
             LastKey = key;
             var old = Children.ToArray();

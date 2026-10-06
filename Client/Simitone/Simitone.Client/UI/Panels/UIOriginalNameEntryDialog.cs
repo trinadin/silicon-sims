@@ -123,12 +123,23 @@ namespace Simitone.Client.UI.Panels
             Submits++;
             LastSubmitted = NameBox.CurrentText ?? "";
             OnResult?.Invoke(LastSubmitted);
-            UIScreen.RemoveDialog(this);
+            Dismiss();
         }
 
         private void Cancel()
         {
             OnResult?.Invoke(null);
+            Dismiss();
+        }
+
+        private void Dismiss()
+        {
+            // AUD-17 B-3: RemoveDialog alone left the box holding keyboard
+            // focus (the engine never clears it on removal), so the screen's
+            // focus-gated speed/pause hotkeys stayed dead afterwards. Release
+            // like the cheat bar does (SetFocus(null)).
+            var im = FSO.Client.GameFacade.Screens?.inputManager;
+            if (im != null && im.GetFocus() == NameBox) im.SetFocus(null);
             UIScreen.RemoveDialog(this);
         }
 

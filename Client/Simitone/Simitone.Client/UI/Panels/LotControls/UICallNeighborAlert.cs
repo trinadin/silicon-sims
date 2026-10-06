@@ -66,15 +66,28 @@ namespace Simitone.Client.UI.Panels.LotControls
             VM = vm;
             var nb = Content.Get().Neighborhood;
             var neigh = nb.GetNeighborByID(callerNID);
-            var rels = neigh.Relationships.Keys;
+            // AUD-17 B-7: a stale/unknown NeighborId NRE'd here inside
+            // vm_OnDialog — the dialog never mounted and only the engine
+            // timeout rescued the tree. Nobody callable instead.
+            IEnumerable<int> rels;
+            short callerFamily = 0;
+            if (neigh != null)
+            {
+                rels = neigh.Relationships.Keys;
+                // AUD-17 B-8: exclude the caller's own household — parity with
+                // the desktop phone book filter (family == callerFamily skip).
+                callerFamily = neigh.PersonData?.ElementAt((int)VMPersonDataVariable.TS1FamilyNumber) ?? 0;
+            }
+            else rels = new int[0];
             //var rels = nb.Neighbors.NeighbourByID.Keys;
 
             foreach (var to in rels)
             {
                 var tn = nb.GetNeighborByID((short)to);
+                if (tn == null) continue; // stale relationship key — skip like the desktop dialog does
                 var family = tn.PersonData?.ElementAt((int)VMPersonDataVariable.TS1FamilyNumber) ?? 0;
                 var gender = tn.PersonData?.ElementAt((int)VMPersonDataVariable.Gender) ?? 0; //can't call pets
-                if (family != 0 && gender < 2)
+                if (family != 0 && family != callerFamily && gender < 2)
                 {
                     List<short> famList = null;
                     if (!NeighborsByFamilyID.TryGetValue(family, out famList))

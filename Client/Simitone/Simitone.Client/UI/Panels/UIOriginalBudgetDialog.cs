@@ -60,8 +60,13 @@ namespace Simitone.Client.UI.Panels
                 today[i] = "§" + v;
                 // SIM-09: the 3-day column reads the history aggregate; rows the
                 // ledger does not track keep the pre-ledger fallback.
+                // AUD-17 B-1: the old `i == 3 || i == 15` guard rendered only
+                // Job/Cash-Flow — the seven other rows ComputeValues stages in
+                // day3Hist were dead stores and their column drew blank. The
+                // r238 decode clears only heading rows (2/6/10, skipped above),
+                // so EVERY value row carries both columns natively.
                 int d3;
-                if (i == 3 || i == 15) day3[i] = "§" + (day3Hist.TryGetValue(i, out d3) ? d3 : v * 3);
+                day3[i] = "§" + (day3Hist.TryGetValue(i, out d3) ? d3 : v * 3);
             }
             labels[17] = labels[17].Replace("%s", "§" + (fam?.Budget ?? 0));
             labels[18] = labels[18].Replace("%s", "§" + ((fam?.Budget ?? 0) + (fam?.ValueInArch ?? 0)));

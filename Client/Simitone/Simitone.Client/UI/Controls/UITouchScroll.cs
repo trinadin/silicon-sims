@@ -250,6 +250,10 @@ namespace Simitone.Client.UI.Controls
                 Remove(child);
             }
             LastSelected = null;
+            // AUD-17 C2-4: leaving Scroll made the next Update clamp it into
+            // the NEW list's range — a subsort switch after deep scrolling
+            // landed at the new list's end instead of its top.
+            Scroll = -Margin;
         }
     }
 

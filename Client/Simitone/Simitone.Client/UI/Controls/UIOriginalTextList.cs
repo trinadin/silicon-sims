@@ -71,6 +71,8 @@ namespace Simitone.Client.UI.Controls
                     if (type == UIMouseEventType.MouseOut) HoverRow = -1;
                     if (type != UIMouseEventType.MouseDown || TopRow + slot >= Items.Count) return;
                     ActiveList = this;
+                    // (A-7 note: ActiveList is released in the Removed override
+                    // below — a dead list must not keep the keyboard latch.)
                     var index = TopRow + slot;
                     Select(index);
                     var now = Stopwatch.GetTimestamp() * 1000.0 / Stopwatch.Frequency;
@@ -94,6 +96,16 @@ namespace Simitone.Client.UI.Controls
             });
             ActiveList = null;
             RefreshRows();
+        }
+
+        public override void Removed()
+        {
+            // AUD-17 A-7: a removed list kept the static keyboard latch — a
+            // reopened list never received arrow keys until the user clicked
+            // some list again (KeyboardActive is only honored while
+            // ActiveList == null).
+            if (ReferenceEquals(ActiveList, this)) ActiveList = null;
+            base.Removed();
         }
 
         public void SetItems(IEnumerable<string> items)

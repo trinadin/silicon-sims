@@ -70,7 +70,13 @@ namespace Simitone.Client.UI.Model
     {
         public static int TotalSamples;    // the +88 lineage (population samples)
         public static int FlaggedSamples;  // the +92 lineage (in-motion samples)
-        private static bool Wired;
+        // AUD-17 E-2: the old `static bool Wired` latched on the FIRST VM —
+        // every lot change disposes that VM (TS1GameScreen.CleanupLastWorld),
+        // so from lot 2 onward WallsChanged was never wired and the static
+        // counters blended every previous lot's trek history. Key the latch
+        // on the VM instance; rewiring re-seeds (native ClearRouteHistory
+        // runs on the house-rebuild/stat-snapshot paths of every entry).
+        private static WeakReference WiredVMRef;
         private static long LastClockTicks = -1;
 
         /// <summary>
@@ -163,8 +169,15 @@ namespace Simitone.Client.UI.Model
 
         private static void Wire(FSO.SimAntics.VM vm)
         {
-            if (Wired) return;
-            Wired = true;
+            if (WiredVMRef != null && ReferenceEquals(WiredVMRef.Target, vm)) return;
+            var old = WiredVMRef?.Target as FSO.SimAntics.VM;
+            if (old != null)
+            {
+                try { old.Context.Architecture.WallsChanged -= OnWallsChanged; } catch { }
+            }
+            WiredVMRef = new WeakReference(vm);
+            Clear();
+            LastClockTicks = -1;
             try
             {
                 vm.Context.Architecture.WallsChanged += OnWallsChanged;

@@ -39,8 +39,12 @@ namespace Simitone.Client.UI.Controls
         public UIOriginalSpeechBalloon(string text, OriginalGlyphFont font, bool large)
         {
             Large = large;
+            // AUD-17 A-1: these were written with doubled backslashes — the
+            // runtime member name "Other\\Speech*.bmp" (two literal slashes)
+            // never resolved, so Tile stayed null and the R194 balloon chrome
+            // never drew. Single separators, like every other call site.
             Tile = Simitone.Client.UI.Model.UIOriginal.EnsureResolved(
-                large ? "Other\\\\SpeechLarge.bmp" : "Other\\\\SpeechMedium.bmp")?.Get(GameFacade.GraphicsDevice);
+                large ? "Other\\SpeechLarge.bmp" : "Other\\SpeechMedium.bmp")?.Get(GameFacade.GraphicsDevice);
             Corner = CornerFor[large ? 1 : 0];
             Label = new UIOriginalText(text ?? "", font)
             {

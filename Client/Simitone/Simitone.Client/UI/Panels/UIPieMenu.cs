@@ -269,9 +269,15 @@ namespace Simitone.Client.UI.Panels
             // The old fixed 2/4/8 configs were the port's own spacing.
             int dirConfig = SliceCount(elems.Count);
 
-            for (int i = 0; i < dirConfig; i++)
+            // AUD-17 C1-1: the +N bands are SPACING slots — at most 8 real
+            // items ride the ring; items 8+ belong to the overflow stack
+            // below. dirConfig > elems.Count by construction, so the old
+            // `i >= elems.Count` break could never stop this loop and items
+            // 8+ were placed radially AND stacked (duplicates whose click
+            // index ran past Children). Cap the ring; angles still i/dirConfig.
+            int ring = Math.Min(elems.Count, 8);
+            for (int i = 0; i < ring; i++)
             {
-                if (i >= elems.Count) break;
                 var elem = elems.ElementAt(i);
                 var but = NewPieBubble(elem.Name, (elem.ColorMod > 0) ? HighlightStyle : ButtonStyle);
 

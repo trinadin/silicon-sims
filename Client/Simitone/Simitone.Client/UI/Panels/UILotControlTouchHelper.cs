@@ -194,7 +194,11 @@ namespace Simitone.Client.UI.Panels
                         TapPoint = newTap;
 
                         var zoom = (vector.Length() / BaseVector.Length()) * StartScale;
-                        if (!float.IsNaN(zoom))Master.TargetZoom = zoom;
+                        // AUD-17 D-3: two pointers at the same spot give
+                        // BaseVector.Length()==0 -> +Inf, which passed the
+                        // NaN-only guard and latched an infinite TargetZoom
+                        // (the <1.25 snap loop could never recover).
+                        if (!float.IsNaN(zoom) && !float.IsInfinity(zoom)) Master.TargetZoom = zoom;
 
                         //clockwise if dot product b against a rotated 90 degrees clockwise is positive
                         var a = BaseVector;

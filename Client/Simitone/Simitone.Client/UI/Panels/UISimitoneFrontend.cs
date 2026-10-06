@@ -300,8 +300,12 @@ namespace Simitone.Client.UI.Panels
             // tracked (mobile never tracks through this model).
             Simitone.Client.UI.Panels.UIOriginalPeopleChrome.SyncTracking(Game);
 
-            // Only switch Sims with Space if no text input has focus
-            if (state.NewKeys.Contains(Keys.Space) && state.InputManager.GetFocus() == null)
+            // Only switch Sims with Space if no text input has focus.
+            // AUD-17 E-1: family-less lots (unowned community/downtown) never
+            // ActivateFamily — CurrentFamily stays null and the old deref of
+            // RuntimeSubset crashed the update loop on the first Space press.
+            if (state.NewKeys.Contains(Keys.Space) && state.InputManager.GetFocus() == null
+                && Game.vm.TS1State.CurrentFamily != null)
             {
                 var selected = Game.LotControl.ActiveEntity;
                 var familyMembers = Game.vm.Context.ObjectQueries.Avatars.Where(x =>

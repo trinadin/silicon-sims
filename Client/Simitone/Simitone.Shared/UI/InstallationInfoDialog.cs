@@ -75,6 +75,9 @@ namespace Simitone.Windows.UI
             };
 
             DefaultButton = okButton;
+            // AUD-17 B-10: single-button dialog — ESC now acts as OK instead
+            // of a no-op (the selector dialog already wires AbortButton).
+            AbortButton = okButton;
         }
     }
 }

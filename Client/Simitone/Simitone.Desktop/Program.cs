@@ -156,9 +156,20 @@ namespace Simitone.Windows
                     var cmd = arg.Substring(1);
                     if (cmd.StartsWith("lang"))
                     {
-                        GlobalSettings.Default.LanguageCode = byte.Parse(cmd.Substring(4));
+                        // AUD-17 G-9: bare/malformed -lang and -hz used to throw
+                        // an unhandled FormatException before any UI existed.
+                        if (!byte.TryParse(cmd.Substring(4), out var langCode))
+                            Console.WriteLine("Warning: -lang expects a number; ignoring '" + arg + "'");
+                        else
+                            GlobalSettings.Default.LanguageCode = langCode;
                     }
-                    else if (cmd.StartsWith("hz")) GlobalSettings.Default.TargetRefreshRate = int.Parse(cmd.Substring(2));
+                    else if (cmd.StartsWith("hz"))
+                    {
+                        if (!int.TryParse(cmd.Substring(2), out var hz))
+                            Console.WriteLine("Warning: -hz expects a number; ignoring '" + arg + "'");
+                        else
+                            GlobalSettings.Default.TargetRefreshRate = hz;
+                    }
                     else
                     {
                         //normal style param
