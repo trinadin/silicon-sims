@@ -93,13 +93,13 @@ namespace Simitone.Client.UI.Panels
             // A nonzero duration owns the window, including native negative
             // durations (which never subscribe a timer).
             if (OwnerDuration != 0 && Target != request.Target) return;
-            // AUD-17 D-2: validate FIRST — these resets used to run before the
-            // gate, so an invalid follow-up for the owned target stripped the
-            // duration ownership (auto-close timer gone, other targets no
-            // longer excluded) while the old request stayed mounted.
-            if (!Valid(request.Target) || request.ZoomIndex > 3) return;
+            // The clears intentionally run BEFORE validity: a same-owner event
+            // ALWAYS unsubscribes the previous timer (PIP-240/243 law, pinned
+            // by uipip-fade's "invalid-same-owner-clears-duration" — AUD-17
+            // D-2 tried to reorder this and the battery correctly rejected it).
             Deadline = 0;
             OwnerDuration = 0;
+            if (!Valid(request.Target) || request.ZoomIndex > 3) return;
             Request = request;
             OwnerDuration = request.DurationMilliseconds;
             SnapshotPending = request.AutoSnapshot && settings.TS1AutoSnapshot;
