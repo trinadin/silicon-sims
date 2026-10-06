@@ -92,6 +92,7 @@ namespace Simitone.Client.UI.Controls
         {
             if (FocusManager?.GetFocus() == this) FocusManager.SetFocus(null);
             IsFocused = false; Dragging = false;
+            Simitone.Client.Utils.SDLTextInput.Clear(); // ORIG-02 G-6
         }
         public void OnMouseEvent(UIMouseEventType type, UpdateState state)
         {
@@ -144,6 +145,19 @@ namespace Simitone.Client.UI.Controls
                 }
             }
             if (IsFocused && state.WindowFocused) ProcessInput(state);
+            // ORIG-02 G-6: anchor the macOS IME/accent candidate window to
+            // the caret (SDL_SetTextInputRect; the dylib exports it, the
+            // MonoGame binding doesn't). Local caret rect -> window points.
+            if (IsFocused && state.WindowFocused)
+            {
+                int line = CaretLine(Caret);
+                float sx = Math.Min(EditorWidth - 1, HorizontalInset + WidthBetween(Lines[line].Start, Caret));
+                float sy = (line - FirstVisibleLine) * LineHeight;
+                Matrix.TransformPoint(ref sx, ref sy);
+                sx *= FSO.Common.FSOEnvironment.DPIScaleFactor;
+                sy *= FSO.Common.FSOEnvironment.DPIScaleFactor;
+                Simitone.Client.Utils.SDLTextInput.SetCaretRect((int)sx, (int)sy, 1, LineHeight);
+            }
             var ticks = state.Time?.TotalGameTime.Ticks ?? 0;
             if (ticks - BlinkTicks >= 5000000) { CaretVisible = !CaretVisible; BlinkTicks = ticks; }
         }

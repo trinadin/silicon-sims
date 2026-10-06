@@ -1626,7 +1626,14 @@ namespace Simitone.Client.UI.Panels
                         else
                         {
                             CustomControl.Modifiers = 0;
-                            if (state.CtrlDown) CustomControl.Modifiers |= UILotControlModifiers.CTRL;
+                            // ORIG-02 G-7: macOS delivers Ctrl+left-press as a
+                            // right-click, so the CTRL tool variants (terrain
+                            // single-tile/forced, floor painter pattern override)
+                            // were unreachable with mouse/trackpad. Command is
+                            // the platform alias (same as the clipboard chords).
+                            var cmdDown = state.KeyboardState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftWindows)
+                                || state.KeyboardState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.RightWindows);
+                            if (state.CtrlDown || cmdDown) CustomControl.Modifiers |= UILotControlModifiers.CTRL;
                             if (state.ShiftDown) CustomControl.Modifiers |= UILotControlModifiers.SHIFT;
                             CustomControl.MousePosition = state.MouseState.Position;
                         }
