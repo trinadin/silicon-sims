@@ -178,23 +178,23 @@ namespace FSO.Client.UI.Panels.LotControls
                         : TerrainToolErrors.CostText(cost);
                     state.UIState.TooltipProperties.UpdateDead = false;
 
-                    // AUD-15: the native terrain-tool denied sound. The R203
-                    // tools played the generic ui_error; natively the dirt-tool
-                    // family branches to cTool::DoDeniedSound, which fires HIT
-                    // event 0x4D35A (the shared tool-sound table base 0x4d300 +
-                    // 90) rate-limited to one per 400 VM ticks. The port's TS1
-                    // content registers the same logical event BY NAME:
-                    // 'denied' (SimsSound.hot [EventMapping]
-                    // denied=kSndobPlay,1284 -> patch 1283 =
-                    // sounddata\sfx\denied.xa); the port fires events by
-                    // name, and 0x4D35A is the native-generated numbering of
-                    // this event.
+                    // ORIG-01 (2026-10-06 re-decode, supersedes AUD-15):
+                    // cTool::DoDeniedSound loads TOC-22024 — a C STRING
+                    // TABLE at raw 0x605978, not the id table EXP-12 read —
+                    // and adds +90, landing exactly on "UI_error"
+                    // (4/4 offset-exact across the slide/explode/refund/
+                    // kaching/denied siblings). denied.xa never shipped
+                    // (absent from every FAR and the retail ISO; the hot
+                    // row is vestigial). The native denied feedback is
+                    // therefore ui_error.xa — exactly what R203 originally
+                    // wired; AUD-15's "denied" lookup was a guaranteed
+                    // silence. Rate limit: one fire per 400 VM ticks.
                     var deniedTicks = vm?.Context?.Clock?.Ticks ?? 0;
                     if (!cmds[0].Equals(LastCmd) && disallowed
                         && deniedTicks - LastDeniedTick >= 400)
                     {
                         LastDeniedTick = deniedTicks;
-                        HITVM.Get().PlaySoundEvent("denied");
+                        HITVM.Get().PlaySoundEvent(UISounds.Error);
                     }
                 }
                 else
