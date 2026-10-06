@@ -138,6 +138,12 @@ namespace Simitone.Client.UI.Panels
         public override void GameResized() { UpdatePosition(); }
         public void Close() { UIScreen.RemoveDialog(this); }
 
+        public override void Removed()
+        {
+            Simitone.Client.UI.Model.UIModalSimPause.Resume(this); // AUD-17 B-12 (no-op when never paused — e.g. probe construction)
+            base.Removed();
+        }
+
         public override void Draw(UISpriteBatch batch)
         {
             if (!Visible) return;

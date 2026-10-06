@@ -46,6 +46,9 @@ namespace Simitone.Client.UI.Panels
         public UIOriginalBudgetDialog(Simitone.Client.UI.Screens.TS1GameScreen game)
         {
             Game = game;
+            // AUD-17 B-12: native SetBlockSimulator — the sim pauses while the
+            // budget is open (released in Removed).
+            Simitone.Client.UI.Model.UIModalSimPause.Pause(this, game?.vm);
             var fam = game?.ActiveFamily;
             var fonts = RowFontIndices.Select(i => OriginalGlyphFont.LoadByIndex(i, GameFacade.GraphicsDevice)).ToArray();
             var labels = RowLabelIdx.Select(i => i < 0 ? "" : S146(i, "")).ToArray();
@@ -130,6 +133,12 @@ namespace Simitone.Client.UI.Panels
         }
         public override void GameResized() { UpdatePosition(); }
         public void Close() { UIScreen.RemoveDialog(this); }
+
+        public override void Removed()
+        {
+            Simitone.Client.UI.Model.UIModalSimPause.Resume(this); // AUD-17 B-12
+            base.Removed();
+        }
         public override void Update(FSO.Common.Rendering.Framework.Model.UpdateState state)
         {
             base.Update(state);

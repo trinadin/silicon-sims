@@ -108,10 +108,24 @@ namespace Simitone.Client.UI.Panels
             X = Y = 0;
             DrawWidth = width;
             DrawHeight = height;
-            ListenForMouse(new Rectangle(0, 0, width, height), (e, s) => { });
+            MouseCover = ListenForMouse(new Rectangle(0, 0, width, height), (e, s) => { });
 
             Font = OriginalGlyphFont.LoadByIndex(12, GameFacade.GraphicsDevice);
             BuildTimeline();
+        }
+
+        private FSO.Common.Rendering.Framework.IO.UIMouseEventRef MouseCover;
+
+        public override void GameResized()
+        {
+            // AUD-17 E-8: the cover rect and clip bounds were frozen at
+            // construction — a resize while credits ran left the black fill
+            // and the mouse-swallow region at the old size.
+            var screen = UIScreen.Current;
+            DrawWidth = screen?.ScreenWidth ?? DrawWidth;
+            DrawHeight = screen?.ScreenHeight ?? DrawHeight;
+            if (MouseCover != null) MouseCover.Region = new Rectangle(0, 0, DrawWidth, DrawHeight);
+            base.GameResized();
         }
 
         /// <summary>The law's composition + shared-timeline cadence. Split out so
@@ -222,7 +236,6 @@ namespace Simitone.Client.UI.Panels
             ClockMs += Math.Max(0, ms);
             int top = ClipMargin;
             int bottom = DrawHeight - ClipMargin;
-            float crawl = (float)(CrawlPixelsPerSecond * ClockMs / 1000.0);
             foreach (var line in Lines)
             {
                 switch (line.State)
@@ -237,13 +250,13 @@ namespace Simitone.Client.UI.Panels
                         // The line crawls up from below the clip; once it has fully
                         // passed the clip top it is done (native state-3 hold window
                         // modeled away, disclosed).
-                        if (LineTop(line, crawl, bottom) + LineHeight() < top) line.State = StateDone;
+                        if (LineTop(line, bottom) + LineHeight() < top) line.State = StateDone;
                         break;
                 }
             }
         }
 
-        private int LineTop(CreditLine line, float crawl, int bottom)
+        private int LineTop(CreditLine line, int bottom)
         {
             // The line's crawl starts from its own scheduled tick (the 770 ms
             // stagger IS the inter-line spacing law).
@@ -300,7 +313,7 @@ namespace Simitone.Client.UI.Panels
                     // blank separator line the English data implies (disclosed).
                     continue;
                 }
-                int y = LineTop(line, 0f, bottom);
+                int y = LineTop(line, bottom);
                 if (y + LineHeight() < top || y > bottom) continue;
                 int w = Font.Measure(text);
                 int x = (DrawWidth - w) / 2;

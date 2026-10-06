@@ -84,7 +84,17 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
         public void UpdateInventoryView()
         {
             var sel = Game.SelectedAvatar;
-            if (sel == null) return;
+            if (sel == null)
+            {
+                // AUD-17 C2-5: early return left the previous Sim's items
+                // mounted after the selection cleared.
+                if (Items.Count > 0)
+                {
+                    Items.Clear();
+                    ScrollView.Reset();
+                }
+                return;
+            }
             var neighbourhood = Content.Get().Neighborhood;
             var neighbour = sel.GetPersonData(VMPersonDataVariable.NeighborId);
             var inventory = neighbourhood.GetInventoryByNID(neighbour)?.Where(x => (CatSort == -1 && !HiddenCats.Contains(x.Type)) || CatSort == x.Type)?.ToList() ?? new List<InventoryItem>();
@@ -149,8 +159,16 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             {
                 Item = obj.Resource.Get<BMP>(obj.OBJ.CatalogStringsID)?.GetTexture(GameFacade.GraphicsDevice);
                 NameLabel.Caption = obj.Resource.Get<CTSS>(obj.OBJ.CatalogStringsID)?.GetString(0) ?? obj.OBJ.ChunkLabel;
-                CountLabel.Caption = item.Count.ToString();
             }
+            else
+            {
+                // AUD-17 C2-5: an expansion item whose catalog entry is absent
+                // (content not installed) used to render a fully empty shell —
+                // no name, no count. Mirror the gift cell's fallback.
+                Item = Simitone.Client.UI.Model.UIOriginal.EnsureResolved("cpanel\\CatalogUnknown.bmp")?.Get(GameFacade.GraphicsDevice);
+                NameLabel.Caption = obj?.OBJ.ChunkLabel ?? "?";
+            }
+            CountLabel.Caption = item.Count.ToString();
         }
 
         public override void Draw(UISpriteBatch batch)

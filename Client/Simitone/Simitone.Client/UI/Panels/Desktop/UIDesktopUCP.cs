@@ -212,8 +212,12 @@ namespace Simitone.Client.UI.Panels.Desktop
                 };
                 HelpButton.OnButtonClick += (b) =>
                 {
-                    FSO.Client.UI.Framework.UIScreen.GlobalShowDialog(
-                        new Simitone.Client.UI.Panels.UIOriginalHelpDialog(), true);
+                    var helpDlg = new Simitone.Client.UI.Panels.UIOriginalHelpDialog();
+                    // AUD-17 B-12: native SetBlockSimulator — the sim pauses
+                    // while the help window is open (released in its Removed).
+                    Simitone.Client.UI.Model.UIModalSimPause.Pause(helpDlg,
+                        (FSO.Client.GameFacade.Screens.CurrentUIScreen as Simitone.Client.UI.Screens.TS1GameScreen)?.vm);
+                    FSO.Client.UI.Framework.UIScreen.GlobalShowDialog(helpDlg, true);
                     Simitone.Client.UI.Panels.UIOriginalHelpDialog.HelpButtonOpens++;
                 };
                 Add(HelpButton);

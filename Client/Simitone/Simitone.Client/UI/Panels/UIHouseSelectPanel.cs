@@ -114,7 +114,10 @@ namespace Simitone.Client.UI.Panels
             var house = neigh.GetHouse(houseID);
 
             var street = neigh.StreetNames;
-            var assignment = street.Get<STR>(2001).GetString(houseID - 1);
+            // AUD-17 E-7: missing StreetNames STR chunks used to crash card
+            // construction (the production popup guards the same lookup).
+            var streetChunk = street.Get<STR>(2001);
+            var assignment = streetChunk?.GetString(houseID - 1);
 
             int streetName;
             if (int.TryParse(assignment, out streetName))
@@ -123,7 +126,7 @@ namespace Simitone.Client.UI.Panels
                 StreetTitle.Position = new Vector2(30, 94 + extra - 64);
                 InitLabel(StreetTitle);
                 StreetTitle.CaptionStyle.Color = UIStyle.Current.BtnActive;
-                StreetTitle.Caption = street.Get<STR>(2000).GetString(streetName - 1).Replace("%s", houseID.ToString());
+                StreetTitle.Caption = (street.Get<STR>(2000)?.GetString(streetName - 1) ?? "%s").Replace("%s", houseID.ToString());
             }
 
             var nameDesc = neigh.GetHouseNameDesc(houseID);
@@ -519,34 +522,47 @@ namespace Simitone.Client.UI.Panels
 
         public void PopulateList(FAMI family)
         {
+            // AUD-17 E-7: the scratch world leaked if CreateObjectInstance
+            // threw (unresolvable member GUID) — try/finally like the popup's
+            // guarded portrait loader; a failed member is skipped, matching
+            // the CAS family card's AUD-17 F-2 guard.
             var world = new FSO.LotView.World(GameFacade.GraphicsDevice);
-            world.Initialize(GameFacade.Scenes);
-            var context = new VMContext(world);
-            var vm = new VM(context, new VMServerDriver(new VMTS1GlobalLinkStub()), new VMNullHeadlineProvider());
-            vm.Init();
-            var blueprint = new Blueprint(1, 1);
-
-            //world.InitBlueprint(blueprint);
-            context.Blueprint = blueprint;
-            context.Architecture = new VMArchitecture(1, 1, blueprint, vm.Context);
-
-            int i = 0;
-            var baseX = 0;
-            foreach (var sim in family.FamilyGUIDs)
+            VM vm = null;
+            try
             {
-                var fam = vm.Context.CreateObjectInstance(sim, LotTilePos.OUT_OF_WORLD, Direction.NORTH, true).BaseObject;
-                var btn = new UIAvatarSelectButton(UIIconCache.GetObject(fam));
-                btn.Opacity = 1f;
-                var id = i;
-                btn.Name = fam.Name;
-                btn.X = baseX + (i++) * 100;
-                btn.Y = 0;
-                btn.DeregisterHandler();
-                Btns.Add(btn);
-                Add(btn);
-                fam.Delete(true, vm.Context);
+                world.Initialize(GameFacade.Scenes);
+                var context = new VMContext(world);
+                vm = new VM(context, new VMServerDriver(new VMTS1GlobalLinkStub()), new VMNullHeadlineProvider());
+                vm.Init();
+                var blueprint = new Blueprint(1, 1);
+
+                //world.InitBlueprint(blueprint);
+                context.Blueprint = blueprint;
+                context.Architecture = new VMArchitecture(1, 1, blueprint, vm.Context);
+
+                int i = 0;
+                var baseX = 0;
+                foreach (var sim in family.FamilyGUIDs)
+                {
+                    var grp = vm.Context.CreateObjectInstance(sim, LotTilePos.OUT_OF_WORLD, Direction.NORTH, true);
+                    if (grp == null) continue;
+                    var fam = grp.BaseObject;
+                    var btn = new UIAvatarSelectButton(UIIconCache.GetObject(fam));
+                    btn.Opacity = 1f;
+                    var id = i;
+                    btn.Name = fam.Name;
+                    btn.X = baseX + (i++) * 100;
+                    btn.Y = 0;
+                    btn.DeregisterHandler();
+                    Btns.Add(btn);
+                    Add(btn);
+                    fam.Delete(true, vm.Context);
+                }
             }
-            world.Dispose();
+            finally
+            {
+                world.Dispose();
+            }
         }
     }
 }

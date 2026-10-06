@@ -130,9 +130,20 @@ namespace Simitone.Client.UI.Panels
             for (int i = Registered.Count - 1; i >= 0; i--)
             {
                 UIElement element;
-                if (!Registered[i].TryGetElement(out element) || element.Parent == null)
+                if (!Registered[i].TryGetElement(out element) || !IsAttached(element))
                     Registered.RemoveAt(i);
             }
+        }
+
+        /// <summary>AUD-17 D-6: this framework never nulls Parent on removal
+        /// (UIContainer.Remove keeps the null-out commented out), so
+        /// Parent==null only caught never-parented controls — a removed
+        /// control kept a stale Parent and resolved as live until GC. Real
+        /// detachment is membership, exactly like the highlight's own
+        /// CheckTargetAlive death check.</summary>
+        private static bool IsAttached(UIElement element)
+        {
+            return element.Parent != null && element.Parent.GetChildren().Contains(element);
         }
 
         /// <summary>
@@ -177,7 +188,7 @@ namespace Simitone.Client.UI.Panels
             foreach (var entry in Registered)
             {
                 if (entry.ImageId != imageId) continue;
-                if (!entry.TryGetElement(out element) || element.Parent == null) continue;
+                if (!entry.TryGetElement(out element) || !IsAttached(element)) continue; // AUD-17 D-6
                 return true;
             }
             element = null;

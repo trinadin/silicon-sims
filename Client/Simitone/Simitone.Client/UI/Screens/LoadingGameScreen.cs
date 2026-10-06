@@ -37,6 +37,8 @@ namespace Simitone.Client.UI.Screens
     {
         public UISimitoneBg Bg;
         public bool LoadingComplete;
+        private string InitFailed;      // AUD-17 E-12: content-init exception message (null = healthy)
+        private int InitErrorShown;
 
         // ROUND-88 original boot/logo screen (kSimsLogo, Res_Other.RT id 9003 =
         // Other\setup.bmp) live-mount state, readable by the uiboot gate. R118: mounted
@@ -121,6 +123,16 @@ namespace Simitone.Client.UI.Screens
                 {
                     Simitone.Client.GameLog.Write("content-init: EXCEPTION " + cie.GetType().Name + " " + cie.Message);
                     Simitone.Client.GameLog.Write(cie.ToString().Replace(Environment.NewLine, " | "));
+                    // AUD-17 E-12: the old path logged then completed anyway —
+                    // EnterGameMode ran against partially initialized content
+                    // and died downstream with unrelated NREs. Record the
+                    // failure; Update surfaces it instead of entering the game.
+                    lock (this)
+                    {
+                        InitFailed = cie.Message ?? cie.GetType().Name;
+                        LoadingComplete = true;
+                    }
+                    return;
                 }
                 lock (this)
                 {
@@ -280,7 +292,22 @@ namespace Simitone.Client.UI.Screens
             {
                 if (LoadingComplete)
                 {
-                    GameController.EnterGameMode("", false);
+                    if (InitFailed != null)
+                    {
+                        // AUD-17 E-12: hold on the loading screen with the
+                        // reason instead of limping into a half-initialized
+                        // game. (Base had no catch at all — an init-thread
+                        // death meant an infinite "loading" hang.)
+                        if (InitErrorShown++ == 0)
+                        {
+                            SetSplashTip("Could not load game data: " + InitFailed +
+                                " — check that The Sims is installed and the path is correct.");
+                        }
+                    }
+                    else
+                    {
+                        GameController.EnterGameMode("", false);
+                    }
                 }
             }
             base.Update(state);

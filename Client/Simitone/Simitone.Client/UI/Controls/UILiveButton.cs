@@ -49,7 +49,11 @@ namespace Simitone.Client.UI.Controls
             if (Avatar != sel)
             {
                 Avatar = sel;
-                AvatarHead = (Avatar == null)?null:UIIconCache.GenHeadTex(Avatar);
+                // AUD-17 A-6: GenHeadTex ran a fresh 3D render + texture per
+                // avatar switch and never disposed the previous one. The icon
+                // cache already keys heads by outfit+texture (bounded by the
+                // neighborhood's distinct heads, cleared at lot exit).
+                AvatarHead = (Avatar == null) ? null : UIIconCache.GetObject(Avatar);
             }
         }
 

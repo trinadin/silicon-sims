@@ -272,6 +272,15 @@ namespace Simitone.Client.UI.Panels
             _icons[guid] = t;
             return t;
         }
+
+        /// <summary>AUD-17 C2-7: the per-process catalog-cell icon cache
+        /// (fresh BMP.GetTexture copies — owned, so disposed on clear).
+        /// Cleared at lot exit alongside UICatalogItem's cache.</summary>
+        public static void ClearIconCache()
+        {
+            foreach (var t in _icons.Values) t?.Dispose();
+            _icons.Clear();
+        }
     }
 
     /// <summary>

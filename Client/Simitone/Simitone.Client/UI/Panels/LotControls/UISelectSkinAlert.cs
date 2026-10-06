@@ -376,13 +376,28 @@ namespace Simitone.Client.UI.Panels.LotControls
         }
 
         #region Lot Content Stuff
+        public override void Removed()
+        {
+            // AUD-17 B-4: this panel's CleanupLastWorld had NO caller (the
+            // screen-level methods shadow the name), so every clothes/pet
+            // dialog session stranded 18 hidden OUT_OF_WORLD avatars in the
+            // LIVE vm — ticking, and marshalled into vm.Save() — until lot
+            // exit. The dialog's own removal is the right lifetime edge.
+            CleanupLastWorld();
+            Scene?.Dispose();
+            base.Removed();
+        }
+
         public void CleanupLastWorld()
         {
-            if (vm == null) return;
+            if (vm == null || BodyAvatars == null) return;
 
             foreach (var body in BodyAvatars)
             {
-                body.Delete(true, vm.Context);
+                if (body == null) continue;
+                Scene?.Remove(body.Avatar);
+                try { body.Delete(true, vm.Context); }
+                catch { /* lot-exit teardown may race the disposal */ }
             }
         }
 

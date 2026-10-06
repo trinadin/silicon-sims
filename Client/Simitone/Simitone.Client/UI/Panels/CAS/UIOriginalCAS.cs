@@ -82,16 +82,21 @@ namespace Simitone.Client.UI.Panels.CAS
         /// Punches a fully transparent hole (the original view-control windows
         /// where the 3D head/body show through the painted background) by
         /// clearing premultiplied color in a rectangle of the background texture.
+        /// AUD-17 F-4: works on a CLONE — the input is the process-wide cached
+        /// CreateACharBack instance, and mutating it baked a permanent hole
+        /// into every other consumer (masked today only because the vita
+        /// preview's static backdrop captures once per process).
         /// </summary>
         public static Texture2D CutHole(Texture2D tex, Rectangle rect)
         {
+            var clone = new Texture2D(tex.GraphicsDevice, tex.Width, tex.Height);
             var data = new Microsoft.Xna.Framework.Color[tex.Width * tex.Height];
             tex.GetData(data);
             for (int y = rect.Y; y < rect.Y + rect.Height && y < tex.Height; y++)
                 for (int x = rect.X; x < rect.X + rect.Width && x < tex.Width; x++)
                     data[y * tex.Width + x] = Color.Transparent;
-            tex.SetData(data);
-            return tex;
+            clone.SetData(data);
+            return clone;
         }
     }
 
@@ -642,7 +647,11 @@ namespace Simitone.Client.UI.Panels.CAS
                 {
                     VitaSurface = new UIOriginalVitaPreview(bg, VITA_RECT);
                     Add(VitaSurface);
-                    CutHole(bg, VITA_RECT);
+                    // AUD-17 F-4: CutHole now returns a CLONE (bg is the
+                    // process-wide cached CreateACharBack instance — the old
+                    // in-place cut baked a permanent hole into it). The vita
+                    // preview keeps the UNCUT original for its own backdrop.
+                    Background.Texture = CutHole(bg, VITA_RECT);
                 }
             }
 

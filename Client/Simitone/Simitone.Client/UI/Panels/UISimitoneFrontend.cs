@@ -304,7 +304,10 @@ namespace Simitone.Client.UI.Panels
             // AUD-17 E-1: family-less lots (unowned community/downtown) never
             // ActivateFamily — CurrentFamily stays null and the old deref of
             // RuntimeSubset crashed the update loop on the first Space press.
+            // AUD-17 E-9: a visible modal dialog owns the keyboard natively —
+            // don't cycle Sims through a quit/move-in confirm.
             if (state.NewKeys.Contains(Keys.Space) && state.InputManager.GetFocus() == null
+                && FSO.Client.GameFacade.Screens.TopVisibleDialog == null
                 && Game.vm.TS1State.CurrentFamily != null)
             {
                 var selected = Game.LotControl.ActiveEntity;

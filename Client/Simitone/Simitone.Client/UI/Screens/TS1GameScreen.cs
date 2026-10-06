@@ -554,11 +554,17 @@ namespace Simitone.Client.UI.Screens
             GameFacade.Game.IsMouseVisible = Visible;
 
             var nofocus = state.InputManager.GetFocus() == null;
-            if (nofocus && state.NewKeys.Contains(Keys.D1)) ChangeSpeedTo(1);
-            if (nofocus && state.NewKeys.Contains(Keys.D2)) ChangeSpeedTo(2);
-            if (nofocus && state.NewKeys.Contains(Keys.D3)) ChangeSpeedTo(3);
-            if (nofocus && state.NewKeys.Contains(Keys.P)) ChangeSpeedTo(0);
-            if (nofocus && state.NewKeys.Contains(Keys.D0))
+            // AUD-17 E-9: NewKeys broadcast to every child — with a modal
+            // dialog up (quit confirm, move-in, switch-fail, budget...) the
+            // speed keys and F12 still fired and the frontend's Space handler
+            // still ran. Native modal windows swallow the keyboard; only the
+            // topmost visible dialog gets keys (its own handlers decide).
+            var modalKeys = GameFacade.Screens.TopVisibleDialog;
+            if (nofocus && modalKeys == null && state.NewKeys.Contains(Keys.D1)) ChangeSpeedTo(1);
+            if (nofocus && modalKeys == null && state.NewKeys.Contains(Keys.D2)) ChangeSpeedTo(2);
+            if (nofocus && modalKeys == null && state.NewKeys.Contains(Keys.D3)) ChangeSpeedTo(3);
+            if (nofocus && modalKeys == null && state.NewKeys.Contains(Keys.P)) ChangeSpeedTo(0);
+            if (nofocus && modalKeys == null && state.NewKeys.Contains(Keys.D0))
             {
                 //frame advance
                 ChangeSpeedTo(1);
@@ -576,7 +582,8 @@ namespace Simitone.Client.UI.Screens
             // Update weather effects (sounds and terrain)
             UpdateWeatherEffects();
 
-            if (state.NewKeys.Contains(Microsoft.Xna.Framework.Input.Keys.F12) && GraphicsModeControl.Mode != GlobalGraphicsMode.Full2D)
+            if (state.NewKeys.Contains(Microsoft.Xna.Framework.Input.Keys.F12) && modalKeys == null
+                && GraphicsModeControl.Mode != GlobalGraphicsMode.Full2D)
             {
                 GraphicsModeControl.ChangeMode((GraphicsModeControl.Mode == GlobalGraphicsMode.Full3D) ? GlobalGraphicsMode.Hybrid2D : GlobalGraphicsMode.Full3D);
             }
@@ -609,19 +616,30 @@ namespace Simitone.Client.UI.Screens
 
             if (SwitchLot > 0)
             {
-                if (!Downtown) SavedLot = vm.Save();
-                if (SwitchLot == ActiveFamily.HouseNumber && SavedLot != null)
+                // AUD-17 E-10: ExitLot can run in the same frame between a
+                // pending engine lot-switch request and this Update — vm is
+                // gone and ActiveFamily may be null (family-less lot). Drop
+                // the stale switch instead of NRE-ing the loop.
+                if (vm == null || ActiveFamily == null)
                 {
-                    Downtown = false;
-                    InitializeLot(SavedLot);
-                    SavedLot = null;
+                    SwitchLot = -1;
                 }
                 else
                 {
-                    Downtown = true;
-                    InitializeLot(Content.Get().Neighborhood.GetHousePath(SwitchLot), false);
+                    if (!Downtown) SavedLot = vm.Save();
+                    if (SwitchLot == ActiveFamily.HouseNumber && SavedLot != null)
+                    {
+                        Downtown = false;
+                        InitializeLot(SavedLot);
+                        SavedLot = null;
+                    }
+                    else
+                    {
+                        Downtown = true;
+                        InitializeLot(Content.Get().Neighborhood.GetHousePath(SwitchLot), false);
+                    }
+                    SwitchLot = -1;
                 }
-                SwitchLot = -1;
             }
             //vm.Context.Clock.Hours = 12;
             if (vm != null) vm.Update();
@@ -718,6 +736,16 @@ namespace Simitone.Client.UI.Screens
         public void CleanupLastWorld()
         {
             if (vm == null) return;
+
+            // AUD-17 C2-7: the per-process catalog icon caches (fresh
+            // BMP.GetTexture copies, privately owned) are swept at lot exit —
+            // the UIBuyBrowsePanel cleanup hook has been deliberately disabled
+            // since upstream ("might want to be careful here") because panels
+            // share it; the lot boundary is the safe edge. (UIIconCache head
+            // textures are intentionally kept — tiny, neighborhood-bounded,
+            // and now shared by the live button.)
+            Simitone.Client.UI.Panels.LiveSubpanels.Catalog.UICatalogItem.ClearIconCache();
+            Simitone.Client.UI.Panels.UIOriginalCatalogCell.ClearIconCache();
 
             //clear our cache too, if the setting lets us do that
             TimedReferenceController.Clear();
@@ -1182,6 +1210,9 @@ namespace Simitone.Client.UI.Screens
             vm.SpeedMultiplier = 0;
             if ((short)lotId == -1)
             {
+                // AUD-17 E-10: the -1 "home lot" sentinel dereferenced
+                // ActiveFamily with no guard — a family-less lot has no home.
+                if (ActiveFamily == null) return;
                 lotId = (uint)ActiveFamily.HouseNumber;
             }
             SwitchLot = (int)lotId;
@@ -1900,7 +1931,23 @@ namespace Simitone.Client.UI.Screens
         else
         {
             GameLog.Write("nghbtns: lot " + house + " could not be rezoned (LotZoning.iff)");
+            // AUD-17 E-5 (the open NBR-05 P3): the failed rezone was a log
+            // line only — surface the receipt dialog instead of a silent
+            // nothing.
+            ShowRezoneFail(RezoneFailMessage);
         }
+    }
+
+    private void ShowRezoneFail(string message)
+    {
+        UIMobileAlert ok = null;
+        ok = new UIMobileAlert(new UIAlertOptions
+        {
+            Title = RezoneTitle,
+            Message = message,
+            Buttons = UIAlertButton.Ok((b) => { ok.Close(); })
+        });
+        GlobalShowDialog(ok, true);
     }
 
     private void ShowRezoneOk(string message)

@@ -59,7 +59,9 @@ namespace Simitone.Client.UI.Controls
 
             var activeWidth = (int)Math.Round(p * Width);
             DrawSlice(batch, activeWidth, Color.White, 2);
-            DrawSlice(batch, activeWidth-2, barcol, 0);
+            // AUD-17 A-8: p == 0 made this a -2 width (negative source rect
+            // → 1px flipped sliver). Nothing to draw below 2px of fill.
+            if (activeWidth >= 2) DrawSlice(batch, activeWidth - 2, barcol, 0);
         }
     }
 

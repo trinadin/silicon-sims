@@ -113,7 +113,7 @@ namespace Simitone.Client.UI.Controls
             Outlined = true;
             Label.CaptionStyle.Color = UIStyle.Current.Bg;
             GameFacade.Screens.Tween.To(this, 0.3f, new Dictionary<string, float>() { { "SelectPct", 1f } }, TweenQuad.EaseOut);
-            TParent.SelectionChanged(ItemID);
+            if (!SilentSelect) TParent.SelectionChanged(ItemID); // AUD-17 A-5: recycled rows re-apply visuals only
         }
 
         public override void Deselected()

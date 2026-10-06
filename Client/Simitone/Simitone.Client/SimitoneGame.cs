@@ -37,6 +37,11 @@ namespace Simitone.Client
         public _3DLayer SceneMgr;
         private bool HasUpdated;
 
+        // AUD-17 F-8: the 800x600 OS-level window floor (DesktopGL already
+        // owns SDL; Window.Handle is the SDL_Window*).
+        [System.Runtime.InteropServices.DllImport("libSDL2-2.0.0.dylib", CallingConvention = System.Runtime.InteropServices.CallingConvention.Cdecl)]
+        private static extern void SDL_SetWindowMinimumSize(IntPtr window, int w, int h);
+
         // R87: IFF-first mount of the ORIGINAL UIGraphics.far .cur cursors (IFF-literalism: the
         // member bytes ARE the original game cursor files). Driven from LoadingGameScreen right after
         // the IFF content mount; guarded so any cursor that fails keeps today's fallback and never
@@ -584,6 +589,15 @@ namespace Simitone.Client
                 // on IsActive edges (desktop only).
                 this.Activated += RegainFocus;
                 this.Deactivated += LostFocus;
+                // AUD-17 F-8: enforce the native 800x600 floor at the OS level —
+                // below it the original-canvas controls (Done/Cancel at y=529,
+                // the bio field) fall outside the window and are unreachable.
+                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
+                        System.Runtime.InteropServices.OSPlatform.OSX))
+                {
+                    try { SDL_SetWindowMinimumSize(Window.Handle, 800, 600); }
+                    catch (Exception mwx) { GameLog.Write("minwin: SDL SetWindowMinimumSize unavailable: " + mwx.GetType().Name); }
+                }
                 // R118: original game name in the title bar (was "Simitone" - residue
                 // called out in the loader round).
                 this.Window.Title = "The Sims";

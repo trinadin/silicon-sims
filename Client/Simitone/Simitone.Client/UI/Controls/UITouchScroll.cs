@@ -68,11 +68,15 @@ namespace Simitone.Client.UI.Controls
                     else
                     {
                         //calculate scroll velocity
+                        // AUD-17 A-5: the loop used to start at index 1,
+                        // discarding the FRESHEST sample (history is
+                        // Insert(0,...) — index 0 is the last frame) and
+                        // basing flings on ~4-frame-old motion.
                         if (ScrollVelocityHistory.Count > 1)
                         {
                             int total = 0;
                             ScrollVelocity = 0f;
-                            for (int i = 1; i < ScrollVelocityHistory.Count; i++)
+                            for (int i = 0; i < ScrollVelocityHistory.Count; i++)
                             {
                                 total++;
                                 ScrollVelocity += ScrollVelocityHistory[i];
@@ -121,7 +125,13 @@ namespace Simitone.Client.UI.Controls
                 item.ItemID = id;
                 if (id == LastSelected?.ItemID)
                 {
-                    item.Selected();
+                    // AUD-17 A-5: recycling the selected row back into the
+                    // window re-fired SelectionChanged without user action
+                    // (consumers re-created previews etc.). Re-apply the
+                    // selected visuals silently.
+                    item.SilentSelect = true;
+                    try { item.Selected(); }
+                    finally { item.SilentSelect = false; }
                     LastSelected = item;
                 }
                 Add(item);
@@ -260,6 +270,9 @@ namespace Simitone.Client.UI.Controls
     public class UITSContainer : UIContainer
     {
         public int ItemID;
+        // AUD-17 A-5: set while re-applying selection visuals to a recycled
+        // row — Selected() implementations should skip their change EVENT.
+        public bool SilentSelect;
         public virtual void Selected()
         {
 

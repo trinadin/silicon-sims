@@ -258,7 +258,23 @@ namespace Simitone.Client.UI.Panels
                 LastDialogID = 0;
                 BlockingDialog = null;
             }
-            if (info == null) return; //return if we're just clearing a dialog.
+            if (info == null)
+            {
+                // AUD-17 E-11: the travel/neighborhood selector is not a
+                // BlockingDialog, so the engine's timeout clear used to leave
+                // it mounted over a hidden lot control with no cancel surface.
+                // The engine already resolved the wait (SignalDialog(null) is
+                // post-response) — this only syncs the UI back.
+                if (TS1NeighSelector != null)
+                {
+                    var sel = TS1NeighSelector;
+                    TS1NeighSelector = null;
+                    ((TS1GameScreen)Parent).Bg.Visible = true;
+                    ((TS1GameScreen)Parent).LotControl.Visible = true;
+                    Parent.Remove(sel);
+                }
+                return; //return if we're just clearing a dialog.
+            }
 
             if (!ShowSimanticsExceptions && info.Title == "SimAntics Exception!")
                 return;
@@ -327,7 +343,17 @@ namespace Simitone.Client.UI.Panels
                         };
                         return;
                     }
-                    options.Buttons = new UIAlertButton[] { new UIAlertButton(UIAlertButtonType.OK, b0Event, info.Yes) };
+                    // AUD-17 B-9: OK-only with no capacity — the engine
+                    // clamped to 32 but native TextEntry capacity is 25, and
+                    // there was no cancel path. Cancel answers code 2 with
+                    // empty text (the engine's no-rename law; the desktop
+                    // original editor answers identically).
+                    options.Buttons = new UIAlertButton[]
+                    {
+                        new UIAlertButton(UIAlertButtonType.OK, b0Event, info.Yes),
+                        new UIAlertButton(UIAlertButtonType.Cancel, b2Event, info.Cancel),
+                    };
+                    options.MaxChars = 25;
                     options.TextEntry = true;
                     break;
                 case VMDialogType.TS1TransformMe:
@@ -919,6 +945,16 @@ namespace Simitone.Client.UI.Panels
                                 this.Add(PieMenu);
                                 PieMenu.X = state.MouseState.X / FSOEnvironment.DPIScaleFactor;
                                 PieMenu.Y = state.MouseState.Y / FSOEnvironment.DPIScaleFactor;
+                                // AUD-17 C1-6: clamp the menu origin so the ring
+                                // (radius 90 + label extents) and the overflow
+                                // stack stay reachable — the people pie runs the
+                                // same decoded cTSPieMenu window law; this
+                                // interaction pie used to mount at the raw cursor
+                                // and let edge clicks spawn off-screen bubbles.
+                                var sw = UIScreen.Current.ScreenWidth;
+                                var sh = UIScreen.Current.ScreenHeight;
+                                PieMenu.X = Math.Max(110, Math.Min(sw - 110, PieMenu.X));
+                                PieMenu.Y = Math.Max(110, Math.Min(sh - 110, PieMenu.Y));
                                 PieMenu.UpdateHeadPosition(state.MouseState.X, state.MouseState.Y);
                             }
                             else
@@ -1407,6 +1443,26 @@ namespace Simitone.Client.UI.Panels
                 bool scrolled = false;
 
                 World.State.Cameras.CameraFirstPerson.CaptureMouse = true;
+
+                // AUD-17 D-4: keyboard camera pan (arrows/WASD) — native TS1
+                // scrolls the view on the arrows; upstream tso.client carries
+                // the same axis law. Gated on no text focus, window focus, and
+                // no pie menu (upstream's gating shape).
+                if (state.WindowFocused && state.InputManager.GetFocus() == null && PieMenu == null)
+                {
+                    int kbAxisX = 0, kbAxisY = 0;
+                    if (state.KeyboardState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Up) || state.KeyboardState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.W)) kbAxisY -= 1;
+                    if (state.KeyboardState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Left) || state.KeyboardState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.A)) kbAxisX -= 1;
+                    if (state.KeyboardState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Down) || state.KeyboardState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.S)) kbAxisY += 1;
+                    if (state.KeyboardState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Right) || state.KeyboardState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D)) kbAxisX += 1;
+                    if (kbAxisX != 0 || kbAxisY != 0)
+                    {
+                        World.State.ScrollAnchor = null;
+                        var kbScroll = new Vector2(kbAxisX, kbAxisY) * 0.05f;
+                        World.Scroll(kbScroll * (60f / FSOEnvironment.RefreshRate));
+                        scrolled = true;
+                    }
+                }
 
                 if (RMBScroll)
                 {

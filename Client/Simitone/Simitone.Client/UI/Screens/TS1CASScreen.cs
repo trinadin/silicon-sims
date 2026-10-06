@@ -94,6 +94,10 @@ namespace Simitone.Client.UI.Screens
         public int HeadPositionLast = 0;
         public int BodyPositionLast = 0;
 
+        // AUD-17 F-3: last outfit applied to the vita preview (skip no-op
+        // per-frame SetBody/SetHead rebuilds).
+        private int _lastVitaBody = int.MinValue, _lastVitaHead = int.MinValue;
+
         public string CurrentCode = "ma";
         public string CurrentSkin = "lgt";
         private bool CurrentChild;
@@ -434,6 +438,7 @@ namespace Simitone.Client.UI.Screens
 
         private void SetBody(VMAvatar body, int i)
         {
+            if (ActiveBodies.Count == 0) return; // AUD-17 F-5: empty corpus — PosMod(x,0) is NaN
             i = (int)DirectionUtils.PosMod(i, ActiveBodies.Count);
             var code = CurrentCode[0];
             if (CurrentCode[1] != 'a') code = 'u';
@@ -464,6 +469,7 @@ namespace Simitone.Client.UI.Screens
 
         private void SetHead(VMAvatar head, int i)
         {
+            if (ActiveHeads.Count == 0) return; // AUD-17 F-5: empty corpus — PosMod(x,0) is NaN
             i = (int)DirectionUtils.PosMod(i, ActiveHeads.Count);
             head.HeadOutfit = new FSO.SimAntics.Model.VMOutfitReference(new Outfit() { TS1AppearanceID = ActiveHeads[i] + ".apr", TS1TextureID = ActiveHeadTex[i] });
         }
@@ -541,7 +547,9 @@ namespace Simitone.Client.UI.Screens
             Add(CASPanel);
 
             FamilyPanel = new UIFamilyCASPanel(RepresentFamily);
-            FamilyPanel.ModifySim = ModifySim;
+            // AUD-17 F-6: route mobile deletes through the native confirm
+            // (RequestModifySim confirms delete, passes everything else through).
+            FamilyPanel.ModifySim = RequestModifySim;
             Add(FamilyPanel);
 
             FamiliesPanel = new UIFamiliesCASPanel();
@@ -606,8 +614,13 @@ namespace Simitone.Client.UI.Screens
         {
             if (delete && (index < 0 || index >= WIPFamily.Count)) return;
             if (!delete && (index < -1 || index >= WIPFamily.Count)) return;
-            if (!delete && index == -1 && Original
-                && (WIPFamily.Count >= 8 || DesktopFamily.FamilyNameBox.CurrentText.Length == 0)) return;
+            // AUD-17 F-6: the Add gate (8-member cap + non-empty family name)
+            // was Original-only — the mobile --touch path could add a 9th
+            // member or add into a blank family name.
+            if (!delete && index == -1
+                && (WIPFamily.Count >= 8
+                    || (Original ? DesktopFamily.FamilyNameBox.CurrentText.Length == 0
+                        : (FamilyPanel != null && FamilyPanel.SecondName.CurrentText.Length == 0)))) return;
             if (index == -1)
             {
                 PrepareEdit(index);
@@ -764,12 +777,16 @@ namespace Simitone.Client.UI.Screens
             {
                 case UICASMode.SimEdit:
                     if ((Original ? DesktopCAS.NameBox.CurrentText : CASPanel.FirstNameTextBox.CurrentText).Length == 0) return;
-                    if (Original && DesktopCAS.Pool > 0)
+                    // AUD-17 F-6: the unspent-points confirm was Original-only —
+                    // the mobile panel tracks the same pool (Allowed − Total).
+                    var unspent = Original ? DesktopCAS.Pool > 0
+                        : (CASPanel != null && CASPanel.TotalPoints < CASPanel.AllowedPoints);
+                    if (unspent)
                     {
                         // Native TSOnCommand @0x2cd414..0x2cd464 asks before
                         // keeping a Sim with unspent personality points.
                         ShowConfirmation(GameFacade.Strings.GetString("130", "13"),
-                            GameFacade.Strings.GetString("130", "14", new[] { DesktopCAS.NameBox.CurrentText }),
+                            GameFacade.Strings.GetString("130", "14", new[] { Original ? DesktopCAS.NameBox.CurrentText : CASPanel.FirstNameTextBox.CurrentText }),
                             () => { AcceptMember(); SetMode(UICASMode.FamilyEdit); });
                         return;
                     }
@@ -971,8 +988,13 @@ namespace Simitone.Client.UI.Screens
                 }
                 var chosenBody = (int)DirectionUtils.PosMod(Math.Round(BodyPosition + 8), ActiveBodies.Count);
                 var chosenHead = (int)DirectionUtils.PosMod(Math.Round(HeadPosition + 8), ActiveHeads.Count);
-                SetBody(VitaPreview, chosenBody);
-                SetHead(VitaPreview, chosenHead);
+                // AUD-17 F-3: SetBody/SetHead ran EVERY frame (~120 outfit
+                // allocations/sec + triple appearance rebuild) for a state that
+                // only changes on spinner clicks — reassign only on change.
+                // AUD-17 F-5: an empty collection (partial/corrupt install)
+                // made PosMod(x,0)=NaN -> invalid index; keep the last outfit.
+                if (chosenBody != _lastVitaBody && ActiveBodies.Count > 0) { SetBody(VitaPreview, chosenBody); _lastVitaBody = chosenBody; }
+                if (chosenHead != _lastVitaHead && ActiveHeads.Count > 0) { SetHead(VitaPreview, chosenHead); _lastVitaHead = chosenHead; }
                 // VisualPosition is tile XY/height Z; VitaWorldPos is renderer
                 // world XYZ. Invert WorldSpace.GetWorldFromTile's axis/scale map.
                 VitaPreview.VisualPosition = new Vector3(VitaWorldPos.X, VitaWorldPos.Z, VitaWorldPos.Y)
@@ -1105,6 +1127,14 @@ namespace Simitone.Client.UI.Screens
         /// R143: the original Create-A-Family member slots - 85x105 cells,
         /// portrait at (15,10), name at the slot bottom (engine law §4.3).
         /// </summary>
+        // AUD-17 F-7: slot-portrait memo — every refresh used to re-render
+        // ALL slots (3 renders + 3 synchronous GPU readbacks per member);
+        // now only members whose representative's head outfit changed
+        // regenerate. Portraits dispose their own texture on removal, so
+        // eviction rides the slot clear.
+        private readonly UIOriginalPersonPortrait[] _slotPortraits = new UIOriginalPersonPortrait[8];
+        private readonly string[] _slotPortraitKeys = new string[8];
+
         public void UpdateFamilySlots()
         {
             if (!Original) return;
@@ -1113,15 +1143,27 @@ namespace Simitone.Client.UI.Screens
             for (int i = 0; i < 8; i++)
             {
                 var slot = DesktopFamily.Slots[i];
-                foreach (var child in slot.GetChildren().ToList()) slot.Remove(child);
+                var rep = (i < RepresentFamily.Count) ? RepresentFamily[i] : null;
+                var key = rep?.HeadOutfit?.OftData?.TS1AppearanceID + ":" + rep?.HeadOutfit?.OftData?.TS1TextureID;
+                if (_slotPortraits[i] != null && _slotPortraitKeys[i] != key) _slotPortraits[i] = null; // stale — cleared below
+                if (i >= WIPFamily.Count) _slotPortraits[i] = null; // hidden slot — the clear below disposes it
+                var keep = (i < WIPFamily.Count) ? _slotPortraits[i] : null;
+                foreach (var child in slot.GetChildren().ToList())
+                    if (child != keep) slot.Remove(child); // removing the memo would dispose its texture
                 slot.Visible = i < WIPFamily.Count;
-                if (i >= WIPFamily.Count) continue;
+                if (keep == null) continue;
                 var data = WIPFamily[i];
                 // WIP representatives use a generic object resource: its saved BMP
                 // belongs to the template Sim, so render the edited head instead.
-                var portrait = UIOriginalPersonPortrait.Create(RepresentFamily[i], false);
+                if (_slotPortraits[i] == null)
+                {
+                    _slotPortraits[i] = UIOriginalPersonPortrait.Create(rep, false);
+                    _slotPortraitKeys[i] = key;
+                }
+                var portrait = _slotPortraits[i];
                 portrait.Position = new Vector2(15, 10);
-                slot.Add(portrait);
+                if (!(portrait.Parent != null && portrait.Parent.GetChildren().Contains(portrait)))
+                    slot.Add(portrait);
                 if (font != null)
                     slot.Add(new UIOriginalFamilyCaption(data.Name, font));
             }
