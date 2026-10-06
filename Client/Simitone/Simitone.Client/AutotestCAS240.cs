@@ -184,7 +184,7 @@ namespace Simitone.Client
                 field.CurrentText="O'Name";
                 require(field.CurrentText=="O'Name","programmatic-text-remains-unchanged");
             }
-            catch(Exception e) { failures.Add(e.GetType().Name+": "+e.Message); }
+            catch(Exception e) { failures.Add(e.GetType().Name+": "+e.Message+" @"+string.Join(" | ",e.StackTrace.Split('\n').Take(8).Select(l=>l.Trim()))); }
             finally
             {
                 input.InputManager.SetFocus(null);

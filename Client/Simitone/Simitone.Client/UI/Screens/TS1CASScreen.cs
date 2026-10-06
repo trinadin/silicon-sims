@@ -1143,15 +1143,17 @@ namespace Simitone.Client.UI.Screens
             for (int i = 0; i < 8; i++)
             {
                 var slot = DesktopFamily.Slots[i];
+                var visible = i < WIPFamily.Count;
                 var rep = (i < RepresentFamily.Count) ? RepresentFamily[i] : null;
                 var key = rep?.HeadOutfit?.OftData?.TS1AppearanceID + ":" + rep?.HeadOutfit?.OftData?.TS1TextureID;
-                if (_slotPortraits[i] != null && _slotPortraitKeys[i] != key) _slotPortraits[i] = null; // stale — cleared below
-                if (i >= WIPFamily.Count) _slotPortraits[i] = null; // hidden slot — the clear below disposes it
-                var keep = (i < WIPFamily.Count) ? _slotPortraits[i] : null;
+                // memo hit? (visible slot, memo present, key unchanged)
+                var memo = visible && _slotPortraits[i] != null && _slotPortraitKeys[i] == key
+                    ? _slotPortraits[i] : null;
+                if (memo == null) _slotPortraits[i] = null; // stale/hidden — detach below
                 foreach (var child in slot.GetChildren().ToList())
-                    if (child != keep) slot.Remove(child); // removing the memo would dispose its texture
-                slot.Visible = i < WIPFamily.Count;
-                if (keep == null) continue;
+                    if (child != memo) slot.Remove(child); // removing a memoed portrait would dispose its texture
+                slot.Visible = visible;
+                if (!visible || rep == null) continue;
                 var data = WIPFamily[i];
                 // WIP representatives use a generic object resource: its saved BMP
                 // belongs to the template Sim, so render the edited head instead.

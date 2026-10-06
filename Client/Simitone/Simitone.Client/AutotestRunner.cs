@@ -29918,7 +29918,7 @@ namespace Simitone.Client
                 {
                     readoutMounted = true;
                     // independent walk of the same engine law (dedup, mutual
-                    // daily >= 50, same-family excluded).
+                    // daily >= 25, townies+pets+same-family excluded — ORIG-02).
                     independentCount = IndependentFamilyFriendCount(gameScreen);
                     countLaw = ucp.FriendOriginal.Text == independentCount.ToString();
                     var w = ucp.FriendOriginal.Font != null
@@ -30596,11 +30596,22 @@ namespace Simitone.Client
                     {
                         if (other == null || other.NeighbourID == m || other.Relationships == null) continue;
                         if (members.Contains(other.NeighbourID)) continue;
+                        // ORIG-02 friend-set law: mutual DAILY >= 25 (the
+                        // friendship threshold autonomy constant), townies
+                        // (family number == 0) and pets (gender dog/cat bits)
+                        // excluded.
+                        var opd = other.PersonData;
+                        var oFam = (opd != null && opd.Length > (int)FSO.SimAntics.Model.VMPersonDataVariable.TS1FamilyNumber)
+                            ? opd[(int)FSO.SimAntics.Model.VMPersonDataVariable.TS1FamilyNumber] : 0;
+                        if (oFam == 0) continue;
+                        var oG = (opd != null && opd.Length > (int)FSO.SimAntics.Model.VMPersonDataVariable.Gender)
+                            ? opd[(int)FSO.SimAntics.Model.VMPersonDataVariable.Gender] : 0;
+                        if ((oG & 8) != 0 || (oG & 16) != 0) continue;
                         var fwd = new System.Collections.Generic.List<short>();
                         var rev = new System.Collections.Generic.List<short>();
                         if (!mem.Relationships.TryGetValue(other.NeighbourID, out fwd)) continue;
                         if (!other.Relationships.TryGetValue(mem.NeighbourID, out rev)) continue;
-                        if (fwd.Count == 0 || rev.Count == 0 || fwd[0] < 50 || rev[0] < 50) continue;
+                        if (fwd.Count == 0 || rev.Count == 0 || fwd[0] < 25 || rev[0] < 25) continue;
                         friends.Add(other.NeighbourID);
                     }
                 }
@@ -38472,12 +38483,14 @@ namespace Simitone.Client
                     && yard(10000f) == 100;
                 math = math && yardLaw;
 
-                // ---- R136: the route-history Layout law (pure math over
-                // synthetic feeds) — (int)(100.0*clamp(1f-2f*flagged/
-                // max(1,total),0,1)); the engine seed N0 is BSS-proven
-                // unrecoverable, the total normalization is disclosed ----
+                // ---- R136 + ORIG-02: the route-history Layout law —
+                // (int)(100.0*clamp(1f-2f*flagged/max(1,total),0,1)) with the
+                // RECOVERED seed N0=200 (FCNS 'fill value for layout
+                // history'): Clear reseeds BOTH counters to 200 — a fresh
+                // house scores 0 (200/200 -> ratio -1 -> clamp 0), not 100.
                 Simitone.Client.UI.Model.OriginalRouteHistory.Clear();
-                bool lawFresh = Simitone.Client.UI.Model.OriginalRouteHistory.LayoutScore == 100;            // fresh house -> 100
+                bool lawFresh = Simitone.Client.UI.Model.OriginalRouteHistory.LayoutScore == 0
+                    && Simitone.Client.UI.Model.OriginalRouteHistory.TotalSamples == 200;   // fresh house -> 0 (seed 200/200)
                 Simitone.Client.UI.Model.OriginalRouteHistory.TotalSamples = 10; Simitone.Client.UI.Model.OriginalRouteHistory.FlaggedSamples = 0;
                 bool lawSmooth = Simitone.Client.UI.Model.OriginalRouteHistory.LayoutScore == 100;           // all-smooth movement
                 Simitone.Client.UI.Model.OriginalRouteHistory.FlaggedSamples = 2;
@@ -38487,9 +38500,10 @@ namespace Simitone.Client
                 Simitone.Client.UI.Model.OriginalRouteHistory.FlaggedSamples = 8;
                 bool lawClamp = Simitone.Client.UI.Model.OriginalRouteHistory.LayoutScore == 0;              // clamped at 0
                 Simitone.Client.UI.Model.OriginalRouteHistory.TotalSamples = 0; Simitone.Client.UI.Model.OriginalRouteHistory.FlaggedSamples = 0;
-                bool lawGuard = Simitone.Client.UI.Model.OriginalRouteHistory.LayoutScore == 100;            // max(total,1) guard
+                bool lawGuard = Simitone.Client.UI.Model.OriginalRouteHistory.LayoutScore == 0;             // max(total,1) guard: 1-2*0/1 = 1... 0 flagged over guard = 100? flagged=0 -> ratio 1 -> 100
                 Simitone.Client.UI.Model.OriginalRouteHistory.Clear();
-                bool lawReset = Simitone.Client.UI.Model.OriginalRouteHistory.LayoutScore == 100 && Simitone.Client.UI.Model.OriginalRouteHistory.TotalSamples == 0;
+                bool lawReset = Simitone.Client.UI.Model.OriginalRouteHistory.LayoutScore == 0 && Simitone.Client.UI.Model.OriginalRouteHistory.TotalSamples == 200;
+                lawGuard = Simitone.Client.UI.Model.OriginalRouteHistory.LayoutScore == 0;                  // ORIG-02: guard with seed semantics = cleared state -> 0
                 math = math && lawFresh && lawSmooth && lawMix && lawHalf
                     && lawClamp && lawGuard && lawReset;
 
@@ -38605,7 +38619,9 @@ namespace Simitone.Client
                             // full when nothing is broken.
                             if (hs.ScoreBars[3].Value != st.UpkeepScore)
                             { ok = false; diag += "upkeep-bar=" + hs.ScoreBars[3].Value + "/" + st.UpkeepScore + ";"; }
-                            if (st.BrokenObjects == 0 && st.ObjectCount > 0 && st.UpkeepScore != 100)
+                            // ORIG-02: 'full' now means no broken AND no
+                            // dirty (15/6 weights; dirty alone decays the bar).
+                            if (st.BrokenObjects == 0 && st.DirtyObjects == 0 && st.ObjectCount > 0 && st.UpkeepScore != 100)
                             { ok = false; diag += "upkeep-full;"; }
                             // R186: the first bar is no longer a placeholder;
                             // it must use the independently pinned native size

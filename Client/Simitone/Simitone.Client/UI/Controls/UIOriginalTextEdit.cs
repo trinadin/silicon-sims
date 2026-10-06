@@ -148,7 +148,9 @@ namespace Simitone.Client.UI.Controls
             // ORIG-02 G-6: anchor the macOS IME/accent candidate window to
             // the caret (SDL_SetTextInputRect; the dylib exports it, the
             // MonoGame binding doesn't). Local caret rect -> window points.
-            if (IsFocused && state.WindowFocused)
+            // (Lines can be empty before the first layout — CaretLine would
+            // return -1; skip the anchor until layout exists.)
+            if (IsFocused && state.WindowFocused && Lines.Count > 0)
             {
                 int line = CaretLine(Caret);
                 float sx = Math.Min(EditorWidth - 1, HorizontalInset + WidthBetween(Lines[line].Start, Caret));
