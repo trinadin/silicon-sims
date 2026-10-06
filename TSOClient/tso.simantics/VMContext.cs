@@ -725,7 +725,9 @@ namespace FSO.SimAntics
             //        (provider+0x14 = 0.0 read from the binary), NOT 0]
             //   score = clamp(wall + obj + t1 + t2 + t3, -100, +100)
             // with wall = min(half,60)−30, obj = room108·40−20, t2 =
-            // room84·10/clamp(half,10,45); room60 = 2x window-pattern walls,
+            // room80·10/clamp(half,10,45) (the corpus names the numerator room80;
+            // the port bridges it with the entity count — the disclosed R231
+            // approximation; the old 'room84' label was stale); room60 = 2x window-pattern walls,
             // window/door pattern code sets {1,7,8,9} / {3,5,6,15,23}; the score
             // stores to room[104]. DISCLOSED approximations that REMAIN: the
             // room84-bridge numerator = the room's entity count (the R231
@@ -779,12 +781,14 @@ namespace FSO.SimAntics
         private const float RoomScoreK_DivMax = 45f;
         private const float RoomScoreK_T2Scale = 10f;
         // (ENG-24) recalibrated against the House07 fixture UNDER THE CORRECTED
-        // law (the 2.05 fit had absorbed the t1/t3 misdecodes — AUD-16 F3): the
-        // engine room scores 8 at 2.05 and 50.4 at 3.11; the original stores 50
-        // (float->short truncation of 50.222). Same disclosure class as before:
-        // the native value is the runtime light-computed phase-1 stat, not
-        // statically recoverable; 3.11 is the corrected-law fit.
-        private const float RoomScoreK_Room108 = 3.11f;
+        // law (the 2.05 fit had absorbed the t1/t3 misdecodes — AUD-16 F3). True
+        // engine values: the fixture room scores 8.58 (→8) at 2.05 and 50.5 at
+        // K=3.098; the original stores 50 (float->short truncation of 50.222).
+        // K is set MID-BAND: score==50 requires K ∈ [3.0853, 3.1103) (one entity
+        // drifting into the room at refresh shifts t2 by ~0.35 — review P3-2);
+        // 3.098 sits centered. Same disclosure class as before: the native value
+        // is the runtime light-computed phase-1 stat, not statically recoverable.
+        private const float RoomScoreK_Room108 = 3.098f;
 
         // (R227/r134) the original's wall-segment style/pattern code sets:
         // window-ish {1,7,8,9}, door-ish {3,5,6,15,23}.
@@ -839,6 +843,10 @@ namespace FSO.SimAntics
             var room60 = 2 * windows;
             // (ENG-24, AUD-16 F1) t1 divides by tile56 UNHALVED — the native's
             // fdivs reads the room's +0x3c (the weighted tile count), unguarded.
+            // Degenerate note (review P3-1): tile56==0 also implies windows==0,
+            // so the pathological case is 0f/0 = NaN, not ±Infinity; NaN flows
+            // through Min/Max and (short)NaN is 0 on mainstream targets — benign,
+            // and unreachable for any real room (each matching tile adds >= 1).
             var t1 = ((float)room60 / tile56) * RoomScoreK_RatioScale + RoomScoreK_RatioBase;
             var f8 = Math.Max(RoomScoreK_DivMin, Math.Min(RoomScoreK_DivMax, half));
             var t2 = entities > 0 ? (entities * RoomScoreK_T2Scale) / f8 : 0f;

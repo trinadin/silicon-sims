@@ -422,9 +422,12 @@ namespace FSO.SimAntics.Primitives
         /// 2/3 = dogs, 4/5 = cats (the EditPerson PersonGender string table
         /// {"male","female","dogmale","dogfemale","catmale","catfemale"}).
         /// The PORT stores its own sex bit (1=female) and species bits (8/16) in the same
-        /// word (SimitoneNeighbourGenerator pd[65]; VMAvatar.IsPet/IsDog/IsCat), so a port
-        /// female (1) would land in the native's special/NPC class and lose autonomy
-        /// (Append demands 0x400: 481/487 house-5 entries die — the R249 funnel).
+        /// word (SimitoneNeighbourGenerator pd[65]; VMAvatar.IsPet/IsDog/IsCat). AUD-16
+        /// P2-2 CORRECTION: the earlier claim that a port female (1) "would land in the
+        /// special/NPC class and lose autonomy (Append demands 0x400)" was WRONG —
+        /// word-65 = 1 sets neither gate bit, so class 1 demands neither mask and flows
+        /// through the class-0 gates; the adapter still maps all humans to 0 (the
+        /// native runtime default for created residents).
         /// This adapter derives the native class from the port's stored identity so the
         /// decoded gates consume native-semantic data without rewriting the stored word
         /// (GetPersonSuitTS1 still reads it as the port sex bit).
