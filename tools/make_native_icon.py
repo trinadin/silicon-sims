@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """R156: generate the NATIVE app icon (the plumbob) for the macOS bundle.
 
-The original game ships no standalone high-res plumbob asset (the Complete
-Collection boot art is the Makin' Magic purple variant; the 70x52 logo
-stamps are RLE8 wordmarks), so the icon is drawn programmatically as the
-game's own symbol — the green mood-crystal octahedron — at every iconset
-size with 4x supersampling (crisp at 16px through 1024px). No proprietary
-bytes are read or committed; the .icns is generated at PACK time by
-packmac.sh and lands in build/NativeIcon.icns (gitignored).
+The original game ships no standalone plumbob asset (the discs' boot art is
+wordmark-only; the in-game crystal is a 3D mesh), so the icon is drawn
+programmatically as the game's own symbol. v2 (2026-10-06, user directive
+"restore the original app icon"): the flat-facet v1 read as synthetic — this
+version shades the octahedron the way the classic artwork did: a vertical
+green gradient, four facet lights from the upper left, a specular streak on
+the upper-left face, and darkened facet seams. Still no proprietary bytes
+are read or committed; the .icns is generated at PACK time by packmac.sh
+into build/NativeIcon.icns (gitignored).
 
 Usage: python3 tools/make_native_icon.py [--out build/NativeIcon.icns]
 """
@@ -17,17 +19,59 @@ import subprocess
 import sys
 import zlib
 
-# classic plumbob facet greens (light source upper-left)
-FACET_TL = (0x8B, 0xE0, 0x4F)   # light
-FACET_TR = (0x4E, 0xBE, 0x3B)   # mid
-FACET_BL = (0x3E, 0xA1, 0x2F)   # dark-mid
-FACET_BR = (0x2A, 0x7E, 0x22)   # dark
-
 SIZES = [16, 32, 64, 128, 256, 512, 1024]
 
+# vertical gradient stops (top vertex -> waist -> bottom vertex)
+GRAD_TOP = (0xDA, 0xF2, 0x78)   # bright yellow-green
+GRAD_MID = (0x53, 0xC2, 0x3C)   # vivid green at the waist
+GRAD_BOT = (0x17, 0x5E, 0x12)   # deep green
 
-def fill_tri(buf, S, p0, p1, p2, color):
-    """Scanline-fill a triangle into an RGBA byte buffer (4*S*S)."""
+# per-facet light multipliers (light from upper-left, classic 4-face look)
+LIGHT_TL = 1.00
+LIGHT_TR = 0.72
+LIGHT_BL = 0.86
+LIGHT_BR = 0.48
+
+SEAM_DARK = 0.62     # facet seam darkening
+SPEC_ADD = 95        # specular streak white addition (TL facet)
+
+
+def grad(u):
+    """Base gradient color at vertical position u (0 top, 1 bottom)."""
+    if u < 0.52:
+        t = u / 0.52
+        a, b = GRAD_TOP, GRAD_MID
+    else:
+        t = (u - 0.52) / 0.48
+        a, b = GRAD_MID, GRAD_BOT
+    return tuple(a[i] + (b[i] - a[i]) * t for i in range(3))
+
+
+def shade_pixel(S, x, y, facet):
+    """Color for one supersample pixel of the crystal."""
+    u = y / S
+    r, g, b = grad(u)
+    light = {0: LIGHT_TL, 1: LIGHT_TR, 2: LIGHT_BL, 3: LIGHT_BR}[facet]
+    r, g, b = r * light, g * light, b * light
+    # specular highlight on the upper-left facet: one compact soft-edged
+    # spot (gaussian in x and y) near the upper third — reads as a glint,
+    # not a stripe
+    if facet == 0:
+        gx = x / S - 0.355
+        gy = u - 0.14
+        s = SPEC_ADD * pow(2.718281828, -((gx * gx) / 0.0016 + (gy * gy) / 0.0022))
+        r, g, b = r + s, g + s, b + s
+    # facet seams: darken a thin band along the vertical centerline and the
+    # horizontal waist so the four faces read as cut crystal
+    if abs(x / S - 0.5) < 1.5 / S:
+        r, g, b = r * SEAM_DARK, g * SEAM_DARK, b * SEAM_DARK
+    if abs(u - 0.52) < 1.5 / S and x / S > 0.28 and x / S < 0.72:
+        r, g, b = r * SEAM_DARK, g * SEAM_DARK, b * SEAM_DARK
+    return (min(255, r), min(255, g), min(255, b))
+
+
+def fill_tri(buf, S, p0, p1, p2, facet):
+    """Scanline-fill a triangle with per-pixel shading."""
     ys = sorted((p0[1], p1[1], p2[1]))
     y_start, y_end = max(0, int(ys[0])), min(S - 1, int(ys[-1]))
     for y in range(y_start, y_end + 1):
@@ -47,9 +91,10 @@ def fill_tri(buf, S, p0, p1, p2, color):
         row = y * S
         for x in range(x_start, x_end + 1):
             o = (row + x) * 4
-            buf[o] = color[0]
-            buf[o + 1] = color[1]
-            buf[o + 2] = color[2]
+            r, g, b = shade_pixel(S, x, y, facet)
+            buf[o] = int(r)
+            buf[o + 1] = int(g)
+            buf[o + 2] = int(b)
             buf[o + 3] = 255
 
 
@@ -79,10 +124,10 @@ def render(size):
     bottom = (0.5, 0.985)
     def P(u):
         return (u[0] * big, u[1] * big)
-    fill_tri(buf, big, P(top), P(left), P((0.5, 0.52)), FACET_TL)
-    fill_tri(buf, big, P(top), P((0.5, 0.52)), P(right), FACET_TR)
-    fill_tri(buf, big, P(left), P(bottom), P((0.5, 0.52)), FACET_BL)
-    fill_tri(buf, big, P((0.5, 0.52)), P(bottom), P(right), FACET_BR)
+    fill_tri(buf, big, P(top), P(left), P((0.5, 0.52)), 0)   # TL
+    fill_tri(buf, big, P(top), P((0.5, 0.52)), P(right), 1)  # TR
+    fill_tri(buf, big, P(left), P(bottom), P((0.5, 0.52)), 2)  # BL
+    fill_tri(buf, big, P((0.5, 0.52)), P(bottom), P(right), 3)  # BR
     # downsample (box) with alpha-weighted color
     out = bytearray(4 * size * size)
     for y in range(size):

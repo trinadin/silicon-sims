@@ -46,22 +46,28 @@ namespace Simitone.Windows
 
             string userDir;
             var myDocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            // 2026-10-06 debrand: the user data folder is "The Sims" now — an
+            // existing "Simitone" folder from earlier builds keeps being used
+            // (saves/config continuity); fresh installs get the new name.
+            string BrandDir(string parent) =>
+                Directory.Exists(Path.Combine(parent, "Simitone")) ? "Simitone" : "The Sims";
             if (!string.IsNullOrEmpty(myDocs))
             {
-                userDir = Path.Combine(myDocs, "Simitone/");
+                userDir = Path.Combine(myDocs, BrandDir(myDocs) + "/");
             }
             else
             {
-                // fallback for Linux: use ~/.local/share/Simitone or ~/Simitone
+                // fallback for Linux: use ~/.local/share/<brand> or ~/<brand>
                 var localShare = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 if (!string.IsNullOrEmpty(localShare))
                 {
-                    userDir = Path.Combine(localShare, "Simitone/");
+                    userDir = Path.Combine(localShare, BrandDir(localShare) + "/");
                 }
                 else
                 {
-                    // fallback to home if nothing else ~/Simitone
-                    userDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Simitone/");
+                    // fallback to home if nothing else
+                    var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    userDir = Path.Combine(home, BrandDir(home) + "/");
                 }
             }
             // Explicit test-only isolation must precede GlobalSettings.Default.
@@ -78,7 +84,7 @@ namespace Simitone.Windows
             FSOEnvironment.UserDir = userDir;
             // Byte-level diagnostics to /tmp (userDir can resolve differently between launch
             // modes; /tmp is always readable from the harness).
-            try { File.AppendAllText(Path.Combine(Path.GetTempPath(), "simitone_diag.log"),
+            try { File.AppendAllText(Path.Combine(Path.GetTempPath(), "thesims_diag.log"),
                 DateTime.Now.ToString("HH:mm:ss.fff") + " boot args=[" + string.Join(" | ", args) + "] userdir=" + userDir + Environment.NewLine); } catch {}
             try
             {
@@ -89,7 +95,7 @@ namespace Simitone.Windows
                 if (testDirIndex >= 0) throw;
                 // macOS sandbox / read-only Documents: fall back to the application bundle directory.
                 Console.WriteLine("Warning: could not create user data directory '" + userDir + "'. Using the application directory instead.");
-                userDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Simitone/").Replace('\\', '/');
+                userDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "The Sims/").Replace('\\', '/');
                 Directory.CreateDirectory(userDir);
                 FSOEnvironment.UserDir = userDir;
             }
@@ -522,7 +528,7 @@ namespace Simitone.Windows
             {
                 try
                 {
-                    var file = Path.Combine(dir, "simitone-crash.log");
+                    var file = Path.Combine(dir, "thesims-crash.log");
                     File.AppendAllText(file, DateTime.Now.ToString("s") + " " + message + Environment.NewLine);
                 }
                 catch

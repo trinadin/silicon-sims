@@ -15,18 +15,18 @@ string libDir = Path.Combine(baseDir, "lib");
 // Determine the target executable name based on platform.
 // AUD-17 G-8: the non-Windows binary was renamed to TheSims (R156) — the
 // launcher still looked for "Simitone" and always failed on macOS/Linux.
-string targetExeName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Simitone.exe" : "TheSims";
+string targetExeName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "TheSims.exe" : "TheSims";
 string targetExePath = Path.Combine(libDir, targetExeName);
 
 // Verify the target executable exists
 if (!File.Exists(targetExePath))
 {
-    string message = $"Error: Cannot find Simitone executable.\nExpected location: {targetExePath}\n\nPlease ensure the 'lib' folder exists and contains the game files.";
-    
+    string message = $"Error: Cannot find The Sims executable.\nExpected location: {targetExePath}\n\nPlease ensure the 'lib' folder exists and contains the game files.";
+
     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     {
         // On Windows, show a message box since we're a WinExe (no console)
-        ShowWindowsMessageBox(message, "Simitone Launcher Error");
+        ShowWindowsMessageBox(message, "The Sims Launcher Error");
     }
     else
     {
@@ -55,11 +55,11 @@ try
 }
 catch (Exception ex)
 {
-    string message = $"Error: Failed to launch Simitone.\n{ex.Message}";
-    
+    string message = $"Error: Failed to launch The Sims.\n{ex.Message}";
+
     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     {
-        ShowWindowsMessageBox(message, "Simitone Launcher Error");
+        ShowWindowsMessageBox(message, "The Sims Launcher Error");
     }
     else
     {
