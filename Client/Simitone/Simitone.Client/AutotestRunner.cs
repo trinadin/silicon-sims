@@ -11066,6 +11066,19 @@ namespace Simitone.Client
                                             " shadowNoObj=" + shadow.ToString("F2") +
                                             " amb=" + amb + " olt=" + olt + " ents=" + r84 +
                                             " r60=" + r60 + " winPat=" + winPat + " doorPat=" + doorPat);
+                                        // (ENG-24) the CORRECTED-law solve: t1' = (r60/tile56
+                                        // unhalved)·40−40; t3' = winPat==0 ? −40 :
+                                        // (doorPat/winPat)·40−40. For House07's engine room the
+                                        // stored original is 50.222 — the room108 the corrected law
+                                        // implies is (50.222 − wall − t1' − t2' − t3' + 20) / 40.
+                                        double t1c = ((double)r60 / kv.Value) * 40 - 40;
+                                        double t3c = winPat == 0 ? -40 : ((double)doorPat / winPat) * 40 - 40;
+                                        double solved108 = (50.222 - wallTerm - t1c - t2 - t3c + 20) / 40;
+                                        Log("AUTOTEST roomlaw-solve24 room=" + engineRoom +
+                                            " tile56=" + kv.Value + " half=" + half +
+                                            " t1c=" + t1c.ToString("F2") + " t3c=" + t3c.ToString("F2") +
+                                            " t2=" + t2.ToString("F2") + " winPat=" + winPat + " doorPat=" + doorPat +
+                                            " impliedRoom108=" + solved108.ToString("F3"));
                                     }
                                 }
                             }
@@ -11104,8 +11117,22 @@ namespace Simitone.Client
                                 // which the original's own float->short storage truncates to 50.
                                 var rm = _vm.Context.GetRoomAt(_avatars[0].Position);
                                 var sc = _vm.Context.GetRoomScore(rm);
-                                Log("AUTOTEST roomlaw pin house7 avatar0 room=" + rm + " score=" + sc + " (stored original 50.222 -> 50)");
-                                pass = sc == 50;
+                                // (ENG-24) the second pin: room 4 is entity-free
+                                // (deterministic) and 7win/3door — under the corrected
+                                // t3 (doors/windows) its t3 is −22.9, and the corrected
+                                // t1 (÷tile56) pulls it down; with room108=3.11 it clamps
+                                // at 100 — under the OLD (misdecoded) law it scored 100
+                                // too, but the fixture below only reproduced 50 under
+                                // BOTH laws with DIFFERENT room108 (2.05 old / 3.11
+                                // corrected): the pair pins the corrected calibration.
+                                // Room 2 (windowless, the −40-skip marker) is logged
+                                // informationally — its score drifts with live entity
+                                // positions (t2 numerator), so it is not pinned.
+                                var sc4 = _vm.Context.GetRoomScore(4);
+                                var sc2 = _vm.Context.GetRoomScore(2);
+                                Log("AUTOTEST roomlaw pin house7 avatar0 room=" + rm + " score=" + sc + " (stored original 50.222 -> 50; ENG-24 corrected law + room108=3.11)"
+                                    + " room4=" + sc4 + " (entity-free, clamp-100 marker) room2=" + sc2 + " (windowless −40-skip marker, live-drifting)");
+                                pass = sc == 50 && sc4 == 100;
                             }
                             else if (house == "5")
                             {
