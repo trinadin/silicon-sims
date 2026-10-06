@@ -1498,7 +1498,9 @@ namespace Simitone.Client.UI.Panels
         // DISCLOSED port hover-fade duration — no engine decode backs it
         // (cWinLotBtn's hover law decodes COLORS at 0x25d6b4, r143; the ramp
         // timing is unrecovered). Formerly misnamed "Native".
-        public const float HoverRampSeconds = 0.300f;
+        // ORIG-02 ui33: cWinLotBtn::Hilite 0x2d2690 — one-shot 9% blend
+        // (literal pool {1.0, 0.09, 255.0}); no ramp, no timer.
+        public const float NativeHoverBlend = 0.09f;
         // cWinLotBtn's zero-delay shared cWinLotPopup hooks.
         public Action<int, UINeighborhoodHouseButton, UpdateState> HoverNotify;
         public Action HoverLeave;
@@ -1582,9 +1584,10 @@ namespace Simitone.Client.UI.Panels
         public override void Update(UpdateState state)
         {
             base.Update(state);
-            float step = (float)(state.Time.ElapsedGameTime.TotalSeconds / HoverRampSeconds);
-            if (Hovered) AlphaTime = Math.Min(1f, AlphaTime + step);
-            else AlphaTime = Math.Max(0f, AlphaTime - step);
+            // ORIG-02 ui33 law (cWinLotBtn::Hilite 0x2d2690): the native has
+            // NO ramp and NO timer — Hilite is a ONE-SHOT 9% blend on hover
+            // enter. The old 300ms ramp was the port's unsourced guess.
+            AlphaTime = Hovered ? NativeHoverBlend : 0f;
         }
 
         public override void Draw(UISpriteBatch batch)

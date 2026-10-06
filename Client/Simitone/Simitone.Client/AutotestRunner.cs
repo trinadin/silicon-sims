@@ -22941,11 +22941,10 @@ namespace Simitone.Client
                         == Simitone.Client.UI.Panels.UIOriginalLotPopup.NativeTextColor * 0.5f);
                 popupProbe.SetRampOpacity(0f);
                 int transparentPopupPixels = RenderElementAlphaPixels(popupProbe);
-                // HoverRampSeconds (formerly "Native") is a DISCLOSED port
-                // value — the engine decode covers hover colors, not the ramp
-                // timing; this pin guards the disclosed choice against silent
-                // drift, it does not certify a native law.
-                bool popupRamp = Simitone.Client.UI.Panels.UINeighborhoodHouseButton.HoverRampSeconds == 0.300f
+                // ORIG-02 ui33 law: cWinLotBtn::Hilite 0x2d2690 is a
+                // ONE-SHOT 9% blend (pool {1.0, 0.09, 255.0}) — no native
+                // ramp exists; the old 300ms ramp was the port's guess.
+                bool popupRamp = Simitone.Client.UI.Panels.UINeighborhoodHouseButton.NativeHoverBlend == 0.09f
                     && opaquePopupPixels > 0 && halfRamp && transparentPopupPixels == 0;
                 popupProbe.SetRampOpacity(1f);
                 string popupGeomInfo = " tiler=" + (popupProbe.Tiler == null ? "null" : popupProbe.Tiler.Width + "x" + popupProbe.Tiler.Height)

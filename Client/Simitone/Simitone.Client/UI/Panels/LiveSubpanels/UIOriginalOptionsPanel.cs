@@ -145,6 +145,21 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
         private class MainDef
         {
             public int Cap, Pos; public string Member; public Texture2D Tex; public Action Act;
+            public Func<bool> Disabled; // ORIG-02: native save-disable law
+        }
+
+        // ORIG-02 community-buildbuy law (cDDDSimsView/Neighborhood::GetZoningType
+        // 0xaaa20): Save is disabled on community lots (zoning == 2) and lots
+        // 93-99 (downtown/visitor).
+        private bool CommunityNoSave()
+        {
+            try
+            {
+                var lot = Game?.vm?.GetGlobalValue(10) ?? 0;
+                if (lot >= 93 && lot <= 99) return true;
+                return FSO.Content.Content.Get().Neighborhood.GetZoningType((short)lot) == 2;
+            }
+            catch { return false; }
         }
 
         public UIOriginalOptionsPanel(TS1GameScreen game) : base(game)
@@ -238,7 +253,13 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             {
                 // canon pairing: even string i is the '(x;y)' position, odd i+1 its caption
                 new MainDef { Cap = 3,  Pos = 2,  Member = "cpanel\\Buttons\\OptSave.BMP",     Tex = _optSave,
-                              Act = () => Game.Save() },
+                              // ORIG-02 community-matrix law: the native disables
+                              // Save on community lots (zoning==2) and lots 93-99
+                              // (downtown/visitor) — the Save button greys out and
+                              // the click is inert. Vacant-house save-disable is
+                              // unreachable here (you cannot enter a vacant house).
+                              Act = () => { if (!CommunityNoSave()) Game.Save(); },
+                              Disabled = CommunityNoSave },
                 new MainDef { Cap = 1,  Pos = 0,  Member = "cpanel\\Buttons\\OptNbhd.bmp",     Tex = _optNbhd,
                               Act = () => Game.ReturnToNeighbourhood() },
                 new MainDef { Cap = 5,  Pos = 4,  Member = "cpanel\\Buttons\\OptExit.bmp",     Tex = _optExit,
@@ -273,6 +294,7 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                         Tooltip = info.Caption,
                     };
                     var act = d.Act;
+                    if (d.Disabled != null) btn.Disabled = d.Disabled(); // ORIG-02: native save-disable
                     btn.OnButtonClick += (b) => { act(); };
                     info.Btn = btn;
                     TrackMain(btn);
