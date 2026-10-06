@@ -193,8 +193,16 @@ namespace FSO.SimAntics.Entities
                 den += w;
             }
             var room = (double)Math.Max(-100, Math.Min(100, roomScore));
-            num += RoomWeight * room;
-            den += RoomWeight;
+            // ORIG-02: the Room weight is NOT flat — it is the same
+            // HappyWeightCurves table's entry 5 (builder index array
+            // {7,6,8,9,15,13,14} -> motive 13 = Room), i.e. the curve
+            // (-100;2) (0;1) (100;2): weight 2 at the extremes, 1 at zero.
+            // The old flat RoomWeight (r223's fit) is retired.
+            double roomW = 1.0;
+            if (curves != null && curves.Length > 5)
+                roomW = curves[5].GetPoint((float)room);
+            num += roomW * room;
+            den += roomW;
             if (den <= 0) return 0;
             return (short)(num / den);
         }

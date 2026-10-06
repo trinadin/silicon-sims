@@ -617,7 +617,10 @@ namespace FSO.SimAntics.Primitives
                 // Stratum >= 3 (and negative): ODD object ids (0x109c80-0x109c88).
                 if (stratum == 1)
                 {
-                    if (Distance(caller, obj) > 20.0f) continue;
+                    // ORIG-02: CFG+0x1c recovered = 7.0f STATIC (14 readers,
+                    // zero writers across the entire code section; the old
+                    // disclosed 20.0f was r249's placeholder).
+                    if (Distance(caller, obj) > 7.0f) continue;
                 }
                 else if (stratum == 2)
                 {
