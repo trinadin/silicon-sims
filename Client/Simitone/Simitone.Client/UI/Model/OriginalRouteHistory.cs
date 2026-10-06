@@ -151,6 +151,11 @@ namespace Simitone.Client.UI.Model
         {
             get
             {
+                // ORIG-02: the seed N0 is RECOVERED = 200 (FCNS 'fill value
+                // for layout history'; writer NeighborhoodConstants::
+                // UpdateConstants) — a fresh/cleared house carries
+                // flagged=200, total=200 -> ratio = 1-2 = -1 -> clamp 0:
+                // the native fresh-house LayoutScore is 0, not 100.
                 int total = TotalSamples;
                 if (total < 1) total = 1; // the engine's max(sum, 1) guard
                 float ratio = 1f - (2f * FlaggedSamples) / total;
@@ -160,11 +165,12 @@ namespace Simitone.Client.UI.Model
             }
         }
 
-        /// <summary>ClearRouteHistory — the renovation reset.</summary>
+        /// <summary>ClearRouteHistory — the renovation reset; ORIG-02: the
+        /// native reseeds BOTH counters to N0 = 200, not zero.</summary>
         public static void Clear()
         {
-            TotalSamples = 0;
-            FlaggedSamples = 0;
+            TotalSamples = 200;
+            FlaggedSamples = 200;
         }
 
         private static void Wire(FSO.SimAntics.VM vm)

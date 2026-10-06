@@ -66,7 +66,8 @@ namespace Simitone.Client.UI.Model
             // the dividend = B*Working + A*Broken when the constants decode.
             public int FurnishingsValue;   // stats+28: sum of indoor object prices
             public int YardValue;          // stats+32: sum of outdoor object prices
-            public int WorkingObjects;     // objects with RepairState < 600
+            public int WorkingObjects;     // objects with RepairState < 600 and == 0
+            public int DirtyObjects;       // RepairState 1..599 (the engine's dirty test)
             public int BrokenObjects;      // RepairState >= 600 (the engine's own
                                            // repair threshold, VMFindBestObjectForFunction)
             public bool HasPool;           // corpus: yard rating mentions the pool
@@ -91,22 +92,25 @@ namespace Simitone.Client.UI.Model
                 get { return ComputeFurnishingsScore(FurnishingsObjectValue, FurnishingsFixedValue); }
             }
 
-            // R135: the decoded UpkeepScore law — int(100.0f * clamp(dividend /
-            // 2^31, 0, 1)), guard objectCount != 0 (GetUpkeepScore 0x8bcd0 with
-            // the FS pool [TOC-23512] = file 0x5a2fb4: 0.0/1.0/100.0). The
-            // engine's dividend uses runtime-normalized weights (B = 2^31/N
-            // gives 100 when nothing is broken — the corpus's 'full as long as
-            // everything is in working order'); the broken-object relative
-            // weight A/B is BSS (runtime-only, proven r135). PORT-SIDE
-            // DISCLOSED choice: A = 0 (broken objects contribute nothing) —
-            // the r=0 case of the engine shape.
+            // R135 + ORIG-02: the UpkeepScore law — GetUpkeepScore 0x8bcd0
+            // with the recovered FCNS defaults ('upkeep penalty per broken
+            // object' = 15, 'per dirty object' = 6):
+            //   int(100 * clamp((count - penalty)/count, 0, 1)),
+            // penalty = 15*broken + 6*dirty. (Dirty = RepairState 1..599:
+            // the engine's dirty-vs-broken test; the old r=0 disclosed
+            // approximation is retired.)
             public int UpkeepScore
             {
                 get
                 {
-                    int n = WorkingObjects + BrokenObjects;
+                    int broken = BrokenObjects;
+                    int dirty = DirtyObjects;
+                    int n = WorkingObjects + broken + dirty;
                     if (n == 0) return 0;
-                    return (int)(100.0f * WorkingObjects / n);
+                    var ratio = (n - (15 * broken + 6 * dirty)) / (float)n;
+                    if (ratio < 0f) ratio = 0f;
+                    if (ratio > 1f) ratio = 1f;
+                    return (int)(100.0f * ratio);
                 }
             }
 
@@ -289,6 +293,7 @@ namespace Simitone.Client.UI.Model
                             try { repair = go.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.RepairState); }
                             catch { }
                             if (repair >= 600) res.BrokenObjects++;
+                            else if (repair > 0) res.DirtyObjects++; // ORIG-02: the engine's dirty test
                             else res.WorkingObjects++;
                         }
                     }
