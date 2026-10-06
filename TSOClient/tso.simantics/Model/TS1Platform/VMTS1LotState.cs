@@ -84,6 +84,30 @@ namespace FSO.SimAntics.Model.TS1Platform
             if (budgetDelta == 0) return;
             var cat = BudgetCat.MiscExpense;
             var income = budgetDelta > 0;
+            // ORIG-02 budget law (cSimulator::Spend — ledger[type] += amount
+            // at sim+0x184+4*type, NO remap; TryBudget validates byte 0..8):
+            // in TS1 the operand IS the native byte and the display rows bind
+            // 1->Job, 2->Misc income, 3->Food, 4->Bills, 5->Services,
+            // 6->Household, 7->Architecture, 0->Misc expenses; byte 8 is
+            // accepted but EXCLUDED from the report and all sums.
+            var raw = (int)type;
+            if (raw >= 0 && raw <= 8)
+            {
+                switch (raw)
+                {
+                    case 1: cat = BudgetCat.JobIncome; break;
+                    case 2: cat = BudgetCat.MiscIncome; break;
+                    case 3: cat = BudgetCat.FoodExpense; break;
+                    case 4: cat = BudgetCat.BillsExpense; break;
+                    case 5: cat = BudgetCat.ServiceExpense; break;
+                    case 6: cat = BudgetCat.HouseholdExpense; break;
+                    case 7: cat = BudgetCat.ArchitectureExpense; break;
+                    case 8: return; // accepted natively, excluded from the report
+                    default: cat = BudgetCat.MiscExpense; break; // 0
+                }
+                TodayReport[(int)cat] += Math.Abs(budgetDelta);
+                return;
+            }
             switch (type)
             {
                 case Primitives.VMTransferFundsExpenseType.IncomeJob:
