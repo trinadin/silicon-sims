@@ -1,3 +1,15 @@
+> **AUD-16 CORRECTION (2026-10-05, evidence/AUD-16/verdict-data.md F1/F2/F5):**
+> the t1 and t3 lines below were MISDECODED (register-tracking slips the
+> Ghidra decompiler exposed): native t1 = (room60 / **room56**)·40 − 40
+> (the weighted tile count, unhalved, unguarded — NOT room80), and native
+> t3 = (room96 == 0) ? **−40** : (**room100 / room96**)·40 − 40 (the ratio
+> is doors/windows with a −40 skip, NOT windows/doors with 0). Corrected in
+> the port by ENG-24 (room108 recalibrated 2.05 → 3.11 under the corrected
+> law). Also: the ENG-15 zoning citations "0x6cd2c/0x6ce8c" elsewhere are
+> RVA (image-relative) addresses, not file offsets (file = RVA + 0x8E90).
+> The remainder of this receipt (wall/obj/t2/clamp/outside terms, the
+> collector map, the fixtures) was decompiler-CONFIRMED.
+
 # R228 — the ComputeRoom law in CLOSED FORM (the six-round arc's specification deliverable)
 
 Assembled from the annotated disassembly (constants substituted from the

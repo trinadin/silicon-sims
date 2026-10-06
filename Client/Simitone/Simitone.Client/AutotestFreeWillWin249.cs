@@ -1270,7 +1270,15 @@ namespace Simitone.Client
             try
             {
                 var autonomyLevel = _subject.GetPersonData(VMPersonDataVariable.AutonomyLevel);
-                var gender = _subject.GetPersonData(VMPersonDataVariable.Gender);
+                // (ENG-25) the census consumes the NATIVE person-class word, not the
+                // raw port Gender (bit 1 = port female), so the gate mirror below is
+                // in native semantics (the NativeGenderClass adapter inlined — the
+                // engine's own is private: dogs 2/3, cats 4/5, humans 0).
+                var gRaw = _subject.GetPersonData(VMPersonDataVariable.Gender);
+                var gender = (gRaw & 8) != 0 ? (2 | (gRaw & 1))
+                    : (gRaw & 16) != 0 ? (4 | (gRaw & 1)) : 0;
+                var isChildCensus = _subject.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.PersonsAge) > 0
+                    && _subject.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.PersonsAge) < 0x12;
                 int objects = 0, withTtab = 0, entries = 0, wPos = 0, wAdmitted = 0,
                     f80 = 0, g1 = 0, g2 = 0, g3 = 0, flagged = 0;
                 var samples = new List<string>();
@@ -1289,9 +1297,12 @@ namespace Simitone.Client
                         if (autonomyLevel < weight) continue;
                         wAdmitted++;
                         if ((e.Flags & (TTABFlags)0x80) != 0) { f80++; continue; }
-                        if ((gender & 1) != 0 && (e.Flags & (TTABFlags)0x400) == 0) { g1++; continue; }
-                        if ((gender & 2) != 0 && (e.Flags & (TTABFlags)0x200) == 0) { g2++; continue; }
-                        if ((gender & 3) == 0 && (e.Flags & (TTABFlags)0x40) != 0) { g3++; continue; }
+                        // (ENG-25/AUD-16 P2-1) mirror the CORRECTED native gates: bit 0x2
+                        // (dog) requires 0x400, bit 0x4 (cat) requires 0x200; the 0x40
+                        // NoAdult block applies to non-children with the pet bits clear.
+                        if ((gender & 2) != 0 && (e.Flags & (TTABFlags)0x400) == 0) { g1++; continue; }
+                        if ((gender & 4) != 0 && (e.Flags & (TTABFlags)0x200) == 0) { g2++; continue; }
+                        if (!isChildCensus && (gender & 6) == 0 && (e.Flags & (TTABFlags)0x40) != 0) { g3++; continue; }
                         if ((e.Flags & (TTABFlags)0x01000000) != 0) flagged++;
                         if (samples.Count < 12)
                             samples.Add("obj" + obj.ObjectID + "#tta" + e.TTAIndex + "/act" + e.ActionFunction +
