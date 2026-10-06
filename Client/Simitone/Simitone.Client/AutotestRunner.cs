@@ -80,7 +80,7 @@ namespace Simitone.Client
             // candidate house ids, tried in order until one loads with >=1 avatar
             public static string HouseCandidates =
                 "5,4,3,2,1,0,6,7,8,9,10,11,21,22,23,24,25,26,27,28,29,30,40,41,42,43,44,45,46,47,48";
-            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall";
+            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall,webexport";
             public static int TimeoutMs = 300000; // hard cap (real ms)
             public static bool ExitOnDone = true;
         }
@@ -10218,6 +10218,7 @@ namespace Simitone.Client
             // R156 'uibrand': native branding — The Sims bundle identity,
             // plumbob icon, TheSims executable, The Sims window title.
             if (CheckEnabled("uibrand")) CheckNativeBranding();
+            if (CheckEnabled("webexport")) CheckWebExport();
             if (CheckEnabled("uiroof")) CheckRoofTools();
             if (CheckEnabled("uigauge")) CheckLiveGauge();
             // UIRATE (Round 132): the People-panel RATINGS family — the pie strips
@@ -29236,6 +29237,73 @@ namespace Simitone.Client
                 Log("AUTOTEST uiconv EXC " + se.GetType().Name + " " + se.Message
                     + (trace.Length > 0 ? " AT " + trace[0].Trim() : ""));
                 Fail("uiconv");
+            }
+        }
+
+        // ENG-27 'webexport': the at-save family web page — run the REAL
+        // exporter on the live lot, then census the output: family site pages,
+        // FamilyGFX renders, root pages, and ZERO residual tokens anywhere.
+        private static void CheckWebExport()
+        {
+            try
+            {
+                var game = GameFacade.Screens.CurrentUIScreen as TS1GameScreen;
+                if (game == null || game.vm == null || game.ActiveFamily == null)
+                { Fail("webexport"); return; }
+
+                var exportsBefore = Simitone.Client.UI.Model.OriginalWebExporter.Exports;
+                Simitone.Client.UI.Model.OriginalWebExporter.Export(game);
+                // The house capture lands on the NEXT DRAW — we are inside
+                // Update, so sleeping here would block the very frame we need.
+                // Defer the census onto the game timer (runs after several
+                // real update/draw cycles).
+                FSO.Common.Utils.GameThread.SetTimeout(() =>
+                {
+                    WebExportVerifyCensus(exportsBefore);
+                }, 3000);
+                return; // verdict is recorded by the deferred census
+            }
+            catch (Exception e)
+            {
+                Log("AUTOTEST webexport EXC " + e.GetType().Name + " " + e.Message);
+                Fail("webexport");
+            }
+        }
+
+        private static void WebExportVerifyCensus(int exportsBefore)
+        {
+            try
+            {
+                var game = GameFacade.Screens.CurrentUIScreen as TS1GameScreen;
+                var root = Path.Combine(FSOEnvironment.UserDir, "Web Pages");
+                bool ok = Simitone.Client.UI.Model.OriginalWebExporter.Exports > exportsBefore;
+                ok &= Simitone.Client.UI.Model.OriginalWebExporter.ExportFailures == 0;
+                ok &= Simitone.Client.UI.Model.OriginalWebExporter.UnresolvedTokens == 0;
+                ok &= File.Exists(Path.Combine(root, "main.html"));
+                ok &= File.Exists(Path.Combine(root, "addressbook.html"));
+                ok &= Directory.GetDirectories(root).Length > 0; // at least one family folder
+                var famDir = Directory.GetDirectories(root)[0];
+                ok &= File.Exists(Path.Combine(famDir, "familyhome.html"));
+                ok &= File.Exists(Path.Combine(famDir, "house.html"));
+                ok &= Directory.GetFiles(famDir, "familymember*.html").Length > 0;
+                ok &= Directory.GetFiles(Path.Combine(famDir, "FamilyGFX"), "family*_face.jpg").Length > 0;
+                // house-exterior is written by the async capture
+                ok &= File.Exists(Path.Combine(famDir, "FamilyGFX", "house-exterior.jpg"));
+                // no template token may survive anywhere
+                foreach (var f in Directory.GetFiles(root, "*.html", SearchOption.AllDirectories))
+                {
+                    if (File.ReadAllText(f).Contains("^^^^sims_")) { ok = false; break; }
+                }
+                Log("AUTOTEST webexport exports=" + Simitone.Client.UI.Model.OriginalWebExporter.Exports
+                    + " captures=" + Simitone.Client.UI.Screens.OriginalWebExportScene.Captures
+                    + " unresolved=" + Simitone.Client.UI.Model.OriginalWebExporter.UnresolvedTokens);
+                if (ok) { Pass("webexport"); return; }
+                Fail("webexport");
+            }
+            catch (Exception e)
+            {
+                Log("AUTOTEST webexport verify EXC " + e.GetType().Name + " " + e.Message);
+                Fail("webexport");
             }
         }
 

@@ -51,6 +51,7 @@ namespace Simitone.Client.UI.Screens
         // mounts above the frontend at the default window position (0,0).
         public Simitone.Client.UI.Controls.UIOriginalPauseLabel PauseLabel { get; set; }
         private OriginalSnapshotCaptureScene SnapshotScene;
+        private OriginalWebExportScene WebExportScene; // ENG-27
         public UIOriginalPictureInPicture PictureInPicture { get; private set; }
         public UISimitoneFrontend Frontend { get; set; }
         private FSO.LotView.World World;
@@ -769,6 +770,7 @@ namespace Simitone.Client.UI.Screens
             vm.CloseNet(VMCloseNetReason.LeaveLot);
             GameFacade.Scenes.Remove(World);
             if (SnapshotScene != null) { GameFacade.Scenes.Remove(SnapshotScene); SnapshotScene.Dispose(); SnapshotScene = null; }
+            if (WebExportScene != null) { GameFacade.Scenes.Remove(WebExportScene); WebExportScene.Dispose(); WebExportScene = null; } // ENG-27
             if (CameraOverlay != null) { this.Remove(CameraOverlay); CameraOverlay = null; }
             if (PictureInPicture != null) { Remove(PictureInPicture); PictureInPicture.Dispose(); PictureInPicture = null; }
             World.Dispose();
@@ -817,6 +819,8 @@ namespace Simitone.Client.UI.Screens
             this.AddAt(1, CameraOverlay);
             SnapshotScene = new OriginalSnapshotCaptureScene(GameFacade.GraphicsDevice);
             GameFacade.Scenes.Add(SnapshotScene);
+            WebExportScene = new OriginalWebExportScene(GameFacade.GraphicsDevice); // ENG-27
+            GameFacade.Scenes.Add(WebExportScene);
             Simitone.Client.UI.Model.OriginalSnapshotAlbum.ResetForLot(ActiveFamily);
 
             if (m_ZoomLevel > 3)
@@ -1337,6 +1341,10 @@ namespace Simitone.Client.UI.Screens
 
             Content.Get().Neighborhood.SaveHouse(vm.GetGlobalValue(10), iff);
             Content.Get().Neighborhood.SaveNeighbourhood(true);
+            // ENG-27: the original at-save family web page (the named
+            // GetHouseStats consumer, R133) — Options → Export HTML.
+            if (GlobalSettings.Default.TS1ExportHTML)
+                Simitone.Client.UI.Model.OriginalWebExporter.Export(this);
 
             // Write weather sidecar alongside the save
             var weatherData = vm.Context.Blueprint?.Weather?.WeatherData ?? (short)(1 << 8);
