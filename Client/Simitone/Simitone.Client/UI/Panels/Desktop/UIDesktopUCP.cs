@@ -823,11 +823,29 @@ namespace Simitone.Client.UI.Panels.Desktop
                         if (other == null || other.NeighbourID == memberId
                             || other.Relationships == null) continue;
                         if (memberIds.Contains(other.NeighbourID)) continue; // same family
+                        // ORIG-02 friend-set law (GetFamilyFriendsCount
+                        // 0xa9330/UpdateFamilyFriendsCount 0xa81c0): a friend
+                        // must BELONG to a family (townies excluded: family
+                        // number +0xEE != 0), must be a person (type +0xF6 <= 1
+                        // — pets excluded), and ANY member needs mutual DAILY
+                        // (slot 0) >= 25 BOTH ways (the friendship threshold
+                        // autonomy constant, default 25.0 pinned in-binary —
+                        // NOT the old 50).
+                        // townie: PersonData[TS1FamilyNumber] == 0 (family +0xEE)
+                        var opd = other.PersonData;
+                        var otherFam = (opd != null && opd.Length > (int)FSO.SimAntics.Model.VMPersonDataVariable.TS1FamilyNumber)
+                            ? opd[(int)FSO.SimAntics.Model.VMPersonDataVariable.TS1FamilyNumber] : 0;
+                        if (otherFam == 0) continue;
+                        // pet gate (type +0xF6 <= 1): the gender raw's dog/cat
+                        // bits (ENG-25 adapter)
+                        var otherG = (opd != null && opd.Length > (int)FSO.SimAntics.Model.VMPersonDataVariable.Gender)
+                            ? opd[(int)FSO.SimAntics.Model.VMPersonDataVariable.Gender] : 0;
+                        if ((otherG & 8) != 0 || (otherG & 16) != 0) continue;
                         System.Collections.Generic.List<short> fwd, rev;
                         if (!member.Relationships.TryGetValue(other.NeighbourID, out fwd)
                             || !other.Relationships.TryGetValue(member.NeighbourID, out rev)
                             || fwd.Count == 0 || rev.Count == 0
-                            || fwd[0] < 50 || rev[0] < 50) continue;
+                            || fwd[0] < 25 || rev[0] < 25) continue;
                         friendIds.Add(other.NeighbourID);
                     }
                 }
