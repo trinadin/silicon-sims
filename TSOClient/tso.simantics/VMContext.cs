@@ -364,7 +364,15 @@ namespace FSO.SimAntics
                 OperandModel = typeof(VMTestObjectTypeOperand)
             });
 
-            //TODO: find 5 worst motives
+            // ORIG-02: prim 33 decoded (TryFind5WorstMotives 0xeef00 via the
+            // rebuilt TryElement table) — implemented in VMFindWorstMotives.
+            AddPrimitive(new VMPrimitiveRegistration(new VMFindWorstMotives())
+            {
+                Opcode = 33,
+                Name = "find_worst_motives",
+                OperandModel = typeof(VMFindWorstMotivesOperand)
+            });
+
 
             //TS1 tutorial ui effect: TryElement 0x22 flashes lesson controls
             //(decode.md r245 §6; tryelement-region.txt).
@@ -489,7 +497,9 @@ namespace FSO.SimAntics
 
             //lots of unused primitives. see http://simantics.wikidot.com/wiki:primitives
 
-            //TODO: Send Maxis Letter
+            // ORIG-02: "Send Maxis Letter" is native-ABSENT — the object
+            // opcode space provably ends at 51 (cmplwi 0x33; bgt -> error 5);
+            // opcode 61 has no dispatch slot, no symbol, no IFF users.
 
             AddPrimitive(new VMPrimitiveRegistration(new VMInvokePlugin())
             {

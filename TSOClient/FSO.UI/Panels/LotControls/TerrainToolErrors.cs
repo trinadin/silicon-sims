@@ -45,6 +45,12 @@ namespace FSO.Client.UI.Panels.LotControls
                 case CodeTileCannotBeModified: return S(0);
                 case CodeCantDivideMultiTile: return S(4);
                 case CodeInsufficientFunds: return S(5);
+                // ORIG-02: code 7 is the HARDCODED string "Area too large"
+                // (data 0x4CF5C+0x2B via the rebuilt TOC pointer — NOT
+                // STR#149[6]); code 8 is entry [6]; code = index+1 holds
+                // for 1..6 and 8 with 7 the lone exception.
+                case 7: return "Area too large";
+                case 8: return S(6);
                 default: return null;
             }
         }
