@@ -270,11 +270,11 @@ namespace Simitone.Client.UI.Panels
         public override void Update(FSO.Common.Rendering.Framework.Model.UpdateState state)
         {
             base.Update(state);
-            // AUD-17 B-11: ESC = Done (the window's own close). No native
-            // decode pins a scrapbook ESC law; Done is the safe native-shaped
-            // default. Skipped while the delete confirmation is up — that
-            // alert owns the keyboard and its Yes/No must not be bypassed.
-            if (state.NewKeys.Contains(Microsoft.Xna.Framework.Input.Keys.Escape) && !ConfirmOpen) Close();
+            // ORIG-02 scrapbook key law (symbol census): cWinScrapbook
+            // registers NO key handler natively (methods are TSEndModal/
+            // TSBeginModal/Update/TSOnCommand/TSPaint/Shutdown only) — ESC
+            // is INERT; closing is the Done/Delete buttons (TSOnCommand).
+            // The B-11 ESC=Done convenience is retired for native parity.
             foreach (var entry in ButtonCaptions)
             {
                 var button = entry.Key;
