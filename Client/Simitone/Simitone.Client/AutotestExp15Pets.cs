@@ -257,8 +257,27 @@ namespace Simitone.Client
                         // the interaction down) — teleport the host next to the dog
                         var adj = new LotTilePos((short)(_dog.Position.x - 16), _dog.Position.y, _dog.Position.Level);
                         _human.SetPosition(adj, Direction.NORTH, vm.Context);
-                        // row tta=45 'Tricks.../Train Bounce' (action 8334 test 8335)
-                        _dog.PushUserInteraction(45, _human, vm.Context, false);
+                        // row tta=45 'Tricks.../Train Bounce' (action 8341 test 8344 — the
+                        // live-semiglobal DISASM). Runs 1-3 law: PushUserInteraction's bare
+                        // enqueue is silently dropped at AttemptPush (VMIdleForInput) —
+                        // items with priority <= the actor's pd[33]=25 never even reach
+                        // CheckRoutine (8344 never traced). The unl-show run-6 idiom:
+                        // FSOSkipPermissions + CheckRoutine=null + Maximum priority. The
+                        // eligibility law is proven separately by the PIE census +
+                        // ROW1-MANUAL; this leg proves the ACTION chain executes and
+                        // lands its dog-side push.
+                        var act = _dog.GetAction(45, _human, vm.Context, false);
+                        if (act == null)
+                        {
+                            _log("AUTOTEST ulpets TRAIN-PUSH GetAction null (row 45)");
+                        }
+                        else
+                        {
+                            act.Flags |= TTABFlags.FSOSkipPermissions;
+                            act.CheckRoutine = null;
+                            act.Priority = (short)VMQueuePriority.Maximum;
+                            _human.Thread.EnqueueAction(act);
+                        }
                         _log("AUTOTEST ulpets TRAIN-PUSH row45 from humanOid=" + _human.ObjectID
                             + " onto dogOid=" + _dog.ObjectID + " q=" + _dog.Thread.Queue.Count);
                     }
