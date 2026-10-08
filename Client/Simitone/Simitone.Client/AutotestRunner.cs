@@ -14848,7 +14848,9 @@ namespace Simitone.Client
                             try { rName = fr0.Routine?.Rti?.Name; } catch { }
                             Log("AUTOTEST brainlive diag   frame" + f + " routineID=" + (fr0.Routine?.Chunk?.ChunkID) +
                                 (fr0.Routine?.Chunk != null ? (" label=" + (fr0.Routine.Chunk as FSO.Files.Formats.IFF.Chunks.BHAV)?.ChunkLabel) : "") +
-                                " rti=" + rName + " semiGlobal=" + sgName);
+                                " rti=" + rName + " semiGlobal=" + sgName +
+                                " ip=" + fr0.InstructionPointer +
+                                " owner=" + fr0.ScopeResource?.MainIff?.Filename);
                         }
                     }
                     for (int f = 0; f < th.Stack.Count; f++)

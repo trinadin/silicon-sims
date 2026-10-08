@@ -32,12 +32,66 @@ namespace FSO.SimAntics.Primitives
                 // controller is itself created BY the eat interaction, BHAV 4112 ins3
                 // op-42 — a chicken-and-egg only this divergence produced). Native law:
                 // report-and-continue -> GOTO_FALSE.
+                VMOp32NullProbe.Note(context, operand);
                 return VMPrimitiveExitCode.GOTO_FALSE;
             }
 
             if (obj.Object.GUID == operand.GUID) return VMPrimitiveExitCode.GOTO_TRUE; //is my guid same?
             else if (obj.MasterDefinition != null && (obj.MasterDefinition.GUID == operand.GUID)) return VMPrimitiveExitCode.GOTO_TRUE; //is master guid same?
             else return VMPrimitiveExitCode.GOTO_FALSE;
+        }
+    }
+
+    /// <summary>
+    /// W4-REG probe (env-gated, SIMTONE_OP32PROBE=1): names every distinct site
+    /// where op-32 evaluates a null/out-of-range object in the live VM, with the
+    /// enclosing frame chain. Diagnostic only — never alters flow.
+    /// </summary>
+    public static class VMOp32NullProbe
+    {
+        public static readonly bool Enabled =
+            (System.Environment.GetEnvironmentVariable("SIMTONE_OP32PROBE") ?? "0") == "1";
+        private static readonly System.Collections.Generic.Dictionary<string, int> _Seen =
+            new System.Collections.Generic.Dictionary<string, int>();
+
+        public static void Note(VMStackFrame context, VMTestObjectTypeOperand operand)
+        {
+            if (!Enabled) return;
+            try
+            {
+                string iff = null, label = null;
+                ushort rid = 0; int ip = -1;
+                try { iff = context.ScopeResource?.MainIff?.Filename; } catch { }
+                try { rid = context.Routine?.Chunk?.ChunkID ?? 0; } catch { }
+                try { label = context.Routine?.Rti?.Name; } catch { }
+                try { ip = context.InstructionPointer; } catch { }
+                var key = (iff ?? "?") + "#" + rid + " ins" + ip;
+                int n;
+                lock (_Seen) { n = _Seen.TryGetValue(key, out var c) ? _Seen[key] = c + 1 : (_Seen[key] = 1); }
+                if (n != 1 && n % 500 != 0) return;
+                var chain = new System.Text.StringBuilder();
+                try
+                {
+                    var stack = context.Thread?.Stack;
+                    if (stack != null)
+                    {
+                        for (int i = stack.Count - 1; i >= 0 && chain.Length < 160; i--)
+                        {
+                            var fr = stack[i];
+                            if (fr == null) continue;
+                            chain.Append(' ').Append(fr.Routine?.Chunk?.ChunkID ?? 0)
+                                 .Append(':').Append(fr.InstructionPointer)
+                                 .Append('(').Append(fr.Routine?.Rti?.Name ?? "?").Append(')');
+                        }
+                    }
+                }
+                catch { }
+                System.Console.WriteLine("[OP32NULL" + (n == 1 ? " " : " x" + n + " ") + "] " + key
+                    + " '" + (label ?? "?") + "' guid=0x" + operand.GUID.ToString("X8")
+                    + " caller=obj" + (context.Caller != null ? context.Caller.ObjectID.ToString() : "?")
+                    + " chain:" + chain.ToString());
+            }
+            catch { }
         }
     }
 
