@@ -250,6 +250,7 @@ namespace Simitone.Client
                     if (_frame == 30 && !_pushedTrain)
                     {
                         _pushedTrain = true;
+                        DumpTrainTrees(vm); // receipt evidence: the row-45 chain, decoded
                         _dogQueueMax = 0;
                         _humanQueueMax = _human.Thread.Queue.Count;
                         // adjacency first (the EXP-05 run-9 law: a long route tears
@@ -263,7 +264,12 @@ namespace Simitone.Client
                     }
                     _dogQueueMax = Math.Max(_dogQueueMax, _dog.Thread.Queue.Count);
                     _humanQueueMax = Math.Max(_humanQueueMax, _human.Thread.Queue.Count);
-                    if (_frame >= 900)
+                    // run-1 law (2026-10-08 ulpets-fix): the row-45 action executes in
+                    // the CALLER's thread (GetAction enqueues on the human; dogQmax
+                    // stays 0) and its chain takes ~12s to reach the dog-side push
+                    // (8276 -> dog TTAB row 95) — 900 frames cut the trick off before
+                    // the dog ran it. 2400 frames (~40s) covers pickup+route+trick.
+                    if (_frame >= 2400)
                     {
                         _log("AUTOTEST ulpets TRAIN treeRan=" + _trainTreeRan + " pushLanded=" + _trainPushLanded
                             + " dogQmax=" + _dogQueueMax + " humanQmax=" + _humanQueueMax + " dogTrees=[" + string.Join(",", _dogTrees) + "]");
@@ -366,29 +372,92 @@ namespace Simitone.Client
         {
             if (string.IsNullOrEmpty(s)) return;
             if (_capturing) { if (_capture.Count < 400) _capture.Add(s); return; }
+            // EXP-15 follow-up: parse ONCE and run the recording logic on EVERY
+            // sighting — the old seen-key early-return sat BEFORE the treeRan
+            // check, so a repeat sighting of 8334 (whose "ent:tid" key collides
+            // with PersonGlobals' idle 8334) could never count the training tree.
+            var fm = System.Text.RegularExpressions.Regex.Match(s, @"ent=(\d+) .* (\d+)@");
+            if (!fm.Success) { _log(s); return; }
+            var key = fm.Groups[1].Value + ":" + fm.Groups[2].Value;
+            int ftid = int.Parse(fm.Groups[2].Value);
+            var ent = int.Parse(fm.Groups[1].Value);
+            var sgFm = System.Text.RegularExpressions.Regex.Match(s, @" sg=(\S+)");
+            var sgName = sgFm.Success ? (sgFm.Groups[1].Value ?? "").ToLowerInvariant() : "";
+            // the training verdict ONLY counts the DogGlobals routine: 8334 collides
+            // with PersonGlobals 8334 'do new adult middle stand' (runs 4/7/8's
+            // treeRan=True was that idle — an id-collision false positive; the sg=
+            // suffix names the routine's own IFF).
+            if (ftid == 8334 && sgName.StartsWith("dogglobals")) _trainTreeRan = true;
+            if (_dog != null && ent == _dog.ObjectID && ftid >= 8192 && ftid <= 8370) _dogTrees.Add(ftid.ToString());
+            else if (_cat != null && ent == _cat.ObjectID && ftid >= 8192 && ftid <= 8370) _catTrees.Add(ftid.ToString());
+            // controller/pedestal band: record on the dog set too (shared evidence bag)
+            else if (ftid >= 4096 && ftid <= 4113) { _dogTrees.Add(ftid.ToString()); }
             // log only first sightings per (ent,tree) + the 4096-4113 show band,
             // so the per-tick flood stays bounded
-            var fm = System.Text.RegularExpressions.Regex.Match(s, @"ent=(\d+) .* (\d+)@");
-            if (fm.Success)
-            {
-                var key = fm.Groups[1].Value + ":" + fm.Groups[2].Value;
-                int ftid = int.Parse(fm.Groups[2].Value);
-                if (!(_seenKeys.Add(key) || (ftid >= 4096 && ftid <= 4113))) return;
-            }
+            if (!(_seenKeys.Add(key) || (ftid >= 4096 && ftid <= 4113))) return;
             _log(s);
-            // format: "... ent=<oid> d=n tick=m <tid>@<ip> op=.."
-            var m = System.Text.RegularExpressions.Regex.Match(s, @"ent=(\d+) .* (\d+)@");
-            if (!m.Success) return;
-            var ent = int.Parse(m.Groups[1].Value);
-            var tid = int.Parse(m.Groups[2].Value);
-            if (tid == 8334 || tid == 8335) _trainTreeRan |= (tid == 8334);
-            if (_dog != null && ent == _dog.ObjectID && tid >= 8192 && tid <= 8370) _dogTrees.Add(tid.ToString());
-            else if (_cat != null && ent == _cat.ObjectID && tid >= 8192 && tid <= 8370) _catTrees.Add(tid.ToString());
-            // controller/pedestal band: record on the dog set too (shared evidence bag)
-            else if (tid >= 4096 && tid <= 4113) { if (_dog != null && ent == _dog.ObjectID) { } _dogTrees.Add(tid.ToString()); }
         }
 
         private static bool HasTree(HashSet<string> set, int id) { return set.Contains(id.ToString()); }
+
+        /// <summary>
+        /// EXP-15 follow-up receipt evidence: the row-45 training chain decoded from
+        /// the LIVE dog semiglobal (the unl-show DISASM idiom) — TTAB 129 rows 44-46
+        /// and 94-96 plus routines 8334 (Train Bounce action), 8335 (its test) and
+        /// 8276 (the router that pushes the dog-side row). Names the resource so the
+        /// PersonGlobals id collision is explicit.
+        /// </summary>
+        private static void DumpTrainTrees(VM vm)
+        {
+            try
+            {
+                var sg = _dog.Object.Resource.SemiGlobal;
+                var iff = sg?.Iff;
+                if (iff == null) { _log("AUTOTEST ulpets TRAIN-DISASM semiglobal ABSENT"); return; }
+                _log("AUTOTEST ulpets TRAIN-DISASM semiglobal=" + (iff.Filename ?? "?"));
+                var ttabs = iff.List<TTAB>() ?? new List<TTAB>();
+                foreach (var tb in ttabs)
+                {
+                    var rows = tb.Interactions;
+                    for (int i = 0; i < rows.Length; i++)
+                    {
+                        if (!((i >= 44 && i <= 46) || (i >= 94 && i <= 96))) continue;
+                        var r = rows[i];
+                        _log("AUTOTEST ulpets TRAIN-DISASM TTAB " + tb.ChunkID + " row " + i
+                            + " action=" + r.ActionFunction + " test=" + r.TestFunction
+                            + " flags=0x" + r.Flags.ToString("x"));
+                    }
+                }
+                var ttas = iff.List<TTAs>() ?? new List<TTAs>();
+                foreach (var tta in ttabs)
+                {
+                    var labels = ttas.FirstOrDefault(t => t.ChunkID == tta.ChunkID);
+                    if (labels == null) continue;
+                    foreach (var i2 in new[] { 44, 45, 46, 94, 95, 96 })
+                        _log("AUTOTEST ulpets TRAIN-DISASM TTAs " + tta.ChunkID + " [" + i2 + "]='"
+                            + (labels.GetString(i2) ?? "<null>") + "'");
+                }
+                foreach (var tid in new ushort[] { 8334, 8335, 8276 })
+                {
+                    var rt = sg.GetRoutine(tid) as VMRoutine;
+                    if (rt == null) { _log("AUTOTEST ulpets TRAIN-DISASM tree" + tid + " MISSING in semiglobal"); continue; }
+                    var bhav = rt.Chunk as BHAV;
+                    _log("AUTOTEST ulpets TRAIN-DISASM tree" + tid + " label=" + (bhav != null ? bhav.ChunkLabel : "?")
+                        + " n=" + rt.Instructions.Length);
+                    for (int i = 0; i < rt.Instructions.Length && i < 48; i++)
+                    {
+                        var ins = rt.Instructions[i];
+                        var opProps = ins.Operand?.GetType().GetProperties() ?? new System.Reflection.PropertyInfo[0];
+                        var opDesc = ins.Operand == null ? "null"
+                            : opProps.Length == 0 ? "RawVal=" + Convert.ToString(ins.Operand)
+                            : string.Join(",", opProps.Select(p => p.Name + "=" + Convert.ToString(p.GetValue(ins.Operand))));
+                        _log("AUTOTEST ulpets TRAIN-DISASM tree" + tid + " @" + i + " op=" + ins.Opcode
+                            + " T:" + ins.TruePointer + " F:" + ins.FalsePointer + " " + opDesc);
+                    }
+                }
+            }
+            catch (Exception ex) { _log("AUTOTEST ulpets TRAIN-DISASM EXC " + ex.GetType().Name + " " + ex.Message); }
+        }
 
         private static string StackStr(VMAvatar a)
         {
