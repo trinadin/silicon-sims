@@ -60,13 +60,12 @@ namespace Simitone.Client.UI.Model
     /// view per floor (the native renders offscreen via HouseViewer.
     /// MakeWebPageThumbnail with a ShrinkWrap crop + a neighborhood overlay
     /// on the thumb — the overlay resource is not ported); the player's
-    /// wall/cutaway mode is kept for interiors; job titles use the port's
-    /// single CARR JobName (the native cJob carries a gendered female title
-    /// at +0xe0 with male-fallback — the female-title data source is not
-    /// decoded); the faminfo_&lt;id&gt;.ini/.pub teleport metadata (a 64 KB
+    /// wall/cutaway mode is kept for interiors; the faminfo_&lt;id&gt;.ini/.pub teleport metadata (a 64 KB
     /// htmlEncrypt-scrambled dependency inventory written to Export/ by
     /// MakePublishingInfo) is not ported — it serves TheSims.com teleport,
-    /// not the web pages. All materials are original (templates,
+    /// not the web pages. Job titles are gendered since EXP-16
+    /// (cJob::GetName(GetGender==1) @ 0x1021d798; STR law in
+    /// evidence/EXP-16/gendered-job-titles-law.md). All materials are original (templates,
     /// .ffn-rendered data, engine renders); no proprietary bytes enter the
     /// repo.
     /// </summary>
@@ -646,11 +645,14 @@ namespace Simitone.Client.UI.Model
                 {
                     var jl = job.JobLevels[level];
                     m.Tokens["sims_familymemberX_career"] = job.ChunkLabel ?? "";
-                    // NOTE (disclosed): the native cJob::GetName(female) has a
-                    // gendered female title (field +0xe0, male/neutral +0x54,
-                    // female-falls-back-to-male); the port's CARR exposes one
-                    // JobName so the single form is used.
-                    m.Tokens["sims_familymemberX_job"] = jl.JobName ?? "";
+                    // EXP-16: native GenerateFamilyMemberData @ 0x1021d410
+                    // substitutes cJob::GetName(GetGender(person)==1) (call @
+                    // 0x1021d798) — the gendered STR title with the
+                    // empty-female-falls-back-to-male law, not the single
+                    // CARR JobName. Disclosure retired.
+                    m.Tokens["sims_familymemberX_job"] =
+                        FSO.Content.Content.Get().Jobs.JobTitle((short)jobType, level, female)
+                        ?? jl.JobName ?? "";
                     m.Tokens["sims_familymemberX_salary"] = jl.Salary.ToString();
                 }
                 else

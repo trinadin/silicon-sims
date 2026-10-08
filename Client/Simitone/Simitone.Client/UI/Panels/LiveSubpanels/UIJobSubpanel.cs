@@ -597,6 +597,12 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
         private static readonly Dictionary<string, string[]> JobFamilyTables = new Dictionary<string, string[]>();
 
         private JobLevel LastJobLevel;
+        // EXP-16: the title now varies with the Sim's gender (native
+        // cWinSubpanelJob::TSPaint @ 0x1029a370 calls
+        // cJob::GetShortName(bool) with GetGender(person)==1 @ 0x1029a900);
+        // cache the gender that produced the cached title so a CAS gender
+        // change re-renders without a level change.
+        private bool LastJobTitleFemale = false;
 
         private UISkillDisplay[] Skills;
         private string[] SkillNames = new string[]
@@ -987,9 +993,14 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                     level = 0; // AUD-17 C2-6: out-of-range JobPromotionLevel in a save threw here (mobile branch; desktop guards this)
                 var myLevel = job.JobLevels[level];
 
-                if (myLevel != LastJobLevel)
+                if (myLevel != LastJobLevel || LastJobTitleFemale != FemaleTitleFor(sel))
                 {
-                    JobTitle.Caption = myLevel.JobName;
+                    // EXP-16: gendered STR title (native GetShortName law —
+                    // short names share the title STR indices, see
+                    // evidence/EXP-16/gendered-job-titles-law.md).
+                    LastJobTitleFemale = FemaleTitleFor(sel);
+                    JobTitle.Caption = Content.Get()?.Jobs?.JobTitle((short)type, level, LastJobTitleFemale)
+                        ?? myLevel.JobName;
                     SalaryTitle.Caption = Game.Desktop
                         ? "§" + myLevel.Salary
                         : (OriginalLiveStrings.Entry(137, 14) ?? "Salary") + ": §" + myLevel.Salary + " (" + ToTime(myLevel.StartTime) + "-" + ToTime(myLevel.EndTime) + ")";
@@ -1133,9 +1144,12 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             }
             else
             {
-                if (myLevel != LastJobLevel)
+                if (myLevel != LastJobLevel || LastJobTitleFemale != FemaleTitleFor(sel))
                 {
-                    JobTitle.Caption = myLevel.JobName;
+                    // EXP-16: gendered STR title (native GetShortName law).
+                    LastJobTitleFemale = FemaleTitleFor(sel);
+                    JobTitle.Caption = Content.Get()?.Jobs?.JobTitle((short)type, level, LastJobTitleFemale)
+                        ?? myLevel.JobName;
                     SalaryTitle.Caption = "§" + myLevel.Salary;
                     SetCareerIconRow(type);
                     LastJobLevel = myLevel;
@@ -1323,6 +1337,16 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                 if (!string.IsNullOrEmpty(alternate)) return alternate;
             }
             return job.JobLevels[level].JobName ?? "";
+        }
+
+        /// <summary>
+        /// EXP-16: the native job-panel title call sites test the gender word
+        /// for equality with 1 (TSPaint @ 0x1029a900 and SetupSummaryClient @
+        /// 0x102997b8 both pass GetGender(person) == 1 as the female flag).
+        /// </summary>
+        private static bool FemaleTitleFor(VMAvatar sel)
+        {
+            return sel != null && sel.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.Gender) == 1;
         }
 
         private static string CareerPopupDescription(int type, int level)
