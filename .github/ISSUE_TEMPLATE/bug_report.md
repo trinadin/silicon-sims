@@ -12,7 +12,7 @@ A clear description of the bug (what you did, what you expected, what happened i
 **Your setup**
 - Mac model / chip:
 - macOS version:
-- Silicon Sims version (from the DMG/Release, or commit if self-built):
+- SimSilicon version (from the DMG/Release, or commit if self-built):
 - Game data source: Complete Collection disc / Legacy Collection (Steam, EA App, Epic) / other:
 
 **Logs**
@@ -26,5 +26,5 @@ one for comparison) helps enormously.
 **Did you check PARITY.md first?**
 Known gaps (fame career, vacation features, pet AI, Makin' Magic coverage, free-will accuracy,
 some neighbourhood management, sound/UI fidelity) are tracked in
-[PARITY.md](https://github.com/trinadin/silicon-sims/blob/main/PARITY.md) — if this is a known
+[PARITY.md](https://github.com/trinadin/simsilicon/blob/main/PARITY.md) — if this is a known
 gap, it already has an entry there.

@@ -7,7 +7,7 @@ the first public release.
 
 ## What this is
 
-**Silicon Sims** — The Sims (2000) as a native Apple Silicon Mac application:
+**SimSilicon** — The Sims (2000) as a native Apple Silicon Mac application:
 the Simitone/FreeSO engine (merged in this repository with full history)
 running the original game logic from your legally-owned Complete Collection
 data. Fidelity claims are decode-backed: where the port's behavior was in

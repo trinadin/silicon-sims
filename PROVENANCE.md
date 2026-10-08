@@ -5,7 +5,7 @@ maintained alongside PARITY.md and HANDOFF.md as part of the keep-it-honest disc
 
 ## What this repository is
 
-**Silicon Sims** is a **native macOS port and fidelity-verification project
+**SimSilicon** is a **native macOS port and fidelity-verification project
 built on top of an MPL-2.0 engine**. It is not a clean-room rewrite and is not "ours alone" in the sense of being
 independent of FreeSO. Concretely:
 
@@ -75,6 +75,6 @@ original IFF behavior/script logic against your legally owned game data (see REA
 ## TL;DR
 
 FreeSO (MPL-2.0) is the engine; Simitone is FreeSO-derived; this repo is a macOS port of
-Simitone — **Silicon Sims** — that adds real verification and fidelity work on top. "Our own thing" =
+Simitone — **SimSilicon** — that adds real verification and fidelity work on top. "Our own thing" =
 the port, the harness, the RE tooling, and the verified fixes — not the engine itself.
 

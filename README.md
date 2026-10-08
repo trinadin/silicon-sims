@@ -1,4 +1,4 @@
-# Silicon Sims
+# SimSilicon
 
 **The Sims™ (2000), natively on Apple Silicon Macs: a byte-faithful port of the open-source
 Simitone engine, running your legally-owned original game data.**
@@ -12,7 +12,7 @@ unaffiliated fan engine that runs the game from **your own copy** of the origina
 ## Download
 
 Grab the latest `SiliconSims-macOS-AppleSilicon.dmg` from
-[**Releases**](https://github.com/trinadin/silicon-sims/releases), mount it, and drag
+[**Releases**](https://github.com/trinadin/simsilicon/releases), mount it, and drag
 **The Sims** to your Applications folder.
 
 - **Requirements:** an Apple Silicon Mac (M1 or later), macOS 11 or later. No .NET runtime,
@@ -22,7 +22,7 @@ Grab the latest `SiliconSims-macOS-AppleSilicon.dmg` from
 
 ## What this project is
 
-Silicon Sims is **not a remake**. It is an engine that:
+SimSilicon is **not a remake**. It is an engine that:
 
 - loads your legally-owned copy of *The Sims: Complete Collection* game data (IFF format), and
 - compiles and runs the **original game logic** — the original `Behavior.iff` scripted behavior
@@ -45,7 +45,7 @@ change (run it yourself with `tools/run-autotest.sh`; the one-page state summary
 needs real-world testing on real Macs and real saves. That's where you come in:
 
 - **Play it.** Every hour of real play on hardware we don't have is a contribution.
-- **Report what breaks.** Open a [GitHub Issue](https://github.com/trinadin/silicon-sims/issues) —
+- **Report what breaks.** Open a [GitHub Issue](https://github.com/trinadin/simsilicon/issues) —
   the bug template asks for your Mac model, macOS version, and game-data source, and the two logs
   below. Vague reports can't be fixed; pinned ones can.
 - **Attach the logs.** `~/Documents/Simitone/game.log` (screen/content-load tracing) and the
@@ -62,7 +62,7 @@ needs real-world testing on real Macs and real saves. That's where you come in:
 
 ## Game data
 
-Silicon Sims needs The Sims 1 **Complete Collection / Legacy Collection** data: a folder containing
+SimSilicon needs The Sims 1 **Complete Collection / Legacy Collection** data: a folder containing
 `GameData/.../Behavior.iff` and the `UserData` layout. See [PORT_STATUS.md](PORT_STATUS.md)
 ("Required: game data") for how to obtain it legally —
 [fetch-game-data.sh](fetch-game-data.sh) stages the Complete Collection DVD from archive.org
@@ -81,8 +81,8 @@ in the user-data `config.ini` (`TS1HybridPath`); user data and saves live in `~/
 One repository, no submodules:
 
 ```sh
-git clone https://github.com/trinadin/silicon-sims.git
-cd silicon-sims && git checkout main
+git clone https://github.com/trinadin/simsilicon.git
+cd simsilicon && git checkout main
 ```
 
 Prerequisites: .NET SDK 9. The exact publish + package commands
