@@ -39,6 +39,19 @@ namespace FSO.SimAntics.Engine
             "CatalogLocal:", "DateLocal:", "ObjectLocal:", "\\n"
         };
 
+        /// <summary>
+        /// EXP-16: the native ParseUIString job-name/offer substitution reads
+        /// the actor's person gender word and tests bit 0 (0x100ef780 call
+        /// sites 0x100f04b8/0x100f051c: uVar4 = *(ushort*)(person+0x60e) &amp; 1).
+        /// Mirrors that bit test exactly, including for pets.
+        /// </summary>
+        private static bool DialogActorFemale(VMStackFrame context)
+        {
+            var actor = context.Callee as VMAvatar;
+            if (actor == null) return false;
+            return (actor.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.Gender) & 1) == 1;
+        }
+
         public static void ShowDialog(VMStackFrame context, VMDialogOperand operand, STR source)
         {
             context.VM.SignalDialog(BuildDialogInfo(context, operand, source));
@@ -320,16 +333,41 @@ namespace FSO.SimAntics.Engine
                                 case "ObjectLocal:":
                                     output.Append(context.VM.GetObjectById(VMMemory.GetVariable(context, Scopes.VMVariableScope.Local, values[0]))?.ToString() ?? ""); break;
                                 case "JobOffer:":
+                                    // EXP-16: native ParseUIString @ 0x100ef780
+                                    // substitutes the offer text through
+                                    // cCareer::GetOfferDialogText(bool) with
+                                    // the actor's gender bit (person word
+                                    // & 1); the port reads the same STR pair.
                                     output.Append(Content.Content.Get().Jobs.JobOffer(
                                         (short)VMMemory.GetBigVariable(context, Scopes.VMVariableScope.Local, values[0]),
-                                        VMMemory.GetBigVariable(context, Scopes.VMVariableScope.Local, values[1])));
+                                        VMMemory.GetBigVariable(context, Scopes.VMVariableScope.Local, values[1]),
+                                        DialogActorFemale(context)));
                                     break;
                                 case "Job:":
                                 case "JobDesc:":
-                                    var level = VMMemory.GetBigVariable(context, Scopes.VMVariableScope.Local, values[1]);
-                                    var jobStr = Content.Content.Get().Jobs.JobStrings(
-                                        (short)VMMemory.GetBigVariable(context, Scopes.VMVariableScope.Local, values[0]));
-                                    if (jobStr != null) output.Append(jobStr.GetString(level*3+((cmdString=="JobDesc:")?3:4)));
+                                    // EXP-16: native title/desc indices are
+                                    // [3+2*level] (title, gendered via
+                                    // [23+level] with empty-fallback) and
+                                    // [4+2*level] (description) —
+                                    // cJob::GetName @ 0x10051ab0, job desc at
+                                    // cJob+0x3b4 per ParseUIString. The old
+                                    // level*3+4 form was a TSO remnant.
+                                    {
+                                        var jobLevel = VMMemory.GetBigVariable(context, Scopes.VMVariableScope.Local, values[1]);
+                                        if (cmdString == "Job:")
+                                        {
+                                            output.Append(Content.Content.Get().Jobs.JobTitle(
+                                                (short)VMMemory.GetBigVariable(context, Scopes.VMVariableScope.Local, values[0]),
+                                                jobLevel, DialogActorFemale(context)) ?? "");
+                                        }
+                                        else
+                                        {
+                                            var jobStr = Content.Content.Get().Jobs.JobStrings(
+                                                (short)VMMemory.GetBigVariable(context, Scopes.VMVariableScope.Local, values[0]));
+                                            if (jobStr != null && jobLevel >= 0)
+                                                output.Append(jobStr.GetString(4 + jobLevel * 2) ?? "");
+                                        }
+                                    }
                                     break;
                                 case "Param:":
                                     output.Append(VMMemory.GetBigVariable(context, Scopes.VMVariableScope.Parameters, values[0]).ToString()); break;
