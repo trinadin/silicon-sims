@@ -1,6 +1,8 @@
 using FSO.Content;
+using FSO.Content.TS1;
 using FSO.SimAntics;
 using FSO.SimAntics.Primitives;
+using Simitone.Client.UI.Screens;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -58,7 +60,7 @@ namespace Simitone.Client
             if (!ok) { _fails.Add(m); Log("AUTOTEST trv05 FAIL " + m); }
         }
 
-        private static FSO.Files.Formats.IFF.Chunks.FAMI FamilyOnDisk(TS1NeighbourProvider provider, int chunkID)
+        private static FSO.Files.Formats.IFF.Chunks.FAMI FamilyOnDisk(TS1NeighborhoodProvider provider, int chunkID)
         {
             // fresh parse of the written Neighborhood.iff — proves the booking
             // reached the FILE, not just the in-memory chunk list
