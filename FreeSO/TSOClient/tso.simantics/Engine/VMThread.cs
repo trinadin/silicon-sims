@@ -171,7 +171,11 @@ namespace FSO.SimAntics.Engine
             // lineage's Tick-tail asymmetry flagged in the arc review).
             // ENG-22: + the full-tree leg's trees (SocialsMagic 4211, and the
             // gosub'd global "idle" 280 when running over a 4211 stack).
-            if (!((AutotestTraceShowTrees && ((tid >= 4096 && tid <= 4113) || tid == 4211))
+            // EXP-15: + the pet semiglobals band 8192..8370 (the CatGlobals/
+            // DogGlobals/PetSitGlobals routine space) under the same armed-only
+            // ShowTrees flag — the ulpets brain audit traces the pet main loop
+            // (8194/8222), the motive scans and the idles. Inert in play.
+            if (!((AutotestTraceShowTrees && ((tid >= 4096 && tid <= 4113) || tid == 4211 || (tid >= 8192 && tid <= 8370)))
                 || ((tid == 4100 || tid == 280 || tid == 281 || tid == 4103)
                     && Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4100))
                 || ((tid == 366 || tid == 280)
