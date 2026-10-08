@@ -4764,6 +4764,10 @@ namespace Simitone.Client
                     if (_mgbookSwitchF > 0 && _mgbookFrame >= _mgbookSwitchF + 3600)
                     { Log("AUTOTEST magicbook verdict no-switch: curHouse=" + cur); Fail("magicbook"); _mgbookState = 99; return; }
                     if (!(_mgbookRebound && cur == 93)) return;
+                    // the visit-session un-park (the petname last-mile law: the
+                    // away-lot visit loads BUY+paused per the NBR-06 native entry
+                    // law and the panel re-parks every frame — same lifelift).
+                    PetNameLivelift();
                     // on the magic lot: wait for the family to arrive (community
                     // lot — sims route in after the switch; run-1 law: the
                     // rebound tick itself has no in-world avatars yet)
