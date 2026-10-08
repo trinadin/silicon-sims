@@ -80,7 +80,7 @@ namespace Simitone.Client
             // candidate house ids, tried in order until one loads with >=1 avatar
             public static string HouseCandidates =
                 "5,4,3,2,1,0,6,7,8,9,10,11,21,22,23,24,25,26,27,28,29,30,40,41,42,43,44,45,46,47,48";
-            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall,webexport,ui37,aud19";
+            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall,webexport,ui37,aud19,cc06";
             public static int TimeoutMs = 300000; // hard cap (real ms)
             public static bool ExitOnDone = true;
         }
@@ -429,10 +429,11 @@ namespace Simitone.Client
             if (_screen == null)
                 _screen = GameFacade.Screens?.CurrentUIScreen as TS1GameScreen;
             if (_screen == null || _screen.InLot) { _neighborhoodReadyFrames = 0; return; }
-            // UI-37 'ui37' + AUD-19 'aud19' (default-suite additions): pure
-            // law probes that need only mounted content — run ONCE here at
-            // neighborhood-ready (an unconditional point), not inside the
-            // corpus block (which is gated by the corpus family being enabled).
+            // UI-37 'ui37' + AUD-19 'aud19' + CC-06 'cc06' (default-suite
+            // additions): pure law probes that need only mounted content —
+            // run ONCE here at neighborhood-ready (an unconditional point),
+            // not inside the corpus block (which is gated by the corpus
+            // family being enabled).
             if (!_ui37Aud19Run)
             {
                 _ui37Aud19Run = true;
@@ -442,6 +443,23 @@ namespace Simitone.Client
                     else { Log("AUTOTEST ui37: one or more residual-law probes failed"); Fail("ui37"); }
                 }
                 if (CheckEnabled("aud19")) CheckAud19();
+                // CC-06 'cc06': custom-content animation hardening — duplicate
+                // skeletons (silent overwrite, native replace law), corrupt and
+                // hostile CFPs (skip + report, native decoder semantics),
+                // null-skeleton/untranslated-anim render paths. Synthesizes
+                // its fixture through the real providers; restores globals.
+                if (CheckEnabled("cc06"))
+                {
+                    AutotestCc06.Run(Log);
+                    if (AutotestCc06.Ran && AutotestCc06.Passed) Pass("cc06");
+                    else
+                    {
+                        Log("AUTOTEST cc06: " + (AutotestCc06.Ran
+                            ? "failures: " + string.Join("; ", AutotestCc06.Failures)
+                            : "probe did not run"));
+                        Fail("cc06");
+                    }
+                }
             }
             // R246 'ucasflow' opt-in (additive): the real-flow CAS audit takes
             // over the run here — it drives the PRODUCTION MoveIn button into

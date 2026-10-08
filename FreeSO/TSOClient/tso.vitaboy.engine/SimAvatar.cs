@@ -55,6 +55,7 @@ namespace FSO.Vitaboy
         /// </summary>
         public void StripAllButHead()
         {
+            if (Skeleton == null) return; // CC-06: unresolvable skeleton — nothing to strip
             int i = 0;
             foreach (var bone in Skeleton.Bones)
             {

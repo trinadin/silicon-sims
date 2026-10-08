@@ -142,26 +142,41 @@ namespace FSO.Vitaboy
 
         public static void ReadNFloats(IoBuffer io, int floats, Action<int, float> output)
         {
+            // CC-06: restructured to mirror the native decoder 1:1
+            // (ReadCompressedFloats @0x10364450). Native keeps a pending-repeat
+            // counter consumed one slot per iteration, bounded by the outer
+            // value-count loops — so an overshooting 0xFE block is naturally
+            // CLAMPED (surplus repeats are discarded, never written past the
+            // destination), and a code above the 0xFD-entry delta table
+            // (InitFloatCompression @0x10364330 fills exactly 0xFD entries,
+            // 0x00-0xFC) reads the zeroed static memory just past the table
+            // end — effectively delta 0 — instead of faulting. A 0xFE count of
+            // N still covers N+1 slots total (current slot + N reuses), exactly
+            // as before for well-formed data.
             float lastValue = 0;
-            for (int i=0; i<floats; i++)
+            int pendingRepeats = 0;
+            for (int i = 0; i < floats; i++)
             {
-                var code = io.ReadByte();
-                switch (code)
+                if (pendingRepeats < 1)
                 {
-                    case 0xFF:
-                        lastValue = io.ReadFloat();
-                        break;
-                    case 0xFE:
-                        //repeat count
-                        var repeats = io.ReadUInt16();
-                        for (int j=0; j<repeats; j++)
-                        {
-                            output(i++, lastValue);
-                        }
-                        break;
-                    default:
-                        lastValue += Delta[code];
-                        break;
+                    var code = io.ReadByte();
+                    switch (code)
+                    {
+                        case 0xFF:
+                            lastValue = io.ReadFloat();
+                            break;
+                        case 0xFE:
+                            //repeat count
+                            pendingRepeats = io.ReadUInt16();
+                            break;
+                        default:
+                            if (code <= 0xFC) lastValue += Delta[code];
+                            break;
+                    }
+                }
+                else
+                {
+                    pendingRepeats--;
                 }
 
                 output(i, lastValue);

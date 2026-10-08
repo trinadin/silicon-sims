@@ -414,6 +414,7 @@ namespace FSO.Vitaboy
         {
             //Effect.CurrentTechnique = Effect.Techniques[0];
             if (SkelBones == null) ReloadSkeleton();
+            if (SkelBones == null || Skeleton == null) return; // CC-06: unresolvable skeleton — no head to draw
             var matrixCopy = new Matrix[SkelBones.Length];
             // Locate the head bone and inject the custom matrix.
 
@@ -467,6 +468,7 @@ namespace FSO.Vitaboy
             }
 
             if (SkelBones == null) ReloadSkeleton();
+            if (SkelBones == null) return; // CC-06: unresolvable skeleton — nothing poseable to draw
             effect.Parameters["SkelBindings"].SetValue(SkelBones);
 
             // Check if censorship is active (either from game or forced for testing)

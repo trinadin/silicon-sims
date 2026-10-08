@@ -90,6 +90,23 @@ namespace FSO.Vitaboy
 
             var numDone = 0;
 
+            // CC-06: an avatar whose skeleton could not be resolved (custom
+            // skeleton removed from a save, or knocked out of the provider by a
+            // duplicate-name registration) has nothing to animate — native
+            // FindSkeleton @0x10387680 returns 0 and the animation simply does
+            // not play. Keep the frame-progress semantics, skip the pose.
+            if (avatar == null || avatar.Skeleton == null)
+            {
+                return (completed || frame + 1 > animation.NumFrames) ? AnimationStatus.COMPLETED : AnimationStatus.IN_PROGRESS;
+            }
+
+            // CC-06: an animation served untranslated (its CFP missing or corrupt —
+            // CC-01 matrix §5 / CC-03 law) has Translations/Rotations null; its
+            // motions must leave the bones at their current (bind/default) pose
+            // instead of null-ref'ing the renderer.
+            var translations = animation.Translations;
+            var rotations = animation.Rotations;
+
             foreach (var motion in animation.Motions)
             {
                 var bone = avatar.Skeleton.GetBone(motion.BoneName);
@@ -104,35 +121,49 @@ namespace FSO.Vitaboy
 
                 if (motion.HasTranslation)
                 {
-                    Vector3 trans;
-                    if (fraction >= 0)
+                    // CC-06: skip the motion when its pose data is absent (untranslated
+                    // animation) or its indices run past the enriched arrays (adversarial
+                    // custom BCF head) — the bone stays at its current pose rather than
+                    // crashing the render.
+                    if (translations != null
+                        && motion.FirstTranslationIndex + motionFrame >= 0
+                        && motion.FirstTranslationIndex + motionFrame < translations.Length)
                     {
-                        var trans1 = animation.Translations[motion.FirstTranslationIndex + motionFrame];
-                        var trans2 = (frame + 1 >= motion.FrameCount) ? trans1 : animation.Translations[motion.FirstTranslationIndex + motionFrame+1];
-                        trans = Vector3.Lerp(trans1, trans2, fraction);
+                        Vector3 trans;
+                        if (fraction >= 0)
+                        {
+                            var trans1 = translations[motion.FirstTranslationIndex + motionFrame];
+                            var trans2 = (frame + 1 >= motion.FrameCount || motion.FirstTranslationIndex + motionFrame + 1 >= translations.Length) ? trans1 : translations[motion.FirstTranslationIndex + motionFrame + 1];
+                            trans = Vector3.Lerp(trans1, trans2, fraction);
+                        }
+                        else
+                        {
+                            trans = translations[motion.FirstTranslationIndex + motionFrame];
+                        }
+                        if (weight == 1) bone.Translation = trans;
+                        else bone.Translation = Vector3.Lerp(bone.Translation, trans, weight);
                     }
-                    else
-                    {
-                        trans = animation.Translations[motion.FirstTranslationIndex + motionFrame];
-                    }
-                    if (weight == 1) bone.Translation = trans;
-                    else bone.Translation = Vector3.Lerp(bone.Translation, trans, weight);
                 }
                 if (motion.HasRotation)
                 {
-                    Quaternion quat;
-                    if (fraction >= 0)
+                    if (rotations != null
+                        && motion.FirstRotationIndex + motionFrame >= 0
+                        && motion.FirstRotationIndex + motionFrame < rotations.Length)
                     {
-                        var quat1 = animation.Rotations[motion.FirstRotationIndex + motionFrame];
-                        var quat2 = (frame + 1 >= motion.FrameCount) ? quat1 : animation.Rotations[motion.FirstRotationIndex + motionFrame + 1];
-                        quat = Quaternion.Slerp(quat1, quat2, fraction);
+                        Quaternion quat;
+                        if (fraction >= 0)
+                        {
+                            var quat1 = rotations[motion.FirstRotationIndex + motionFrame];
+                            var quat2 = (frame + 1 >= motion.FrameCount || motion.FirstRotationIndex + motionFrame + 1 >= rotations.Length) ? quat1 : rotations[motion.FirstRotationIndex + motionFrame + 1];
+                            quat = Quaternion.Slerp(quat1, quat2, fraction);
+                        }
+                        else
+                        {
+                            quat = rotations[motion.FirstRotationIndex + motionFrame];
+                        }
+                        if (weight == 1) bone.Rotation = quat;
+                        else bone.Rotation = Quaternion.Slerp(bone.Rotation, quat, weight);
                     }
-                    else
-                    {
-                        quat = animation.Rotations[motion.FirstRotationIndex + motionFrame];
-                    }
-                    if (weight == 1) bone.Rotation = quat;
-                    else bone.Rotation = Quaternion.Slerp(bone.Rotation, quat, weight);
                 }
             }
 
@@ -142,8 +173,12 @@ namespace FSO.Vitaboy
 
         public static Quaternion CalculateHeadSeek(Avatar avatar, Vector3 target, float radianDir)
         {
-            var head = avatar.Skeleton.GetBone("HEAD");
+            // CC-06: no skeleton (unresolvable custom skeleton) or no HEAD/neck
+            // bone — nothing to seek with; return identity instead of throwing.
+            var head = avatar?.Skeleton?.GetBone("HEAD");
+            if (head == null) return Quaternion.Identity;
             var neck = avatar.Skeleton.GetBone(head.ParentName);
+            if (neck == null) return Quaternion.Identity;
 
             var absoluteNeck = neck.AbsoluteMatrix * Matrix.CreateRotationY((float)(Math.PI - radianDir));
             var inv = Matrix.Invert(absoluteNeck);
@@ -165,7 +200,8 @@ namespace FSO.Vitaboy
 
         public static void ApplyHeadSeek(SimAvatar avatar, Quaternion quat, float weight)
         {
-            var head = avatar.Skeleton.GetBone("HEAD");
+            var head = avatar?.Skeleton?.GetBone("HEAD");
+            if (head == null) return; // CC-06: unresolvable skeleton — nothing to apply
 
             if (weight == 1) head.Rotation = quat;
             else head.Rotation = Quaternion.Slerp(head.Rotation, quat, weight);
@@ -225,7 +261,12 @@ namespace FSO.Vitaboy
             /** Speed is 30fps by default **/
             foreach (var motion in Animation.Motions)
             {
+                // CC-06: same custom-content safety laws as Animator.RenderFrame —
+                // missing bone (skip motion), untranslated animation (null pose
+                // arrays) and out-of-range motion indices must not throw.
+                if (Avatar?.Skeleton == null) return;
                 var bone = Avatar.Skeleton.GetBone(motion.BoneName);
+                if (bone == null) continue;
                 var motionFrame = frame;
                 if (frame >= motion.FrameCount)
                 {
@@ -235,11 +276,21 @@ namespace FSO.Vitaboy
 
                 if (motion.HasTranslation)
                 {
-                    bone.Translation = Animation.Translations[motion.FirstTranslationIndex + motionFrame];
+                    if (Animation.Translations != null
+                        && motion.FirstTranslationIndex + motionFrame >= 0
+                        && motion.FirstTranslationIndex + motionFrame < Animation.Translations.Length)
+                    {
+                        bone.Translation = Animation.Translations[motion.FirstTranslationIndex + motionFrame];
+                    }
                 }
                 if (motion.HasRotation)
                 {
-                    bone.Rotation = Animation.Rotations[motion.FirstRotationIndex + motionFrame];
+                    if (Animation.Rotations != null
+                        && motion.FirstRotationIndex + motionFrame >= 0
+                        && motion.FirstRotationIndex + motionFrame < Animation.Rotations.Length)
+                    {
+                        bone.Rotation = Animation.Rotations[motion.FirstRotationIndex + motionFrame];
+                    }
                 }
             }
 

@@ -84,7 +84,17 @@ namespace FSO.Content.TS1
                     }
                     foreach (var skel in file.Skeletons)
                     {
-                        SkelHostBCF.Add(skel.Name.ToLowerInvariant(), Path.GetFileName(bcf.ToString().ToLowerInvariant().Replace('\\', '/')));
+                        // CC-06: duplicate skeleton names must never throw. Native law
+                        // (VBAnimMgr::LoadAnimationFromStream @0x1038aa30): a duplicate
+                        // against an unloaded envelope silently REPLACES it (boot-time net
+                        // effect: last registration wins); against a loaded one the
+                        // newcomer is silently Released. No failure record either way.
+                        // The old .Add threw ArgumentException on the second file carrying
+                        // a name (custom BCFs re-ship "adult" as a CMX-format necessity),
+                        // aborting that file's remaining registrations and recording a
+                        // spurious failure — SkelHostBCF now follows the same silent
+                        // last-write-wins rule as AnimHostBCF/SkinHostBCF above.
+                        SkelHostBCF[skel.Name.ToLowerInvariant()] = Path.GetFileName(bcf.ToString().ToLowerInvariant().Replace('\\', '/'));
                     }
                 }
                 catch (System.IO.EndOfStreamException)
@@ -191,7 +201,36 @@ namespace FSO.Content.TS1
                         //the animation untranslated (CC-01 matrix §5 law) — the
                         //previous null return dropped whole BCF animations.
                         var cfp = CFPProvider.Get((anim.XSkillName + ".cfp").ToLowerInvariant());
-                        if (cfp != null) cfp.EnrichAnim(anim);
+                        if (cfp != null)
+                        {
+                            // CC-06: a CORRUPT CFP (truncated stream, bad opcode) must
+                            // not throw out of Get — the caller chain lands in
+                            // VMAnimateSim with no catch, i.e. a game crash on first
+                            // play of a custom object's animation. Native law
+                            // (ReadCompressedFloats @0x10364450 returns 0 on a failed
+                            // read; LoadAnimationFromStream @0x1038aa30 then calls
+                            // ReportBadFormat and skips): bounded failure, game
+                            // survives. Port: record the failure (provider table +
+                            // the game's bounded content-failure channel) and serve
+                            // the animation untranslated, same observable class as
+                            // the missing-CFP law above.
+                            try
+                            {
+                                cfp.EnrichAnim(anim);
+                            }
+                            catch (Exception ex) when (ex is EndOfStreamException || ex is InvalidDataException || ex is IndexOutOfRangeException || ex is IOException)
+                            {
+                                var cfpName = anim.XSkillName + ".cfp";
+                                FailedFiles.Add(new FailedFileInfo
+                                {
+                                    Filename = cfpName,
+                                    ErrorMessage = $"Animation '{anim.Name}' served without pose data (corrupt CFP: {ex.Message})",
+                                    ErrorType = ex.GetType().Name
+                                });
+                                FSO.Content.Content.RecordContentFailure(cfpName, ex.GetType().Name,
+                                    $"Animation '{anim.Name}' served without pose data (corrupt CFP: {ex.Message})");
+                            }
+                        }
                     }
                     return anim;
                 }
