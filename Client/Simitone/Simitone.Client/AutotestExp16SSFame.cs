@@ -261,25 +261,43 @@ namespace Simitone.Client
                     mounted++;
                     foreach (var r in refs)
                     {
-                        var gobj = r.Get();
-                        var res = gobj?.Resource;
-                        var objd = gobj?.OBJ;
-                        if (res == null || objd == null) { unresolvedList.Add(name + ":NO-RES"); unresolved++; continue; }
-                        var ttab = res.Get<TTAB>(objd.TreeTableID) ?? res.List<TTAB>().FirstOrDefault();
-                        if (ttab == null || ttab.Interactions.Length == 0) continue; // decor slabs: legal
-                        foreach (var ix in ttab.Interactions)
+                        try
                         {
-                            interactions++;
-                            bool okTree = TreeResolves(vm, res, ix.ActionFunction)
-                                       && (ix.TestFunction == 0 || TreeResolves(vm, res, ix.TestFunction));
-                            if (okTree) resolved++;
-                            else
+                            var gobj = r.Get();
+                            var res = gobj?.Resource;
+                            var objd = gobj?.OBJ;
+                            if (res == null || objd == null) { unresolvedList.Add(name + ":NO-RES"); unresolved++; continue; }
+                            // Only the LABEL-BEARING table is the user interaction
+                            // table (a same-id TTAs chunk). A second TTAB without
+                            // TTAs is the ENTRY-POINT table (init/load trees) —
+                            // e.g. SpaSteamer's TTAB 128 carries a dangling load
+                            // pair 4103/4104 in the SHIPPED data (no such BHAVs
+                            // anywhere; native cannot resolve it either — benign,
+                            // banked in studio-town-objects.md).
+                            var ttab = res.Get<TTAB>(objd.TreeTableID);
+                            if (ttab == null || ttab.Interactions.Length == 0) continue; // decor slabs: legal
+                            var hasTTAs = res.Get<TTAs>(objd.TreeTableID) != null;
+                            if (!hasTTAs) continue; // entry-point table, not interactions
+                            foreach (var ix in ttab.Interactions)
                             {
-                                unresolved++;
-                                if (unresolvedList.Count < 30)
-                                    unresolvedList.Add(name + ":tree"
-                                        + ix.ActionFunction.ToString() + "/t" + ix.TestFunction);
+                                interactions++;
+                                bool okTree = TreeResolves(vm, res, ix.ActionFunction)
+                                           && (ix.TestFunction == 0 || TreeResolves(vm, res, ix.TestFunction));
+                                if (okTree) resolved++;
+                                else
+                                {
+                                    unresolved++;
+                                    if (unresolvedList.Count < 30)
+                                        unresolvedList.Add(name + ":tree"
+                                            + ix.ActionFunction.ToString() + "/t" + ix.TestFunction);
+                                }
                             }
+                        }
+                        catch (Exception ex)
+                        {
+                            unresolved++;
+                            if (unresolvedList.Count < 30)
+                                unresolvedList.Add(name + ":EXC " + ex.GetType().Name);
                         }
                     }
                 }
