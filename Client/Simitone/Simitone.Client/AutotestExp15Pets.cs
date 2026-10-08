@@ -235,6 +235,10 @@ namespace Simitone.Client
                     {
                         _pushedTrain = true;
                         _dogQueueMax = 0;
+                        // adjacency first (the EXP-05 run-9 law: a long route tears
+                        // the interaction down) — teleport the host next to the dog
+                        var adj = new LotTilePos((short)(_dog.Position.x - 16), _dog.Position.y, _dog.Position.Level);
+                        _human.SetPosition(adj, Direction.NORTH, vm.Context);
                         // row tta=45 'Tricks.../Train Bounce' (action 8334 test 8335)
                         _dog.PushUserInteraction(45, _human, vm.Context, false);
                         _log("AUTOTEST ulpets TRAIN-PUSH row45 from humanOid=" + _human.ObjectID
