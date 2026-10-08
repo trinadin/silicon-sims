@@ -484,6 +484,62 @@ namespace Simitone.Client.UI.Panels
             return true;
         }
 
+        // UI-38: probe/switcher access to the mounted lot buttons (the native
+        // walks the lot tree this+0x13c..0x144; the port's equivalent store).
+        internal System.Collections.Generic.IReadOnlyDictionary<int, UINeighborhoodHouseButton> LotButtonsForProbe
+        { get { return LotButtonByHouse; } }
+
+        // UI-38 — HighlightLotsForMode__18cWinNeighborhoodULFv @ image 0x1045a9c0,
+        // ported law-exact. Per lot (in tree order): clear the import hilite;
+        // community-zoned lots take the BLUE tint (gate `this+0x111 == 0` = the
+        // community screen, always true on the UL community view); if the engine
+        // filter mode == 3 (Gardening — the native's only unconditional arm; the
+        // this+0x108 residential-detail flag is unresolved and pinned false,
+        // DISCLOSED): community -> blue, residential -> green when unoccupied
+        // (native lot+0x1b0 == -1) else red; engine mode == 5 (Park/import)
+        // disables every lot but the target (this+0x10c). Last write wins —
+        // the native Hilite replaces the button buffer each call.
+        // The plaque gate rides the same walk: a lot carries the active
+        // filter plaque when `(filterId & lot.categoryBits) != 0`
+        // (DrawFilterAt callers 0x45ac40/0x45b06c); production bits are 0
+        // until the native lot+0x1ac writer is decoded (DISCLOSED).
+        public int ULFilterHiliteApplications;
+        public void ApplyULFilterMode(int filterCmdId, int engineMode, string plaqueMember, int importTargetLot = -1)
+        {
+            var neigh = Content.Get().Neighborhood;
+            foreach (var kv in LotButtonByHouse)
+            {
+                var btn = kv.Value;
+                if (btn == null) continue;
+                btn.SetULFilterHilite(null);                       // HiliteForImport(lot, 0)
+                btn.ULPlaqueMember = (filterCmdId != 0
+                    && (filterCmdId & btn.ULFilterCategoryBits) != 0) ? plaqueMember : null;
+                short zoning;
+                if (!neigh.ZoningDictionary.TryGetValue((short)kv.Key, out zoning)) zoning = 0;
+                bool community = zoning > 0;                       // engine: GetZoningType == 2
+                if (community)
+                {
+                    btn.SetULFilterHilite(UINeighborhoodHouseButton.ULCommunityTint);
+                    ULFilterHiliteApplications++;
+                }
+                if (engineMode == 3)                               // the Gardening arm (unconditional)
+                {
+                    Color hilite;
+                    if (community) hilite = UINeighborhoodHouseButton.ULCommunityTint;
+                    else if (neigh.GetFamilyForHouse((short)kv.Key) == null)
+                        hilite = UINeighborhoodHouseButton.ULResidentialTint;   // unoccupied
+                    else hilite = UINeighborhoodHouseButton.ULDisabledTint;     // occupied
+                    btn.SetULFilterHilite(hilite);
+                    ULFilterHiliteApplications++;
+                }
+                if (engineMode == 5 && kv.Key != importTargetLot)  // the Park/import arm
+                {
+                    btn.SetULFilterHilite(UINeighborhoodHouseButton.ULDisabledTint);
+                    ULFilterHiliteApplications++;
+                }
+            }
+        }
+
         public void SelectHouse(int house)
         {
             // UI-30: while the evict/bulldoze mode is armed, lot clicks route to
@@ -1507,6 +1563,83 @@ namespace Simitone.Client.UI.Panels
         // ramp, NO timer, NO duration. The former 0.300s fade (and its
         // "Native" misname) was a port embellishment, removed.
         public const float NativeHoverBlend = 0.09f;
+        // UI-38 (UL filter toolbar, HighlightLotsForMode @0x1045a9c0 /
+        // Hilite__10cWinLotBtnFbiii @0x102c9800): the native hilite is a
+        // BUFFER COPY of the lot sprite where every non-mask pixel is
+        // BrightenColor(rgb, 1.0, 0.09) — the same {1.0, 0.09} pool as the
+        // hover law, byte-read at PTR 0x105bc74c -> 0x59b970 — and pixels
+        // adjacent to the mask color (buffer+0x24; port: A==0) take the
+        // FLAT category tint in ONE scanline pass, exactly the native loop
+        // order (brighten on a pixel's own iteration; the tint written from
+        // its mask neighbor's iteration). Category colors are the literal
+        // args of HiliteFor{Community,Residential,Disabled,Import}
+        // @0x102c9790/0x102c9720/0x102c96c0/0x102c9bf0. The native brighten
+        // runs through a gamma/colors-matrix pipeline; the port adds the 9%
+        // in sRGB (DISCLOSED simplification).
+        public const float NativeFilterBrighten = 0.09f;
+        public static readonly Color ULCommunityTint = new Color(0, 0, 255);
+        public static readonly Color ULResidentialTint = new Color(0, 200, 0);
+        public static readonly Color ULDisabledTint = new Color(242, 0, 0);
+        public static readonly Color ULImportTint = new Color(242, 255, 29);
+        private Color? _ulFilterTint;
+        private Texture2D _ulHiliteTex;
+        // UI-38: the per-lot filter CATEGORY BITS (native lot+0x1ac — the
+        // plaque/match gate `(filterId & bits) != 0`, DrawFilterAt callers
+        // 0x45ac40/0x45b06c). The native writer was not located (no direct
+        // stw; computed/stwx) — production lots carry 0 bits (no plaque)
+        // until the source is decoded; the probe drives the machinery via
+        // this field (DISCLOSED).
+        public int ULFilterCategoryBits;
+        // UI-38 (DrawFilterAt @0x1045a340): the active plaque member for
+        // THIS lot; drawn at (Position.x - 24, Position.y - 70) — the lot's
+        // CenterOn point minus (24,70) (0x45ac38/0x45ac3c), frame 0 of the
+        // 150x50 3-frame sheet (this+0x1dc == 0).
+        public string ULPlaqueMember;
+        public static int ULPlaqueOffsetX = -24;
+        public static int ULPlaqueOffsetY = -70;
+
+        public Color? ULFilterTintForProbe { get { return _ulFilterTint; } }
+        public Texture2D ULHiliteTextureForProbe { get { return _ulHiliteTex; } }
+
+        public void SetULFilterHilite(Color? tint)
+        {
+            if (_ulFilterTint.HasValue == tint.HasValue && (!tint.HasValue || _ulFilterTint.Value == tint.Value)) return;
+            _ulFilterTint = tint;
+            _ulHiliteTex?.Dispose();
+            _ulHiliteTex = null;
+            if (tint == null || HouseTex == null) return;
+            try
+            {
+                int w = HouseTex.Width, h = HouseTex.Height;
+                var px = new Color[w * h];
+                HouseTex.GetData(px);
+                int add = (int)(NativeFilterBrighten * 255f + 0.5f);
+                var flat = tint.Value;
+                for (int i = 0; i < px.Length; i++)
+                {
+                    var p = px[i];
+                    if (p.A == 0)
+                    {
+                        int right = i + 1;
+                        if (right < px.Length && px[right].A != 0)
+                            px[right] = flat;
+                        if (i > 0 && px[i - 1].A != 0)
+                            px[i - 1] = flat;
+                    }
+                    else
+                    {
+                        px[i] = new Color(
+                            (byte)Math.Min(255, p.R + add),
+                            (byte)Math.Min(255, p.G + add),
+                            (byte)Math.Min(255, p.B + add),
+                            p.A);
+                    }
+                }
+                _ulHiliteTex = new Texture2D(GameFacade.GraphicsDevice, w, h);
+                _ulHiliteTex.SetData(px);
+            }
+            catch { _ulHiliteTex = null; }
+        }
         // cWinLotBtn's zero-delay shared cWinLotPopup hooks.
         public Action<int, UINeighborhoodHouseButton, UpdateState> HoverNotify;
         public Action HoverLeave;
@@ -1608,9 +1741,29 @@ namespace Simitone.Client.UI.Panels
                     new Vector2(-Offsets.Width, -Offsets.Height) / HouseScale + yOff2,
                     Color.White);
             }
-            DrawArtboardClipped(batch, HouseTex,
+            // UI-38: while a filter hilite is active the native SWAPS the
+            // button's buffer to the tinted copy (Hilite @0x102c9800 saves
+            // this+0xd0 to this+0x248 and replaces it) — the hilited sprite
+            // REPLACES the normal art (no blend with it).
+            var body = _ulHiliteTex ?? HouseTex;
+            DrawArtboardClipped(batch, body,
                 new Vector2(-Offsets.Width, -Offsets.Height) / HouseScale + yOff,
                 Color.White * (1 - AlphaTime));
+            // UI-38 (DrawFilterAt @0x1045a340, callers 0x45ac40/0x45b06c):
+            // a category-matching lot carries the filter PLAQUE at its
+            // CenterOn point minus (24,70); frame 0 of the 150x50 3-frame
+            // sheet (src width = W/3). Drawn at artboard scale (the plaque
+            // buffer is not part of the lot sprite).
+            if (!string.IsNullOrEmpty(ULPlaqueMember))
+            {
+                var plaque = UIOriginal.EnsureResolved(ULPlaqueMember)?.Get(GameFacade.GraphicsDevice);
+                if (plaque != null)
+                {
+                    var src = new Rectangle(0, 0, plaque.Width / 3, plaque.Height);
+                    DrawLocalTexture(batch, plaque, src,
+                        new Vector2(ULPlaqueOffsetX, ULPlaqueOffsetY));
+                }
+            }
         }
 
         // cWinLotBtn::ImageBlt passes the neighborhood bounds at this+0x220 to
@@ -1652,6 +1805,7 @@ namespace Simitone.Client.UI.Panels
         {
             HouseTex?.Dispose();
             HouseOpenTex?.Dispose();
+            _ulHiliteTex?.Dispose();
         }
     }
 

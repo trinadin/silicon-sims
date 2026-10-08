@@ -123,6 +123,85 @@ namespace Simitone.Client.UI.Panels
         private UIOriginalNavbarButton _payphoneButton;
         public readonly List<string> LastMembers = new List<string>();
 
+        // UI-38 — the UL community filter toolbar (cWinNeighborhoodUL, PPC
+        // The Sims Complete; receipt evidence/UI-38/ul-filter-toolbar-law.md).
+        // The decoded engine law, in BuildFilterToolbar's button order
+        // (this+0xd4+i*4; thunks 0x459ba4/0x459c54/0x459d00/0x459dac/
+        // 0x459e58/0x459f04/0x459fb0; art ids byte-proven against
+        // Res_Nbhd.h in UIGraphics.far; ladder x from the static-init writer
+        // 0x465460, strip-local y=20; labels = STR# 171 english[0..6]).
+        public sealed class ULFilterSlot
+        {
+            public string DebugName;   // category
+            public int CmdBit;         // ProcessFilterToolbarByType input
+            public int ArtId;          // Res_Nbhd.h id (kFilter*Button)
+            public string Member;      // UIGraphics.far sheet (200x52, 4x1)
+            public int X, Y;           // ladder pair (strip-local)
+            public int Mode;           // ProcessFilterToolbarByType id->mode
+            public int LabelIndex;     // STR# 171 english block (0-based)
+            public string PlaqueMember; // SetFilterMode 4930..4936 art
+        }
+        public static readonly ULFilterSlot[] ULFilterLaw = new ULFilterSlot[]
+        {
+            new ULFilterSlot { DebugName = "DogCat",       CmdBit = 0x10, ArtId = 5064, Member = "NghUI\\FilterDogCatBtn.bmp",      X = 225, Y = 20, Mode = 0, LabelIndex = 0, PlaqueMember = "cpanel\\filterdogcat.bmp" },
+            new ULFilterSlot { DebugName = "SmallAnimal",  CmdBit = 0x20, ArtId = 5065, Member = "NghUI\\FilterSmallAnimalBtn.bmp", X = 275, Y = 20, Mode = 1, LabelIndex = 1, PlaqueMember = "cpanel\\filtersmallanimal.bmp" },
+            new ULFilterSlot { DebugName = "Shopping",     CmdBit = 0x08, ArtId = 5063, Member = "NghUI\\FilterShoppingBtn.bmp",    X = 325, Y = 20, Mode = 2, LabelIndex = 2, PlaqueMember = "cpanel\\filtershopping.bmp" },
+            new ULFilterSlot { DebugName = "Gardening",    CmdBit = 0x04, ArtId = 5062, Member = "NghUI\\FilterGardeningBtn.bmp",   X = 375, Y = 20, Mode = 3, LabelIndex = 3, PlaqueMember = "cpanel\\filtergardening.bmp" },
+            new ULFilterSlot { DebugName = "Food",         CmdBit = 0x02, ArtId = 5061, Member = "NghUI\\FilterFoodBtn.bmp",        X = 425, Y = 20, Mode = 4, LabelIndex = 4, PlaqueMember = "cpanel\\filterfood.bmp" },
+            new ULFilterSlot { DebugName = "Recreation",   CmdBit = 0x40, ArtId = 5066, Member = "NghUI\\FilterRecreationBtn.bmp",  X = 475, Y = 20, Mode = 5, LabelIndex = 5, PlaqueMember = "cpanel\\filterpark.bmp" },
+            new ULFilterSlot { DebugName = "Lodging",      CmdBit = 0x01, ArtId = 5060, Member = "NghUI\\FilterLodgingBtn.bmp",     X = 525, Y = 20, Mode = 6, LabelIndex = 6, PlaqueMember = "cpanel\\filterlodging.bmp" },
+        };
+        // probe surfaces
+        public readonly List<UIOriginalNavbarButton> ULFilterButtons = new List<UIOriginalNavbarButton>();
+        public UIOriginalNavbarButton ULFilterStrip;
+        public bool ULFilterStripMounted, ULFilterButtonsMounted;
+        public int ULFilterCmdId = -1;        // native this+0x188 (the active bit)
+        public int ULFilterEngineMode = -1;   // native this+0xcc filter mode
+        public string ULFilterPlaqueMember;   // native this+0x184 art
+        public int ULFilterClicksForProbe;
+
+        /// <summary>ProcessFilterToolbarByType @0x10458c60 + ProcessFilterToolbar
+        /// @0x104598f0 + SetFilterMode @0x1045a1c0 + HighlightLotsForMode
+        /// @0x1045a9c0, ported law-exact: clear the PREVIOUS bit's button,
+        /// press the new one, set the plaque art, apply the lot hilites.</summary>
+        public void ProcessULFilterByType(int cmdBit)
+        {
+            var slot = ULFilterCmdId >= 0
+                ? System.Linq.Enumerable.FirstOrDefault(ULFilterLaw, s => s.CmdBit == ULFilterCmdId)
+                : null;
+            var prevBtn = slot != null && ULFilterButtons.Count == ULFilterLaw.Length
+                ? ULFilterButtons[System.Array.FindIndex(ULFilterLaw, s => s.CmdBit == ULFilterCmdId)]
+                : null;
+            if (prevBtn != null) prevBtn.Selected = false;    // SetState(prev, 0)
+            var next = System.Linq.Enumerable.FirstOrDefault(ULFilterLaw, s => s.CmdBit == cmdBit);
+            if (next == null) return;
+            int idx = System.Array.IndexOf(ULFilterLaw, next);
+            if (ULFilterButtons.Count == ULFilterLaw.Length) ULFilterButtons[idx].Selected = true;
+            ULFilterCmdId = cmdBit;                           // this+0x188 = id
+            ULFilterEngineMode = next.Mode;                   // via ProcessFilterToolbarByType
+            ULFilterPlaqueMember = next.PlaqueMember;         // SetFilterMode 0x1342+idx
+            ULFilterClicksForProbe++;
+            Panel?.ApplyULFilterMode(cmdBit, next.Mode, next.PlaqueMember);
+            GameLog.Write("uidtbar: filter " + next.DebugName + " (cmd 0x" + cmdBit.ToString("x")
+                + " mode " + next.Mode + " plaque " + next.PlaqueMember + ")");
+        }
+
+        /// <summary>STR# 171 'Filter Bar' english block with the R159-style
+        /// literal fallback (the seven UL labels; UIText.iff).</summary>
+        private static string ULTip171(int idx)
+        {
+            var names = new string[]
+            {
+                "Show Dog & Cat Adoption Centers", "Show Small Pet Shops",
+                "Show Shopping Locations", "Show Gardening Shops",
+                "Show Food Service Areas", "Show Recreational Areas",
+                "Show Lodging Areas",
+            };
+            var t = GameFacade.Strings.GetString("171", idx.ToString());
+            if (string.IsNullOrEmpty(t) || t.Contains("MISSING")) return names[idx];
+            return t;
+        }
+
         public UINeighborhoodSelectionPanel Panel;
         private ushort Mode;
         public bool MoveInMode;
@@ -258,6 +337,12 @@ namespace Simitone.Client.UI.Panels
             FilterBarMounted = PayphoneMounted = false;
             LastFilterMember = null;
             LastMembers.Clear();
+            // UI-38: fresh UL filter state per strip (native Init rebuild).
+            ULFilterButtons.Clear();
+            ULFilterStrip = null;
+            ULFilterStripMounted = ULFilterButtonsMounted = false;
+            ULFilterCmdId = ULFilterEngineMode = -1;
+            ULFilterPlaqueMember = null;
             BaseAnchors.Clear();
             ArtboardAnchors.Clear();
             CurrentNumber = null;
@@ -459,6 +544,66 @@ namespace Simitone.Client.UI.Panels
                     PayphoneMounted = phone.OriginalMounted;
                     _payphoneButton = phone;
                 }
+            }
+
+            // UI-38 — the UL community FILTER TOOLBAR (cWinNeighborhoodUL,
+            // The Sims Complete PPC; receipt evidence/UI-38/ul-filter-toolbar-law.md):
+            // on the community screen (0x111==0) the engine mounts NO navbar —
+            // the strip IS the top chrome: kFilterToolbar 5045
+            // NghUI\Filter_Toolbar_Unleashed.bmp 800x72 at the artboard origin
+            // (cWinNeighborhoodUL::Init 0x10462810: strip button this+0x180,
+            // SetImage(this+0x11c = 5045, 1, 1), no SetArea -> parent origin),
+            // with SEVEN cTSWinBtn children at the static-init ladder
+            // (225|275|325|375|425|475|525, y=20 — writer 0x465460-0x4656b4,
+            // file 0x46e3bc; BuildFilterToolbar 0x10459b10 walks it via
+            // [r2-0x470c] + 8/button; 200x52 sheets SetImage(4,1) -> 50x52
+            // cells). Button order/art (thunks 0x459ba4.., Res_Nbhd.h ids):
+            // DogCat 5064, SmallAnimal 5065, Shopping 5063, Gardening 5062,
+            // Food 5061, Recreation 5066, Lodging 5060; tooltips STR# 171
+            // 'Filter Bar' [0..6] (BuildFilterToolbar GetString(set, i+1),
+            // 1-based). Click = ProcessFilterToolbarByType @0x10458c60:
+            // bit->mode {1:6, 2:4, 4:3, 8:2, 0x10:0, 0x20:1, 0x40:5}, clear
+            // the previous button (ProcessFilterToolbar 0x104598f0), press
+            // the new one, SetFilterMode plaque
+            // ({0x10:cpanel\filterdogcat, 0x20:filtersmallanimal,
+            // 8:filtershopping, 4:filtergardening, 2:filterfood,
+            // 0x40:filterpark, 1:filterlodging}.bmp — 4930..4936) and
+            // HighlightLotsForMode. The Init tail enters with the DEFAULT
+            // filter 0x10 (DogCat) — this+0x188 = 0x10, plaque 0x1346,
+            // ProcessFilterToolbarByType(this, 0x10) — then the persisted
+            // filter overrides (LoadCurrentFilter; port keeps the default,
+            // persistence not ported, DISCLOSED).
+            // DISCLOSED divergence: the port's mode 4 is the MERGED
+            // residential+community view that keeps the engine navbar as its
+            // navigation surface, so the strip band mounts directly BELOW
+            // the 52px navbar (strip top at artboard y=52); the strip's
+            // INTERNAL layout is engine-exact (buttons at strip-local
+            // ladder y=20 -> artboard y=72).
+            if (mode == 4)
+            {
+                var strip = new UIOriginalNavbarButton("NghUI\\filter_toolbar_Unleashed.bmp", 1, 1, null)
+                { ForceState = 0 };
+                RegisterAnchor(strip, new Vector2(0, 52), true);
+                Add(strip);
+                ULFilterStrip = strip;
+                ULFilterStripMounted = strip.OriginalMounted;
+
+                for (int ui = 0; ui < ULFilterLaw.Length; ui++)
+                {
+                    var slot = ULFilterLaw[ui];
+                    var ubtn = new UIOriginalNavbarButton(slot.Member, 4, 1, ULTip171(slot.LabelIndex))
+                    { ForceState = 0 };
+                    RegisterAnchor(ubtn, new Vector2(slot.X, 52 + slot.Y), true);
+                    var cmd = slot.CmdBit;
+                    ubtn.OnButtonClick += (b) => ProcessULFilterByType(cmd);
+                    Add(ubtn);
+                    ULFilterButtons.Add(ubtn);
+                }
+                ULFilterButtonsMounted = ULFilterButtons.Count == 7
+                    && ULFilterButtons.TrueForAll(b => b.OriginalMounted);
+                // the Init default: filter 0x10 (DogCat) pressed + plaque +
+                // HighlightLotsForMode (mode 0 -> community lots blue).
+                ProcessULFilterByType(0x10);
             }
 
             // The engine emits this from PostChildDraw, after the banner and
