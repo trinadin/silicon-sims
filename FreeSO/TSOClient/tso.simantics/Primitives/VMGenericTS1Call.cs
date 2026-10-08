@@ -259,7 +259,6 @@ namespace FSO.SimAntics.Primitives
                     // EXP-14 hdserve follow-up (bounded transit diagnostic): one line
                     // per travel, naming the exact pre-switch transit state the
                     // arrival-side build (mode 18) will consume.
-                    System.Console.WriteLine("[TransitDiag] mode17 switch->lot " + switchLotId
                         + " vacation=" + vacation
                         + " g34=" + context.VM.GetGlobalValue(34)
                         + " LotTransitInfo=" + crossData.LotTransitInfo
@@ -321,7 +320,6 @@ namespace FSO.SimAntics.Primitives
                     // EXP-14 hdserve follow-up (bounded transit diagnostic): the
                     // middle ped marker calls this on attr3; name the exact leg
                     // taken (one line per ATTEMPT, capped by the marker loop).
-                    System.Console.WriteLine("[TransitDiag] mode18 build-attempt by obj" + context.Caller.ObjectID
                         + "/" + (context.Caller.Object?.Resource?.MainIff?.Filename ?? "?")
                         + " ActiveFamily=" + (crossDataDT.ActiveFamily?.ChunkID.ToString() ?? "NULL")
                         + " LotTransitInfo=" + crossDataDT.LotTransitInfo
@@ -329,7 +327,6 @@ namespace FSO.SimAntics.Primitives
                     if (crossDataDT.ActiveFamily == null) return VMPrimitiveExitCode.GOTO_FALSE;
 
                     var control = context.VM.Context.CreateObjectInstance(crossDataDT.DowntownSimGUID, LotTilePos.OUT_OF_WORLD, Direction.NORTH)?.BaseObject;
-                    System.Console.WriteLine("[TransitDiag] mode18 create=" + (control?.ObjectID.ToString() ?? "NULL"));
                     if (control == null) return VMPrimitiveExitCode.GOTO_FALSE; // P3-1: the create-deref twin
                     ((VMAvatar)control).AvatarState.Permissions = Model.TSOPlatform.VMTSOAvatarPermissions.Owner;
                     context.VM.SetGlobalValue(3, control.ObjectID);
@@ -454,13 +451,11 @@ namespace FSO.SimAntics.Primitives
                     if (crossData2.ActiveFamily == null)
                     {
                         // EXP-14 hdserve follow-up (bounded transit diagnostic)
-                        System.Console.WriteLine("[TransitDiag] mode26 build-attempt by obj" + context.Caller.ObjectID
                             + "/" + (context.Caller.Object?.Resource?.MainIff?.Filename ?? "?")
                             + " ActiveFamily=NULL LotTransitInfo=" + crossData2.LotTransitInfo
                             + " (the arrival build declines — no traveler materializes)");
                         return VMPrimitiveExitCode.GOTO_FALSE;
                     }
-                    System.Console.WriteLine("[TransitDiag] mode26 build-attempt by obj" + context.Caller.ObjectID
                         + "/" + (context.Caller.Object?.Resource?.MainIff?.Filename ?? "?")
                         + " ActiveFamily=" + crossData2.ActiveFamily.ChunkID
                         + " LotTransitInfo=" + crossData2.LotTransitInfo
