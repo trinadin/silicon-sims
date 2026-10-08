@@ -36,7 +36,7 @@ engine is corrected to match it — constants, thresholds, formulas and all (see
 ## Status — and how you can help
 
 **Playable:** boots to gameplay, loads and saves neighbourhoods and houses, plays the core
-single-family game — verified by a 144-check automated battery that boots the real game
+single-family game — verified by a 146-check automated battery that boots the real game
 headlessly and exercises gameplay, UI, saves, sound, and the autonomy engine on every
 change (run it yourself with `tools/run-autotest.sh`; the one-page state summary is
 [HANDOFF.md](HANDOFF.md)).

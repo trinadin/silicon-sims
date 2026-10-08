@@ -7,14 +7,15 @@
 
 **Goal:** drive the game as close to 1:1 behavior with the original *The Sims* (2000) as feasible, verified against the original IFF data and the original PowerPC binary. Every claim is labelled with its source; nothing is asserted from live play unless a read/write trace proves it. IFF-literalism and binary decode are the verification standards.
 
-## Where the game stands — v0.9.0, 2026-10-08 (READ THIS FIRST)
+## Where the game stands — v0.9.1, 2026-10-08 (READ THIS FIRST)
 
 This section is the current truth. Everything below it is the historical round record
 (newest-first-ish through late September) — rows there may be superseded; where a row was
 later overturned, corrections are noted in place or here.
 
-**Verified working** (the default 144-check battery boots the real game headlessly and
-exercises all of this on every change; `tools/run-autotest.sh`):
+**Verified working** (the default 146-check battery boots the real game headlessly and
+exercises all of this on every change; `tools/run-autotest.sh`; opt-in batteries
+`nbr06`, `nbr05ui`, `nghbtns`, `freewillwin`, `moodlaw` cover the decode-pinned laws):
 
 - Boot → neighbourhood → lot → live play; saves and reload (byte-audited against the
   original record format); CAS on the original desktop law (portraits, personality
@@ -31,16 +32,31 @@ exercises all of this on every change; `tools/run-autotest.sh`):
 
 **Open — base game (the honest remainder):**
 
-- Neighbourhood management: lot bulldoze/rezone/create and eviction flows are partial
-  (the failed-rezone receipt landed; the full management surface is not decoded/ported),
-  and the community-lot build/buy entry-gate matrix is a bounded open decode.
-- Sound: infrastructure is runtime-verified; a per-event audible-fidelity trace has not
-  been run.
-- Custom content: objects with custom animations are not fully supported.
-- UI residuals: the original neighbourhood layout montage is incomplete; several
-  interactions are modeled rather than decoded (list pickers, non-scrolling phonebook
-  columns, view-pie gesture arithmetic); a small set of constants carries explicit
-  DISCLOSED markers (see the UI-33 remediation note below).
+- ~~Neighbourhood management~~ **CLOSED 2026-10-08 (NBR-06)**: bulldoze
+  (all four dialog arms, STR#131[0]/[1] + 132[4]/[5] + failure 131[10]/[11]),
+  eviction-with-demolition (EvictFamily → MoveOut's house-file deletion), the
+  same-click rezone chain, and the community build/buy entry + SAVE matrix
+  (the port's save gate was inverted) are decoded, implemented and gated
+  (`nbr06` opt-in, 9 phases; nghbtns/nbr05ui re-pinned). Residuals: the
+  zone-choice dialog's strings table (behaviorally covered by the toggle),
+  hide-slot pairing, evict web-export (ENG-27 scope), venue variants.
+- ~~Sound trace~~ **ROUND 1 DONE (AUD-19)**: per-event trace (HITTrace) +
+  10 native laws; the CAS personality-deny sound (dead name → `ui_nhood_error`)
+  and cross-level attenuation (×3/5 both directions) FIXED; dead native names
+  pinned. **Still open**: footsteps are a missing class entirely; the UI-button
+  down-vs-up firing law and the zoom-volume byte-law are documented deltas;
+  gated listen-run on real hardware.
+- Custom content: objects with custom animations are not fully supported
+  (CC-06 queued — the analysis agent was interrupted by a usage limit; its
+  dart-board custom-anim fixture set is banked in the ledger evidence).
+- ~~UI residuals~~ **LARGELY CLOSED (UI-37)**: phonebook/help columns scroll
+  on the DECODED animated law (ScrollTo pool + 200ms autorepeat); view-pie
+  cell ladder + magnitude + commit clamps decoded (old model replaced;
+  speed-sound attribution corrected — the port already played the native
+  matrix); the "list picker" premise refuted in-binary (no native dropdown);
+  skill-pip/band constants art-anchored. Remaining: the neighbourhood layout
+  montage; the view-pie pop gesture (re-proved vtable-unrecoverable — stays
+  disclosed); the UL filter-toolbar live mount (canon banked).
 - Platform: `-3d` is experimental; `-jit`/`-dx` are inherited and unverified; trackpad
   natural-scroll and other hardware feel items lack systematic human verification —
   **human verification is partial** (portions played and accepted hands-on; no

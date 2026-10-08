@@ -16,7 +16,7 @@ to the recovered law (constants, thresholds, formulas, UI geometry, art).
 
 ## Verified state
 
-- **Default battery: 144 checks, PASS** — boots the real game headlessly,
+- **Default battery: 146 checks, PASS** — boots the real game headlessly,
   exercises gameplay/UI/saves/sound/autonomy, and runs on every change
   (`./tools/run-autotest.sh`; see [AUTOTEST.md](AUTOTEST.md)). Focused gates
   (freewillwin, moodlaw, roomlaw, …) cover the decode-pinned laws.
