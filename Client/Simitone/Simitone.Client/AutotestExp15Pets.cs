@@ -69,11 +69,12 @@ namespace Simitone.Client
         private static VMAvatar _human, _cat, _dog;
         private static VMEntity _ctr, _pedestal;
         private static FAMI _fam;
+        private static short _probeFamId;
         private static readonly HashSet<string> _dogTrees = new HashSet<string>();
         private static readonly HashSet<string> _catTrees = new HashSet<string>();
         private static readonly Dictionary<int, HashSet<short>> _ctrAttrs = new Dictionary<int, HashSet<short>>();
         private static bool _pushedTrain, _pushedShow, _trainPushLanded, _trainTreeRan, _pieDone;
-        private static int _dogQueueMax, _pedestalQ0 = -1;
+        private static int _dogQueueMax, _humanQueueMax, _pedestalQ0 = -1;
         private static readonly List<string> _pieLabels = new List<string>();
         private static bool _pushHooked;
         private static readonly List<string> _capture = new List<string>();
@@ -144,6 +145,7 @@ namespace Simitone.Client
                     famsChunk.InsertString(0, new STRItem { Comment = "", Value = "Exp15Pets" });
                     neigh.MainResource.AddChunk(famsChunk);
                     neigh.SetFamilyForHouse(ProbeHouse, _fam, false);
+                    _probeFamId = (short)newId;
                     _log("AUTOTEST ulpets attach famId=" + newId + " house=" + ProbeHouse
                         + " human=0x" + human.ToString("x8") + " cat=0x" + CatGuid.ToString("x8")
                         + " dog=0x" + DogGuid.ToString("x8"));
@@ -172,6 +174,13 @@ namespace Simitone.Client
                             ?? avatars.FirstOrDefault(a => a != _cat && a != _dog);
                         if (_human != null)
                         {
+                            var humFam = _human.GetPersonData(VMPersonDataVariable.TS1FamilyNumber);
+                            if (humFam != _probeFamId)
+                            {
+                                _human.SetPersonData(VMPersonDataVariable.TS1FamilyNumber, _probeFamId);
+                                _log("AUTOTEST ulpets FAM-UNIFY human pd61 " + humFam + " -> " + _probeFamId
+                                    + " (the record restore overwrote the probe family)");
+                            }
                             _log("AUTOTEST ulpets SPAWN catOid=" + _cat.ObjectID + " dogOid=" + _dog.ObjectID
                                 + " humanOid=" + _human.ObjectID + " avatars=" + avatars.Count
                                 + " dog(pd32=" + _dog.GetPersonData(VMPersonDataVariable.PersonType)
@@ -235,6 +244,7 @@ namespace Simitone.Client
                     {
                         _pushedTrain = true;
                         _dogQueueMax = 0;
+                        _humanQueueMax = _human.Thread.Queue.Count;
                         // adjacency first (the EXP-05 run-9 law: a long route tears
                         // the interaction down) — teleport the host next to the dog
                         var adj = new LotTilePos((short)(_dog.Position.x - 16), _dog.Position.y, _dog.Position.Level);
@@ -245,11 +255,12 @@ namespace Simitone.Client
                             + " onto dogOid=" + _dog.ObjectID + " q=" + _dog.Thread.Queue.Count);
                     }
                     _dogQueueMax = Math.Max(_dogQueueMax, _dog.Thread.Queue.Count);
+                    _humanQueueMax = Math.Max(_humanQueueMax, _human.Thread.Queue.Count);
                     if (_frame >= 900)
                     {
                         _log("AUTOTEST ulpets TRAIN treeRan=" + _trainTreeRan + " pushLanded=" + _trainPushLanded
-                            + " dogQmax=" + _dogQueueMax + " dogTrees=[" + string.Join(",", _dogTrees) + "]");
-                        if (!(_trainTreeRan && (_trainPushLanded || _dogQueueMax > 0)))
+                            + " dogQmax=" + _dogQueueMax + " humanQmax=" + _humanQueueMax + " dogTrees=[" + string.Join(",", _dogTrees) + "]");
+                        if (!(_trainTreeRan && (_trainPushLanded || _dogQueueMax > 0 || _humanQueueMax > 1)))
                         {
                             _log("AUTOTEST ulpets train FAIL: 8334 must execute and land its push on the dog");
                             _fail("ulpets"); State = 99; TeardownTrace(); return;

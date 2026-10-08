@@ -292,18 +292,16 @@ namespace FSO.SimAntics
             // tables; the NATIVE species discriminator is the same body-strings
             // word: EditPerson::GetSpecies @0x10062290 compares the species
             // string against {"dogmale","dogfemale","catmale","catfemale"}) and
-            // (b) person type = the PERMANENT Global.iff BCON 260 'Person Types'
-            // class 2: Cat/DogGlobals 8200 'get interaction eligibility'
-            // ins2/ins3 gate the ENTIRE owner-interaction set on pd[32] ==
-            // Tuning[0x4202] (= BCON 260 key 2 = 2); the PPC cXPerson init
+            // (b) person type = the pet class 1 (Global.iff BCON 260 'Person
+            // Types' key 1): the pets' own main loop (Dog/CatGlobals 8222 ins7)
+            // self-writes Tuning[0x4201] = 1 on non-residential lots, and 8200
+            // 'get interaction eligibility' ins3 (t=255 = Pop RETURN_FALSE)
+            // REJECTS class-2 targets — the port's synthesized records gave
+            // pets the 'init NPC' class 2 (MakePersonData/SIM-19's visitor
+            // canon), which hides every pet-owner row. The PPC cXPerson init
             // (0x10108b00 region) stores the creation type param at
-            // person+0x5cc, and the same function's zoning law exempts class 2
-            // from the visitor conversion. Template-family pets and old saves
-            // previously arrived with pd[32]=0 and no species bits, so 8200's
-            // gate returned false and every pet-owner row (Call Over / Scold /
-            // Praise / Treat / toys / Play / Tricks / Train / pet show entry)
-            // was unreachable — live-proven by the ulpets PIECAP trace
-            // (run 2: 8200@3 f->14 on every gated row).
+            // person+0x5cc and its zoning law exempts class 2 from the visitor
+            // conversion; class 1 is the pets' file-law value.
             // (raw array writes: SetAvatarType runs in the ctor BEFORE WorldUI
             // exists, so SetPersonData's WorldUI side-effect paths are unsafe here)
             if (AvatarType == VMAvatarType.Dog || AvatarType == VMAvatarType.Cat)
@@ -311,7 +309,7 @@ namespace FSO.SimAntics
                 var g = (ushort)PersonData[(ushort)VMPersonDataVariable.Gender];
                 g |= (AvatarType == VMAvatarType.Dog) ? (ushort)8 : (ushort)16;
                 PersonData[(ushort)VMPersonDataVariable.Gender] = (short)g;
-                PersonData[(ushort)VMPersonDataVariable.PersonType] = 2;
+                PersonData[(ushort)VMPersonDataVariable.PersonType] = 1;
             }
 
             Avatar = new SimAvatar(FSO.Content.Content.Get().AvatarSkeletons.Get((data?.GetString(0)??"adult")+".skel"));
@@ -1108,7 +1106,7 @@ namespace FSO.SimAntics
                 var g = (ushort)GetPersonData(VMPersonDataVariable.Gender);
                 g |= (AvatarType == VMAvatarType.Dog) ? (ushort)8 : (ushort)16;
                 SetPersonData(VMPersonDataVariable.Gender, (short)g);
-                SetPersonData(VMPersonDataVariable.PersonType, 2);
+                SetPersonData(VMPersonDataVariable.PersonType, 1);
             }
             SetPersonData(VMPersonDataVariable.VisitorSchedule, sched);
             SetPersonData(VMPersonDataVariable.GreetStatus, 0);
