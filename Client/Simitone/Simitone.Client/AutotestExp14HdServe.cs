@@ -147,6 +147,13 @@ namespace Simitone.Client
         private int _podiumEatDrawnFrame = -1;
         private string _podiumEatDrawnDetail;
         private bool _podiumEatDrawnByTraveler;
+        // the traveler-leg evidence: her own gathers must POOL the podium rows
+        // (hunger < -35 per the curve law → the row scores for her); the gather
+        // cadence of a standing idle sim is stochastic (observed 42-950f gaps),
+        // so the window must outlast several of her gathers.
+        private bool _podiumDrawnAnyCaller;
+        private int _travelerDecisions;
+        private int _travelerPodiumCandDecisions;
         private readonly List<string> _decisionLog = new List<string>();
 
         public bool Passed { get; private set; }
@@ -460,21 +467,31 @@ namespace Simitone.Client
             var podiumCands = (d.Candidates ?? new List<VMTS1DecisionCandidate>())
                 .Where(c => podiumIds.Contains(c.CalleeId)).ToList();
             if (podiumCands.Count > 0) _podiumCandidateDecisions++;
+            var byTraveler = _traveler != null && d.CallerId == _traveler.ObjectID;
+            if (byTraveler)
+            {
+                _travelerDecisions++;
+                if (podiumCands.Count > 0) _travelerPodiumCandDecisions++;
+            }
             // the draw leg: the winner IS a podium Eat row (fn 4098 'Eat' / 4112
             // 'Eat Alone' — the only rows whose BHAVs run the op-42 controller create)
-            if (!_podiumEatDrawn && d.Winner != null && podiumIds.Contains(d.Winner.CalleeId)
+            if (d.Winner != null && podiumIds.Contains(d.Winner.CalleeId)
                 && (d.Winner.ActionNumber == 4098 || d.Winner.ActionNumber == 4112))
             {
-                _podiumEatDrawn = true;
-                _podiumEatDrawnFrame = _frame;
-                _podiumEatDrawnByTraveler = _traveler != null && d.CallerId == _traveler.ObjectID;
-                _podiumEatDrawnDetail = "f" + _frame + " caller=obj" + d.CallerId
-                    + (_podiumEatDrawnByTraveler ? " (THE TRAVELER)" : " (lot sim)")
-                    + " -> obj" + d.Winner.CalleeId + "/fn" + d.Winner.ActionNumber
-                    + "/score" + d.Winner.Score.ToString("F6") + " acc=" + d.Accepted;
-                _log("AUTOTEST hdserve PODIUM EAT DRAWN at " + _podiumEatDrawnDetail
-                    + " — the autonomy draw selected the podium's Eat row (the op-42"
-                    + " controller-creating interaction; controller leg follows)");
+                _podiumDrawnAnyCaller = true;
+                if (!_podiumEatDrawn || (byTraveler && !_podiumEatDrawnByTraveler))
+                {
+                    _podiumEatDrawn = true;
+                    _podiumEatDrawnFrame = _frame;
+                    _podiumEatDrawnByTraveler = byTraveler;
+                    _podiumEatDrawnDetail = "f" + _frame + " caller=obj" + d.CallerId
+                        + (byTraveler ? " (THE TRAVELER)" : " (lot sim)")
+                        + " -> obj" + d.Winner.CalleeId + "/fn" + d.Winner.ActionNumber
+                        + "/score" + d.Winner.Score.ToString("F6") + " acc=" + d.Accepted;
+                    _log("AUTOTEST hdserve PODIUM EAT DRAWN at " + _podiumEatDrawnDetail
+                        + " — the autonomy draw selected the podium's Eat row (the op-42"
+                        + " controller-creating interaction; controller leg follows)");
+                }
             }
             if (_decisionLog.Count < 40)
             {
@@ -512,10 +529,19 @@ namespace Simitone.Client
             {
                 _controllerSeen = true;
                 _controllerSeenFrame = _frame;
+                // who is dining? dump every avatar's active action — names the
+                // eater whether the engagement came from a free-will draw or an
+                // NPC recruit push (e.g. the maitre'd's seat-a-walk-in law, whose
+                // push ALSO runs the podium's test tree).
+                var actScan = string.Join(" | ", vm.Entities.OfType<VMAvatar>()
+                    .Where(a => a.Thread?.ActiveAction != null)
+                    .Select(a => "obj" + a.ObjectID + ":'" + a.Thread.ActiveAction.Name + "'")
+                    .Take(10));
                 _log("AUTOTEST hdserve CONTROLLER SPAWNED at f=" + _frame
                     + " (Controller - Restaurant Eat count=" + controllers
-                    + (_eatSeen ? " — after an eat engagement (the BHAV 4098/4112 op-42 creation law)" : " — BEFORE any observed eat"
-                        + " (an unobserved sim autonomously ate, or another creation path)"));
+                    + "; creation is the podium Eat interaction's own op-42 — 4098 ins2/4112 ins3;"
+                    + " no other IFF path creates GUID 0x92534734). Active actions now: ["
+                    + (actScan.Length > 0 ? actScan : "none") + "]");
             }
 
             // eat-engagement scan across ALL avatars (any autonomous diner counts:
@@ -556,14 +582,20 @@ namespace Simitone.Client
             }
 
             var armed = _frame - _hungerArmFrame;
-            // EXP-14 hdserve-residual close law: the window ends when the CONTROLLER
-            // (the op-42 creation leg) has been observed + a 600f grace for the meal
-            // to progress, or at the full soak bound. The old 'eatSeen + 1200f' early
-            // close was retired: an eat-family action NAME can flash from a FAILED
-            // engagement (a slave-part podium draw returns false at 4112 ins0/15/16's
-            // GUID chain before doing anything) — the controller, not the name, is the
-            // decode-backed creation proof.
-            if ((_controllerSeen && _frame >= _controllerSeenFrame + 600) || armed >= SoakFrames)
+            // EXP-14 hdserve-residual close law: the window runs the FULL soak
+            // (the traveler's gather cadence is stochastic — observed 42-950f
+            // gaps between her decisions — so several of her gathers must fit
+            // inside the window) and closes early ONLY when every pass leg has
+            // been observed + a 300f grace. The controller alone (hdr1 run1:
+            // spawned f315 via the maitre'd's recruit path, whose push runs the
+            // same podium test tree) is a REAL autonomous eat proof but not the
+            // whole gate: the traveler's own free-will gather must also be seen
+            // pooling the podium row.
+            var passComplete = _controllerSeen && (_podiumEatDrawnByTraveler
+                || (_podiumDrawnAnyCaller && _travelerPodiumCandDecisions > 0));
+            if ((passComplete && _frame >= _controllerSeenFrame + 300 && _podiumEatDrawnFrame >= 0
+                    && _frame >= _podiumEatDrawnFrame + 300)
+                || armed >= SoakFrames)
             {
                 CloseSoak(vm, armed);
                 return true; // verdict delivered
@@ -579,22 +611,44 @@ namespace Simitone.Client
             foreach (var l in _decisionLog.Take(40)) _log("AUTOTEST hdserve decision " + l);
 
             // PASS law (decode receipt coordination/evidence/EXP-14/): the native
-            // self-start = the free-will draw selects the podium's Eat row (fn
-            // 4098/4112 — hunger-keyed per the STR#501 curve law, min=1/delta=49/
-            // pers=10 ad) and the interaction's OWN op-42 create (4112 ins3 / 4098
-            // ins2) brings the Controller - Restaurant Eat into existence. A bar
-            // 'Order Drink' engagement is a different lawful autonomous path and does
-            // NOT satisfy the controller leg.
-            if (_podiumEatDrawn && _controllerSeen)
+            // self-start = the free-will machinery makes the podium's Eat row
+            // available and some autonomous path engages it (the free-will draw
+            // for the armed traveler — hunger < -35 per the STR#501 curve law,
+            // min=1/delta=49/pers=10 ad — or a lot-side recruit whose push runs
+            // the same test tree), and the interaction's OWN op-42 create (4112
+            // ins3 / 4098 ins2) brings the Controller - Restaurant Eat into
+            // existence. The traveler leg additionally requires HER gathers to
+            // pool the podium row (native-true evidence her autonomy works).
+            var travelerLegOk = _podiumEatDrawnByTraveler
+                || (_podiumDrawnAnyCaller && _travelerPodiumCandDecisions > 0);
+            if (_controllerSeen && travelerLegOk)
             {
-                Verdict = "SERVE-SELF-START-PROVEN: the autonomy draw selected the podium's Eat row ("
-                    + _podiumEatDrawnDetail + ") with ZERO probe pushes after arrival, and the Eat"
-                    + " interaction's own op-42 creation spawned the Controller - Restaurant Eat"
-                    + " (f=" + _controllerSeenFrame + ") — the native self-start law (podium-anchored"
-                    + " autonomous dining) runs in the port; hunger delta over the window " + dH
+                Verdict = "SERVE-SELF-START-PROVEN: the Controller - Restaurant Eat spawned"
+                    + (_controllerSeenFrame >= 0 ? " at f=" + _controllerSeenFrame : "")
+                    + " (the podium Eat interaction's own op-42 creation — 4098 ins2/4112 ins3,"
+                    + " the only IFF paths that create GUID 0x92534734) with ZERO probe pushes"
+                    + " after arrival, and the traveler's free-will gather "
+                    + (_podiumEatDrawnByTraveler
+                        ? "DREW the podium Eat row (" + _podiumEatDrawnDetail + ")"
+                        : "pooled the podium Eat rows (" + _travelerPodiumCandDecisions + " of her "
+                            + _travelerDecisions + " decisions; the draw leg: " + _podiumEatDrawnDetail + ")")
+                    + " — the native self-start law (podium-anchored autonomous dining) runs in"
+                    + " the port; hunger delta over the window " + dH
                     + (dH > 5 ? " (meal served)" : " (choreography mid-flight at close)")
                     + (_eatSeen ? "; eat-family action observed: " + _eatSeenDetail : "");
                 Done(true);
+                return;
+            }
+            if (_controllerSeen && !travelerLegOk)
+            {
+                Verdict = "CONTROLLER-WITHOUT-TRAVELER-GATHER: the Controller - Restaurant Eat"
+                    + " spawned (f=" + _controllerSeenFrame + " — an autonomous podium Eat ran,"
+                    + " e.g. an NPC recruit whose push passes the podium test) but the traveler's"
+                    + " own gathers never pooled the podium rows (traveler decisions="
+                    + _travelerDecisions + ", with podium candidates=" + _travelerPodiumCandDecisions
+                    + "; targetGather[" + FSO.SimAntics.Primitives.VMFindBestAction.TS1GatherDiagTargetLast
+                    + "]) — her draw leg is the residual";
+                Done(false);
                 return;
             }
             if (_podiumEatDrawn && !_controllerSeen)
@@ -620,6 +674,7 @@ namespace Simitone.Client
                 + "f hands-off (traveler hunger armed to -80); controllers=" + controllers
                 + "; decisions=" + _decisions + " withCands=" + _decisionsWithCandidates
                 + " podiumCandDecisions=" + _podiumCandidateDecisions
+                + " travelerDecisions=" + _travelerDecisions
                 + "; targetGather[" + FSO.SimAntics.Primitives.VMFindBestAction.TS1GatherDiagTargetLast + "]"
                 + " — see the per-avatar pd36/stratum census above for the gather-gate state";
             Done(false);
