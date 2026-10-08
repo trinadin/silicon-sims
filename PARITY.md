@@ -97,10 +97,17 @@ cover the decode-pinned laws):
   NPC person-class and zero autonomy — the record-restore computes the class
   against a stale family word and the pd36=50 person-init only runs on home
   lots; both are now granted at build (the same law family as the Unleashed
-  pet-class fix). Residual: the podium-vs-bar draw and the op-42
-  controller-creation leg are the remaining `hdserve` assertions (opt-in gate,
-  follow-up in flight); the family-path twin of the class fix (`petname`)
-  awaits its validation run.
+  pet-class fix). **CLOSED (residual round, 2026-10-08)**: the `hdserve`
+  opt-in gate PASSES — the adult traveler's own free-will gather draws the
+  podium's 'Eat Alone' row (the hunger curve lawfully outscores the bar's fun
+  rows at low hunger; the earlier bar win was a non-hungry NPC — lawful),
+  the interaction's op-42 creates Controller-Restaurant-Eat, and the meal
+  engages (SERVE-SELF-START-PROVEN). One more real engine defect fixed on
+  Ghidra decode: VMTestObjectType returned ERROR on a null StackObject
+  where the native (op-32, TryElement table 0x10601898) reports error 0x17
+  and CONTINUES — the podium's test chain died on the no-controller path.
+  Bounded lawful residuals: child diners never draw podium rows 0/2
+  (TS1NoChild); stratum-1 travelers are distance-capped (7.0).
 - Unleashed: pets are live (adoption, naming, transforms incl. the dragon, nests);
   **pet-AI depth root-caused (EXP-15, 2026-10-08): two decoded port defects
   fixed** — family pets carried the NPC person-class 2 (which Cat/DogGlobals
