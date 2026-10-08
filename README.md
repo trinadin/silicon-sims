@@ -31,7 +31,7 @@ SimSilicon is **not a remake**. It is an engine that:
 
 Where behavior differs from the 2000 PowerPC original, the original binary is disassembled and the
 engine is corrected to match it — constants, thresholds, formulas and all (see
-[PROVENANCE.md](PROVENANCE.md) and [PARITY.md](PARITY.md)).
+[PROVENANCE.md](docs/PROVENANCE.md) and [PARITY.md](PARITY.md)).
 
 ## Status — and how you can help
 
@@ -39,7 +39,7 @@ engine is corrected to match it — constants, thresholds, formulas and all (see
 single-family game — verified by a 147-check automated battery that boots the real game
 headlessly and exercises gameplay, UI, saves, sound, and the autonomy engine on every
 change (run it yourself with `tools/run-autotest.sh`; the one-page state summary is
-[HANDOFF.md](HANDOFF.md)).
+[PARITY.md](PARITY.md) → "Where the game stands"). Every release artifact is validated by running the battery against the packed `.app` itself, not just the build tree.
 
 **Honest status:** this is an **engine parity project, not a finished 1:1 clone** — and it
 needs real-world testing on real Macs and real saves. That's where you come in:
@@ -65,7 +65,7 @@ needs real-world testing on real Macs and real saves. That's where you come in:
 ## Game data
 
 SimSilicon needs The Sims 1 **Complete Collection / Legacy Collection** data: a folder containing
-`GameData/.../Behavior.iff` and the `UserData` layout. See [PORT_STATUS.md](PORT_STATUS.md)
+`GameData/.../Behavior.iff` and the `UserData` layout. See [PORT_STATUS.md](docs/PORT_STATUS.md)
 ("Required: game data") for how to obtain it legally —
 [fetch-game-data.sh](fetch-game-data.sh) stages the Complete Collection DVD from archive.org
 (you must own/obtain the game; it just avoids needing a disc drive). The selected path persists
@@ -89,7 +89,7 @@ cd simsilicon && git checkout main
 
 Prerequisites: .NET SDK 9. The exact publish + package commands
 (and why the `NUGET_PACKAGES`/`DOTNET_CLI_HOME` redirects and `WarningsAsErrors` relaxations are
-needed) are in [PORT_STATUS.md](PORT_STATUS.md) → "Build / package".
+needed) are in [PORT_STATUS.md](docs/PORT_STATUS.md) → "Build / package".
 
 ## Repository layout
 
@@ -117,15 +117,18 @@ Everything builds from this one repository:
   [riperiperi/FreeSO](https://github.com/riperiperi/FreeSO) and
   [riperiperi/FSOMonoGame](https://github.com/riperiperi/FSOMonoGame).
 - macOS port & parity work: this repository.
-- Icon/audio attributions from upstream (Icons8, CC0 freesound loops) apply to bundled assets; see ATTRIBUTION.md
+- Icon/audio attributions: the app icon is generated programmatically at pack
+  time by `tools/make_native_icon.py` (no proprietary or third-party bytes); the
+  legacy/fallback icon and UI art are Icons8 (upstream Simitone attribution);
+  `rain_loop.wav` / `thunder.wav` are CC0 freesound.org loops (upstream Simitone)
 
 ## Source code (MPL §3.2)
 
 The complete corresponding source for this application is this repository — including the merged
 engine tree and the vendored libraries — at the packaged revision (the `main` branch tip). Clone,
-`git checkout` that commit, and build with `packmac.sh` per PORT_STATUS.md. Third-party license
+`git checkout` that commit, and build with `packmac.sh` per docs/PORT_STATUS.md. Third-party license
 notices ship with the bundle (`Contents/Resources/THIRD-PARTY-NOTICES.md`) and as
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 For the honest answer to "whose code is this?" (engine vs port vs verification layer), read
-[PROVENANCE.md](PROVENANCE.md).
+[PROVENANCE.md](docs/PROVENANCE.md).

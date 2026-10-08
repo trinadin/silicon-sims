@@ -1,9 +1,9 @@
 # SimSilicon — Native macOS (Apple Silicon) Port
 
 **Status: playable on Apple Silicon; base-game parity work continues.**
-Current verified build, counts, integration decisions and remaining work are
-maintained in [HANDOFF.md](HANDOFF.md). Consult that summary before using the
-build commands below; historical round results are not current-state claims.
+Current verified state and the remaining-work list live in
+[PARITY.md](../PARITY.md) → "Where the game stands" (the one-page truth).
+Historical round results are not current-state claims.
 
 This repository (**SimSilicon**, branch `main`) is a native Apple
 Silicon port of **Simitone** (alexjyong fork, v0.8.20-forked), the open-source re-implementation

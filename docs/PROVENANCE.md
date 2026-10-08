@@ -1,7 +1,7 @@
 # PROVENANCE — whose code is this?
 
 This file answers that question plainly, so nobody (including us) has to guess. It is
-maintained alongside PARITY.md and HANDOFF.md as part of the keep-it-honest discipline.
+maintained alongside PARITY.md (the gap tracker) as part of the keep-it-honest discipline.
 
 ## What this repository is
 
@@ -30,12 +30,12 @@ Our original, value-adding work lives in a thin layer around the engine:
 
 - The macOS packaging/build layer (`packmac.sh`, Info.plist, icon, DMG tooling) and the
   port fixes needed to run on Apple Silicon.
-- The headless `-autotest` verification harness and its 144-check suite (AUTOTEST.md).
+- The headless `-autotest` verification harness and its 147-check suite (AUTOTEST.md).
 - The reverse-engineering toolkit under `tools/` and the staged-data evidence under
   `tools/iff-dump/` (tracked evidence).
 - Engine-side fidelity fixes, each committed with IFF-grounded evidence (e.g. UseNeighbor
   matrix-key fix; exit-hang fix; TS1 new-sim motive-init byte-fidelity fix).
-- The honest gap tracker (PARITY.md) and per-round verification log (HANDOFF.md).
+- The honest gap tracker (PARITY.md).
 
 All of that stands on the engine. None of it replaces FreeSO's simulation core.
 
