@@ -839,6 +839,10 @@ namespace FSO.SimAntics.Engine
             }
             else
             {
+                // W4-REG: execution recorder for the autotest probes (see
+                // VMRoutineExecRecorder) — THE live per-instruction path
+                // (Routine.Execute). Single static bool test when disabled.
+                if (VMRoutineExecRecorder.Enabled) VMRoutineExecRecorder.Record(currentFrame);
                 var trace = InstructionTrace;
                 if (trace != null)
                 {
@@ -980,10 +984,6 @@ namespace FSO.SimAntics.Engine
         {
             var instruction = frame.GetCurrentInstruction();
             var opcode = instruction.Opcode;
-
-            // W4-REG: execution recorder for the autotest probes (see
-            // VMRoutineExecRecorder). Single static bool test when disabled.
-            if (VMRoutineExecRecorder.Enabled) VMRoutineExecRecorder.Record(frame);
 
             if (opcode >= 256)
             {

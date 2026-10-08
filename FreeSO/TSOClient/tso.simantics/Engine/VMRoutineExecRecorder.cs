@@ -40,8 +40,14 @@ namespace FSO.SimAntics.Engine
                 string owner;
                 if (!_OwnerByRoutine.TryGetValue(routine, out owner))
                 {
-                    try { owner = frame.ScopeResource?.MainIff?.Filename ?? "?"; }
-                    catch { owner = "?"; }
+                    // W4-REG fix: PersonGlobals/CarGlobals routines run under the
+                    // frame scope's SEMI-global (MainIff is the person's User IFF /
+                    // the car object's IFF) — key by BOTH so the probes' substring
+                    // laws (ersonglobals / car) attribute execution correctly.
+                    string main = null, semi = null;
+                    try { main = frame.ScopeResource?.MainIff?.Filename; } catch { }
+                    try { semi = frame.ScopeResource?.SemiGlobal?.Iff?.Filename; } catch { }
+                    owner = (main ?? "?") + "|" + (semi ?? "");
                     _OwnerByRoutine.Add(routine, owner);
                 }
                 lock (_Lock)

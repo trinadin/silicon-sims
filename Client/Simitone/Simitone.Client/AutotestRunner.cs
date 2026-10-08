@@ -173,6 +173,7 @@ namespace Simitone.Client
         private static readonly HashSet<ushort> BrainPersonGlobalsIds = new HashSet<ushort> { 8219, 8301, 8229, 8275, 8303 };
         private static bool BrainPgSeen;
         private static long BrainPgRoutineCount;
+        private static int BrainExecAddedIds; // W4-REG: distinct ids first seen via the EXEC recorder union
         private static readonly HashSet<ushort> BrainPgRoutinesSeen = new HashSet<ushort>();
         private static bool DeathCollapseDone; // (R77) natural motive-collapse death-reach probe
         private static bool MoodGateDone;      // (R149) the death collapse must not race the mood window
@@ -11720,6 +11721,8 @@ namespace Simitone.Client
             {
                 Log("AUTOTEST brainlive pg-seen=" + BrainPgSeen + " routine-count=" + BrainPgRoutineCount +
                     " distinct=" + BrainPgRoutinesSeen.Count +
+                    " exec-added=" + BrainExecAddedIds +
+                    " exec-total=" + FSO.SimAntics.Engine.VMRoutineExecRecorder.TotalInstructions() +
                     " ids=" + string.Join(",", BrainPgRoutinesSeen.OrderBy(x => x)));
                 var brainHit = BrainPgRoutinesSeen.Any(x => BrainPersonGlobalsIds.Contains(x));
                 Log("AUTOTEST brainlive brain-id-hit=" + brainHit +
@@ -14926,7 +14929,7 @@ namespace Simitone.Client
                             BrainPgSeen = true; // executed PersonGlobals code is live-VM execution too
                             foreach (var idkv in kv.Value)
                             {
-                                if (idkv.Key != 0) BrainPgRoutinesSeen.Add(idkv.Key);
+                                if (idkv.Key != 0 && BrainPgRoutinesSeen.Add(idkv.Key)) BrainExecAddedIds++;
                             }
                         }
                     }
