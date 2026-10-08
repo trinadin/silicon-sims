@@ -54,8 +54,9 @@ needs real-world testing on real Macs and real saves. That's where you come in:
   [PARITY.md](PARITY.md) → "Where the game stands": neighbourhood management is partial,
   the sound fidelity trace hasn't been run, several UI interactions are modeled rather than
   decoded, the expansion packs (Hot Date, Unleashed, Vacation, Superstar, Makin' Magic) each
-  have substantial working systems with open completeness gaps — and nothing has had a human
-  acceptance pass yet. Duplicate-gap reports will be closed with a pointer.
+  have substantial working systems with open completeness gaps — and human verification of
+  the whole is still partial (heavily automated; played and accepted hands-on in portions).
+  Duplicate-gap reports will be closed with a pointer.
 - **Code welcome.** MPL-2.0 — PRs are open. PARITY.md's gap table is the roadmap; small,
   well-evidenced fixes (see the PROVENANCE discipline) land fastest.
 
