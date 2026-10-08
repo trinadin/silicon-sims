@@ -187,10 +187,31 @@ namespace Simitone.Client
                             + " travelerActive='" + (_traveler?.Thread?.ActiveAction?.Name ?? "-") + "'");
                     return false;
 
-                case 2: // post-arrival settling: hand control to the soak after a short census delay
+                case 2: // post-arrival settling: wait for the mode-18 downtown-sim
+                        // build (bounded), then hand control to the soak
                     if (vm == null) return false;
                     KeepUnblocked(vm);
                     AnswerDialogs(vm);
+                    if (_traveler == null)
+                    {
+                        var avs2 = vm.Entities.OfType<VMAvatar>().ToList();
+                        if (avs2.Count > 0)
+                        {
+                            _traveler = _travelerGuid != 0
+                                ? avs2.FirstOrDefault(a => a.Object?.OBJ?.GUID == _travelerGuid) ?? avs2.FirstOrDefault()
+                                : avs2.FirstOrDefault();
+                            _log("AUTOTEST hdserve: downtown sim built at f=" + _frame
+                                + " (+" + (_frame - _arrivalFrame) + " after the swap)");
+                            _arrivalFrame = _frame; // restart the settle window from the build
+                        }
+                        else if (_frame - _arrivalFrame > 1800)
+                        {
+                            Verdict = "arrival-no-traveler: no avatar on the downtown VM within 1800f of the swap (mode-18 build never landed)";
+                            Done(false);
+                            return true;
+                        }
+                        else return false;
+                    }
                     if (_frame - _arrivalFrame < 120) return false;
                     ArmHungerAndOpenSoak(vm);
                     return false;
@@ -314,8 +335,11 @@ namespace Simitone.Client
                 : avs.FirstOrDefault();
             if (_traveler == null)
             {
-                Verdict = "arrival-no-traveler: no avatar on the downtown VM";
-                Done(false);
+                // Mode-18 law (VMGenericTS1Call): the caller travels as
+                // inventory transit data; the destination lot's controller
+                // BUILDS the downtown sim after arrival. The avatar can lag
+                // the VM swap by many frames — phase 2 waits for it (bounded).
+                _log("AUTOTEST hdserve arrival: no avatar at swap (mode-18 build pending); waiting");
                 return;
             }
 
