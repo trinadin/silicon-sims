@@ -51,9 +51,27 @@ in the user-data `config.ini` (`TS1HybridPath`); user data and saves live in `~/
 
 ## Building from source
 
-Prerequisites: .NET SDK 9, git (for the FreeSO submodule). The exact publish + package commands
+Prerequisites: .NET SDK 9, git. The exact publish + package commands
 (and why the `NUGET_PACKAGES`/`DOTNET_CLI_HOME` redirects and `WarningsAsErrors` relaxations are
 needed) are in [PORT_STATUS.md](PORT_STATUS.md) → "Build / package".
+
+## Repository layout (three-repo fork chain)
+
+This project keeps its upstreams' structure — a client repo consuming the engine as a
+submodule — so each fork carries its own full history and stays diffable against
+upstream:
+
+1. **This repo** ([Simitone-macOS](https://github.com/trinadin/Simitone-macOS), branch `mac-port`) — the Simitone client, macOS packaging, docs and battery tooling.
+2. [trinadin/FreeSO-mac-port](https://github.com/trinadin/FreeSO-mac-port) — the engine fork (submodule `FreeSO/`, branch `mac-port-rel`).
+3. [trinadin/FSOMonoGame](https://github.com/trinadin/FSOMonoGame) — the MonoGame fork the engine uses (nested submodule; one commit on top of upstream: the macOS trackpad natural-scroll fix).
+
+```sh
+git clone --recurse-submodules https://github.com/trinadin/Simitone-macOS.git
+cd Simitone-macOS && git checkout mac-port
+```
+
+Every submodule pin resolves inside those three public repos, so
+`--recurse-submodules` is sufficient — nothing else to fetch by hand.
 
 ## Parity status
 
@@ -69,22 +87,27 @@ The engine is shared; the iOS shell (FSO.iOS) is legacy Xamarin and needs modern
 
 ## License & credits
 
-- Engine: [FreeSO](https://freeso.org) — MPL-2.0 (this repo is LICENSE.md MPL-2.0 as a whole; per MPL §3.2/Exhibit A file headers are optional and only a minority of files carry one).
+- Engine: [FreeSO](https://freeso.org) — MPL-2.0, via our fork
+  [trinadin/FreeSO-mac-port](https://github.com/trinadin/FreeSO-mac-port) (submodule `FreeSO/`;
+  this repo is LICENSE.md MPL-2.0 as a whole; per MPL §3.2/Exhibit A file headers are optional and only a minority of files carry one).
 - Original game & data: © Maxis / EA — not bundled here.
 - Upstream: [riperiperi/Simitone](https://github.com/riperiperi/Simitone),
-  [alexjyong/Simitone](https://github.com/alexjyong/Simitone).
+  [alexjyong/Simitone](https://github.com/alexjyong/Simitone),
+  [riperiperi/FreeSO](https://github.com/riperiperi/FreeSO) and
+  [riperiperi/FSOMonoGame](https://github.com/riperiperi/FSOMonoGame) (both forked here — see
+  [Repository layout](#repository-layout-three-repo-fork-chain)).
 - macOS port & parity work: this repository.
 - Icon/audio attributions from upstream (Icons8, CC0 freesound loops) apply to bundled assets; see ATTRIBUTION.md
 
 ## Source code (MPL §3.2)
 
 The complete corresponding source for this application is this repository at the
-packaged revision: parent commit `c027914` with the `FreeSO` engine submodule at
-`46495bb3` (nested submodule pins are recorded in the REL-01 evidence). Clone the
-repository and `git checkout` those commits to obtain the exact sources; build with
+packaged revision: the `mac-port` branch tip, with the `FreeSO` engine submodule at the
+gitlink that commit records (and the engine's own nested pins). Clone with
+`--recurse-submodules`, `git checkout` that parent commit, and build with
 `packmac.sh`/`build-mac-linux.sh` per PORT_STATUS.md. Third-party license notices
 ship with the bundle (`Contents/Resources/THIRD-PARTY-NOTICES.md`) and as
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
-  history.
-- For the honest answer to "whose code is this?" (engine vs port vs verification layer), read
-  [PROVENANCE.md](PROVENANCE.md).
+
+For the honest answer to "whose code is this?" (engine vs port vs verification
+layer), read [PROVENANCE.md](PROVENANCE.md).
