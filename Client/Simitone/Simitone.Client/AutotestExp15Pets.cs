@@ -80,6 +80,12 @@ namespace Simitone.Client
         private static readonly List<string> _capture = new List<string>();
         private static readonly HashSet<string> _seenKeys = new HashSet<string>();
         private static bool _capturing;
+        // teardown restore pins (central battery run 2 defect 2: the probe used to
+        // leave Global[10]=555, the host's Social pinned 0, the show controller and
+        // pedestal in-world and house 5's family mapping pointing at the probe FAMI)
+        private static short? _global10Saved;
+        private static short? _humanSocialSaved;
+        private static FAMI _origHouseFam;
 
         // brain-band membership (DogGlobals/CatGlobals ids overlap; id alone is enough)
         private static bool IsMotiveScan(int id) { return id >= 8223 && id <= 8232; }
@@ -144,6 +150,7 @@ namespace Simitone.Client
                     };
                     famsChunk.InsertString(0, new STRItem { Comment = "", Value = "Exp15Pets" });
                     neigh.MainResource.AddChunk(famsChunk);
+                    _origHouseFam = neigh.GetFamilyForHouse(ProbeHouse); // teardown restores this
                     neigh.SetFamilyForHouse(ProbeHouse, _fam, false);
                     _probeFamId = (short)newId;
                     _log("AUTOTEST ulpets attach famId=" + newId + " house=" + ProbeHouse
@@ -280,6 +287,7 @@ namespace Simitone.Client
                         _ctr = vm.Context.CreateObjectInstance(ShowCtrGuid, near, Direction.NORTH)?.Objects?.FirstOrDefault();
                         var pedPos = new LotTilePos((short)(_human.Position.x + 96), (short)(_human.Position.y + 64), _human.Position.Level);
                         _pedestal = vm.Context.CreateObjectInstance(PedestalGuid, pedPos, Direction.NORTH)?.Objects?.FirstOrDefault();
+                        if (!_global10Saved.HasValue) _global10Saved = vm.GetGlobalValue(10);
                         vm.SetGlobalValue(10, 555); // zoning-gate default (unl-show run-17 law)
                         _log("AUTOTEST ulpets SHOW-PLACE ctr=" + (_ctr != null ? _ctr.ObjectID.ToString() : "FAIL")
                             + " pedestal=" + (_pedestal != null ? _pedestal.ObjectID.ToString() : "FAIL")
@@ -440,6 +448,7 @@ namespace Simitone.Client
                 // 8201 ins14 motive gate) + per-row CheckAction outcome
                 try
                 {
+                    if (!_humanSocialSaved.HasValue) _humanSocialSaved = _human.GetMotiveData(VMMotive.Social);
                     _human.SetMotiveData(VMMotive.Social, (short)0);
                     _capture.Clear(); _capturing = true;
                     var act = _dog.GetAction(1, _human, vm.Context, false, new short[] { (short)_dog.ObjectID, 0, 0, 0 });
@@ -513,6 +522,40 @@ namespace Simitone.Client
                     _pushHooked = false;
                     VMPushInteraction.PushOutcome -= OnPushOutcome;
                 }
+            }
+            catch { }
+            // EXP-15 follow-up (central battery run 2 defect 2): full world restore so
+            // the ride-along soak after the verdict stays live — the probe used to
+            // leave the show controller + pedestal in-world (their interactions pin
+            // queues and the stale zoning gate), the host's Social pinned at 0, and
+            // house 5's family mapping pointing at the probe FAMI. The runner's
+            // ulpets resync re-binds _vm/_avatars after this.
+            var vm = VM;
+            try
+            {
+                if (vm != null)
+                {
+                    if (_ctr != null && !_ctr.Dead) _ctr.Delete(true, vm.Context);
+                    if (_pedestal != null && !_pedestal.Dead) _pedestal.Delete(true, vm.Context);
+                }
+            }
+            catch (Exception de) { try { _log("AUTOTEST ulpets teardown-delete EXC " + de.GetType().Name); } catch { } }
+            try
+            {
+                if (vm != null && _global10Saved.HasValue) vm.SetGlobalValue(10, _global10Saved.Value);
+                if (_human != null && _humanSocialSaved.HasValue)
+                    _human.SetMotiveData(VMMotive.Social, _humanSocialSaved.Value);
+                if (vm != null && vm.SpeedMultiplier <= 0)
+                {
+                    vm.SpeedMultiplier = 1; // a verdict-time dialog must not pause the following soak
+                    vm.GlobalBlockingDialog = null;
+                }
+            }
+            catch (Exception re) { try { _log("AUTOTEST ulpets teardown-restore EXC " + re.GetType().Name); } catch { } }
+            try
+            {
+                var neigh = Content.Get().Neighborhood;
+                if (neigh != null) neigh.SetFamilyForHouse(ProbeHouse, _origHouseFam, false);
             }
             catch { }
         }

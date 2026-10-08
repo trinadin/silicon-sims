@@ -147,6 +147,7 @@ namespace Simitone.Client
         private static int _motiveStartMinute = -1;
         private static int _lastLoggedMinute = -1;
         private static bool _roomLawDumped; // (R224) one-shot room-internals dump
+        private static bool _ulpetsResyncDone; // EXP-15 follow-up: one-shot post-probe soak re-bind
         private static readonly VMMotive[] DecayMotives = new[]
         {
             VMMotive.Hunger, VMMotive.Comfort, VMMotive.Hygiene, VMMotive.Bladder,
@@ -11079,6 +11080,40 @@ namespace Simitone.Client
                 }
                 return;
             }
+            // EXP-15 follow-up (central battery run 2 defect 2): the probe's PlayHouse
+            // swapped the lot VM. Re-bind the soak to the live world exactly once at
+            // teardown — the dead pre-probe avatar refs froze the motive samples (the
+            // 29-min 'mood load-phase' spam) and the stale baseline left the window
+            // math wedged until the 30-min hard timeout. Pets stay OUT of the sample
+            // set: mood/motive are the R251 PERSON curves; pets compute mood through
+            // their own semiglobals (dogglobals/catglobals), so sampling them would
+            // test a law they don't follow.
+            if (CheckEnabled("ulpets") && !_ulpetsResyncDone)
+            {
+                _ulpetsResyncDone = true;
+                var resyncVm = (_screen != null && _screen.vm != null) ? _screen.vm
+                    : (AutotestExp15Pets.VM ?? _vm);
+                if (resyncVm != null && !ReferenceEquals(resyncVm, _vm))
+                {
+                    _vm = resyncVm;
+                    Log("AUTOTEST ulpets teardown resync: vm re-bound (post-PlayHouse)");
+                }
+                if (_vm != null)
+                {
+                    _avatars = _vm.Entities.OfType<VMAvatar>().Where(a => !a.IsPet).ToList();
+                    if (_vm.SpeedMultiplier <= 0)
+                    {
+                        _vm.SpeedMultiplier = 1;
+                        _vm.GlobalBlockingDialog = null;
+                        Log("AUTOTEST ulpets teardown resync: unpaused (stale-dialog-latch released)");
+                    }
+                }
+                _samples.Clear();
+                _motiveStartMinute = -1; // re-arm the 10-sim-min window on the post-probe clock
+                _lastLoggedMinute = -1;
+                Log("AUTOTEST ulpets teardown resync: avatars=" + _avatars.Count
+                    + " (pets excluded) samples cleared, soak window re-armed");
+            }
             // EXP-09 leg 4 (opt-in "exp09neg"): negatives/cancel for the
             // booking gate.
             if (CheckEnabled("exp09neg") && _ngState != 99)
@@ -11103,7 +11138,14 @@ namespace Simitone.Client
                 }
                 return;
             }
-            var minute = _vm.Context.Clock.Minutes;
+            // EXP-15 follow-up (central battery run 2 defect 2): CUMULATIVE sim-minutes
+            // (Hours*60+Minutes — the socexec idiom). The old minute-of-hour window
+            // wedged across the hour wrap: a baseline armed at :55 needs
+            // minute-baseline >= 10 == 65, impossible after the wrap to 0, so the
+            // soak sat in state 2 (re-logging the load-phase branch) until the 30-min
+            // hard timeout. All comparisons below are relative to _motiveStartMinute,
+            // so the cumulative form is a drop-in fix.
+            var minute = _vm.Context.Clock.Hours * 60 + _vm.Context.Clock.Minutes;
             if (_motiveStartMinute < 0) _motiveStartMinute = minute;
 
             // (R249) 'freewillwin' battery: arm on the first soak frame (pins + seam
@@ -11419,7 +11461,7 @@ namespace Simitone.Client
                 _lastLoggedMinute = minute;
                 Log("AUTOTEST motive sample minute=" + minute + " avatars=" + snap.Count +
                     " moodAllOk=" + moodAllOk + " elapsed=" + (minute - _motiveStartMinute) +
-                    " speed=" + _vm.SpeedMultiplier + " (" + minute + ":" + _vm.Context.Clock.Hours + " h)");
+                    " speed=" + _vm.SpeedMultiplier + " (" + _vm.Context.Clock.Minutes + ":" + _vm.Context.Clock.Hours + " h)");
             }
 
             // brainlive: sample the live VM for IFF-factual execution of the original brain.

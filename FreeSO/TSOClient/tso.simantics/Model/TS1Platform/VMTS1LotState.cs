@@ -230,7 +230,23 @@ namespace FSO.SimAntics.Model.TS1Platform
             var missingMembers = new HashSet<uint>(CurrentFamily.RuntimeSubset);
             foreach (var avatar in vm.Context.ObjectQueries.Avatars)
             {
-                missingMembers.Remove(avatar.Object.OBJ.GUID);
+                if (!missingMembers.Remove(avatar.Object.OBJ.GUID)) continue;
+                var memberAv = avatar as VMAvatar;
+                if (memberAv == null) continue;
+                // EXP-15 follow-up (central battery run 2 defect 1): membership in
+                // THIS family is granted here, but InheritNeighbor already computed
+                // PersonType against the RECORD's family word (a record restored or
+                // synthesized before this family existed carries a different pd[61]),
+                // so a family pet activated as the NPC class 2 — which Cat/DogGlobals
+                // 8200 ins3 rejects as an interaction target, hiding every owner row
+                // (Call Over/Scold/Praise/toys/Play/Tricks/Train). Unify the family
+                // word and apply the resident class 0 for present family pets; the
+                // pets' own main loop (Dog/CatGlobals 8222 ins7) re-classes to BCON
+                // 260 key 1 on non-residential lots (decode receipt L4).
+                if (memberAv.GetPersonData(VMPersonDataVariable.TS1FamilyNumber) != (short)CurrentFamily.ChunkID)
+                    memberAv.SetPersonData(VMPersonDataVariable.TS1FamilyNumber, (short)CurrentFamily.ChunkID);
+                if (memberAv.IsPet)
+                    memberAv.SetPersonData(VMPersonDataVariable.PersonType, 0);
             }
 
             int unresolvable = 0;
@@ -253,6 +269,14 @@ namespace FSO.SimAntics.Model.TS1Platform
                 }
                 var sim = group.Objects[0];
                 ((VMAvatar)sim).SetPersonData(VMPersonDataVariable.TS1FamilyNumber, (short)CurrentFamily.ChunkID);
+                // EXP-15 follow-up (same defect as the present-member branch above):
+                // the family word is granted HERE — after InheritNeighbor decided
+                // PersonType against the record's stale family word — so a spawned
+                // family pet arrived as the NPC class 2 (8200 ins3 rejects class-2
+                // targets; every owner row hidden). Family pets are the resident
+                // class 0; their own main loop re-classes off-home (8222 ins7).
+                if (sim is VMAvatar && ((VMAvatar)sim).IsPet)
+                    ((VMAvatar)sim).SetPersonData(VMPersonDataVariable.PersonType, 0);
                 var mailbox = vm.Entities.FirstOrDefault(x => (x.Object.OBJ.GUID == 0xEF121974 || x.Object.OBJ.GUID == 0x1D95C9B0));
                 if (mailbox != null) VMFindLocationFor.FindLocationFor(sim, mailbox, vm.Context, VMPlaceRequestFlags.Default);
                 ((VMAvatar)sim).AvatarState.Permissions = Model.TSOPlatform.VMTSOAvatarPermissions.Owner;
