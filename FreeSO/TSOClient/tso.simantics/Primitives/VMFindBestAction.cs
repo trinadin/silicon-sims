@@ -586,6 +586,12 @@ namespace FSO.SimAntics.Primitives
             // EXP-14 follow-up diagnostics (probe-gated): coarse skip counters
             // discriminating entry-gate rejection from TestInteraction failure.
             var diag = TS1GatherDiag;
+            // EXP-14 hdserve-residual (probe-gated, target-caller only): per-PODIUM-row
+            // fate line — names the exact leg each podium TTAB row dies on for the
+            // armed traveler (static gate / test / sentinel / score-below-min).
+            var diagPod = diag && (_diagTargetOid == 0 || context.Caller == null
+                || context.Caller.ObjectID == _diagTargetOid);
+            var dPodLog = new List<string>();
             int dObjSeen = 0, dGatePassed = 0, dTestFail = 0, dPool = 0;
             var candidates = new List<ScoredCandidate>();
             foreach (var obj in ents)
@@ -665,16 +671,25 @@ namespace FSO.SimAntics.Primitives
                     && (NativeGenderClass(caller) & 6) == 0) continue;
 
                 var distance = Distance(caller, obj); // CalcShortDistance (0xc5e20) proxy
+                var isPod = diagPod && (obj.Object != null && obj.Object.OBJ != null
+                    && (obj.Object.OBJ.ChunkLabel ?? "").ToLowerInvariant().Contains("podium"));
 
                 // AppendInteractionsForAuto (0x105900): iterate the object's TTAB BACKWARDS
                 // (0x1059a0-0x105c6c: index count-1 .. 0) — the entry order feeds the draw.
                 for (int e = treeTable.Interactions.Length - 1; e >= 0; e--)
                 {
                     var entry = treeTable.Interactions[e];
+                    Action<string> pod = null;
+                    if (isPod) pod = (fate) => dPodLog.Add("obj" + obj.ObjectID + " row" + e
+                        + " fn" + entry.ActionFunction + ": " + fate);
                     // 0x1059f8-0x105a00: advertise weight (entry+0x1c s16) must be > 0.
                     // 0x105b60-0x105b68: signed gate attr 36 (AutonomyLevel) >= weight.
                     var weight = (short)((ushort)entry.AutonomyThreshold & 0xFFFF);
-                    if (weight <= 0 || autonomyLevel < weight) continue;
+                    if (weight <= 0 || autonomyLevel < weight)
+                    {
+                        if (pod != null) pod("weight-gate (weight=" + weight + " autonomyLevel=" + autonomyLevel + ")");
+                        continue;
+                    }
                     // 0x105b6c-0x105b74: unconditional candidate skip, entry flags mask
                     // 0x80 (rlwinm 0x18/0x18; TTAB "Debug" — the native "always block" bit).
                     if ((entry.Flags & (TTABFlags)0x80) != 0) continue;
@@ -691,7 +706,12 @@ namespace FSO.SimAntics.Primitives
                     if ((gender & 4) != 0 && (entry.Flags & (TTABFlags)0x200) == 0) continue;
                     // 0x105b28-0x105b38: children (attr58 in 1..17) are blocked by entry
                     // mask 0x10 (TS1NoChild) — rlwinm 0x1b/0x1b.
-                    if (isChild && (entry.Flags & (TTABFlags)0x10) != 0) continue;
+                    if (isChild && (entry.Flags & (TTABFlags)0x10) != 0)
+                    {
+                        if (pod != null) pod("CHILD-GATE (TS1NoChild 0x10; caller attr58="
+                            + caller.GetPersonData(VMPersonDataVariable.PersonsAge) + ")");
+                        continue;
+                    }
                     // 0x105b3c-0x105b5c: a plain APPEND person (NOT a child, and
                     // word-65 bits 0x2|0x4 clear) is blocked by entry mask 0x40
                     // (TS1NoAdult) — rlwinm 0x19/0x19. ENG-25 (AUD-16 interpreter P3-5):
@@ -770,7 +790,7 @@ namespace FSO.SimAntics.Primitives
                         }
                     }
                     catch { candStrings = null; } // a test that dies fails the candidate (the hand-off's own convention)
-                    if (candStrings == null) { if (diag) dTestFail++; continue; } // TestInteraction failed: the candidate never reaches the pool (native passed-flag law)
+                    if (candStrings == null) { if (diag) dTestFail++; if (pod != null) pod("TEST-FAIL"); continue; } // TestInteraction failed: the candidate never reaches the pool (native passed-flag law)
                     // 0x109cfc-0x109d08: interaction flags bit0 -> ScoredInteraction+0xc
                     // byte. The ctor tail (0x9cbb4-0x9cbcc) copies TTAB entry flags mask
                     // 0x01000000 (decoded this round from the binary; the person-person
@@ -811,13 +831,24 @@ namespace FSO.SimAntics.Primitives
                     var hPrime = GetInteractionScore(caller, ads, curves);
                     // 0x109d4c-0x109d54: the sentinel drop — H' == CFG+4 (0.0) excludes
                     // the candidate outright.
-                    if (hPrime == CFG_SCORE_SENTINEL) continue;
+                    if (hPrime == CFG_SCORE_SENTINEL)
+                    {
+                        if (pod != null) pod("SENTINEL (hPrime==0)");
+                        continue;
+                    }
                     // 0x109d58-0x109d5c: score = atten * (H' - H).
                     var score = atten * (hPrime - baseH);
                     // 0x109d64-0x109d74: the push gate — score >= the FCNS min autonomy
                     // score for the actor's class (family/visitor; live 1e-7).
-                    if (score < minScore) continue;
+                    if (score < minScore)
+                    {
+                        if (pod != null) pod("SCORE " + score.ToString("E3") + " < minScore " + minScore.ToString("E3")
+                            + " (hPrime " + hPrime.ToString("F4") + " baseH " + baseH.ToString("F4")
+                            + " atten " + atten.ToString("F4") + " dist " + distance.ToString("F1") + ")");
+                        continue;
+                    }
                     if (diag) dPool++;
+                    if (pod != null) pod("POOLED score " + score.ToString("E3"));
                     candidates.Add(new ScoredCandidate
                     {
                         Callee = obj,
@@ -839,6 +870,22 @@ namespace FSO.SimAntics.Primitives
                     // in the module order like every other object. DISCLOSED omission.
                 }
             }
+            // EXP-14 hdserve-residual: the per-target diag stash now runs on the
+            // ZERO-CANDIDATE path too (it previously sat after the sort point, so an
+            // n=0 target gather never refreshed TS1GatherDiagTargetLast and the probe
+            // read a stale '(no target gather yet)' while the traveler HAD gathered —
+            // diag7's tgt line was an artifact, its decision log showed 9 n=0 runs).
+            if (diag)
+            {
+                _diagObjSeen = dObjSeen; _diagGatePassed = dGatePassed;
+                _diagTestFail = dTestFail; _diagPool = dPool;
+                _diagCaller = context.Caller != null ? context.Caller.ObjectID : 0;
+                if (_diagCaller == _diagTargetOid)
+                    TS1GatherDiagTargetLast = "objSeen=" + dObjSeen + " gatePassed=" + dGatePassed
+                        + " testFail=" + dTestFail + " pool=" + dPool + " caller=obj" + _diagCaller;
+                if (diagPod && dPodLog.Count > 0)
+                    TS1GatherDiagPodiumLast = string.Join(" | ", dPodLog.Take(12));
+            }
             // 0x109dd8-0x109de0: no candidates -> return 0.
             if (candidates.Count == 0)
             {
@@ -858,15 +905,6 @@ namespace FSO.SimAntics.Primitives
             // the R250 lazy-zero scores and is retired. The routine is ported
             // LITERALLY (element granularity) so permutations match the CFG agent's
             // transpile (tools/iff-dump/r249-freewill-cfg/verify.py, group H).
-            if (diag)
-            {
-                _diagObjSeen = dObjSeen; _diagGatePassed = dGatePassed;
-                _diagTestFail = dTestFail; _diagPool = dPool;
-                _diagCaller = context.Caller != null ? context.Caller.ObjectID : 0;
-                if (_diagCaller == _diagTargetOid)
-                    TS1GatherDiagTargetLast = "objSeen=" + dObjSeen + " gatePassed=" + dGatePassed
-                        + " testFail=" + dTestFail + " pool=" + dPool + " caller=obj" + _diagCaller;
-            }
             GameHeapsort(candidates);
 
             // ---- LAW STEP 6: the winner draw (0x109dd8-0x109ea8) -----------------------
@@ -1256,6 +1294,9 @@ namespace FSO.SimAntics.Primitives
         public static bool TS1GatherDiag;
         public static string TS1GatherDiagLast = "";
         public static string TS1GatherDiagTargetLast = "(no target gather yet)";
+        // EXP-14 hdserve-residual: per-podium-row fate lines from the target caller's
+        // gather (probe-gated; empty in play).
+        public static string TS1GatherDiagPodiumLast = "";
         internal static int _diagObjSeen, _diagGatePassed, _diagTestFail, _diagPool, _diagCaller;
         public static int _diagTargetOid;
 
