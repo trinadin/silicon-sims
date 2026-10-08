@@ -185,20 +185,18 @@ namespace Simitone.Client
                     log("AUTOTEST mmquest B0 lot booted avatar=obj" + av.ObjectID
                         + " avatars=" + vm.Entities.OfType<VMAvatar>().Count(e => !e.Dead)
                         + " (curHouse=" + (vm.TS1State?.CurrentHouse.ToString() ?? "?") + ")");
-                    // The quest trees' early gates compare against the magic-town
-                    // tuning (4123 ins1 tuning[17239]) and the native quest lines
-                    // only open on Magic Town — switch the run to lot 93 (the
-                    // unl-magic10 idiom: LotTransitInfo pre-seed + switch).
-                    try
-                    {
-                        var gs = Content.Get().Neighborhood.GameState;
-                        log("AUTOTEST mmquest B0 pre-seed LotTransitInfo=" + gs.LotTransitInfo + " -> 1");
-                        gs.LotTransitInfo = 1;
-                    }
-                    catch (Exception ex) { log("AUTOTEST mmquest B0 pre-seed-exc " + ex.GetType().Name); }
-                    vm.SignalLotSwitch(93u);
+                    // v5 finding: switching to the magic lot (93) does NOT unlock
+                    // the Choose Quest dialogs (the quiet-exit gate is the
+                    // customer scan — the delivery branch needs a second
+                    // non-family, non-NPC sim, and the family-only autotest lot
+                    // has none), while lot 93's native NPC controllers open
+                    // blocking dialogs headlessly that pause the VM and freeze
+                    // the soak clock (69601 watchdog lines in 19 min). Stay on
+                    // the boot lot; the quest-core asserts are lot-independent
+                    // (proven live: Choose Reward + the substitution laws).
+                    log("AUTOTEST mmquest B0 staying on the boot lot (magic-lot switch: no assert gain, pause-storm cost — see evidence)");
                     _settle = 0;
-                    _state = 15;
+                    _state = 2;
                     return;
                 }
                 if (_state == 15)
@@ -401,6 +399,20 @@ namespace Simitone.Client
                     {
                         Fail("parse-law exc " + e.GetType().Name + ": " + e.Message);
                     }
+                    // cleanup: delete the probe-spawned NPC persons (their native
+                    // mains block on dialogs headlessly and pause the VM — the r157
+                    // watchdog re-fights the pause every tick, freezing the soak
+                    // clock), then release the latch and force speed.
+                    try
+                    {
+                        _vamp?.Delete(true, vm.Context);
+                        foreach (var e in vm.Entities.Where(e => !e.Dead && (e.Object?.OBJ?.GUID == GUID_Apothecary || e.Object?.OBJ?.GUID == GUID_Vampiress)).ToList())
+                            e.Delete(true, vm.Context);
+                        _cq?.Delete(true, vm.Context);
+                    }
+                    catch (Exception e) { log("AUTOTEST mmquest cleanup-exc " + e.GetType().Name); }
+                    vm.GlobalBlockingDialog = null;
+                    if (vm.SpeedMultiplier <= 0) vm.SpeedMultiplier = 1;
                     _state = 3;
                     Finished = true;
                     Passed = Failures.Count == 0;
