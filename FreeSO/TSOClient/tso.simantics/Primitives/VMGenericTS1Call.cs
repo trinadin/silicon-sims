@@ -434,7 +434,20 @@ namespace FSO.SimAntics.Primitives
                     // any content could scan for them. Natively unreachable
                     // (arrivals always carry a family); fail soft like the
                     // other unavailable-state modes.
-                    if (crossData2.ActiveFamily == null) return VMPrimitiveExitCode.GOTO_FALSE;
+                    if (crossData2.ActiveFamily == null)
+                    {
+                        // EXP-14 hdserve follow-up (bounded transit diagnostic)
+                        System.Console.WriteLine("[TransitDiag] mode26 build-attempt by obj" + context.Caller.ObjectID
+                            + "/" + (context.Caller.Object?.Resource?.MainIff?.Filename ?? "?")
+                            + " ActiveFamily=NULL LotTransitInfo=" + crossData2.LotTransitInfo
+                            + " (the arrival build declines — no traveler materializes)");
+                        return VMPrimitiveExitCode.GOTO_FALSE;
+                    }
+                    System.Console.WriteLine("[TransitDiag] mode26 build-attempt by obj" + context.Caller.ObjectID
+                        + "/" + (context.Caller.Object?.Resource?.MainIff?.Filename ?? "?")
+                        + " ActiveFamily=" + crossData2.ActiveFamily.ChunkID
+                        + " LotTransitInfo=" + crossData2.LotTransitInfo
+                        + " DowntownSimGUID=0x" + crossData2.DowntownSimGUID.ToString("x8"));
                     if (crossData2.LotTransitInfo >= 1)
                     {
                         crossData2.ActiveFamily.SelectWholeFamily();
