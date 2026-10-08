@@ -839,6 +839,20 @@ namespace FSO.SimAntics.Primitives
                     // in the module order like every other object. DISCLOSED omission.
                 }
             }
+            // EXP-14 hdserve-residual: the per-target diag stash now runs on the
+            // ZERO-CANDIDATE path too (it previously sat after the sort point, so an
+            // n=0 target gather never refreshed TS1GatherDiagTargetLast and the probe
+            // read a stale '(no target gather yet)' while the traveler HAD gathered —
+            // diag7's tgt line was an artifact, its decision log showed 9 n=0 runs).
+            if (diag)
+            {
+                _diagObjSeen = dObjSeen; _diagGatePassed = dGatePassed;
+                _diagTestFail = dTestFail; _diagPool = dPool;
+                _diagCaller = context.Caller != null ? context.Caller.ObjectID : 0;
+                if (_diagCaller == _diagTargetOid)
+                    TS1GatherDiagTargetLast = "objSeen=" + dObjSeen + " gatePassed=" + dGatePassed
+                        + " testFail=" + dTestFail + " pool=" + dPool + " caller=obj" + _diagCaller;
+            }
             // 0x109dd8-0x109de0: no candidates -> return 0.
             if (candidates.Count == 0)
             {
@@ -858,15 +872,6 @@ namespace FSO.SimAntics.Primitives
             // the R250 lazy-zero scores and is retired. The routine is ported
             // LITERALLY (element granularity) so permutations match the CFG agent's
             // transpile (tools/iff-dump/r249-freewill-cfg/verify.py, group H).
-            if (diag)
-            {
-                _diagObjSeen = dObjSeen; _diagGatePassed = dGatePassed;
-                _diagTestFail = dTestFail; _diagPool = dPool;
-                _diagCaller = context.Caller != null ? context.Caller.ObjectID : 0;
-                if (_diagCaller == _diagTargetOid)
-                    TS1GatherDiagTargetLast = "objSeen=" + dObjSeen + " gatePassed=" + dGatePassed
-                        + " testFail=" + dTestFail + " pool=" + dPool + " caller=obj" + _diagCaller;
-            }
             GameHeapsort(candidates);
 
             // ---- LAW STEP 6: the winner draw (0x109dd8-0x109ea8) -----------------------
