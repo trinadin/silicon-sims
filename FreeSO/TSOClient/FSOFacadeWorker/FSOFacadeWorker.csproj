@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FSOFacadeWorker</RootNamespace>
+    <AssemblyName>FSOFacadeWorker</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <TrimMode>partial</TrimMode>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="facadeconfig.sample.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FSO.Server.Clients\FSO.Server.Clients.csproj" />
+    <ProjectReference Include="..\FSO.Server\FSO.Server.csproj" />
+    <ProjectReference Include="..\FSO.Windows\FSO.Windows.csproj" />
+    <ProjectReference Include="..\tso.client\FSO.Client.csproj" />
+    <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
+    <ProjectReference Include="..\tso.content\FSO.Content.csproj" />
+    <ProjectReference Include="..\tso.files\FSO.Files.csproj" />
+    <ProjectReference Include="..\tso.simantics\FSO.SimAntics.csproj" />
+    <ProjectReference Include="..\tso.sound\FSO.HIT.csproj" />
+    <ProjectReference Include="..\tso.vitaboy.engine\FSO.Vitaboy.Engine.csproj" />
+    <ProjectReference Include="..\tso.vitaboy.model\FSO.Vitaboy.csproj" />
+    <ProjectReference Include="..\tso.world\FSO.LotView.csproj" />
+  </ItemGroup>
+
+</Project>

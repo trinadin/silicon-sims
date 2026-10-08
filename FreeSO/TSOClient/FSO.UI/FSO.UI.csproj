@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>FSO.UI</RootNamespace>
+    <AssemblyName>FSO.UI</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <IsAotCompatible>True</IsAotCompatible>
+    <PublishAot>true</PublishAot>
+    <PublishTrimmed>true</PublishTrimmed>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimMode>full</TrimMode>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <IsAotCompatible>True</IsAotCompatible>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <IsAotCompatible>True</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Screens\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mina" Version="2.0.12" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
+    <PackageReference Include="MP3Sharp" Version="1.0.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Ninject" Version="3.3.6" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.9" />
+    <PackageReference Include="System.Resources.Extensions" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Other\libs\MSDFData\MSDFData.csproj" />
+    <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
+    <ProjectReference Include="..\tso.files\FSO.Files.csproj" />
+    <ProjectReference Include="..\tso.simantics\FSO.SimAntics.csproj" />
+    <ProjectReference Include="..\tso.sound\FSO.HIT.csproj" />
+    <ProjectReference Include="..\tso.world\FSO.LotView.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="GOLDEngine">
+      <HintPath>Dependencies\GOLDEngine.dll</HintPath>
+    </Reference>
+    <Content Include="discord-rpc.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

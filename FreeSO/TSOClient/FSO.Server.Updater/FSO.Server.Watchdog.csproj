@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>FSO.Server.Watchdog</RootNamespace>
+    <AssemblyName>watchdog</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <!-- disable apphost for self-contained builds to avoid conflicts when referenced as dependency -->
+    <UseAppHost Condition="'$(SelfContained)' != 'true'">false</UseAppHost>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="watchdog.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="watchdog.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

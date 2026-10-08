@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>MSDFData</RootNamespace>
+    <AssemblyName>MSDFData</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <PublishAot>true</PublishAot>
+    <IsAotCompatible>True</IsAotCompatible>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>link</TrimMode>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,1235 @@
+﻿#define VM_DESYNC_DEBUG
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using FSO.Files.Formats.IFF.Chunks;
+using FSO.SimAntics.Engine;
+using Microsoft.Xna.Framework;
+using FSO.SimAntics.Model;
+using FSO.SimAntics.NetPlay;
+using FSO.SimAntics.NetPlay.Model;
+using FSO.SimAntics.Marshals;
+using FSO.LotView.Components;
+using FSO.SimAntics.Marshals.Threads;
+using FSO.SimAntics.Entities;
+using FSO.SimAntics.Engine.TSOTransaction;
+using FSO.SimAntics.Model.TSOPlatform;
+using FSO.SimAntics.Model.Sound;
+using FSO.SimAntics.NetPlay.EODs;
+using FSO.SimAntics.NetPlay.Drivers;
+using FSO.SimAntics.NetPlay.Model.Commands;
+using FSO.SimAntics.Marshals.Hollow;
+using FSO.SimAntics.Engine.Debug;
+using FSO.Common;
+using FSO.LotView.Model;
+using FSO.HIT;
+using FSO.Common.Model;
+using FSO.SimAntics.Model.TS1Platform;
+using FSO.SimAntics.Model.Platform;
+using FSO.Common.Utils;
+
+namespace FSO.SimAntics
+{
+    /// <summary>
+    /// Simantics Virtual Machine.
+    /// </summary>
+    public class VM
+    {
+        public bool UseSchedule = true;
+        public static bool SignalBreaks = false;
+
+        [ThreadStatic]
+        private static bool _UseWorld = true;
+
+        public static bool UseWorld
+        {
+            get { return _UseWorld; }
+            set
+            {
+                _UseWorld = value;
+            }
+        }
+
+        public static string TestBinding;
+
+        public bool IsServer
+        {
+            get { return GlobalLink != null; }
+        }
+        public bool BlueprintRestore
+        {
+            get { return GlobalLink != null || Driver is VMFSORDriver; }
+        }
+        public bool TS1;
+        public static bool GlobTS1; //I don't like this, but we don't pass VM to some things and this needs to be fast
+        //we can assume one application won't be running TS1 and TSO at the same time.
+        public bool Aborting = false;
+
+        /// <summary>
+        /// Global toggle for free will (autonomy). When disabled, player family Sims will not
+        /// autonomously choose actions. Visitors and pets still have free will.
+        /// R249 native law: the free-will byte (data 0x45f1c, init 1) is mirrored into
+        /// SimAntics global 30 (0x1e) by SetFreeWill__8cXObject (0xc9d40:
+        /// cSimulator::SetGlobal(0x1e, (s16)v) when the simulator chain exists) — this
+        /// property setter is the port's hook for that mirror (weak-ref'd live VMs).
+        /// </summary>
+        private static bool _FreeWillEnabled = true;
+        private static readonly List<WeakReference> _LiveVMs = new List<WeakReference>();
+        // P2-9: the game thread constructs VMs (Add) while the UI thread can flip the
+        // free-will toggle (enumerate + sweep dead refs) — guard the list with a lock.
+        private static readonly object _LiveVMsLock = new object();
+        public static bool FreeWillEnabled
+        {
+            get { return _FreeWillEnabled; }
+            set
+            {
+                if (_FreeWillEnabled == value) return;
+                _FreeWillEnabled = value;
+                lock (_LiveVMsLock)
+                {
+                    for (int i = _LiveVMs.Count - 1; i >= 0; i--)
+                    {
+                        var vm = _LiveVMs[i].Target as VM;
+                        if (vm == null)
+                        {
+                            _LiveVMs.RemoveAt(i);
+                            continue;
+                        }
+                        // SetFreeWill mirror: SimAntics global 0x1e = the BHAV-visible flag.
+                        if (vm.GlobalState != null && vm.GlobalState.Length > 0x1e)
+                            vm.GlobalState[0x1e] = (short)(value ? 1 : 0);
+                    }
+                }
+            }
+        }
+
+        private const long TickInterval = 33 * TimeSpan.TicksPerMillisecond;
+        public byte[][] HollowAdj;
+
+        public VMContext Context { get; internal set; }
+
+        // The port's Tut_CheckForEvents (0x156550) instance: the client ticks
+        // MirrorLastButton + Poll once per view update, mirroring the native's
+        // single call site at cDDDSimsView::Simulate 0x21715c. Created lazily
+        // per VM; obtaining vm.TutorialEvents is the only setup needed.
+        private TutorialEventPoller _TutorialEvents;
+        public TutorialEventPoller TutorialEvents
+        {
+            get
+            {
+                if (_TutorialEvents == null) _TutorialEvents = new TutorialEventPoller(this);
+                return _TutorialEvents;
+            }
+        }
+
+        public List<VMEntity> Entities = new List<VMEntity>();
+        public HashSet<VMEntity> SoundEntities = new HashSet<VMEntity>();
+        public short[] GlobalState;
+        public VMAbstractLotState PlatformState;
+
+        public VMScheduler Scheduler;
+
+        public VMTSOLotState TSOState
+        {
+            get { return PlatformState as VMTSOLotState; }
+        }
+
+        public VMTS1LotState TS1State
+        {
+            get { return PlatformState as VMTS1LotState; }
+        }
+
+        public string LotName
+        {
+            get
+            {
+                return TSOState?.Name ?? "";
+            }
+        }
+
+        public DynamicTuning Tuning;
+        public VMTuningCache TuningCache = new VMTuningCache();
+        private Dictionary<short, VMEntity> ObjectsById = new Dictionary<short, VMEntity>();
+        private short ObjectId = 1;
+
+        internal VMNetDriver Driver;
+        public VMHeadlineRendererProvider Headline;
+
+        public bool Ready;
+        public bool BHAVDirty;
+
+        //attributes for the current VM session.
+        public uint MyUID; //UID of this client in the VM
+        public VMSyncTrace Trace;
+        public List<VMLoadError> LoadErrors = new List<VMLoadError>();
+        public List<VMInventoryItem> MyInventory = new List<VMInventoryItem>();
+
+        public event VMDialogHandler OnDialog;
+        public event VMChatEventHandler OnChatEvent;
+        public event VMRefreshHandler OnFullRefresh;
+        public event VMBreakpointHandler OnBreakpoint;
+        public event VMEODMessageHandler OnEODMessage;
+        public event VMLotSwitchHandler OnRequestLotSwitch;
+        public event VMGenericEvtHandler OnGenericVMEvent;
+        public event VMTutorialUIEffectHandler OnTutorialUIEffect;
+
+        public delegate void VMDialogHandler(VMDialogInfo info);
+        public delegate void VMChatEventHandler(VMChatEvent evt);
+        public delegate void VMRefreshHandler();
+        public delegate void VMBreakpointHandler(VMEntity entity);
+        public delegate void VMEODMessageHandler(VMNetEODMessageCmd msg);
+        public delegate void VMLotSwitchHandler(uint lotId);
+        public delegate void VMGenericEvtHandler(VMEventType type, object data);
+        public delegate void VMTutorialUIEffectHandler(int subOp, int id, bool on);
+
+        public IVMTSOGlobalLink GlobalLink
+        {
+            get
+            {
+                return Driver.GlobalLink;
+            }
+        }
+        public VMEODHost EODHost; //only present if we're a server
+        public VMTSOGlobalLinkStub CheckGlobalLink = new VMTSOGlobalLinkStub();
+
+        /// <summary>
+        /// Constructs a new Virtual Machine instance.
+        /// </summary>
+        /// <param name="context">The VMContext instance to use.</param>
+        public VM(VMContext context, VMNetDriver driver, VMHeadlineRendererProvider headline)
+        {
+            context.VM = this;
+            Context = context;
+            Driver = driver;
+            Headline = headline;
+            Scheduler = new VMScheduler(this);
+            GameTickRate = FSOEnvironment.RefreshRate;
+
+            TS1 = Content.Content.Get().TS1;
+            GlobTS1 = TS1;
+            lock (_LiveVMsLock) // P2-9: game thread appends while the UI thread enumerates
+            {
+                _LiveVMs.Add(new WeakReference(this)); // for the FreeWillEnabled -> global 0x1e mirror
+            }
+        }
+
+        private void VM_OnBHAVChange()
+        {
+            BHAVDirty = true;
+        }
+
+        /// <summary>
+        /// Gets an entity from this VM.
+        /// </summary>
+        /// <param name="id">The entity's ID.</param>
+        /// <returns>A VMEntity instance associated with the ID.</returns>
+        public VMEntity GetObjectById(short id)
+        {
+            VMEntity result;
+            if (ObjectsById.TryGetValue(id, out result))
+            {
+                return result;
+            }
+            return null;
+        }
+
+        public VMEntity GetObjectByPersist(uint id)
+        {
+            return Entities.FirstOrDefault(x => x.PersistID == id);
+        }
+
+        public VMAvatar GetAvatarByPersist(uint id)
+        {
+            VMAvatar result;
+            Context.ObjectQueries.AvatarsByPersist.TryGetValue(id, out result);
+            return result;
+        }
+
+        public string GetActiveTrace()
+        {
+            if (!Scheduler.RunningNow)
+            {
+                var cmd = Driver.Executing;
+                if (cmd != null)
+                    return "Running Command of type: " + cmd.ToString();
+                return "Not running object tick or command.";
+            }
+
+            var objID = Scheduler.CurrentObjectID;
+
+            var obj = GetObjectById(objID);
+            if (obj == null) return "Not running object tick or command.";
+
+            List<VMStackFrame> activeStack = new List<VMStackFrame>(obj.Thread.Stack);
+            return obj.ToString() + " Running: \r\n\r\n" + VMSimanticsException.GetStackTrace(activeStack);
+        }
+
+        public void SignalTraceLog(string description, bool withCSStack)
+        {
+            var trace = GetActiveTrace();
+            var cs = "";
+            if (withCSStack)
+            {
+                cs = new System.Diagnostics.StackTrace().ToString();
+            }
+            SignalChatEvent(new VMChatEvent(null, VMChatEventType.Debug, $"{description}\n{trace}\n--------\n{cs}"));
+        }
+
+        /// <summary>
+        /// Initializes this Virtual Machine.
+        /// </summary>
+        public void Init()
+        {
+            PlatformState = (TS1)?(VMAbstractLotState)new VMTS1LotState():new VMTSOLotState();
+            GlobalState = new short[38];
+            GlobalState[20] = 255; //Game Edition. Basically, what "expansion packs" are running. Let's just say all of them.
+            GlobalState[25] = 4; //as seen in EA-Land edith's simulator globals, this needs to be set for people to do their idle interactions.
+            GlobalState[17] = 4; //Runtime Code Version, is this in EA-Land.
+            GlobalState[0x1e] = (short)(_FreeWillEnabled ? 1 : 0); //free-will byte mirror (SetFreeWill__8cXObject 0xc9d40)
+            if (Driver is VMServerDriver) EODHost = new VMEODHost();
+            PlatformState.ActivateValidator(this);
+        }
+
+        public void Reset()
+        {
+            //some objects expect that the server delete all avatars upon loading the lot (pets, food counters)
+            //var avatars = new List<VMEntity>(Entities.Where(x => x is VMAvatar && x.PersistID > 0));
+            var avatars = new List<VMEntity>(Context.ObjectQueries.Avatars);
+            foreach (var avatar in avatars) avatar.Delete(true, Context);
+
+            var ents = new List<VMEntity>(Entities);
+            foreach (var ent in ents)
+            {
+                if (ent.Thread.BlockingState != null) ent.Thread.BlockingState = null;
+                if (ent.Thread.EODConnection != null) ent.Thread.EODConnection = null;
+                if (ent.Object.OBJ.GUID == 0x3929AADC) ent.Delete(true, Context); //also remove any reserved tiles
+            }
+        }
+
+        private int GameTickRate = 60;
+        private int GameTickNum = 0;
+        public int SpeedMultiplier = 1;
+        public int LastSpeedMultiplier;
+        private int LastFrameSpeed = 1;
+        private float Fraction;
+        public VMEntity GlobalBlockingDialog;
+
+        public void ResetTickAlign()
+        {
+            GameTickNum = GameTickRate-1;
+        }
+
+        // UI-26 wire (r260-options-readiness WIRE row c, 'Sim In Background'):
+        // the native cSimulator keeps one +52 signed speed field where negative
+        // means suspended (GetSuspendedSpeed/IsSuspended @0x139170); the OS focus
+        // law is "don't pause on Alt-Tab" only when GetSimInBackground is on.
+        // Port analogue: while the window lacks focus SpeedMultiplier parks at 0
+        // (VM.Update then pauses sound threads and stops ticks) and the exact
+        // prior speed is restored on regain. SimInBackground=true leaves the
+        // simulator running in the background. This is consumed by the
+        // production relay SimitoneGame.RelayFocus (LostFocus/RegainFocus) and
+        // driven directly by the 'uioptswire' gate.
+        public bool FocusSuspended;
+        private int FocusSavedSpeed;
+
+        /// <summary>
+        /// UI-26: apply the focus suspend/restore law (native cSimulator +52
+        /// signed speed). Safe to call repeatedly with the same state.
+        /// </summary>
+        public void ApplyFocus(bool focused, bool simInBackground)
+        {
+            if (focused)
+            {
+                if (FocusSuspended)
+                {
+                    FocusSuspended = false;
+                    SpeedMultiplier = FocusSavedSpeed;
+                }
+            }
+            else if (!simInBackground && !FocusSuspended)
+            {
+                FocusSuspended = true;
+                FocusSavedSpeed = SpeedMultiplier;
+                SpeedMultiplier = 0;
+            }
+        }
+
+        public void Update()
+        {
+            AutotestLastUpdateSpeed = SpeedMultiplier;
+            if (UseWorld)
+            {
+                Microsoft.Xna.Framework.Audio.SoundEffect.DistanceScale = 10;
+                var listener = HIT.HITVM.Get().Listener;
+                var cam = Context.World.State.Camera;
+                listener.Position = cam.Position;
+                var forward = cam.Target - cam.Position;
+                forward.X *= -1f;
+                forward.Normalize();
+                listener.Forward = forward;
+                Context.World.State.SimSpeed = Math.Max(0, SpeedMultiplier);
+            }
+
+            if (LastFrameSpeed != SpeedMultiplier)
+            {
+                var allSounds = new List<HITSound>();
+                foreach (var ent in SoundEntities)
+                {
+                    allSounds.AddRange(ent.SoundThreads.Select(x => x.Sound));
+                }
+
+                if (SpeedMultiplier < 1 && SpeedMultiplier > -2 && LastFrameSpeed >= 1) allSounds.ForEach((x) => x.Pause()); 
+                else if (SpeedMultiplier >= 1 && LastFrameSpeed < 1) allSounds.ForEach((x) => x.Resume());
+                LastFrameSpeed = SpeedMultiplier;
+            }
+
+            AutotestPumpUpdates++;
+            AutotestPumpLastSpeed = SpeedMultiplier;
+            var mul = Math.Max(SpeedMultiplier, 1);
+            var oldFrame = (GameTickNum * 30 * mul) / GameTickRate;
+            GameTickNum++;
+            var newFrame = (GameTickNum * 30 * mul) / GameTickRate;
+            for (int i = 0; i < newFrame - oldFrame; i++)
+            {
+                Tick();
+                if (SpeedMultiplier <= 0) break;
+            }
+
+            Fraction = ((GameTickNum * 30 * SpeedMultiplier) - (newFrame * GameTickRate)) / (float)GameTickRate;
+            if (GameTickNum >= GameTickRate) GameTickNum = 0;
+        }
+
+        public void PreDraw()
+        {
+            if (SpeedMultiplier <= 0) Fraction = 0;
+            var snd = new List<VMEntity>(SoundEntities);
+            foreach (var sound in snd)
+                sound.TickSounds();
+            //fractional animation for avatars
+            foreach (var obj in Entities)
+            {
+                (obj as VMAvatar)?.FractionalAnim(Fraction);
+            }
+        }
+
+        public void SendCommand(VMNetCommandBodyAbstract cmd)
+        {
+            cmd.ActorUID = MyUID;
+            Driver.SendCommand(cmd);
+        }
+
+        public void SendDirectCommand(uint targetID, VMNetCommandBodyAbstract cmd)
+        {
+            //clients can't directly message each other - it must go through the server (no p2p). Only server drivers can use this.
+            Driver.SendDirectCommand(targetID, cmd);
+        }
+
+        public void ForwardCommand(VMNetCommandBodyAbstract cmd)
+        {
+            Driver.SendCommand(cmd);
+        }
+
+        public string GetUserIP(uint uid)
+        {
+            if (uid == MyUID) return "local";
+            return Driver.GetUserIP(uid);
+        }
+
+        public void CloseNet(VMCloseNetReason reason)
+        {
+            if (reason == VMCloseNetReason.LeaveLot && !Ready) return;
+            Driver.CloseReason = reason;
+            Driver.Shutdown();
+        }
+
+        public void ReplaceNet(VMNetDriver driver)
+        {
+            lock (Driver)
+            {
+                Driver = driver;
+            }
+        }
+
+        public void Tick()
+        {
+            AutotestTickCalls++;
+            AutotestLastTickSpeed = SpeedMultiplier;
+            AutotestPumpTicks++;
+            if (FSOVAsyncLoading) return;
+            AutotestTickBody++;
+            if (BHAVDirty)
+            {
+                foreach (var ent in Entities)
+                {
+                    if (ent.Thread != null)
+                    {
+                        foreach (var frame in ent.Thread.Stack)
+                            if (frame.Routine.Chunk.RuntimeVer != frame.Routine.RuntimeVer) frame.CodeOwner.Resource.Recache();
+                    }
+                }
+                BHAVDirty = false;
+            }
+
+            lock (Driver)
+            {
+                if (Driver.Tick(this)) //returns true the first time we catch up to the state.
+                    Ready = true;
+            }
+        }
+
+        public void InternalTick(uint tickID)
+        {
+            Scheduler.BeginTick(tickID);
+            if (GlobalLink != null) GlobalLink.Tick(this);
+            if (EODHost != null) EODHost.Tick();
+            if (SpeedMultiplier > 0)
+            {
+                var lastHour = Context.Clock.Hours;
+                Context.Clock.Tick();
+
+                if (lastHour != Context.Clock.Hours && Context.Clock.Hours % 6 == 0)
+                {
+                    ProcessQTRDay();
+                }
+            }
+
+            Context.Architecture.Tick();
+
+            if (SpeedMultiplier < 0)
+            {
+                Context.ProcessLightingChanges();
+                return;
+            }
+            if (!UseSchedule) { //scheduleless mode is still useful for desync debug.
+                var entCpy = Entities.ToArray();
+                foreach (var obj in entCpy)
+                {
+                    //Context.NextRandom(1);
+                    obj.Tick(); //run object specific tick behaviors, like lockout count decrement
+                    if (obj.Thread != null && Trace != null) {
+                        foreach (var item in obj.Thread.Stack)
+                        {
+                            Context.NextRandom(1);
+                            if (item is VMRoutingFrame)
+                            {
+                                Trace.Trace(obj.ObjectID + "("+Context.RandomSeed+"): "+"VMRoutingFrame with state: "+ ((VMRoutingFrame)item).State.ToString());
+                            }
+                            else
+                            {
+                                var opcode = item.GetCurrentInstruction().Opcode;
+                                var primitive = (opcode > 255) ? null : VMContext.Primitives[opcode];
+                                Trace.Trace(obj.ObjectID + "(" + Context.RandomSeed + "): " + item.Routine.Rti.Name.TrimEnd('\0')+':'+item.InstructionPointer+" ("+ ((primitive == null) ? opcode.ToString() : primitive.Name) + ")");
+                            }
+                        }
+                    }
+                }
+            } else
+            {
+                Scheduler.RunTick();
+            }
+
+            if (tickID % Math.Max(1, SpeedMultiplier) == 0) Context.ProcessLightingChanges();
+            //Context.SetToNextCache.VerifyPositions(); use only for debug!
+
+            if (UseWorld && Context.Blueprint?.SM64 != null)
+            {
+                Context.Blueprint.SM64.MyID = GetAvatarByPersist(MyUID)?.ObjectID ?? 0;
+                var state = Context.Blueprint.SM64.MyVisualState;
+                if (state.Active)
+                {
+                    SendCommand(new VMNetSM64PositionCmd()
+                    {
+                        VisualState = state,
+                    });
+                }
+
+                while (Context.Blueprint.SM64.SoundQueue.Count > 0)
+                {
+                    SendCommand(new VMNetSM64EventCmd()
+                    {
+                        EventType = 0,
+                        EventValue = Context.Blueprint.SM64.SoundQueue.Dequeue()
+                    });
+                }
+            }
+        }
+
+        public void ProcessQTRDay()
+        {
+            foreach (var ent in Entities)
+            {
+                (ent.PlatformState as VMIObjectState)?.ProcessQTRDay(this, ent);
+            }
+        }
+
+        public void UpdateTuning()
+        {
+            TuningCache.UpdateTuning(this);
+            foreach (var entity in Entities)
+            {
+                entity.UpdateTuning(this);
+            }
+            Context.InitSpecialTuning();
+        }
+
+        /// <summary>
+        /// Adds an entity to this Virtual Machine.
+        /// </summary>
+        /// <param name="entity">The entity to add.</param>
+        public void AddEntity(VMEntity entity)
+        {
+            entity.ObjectID = ObjectId;
+            ObjectsById.Add(entity.ObjectID, entity);
+            AddToObjList(this.Entities, entity);
+            if (!entity.GhostImage) Context.ObjectQueries.NewObject(entity);
+            ObjectId = NextObjID();
+        }
+
+        public static void AddToObjList(List<VMEntity> list, VMEntity entity)
+        {
+            if (list.Count == 0) { list.Add(entity); return; }
+            int id = entity.ObjectID;
+            int max = list.Count;
+            int min = 0;
+            while (max>min)
+            {
+                int mid = (max+min) / 2;
+                int nid = list[mid].ObjectID;
+                if (id < nid) max = mid;
+                else if (id == nid) return; //do not add dupes
+                else min = mid+1;
+            }
+            list.Insert(min, entity);
+            // list.Insert((list[min].ObjectID>id)?min:((list[max].ObjectID > id)?max:max+1), entity);
+        }
+
+        public static void DeleteFromObjList(List<VMEntity> list, VMEntity entity)
+        {
+            if (list.Count == 0) { return; }
+            int id = entity.ObjectID;
+            int max = list.Count;
+            int min = 0;
+            while (max > min)
+            {
+                int mid = (max + min) / 2;
+                int nid = list[mid].ObjectID;
+                if (id < nid) max = mid;
+                else if (id == nid)
+                {
+                    list.RemoveAt(mid); //found it
+                    return;
+                }
+                else min = mid + 1;
+            }
+            //list.RemoveAt(min);
+        }
+
+        public static int FindNextIndexInObjList(List<VMEntity> list, short targId)
+        {
+            if (list.Count == 0) return 0;
+            int count = list.Count;
+            int max = count;
+            int min = 0;
+            while (max > min)
+            {
+                int mid = (max + min) / 2;
+                int nid = list[mid].ObjectID;
+                if (targId < nid) max = mid; //target object is below us
+                else if (targId == nid)
+                {
+                    //found it. find NEXT!
+                    return mid+1;
+                }
+                else min = mid + 1; //target object is above us
+            }
+            if (min >= count) return count;
+            return list[min].ObjectID > targId ? min : min+1;
+        }
+
+        /// <summary>
+        /// Removes an entity from this Virtual Machine.
+        /// </summary>
+        /// <param name="entity">The entity to remove.</param>
+        public void RemoveEntity(VMEntity entity)
+        {
+            if (Entities.Contains(entity))
+            {
+                Context.ObjectQueries.RemoveObject(entity);
+                DeleteFromObjList(Entities, entity);
+                ObjectsById.Remove(entity.ObjectID);
+                Scheduler.DescheduleTick(entity);
+                if (entity.ObjectID < ObjectId) ObjectId = entity.ObjectID; //this id is now the smallest free object id.
+            }
+            entity.Dead = true;
+        }
+
+        /// <summary>
+        /// Finds the next free object ID and remembers it for use when making another object.
+        /// </summary>
+        private short NextObjID()
+        {
+            for (short i = ObjectId; i > 0; i++)
+                if (!ObjectsById.ContainsKey(i)) return i;
+            return 0;
+        }
+
+        /// <summary>
+        /// Updates the free object ID. Useful after unsafe modification of the objects list.
+        /// </summary>
+        public void UpdateFreeObjectID()
+        {
+            ObjectId = 1;
+            ObjectId = NextObjID();
+        }
+
+        /// <summary>
+        /// Gets a global value set for this Virtual Machine.
+        /// </summary>
+        /// <param name="var">The index of the global value to get. WARNING: Throws exception if index is OOB.
+        /// Must be in range of 0 - 31.</param>
+        /// <returns>A global value if found.</returns>
+        public short GetGlobalValue(ushort var)
+        {
+            // should this be in VMContext?
+            if (var >= GlobalState.Length) throw new Exception("Global Access out of bounds!");
+            
+            switch (var)
+            {
+                case 0:
+                    return (short)Context.Clock.Hours;
+                case 1:
+                    return (short)Context.Clock.DayOfMonth;
+                case 4:
+                    return (short)Context.Clock.TimeOfDay;
+                case 5:
+                    return (short)Context.Clock.Minutes;
+                case 6:
+                    return (short)Context.Clock.Seconds;
+                case 7:
+                    return (short)Context.Clock.Month;
+                case 8:
+                    return (short)Context.Clock.Year;
+            }
+            return GlobalState[var];
+        }
+
+        /// <summary>
+        /// Sets a global value for this Virtual Machine.
+        /// </summary>
+        /// <param name="var">Index for value, must be in range 0 - 31.</param>
+        /// <param name="value">Global value.</param>
+        /// <returns>True if successful. WARNING: If index was OOB, exception is thrown.</returns>
+        public bool SetGlobalValue(ushort var, short value)
+        {
+            if (var >= GlobalState.Length) throw new Exception("Global Access out of bounds!");
+            GlobalState[var] = value;
+            return true;
+        }
+        private static event VMBHAVChangeDelegate OnBHAVChange;
+
+        public static void BHAVChanged(BHAV bhav)
+        {
+            OnBHAVChange?.Invoke();
+        }
+
+        /// <summary>
+        /// Signals a Dialog to all listeners. (usually a UI)
+        /// </summary>
+        /// <param name="info">The dialog info to pass along.</param>
+        public void SignalDialog(VMDialogInfo info)
+        {
+            if (Driver.InResync) return;
+            OnDialog?.Invoke(info);
+        }
+
+        /// <summary>
+        /// Signals a chat event to all listeners. (usually a UI)
+        /// </summary>
+        /// <param name="info">The chat event to pass along.</param>
+        public void SignalChatEvent(VMChatEvent evt)
+        {
+            if (Driver.InResync) return;
+            OnChatEvent?.Invoke(evt);
+        }
+
+        /// <summary>
+        /// Signals a TS1 tutorial UI-effect request (primitive 34 / TryElement
+        /// 0x22: 0 = flash the button with image id, 1 = flash the person
+        /// panel button of a neighbor, 2 = flash the relationship panel) to
+        /// all listeners. (usually a UI)
+        /// </summary>
+        public void SignalTutorialUIEffect(int subOp, int id, bool on)
+        {
+            OnTutorialUIEffect?.Invoke(subOp, id, on);
+        }
+
+        public void SignalEODMessage(VMNetEODMessageCmd msg)
+        {
+            OnEODMessage?.Invoke(msg);
+        }
+
+        public void SignalLotSwitch(uint lotId)
+        {
+            // EXP-05 V6 watch hook: the away lot ejects the visiting family
+            // within a single probe frame, so no probe-side poll can attribute
+            // the return signal; this sink logs every switch with its VM
+            // identity. Null when no autotest runs.
+            AutotestLotSwitchSink?.Invoke(lotId, GetHashCode().ToString("x"));
+            OnRequestLotSwitch?.Invoke(lotId);
+        }
+
+        public void SignalGenericVMEvt(VMEventType type, object data)
+        {
+            OnGenericVMEvent?.Invoke(type, data);
+        }
+
+        public VMSandboxRestoreState Sandbox()
+        {
+            var state = new VMSandboxRestoreState { Entities = Entities, ObjectId = ObjectId,
+                ObjectsById = ObjectsById, ObjectQueries = Context.ObjectQueries, RandomSeed = Context.RandomSeed };
+
+            Context.ObjectQueries = new VMObjectQueries(Context);
+            Entities = new List<VMEntity>();
+            ObjectsById = new Dictionary<short, VMEntity>();
+            ObjectId = 1;
+
+            return state;
+        }
+
+        public void SandboxRestore(VMSandboxRestoreState state)
+        {
+            Entities = state.Entities;
+            ObjectsById = state.ObjectsById;
+            ObjectId = state.ObjectId;
+            Context.ObjectQueries = state.ObjectQueries;
+            Context.RandomSeed = state.RandomSeed;
+        }
+
+#region VM Marshalling Functions
+        public VMMarshal Save(bool user = false)
+        {
+            var ents = new VMEntityMarshal[Entities.Count];
+            var threads = new VMThreadMarshal[Entities.Count];
+            var mult = new List<VMMultitileGroupMarshal>();
+
+            int i = 0;
+            foreach (var ent in Entities)
+            {
+                if (user && ((VMMovementFlags)ent.GetValue(VMStackObjectVariable.MovementFlags)).HasFlag(VMMovementFlags.FSOExcludeUserSave))
+                {
+                    continue;
+                }
+
+                if (ent is VMAvatar)
+                {
+                    ents[i] = ((VMAvatar)ent).Save();
+                }
+                else
+                {
+                    ents[i] = ((VMGameObject)ent).Save();
+                }
+                threads[i++] = ent.Thread.Save();
+                if (ent.MultitileGroup.BaseObject == ent)
+                {
+                    mult.Add(ent.MultitileGroup.Save());
+                }
+            }
+
+            if (i != ents.Length)
+            {
+                Array.Resize(ref ents, i);
+                Array.Resize(ref threads, i);
+            }
+
+            return new VMMarshal
+            {
+                Context = Context.Save(),
+                TS1 = TS1,
+                Entities = ents,
+                Threads = threads,
+                MultitileGroups = mult.ToArray(),
+                GlobalState = (short[])GlobalState.Clone(),
+                PlatformState = PlatformState,
+                ObjectId = ObjectId,
+                Tuning = Tuning
+            };
+        }
+
+        public VMHollowMarshal HollowSave()
+        {
+            var ents = new List<VMHollowGameObjectMarshal>();
+            var mult = new List<VMMultitileGroupMarshal>();
+
+            foreach (var ent in Entities)
+            {
+
+                if (ent is VMGameObject && !(ent.Container != null && ent.Container is VMAvatar))
+                {
+                    if (ent.MultitileGroup.Objects.All(x => x.GetValue(VMStackObjectVariable.Hidden) > 0 || (!Context.RoomInfo[Context.GetRoomAt(x.Position)].Room.IsOutside))) continue;
+                    //todo: recursively check if parent object is vm avatar.
+                    //restoring state ignores objects with invalid containers anyways.
+                    ents.Add(((VMGameObject)ent).HollowSave());
+                    if (ent.MultitileGroup.BaseObject == ent)
+                    {
+                        mult.Add(ent.MultitileGroup.Save());
+                    }
+                }
+            }
+
+            return new VMHollowMarshal
+            {
+                Context = Context.Save(),
+                Entities = ents.ToArray(),
+                MultitileGroups = mult.ToArray()
+            };
+        }
+
+        public bool FSOVAsyncLoading;
+        public bool FSOVDoAsyncLoad;
+        public bool FSOVClientJoin;
+        public int FSOVObjLoaded;
+        public int FSOVObjTotal;
+
+        // EXP-06 (declared in coordination/tasks/EXP-06.md before this edit):
+        // pump observability counters for the ss-book leg-4 stall bisect (the
+        // EXP-04 V4.1 AutotestTickCalls precedent). Written unconditionally on
+        // every Update/Tick; read only by the autotest. Plain int increments —
+        // inert for normal play.
+        public static int AutotestPumpUpdates;
+        public static int AutotestPumpTicks;
+        public static int AutotestPumpLastSpeed;
+
+        // EXP-05 arc integration (ported from the hddowntown fork lineage,
+        // 152b3a9): pump-decomposition counters under the names the EXP-04/05
+        // probes read. Coexists with the AutotestPump* trio above (leg-4
+        // naming); all are unconditional int writes, inert for normal play.
+        public static long AutotestTickCalls;
+        public static long AutotestTickBody;
+        public static int AutotestLastTickSpeed = int.MinValue;
+        public static int AutotestLastUpdateSpeed = int.MinValue;
+
+        /// <summary>EXP-05 V6 watch hook (V4.4 sink precedent) — fired from
+        /// SignalLotSwitch with (lotId, vmHash). Null when no autotest runs.</summary>
+        public static Action<uint, string> AutotestLotSwitchSink;
+
+        public void Load(VMMarshal input)
+        {
+            FSOVClientJoin = (Context.Architecture == null);
+            FSOVAsyncLoading = true;
+            LoadAsync(input);
+            LoadComplete();
+        }
+
+        public void LoadAsync(VMMarshal input)
+        {
+            FSOVAsyncLoading = true;
+            var lastBp = Context.Blueprint; //try keep this alive I suppose
+            //var oldWorld = Context.World;
+            //TS1 = input.TS1;
+            Context = new VMContext(input.Context, Context);
+            Context.VM = this;
+            var idMap = input.Context.Architecture.IDMap;
+            if (idMap != null) idMap.Apply(this);
+            Context.Architecture.RegenRoomMap();
+            Context.RegeneratePortalInfo();
+            Context.Architecture.Terrain.RegenerateCenters();
+
+            if (VM.UseWorld)
+            {
+                Context.Blueprint.Altitude = Context.Architecture.Terrain.Heights;
+                Context.Blueprint.AltitudeCenters = Context.Architecture.Terrain.Centers;
+            }
+
+            var oldSounds = new List<VMSoundTransfer>();
+
+            if (Entities != null) //free any object resources here.
+            {
+                foreach (var obj in Entities)
+                {
+                    obj.Dead = true;
+                    if (obj.HeadlineRenderer != null)
+                    {
+                        if (UseWorld)
+                        {
+                            GameThread.InUpdate(() =>
+                            {
+                                obj.HeadlineRenderer.Dispose();
+                            });
+                        }
+                    }
+                    oldSounds.AddRange(obj.GetActiveSounds());
+                }
+            }
+
+            SoundEntities = new HashSet<VMEntity>();
+            Entities = new List<VMEntity>();
+            Scheduler.Reset();
+            ObjectsById = new Dictionary<short, VMEntity>();
+            FSOVObjTotal = input.Entities.Length;
+            foreach (var ent in input.Entities)
+            {
+                VMEntity realEnt;
+                var objDefinition = FSO.Content.Content.Get().WorldObjects.Get(ent.GUID);
+                if (objDefinition == null)
+                {
+                    LoadErrors.Add(new VMLoadError(VMLoadErrorCode.MISSING_OBJECT, 
+                        "0x" + ent.GUID.ToString("X8") + " " + input.MultitileGroups.FirstOrDefault(x => x.Objects.Contains(ent.ObjectID))?.Name ?? "(unknown name)", (ushort)ent.ObjectID));
+                    ent.LoadFailed = true;
+                    continue;
+                }
+                if (ent is VMAvatarMarshal)
+                {
+                    var avatar = new VMAvatar(objDefinition);
+                    avatar.Load((VMAvatarMarshal)ent);
+                    if (UseWorld) Context.Blueprint.AddAvatar((AvatarComponent)avatar.WorldUI);
+                    realEnt = avatar;
+                }
+                else
+                {
+                    var worldObject = Context.MakeObjectComponent(objDefinition);
+                    var obj = new VMGameObject(objDefinition, worldObject);
+                    obj.Load((VMGameObjectMarshal)ent);
+                    if (UseWorld)
+                    {
+                        Context.Blueprint.AddObject((ObjectComponent)obj.WorldUI);
+                        Context.Blueprint.ChangeObjectLocation((ObjectComponent)obj.WorldUI, obj.Position);
+                    }
+                    obj.Position = obj.Position;
+                    realEnt = obj;
+                }
+                realEnt.FetchTreeByName(Context);
+                Entities.Add(realEnt);
+                Context.ObjectQueries.NewObject(realEnt);
+                ObjectsById.Add(ent.ObjectID, realEnt);
+                FSOVObjLoaded++;
+            }
+
+            int i = 0;
+            int j = 0;
+            foreach (var ent in input.Entities)
+            {
+                if (ent.LoadFailed)
+                {
+                    i++;
+                    continue;
+                }
+                var threadMarsh = input.Threads[i];
+                var realEnt = Entities[j++];
+                i++;
+
+                realEnt.Thread = new VMThread(threadMarsh, Context, realEnt);
+                Scheduler.ScheduleTickIn(realEnt, 1);
+
+                if (realEnt is VMAvatar)
+                    ((VMAvatar)realEnt).LoadCrossRef((VMAvatarMarshal)ent, Context);
+                else
+                    ((VMGameObject)realEnt).LoadCrossRef((VMGameObjectMarshal)ent, Context);
+            }
+
+            foreach (var multi in input.MultitileGroups)
+            {
+                var grp = new VMMultitileGroup(multi, Context); //should self register
+                if (VM.UseWorld)
+                {
+                    var b = grp.BaseObject;
+                    var avgPos = new LotTilePos();
+                    foreach (var obj in grp.Objects)
+                    {
+                        avgPos += obj.Position;
+                    }
+                    avgPos /= Math.Max(grp.Objects.Count, 1);
+
+                    foreach (var obj in grp.Objects)
+                    {
+                        var off = obj.Position - avgPos;
+                        obj.WorldUI.MTOffset = new Vector3(off.x, off.y, 0);
+                        obj.Position = obj.Position;
+                    }
+                }
+                var persist = grp.BaseObject?.PersistID ?? 0;
+                if (persist != 0 && grp.BaseObject is VMGameObject) Context.ObjectQueries.RegisterMultitilePersist(grp, persist);
+            }
+
+            foreach (var ent in Entities)
+            {
+                if (ent.Container == null) ent.PositionChange(Context, true); //called recursively for contained objects.
+            }
+
+            GlobalState = input.GlobalState;
+            // SetFreeWill mirror law (SetFreeWill__8cXObject 0xc9d40): SimAntics global
+            // 0x1e always mirrors the live free-will flag. Init() seeded it above, but
+            // this restore replaces the whole array with the saved word, which can be
+            // stale; and FreeWillEnabled's setter early-returns on an unchanged static,
+            // so it would never re-mirror. Re-apply the mirror directly. (Scoped to the
+            // free-will word only — no other global is owned by the port.)
+            if (GlobalState != null && GlobalState.Length > 0x1e)
+                GlobalState[0x1e] = (short)(_FreeWillEnabled ? 1 : 0);
+            if (TS1)
+            {
+                ((VMTS1LotState)input.PlatformState).CurrentFamily = TS1State.CurrentFamily;
+            }
+            var lastPlatformState = PlatformState;
+            PlatformState = input.PlatformState;
+            PlatformState.ActivateValidator(this);
+            if (lastPlatformState != null && lastPlatformState is VMTSOLotState)
+            {
+                TSOState.Names = ((VMTSOLotState)lastPlatformState).Names;
+            }
+            ObjectId = input.ObjectId;
+
+            //just a few final changes to refresh everything, and avoid signalling objects
+            var clock = Context.Clock;
+            Context.Architecture.SetTimeOfDay();
+
+            Context.Architecture.SignalAllDirty();
+            Context.DisableRouteInvalidation = true;
+            Context.Architecture.Tick();
+            Context.DisableRouteInvalidation = false;
+
+            Context.Architecture.WallDirtyState(input.Context.Architecture);
+
+            if (oldSounds.Count > 0)
+            {
+                GameThread.InUpdate(() =>
+                {
+                    foreach (var snd in oldSounds)
+                    {
+                        //find new owners
+                        var obj = GetObjectById(snd.SourceID);
+                        if (obj == null || obj.Object.GUID != snd.SourceGUID) snd.SFX.Sound.RemoveOwner(snd.SourceID);
+                        else
+                        {
+                            SoundEntities.Add(obj);
+                            obj.SoundThreads.Add(snd.SFX); // successfully transfer sound to new object
+                        }
+                    }
+                });
+            }
+            
+            Context.UpdateTSOBuildableArea();
+            Tuning = input.Tuning;
+            UpdateTuning();
+            if (OnFullRefresh != null) OnFullRefresh();
+
+            if (lastBp != null && UseWorld)
+            {
+                Context.Blueprint.SM64 = lastBp.SM64;
+                Context.Blueprint.SM64?.MigrateSM64(Context.World.State, Context.Blueprint);
+            }
+        }
+
+        public void LoadComplete()
+        {
+            FSOVAsyncLoading = false;
+            if (!TS1 && VM.UseWorld)
+            {
+                Context.Blueprint.Weather?.SetWeather(GetGlobalValue(18));
+            }
+            Context.RefreshAllLighting(); //height of some objects not loaded during async load - must regenerate lighting for the rooms.
+            if (FSOVClientJoin)
+            {
+                //run clientJoin functions to play object sounds, update some gfx.
+                foreach (var obj in Entities)
+                {
+                    obj.ExecuteEntryPoint(30, Context, true);
+                }
+            }
+        }
+
+        public void HollowLoad(VMHollowMarshal input)
+        {
+            input.Context.Ambience.ActiveBits = 0;
+            Context = new VMContext(input.Context, Context);
+            Context.VM = this;
+            Context.Architecture.RegenRoomMap();
+            Context.RegeneratePortalInfo();
+
+            Entities = new List<VMEntity>();
+            ObjectsById = new Dictionary<short, VMEntity>();
+            var includedEnts = new List<VMHollowGameObjectMarshal>();
+            foreach (var ent in input.Entities)
+            {
+                VMEntity realEnt;
+                var objDefinition = FSO.Content.Content.Get().WorldObjects.Get(ent.GUID);
+
+                var worldObject = Context.MakeObjectComponent(objDefinition);
+                var obj = new VMGameObject(objDefinition, worldObject);
+                obj.HollowLoad(ent);
+                if (UseWorld)
+                {
+                    Context.Blueprint.AddObject((ObjectComponent)obj.WorldUI);
+                    Context.Blueprint.ChangeObjectLocation((ObjectComponent)obj.WorldUI, obj.Position);
+                }
+                obj.Position = obj.Position;
+                realEnt = obj;
+
+                includedEnts.Add(ent);
+                Entities.Add(realEnt);
+                Context.ObjectQueries.NewObject(realEnt);
+                ObjectsById.Add(ent.ObjectID, realEnt);
+            }
+
+            int i = 0;
+            foreach (var realEnt in Entities)
+            {
+                var ent = includedEnts[i++];
+                ((VMGameObject)realEnt).LoadHollowCrossRef(ent, Context);
+            }
+
+            foreach (var multi in input.MultitileGroups)
+            {
+                new VMMultitileGroup(multi, Context); //should self register
+            }
+
+            foreach (var ent in Entities)
+            {
+                if (ent.Container == null) ent.PositionChange(Context, true); //called recursively for contained objects.
+            }
+
+            input.Context.Architecture.WallsDirty = true;
+            input.Context.Architecture.FloorsDirty = true;
+            Context.Architecture.WallDirtyState(input.Context.Architecture);
+            Context.Architecture.Tick();
+            ObjectId = NextObjID();
+        }
+
+        internal void BreakpointHit(VMEntity entity)
+        {
+            if (OnBreakpoint == null) entity.Thread.ThreadBreak = VMThreadBreakMode.Active; //no handler..
+            else OnBreakpoint(entity);
+        }
+
+        public void ListenBHAVChanges()
+        {
+            OnBHAVChange -= VM_OnBHAVChange;
+        }
+
+        public void SuppressBHAVChanges()
+        {
+            OnBHAVChange -= VM_OnBHAVChange;
+        }
+#endregion
+    }
+
+    public delegate void VMBHAVChangeDelegate();
+
+    public class VMSandboxRestoreState
+    {
+        public List<VMEntity> Entities;
+        public Dictionary<short, VMEntity> ObjectsById;
+        public short ObjectId = 1;
+        public VMObjectQueries ObjectQueries;
+        public ulong RandomSeed;
+    }
+
+    public enum VMEventType
+    {
+        TSOUnignore,
+        TSOTimeout,
+        TS1LotChange,
+        TS1BuildBuyChange,
+        TSOUpgraded,
+        TS1PictureInPicture
+    }
+}

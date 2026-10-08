@@ -1,0 +1,205 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Xml;
+
+namespace FSO.Server.Watchdog
+{
+    public class Program
+    {
+        //really simple console application to retrieve and extract a server distribution from teamcity.
+
+        static HashSet<string> IgnoreFiles = new HashSet<string>()
+        {
+            "watchdog.exe",
+            "watchdog.sh",
+            "watchdog.bat",
+            "watchdog.ini",
+            "config.json",
+            "NLog.config"
+        };
+
+        static int Main(string[] args)
+        {
+            var restart = true;
+            if (args.Length > 0 && args.Any(x => x == "--update"))
+            {
+                Update(new string[0]);
+                args = args.Where(x => x != "--update").ToArray();
+            }
+
+            if (args.Length > 0 && args.Any(x => x == "--core"))
+            {
+                Update(new string[0]);
+                return 0; //sh script handles restarting when in core mode
+            }
+
+            while (restart)
+            {
+                int result = 3;
+                try
+                {
+                    // Use Process instead of AppDomain
+                    var process = new Process();
+                    process.StartInfo.FileName = "server.exe";
+                    process.StartInfo.Arguments = string.Join(" ", args.Select(a => $"\"{a}\""));
+                    process.StartInfo.UseShellExecute = false;
+                    process.Start();
+                    process.WaitForExit();
+                    result = process.ExitCode;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Unhandled exception occurred!");
+                    Console.WriteLine(e.ToString());
+                }
+
+                if (result > 1)
+                {
+                    switch (result)
+                    {
+                        case 2:
+                            restart = false;
+                            break;
+                        case 4:
+                            Update(new string[0]);
+                            break;
+                    }
+                }
+                //was trying to do something smart here with appdomains to reload the app without closing it
+                //but it breaks mono... so to loop running the application you need to use a shell script.
+                //just loop while this watcher doesn't return 2 (shutdown)
+                else
+                {
+                    restart = false; // exit loop if normal
+                }
+            }
+
+            return 0;
+        }
+
+        static string GetTeamcityLatestURL()
+        {
+            var config = Config.Default;
+            Uri url;
+            var baseUri = new Uri(config.TeamCityUrl);
+            if (!Uri.TryCreate(baseUri, "guestAuth/app/rest/builds?locator=buildType:" + config.TeamCityProject + ",status:success,count:1,branch:" + config.Branch, out url))
+                url = null;
+
+            if (url != null)
+            {
+                string contents;
+                using (var wc = new System.Net.WebClient())
+                    contents = wc.DownloadString(url);
+                var doc = new XmlDocument();
+                doc.LoadXml(contents);
+                var builds = doc.GetElementsByTagName("build");
+                foreach (XmlNode build in builds)
+                {
+                    var wholenumber = build.Attributes["number"].Value;
+                    var number = wholenumber.Substring(wholenumber.LastIndexOf('-') + 1);
+                    return config.TeamCityUrl.TrimEnd('/') + "/repository/download/" + config.TeamCityProject + "/" + build.Attributes["id"].Value + ":id/server-" + number + ".zip?guest=1";
+                }
+            }
+
+            return null;
+        }
+
+        static void DownloadAndExtractAll(string[] urls)
+        {
+            foreach (var url in urls)
+            {
+                var wait = new AutoResetEvent(false);
+                if (Directory.Exists("selfUpdate/")) Directory.Delete("selfUpdate/", true);
+                Directory.CreateDirectory("selfUpdate/");
+                Console.WriteLine("Downloading artifacts...");
+                var client = new WebClient();
+                client.DownloadFileCompleted += (sender, evt) =>
+                {
+                    var file = "selfUpdate/artifact.zip";
+                    Console.WriteLine("Extracting " + file + "...");
+                    var archive = ZipFile.OpenRead(file);
+                    var entries = archive.Entries;
+                    foreach (var entry in entries)
+                    {
+                        var targPath = Path.Combine("./", entry.FullName);
+                        if (File.Exists(targPath) && IgnoreFiles.Contains(entry.FullName)) continue;
+                        Directory.CreateDirectory(Path.GetDirectoryName(targPath));
+                        try
+                        {
+                            entry.ExtractToFile(targPath, true);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Could not replace " + targPath + "!");
+                        }
+                    }
+                    archive.Dispose();
+                    Directory.Delete("selfUpdate/", true);
+                    Console.WriteLine("Update Complete!");
+                    wait.Set();
+                };
+
+                client.DownloadFileAsync(new Uri(url), "selfUpdate/artifact.zip");
+                wait.WaitOne();
+            }
+        }
+
+        static void Update(string[] args)
+        {
+            var config = Config.Default;
+
+            if (config.ManifestDownload)
+            {
+                if (File.Exists("scheduledUpdate/update.txt"))
+                {
+                    var lines = File.ReadAllLines("scheduledUpdate/update.txt");
+                    DownloadAndExtractAll(lines.Skip(1).Take(lines.Length - 2).ToArray());
+                    Console.WriteLine("Writing update complete acknowledgement...");
+                    File.WriteAllText("scheduledUpdate/complete.txt", lines.Last());
+                    File.WriteAllText("updateID.txt", lines.Last());
+                }
+                else
+                {
+                    Console.WriteLine("No scheduled update found...");
+                }
+            }
+            else
+            {
+                Uri url;
+
+                if (!config.UseTeamCity)
+                {
+                    Console.WriteLine("Fetching update from " + config.NormalUpdateUrl + "...");
+                    url = new Uri(config.NormalUpdateUrl);
+                }
+                else
+                {
+                    Console.WriteLine("Fetching update from " + config.TeamCityUrl + "/" + config.TeamCityProject + "...");
+                    url = new Uri(GetTeamcityLatestURL());
+                    Console.WriteLine("(specifically " + url.ToString() + ")");
+                    //var baseUri = new Uri(config.TeamCityUrl);
+                    //if (!Uri.TryCreate(baseUri, "guestAuth/downloadArtifacts.html?buildTypeId=" + config.TeamCityProject + "&buildId=lastSuccessful", out url))
+                    //    url = null;
+                }
+
+                using (var file = File.Open("updateUrl.txt", FileMode.Create, FileAccess.Write))
+                {
+                    var writer = new StreamWriter(file);
+                    writer.WriteLine(url.ToString().Replace(":id/server-", ":id/client-"));
+                    writer.Close();
+                }
+                
+                if (url != null)
+                {
+                    DownloadAndExtractAll(new string[] { url.AbsoluteUri });
+                }
+            }
+        }
+    }
+}

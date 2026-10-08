@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SimplePaletteQuantizer</RootNamespace>
+    <AssemblyName>SimplePaletteQuantizer</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <ApplicationIcon>Aero - Ying Yang.ico</ApplicationIcon>
+    <UseWindowsForms>true</UseWindowsForms>
+    <TrimMode>partial</TrimMode>
+    <PublishReadyToRun>true</PublishReadyToRun>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Aero - Ying Yang.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Resources.Extensions" Version="9.0.9" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.9" />    
+  </ItemGroup>
+
+</Project>

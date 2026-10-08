@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <OutputType>Library</OutputType>
+    <RootNamespace>FSO.LotView</RootNamespace>
+    <AssemblyName>FSO.LotView</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <IsAotCompatible>True</IsAotCompatible>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <IsAotCompatible>True</IsAotCompatible>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <IsAotCompatible>True</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
+    <ProjectReference Include="..\tso.content\FSO.Content.csproj" />
+    <ProjectReference Include="..\tso.files\FSO.Files.csproj" />
+    <ProjectReference Include="..\tso.sound\FSO.HIT.csproj" />
+    <ProjectReference Include="..\tso.vitaboy.engine\FSO.Vitaboy.Engine.csproj" />
+    <ProjectReference Include="..\tso.vitaboy.model\FSO.Vitaboy.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Mario">
+      <HintPath>Mario.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

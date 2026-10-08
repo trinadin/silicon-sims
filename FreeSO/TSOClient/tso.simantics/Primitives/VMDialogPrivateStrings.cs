@@ -1,0 +1,395 @@
+﻿using System;
+using System.Collections.Generic;
+using FSO.SimAntics.Engine;
+using FSO.Files.Utils;
+using FSO.Files.Formats.IFF.Chunks;
+using System.IO;
+using FSO.SimAntics.Model.TSOPlatform;
+
+namespace FSO.SimAntics.Primitives
+{
+    public class VMDialogPrivateStrings : VMPrimitiveHandler
+    {
+        public static readonly int DIALOG_MAX_WAITTIME = 60 * 30;
+        public static Dictionary<VMDialogType, int> TypeToNeighID = new Dictionary<VMDialogType, int>() {
+            {VMDialogType.TS1Neighborhood, 4 },
+            {VMDialogType.TS1Downtown, 2 },
+            {VMDialogType.TS1Vacation, 3 },
+            {VMDialogType.TS1StudioTown, 5 },
+            {VMDialogType.TS1Magictown, 7 },
+        };
+
+        public override VMPrimitiveExitCode Execute(VMStackFrame context, VMPrimitiveOperand args)
+        {
+            return ExecuteGeneric(context, args, context.ScopeResource.Get<STR>(301));
+        }
+
+        public static VMPrimitiveExitCode ExecuteGeneric(VMStackFrame context, VMPrimitiveOperand args, STR table)
+        {
+            var operand = (VMDialogOperand)args;
+            var curDialog = context.Thread.BlockingState as VMDialogResult;
+            if (curDialog == null)
+            {
+                //in ts1, it's possible for a lot of blocking dialogs to come in one frame. due to the way our engine works,
+                //we cannot pause the rest of the tick as soon as we hit a blocking dialog, and we cannot show more than one blocking dialog.
+                //so additional blocking dialogs must wait.
+                if (context.VM.TS1 && context.VM.GlobalBlockingDialog != null)
+                {
+                    // r157: mark this dialog QUEUED (HasDisplayed = false) so the shared
+                    // DIALOG_MAX_WAITTIME applies — WaitTime accrues every VMThread.Tick.
+                    // This wait used to be STATELESS, and GlobalBlockingDialog is released
+                    // only by VMNetDialogResponseCmd (the player's click): any latch
+                    // orphaned without a click (e.g. the game unpaused by outside code
+                    // while the help dialog was up) froze EVERY subsequent TS1 blocking
+                    // dialog's tree forever. Observed as the CarPortal 'process' (4125
+                    // ins15) hang: no bookmark, no carpool, in every soak — the tree
+                    // re-entered this branch each tick without any timeout path.
+                    context.Thread.BlockingState = new VMDialogResult
+                    {
+                        Type = operand.Type,
+                        HasDisplayed = false
+                    };
+                    return VMPrimitiveExitCode.CONTINUE_NEXT_TICK;
+                }
+                VMDialogHandler.ShowDialog(context, operand, table);
+
+                if ((operand.Flags & VMDialogFlags.Continue) == 0)
+                {
+                    context.Thread.BlockingState = new VMDialogResult
+                    {
+                        Type = operand.Type,
+                        HasDisplayed = true
+                    };
+                    if (context.VM.TS1)
+                    {
+                        context.VM.GlobalBlockingDialog = context.Caller;
+                        context.VM.LastSpeedMultiplier = context.VM.SpeedMultiplier;
+                        context.VM.SpeedMultiplier = -2;
+                    }
+                    return VMPrimitiveExitCode.CONTINUE_NEXT_TICK;
+                }
+                else return VMPrimitiveExitCode.GOTO_TRUE;
+            }
+            else
+            {
+                if (curDialog.Responded || curDialog.WaitTime > DIALOG_MAX_WAITTIME)
+                {
+                    context.Thread.BlockingState = null;
+                    // r157: if THIS dialog owned the global slot, release it here too —
+                    // VMNetDialogResponseCmd's release law, applied to the timeout path
+                    // as well. Previously a dialog that timed out (player never clicked,
+                    // pause lifted elsewhere) leaked GlobalBlockingDialog forever.
+                    if (context.VM.TS1 && context.VM.GlobalBlockingDialog == context.Caller)
+                    {
+                        context.VM.GlobalBlockingDialog = null;
+                        if (context.VM.SpeedMultiplier < 0)
+                            context.VM.SpeedMultiplier = (context.VM.LastSpeedMultiplier > 0) ? context.VM.LastSpeedMultiplier : 1;
+                    }
+                    if (context.VM.MyUID == context.Caller.PersistID) context.VM.SignalDialog(null);
+                    switch (curDialog.Type)
+                    {
+                        default:
+                        case VMDialogType.Message:
+                            return VMPrimitiveExitCode.GOTO_TRUE;
+                        case VMDialogType.TS1Spellbook:
+                        case VMDialogType.TS1Cookbook:
+                            // CWinMagicBook law (native TryDialog 0xf1c7c/0xf1ce8):
+                            // the modal book window's result is DISCARDED and the
+                            // primitive returns TRUE — no temps, no response text.
+                            return VMPrimitiveExitCode.GOTO_TRUE;
+                        case VMDialogType.TS1TransformMe:
+                            // ENG-09 decode (dialogs-5-14-decode.md §3, instruction-exact
+                            // 0x0f1a24): the primitive registers an answer slot and yields;
+                            // completion reads the PostSim-written pair — state -2 = CONFIRM
+                            // -> TRUE, anything else = CANCEL -> FALSE — and the form index
+                            // (the modal result's HIGH half) lands in Temp0 on BOTH exits.
+                            // The corpus trees (Charms 4119 + CharmsKid 4109) never read
+                            // Temp0, but the port writes it anyway (byte-faithful).
+                            // Port response mapping (the UIOriginalNameEntryDialog idiom):
+                            // ResponseCode 0 = OK/confirm, 2 = Cancel; ResponseText carries
+                            // the picked form index. With no picker mounted the default OK
+                            // alert answers 0 — the confirm-law stand-in ENG-09 landed.
+                            {
+                                short form14;
+                                short.TryParse(curDialog.ResponseText ?? "", out form14);
+                                context.Thread.TempRegisters[0] = form14;
+                                return (curDialog.ResponseCode == 0)
+                                    ? VMPrimitiveExitCode.GOTO_TRUE
+                                    : VMPrimitiveExitCode.GOTO_FALSE;
+                            }
+                        case VMDialogType.YesNo:
+                            return (curDialog.ResponseCode == 0) ? VMPrimitiveExitCode.GOTO_TRUE : VMPrimitiveExitCode.GOTO_FALSE;
+                        case VMDialogType.YesNoCancel:
+                            if (curDialog.ResponseCode > 0)
+                            {
+                                context.Thread.TempRegisters[((operand.Flags & VMDialogFlags.UseTemp1) > 0) ? 1 : 0] = (short)((curDialog.ResponseCode - 1) % 2);
+                                return VMPrimitiveExitCode.GOTO_FALSE;
+                            }
+                            else return VMPrimitiveExitCode.GOTO_TRUE;
+                        case VMDialogType.TextEntry:
+                            //todo: filter profanity, limit name length
+                            //also verify behaviour.
+                            if ((curDialog.ResponseText ?? "") != "")
+                            {
+                                if (curDialog.ResponseText.Length > 32) curDialog.ResponseText = curDialog.ResponseText.Substring(0, 32);
+                                context.StackObject.Name = curDialog.ResponseText;
+                            }
+                                
+                            return VMPrimitiveExitCode.GOTO_TRUE;
+                        case VMDialogType.FSOChars:
+                            context.StackObject.MyList.Clear();
+                            var charR = (curDialog.ResponseText ?? "");
+                            if (charR != "") {
+                                charR = charR.Replace("\\n", "\n");
+                                context.StackObject.MyList.Clear();
+                                foreach (var c in charR)
+                                    context.StackObject.MyList.AddLast((short)c);
+                            }
+                            return VMPrimitiveExitCode.GOTO_TRUE;
+                        case VMDialogType.NumericEntry: //also downtown
+                            // ENG-09 decode (body 0x0f1810): TS1Downtown IS this case —
+                            // the native is a slot poll; the chosen lot (the modal
+                            // runner's return, stored in the ObjectModule answer slot)
+                            // is read into Temp0 and the primitive returns TRUE with no
+                            // FALSE exit. The parse->Temp0->GOTO_TRUE contract below is
+                            // the native law (EXP-10's picker success was
+                            // native-correct by structure).
+                        case VMDialogType.TS1Vacation:
+                        case VMDialogType.TS1Neighborhood:
+                        case VMDialogType.TS1StudioTown:
+                        case VMDialogType.TS1Magictown:
+                        case VMDialogType.TS1PhoneBook:
+                            int number;
+                            if (!int.TryParse(curDialog.ResponseText, out number)) return VMPrimitiveExitCode.GOTO_FALSE;
+
+                            var tempNumber = ((operand.Flags & VMDialogFlags.UseTemp1) > 0) ? 1 : 0;
+
+                            if ((operand.Flags & VMDialogFlags.UseTempXL) > 0) context.Thread.TempXL[tempNumber] = number;
+                            else context.Thread.TempRegisters[tempNumber] = (short)number;
+                            return VMPrimitiveExitCode.GOTO_TRUE;
+                        case VMDialogType.FSOColor:
+                            int number2;
+                            if (curDialog.ResponseCode == 1) return VMPrimitiveExitCode.GOTO_FALSE;
+                            if (!int.TryParse(curDialog.ResponseText, out number2)) return VMPrimitiveExitCode.GOTO_FALSE;
+                            context.Thread.TempRegisters[0] = (byte)(number2 >> 16);
+                            context.Thread.TempRegisters[1] = (byte)(number2 >> 8);
+                            context.Thread.TempRegisters[2] = (byte)(number2);
+                            return VMPrimitiveExitCode.GOTO_TRUE;
+                        case VMDialogType.TS1PetChoice:
+                        case VMDialogType.TS1Clothes:
+                            if (curDialog.ResponseCode == 0) return VMPrimitiveExitCode.GOTO_FALSE;
+                            goto case VMDialogType.NumericEntry;
+                    }
+                }
+                else
+                {
+                    if (!curDialog.HasDisplayed)
+                    {
+                        if (context.VM.TS1 && context.VM.GlobalBlockingDialog != null && context.VM.GlobalBlockingDialog != context.Caller)
+                        {
+                            // r157: still queued behind another entity's global dialog —
+                            // wait for the slot; the shared timeout above bounds the wait
+                            // (this state was previously unreachable: queued dialogs had
+                            // no BlockingState at all).
+                            return VMPrimitiveExitCode.CONTINUE_NEXT_TICK;
+                        }
+                        VMDialogHandler.ShowDialog(context, operand, table);
+                        curDialog.HasDisplayed = true;
+                        if (context.VM.TS1 && context.VM.GlobalBlockingDialog == null)
+                        {
+                            // r157: taking the freed slot — take the latch and pause with it,
+                            // exactly like a first-run dialog (a queued dialog that shows
+                            // after a timeout-release must own the slot or the release law
+                            // above can never apply to it).
+                            context.VM.GlobalBlockingDialog = context.Caller;
+                            context.VM.LastSpeedMultiplier = context.VM.SpeedMultiplier;
+                            context.VM.SpeedMultiplier = -2;
+                        }
+                    }
+                    return VMPrimitiveExitCode.CONTINUE_NEXT_TICK;
+                }
+            }
+        }
+    }
+
+    public class VMDialogOperand : VMPrimitiveOperand
+    {
+        //engage and block sim, automatic icon, local reference 0, string not debug
+
+        public byte CancelStringID { get; set; } //button 3. renaming used for genie, as an example.
+        public byte IconNameStringID { get; set; }
+        public byte MessageStringID { get; set; }
+        public byte YesStringID { get; set; } //button 1
+        public byte NoStringID { get; set; } //button 2
+        public VMDialogType Type { get; set; }
+        public byte TitleStringID { get; set; }
+        public VMDialogFlags Flags; 
+
+        public VMDialogIconMode IconMode
+        {
+            get { return (VMDialogIconMode)(((byte)Flags >> 1) & 0x7); }
+        }
+
+        public bool Continue
+        {
+            get
+            {
+                return (Flags & VMDialogFlags.Continue) == VMDialogFlags.Continue;
+            }
+            set
+            {
+                if (value) Flags |= VMDialogFlags.Continue;
+                else Flags &= ~VMDialogFlags.Continue;
+            }
+        }
+        public bool UseTempXL
+        {
+            get
+            {
+                return (Flags & VMDialogFlags.UseTempXL) == VMDialogFlags.UseTempXL;
+            }
+            set
+            {
+                if (value) Flags |= VMDialogFlags.UseTempXL;
+                else Flags &= ~VMDialogFlags.UseTempXL;
+            }
+        }
+
+        public bool UseTemp1
+        {
+            get
+            {
+                return (Flags & VMDialogFlags.UseTemp1) == VMDialogFlags.UseTemp1;
+            }
+            set
+            {
+                if (value) Flags |= VMDialogFlags.UseTemp1;
+                else Flags &= ~VMDialogFlags.UseTemp1;
+            }
+        }
+
+        #region VMPrimitiveOperand Members
+        public void Read(byte[] bytes)
+        {
+            using (var io = IoBuffer.FromBytes(bytes, ByteOrder.LITTLE_ENDIAN)){
+                CancelStringID = io.ReadByte();
+                IconNameStringID = io.ReadByte();
+                MessageStringID = io.ReadByte();
+                YesStringID = io.ReadByte();
+                NoStringID = io.ReadByte();
+                Type = (VMDialogType)io.ReadByte();
+                TitleStringID = io.ReadByte();
+                Flags = (VMDialogFlags)io.ReadByte();
+            }
+        }
+
+        public void Write(byte[] bytes) {
+            using (var io = new BinaryWriter(new MemoryStream(bytes)))
+            {
+                io.Write(CancelStringID);
+                io.Write(IconNameStringID);
+                io.Write(MessageStringID);
+                io.Write(YesStringID);
+                io.Write(NoStringID);
+                io.Write((byte)Type);
+                io.Write(TitleStringID);
+                io.Write((byte)Flags);
+            }
+        }
+        #endregion
+    }
+
+    [Flags]
+    public enum VMDialogFlags
+    {
+        Continue = 1,
+
+        Unknown1 = 2, // icon type? 3 bit int
+        Unknown2 = 4, //
+        Unknown3 = 8, // always 0 in tso.
+
+        // Icon type:
+        // 0 = auto,
+        // 1 = none,
+        // 2 = neighbour,
+        // 3 = indexed,
+        // 4 = named
+
+        UseTempXL = 16,
+        UseTemp1 = 32,
+        FilterProfanity = 64,
+        NewEngageContinue = 128
+    }
+
+    public enum VMDialogIconMode : byte
+    {
+        Automatic = 0,
+        None = 1,
+        Neighbor = 2,
+        Indexed = 3,
+        Named = 4,
+        Reserved5 = 5,
+        Reserved6 = 6,
+        Reserved7 = 7
+    }
+
+    public enum VMDialogType : byte
+    {
+        Message = 0,
+        YesNo = 1,
+        YesNoCancel = 2,
+        TextEntry = 3,
+        Sims1Tutorial = 4,
+        NumericEntry = 5,
+        ImageMapped = 6, //truncated in edith..
+        Custom = 7,
+        UserBitmap = 8,
+
+        TS1Downtown = 5, //house number in temp0
+        TS1Clothes = 6,
+        TS1Vacation = 7,
+        TS1Neighborhood = 8,
+        TS1PetChoice = 9,
+        TS1PhoneBook = 10,
+        TS1StudioTown = 11,
+        TS1Spellbook = 12,
+        TS1Magictown = 13,
+        TS1TransformMe = 14,
+        TS1Cookbook = 15,
+
+        FSOJob = 127,
+        FSOColor = 128,
+        FSOChars = 129,
+        
+    }
+
+    public class VMDialogResult : VMAsyncState
+    {
+        public int Timeout = 30 * 60;
+        public byte ResponseCode; //0,1,2 = yes/ok,no,cancel.
+        public string ResponseText = "";
+
+        //local variables
+        public bool HasDisplayed; //re-display dialog if we restore into it being up, in case UI missed it
+
+        public VMDialogType Type; //used for input sanitization
+
+        public override void SerializeInto(BinaryWriter writer)
+        {
+            base.SerializeInto(writer);
+            writer.Write(Timeout);
+            writer.Write(ResponseCode);
+            writer.Write((ResponseText == null)?"":ResponseText);
+            writer.Write((byte)Type);
+        }
+
+        public override void Deserialize(BinaryReader reader)
+        {
+            base.Deserialize(reader);
+            Timeout = reader.ReadInt32();
+            ResponseCode = reader.ReadByte();
+            ResponseText = reader.ReadString();
+            Type = (VMDialogType)reader.ReadByte();
+        }
+    }
+}

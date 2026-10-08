@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "FSO.Windows": {
+      "commandName": "Project"
+    },
+    "FSO.Windows 3D": {
+      "commandName": "Project",
+      "commandLineArgs": "-3d"
+    },
+    "FSO.Windows GL": {
+      "commandName": "Project",
+      "commandLineArgs": "-gl"
+    }
+  }
+}

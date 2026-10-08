@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TargaImage</RootNamespace>
+    <AssemblyName>TargaImage</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <ApplicationIcon>Resources\Paloma.ico</ApplicationIcon>
+    <UseWindowsForms>true</UseWindowsForms>
+    <TrimMode>partial</TrimMode>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="VS2008/**/*.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="CPOL.html" />
+    <EmbeddedResource Include="Resources\Paloma.ico" />
+  </ItemGroup>
+
+</Project>

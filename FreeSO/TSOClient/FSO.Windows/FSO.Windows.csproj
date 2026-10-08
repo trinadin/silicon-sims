@@ -1,0 +1,91 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>FSO.Windows</RootNamespace>
+    <AssemblyName>FreeSO</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PublishAot>false</PublishAot>
+    <IsAotCompatible>false</IsAotCompatible>
+    <TrimMode>partial</TrimMode>
+    <ApplicationIcon>fso.ico</ApplicationIcon>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <TieredPGO>true</TieredPGO>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="fso.ico" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <ApplicationIcon>fso.ico</ApplicationIcon>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="fso.ico" />
+    <None Remove="Icon.bmp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="fso.ico">
+      <LogicalName>Icon.ico</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icon.bmp">
+      <LogicalName>Icon.bmp</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.4" />
+    <PackageReference Include="System.Speech" Version="9.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\tso.client\FSO.Client.csproj" />
+    <ProjectReference Include="..\tso.common\FSO.Common.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <NuGetGlobalPackages Condition=" '$(OS)' == 'Windows_NT' ">$(USERPROFILE)\.nuget\packages</NuGetGlobalPackages>
+    <NuGetGlobalPackages Condition=" '$(OS)' != 'Windows_NT' ">$(HOME)/.nuget/packages</NuGetGlobalPackages>
+  </PropertyGroup>
+
+  <Target Name="CopyMonoGameDLLs" AfterTargets="Build">
+    <!-- Remove root MonoGame.Framework.dll if it exists -->
+    <Delete Files="$(OutputPath)MonoGame.Framework.dll" ContinueOnError="true" />
+
+    <MakeDir Directories="$(OutputPath)Monogame\Windows" />
+    <ItemGroup>
+      <MGWindowsDX Include="$(NuGetGlobalPackages)\monogame.framework.windowsdx\3.8.4\lib\**\MonoGame.Framework.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(MGWindowsDX)" DestinationFolder="$(OutputPath)Monogame\Windows" SkipUnchangedFiles="true" />
+
+    <MakeDir Directories="$(OutputPath)Monogame\WindowsGL" />
+    <ItemGroup>
+      <MGDesktopGL Include="$(NuGetGlobalPackages)\monogame.framework.desktopgl\3.8.4\lib\**\MonoGame.Framework.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(MGDesktopGL)" DestinationFolder="$(OutputPath)Monogame\WindowsGL" SkipUnchangedFiles="true" />
+  </Target>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+</Project>

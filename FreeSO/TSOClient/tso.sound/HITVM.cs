@@ -1,0 +1,452 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using FSO.HIT.Model;
+using FSO.Files.HIT;
+using System.IO;
+using FSO.HIT.Events;
+using Microsoft.Xna.Framework.Audio;
+using FSO.Common;
+
+namespace FSO.HIT
+{
+    public class HITVM
+    {
+        public static bool DISABLE_SOUND = false;
+        private static HITVM INSTANCE;
+
+        public static HITVM Get()
+        {
+            return INSTANCE; //there can be only one!
+        }
+
+        public static void Init()
+        {
+            DISABLE_SOUND = FSOEnvironment.NoSound;
+            INSTANCE = new HITVM();
+        }
+
+        //non static stuff
+
+        private Dictionary<string, HITSound> ActiveEvents; //events that are active are reused for all objects calling that event.
+        // AUD-12: widened for the capture-rail gate's live-source enumeration
+        // (read-only adoption of an active MUSIC-group thread).
+        public List<HITSound> Sounds;
+        private int[] Globals; //SimSpeed 0x64 to CampfireSize 0x87.
+        // AUD-06 native ducking law: per-player duck registry (sound -> announced
+        // main_duckpri). Index in Globals of the republished global main_duckpri
+        // (VM reg 123 -> WriteGlobal(123 - 0x64) = Globals[23]).
+        private const int GLOBAL_MAIN_DUCK_PRI = 23;
+        private Dictionary<HITSound, int> DuckMap;
+        private HITTVOn TVEvent;
+        private HITTVOn MusicEvent;
+        private HITTVOn NextMusic;
+        public AudioListener Listener = new AudioListener();
+
+        private List<FSCPlayer> FSCPlayers;
+        public List<SoundEffectInstance> AmbLoops;
+        public List<HITNoteEntry> PlayQueue = new List<HITNoteEntry>();
+        private float[] GroupMasterVolumes = new float[]
+        {
+            1.0f, 1.0f, 1.0f, 1.0f
+        };
+
+        public HITVM()
+        {
+            var content = FSO.Content.Content.Get();
+
+            Globals = new int[36];
+            Sounds = new List<HITSound>();
+            ActiveEvents = new Dictionary<string, HITSound>();
+            FSCPlayers = new List<FSCPlayer>();
+            AmbLoops = new List<SoundEffectInstance>();
+            DuckMap = new Dictionary<HITSound, int>();
+        }
+
+        public void SetMasterVolume(HITVolumeGroup group, float volume)
+        {
+            GroupMasterVolumes[(int)group] = volume;
+            foreach (var sound in Sounds)
+            {
+                if (sound.VolGroup == group) sound.RecalculateVolume();
+            }
+
+            foreach (var amb in AmbLoops)
+            {
+                amb.Volume = GetMasterVolume(HITVolumeGroup.AMBIENCE);
+            }
+        }
+
+        public float GetMasterVolume(HITVolumeGroup group)
+        {
+            return GroupMasterVolumes[(int)group];
+        }
+
+        public void WriteGlobal(int num, int value)
+        {
+            Globals[num] = value;
+        }
+
+        public int ReadGlobal(int num) 
+        {
+            return Globals[num];
+        }
+
+        // ---- AUD-06 native ducking law -------------------------------------
+        // A sound that executes `set main_duckpri, X` (X!=0) announces X and is
+        // registered in the duck map; `set main_duckpri, 0` or Kill/dispose
+        // deregisters. Every mutation re-publishes max(map) into the global
+        // main_duckpri register (Globals[23]) and re-sprays all live volumes.
+        public void DuckAnnounce(HITSound s, int level)
+        {
+            if (level == 0) DuckMap.Remove(s);
+            else DuckMap[s] = level;
+            RepublishDuck();
+            DuckRespay();
+        }
+
+        public void DuckRemove(HITSound s)
+        {
+            if (DuckMap.Remove(s))
+            {
+                s.MainDuckPri = 0; // no longer announcing
+                RepublishDuck();
+                DuckRespay();
+            }
+        }
+
+        public void DuckReset()
+        {
+            if (DuckMap.Count == 0 && Globals[GLOBAL_MAIN_DUCK_PRI] == 0) return;
+            DuckMap.Clear();
+            Globals[GLOBAL_MAIN_DUCK_PRI] = 0;
+            DuckRespay();
+        }
+
+        private void RepublishDuck()
+        {
+            int max = 0;
+            foreach (var v in DuckMap.Values) if (v > max) max = v;
+            Globals[GLOBAL_MAIN_DUCK_PRI] = max;
+        }
+
+        private void DuckRespay()
+        {
+            foreach (var s in Sounds) s.RecalculateVolume();
+        }
+
+        /// <summary>Current announced main_duckpri for a sound (or 0).</summary>
+        public int GetMainDuckPri(HITSound s)
+        {
+            return DuckMap.TryGetValue(s, out int v) ? v : 0;
+        }
+
+        /// <summary>Current republished global main_duckpri (max of the map).</summary>
+        public int GetGlobalMainDuckPri()
+        {
+            return Globals[GLOBAL_MAIN_DUCK_PRI];
+        }
+
+        /// <summary>Active duck-registry size (for the runtime check).</summary>
+        public int DuckCount { get { return DuckMap.Count; } }
+
+        /// <summary>
+        /// AUD-12 capture rail: fired for every note that reaches the mixer queue
+        /// (the audible truth before output). Read-only observation; subscribers
+        /// must not alter the entry. Null-subscriber fast path.
+        /// </summary>
+        public static event Action<HITNoteEntry> NoteQueued;
+
+        public void QueuePlay(HITNoteEntry note)
+        {
+            PlayQueue.Add(note);
+            var observers = NoteQueued;
+            if (observers != null)
+            {
+                foreach (Action<HITNoteEntry> observer in observers.GetInvocationList())
+                {
+                    try { observer(note); }
+                    catch { }
+                }
+            }
+        }
+
+        public bool NightclubMode;
+
+        public void Tick()
+        {
+            if (NightclubMode)
+            {
+                //find the loudest nightclub sound
+                var nc = Sounds.Where(x => x.Name?.StartsWith("nc_") == true);
+                if (nc.Count() == 0) NightclubMode = false;
+                else
+                {
+                    var max = nc.OrderBy(x => x.GetVolume()).Last();
+                    var bestID = max.Name.Last();
+                    foreach (var sound in nc)
+                    {
+                        if (sound.Name.Last() != bestID) sound.Mute();
+                    }
+                }
+            }
+
+            for (int i = 0; i < Sounds.Count; i++)
+            {
+                if (!Sounds[i].Tick())
+                {
+                    // TYPE53-FC1: a completed kSequenceTrackHitList (53) event thread
+                    // chains its payload sequence hitlist (TYPE53 audit §2 native law:
+                    // "play the track and sequence the payload hitlist"). Skipped when
+                    // the thread was Interrupted — a newer same-event thread superseded
+                    // it, so its section audio is no longer the one the object wants.
+                    var doneThread = Sounds[i] as HITThread;
+                    if (doneThread != null && doneThread.SequenceHitlist != 0
+                        && !doneThread.SequenceChained && !doneThread.Interrupted)
+                    {
+                        doneThread.SequenceChained = true;
+                        var cont = HITThread.SequenceContinuation(doneThread, this);
+                        if (cont != null) Sounds.Add(cont);
+                    }
+                    Sounds[i].Dispose();
+                    Sounds.RemoveAt(i--);
+                }
+            }
+
+            foreach (var item in PlayQueue)
+            {
+                // AUD-07 integration hardening: a queued note's thread can be
+                // disposed between QueuePlay and this tick — skip, don't play
+                // a disposed SoundEffectInstance.
+                if (item.instance == null || item.instance.IsDisposed) continue;
+                item.started = true;
+                item.instance.Play();
+            }
+            if (PlayQueue.Count > 0) PlayQueue.Clear();
+
+            if (NextMusic != null)
+            {
+                if (MusicEvent == null || MusicEvent.Dead)
+                {
+                    MusicEvent = NextMusic;
+                    Sounds.Add(NextMusic);
+                    NextMusic = null;
+                }
+            }
+
+            for (int i = 0; i < FSCPlayers.Count; i++)
+            {
+                FSCPlayers[i].Tick(1/60f);
+            }
+        }
+
+        public void StopFSC(FSCPlayer input)
+        {
+            FSCPlayers.Remove(input);
+        }
+
+        public FSCPlayer PlayFSC(string path)
+        {
+            var dir = Path.GetDirectoryName(path)+"/";
+            FSC fsc = new FSC(path);
+            var player = new FSCPlayer(fsc, dir);
+            FSCPlayers.Add(player);
+
+            return player;
+        }
+
+        /// <summary>
+        /// AUD-03 (D1): TS1 volume-group routing comes from the track's DECLARED
+        /// control group ([Track] column 6; the original reads it in cTrackPlayer::
+        /// UpdateVolPan 0x30F900), not the sample content sniff. Undefined groups
+        /// and the whole TSO path fall back to the caller's historic default.
+        /// </summary>
+        private HITVolumeGroup GroupForTrack(FSO.Content.Model.HITEventRegistration evtent, HITVolumeGroup fallback)
+        {
+            if (!FSO.Content.Content.Get().TS1) return fallback;
+            var audio = FSO.Content.Content.Get().Audio;
+            var track = evtent?.ResGroup == null ? null : audio.GetTrack(evtent.TrackID, evtent.TrackID, evtent.ResGroup);
+            switch (track?.ControlGroup ?? 0)
+            {
+                case HITControlGroups.kGroupSFX: return HITVolumeGroup.FX;
+                case HITControlGroups.kGroupMusic: return HITVolumeGroup.MUSIC;
+                case HITControlGroups.kGroupVox: return HITVolumeGroup.VOX;
+                default: return fallback;
+            }
+        }
+
+        public HITSound PlaySoundEvent(string evt)
+        {
+            if (DISABLE_SOUND) return null;
+            evt = evt.ToLowerInvariant();
+            if (evt.StartsWith("nc_")) NightclubMode = true;
+            HITThread InterruptBlocker = null; //the thread we have to wait for to finish before we begin.
+            if (ActiveEvents.ContainsKey(evt))
+            {
+                var aevt = ActiveEvents[evt];
+                if (aevt.Dead) ActiveEvents.Remove(evt); //if the last event is dead, remove and make a new one
+                else
+                {
+                    if ((aevt as HITThread)?.InterruptBlocker != null)
+                    {
+                        //we can stop this thread - steal its waiter
+                        (aevt as HITThread).Dead = true;
+                        InterruptBlocker = (aevt as HITThread).InterruptBlocker;
+                    } else if ((aevt as HITThread)?.Interruptable == true)
+                    {
+                        InterruptBlocker = (aevt as HITThread);
+                    }
+                    else return aevt; //an event of this type is already alive - here, take it.
+                }
+            }
+
+            var content = FSO.Content.Content.Get();
+            var evts = content.Audio.Events;
+
+            if (evts != null && evts.ContainsKey(evt))
+            {
+                var evtent = evts[evt];
+
+                //objects call the wrong event for piano playing
+                //there is literally no file or evidence that this is not hard code mapped to PlayPiano in TSO, so it's hardcoded here.
+                //the track and HSM associated with the piano_play event, however, are correct. it's just the subroutine that is renamed.
+                if (evt.Equals("piano_play", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    evt = "playpiano";
+                    if (ActiveEvents.ContainsKey(evt))
+                    {
+                        if (ActiveEvents[evt].Dead) ActiveEvents.Remove(evt); //if the last event is dead, remove and make a new one
+                        else return ActiveEvents[evt]; //an event of this type is already alive - here, take it.
+                    }
+                }
+
+                uint TrackID = 0;
+                uint SubroutinePointer = 0;
+
+                if (content.TS1)
+                {
+                    TrackID = evtent.TrackID;
+                    var track = content.Audio.GetTrack(TrackID, 0, evtent.ResGroup);
+                    if (track != null && track.SubroutineID != 0) SubroutinePointer = track.SubroutineID;
+                }
+                else
+                {
+                    if (evtent.ResGroup.hsm != null)
+                    {
+                        var c = evtent.ResGroup.hsm.Constants;
+                        if (c.ContainsKey(evt)) SubroutinePointer = (uint)c[evt];
+                        var trackIdName = "guid_tkd_" + evt;
+                        if (c.ContainsKey(trackIdName)) TrackID = (uint)c[trackIdName];
+                        else TrackID = evtent.TrackID;
+                    }
+                    else
+                    { //no hsm, fallback to eent and event track ids (tsov2)
+                        var entPoints = evtent.ResGroup.hit.EntryPointByTrackID;
+                        TrackID = evtent.TrackID;
+                        if (entPoints != null && entPoints.ContainsKey(evtent.TrackID)) SubroutinePointer = entPoints[evtent.TrackID];
+                    }
+                }
+
+                if (evtent.EventType == HITEvents.kTurnOnTV)
+                {
+                    var thread = new HITTVOn(evtent.TrackID, this);
+                    // AUD-03 (D1): in TS1 the radio/TV thread follows the event
+                    // track's DECLARED control group (stereo tracks carry
+                    // kGroupMusic) instead of the TSO-era forced FX. TSO keeps
+                    // the historic FX forcing.
+                    thread.VolGroup = GroupForTrack(evtent, HITVolumeGroup.FX);
+                    Sounds.Add(thread);
+                    ActiveEvents.Add(evt, thread);
+                    return thread;
+                }
+                else if (evtent.EventType == HITEvents.kSetMusicMode)
+                {
+                    if (evtent.TrackID == 0)
+                    {
+                        if (evtent.Name == "bkground_buy1") evtent.TrackID = 1;
+                        else if (evtent.Name == "bkground_build") evtent.TrackID = 2;
+                    }
+                    var thread = new HITTVOn(evtent.TrackID, this, true);
+                    thread.VolGroup = HITVolumeGroup.MUSIC;
+                    ActiveEvents.Add(evt, thread);
+                    if (NextMusic != null) NextMusic.Kill();
+                    if (MusicEvent != null) MusicEvent.Fade();
+                    NextMusic = thread;
+                    return thread;
+                }
+                else if (evtent.EventType == HITEvents.kSequenceTrackHitList)
+                {
+                    // TYPE53-FC1 (TYPE53 audit §2/§4): a type-53 event plays its
+                    // payload track and sequences the payload hitlist. The shipped
+                    // shape (MusicRecordingStudio / sep6snds.hot, 59 live events over
+                    // 5 tracks) is track-with-subroutine: the track's @tkd code plays
+                    // the track's own content and this arm records the payload
+                    // hitlist so HITVM.Tick chains the section samples when the
+                    // thread completes. Without the arm these events fell through to
+                    // the generic subroutine branch and the payload hitlist — the
+                    // actual section music — was dropped at parse time.
+                    HITThread thread = null;
+                    if (SubroutinePointer != 0)
+                    {
+                        thread = new HITThread(evtent.ResGroup, this);
+                        thread.PC = HITInterpreter.PCTrans(SubroutinePointer, thread);
+                        thread.LoopPointer = (int)thread.PC;
+                        if (TrackID != 0) thread.SetTrack(TrackID, evtent.TrackID);
+                    }
+                    else if (TrackID != 0 && content.Audio.GetTrack(TrackID, 0, evtent.ResGroup) != null)
+                    { //no subroutine: one-shot the track's own patch, the chain still applies
+                        thread = new HITThread(TrackID, this, evtent.ResGroup);
+                    }
+                    if (thread == null) return null;
+                    thread.SequenceHitlist = evtent.SequenceHitlist;
+                    Sounds.Add(thread);
+                    ActiveEvents[evt] = thread;
+                    if (InterruptBlocker != null)
+                    {
+                        InterruptBlocker.Interrupt(thread);
+                        if (!InterruptBlocker.Name.StartsWith("nc_")) InterruptBlocker.KillVocals();
+                    }
+                    thread.Name = evt;
+                    return thread;
+                }
+                else if (SubroutinePointer != 0)
+                {
+                    var thread = new HITThread(evtent.ResGroup, this);
+                    // AUD-13: on TS1 the event track's SubroutineID is a [TrackData]
+                    // ID, not a file offset — the entry PC needs the same remap that
+                    // in-code jumps get via PCTrans (e.g. 0x115 -> 0x17f in
+                    // SimsGeneratedHitSource). Without it every voice stem executes
+                    // garbage bytes and dies before note_on; tracks without an @tkd
+                    // subroutine (all aud12 fx legs) never took this branch.
+                    thread.PC = HITInterpreter.PCTrans(SubroutinePointer, thread);
+                    thread.LoopPointer = (int)thread.PC;
+                    if (TrackID != 0) thread.SetTrack(TrackID, evtent.TrackID);
+                    Sounds.Add(thread);
+                    ActiveEvents[evt] = thread;
+                    if (InterruptBlocker != null)
+                    {
+                        InterruptBlocker.Interrupt(thread);
+                        if (!InterruptBlocker.Name.StartsWith("nc_")) InterruptBlocker.KillVocals();
+                    }
+                    thread.Name = evt;
+                    return thread;
+                }
+                else if (TrackID != 0 && content.Audio.GetTrack(TrackID, 0, evtent.ResGroup) != null)
+                {
+                    var thread = new HITThread(TrackID, this, evtent.ResGroup);
+                    Sounds.Add(thread);
+                    ActiveEvents[evt] = thread;
+                    if (InterruptBlocker != null)
+                    {
+                        InterruptBlocker.Interrupt(thread);
+                        if (!InterruptBlocker.Name.StartsWith("nc_")) InterruptBlocker.KillVocals();
+                    }
+                    thread.Name = evt;
+                    return thread;
+                }
+            }
+
+            return null;
+        }
+    }
+}

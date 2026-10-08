@@ -1,0 +1,160 @@
+﻿using System;
+using FSO.Client.UI.Framework;
+using FSO.Client.UI.Controls;
+using Microsoft.Xna.Framework;
+using FSO.Client.UI.Archive;
+using FSO.Client.Controllers;
+
+namespace FSO.Client.UI.Panels
+{
+    //in matchmaker displays title of city. in lot displays lot name.
+
+    public class UIGameTitle : UICachedContainer
+    {
+        public UIImage Background;
+        public UILabel Label;
+        public UIButton CancelButton;
+        public UIButton InfoButton;
+
+        private string Title;
+        private Tuple<string, Action> OverrideMode;
+        private bool ShowInfo;
+        private bool InfoOpen;
+
+        public UIGameTitle()
+        {
+            Background = new UIImage(GetTexture((ulong)0x000001A700000002));
+            Background.With9Slice(40, 40, 0, 0);
+            this.AddAt(0, Background);
+            Background.BlockInput();
+
+            Label = new UILabel();
+            Label.CaptionStyle = TextStyle.DefaultLabel.Clone();
+            Label.CaptionStyle.Size = 11;
+            Label.Alignment = TextAlignment.Middle;
+            this.Add(Label);
+
+            var ui = Content.Content.Get().CustomUI;
+            var btnTex = ui.Get("chat_cat.png").Get(GameFacade.GraphicsDevice);
+
+            var btnCaption = TextStyle.DefaultLabel.Clone();
+            btnCaption.Size = 8;
+            btnCaption.Shadow = true;
+
+            CancelButton = new UIButton(btnTex);
+            CancelButton.Caption = GameFacade.Strings.GetString("f115", "48");
+            CancelButton.CaptionStyle = btnCaption;
+            CancelButton.OnButtonClick += CancelOverride;
+            CancelButton.Width = 64;
+            CancelButton.Y = 2;
+            Add(CancelButton);
+
+            InfoButton = new UIButton(btnTex)
+            {
+                Caption = "i",
+                CaptionStyle = btnCaption,
+                Width = 20,
+                Y = 2,
+                Visible = false
+            };
+            InfoButton.OnButtonClick += ShowServerInfo;
+            Add(InfoButton);
+
+            SetTitle("Not Blazing Falls");
+        }
+
+        private void ShowServerInfo(UIElement button)
+        {
+            if (!InfoOpen)
+            {
+                InfoOpen = true;
+                var info = new UIArchiveHostInformation(FindController<CoreGameScreenController>());
+                info.CloseButton.OnButtonClick += (elem) =>
+                {
+                    InfoOpen = false;
+                    UIScreen.RemoveDialog(info);
+                };
+
+                UIScreen.ShowDialog(info, false);
+            }
+        }
+
+        private void CancelOverride(UIElement button)
+        {
+            OverrideMode?.Item2?.Invoke();
+        }
+
+        public void SetOverrideMode(string title, Action callback)
+        {
+            Label.Caption = title;
+
+            var style = Label.CaptionStyle;
+
+            var twidth = style.MeasureString(title).X;
+            var ScreenWidth = GlobalSettings.Default.GraphicsWidth / 2;
+
+            var width = twidth + 72;
+
+            X = ScreenWidth - (width / 2 + 40);
+            Background.X = 0;
+            Background.SetSize(width + 80, 24);
+            Size = new Vector2(width + 80, 24);
+
+            Label.X = 40;
+            Label.Size = new Vector2(width, 20);
+
+            //cancel button
+
+            CancelButton.Visible = true;
+            CancelButton.X = twidth + 48;
+            CancelButton.Y = 2;
+            CancelButton.Width = 64;
+
+            InfoButton.Visible = false;
+
+            OverrideMode = new Tuple<string, Action>(title, callback);
+        }
+
+        public void ClearOverrideMode()
+        {
+            OverrideMode = null;
+            SetNormalTitle(Title);
+        }
+
+        public void SetTitle(string title)
+        {
+            ShowInfo = FindController<CoreGameScreenController>()?.Mode == Regulators.CityConnectionMode.ARCHIVE;
+            Title = title;
+
+            if (OverrideMode == null) SetNormalTitle(Title);
+        }
+
+        private void SetNormalTitle(string title)
+        {
+            Label.Caption = title;
+
+            var style = Label.CaptionStyle;
+
+            var twidth = style.MeasureString(title).X;
+            var ScreenWidth = GlobalSettings.Default.GraphicsWidth/2;
+
+            var width = ShowInfo ? twidth + 28 : twidth;
+
+            X = ScreenWidth - (width / 2 + 40);
+            Background.X = 0;
+            Background.SetSize(width + 80, 24);
+            Size = new Vector2(width + 80, 24);
+
+            Label.X = 40;
+            Label.Size = new Vector2(width, 20);
+
+            InfoButton.Visible = ShowInfo;
+            if (ShowInfo)
+            {
+                InfoButton.X = twidth + 48;
+            }
+
+            CancelButton.Visible = false;
+        }
+    }
+}

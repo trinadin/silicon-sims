@@ -1,0 +1,1632 @@
+﻿//#define THROW_SIMANTICS
+#if !Server
+    #define IDE_COMPAT
+#endif
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using FSO.Content;
+using FSO.Files.Formats.IFF.Chunks;
+using FSO.SimAntics.Primitives;
+using FSO.SimAntics.Model;
+using FSO.SimAntics.Marshals.Threads;
+using FSO.SimAntics.Model.TSOPlatform;
+using FSO.SimAntics.NetPlay.EODs.Model;
+using System.Threading;
+
+namespace FSO.SimAntics.Engine
+{
+    /// <summary>
+    /// Handles instruction execution
+    /// </summary>
+    public class VMThread
+    {
+        public static int MAX_USER_ACTIONS = 20;
+
+        /// <summary>
+        /// SIM-19 read-only observation point: fired when AttemptPush silently
+        /// removes a queued action because CheckAction returned null (the queue
+        /// re-validation drop). Autotests use this to attribute dropped socials;
+        /// no subscriber may alter primitive success or failure.
+        /// </summary>
+        public static event Action<VMEntity, VMQueuedAction> QueueDrop;
+
+        /// <summary>
+        /// SIM-19 read-only observation: any other queue removal, with a reason tag
+        /// (dead-callee cleanup / interrupt / cancel / parent-idle). Read-only.
+        /// </summary>
+        public static event Action<string, VMEntity, VMQueuedAction> QueueRemoveAny;
+
+        /// <summary>
+        /// SIM-19 read-only observation point: fired per instruction just before
+        /// execution (plain stack frames only — routing/direct-control frames are
+        /// not reported). Autotests subscribe to trace whitelisted trees through
+        /// the greet window. Read-only: exceptions are swallowed so a probe can
+        /// never kill the VM tick, and no subscriber may alter execution.
+        /// </summary>
+        public static event Action<VMStackFrame> InstructionTrace;
+
+        private static void NotifyRemoveAny(string reason, VMEntity entity, VMQueuedAction action)
+        {
+            var observers = QueueRemoveAny;
+            if (observers == null) return;
+            foreach (Action<string, VMEntity, VMQueuedAction> observer in observers.GetInvocationList())
+            {
+                try { observer(reason, entity, action); }
+                catch { }
+            }
+        }
+
+        private static void NotifyQueueDrop(VMEntity entity, VMQueuedAction action)
+        {
+            var observers = QueueDrop;
+            if (observers == null) return;
+            foreach (Action<VMEntity, VMQueuedAction> observer in observers.GetInvocationList())
+            {
+                try { observer(entity, action); }
+                catch (Exception error)
+                {
+                    Console.WriteLine("[QueueDropObserver] " + error.GetType().Name + " " + error.Message);
+                }
+            }
+        }
+
+        public VMContext Context;
+        private VMEntity Entity;
+
+        public VMThreadBreakMode ThreadBreak = VMThreadBreakMode.Active;
+        public string ThreadBreakString;
+        public int BreakFrame; //frame the last breakpoint was performed on
+        public bool RoutineDirty;
+
+        //check tree only vars
+        public bool IsCheck;
+        public List<VMPieMenuInteraction> ActionStrings;
+        public Dictionary<int, short> MotiveAdChanges;
+
+        public List<VMStackFrame> Stack;
+        private bool ContinueExecution;
+
+        public List<VMQueuedAction> Queue;
+        public VMQueuedAction ActiveAction
+        {
+            get
+            {
+                return (ActiveQueueBlock>-1)?Queue[ActiveQueueBlock]:null;
+            }
+        }
+        /// <summary>
+        /// Set when a change to the queue or an item's priority is changed. Internal functions set this, but since you can modify the queue 
+        /// from other classes MAKE SURE you set this when such a change is made. (eg. priority set from VMAvatar)
+        /// </summary>
+        public bool QueueDirty;
+
+        public sbyte ActiveQueueBlock = -1; //cannot reorder items in the queue with index <= this.
+        public short[] TempRegisters = new short[20];
+        public int[] TempXL = new int[2];
+        public VMPrimitiveExitCode LastStackExitCode = VMPrimitiveExitCode.GOTO_FALSE;
+
+        public VMAsyncState BlockingState;
+        // R249: explicit per-Tick yield signal. A primitive that does not finish within
+        // the Tick (CONTINUE_NEXT_TICK / CONTINUE_FUTURE_TICK, or a GOTO_*_NEXT_TICK that
+        // had to re-schedule) sets this in HandleResult; Tick clears it on entry. Check
+        // evaluation uses it to apply the synchronous-serving law directly instead of
+        // inferring a yield from an unmoved instruction pointer.
+        public bool YieldedThisTick;
+        public VMEODPluginThreadState EODConnection;
+        public bool Interrupt;
+
+        private ushort ActionUID;
+
+        // Exception handling variables
+        // Don't need to be serialized.
+        public int DialogCooldown = 0;
+        // the number of ticks that have executed so far this frame. If this exceeds the allowed max,
+        // the thread resets, and a SimAntics Error pops up.
+        public int TicksThisFrame = 0;
+        // the maximum number of primitives a thread can execute in one frame. Tweak appropriately.
+
+        // variables for internal scheduler
+        public uint ScheduleIdleStart; // keep track of tick when we started idling for an object. must be synced!
+        public uint ScheduleIdleEnd;
+
+        public static readonly int MAX_LOOP_COUNT = 500000;
+
+        // EXP-06 (declared in coordination/tasks/EXP-06.md before this edit):
+        // per-instruction trace sink for the autotest, ported from the EXP-04
+        // ITRACE / EXP-05 V4.4 sink precedent (hddowntown fork-engine pattern).
+        // While the autotest holds AutotestInstrTraceBudget > 0, every executed
+        // instruction on a stack containing routine 4100 is emitted through the
+        // injected sink, naming the pickup machine's executed cycle directly (the
+        // ss-book leg-4 diagnostic: the machine polls at 4100@2 with temp0 banked
+        // and the departure tokens unread — the trace names which branch cycles).
+        // Inert when the sink is null and the budget is 0 — normal play and every
+        // other check never touch either. The EXP-05 arc integration adds an
+        // armed-only REWRITE lever below (AutotestVacLotOverride, default 0 =
+        // inert) — the only write path, disclosed in
+        // coordination/evidence/COORD/indep-review-exp05-arc-20260923-zcode-assist.md.
+        public static Action<string> AutotestTraceSink;
+        public static int AutotestInstrTraceBudget;
+        // EXP-05 arc integration (ported from the hddowntown fork lineage
+        // 152b3a9/28bfa7f/9abfc6f): show/mice trace admission + unbudgeted-entity
+        // set, written only by the autotest. Inert (and read-only) in normal play.
+        public static bool AutotestTraceShowTrees;
+        public static readonly HashSet<int> AutotestUnbudgetedEnts = new HashSet<int>();
+        // EXP-04 V2.8 lever: when > 0, the trace hook rewrites TempRegisters[0]
+        // to this lot id immediately before a 4100@12 op=1 (mode 17
+        // ChangeToLotInTemp0) executes. Armed by the autotest only; 0 = inert.
+        public static int AutotestVacLotOverride;
+
+        private void AutotestSSInstructionTrace(string tag)
+        {
+            if (AutotestTraceSink == null || Stack.Count == 0) return;
+            var unbudgeted = AutotestUnbudgetedEnts.Contains(Entity.ObjectID);
+            if (AutotestInstrTraceBudget <= 0 && !unbudgeted) return;
+            var tf = Stack[Stack.Count - 1];
+            var tid = tf.Routine?.Chunk?.ChunkID ?? 0;
+            // EXP-05 arc admission: the show/mice band 4096-4113, the classic
+            // 4100 family, and the mice-park 366/280 frames over a 4104 stack.
+            // Shared by BOTH loop tails through this helper (fixes the fork
+            // lineage's Tick-tail asymmetry flagged in the arc review).
+            // ENG-22: + the full-tree leg's trees (SocialsMagic 4211, and the
+            // gosub'd global "idle" 280 when running over a 4211 stack).
+            if (!((AutotestTraceShowTrees && ((tid >= 4096 && tid <= 4113) || tid == 4211))
+                || ((tid == 4100 || tid == 280 || tid == 281 || tid == 4103)
+                    && Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4100))
+                || ((tid == 366 || tid == 280)
+                    && Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4104))
+                || (tid == 280 && Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4211)))) return;
+            var tins = tf.Routine?.Instructions;
+            var tci = (tins != null && tf.InstructionPointer >= 0 && tf.InstructionPointer < tins.Length)
+                ? tins[tf.InstructionPointer] : null;
+            if (tci == null) return;
+            if (!unbudgeted) AutotestInstrTraceBudget--;
+            AutotestTraceSink(tag + " ent=" + Entity.ObjectID + " d=" + (Stack.Count - 1)
+                + " tick=" + Context.VM.Scheduler.CurrentTickID
+                + " " + tid + "@" + tf.InstructionPointer
+                + " op=" + tci.Opcode + " t=" + tci.TruePointer + " f=" + tci.FalsePointer);
+            if (AutotestVacLotOverride > 0 && tid == 4100
+                && tf.InstructionPointer == 12 && tci.Opcode == 1)
+            {
+                TempRegisters[0] = (short)AutotestVacLotOverride;
+                AutotestTraceSink(tag + " REWRITE temp0=" + AutotestVacLotOverride
+                    + " (mode 17 ChangeToLotInTemp0 reroute) ent=" + Entity.ObjectID);
+            }
+        }
+
+        // WEDGE-1 (EntertainerFemale decode, 2026-09-19): native TS1 time-slices
+        // thread execution per tick; the port runs a thread to its next yield with
+        // only the MAX_LOOP_COUNT kill. Content that legitimately cycles on
+        // plain-CONTINUE edges (DanceFloor.iff 4122's dance-marathon re-pick when
+        // 'go to available tile' cannot place the dancer) therefore wedges the
+        // whole VM instead of running at native intensity. Forced-yield tier:
+        // after SOFT_LOOP_COUNT instructions without a yield, defer the thread one
+        // tick (resume the same instruction) unless it is a CHECK tree (checks must
+        // complete synchronously). A streak of consecutive forced yields without
+        // genuine progress escalates to the original hard kill.
+        public static readonly int SOFT_LOOP_COUNT = 10000;
+        public static readonly int FORCED_YIELD_MAX = 200;
+        public int ForcedYieldStreak;
+        public int CatchReentries; // DEFECT-2: suppressed-catch re-entry counter (REVIEW F2: no reset — monotonic per thread lifetime, by design)
+
+        // DEFECT-2 probe (ENG-01): the WEDGE-1 counters only increment BETWEEN
+        // instructions — a single Tick()/Execute() that never returns spins the
+        // main thread at 100% CPU with no guard firing (runs 9/2/3 froze at the
+        // HD cab window with and without the patch). Wall-clock watchdog: one
+        // instruction exceeding WDOG_MS names its owner before the throw.
+        public static readonly int WDOG_MS = 1000;
+
+        public static VMPrimitiveExitCode EvaluateCheck(VMContext context, VMEntity entity, VMStackFrame initFrame)
+        {
+            return EvaluateCheck(context, entity, initFrame, null, null);
+        }
+
+        public static VMPrimitiveExitCode EvaluateCheck(VMContext context, VMEntity entity, VMStackFrame initFrame, VMQueuedAction action)
+        {
+            return EvaluateCheck(context, entity, initFrame, action, null);
+        }
+
+
+        // R249: nesting bound for check evaluations. Primitives like Run Functional Tree
+        // re-enter EvaluateCheck from inside a running check; a cyclic functional-tree
+        // chain (an autonomy check tree running Find Best Object For Function, whose
+        // nested checks re-enter the same tree) recurses with a branching factor of the
+        // whole object module — effectively unbounded work. Legitimate nesting is
+        // shallow; the cap fails pathological chains. The native interpreter bounds its
+        // tree stack instead.
+        [ThreadStatic] private static int CheckDepth;
+
+        public static VMPrimitiveExitCode EvaluateCheck(VMContext context, VMEntity entity, VMStackFrame initFrame, VMQueuedAction action, List<VMPieMenuInteraction> actionStrings)
+        {
+            if (CheckDepth >= 16) return VMPrimitiveExitCode.RETURN_FALSE;
+            CheckDepth++;
+            try
+            {
+                return EvaluateCheckInner(context, entity, initFrame, action, actionStrings);
+            }
+            finally
+            {
+                CheckDepth--;
+            }
+        }
+
+        private static VMPrimitiveExitCode EvaluateCheckInner(VMContext context, VMEntity entity, VMStackFrame initFrame, VMQueuedAction action, List<VMPieMenuInteraction> actionStrings)
+        {
+            var temp = new VMThread(context, entity, 5);
+            var forceClone = !context.VM.Scheduler.RunningNow;
+            //temps should only persist on check trees running within the vm tick to avoid desyncs.
+            if (entity.Thread != null)
+            {
+                temp.TempRegisters = forceClone?(short[])entity.Thread.TempRegisters.Clone() : entity.Thread.TempRegisters;
+                temp.TempXL = forceClone ? (int[])entity.Thread.TempXL.Clone() : entity.Thread.TempXL;
+            }
+            temp.IsCheck = true;
+            temp.ActionStrings = actionStrings; //generate and place action strings in here
+            temp.Push(initFrame);
+            if (action != null)
+            {
+                temp.Queue.Add(action); //this check runs an action. We may need its interaction number, etc.
+                temp.ActiveQueueBlock = 0;
+            }
+            // R249: bound the check-tree stack depth. The native interpreter caps its
+            // tree stack and fails the check when the cap is hit; without a cap here a
+            // TS1 test tree whose gosub chain cycles (several autonomy 'sit' trees do)
+            // recurses forever inside this while and freezes the whole VM tick.
+            //
+            // R249 CHECK-TREE SERVING LAW (deliberate, all EvaluateCheck callers): a
+            // check that yields is a FAILED check. The check server must hand the caller
+            // an answer synchronously; a primitive that defers to a later tick has no
+            // answer, so the check fails (RETURN_FALSE) immediately. The yield is read
+            // explicitly from the thread's YieldedThisTick signal (set by HandleResult),
+            // NOT inferred from an unmoved instruction pointer. Scope: EVERY check tree
+            // — TS1 CheckTS1Action (this port's only live TTAB path), the TSO CheckAction
+            // twin, routing/direct-control entry-point condition checks, and the nested
+            // Run Functional Tree / Find Best Object For Function checks. Audited: no
+            // caller legitimately yields — upstream this loop spun forever on a yielding
+            // check ("idling is for losers!"), so any yielding tree was already a freeze,
+            // not a feature; the brain's 'try autonomy' (8233) fall-through is the
+            // unknown-opcode GOTO_FALSE law, not a yield; and the known yielding TS1
+            // trees (chair 'sit' 4107, slot routing unported downstream) already fail
+            // and drop at the hand-off — this only makes the fail immediate. The stuck
+            // detector below is kept for a DIFFERENT condition: a suppressed-exception
+            // primitive that leaves the frame pointer stuck with no yield signal (the
+            // tick-level handler swallows the loop-guard throw without popping the
+            // frame) — it fails the check after 5 spins. Neither guard may kill the VM.
+            var checkGuard = 0;
+            var stuckTicks = 0;
+            while (temp.Stack.Count > 0 && temp.Stack.Count < 64 && temp.DialogCooldown == 0 && !temp.Entity.Dead) //keep going till we're done! idling is for losers!
+            {
+                var beforeCount = temp.Stack.Count;
+                var beforeFrame = temp.Stack[temp.Stack.Count - 1];
+                var beforeIp = beforeFrame.InstructionPointer;
+                temp.Tick();
+                temp.ThreadBreak = VMThreadBreakMode.Active; //cannot breakpoint in check trees
+                if (temp.YieldedThisTick)
+                {
+                    return VMPrimitiveExitCode.RETURN_FALSE; // a check that yields is a failed check (synchronous-serving law)
+                }
+                if (temp.Stack.Count == beforeCount && temp.Stack.Count > 0 &&
+                    temp.Stack[temp.Stack.Count - 1].InstructionPointer == beforeIp)
+                {
+                    if (++stuckTicks > 4) return VMPrimitiveExitCode.RETURN_FALSE; // stuck frame (suppressed exception, no yield signal)
+                }
+                if (++checkGuard > 200000) return VMPrimitiveExitCode.RETURN_FALSE;
+            }
+            if (temp.Stack.Count >= 64) return VMPrimitiveExitCode.RETURN_FALSE; // depth-capped: the check fails (native max-tree-depth law)
+            if (actionStrings != null && actionStrings.Count == 0)
+            {
+                //add an action string containing any modified ads
+                actionStrings.Add(new VMPieMenuInteraction()
+                {
+                    MotiveAdChanges = temp.MotiveAdChanges
+                });
+            }
+            if (context.VM.Aborting) return VMPrimitiveExitCode.ERROR;
+            return (temp.DialogCooldown > 0) ? VMPrimitiveExitCode.RETURN_FALSE : temp.LastStackExitCode;
+        }
+
+        public bool RunInMyStack(VMRoutine routine, GameObject CodeOwner, short[] passVars, VMEntity stackObj)
+        {
+            //a little bit hacky. We may not need to do as serious a context switch as this.
+            var OldStack = Stack;
+            var OldQueue = Queue;
+            var OldCheck = IsCheck;
+            var OldQueueBlock = ActiveQueueBlock;
+
+            VMStackFrame prevFrame = new VMStackFrame() { Caller = Entity, Callee = Entity };
+            if (Stack.Count > 0)
+            {
+                prevFrame = Stack[Stack.Count - 1];
+                Stack = new List<VMStackFrame>() { prevFrame };
+            }
+            else
+            {
+                Stack = new List<VMStackFrame>();
+            }
+
+            Queue = new List<VMQueuedAction>();
+            if (Queue.Count > 0) Queue.Add(Queue[0]);
+            IsCheck = true;
+
+            ExecuteSubRoutine(prevFrame, routine, CodeOwner, new VMSubRoutineOperand(passVars));
+            Stack.RemoveAt(0);
+            if (Stack.Count == 0)
+            {
+                Stack = OldStack;
+                Queue = OldQueue;
+                return false;
+                //bhav was invalid/empty
+            }
+            var frame = Stack[Stack.Count - 1];
+            frame.Callee = stackObj;
+            frame.StackObject = stackObj;
+
+            try
+            {
+                // R249: respect the scheduler and bound the stack — this loop previously
+                // ran `while (Stack.Count > 0) NextInstruction();` unguarded, so any
+                // primitive yielding (CONTINUE_NEXT_TICK — an idle/wait node in a brain
+                // tree) or a gosub cycle spun the caller forever on the game's main
+                // thread (the R249 window freeze). The pushed frame now resumes over
+                // subsequent ticks exactly like a normal thread stack, and a runaway
+                // gosub chain is failed at the native max-tree-depth bound.
+                ContinueExecution = true;
+                while (Stack.Count > 0 && Stack.Count < 64 && (ContinueExecution || IsCheck))
+                {
+                    if (ContinueExecution && TicksThisFrame++ > MAX_LOOP_COUNT)
+                    {
+                        TicksThisFrame = 0;
+                        throw new Exception("Thread entered infinite loop! ( >" + MAX_LOOP_COUNT + " primitives)");
+                    }
+                    if (ContinueExecution && TicksThisFrame > SOFT_LOOP_COUNT && !IsCheck)
+                    {
+                        // REVIEW F1 (indep-review-eng01-20260920): UNREACHABLE in
+                        // this method — IsCheck is forced true by every RunInMyStack
+                        // caller before this loop, so !IsCheck never holds. Kept
+                        // annotated, NOT enabled: enabling would need the child-frame
+                        // restore path audited first (a break here can discard the
+                        // sub-stack). The operative tier is Tick()'s main loop below.
+                        // WEDGE-1 forced yield (see field notes): resume this exact
+                        // instruction next tick; kill only after a progress-free streak.
+                        TicksThisFrame = 0;
+                        if (++ForcedYieldStreak < FORCED_YIELD_MAX)
+                        {
+                            Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
+                            ContinueExecution = false;
+                            YieldedThisTick = true;
+                            break; // exit via the loop condition — the R249 deferred-child path
+                        }
+                        ForcedYieldStreak = 0;
+                        throw new Exception("Thread entered infinite loop! (forced-yield streak)!");
+                    }
+                    AutotestSSInstructionTrace("[ITRACE-T]");
+                    ContinueExecution = false;
+                    NextInstruction();
+                }
+            }
+            catch (Exception e)
+            {
+                if (e is ThreadAbortException) throw e;
+                //we need to catch these so that the parent can be restored.
+            }
+
+            //copy child stack things to parent stack
+            Stack = OldStack;
+            Queue = OldQueue;
+            IsCheck = OldCheck;
+            ActiveQueueBlock = OldQueueBlock;
+
+            return (LastStackExitCode == VMPrimitiveExitCode.RETURN_TRUE) ? true : false;
+        }
+
+        public VMThread(VMContext context, VMEntity entity, int stackSize)
+        {
+            this.Context = context;
+            this.Entity = entity;
+
+            this.Stack = new List<VMStackFrame>(stackSize);
+            this.Queue = new List<VMQueuedAction>();
+        }
+
+        /// <summary>The entity this thread is bound to (probe surface; the
+        /// binding is otherwise private by design — ctors are its only other
+        /// writer).</summary>
+        public VMEntity BoundEntity => Entity;
+
+        /// <summary>
+        /// ENG-19: re-bind this thread to a REPLACEMENT entity — the transform
+        /// instance swap's SELF-CAST path. The scheduler keys on ENTITIES and
+        /// each entity ticks its own Thread field, so the binding swap is the
+        /// whole mechanism: the replacement's own init thread becomes
+        /// unreferenced (it never ticks; the person continues their life —
+        /// Main, action queue, this stack — on the new body), and this thread
+        /// stops being dead-bound the moment Entity points at the live
+        /// replacement. Native contract: the caller's tree survives the swap
+        /// and re-binds StackObjectID := Temp[1] itself (CharmsKid 4111 ins7);
+        /// without this, any post-swap YIELD lost the tree (the 4211
+        /// dialog_private casualty — the wave-12 review's residual).
+        /// </summary>
+        public void RebindEntity(VMEntity newEntity)
+        {
+            if (newEntity == null || newEntity == Entity) return;
+            var old = Entity;
+            Entity = newEntity;
+            newEntity.Thread = this;
+            // ENG-19 review P1-1 (the resume made real): re-point the entity
+            // references the dead-Callee guard and the queue pruning consult —
+            // the port-side equivalent of the native trees' post-swap
+            // StackObjectID := Temp[1] re-bind (CharmsKid 4111 ins7). Without
+            // this, Tick's guard (Stack.Last().ActionTree && Queue[0].Callee.Dead
+            // => Entity.Reset) destroyed the tree one tick after the transplant:
+            // a live self-cast is a queued SOCIAL whose Callee IS the dying
+            // entity (VMEntity.PushInteraction cal: Callee = the clicked sim).
+            foreach (var action in Queue)
+            {
+                if (action.Callee == old) action.Callee = newEntity;
+                if (action.StackObject == old) action.StackObject = newEntity;
+                if (action.IconOwner == old) action.IconOwner = newEntity; // review N2 (queue icon parity)
+            }
+            foreach (var frame in Stack)
+            {
+                if (frame.Callee == old) frame.Callee = newEntity;
+                if (frame.StackObject == old) frame.StackObject = newEntity;
+                if (frame.Caller == old) frame.Caller = newEntity;
+            }
+            // old.Thread deliberately stays pointing here: pre-re-point dialogs
+            // routed responses through GlobalBlockingDialog's (stale) entity ->
+            // Thread; VMEntity.Reset is fenced against transplanted threads, so
+            // the stale pointer is inert as a corruption channel (review P2-1/P2-2).
+        }
+
+        /// <summary>
+        /// Checks to see if it can push an interaction, and pushes it.
+        /// Returns true on success, false on failure.
+        /// </summary>
+        public bool AttemptPush()
+        {
+            int priorityCompare = ((VMAvatar)Entity).GetPersonData(VMPersonDataVariable.Priority);
+            if (priorityCompare <= 2) priorityCompare -= 1; //autonomous interactions fall through to other ones
+            QueueDirty = true;
+            while (Queue.Count > ActiveQueueBlock+1)
+            {
+                var item = Queue[ActiveQueueBlock+1];
+                if (item.Priority <= priorityCompare) return false;
+                if (item.NotifyIdle) Entity.SetFlag(VMEntityFlags.InteractionCanceled, item.NotifyIdle);
+                if (IsCheck || ((item.Mode != VMQueueMode.ParentIdle || !Entity.GetFlag(VMEntityFlags.InteractionCanceled)) && CheckAction(item) != null))
+                {
+                    Entity.SetFlag(VMEntityFlags.InteractionCanceled, false);
+                    if (!ExecuteAction(item)) return false;
+                    ActiveQueueBlock++;
+                    return true;
+                }
+                else
+                {
+                    NotifyQueueDrop(Entity, item);
+                    Queue.RemoveAt(ActiveQueueBlock + 1); //keep going.
+                }
+            }
+            return false;
+        }
+
+        public void TryRunImmediately()
+        {
+            //check if we have a run immediately interaction, and inject it if we do.#
+            while (true)
+            {
+                var ind = Queue.FindIndex(x => (x.Flags & TTABFlags.RunImmediately) > 0);
+                if ((ind > ActiveQueueBlock || (!(Stack.Count > 0 && Stack.LastOrDefault().ActionTree) && ind > -1)))
+                {
+                    //not already running (if no action we are still not running if we're queue[0], so go for it)
+                    //swap current item with ind.
+                    var temp = Queue[ind];
+                    Queue.RemoveAt(ind);
+                    if (CheckAction(temp) != null)
+                    {
+                        Queue.Insert(ActiveQueueBlock+1, temp);
+                        var frame = temp.ToStackFrame(Entity);
+                        frame.SpecialResult = VMSpecialResult.Interaction;
+                        Push(frame);
+                        ActiveQueueBlock++; //both the run immediately interaction and the active interaction must be protected.
+                        break;
+                    }
+                    else
+                    {
+                        //SIM-19: this was the one unobserved removal site (flagged by the
+                        //indep review) — a RunImmediately action whose check fails is
+                        //dropped from the queue with no event. Read-only observation.
+                        NotifyRemoveAny("tryrunimmediately-checknull", Entity, temp);
+                    }
+                } else
+                {
+                    break;
+                }
+            }
+        }
+
+        private void EndCurrentInteraction()
+        {
+            QueueDirty = true;
+            var interaction = Queue[ActiveQueueBlock];
+            //clear "interaction cancelled" since we are leaving the interaction
+            if (interaction.Mode != VMQueueMode.ParentIdle) Entity.SetFlag(VMEntityFlags.InteractionCanceled, false);
+            if (interaction.Callback != null) interaction.Callback.Run(Entity);
+            if (Queue.Count > 0)
+            {
+                NotifyRemoveAny("end-interaction", Entity, Queue[ActiveQueueBlock]);
+                Queue.RemoveAt(ActiveQueueBlock);
+            }
+            if (Entity is VMAvatar && !IsCheck && ActiveQueueBlock == 0)
+            {
+                //some things are reset when an interaction ends
+                //motive deltas reset between interactions
+                ((VMAvatar)Entity).SetPersonData(VMPersonDataVariable.NonInterruptable, 0); //verified in ts1
+                ((VMAvatar)Entity).ClearMotiveChanges();
+            }
+            ContinueExecution = true; //continue where the Allow Push idle left off
+            ActiveQueueBlock--;
+            //update priority with the priority of the interaction we are going back to (or 0)
+            ((VMAvatar)Entity).SetPersonData(VMPersonDataVariable.Priority, (ActiveQueueBlock > -1) ? Queue[ActiveQueueBlock].Priority : (short)0);
+            EvaluateQueuePriorities();
+        }
+
+        public void AbortCurrentInteraction()
+        {
+            //go all the way back to the stack frame that Allow Push'd us.
+            var returnTo = Stack.FindLast(x => x.SpecialResult == VMSpecialResult.Interaction);
+            if (returnTo != null)
+            {
+                var ind = Stack.IndexOf(returnTo);
+                while (Stack.Count > ind)
+                {
+                    Stack.RemoveAt(Stack.Count-1);
+                }
+                EndCurrentInteraction();
+            }
+        }
+
+        public void Tick(){
+#if IDE_COMPAT
+            if (ThreadBreak == VMThreadBreakMode.Pause) return;
+            else if (ThreadBreak == VMThreadBreakMode.Reset)
+            {
+                Entity.Reset(Context);
+                ThreadBreak = VMThreadBreakMode.Active;
+            }
+            else if (ThreadBreak == VMThreadBreakMode.Immediate)
+            {
+                Breakpoint(Stack.LastOrDefault(), "Paused."); return;
+            }
+#endif
+
+            YieldedThisTick = false; //cleared every Tick; HandleResult sets it when a primitive defers
+            if (BlockingState != null) BlockingState.WaitTime++;
+            if (DialogCooldown > 0) DialogCooldown--;
+#if !THROW_SIMANTICS
+            try
+            {
+#endif
+                if (!Entity.Dead)
+                {
+                    if (QueueDirty)
+                    {
+                        Engine.VMScheduler.Defect2Mark("queueEval ent=" + Entity.ObjectID + " " + (Entity.Object?.Resource?.MainIff?.Filename ?? "?"));
+                        EvaluateQueuePriorities();
+                        TryRunImmediately();
+                        QueueDirty = false;
+                        Engine.VMScheduler.Defect2Pulse();
+                    }
+                    if (Stack.Count == 0)
+                    {
+                        if (IsCheck) return; //running out of execution means check trees have ended.
+                        Entity.ExecuteEntryPoint(1, Context, false);
+                        if (Stack.Count == 0) return;
+                    }
+                    if ((!Stack.LastOrDefault().ActionTree) || (!Queue[0].Callee.Dead)) //main or our target is not dead
+                    {
+#if IDE_COMPAT
+                        if (ThreadBreak == VMThreadBreakMode.ReturnTrue)
+                        {
+                            var bf = Stack[BreakFrame];
+                            HandleResult(bf, bf.GetCurrentInstruction(), VMPrimitiveExitCode.RETURN_TRUE);
+                            Breakpoint(Stack.LastOrDefault(), "Returned True.");
+                            return;
+                        }
+                        if (ThreadBreak == VMThreadBreakMode.ReturnFalse)
+                        {
+                            var bf = Stack[BreakFrame];
+                            HandleResult(bf, bf.GetCurrentInstruction(), VMPrimitiveExitCode.RETURN_TRUE);
+                            Breakpoint(Stack.LastOrDefault(), "Returned False.");
+                            return;
+                        }
+#endif
+                        ContinueExecution = true;
+                        while (ContinueExecution)
+                        {
+                            if (TicksThisFrame++ > MAX_LOOP_COUNT)
+                            {
+                                TicksThisFrame = 0;
+                                throw new Exception("Thread entered infinite loop! ( >" + MAX_LOOP_COUNT + " primitives)");
+                            }
+                            if (TicksThisFrame > SOFT_LOOP_COUNT && !IsCheck)
+                            {
+                                // WEDGE-1 forced yield (see field notes). Exit via
+                                // the loop condition like a CONTINUE_NEXT_TICK
+                                // primitive. (REVIEW NOTE: the original v1 `return` was
+                                // NOT the freeze cause — return/break are equivalent
+                                // here, no tail code exists to skip; runs 2 and 3 froze
+                                // identically on defect #2. Comment corrected per
+                                // indep-review-eng01-20260920.)
+                                TicksThisFrame = 0;
+                                if (++ForcedYieldStreak < FORCED_YIELD_MAX)
+                                {
+                                    Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
+                                    ContinueExecution = false;
+                                    YieldedThisTick = true;
+                                    break;
+                                }
+                                ForcedYieldStreak = 0;
+                                throw new Exception("Thread entered infinite loop! (forced-yield streak)!");
+                            }
+                            AutotestSSInstructionTrace("[ITRACE]");
+                            ContinueExecution = false;
+                            NextInstruction();
+                        }
+                    }
+                    else //interaction owner is dead, rip
+                    {
+                        Engine.VMScheduler.Defect2Mark("reset ent=" + Entity.ObjectID + " " + (Entity.Object?.Resource?.MainIff?.Filename ?? "?"));
+                        Entity.Reset(Context);
+                        Engine.VMScheduler.Defect2Pulse();
+                    }
+                }
+
+#if !THROW_SIMANTICS
+            }
+            catch (Exception e)
+            {
+#if IDE_COMPAT
+                if (!IsCheck && VM.SignalBreaks)
+                {
+                    Breakpoint(Stack.LastOrDefault(), "!"+e.Message+" "+StackTraceSimplify(e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(".cs")) ?? ""));
+                    ContinueExecution = false;
+                    return;
+                }
+#endif
+
+                if (e is ThreadAbortException) throw e;
+                // DEFECT-2 catch-crumb (ENG-01, run-22/23 law): if the freeze
+                // is a SUPPRESSED-EXCEPTION RETRY CYCLE (this catch swallowing
+                // the watchdog's throw and Tick re-entering the same
+                // instruction), this counter explodes — logging the entity +
+                // count + the current instruction names the culprit primitive.
+                CatchReentries++;
+                if (CatchReentries % 100 == 1)
+                {
+                    try
+                    {
+                        var cf = Stack[Stack.Count - 1];
+                        var ci = cf.GetCurrentInstruction();
+                        Console.Out.WriteLine("[DEFECT-2 catch] ent=" + (Entity?.ObjectID ?? 0) + " iff="
+                            + (Entity?.Object?.Resource?.MainIff?.Filename ?? "?") + " reentries=" + CatchReentries
+                            + " routine=" + (cf.Routine?.Chunk?.ChunkID ?? -1) + " '" + (cf.Routine?.Chunk?.ChunkLabel ?? "?")
+                            + "' ip=" + ((int)cf.InstructionPointer) + " opcode=" + (ci?.Opcode ?? -1));
+                        Console.Out.Flush();
+                    } catch { }
+                }
+                if (Stack.Count == 0) return;
+                var context = Stack[Stack.Count - 1];
+                bool Delete = ((Entity is VMGameObject) && (DialogCooldown > 30 * 20 - 10));
+                if (DialogCooldown == 0)
+                {
+
+                    Engine.VMScheduler.Defect2Mark("thread-exception-path ent=" + (Entity?.ObjectID ?? 0) + " " + (Entity?.Object?.Resource?.MainIff?.Filename ?? "?"));
+                    var simExcept = new VMSimanticsException(e.Message + StackTraceSimplify(e.StackTrace.Split('\n').FirstOrDefault(x => x.Contains(".cs")) ?? ""), context);
+                    Engine.VMScheduler.Defect2Pulse();
+                    string exceptionStr = "A SimAntics Exception has occurred, and has been suppressed: \r\n\r\n" + simExcept.ToString() + "\r\n\r\nThe object will be reset. Please report this!";
+                    // IFF-literalism: mirror the literal suppressed-exception alert text to the gate log (throttled to every 600 ticks).
+                    // r157: the mirror now carries the failing ENTITY (callee id + owning IFF) and the one-lined VM
+                    // stack (routine:ip per frame) — the message alone cannot attribute a crash to its owner, which
+                    // the commute-tail diagnosis needed (the r156 soak showed 129 unattributed avatar exceptions).
+                    var vmStackOneLine = new System.Text.StringBuilder();
+                    try
+                    {
+                        vmStackOneLine.Append("callee=").Append(context.Callee?.ObjectID ?? 0)
+                            .Append(" iff=").Append(context.Callee?.Object?.Resource?.MainIff?.Filename ?? "?");
+                        var exStack = context.Thread?.Stack;
+                        if (exStack != null)
+                            for (int si = exStack.Count - 1; si >= 0 && si >= exStack.Count - 6; si--)
+                            {
+                                var sf = exStack[si];
+                                vmStackOneLine.Append(" > ");
+                                if (sf is VMRoutingFrame) vmStackOneLine.Append("route");
+                                else vmStackOneLine.Append((sf.Routine?.Rti?.Name ?? "?").TrimEnd('\0')).Append(':').Append(sf.InstructionPointer);
+                            }
+                    }
+                    catch { vmStackOneLine.Append(" (stack-read-failed)"); }
+                    System.Console.WriteLine("[SimAnticsExc] " + simExcept.Message + " {" + vmStackOneLine + "}");
+                    VMDialogInfo info = new VMDialogInfo
+                    {
+                        Caller = null,
+                        Icon = context.Callee,
+                        Operand = new VMDialogOperand { },
+                        Message = exceptionStr,
+                        Title = "SimAntics Exception!"
+                    };
+                    Context.VM.SignalDialog(info);
+                    DialogCooldown = 30 * 20;
+                }
+
+                if (!IsCheck)
+                {
+                    context.Callee.Reset(context.VM.Context);
+                    context.Caller.Reset(context.VM.Context);
+                    if (Delete) Entity.Delete(true, context.VM.Context);
+                } else
+                {
+                    Stack.Clear();
+                }
+            }
+#endif
+        }
+
+        private string StackTraceSimplify(string st)
+        {
+            var lastSlash = st.LastIndexOf('\\');
+            if (lastSlash == -1) lastSlash = st.LastIndexOf('/');
+            return (lastSlash == -1) ? st : st.Substring(lastSlash+1);
+        }
+
+        private void EvaluateQueuePriorities()
+        {
+            EnsureDirectControlAction();
+            if (ActiveQueueBlock == -1 || ActiveQueueBlock >= Queue.Count) return;
+            var active = Queue[ActiveQueueBlock];
+            int CurrentPriority = (int)((VMAvatar)Entity).GetPersonData(VMPersonDataVariable.Priority); 
+            if (CurrentPriority == (int)VMQueuePriority.Autonomous) CurrentPriority -= 1; // allow other auto actions to interrupt us
+
+            // HACK: TS1 pushes a "Cancel Interaction" action onto the tree to interrupt itself, as well as setting current interaction to prio 0.
+            // We're simulating that by notifiying idle if priority hits 0. (implied cancel interaction queued)
+            // Make sure this interaction is not *meant* to be priority 0, like tso's idle.
+            active.NotifyIdle = active.Priority != 0 && CurrentPriority == 0; 
+            for (int i = ActiveQueueBlock + 1; i < Queue.Count; i++)
+            {
+                if (Queue[i].Callee == null || Queue[i].Callee.Dead)
+                {
+                    NotifyRemoveAny(Queue[i].Callee == null ? "dead-callee(null)" : "dead-callee(obj" + Queue[i].Callee.ObjectID + ")", Entity, Queue[i]);
+                    Queue.RemoveAt(i--); //remove interactions to dead objects (not within active queue block)
+                    continue;
+                }
+                if ((int)Queue[i].Priority > CurrentPriority)// && mode != VMQueueMode.ParentIdle)
+                {
+                    active.NotifyIdle = true;
+                    Entity.SetFlag(VMEntityFlags.InteractionCanceled, true);
+                }
+            }
+        }
+
+        private void NextInstruction()
+        {
+            /** Next instruction **/
+            var currentFrame = Stack.LastOrDefault();
+            if (currentFrame == null) return;
+
+            var wdog0 = Environment.TickCount; // DEFECT-2 probe (ENG-01)
+            if (currentFrame is VMRoutingFrame)
+            {
+                HandleResult(currentFrame, null, ((VMRoutingFrame)currentFrame).Tick());
+                if (Environment.TickCount - wdog0 > WDOG_MS)
+                    throw new Exception("DEFECT-2 watchdog: ROUTING frame tick ran " + (Environment.TickCount - wdog0)
+                        + "ms (callee=obj" + (currentFrame.Callee?.ObjectID ?? 0) + " iff="
+                        + (currentFrame.Callee?.Object?.Resource?.MainIff?.Filename ?? "?") + ")");
+            }
+            else if (currentFrame is VMDirectControlFrame)
+            {
+                HandleResult(currentFrame, null, ((VMDirectControlFrame)currentFrame).Tick());
+                if (Environment.TickCount - wdog0 > WDOG_MS)
+                    throw new Exception("DEFECT-2 watchdog: DIRECT-CONTROL frame tick ran " + (Environment.TickCount - wdog0) + "ms");
+            }
+            else
+            {
+                var trace = InstructionTrace;
+                if (trace != null)
+                {
+                    try { trace(currentFrame); } catch { } //SIM-19 read-only per-instruction observation
+                }
+                VMInstruction instruction;
+                VMPrimitiveExitCode result = currentFrame.Routine.Execute(currentFrame, out instruction);
+                var wdog1 = Environment.TickCount - wdog0;
+                if (wdog1 > WDOG_MS)
+                    throw new Exception("DEFECT-2 watchdog: routine " + (currentFrame.Routine?.Chunk?.ChunkID ?? -1)
+                        + " (" + (currentFrame.Routine?.Chunk?.ChunkLabel ?? "?") + ") ip=" + ((int)currentFrame.InstructionPointer)
+                        + " opcode=" + (instruction?.Opcode ?? -1)
+                        + " operand=" + (instruction?.Operand?.ToString() ?? "?")
+                        + " ran " + wdog1 + "ms (callee=obj" + (currentFrame.Callee?.ObjectID ?? 0) + " iff="
+                        + (currentFrame.Callee?.Object?.Resource?.MainIff?.Filename ?? "?") + ")");
+                HandleResult(currentFrame, instruction, result);
+            }
+        }
+
+        public VMRoutingFrame PushNewRoutingFrame(VMStackFrame frame, bool failureTrees)
+        {
+            var childFrame = new VMRoutingFrame
+            {
+                Routine = frame.Routine,
+                Caller = frame.Caller,
+                Callee = frame.Callee,
+                CodeOwner = frame.CodeOwner,
+                StackObject = frame.StackObject,
+                Thread = this,
+                CallFailureTrees = failureTrees,
+                ActionTree = frame.ActionTree
+            };
+
+            Stack.Add(childFrame);
+            return childFrame;
+        }
+
+        public VMDirectControlFrame PushNewDirectControlFrame(VMStackFrame frame)
+        {
+            var childFrame = new VMDirectControlFrame
+            {
+                Routine = frame.Routine,
+                Caller = frame.Caller,
+                Callee = frame.Callee,
+                CodeOwner = frame.CodeOwner,
+                StackObject = frame.StackObject,
+                Thread = this,
+                ActionTree = frame.ActionTree
+            };
+
+            Stack.Add(childFrame);
+            return childFrame;
+        }
+
+        public void ExecuteSubRoutine(VMStackFrame frame, VMRoutine routine, GameObject codeOwner, VMSubRoutineOperand args)
+        {
+            if (routine == null)
+            {
+                Pop(VMPrimitiveExitCode.ERROR);
+                return;
+            }
+
+            var childFrame = new VMStackFrame
+            {
+                Routine = routine,
+                Caller = frame.Caller,
+                Callee = frame.Callee,
+                CodeOwner = codeOwner,
+                StackObject = frame.StackObject,
+                _StackObjectID = frame.StackObjectID, //pass this without doing a lookup
+                ActionTree = frame.ActionTree
+            };
+            childFrame.Args = new short[(routine.Arguments > 4) ? routine.Arguments : 4];
+            for (var i = 0; i < childFrame.Args.Length; i++)
+            {
+                short argValue = (i > 3) ? (short)-1 : args.Arguments[i];
+                if (argValue == -1 && args.UseTemp0)
+                {
+                    argValue = TempRegisters[i];
+                }
+                childFrame.Args[i] = argValue;
+            }
+            Push(childFrame);
+        }
+
+        /// <summary>
+        /// R249: mirrors the routine resolution of ExecuteSubRoutine(ushort) so the
+        /// dispatcher can apply the native unknown-opcode law (false, never abort)
+        /// before committing to the gosub. Purely TS1.
+        /// </summary>
+        private bool TS1SubRoutineResolves(VMStackFrame frame, ushort opcode)
+        {
+            if (opcode >= 8192) return frame.ScopeResource?.SemiGlobal?.GetRoutine(opcode) != null;
+            if (opcode >= 4096) return frame.ScopeResource?.GetRoutine(opcode) != null;
+            return frame.Global?.Resource?.GetRoutine(opcode) != null;
+        }
+
+        public VMPrimitiveExitCode ExecuteSubRoutine(VMStackFrame frame, ushort opcode, VMSubRoutineOperand operand)
+        {
+            VMRoutine bhav = null;
+
+            GameObject CodeOwner;
+            if (opcode >= 8192)
+            {
+                // Semi-Global sub-routine call
+                bhav = (VMRoutine)frame.ScopeResource.SemiGlobal.GetRoutine(opcode);
+            }
+            else if (opcode >= 4096)
+            {
+                // Private sub-routine call
+                bhav = (VMRoutine)frame.ScopeResource.GetRoutine(opcode);
+            }
+            else
+            {
+                // Global sub-routine call
+                //CodeOwner = frame.Global.Resource;
+                bhav = (VMRoutine)frame.Global.Resource.GetRoutine(opcode);
+            }
+
+            CodeOwner = frame.CodeOwner;
+            
+            ExecuteSubRoutine(frame, bhav, CodeOwner, operand);
+#if IDE_COMPAT
+            if (Stack.LastOrDefault().GetCurrentInstruction().Breakpoint || ThreadBreak == VMThreadBreakMode.StepIn)
+            {
+                Breakpoint(frame, "Stepped in.");
+                ContinueExecution = false;
+            }
+            else
+#endif
+            {
+                ContinueExecution = true;
+            }
+
+            return VMPrimitiveExitCode.CONTINUE;
+        }
+
+        private void ExecuteInstruction(VMStackFrame frame)
+        {
+            var instruction = frame.GetCurrentInstruction();
+            var opcode = instruction.Opcode;
+
+            if (opcode >= 256)
+            {
+                // R249: the native unknown-opcode law. The native dispatch accepts
+                // opcodes 3..0x2f (cXPerson::TryElement 0x10c3cc-0x10c3e8, jump table
+                // *(TOC-0x5904)) and 0..0x33 (cXObject::TryElement 0xf0444-0xf058);
+                // anything else falls into 0xf0c8c: alert via 0x590720 and return
+                // r26 = -1 — DoNodeAction returns "tree done-FALSE" (return 2)
+                // immediately: the tree ends FALSE for its CALLER with no pointer
+                // move and no false-branch walk (ENG-22 §3; AUD-16 interpreter P2-3
+                // corrected this comment — the false-POINTER move is the result-0
+                // path). The thread is NEVER aborted. The brain's
+                // 'try autonomy' (PersonGlobals 8233) instruction 0 (raw 41 01 01 07:
+                // opcode 0x141, unhandled natively) depends on this — control falls to
+                // instruction 7 (global 30 == free will == 1) and only there dispatches
+                // prim 3 FindBestAction at instruction 1. The port's gosub encoding
+                // (>= 256) still applies when the routine actually resolves (ENG-22:
+                // >= 0x100 is natively TreeSim::Gosub, 0x1540d0 via the DoNodeAction
+                // intercept 0x153a38 — resolvable targets gosub natively too). The
+                // UNRESOLVED corner — ORIG-01 D-7 restored native-exact: report
+                // errors 0x44e/0x3e8 and return 0 with the pointer UNADVANCED
+                // (0x153a88-0x153ad8): report-and-retry every tick. No live TS1
+                // path hits it (globalcalls r45: 0 dangling). The port's WEDGE-1
+                // forced-yield watchdog bounds a genuinely-forever retry, taking
+                // the place of the native livelock; the old GOTO_FALSE advance
+                // (ENG-22's documented deliberate divergence) is retired.
+                if (Context.VM.TS1 && !TS1SubRoutineResolves(frame, opcode))
+                {
+                    System.Console.WriteLine("[GosubUnresolved] 0x" + opcode.ToString("X")
+                        + " in " + (frame.Routine.Rti?.Name ?? "?") + " @" + instruction.Index
+                        + " (native report-and-retry; errors 0x44e/0x3e8)");
+                    ContinueExecution = false;
+                    Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
+                    YieldedThisTick = true;
+                    return;
+                }
+                ExecuteSubRoutine(frame, opcode, (VMSubRoutineOperand)instruction.Operand);
+                return;
+            }
+
+
+            var primitive = VMContext.Primitives[opcode];
+            if (primitive == null)
+            {
+                HandleResult(frame, instruction, VMPrimitiveExitCode.GOTO_TRUE);
+                return;
+            }
+
+            VMPrimitiveHandler handler = primitive.GetHandler();
+            var result = handler.Execute(frame, instruction.Operand);
+            HandleResult(frame, instruction, result);
+        }
+
+        private void HandleResult(VMStackFrame frame, VMInstruction instruction, VMPrimitiveExitCode result)
+        {
+            switch (result)
+            {
+                // Don't advance the instruction pointer, this primitive isnt finished yet
+                case VMPrimitiveExitCode.CONTINUE_NEXT_TICK:
+                    ScheduleIdleStart = Context.VM.Scheduler.CurrentTickID;
+                    Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
+                    ContinueExecution = false;
+                    YieldedThisTick = true; //R249: the primitive deferred — visible to check evaluation
+                    ForcedYieldStreak = 0; //WEDGE-1: genuine progress resets the forced-yield streak
+                    break;
+                case VMPrimitiveExitCode.CONTINUE_FUTURE_TICK:
+                    ContinueExecution = false;
+                    YieldedThisTick = true;
+                    ForcedYieldStreak = 0; //WEDGE-1
+                    break;
+                case VMPrimitiveExitCode.ERROR:
+                    ContinueExecution = false;
+                    Pop(result);
+                    break;
+                case VMPrimitiveExitCode.RETURN_TRUE:
+                case VMPrimitiveExitCode.RETURN_FALSE:
+                    /** pop stack and return false **/
+                    Pop(result);
+                    break;
+                case VMPrimitiveExitCode.GOTO_TRUE:
+                    MoveToInstruction(frame, instruction.TruePointer, true);
+                    break;
+                case VMPrimitiveExitCode.GOTO_FALSE:
+                    MoveToInstruction(frame, instruction.FalsePointer, true);
+                    break;
+                case VMPrimitiveExitCode.GOTO_TRUE_NEXT_TICK:
+                    MoveToInstruction(frame, instruction.TruePointer, true);
+                    if (ContinueExecution)
+                    {
+                        ScheduleIdleStart = Context.VM.Scheduler.CurrentTickID;
+                        Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
+                        ContinueExecution = false;
+                        YieldedThisTick = true;
+                    }
+                    break;
+                case VMPrimitiveExitCode.GOTO_FALSE_NEXT_TICK:
+                    MoveToInstruction(frame, instruction.FalsePointer, true);
+                    if (ContinueExecution)
+                    {
+                        ScheduleIdleStart = Context.VM.Scheduler.CurrentTickID;
+                        Context.VM.Scheduler.ScheduleTickIn(Entity, 1);
+                        ContinueExecution = false;
+                        YieldedThisTick = true;
+                    }
+                    break;
+                case VMPrimitiveExitCode.CONTINUE:
+                    ContinueExecution = true;
+                    break;
+                case VMPrimitiveExitCode.INTERRUPT:
+                    Stack.Clear();
+                    QueueDirty = true;
+                    if (Queue.Count > 0)
+                    {
+                        NotifyRemoveAny("interrupt", Entity, Queue[0]);
+                        Queue.RemoveAt(0);
+                    }
+                    LastStackExitCode = result;
+                    break;
+            }
+        }
+
+        private void MoveToInstruction(VMStackFrame frame, byte instruction, bool continueExecution)
+        {
+            if (frame is VMRoutingFrame)
+            {
+                //TODO: Handle returning false into the pathfinder (indicates failure)
+                return;
+            }
+
+            ContinueExecution = continueExecution;
+            switch (instruction)
+            {
+                case 255:
+                    Pop(VMPrimitiveExitCode.RETURN_FALSE);
+                    break;
+                case 254:
+                    Pop(VMPrimitiveExitCode.RETURN_TRUE); break;
+                case 253:
+                    //attempt to continue along only path available. 
+                    if (frame.GetCurrentInstruction().TruePointer != 253)
+                    {
+                        MoveToInstruction(frame, frame.GetCurrentInstruction().TruePointer, continueExecution); return;
+                    }
+                    else if (frame.GetCurrentInstruction().FalsePointer != 253)
+                    {
+                        MoveToInstruction(frame, frame.GetCurrentInstruction().FalsePointer, continueExecution); return;
+                    }
+                    Pop(VMPrimitiveExitCode.ERROR); break;
+                default:
+                    frame.InstructionPointer = instruction;
+                    if (frame.GetCurrentInstruction().Breakpoint ||
+                        (ThreadBreak != VMThreadBreakMode.Active && (
+                            ThreadBreak == VMThreadBreakMode.StepIn ||
+                            (ThreadBreak == VMThreadBreakMode.StepOver && Stack.Count - 1 <= BreakFrame) ||
+                            (ThreadBreak == VMThreadBreakMode.StepOut && Stack.Count <= BreakFrame)
+                        )))
+                    {
+                        string result = "Unknown Break";
+                        switch (ThreadBreak) {
+                            case VMThreadBreakMode.StepIn:
+                                result = "Stepped In."; break;
+                            case VMThreadBreakMode.StepOut:
+                                result = "Stepped Out."; break;
+                            case VMThreadBreakMode.StepOver:
+                                result = "Stepped Over."; break;
+                        }
+                        Breakpoint(frame, result);
+                    }
+                    break;
+            }
+
+            ContinueExecution = (ThreadBreak != VMThreadBreakMode.Pause) && ContinueExecution;
+        }
+
+        public void Breakpoint(VMStackFrame frame, string description)
+        {
+            if (IsCheck) return; //can't breakpoint in check trees.
+            ThreadBreak = VMThreadBreakMode.Pause;
+            ThreadBreakString = description;
+            BreakFrame = Stack.IndexOf(frame);
+            Context.VM.BreakpointHit(Entity);
+        }
+
+        public void Pop(VMPrimitiveExitCode result)
+        {
+            var discardResult = Stack[Stack.Count - 1].SpecialResult;
+            var contextSwitch = (Stack.Count > 1) && Stack.LastOrDefault().ActionTree != Stack[Stack.Count - 2].ActionTree;
+            Stack.RemoveAt(Stack.Count - 1);
+            LastStackExitCode = result;
+
+            if (discardResult == VMSpecialResult.Interaction) //interaction switching back to main (it cannot be the other way...)
+            {
+                var interaction = Queue[ActiveQueueBlock];
+                EndCurrentInteraction();
+                result = (!interaction.Flags.HasFlag(TTABFlags.RunImmediately)) ? VMPrimitiveExitCode.CONTINUE_NEXT_TICK : VMPrimitiveExitCode.CONTINUE;
+            }
+            else if (discardResult == VMSpecialResult.Retry)
+            {
+                result = VMPrimitiveExitCode.CONTINUE;
+            }
+
+            if (Stack.Count > 0)
+            {
+                if (result == VMPrimitiveExitCode.RETURN_TRUE)
+                    result = VMPrimitiveExitCode.GOTO_TRUE;
+                else if (result == VMPrimitiveExitCode.RETURN_FALSE)
+                    result = VMPrimitiveExitCode.GOTO_FALSE;
+                var currentFrame = Stack.Last();
+                HandleResult(currentFrame, currentFrame.GetCurrentInstruction(), result);
+            }
+            else // :(
+            {
+                ContinueExecution = false;
+            }
+        }
+
+        public bool Push(VMStackFrame frame)
+        {
+            if (frame.Routine.Instructions.Length == 0) return false; //some bhavs are empty... do not execute these.
+            Stack.Add(frame);
+
+            /** Initialize the locals **/
+            var numLocals = Math.Max(frame.Routine.Locals, frame.Routine.Arguments);
+            frame.Locals = new short[numLocals];
+            frame.Thread = this;
+
+            frame.InstructionPointer = 0;
+            return true;
+        }
+
+        /// <summary>
+        /// Add an item to the action queue
+        /// </summary>
+        /// <param name="invocation"></param>
+        public void EnqueueAction(VMQueuedAction invocation)
+        {
+            invocation.UID = ActionUID++;
+            QueueDirty = true;
+            if (!IsCheck && (invocation.Flags & TTABFlags.RunImmediately) > 0)
+            {
+                // shove this action in the queue to try run it next tick.
+                // interaction can be run normally if we actually hit it using allow push. (unlikely)
+                // otherwise next tick will detect the "run immediately" interaction's presence. 
+                // and it will be pushed to the stack immediately.
+                // TODO: check if any interactions of this kind clobber the temps.
+                // this doesnt ""run immediately"", but is good enough.
+
+                invocation.Mode = VMQueueMode.Idle; //hide
+                //invocation.Priority = short.MinValue;
+                this.Queue.Add(invocation);
+                return;
+            }
+            var leapfrog = Context.VM.TS1 ? (TTABFlags)0: TTABFlags.Leapfrog;
+
+            if (Queue.Count == 0) //if empty, just queue right at the front 
+                this.Queue.Add(invocation);
+            else if ((invocation.Flags & TTABFlags.FSOPushHead) > 0)
+                //place right after active interaction, ignoring all priorities.
+                this.Queue.Insert(ActiveQueueBlock + 1, invocation);
+            else if ((invocation.Flags & (TTABFlags.FSOPushTail | leapfrog)) > 0 && invocation.Mode != VMQueueMode.ParentExit)
+            {
+                //this one's weird. start at the left til there's a lower priority. (eg. parent exit or idle)
+                bool hitParentEnd = (invocation.Mode != VMQueueMode.ParentIdle);
+                for (int i = ActiveQueueBlock+1; i < Queue.Count; i++)
+                {
+                    if (Queue[i].Priority < invocation.Priority) //we have higher priority than this item
+                    {
+                        this.Queue.Insert(i, invocation); //insert before this. will come before parent exit and pals.
+                        EvaluateQueuePriorities();
+                        return;
+                    }
+                }
+                this.Queue.Add(invocation); //right at the end! (somehow)
+            }
+            else //we've got an even harder job! find a place for this interaction based on its priority
+            {
+                bool hitParentEnd = (invocation.Mode != VMQueueMode.ParentIdle);
+                for (int i = Queue.Count - 1; i > ActiveQueueBlock; i--)
+                {
+                    if (hitParentEnd && (invocation.Priority <= Queue[i].Priority || Queue[i].Mode == VMQueueMode.ParentExit)) //skip until we find a parent exit or something with the same or higher priority.
+                    {
+                        this.Queue.Insert(i + 1, invocation);
+                        if (Context.VM.TS1 && invocation.Priority <= Queue[i].Priority)
+                        {
+                            // queue skip all items with a lower priority (after this interaction)
+                            // i've verified this happens in ts1, but I don't know if it does in TSO so i've locked it for now.
+                            i += 2;
+                            while (i < this.Queue.Count)
+                            {
+                                CancelAction(this.Queue[i].UID);
+                            }
+                        }
+                        EvaluateQueuePriorities();
+                        return;
+                    }
+                    if (Queue[i].Mode == VMQueueMode.ParentExit) hitParentEnd = true;
+                }
+                this.Queue.Insert(ActiveQueueBlock + 1, invocation); //this is more important than all other queued items that are not running, so stick this to run next.
+            }
+            EvaluateQueuePriorities();
+        }
+
+        public void CancelAction(ushort actionUID)
+        {
+            var interaction = Queue.FirstOrDefault(x => x.UID == actionUID);
+            if (interaction != null)
+            {
+                NotifyRemoveAny("cancel", Entity, interaction);
+                if (Entity is VMAvatar && interaction == Queue[0] && Context.VM.EODHost != null) Context.VM.EODHost.ForceDisconnect((VMAvatar)Entity);
+                QueueDirty = true;
+                interaction.NotifyIdle = true;
+                //cancel any idle parents after this interaction
+                var index = Queue.IndexOf(interaction);
+
+                if (interaction.Mode == Engine.VMQueueMode.ParentIdle)
+                {
+                    for (int i = index + 1; i < Queue.Count; i++)
+                    {
+                        if (Queue[i].Mode == Engine.VMQueueMode.ParentIdle)
+                        {
+                            if (interaction.Mode == Engine.VMQueueMode.ParentIdle) Queue.RemoveAt(i--);
+                            else
+                            {
+                                Queue[i].NotifyIdle = true;
+                                Queue[i].Priority = 0;
+                            }
+                        }
+                        else if (Queue[i].Mode == Engine.VMQueueMode.ParentExit)
+                        {
+                            Queue[i].NotifyIdle = true;
+                            Queue[i].Priority = 0;
+                        }
+                        //parent exit needs to "appear" like it is cancelled.
+                    }
+                }
+
+                var canQueueSkip = !interaction.Flags.HasFlag(TTABFlags.MustRun);
+
+                if (canQueueSkip && (index > ActiveQueueBlock || Stack.LastOrDefault()?.ActionTree == false) && (interaction.Mode == Engine.VMQueueMode.Normal || interaction.Flags.HasFlag(TTABFlags.FSODirectControl)))
+                {
+                    Queue.Remove(interaction);
+                    if (Context.VM.TS1) interaction.Callee.ExecuteEntryPoint(4, Context, true, Entity); //queue skipped
+                }
+                else
+                {
+                    Entity.SetFlag(VMEntityFlags.InteractionCanceled, true);
+                    ((VMAvatar)Entity).SetPersonData(VMPersonDataVariable.Priority, 0);
+                }
+            }
+        }
+
+        private bool ExecuteAction(VMQueuedAction action)
+        {
+            //set the new interaction's priority
+            ((VMAvatar)Entity).SetPersonData(VMPersonDataVariable.Priority, action.Priority);
+            var frame = action.ToStackFrame(Entity);
+            frame.SpecialResult = VMSpecialResult.Interaction;
+            return Push(frame);
+        }
+
+        public List<VMPieMenuInteraction> CheckTS1Action(VMQueuedAction action, bool auto, short[] args = null)
+        {
+            var result = new List<VMPieMenuInteraction>();
+
+            if (Entity is VMAvatar && !action.Flags.HasFlag(TTABFlags.FSOSkipPermissions)) //just let everyone use the CSR interactions
+            {
+                var avatar = (VMAvatar)Entity;
+
+                if ((action.Flags & (TTABFlags.TS1AllowCats | TTABFlags.TS1AllowDogs)) > 0)
+                {
+                    //interaction can only be performed by cats or dogs
+                    //if (!avatar.IsPet) return null;
+                    //check we're the correct type
+                    if (avatar.IsCat && (action.Flags & TTABFlags.TS1AllowCats) == 0) return null;
+                    if (avatar.IsDog && (action.Flags & TTABFlags.TS1AllowDogs) == 0) return null;
+                }
+                else if (avatar.IsPet) return null; //not allowed
+
+                // SIM-19 review reconciliation (2026-09-20): native Global.iff BCON 260
+                // 'Person Types' makes INVITED VISITORS type 2 ('person main' 8193 ins3
+                // routes every non-0 person into begin-visiting 8286, whose ins57 gate
+                // MyPD[32]==PersonTypes[2]==2 selects the visit path; type 1 runs the
+                // leave path). The former == 1 here locked type-2 visitors out of
+                // AllowVisitors interactions (their own greet). != 0 matches the
+                // skeptic-confirmed visitor reading already used in
+                // VMFindBestAction.cs:543 and still admits type-1 strays; gs < 2 keeps
+                // the awaiting-greet window.
+                var isVisitor = avatar.GetPersonData(VMPersonDataVariable.PersonType) != 0 && avatar.GetPersonData(VMPersonDataVariable.GreetStatus) < 2;
+                //avatar.ObjectID != Context.VM.GetGlobalValue(3);
+                var debugTrees = false;
+
+                TTABFlags ts1State =
+                      ((isVisitor) ? TTABFlags.AllowVisitors : 0)
+                    | ((avatar.GetPersonData(VMPersonDataVariable.PersonsAge) < 18) ? TTABFlags.TS1NoChild : 0)
+                    | ((avatar.GetPersonData(VMPersonDataVariable.PersonsAge) >= 18 && !avatar.IsPet) ? TTABFlags.TS1NoAdult : 0);
+
+                //DEBUG: enable debug interction for all CSRs.
+                if ((action.Flags & TTABFlags.Debug) > 0)
+                {
+                    if (!isVisitor && debugTrees)
+                        return result; //do not bother running check
+                    else
+                        return null; //disable debug for everyone else.
+                }
+
+                //NEGATIVE EFFECTS:
+                var pos = ts1State & (TTABFlags.TS1NoChild | TTABFlags.TS1NoAdult);
+                var ts1Compare = action.Flags;
+                if ((pos & ts1Compare) > 0) return null;
+
+                var negMask = (TTABFlags.AllowVisitors);
+
+                var negatedFlags = (~ts1Compare) & negMask;
+                if ((negatedFlags & ts1State) > 0) return null; //we are disallowed
+            }
+            if (action.CheckRoutine != null)
+            {
+                // R249: callers may pass explicit tree params — the native test-tree call
+                // (0x106570) passes (auto, 0, TTAB action number, 0) with the action number
+                // riding params[2] (skeptic S10). Default behaviour is unchanged.
+                var treeArgs = args ?? new short[4];
+                if (auto) treeArgs[0] = 1;
+                if (EvaluateCheck(Context, Entity, new VMStackFrame()
+                {
+                    Caller = Entity,
+                    Callee = action.Callee,
+                    CodeOwner = action.CodeOwner,
+                    StackObject = action.StackObject,
+                    Routine = action.CheckRoutine,
+                    Args = treeArgs
+                }, null, result) != VMPrimitiveExitCode.RETURN_TRUE)
+                {
+                    return null;
+                }
+            }
+            return result;
+        }
+
+        public List<VMPieMenuInteraction> CheckAction(VMQueuedAction action, bool auto = false)
+        {
+            // 1. check action flags for permissions (if we are avatar)
+            // 2. run check tree
+
+            // rules:
+            // Dogs/Cats means people CANNOT use these interactions. (DogsFlag|CatsFlag & IsDog|IsCat)
+
+            // When Allow Object Owner is OFF it disallows the object owner, otherwise no effect
+            // Visitors, Roommates, Ghosts have this same negative effect.
+            // Friends apprars to override Owner, Visitors, Roommates
+
+            // Allow CSRs:positive effect.
+
+            if (action == null) return null;
+            if (Context.VM.TS1) return CheckTS1Action(action, auto);
+            var result = new List<VMPieMenuInteraction>();
+            
+            if (!action.Flags.HasFlag(TTABFlags.FSOSkipPermissions) && Entity is VMAvatar) //just let everyone use the CSR interactions
+            {
+                var avatar = (VMAvatar)Entity;
+
+                if (avatar.GetSlot(0) != null && (action.Flags & TTABFlags.TSOAvailableCarrying) == 0) return null;
+
+                if ((action.Flags & (TTABFlags.AllowCats | TTABFlags.AllowDogs)) > 0)
+                {
+                    //interaction can only be performed by cats or dogs
+                    if (!avatar.IsPet) return null;
+                    //check we're the correct type
+                    if (avatar.IsCat && (action.Flags & TTABFlags.AllowCats) == 0) return null;
+                    if (avatar.IsDog && (action.Flags & TTABFlags.AllowDogs) == 0) return null;
+                }
+                else if (avatar.IsPet && (avatar.AvatarState.Permissions < VMTSOAvatarPermissions.Admin || auto)) return null; //not allowed
+
+                bool isActionGlobal = action.ActionRoutine.ID < 4096; // Ignore global actions for disabling interactions due to repair.
+                bool isRepair = (action.Flags & TTABFlags.TSOIsRepair) > 0;
+
+                if ((!isActionGlobal || isRepair) && 
+                    (isRepair != ((action.Callee.MultitileGroup.BaseObject?.TSOState as VMTSOObjectState)?.Broken ?? false))) return null;
+
+                uint ownerID = 0;
+                if (action.Callee is VMGameObject) {
+                    var state = ((VMTSOObjectState)action.Callee.TSOState);
+                    ownerID = state?.OwnerID ?? 0;
+                    if (ownerID != 0 && state.ObjectFlags.HasFlag(VMTSOObjectFlags.FSODonated))
+                    {
+                        ownerID = Context.VM.TSOState.OwnerID; //owner rewrite to mayor
+                    }
+                }
+
+                TSOFlags tsoState =
+                    ((!(action.Callee is VMGameObject) || avatar.PersistID == ownerID)
+                    ? TSOFlags.AllowObjectOwner : 0)
+                    | ((avatar.AvatarState.Permissions == VMTSOAvatarPermissions.Visitor) ? TSOFlags.AllowVisitors : 0)
+                    | ((avatar.AvatarState.Permissions >= VMTSOAvatarPermissions.Roommate) ? TSOFlags.AllowRoommates : 0)
+                    | ((avatar.AvatarState.Permissions == VMTSOAvatarPermissions.Admin) ? TSOFlags.AllowCSRs : 0)
+                    | ((avatar.GetPersonData(VMPersonDataVariable.IsGhost) > 0) ? TSOFlags.AllowGhost : 0)
+                    | TSOFlags.AllowFriends;
+                TSOFlags tsoCompare = action.Flags2;
+                //if flags are empty apart from "Non-Empty", force everything but visitor. (a kind of default state)
+                if (tsoCompare == TSOFlags.NonEmpty) tsoCompare |= TSOFlags.AllowFriends | TSOFlags.AllowRoommates | TSOFlags.AllowObjectOwner;
+
+                //DEBUG: enable debug interction for all CSRs.
+                if ((action.Flags & TTABFlags.Debug) > 0)
+                {
+                    if ((tsoState & TSOFlags.AllowCSRs) > 0)
+                        return result; //do not bother running check
+                    else
+                        return null; //disable debug for everyone else.
+                }
+
+                if ((action.Flags & TTABFlags.TSOAvailableWhenDead) > 0) tsoCompare |= TSOFlags.AllowGhost;
+                if ((action.Flags & TTABFlags.AllowVisitors) > 0) tsoCompare |= TSOFlags.AllowVisitors; //wrong???????
+
+                var posMask = (TSOFlags.AllowObjectOwner);
+                if (((tsoState & posMask) & (tsoCompare & posMask)) == 0)
+                {
+                    //NEGATIVE EFFECTS:
+                    var negMask = (TSOFlags.AllowVisitors | TSOFlags.AllowRoommates | TSOFlags.AllowGhost);
+
+                    var negatedFlags = (~tsoCompare) & negMask;
+                    if ((negatedFlags & tsoState) > 0) return null; //we are disallowed
+                    if ((tsoCompare & TSOFlags.AllowCSRs) > 0 && (tsoState & TSOFlags.AllowCSRs) == 0) return null; // only admins can run csr.
+                }
+            }
+            if ((!action.Flags.HasFlag(TTABFlags.FSOSkipPermissions) || ((action.Flags & TTABFlags.TSORunCheckAlways) > 0))
+                && action.CheckRoutine != null)
+            {
+                var args = new short[4];
+                if (auto) args[0] = 1;
+                if (EvaluateCheck(Context, Entity, new VMStackFrame()
+                {
+                    Caller = Entity,
+                    Callee = action.Callee,
+                    CodeOwner = action.CodeOwner,
+                    StackObject = action.StackObject,
+                    Routine = action.CheckRoutine,
+                    Args = args
+                }, null, result) != VMPrimitiveExitCode.RETURN_TRUE)
+                {
+                    return null;
+                }
+            }
+            return result;
+        }
+
+        public void EnsureDirectControlAction()
+        {
+            if (!(Entity is VMAvatar ava) ||
+                VM.GlobTS1 ||
+                ava.GetPersonData(VMPersonDataVariable.UnusedAndDoNotUse2) != 32767 ||
+                ava.GetPersonData(VMPersonDataVariable.Posture) != 0 ||
+                Queue.Any(entry => entry.Flags.HasFlag(TTABFlags.FSODirectControl)))
+            {
+                return;
+            }
+
+            var routine = Entity.GetRoutineWithOwner(9001, Context);
+            if (routine == null || routine.routine == null) return;
+
+            EnqueueAction(
+                new VMQueuedAction
+                {
+                    Callee = Entity,
+                    CodeOwner = routine.owner,
+                    ActionRoutine = routine.routine,
+                    Name = "Direct Control",
+                    StackObject = Entity,
+                    Args = new short[4],
+                    Priority = (short)VMQueuePriority.Idle + 1,
+                    Flags = TTABFlags.FSOSkipPermissions | TTABFlags.FSODirectControl,
+                    Mode = VMQueueMode.Idle
+                }
+            );
+        }
+
+        #region VM Marshalling Functions
+        public virtual VMThreadMarshal Save()
+        {
+            var stack = new VMStackFrameMarshal[Stack.Count];
+            int i = 0;
+            foreach (var item in Stack) stack[i++] = item.Save();
+
+            var queue = new VMQueuedActionMarshal[Queue.Count];
+            i = 0;
+            foreach (var item in Queue) queue[i++] = item.Save();
+
+            return new VMThreadMarshal
+            {
+                Stack = stack,
+                Queue = queue,
+                ActiveQueueBlock = ActiveQueueBlock,
+                TempRegisters = (short[])TempRegisters.Clone(),
+                TempXL = (int[])TempXL.Clone(),
+                LastStackExitCode = LastStackExitCode,
+
+                BlockingState = BlockingState,
+                EODConnection = EODConnection,
+
+                Interrupt = Interrupt,
+
+                ActionUID = ActionUID,
+                DialogCooldown = DialogCooldown,
+                ScheduleIdleStart = ScheduleIdleStart
+            };
+        }
+
+        public virtual void Load(VMThreadMarshal input, VMContext context)
+        {
+            Stack = new List<VMStackFrame>();
+            foreach (var item in input.Stack)
+            {
+                if (item is VMRoutingFrameMarshal)
+                {
+                    Stack.Add(new VMRoutingFrame(item, context, this));
+                }
+                else if (item is VMDirectControlFrameMarshal)
+                {
+                    Stack.Add(new VMDirectControlFrame(item, context, this));
+                }
+                else
+                {
+                    Stack.Add(new VMStackFrame(item, context, this));
+                }
+            }
+            Queue = new List<VMQueuedAction>();
+            QueueDirty = true;
+            foreach (var item in input.Queue) Queue.Add(new VMQueuedAction(item, context));
+            ActiveQueueBlock = input.ActiveQueueBlock;
+            TempRegisters = input.TempRegisters;
+            TempXL = input.TempXL;
+            LastStackExitCode = input.LastStackExitCode;
+
+            BlockingState = input.BlockingState;
+            EODConnection = input.EODConnection;
+            Interrupt = input.Interrupt;
+            ActionUID = input.ActionUID;
+            DialogCooldown = input.DialogCooldown;
+            ScheduleIdleStart = input.ScheduleIdleStart;
+        }
+
+        public VMThread(VMThreadMarshal input, VMContext context, VMEntity entity)
+        {
+            Context = context;
+            Entity = entity;
+            Load(input, context);
+        }
+        #endregion
+    }
+
+    public enum VMThreadBreakMode
+    {
+        Active = 0,
+        Pause = 1,
+        StepIn = 2,
+        StepOut = 3,
+        StepOver = 4,
+        ReturnTrue = 5,
+        ReturnFalse = 6,
+        Immediate = 7,
+        Reset = 8
+    }
+}
