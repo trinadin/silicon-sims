@@ -278,7 +278,30 @@ namespace FSO.SimAntics.Model.TS1Platform
                 if (sim is VMAvatar && ((VMAvatar)sim).IsPet)
                     ((VMAvatar)sim).SetPersonData(VMPersonDataVariable.PersonType, 0);
                 var mailbox = vm.Entities.FirstOrDefault(x => (x.Object.OBJ.GUID == 0xEF121974 || x.Object.OBJ.GUID == 0x1D95C9B0));
-                if (mailbox != null) VMFindLocationFor.FindLocationFor(sim, mailbox, vm.Context, VMPlaceRequestFlags.Default);
+                if (mailbox != null)
+                {
+                    VMFindLocationFor.FindLocationFor(sim, mailbox, vm.Context, VMPlaceRequestFlags.Default);
+                }
+                else
+                {
+                    // EXP-14/petname follow-up: away lots (downtown/Old Town/
+                    // Studio/vacation) carry no mailbox, so the home-lot anchor
+                    // is absent and spawned family members stayed OUT_OF_WORLD —
+                    // created but never placed. Fall back to the away lots'
+                    // pedestrian-marker infrastructure (the same PedMarker
+                    // objects whose trees build-and-place arriving sims — the
+                    // mode-18 callers), else any in-world non-avatar entity.
+                    // DISCLOSED: the specific fallback anchor is not separately
+                    // decoded; the mailbox law above is the home-lot idiom.
+                    var anchor = vm.Entities.FirstOrDefault(e =>
+                        e.Position != LotView.Model.LotTilePos.OUT_OF_WORLD
+                        && (e.Object?.Resource?.MainIff?.Filename ?? "").StartsWith("PedMarkers"))
+                        ?? vm.Entities.FirstOrDefault(e =>
+                            e.Position != LotView.Model.LotTilePos.OUT_OF_WORLD
+                            && !(e is VMAvatar));
+                    if (anchor != null)
+                        VMFindLocationFor.FindLocationFor(sim, anchor, vm.Context, VMPlaceRequestFlags.Default);
+                }
                 ((VMAvatar)sim).AvatarState.Permissions = Model.TSOPlatform.VMTSOAvatarPermissions.Owner;
 
                 vm.Scheduler.RescheduleInterrupt(sim);
