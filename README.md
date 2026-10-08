@@ -36,7 +36,7 @@ engine is corrected to match it — constants, thresholds, formulas and all (see
 ## Status — and how you can help
 
 **Playable:** boots to gameplay, loads and saves neighbourhoods and houses, plays the core
-single-family game — verified by a 147-check automated battery that boots the real game
+single-family game — verified by a 155-check automated battery that boots the real game
 headlessly and exercises gameplay, UI, saves, sound, and the autonomy engine on every
 change (run it yourself with `tools/run-autotest.sh`; the one-page state summary is
 [PARITY.md](PARITY.md) → "Where the game stands"). Every release artifact is validated by running the battery against the packed `.app` itself, not just the build tree.
@@ -53,13 +53,14 @@ needs real-world testing on real Macs and real saves. That's where you come in:
 - **Know the known gaps before filing.** The current gap list lives in
   [PARITY.md](PARITY.md) → "Where the game stands". As of 2026-10-08: footsteps,
   the neighbourhood layout montage, the UL filter toolbar, Superstar's fame
-  surfaces and gendered job titles, and Vacation's save-on-vacation/bookings are
-  on decoded native laws; the view-pie pop gesture stays a disclosed model (the
-  original's window-manager vtable was not shipped — not statically recoverable);
-  open completeness gaps remain in Hot Date (serve self-start), Unleashed
-  (pet-AI depth, shows/training), Vacation (score/souvenir live legs) and
-  Makin' Magic (quest coverage) — and human verification of the whole is still
-  partial (heavily automated; played and accepted hands-on in portions).
+  surfaces and gendered job titles, Vacation's save-on-vacation/bookings, and
+  Makin' Magic's quest lines are on decoded native laws; the view-pie pop gesture
+  stays a disclosed model (the original's window-manager vtable was not shipped —
+  not statically recoverable). Actively open: a regression where the travelling
+  sim does not materialize on downtown/Old Town arrival (vacation arrivals are
+  fine), the Hot Date serve self-start and Unleashed pet-gate follow-ups,
+  Vacation's score/souvenir live legs — and human verification of the whole is
+  still partial (heavily automated; played and accepted hands-on in portions).
   Duplicate-gap reports will be closed with a pointer.
 - **Code welcome.** MPL-2.0 — PRs are open. PARITY.md's gap table is the roadmap; small,
   well-evidenced fixes (see the PROVENANCE discipline) land fastest.

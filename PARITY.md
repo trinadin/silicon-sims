@@ -13,9 +13,10 @@ This section is the current truth. Everything below it is the historical round r
 (newest-first-ish through late September) — rows there may be superseded; where a row was
 later overturned, corrections are noted in place or here.
 
-**Verified working** (the default 147-check battery boots the real game headlessly and
+**Verified working** (the default 155-check battery boots the real game headlessly and
 exercises all of this on every change; `tools/run-autotest.sh`; opt-in batteries
-`nbr06`, `nbr05ui`, `nghbtns`, `freewillwin`, `moodlaw` cover the decode-pinned laws):
+`nbr06`, `nbr05ui`, `nghbtns`, `freewillwin`, `moodlaw`, `trv05`, `hdserve`, `ulpets`
+cover the decode-pinned laws):
 
 - Boot → neighbourhood → lot → live play; saves and reload (byte-audited against the
   original record format); CAS on the original desktop law (portraits, personality
@@ -86,9 +87,25 @@ exercises all of this on every change; `tools/run-autotest.sh`; opt-in batteries
 **Open — expansions (substantial parts landed; completeness is the gap, not presence):**
 
 - Hot Date/Downtown: travel, shopping, restaurants, interests, downtown NPCs verified
-  live; the serve choreography's self-start is a named residual.
+  live. The serve-choreography SELF-START law is DECODED (EXP-14, 2026-10-08:
+  podium-anchored autonomous dining — the Eat interaction itself creates
+  Controller-Restaurant-Eat; the hunger-gate hypothesis CONFIRMED as the ad/curve
+  law; the port's freewill law proven faithful on zoning-0 lots); the `hdserve`
+  opt-in gate is in follow-up. **Open regression under investigation (first
+  observed in wave-4 central validation): after phone-plugin travel to a
+  NON-vacation destination (downtown lot 21 / Old Town 93), the lot loads with
+  its NPCs but the traveler/family sim never materializes** (the `hdserve` and
+  `petname` opt-in gates fail on it; vacation arrivals are unaffected — `trv05`
+  passes end-to-end from the same build).
 - Unleashed: pets are live (adoption, naming, transforms incl. the dragon, nests);
-  pet-AI depth and shows/training remain partial.
+  **pet-AI depth root-caused (EXP-15, 2026-10-08): two decoded port defects
+  fixed** — family pets carried the NPC person-class 2 (which Cat/DogGlobals
+  8200's eligibility gate rejects as an owner-interaction target, hiding Call
+  Over/Scold/Praise/toys/Play/Tricks/Train) and pet avatars lacked the pd[65]
+  species bits the TTAB gates read; shows/training were found largely
+  receipt-closed already (EXP-05 unl-show/unl-mice, EXP-09 exp09train). The
+  `ulpets` opt-in gate is in follow-up (record-restore class path + probe
+  soak-release).
 - Vacation: **save-on-vacation + bookings CLOSED (TRV-05, 2026-10-08)** on
   the decoded native law (Family::DoStream field-8 rental +0x13C in the
   version-9 shape, the SaveGame matrix — vacation lot saves house only,
@@ -107,9 +124,17 @@ exercises all of this on every change; `tools/run-autotest.sh`; opt-in batteries
   interactions (1125 interactions, 0 unresolved trees; `ssfame` gate).
   Residuals: EXP-11's award-ceremony choreography blockers (BHAV-level),
   home fame-decay self-start.
-- Makin' Magic: the major systems are verified live (spells/recipes via the mode-38
-  primitive, duels, nectar, dragon, spellbound, family spells, Magic Town transit);
-  quest-line coverage is open.
+- Makin' Magic: the major systems are verified live (spells/recipes via the
+  mode-38 primitive, duels, nectar, dragon, spellbound, family spells, Magic
+  Town transit); **quest-line coverage CLOSED (EXP-17, 2026-10-08)**: the quest
+  lines enumerated from the IFFs (quest-giver set + Choose Quest/Choose Reward
+  core), two genuine engine gaps fixed on native decodes (the
+  `$TokenNameLocal:` dialog substitution; the FindToken index-dst selector
+  `(Flags2.0x18)>>3`, superseding ENG-06's zero-caller guess), everything else
+  proven live-by-construction; `mmquest` rides the default suite (PASS from
+  dist). Bounded residuals enumerated on the card (delivery-quest fixture,
+  zero-caller selector/native substitutions, the lot-93 headless NPC-dialog
+  pause storm — a harness limitation, banked).
 
 **Deliberate divergences (documented, not accidents):** the malformed GenericCall-13
 path throws instead of running the native destructive cleanup (unused by the owned
