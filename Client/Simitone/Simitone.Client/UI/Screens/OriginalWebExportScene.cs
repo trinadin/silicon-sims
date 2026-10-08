@@ -7,10 +7,18 @@ using System.Collections.Generic;
 namespace Simitone.Client.UI.Screens
 {
     /// <summary>
-    /// ENG-27: the house-exterior capture hook for the web exporter — the
-    /// same next-frame backbuffer readback discipline as R190's snapshot
+    /// ENG-27/AUD-18: the house-render capture hook for the web exporter —
+    /// the same next-frame backbuffer readback discipline as R190's snapshot
     /// scene (draws nothing; appended after the lot World so the backbuffer
-    /// holds the finished view with no UI painted over it).
+    /// holds the finished view with no UI painted over it). AUD-18/R2: the
+    /// native writes FOUR renders (exterior + floor1 + floor2, ExportHTML
+    /// tail); the exporter drives a multi-frame state machine here — each
+    /// capture is delivered to OnHouseCaptured, which flips World.State.Level
+    /// for the next shot; the world redraws on the following frame and this
+    /// scene captures that view (one frame per shot, the player's level
+    /// restored at the end). The native renders the floors offscreen on a
+    /// HouseViewer; capturing the live view per floor is the disclosed port
+    /// necessity.
     /// </summary>
     public class OriginalWebExportScene : _3DAbstract
     {
@@ -23,6 +31,8 @@ namespace Simitone.Client.UI.Screens
 
         public override void Draw(GraphicsDevice device)
         {
+            // stay armed while the exporter's multi-shot queue runs
+            // (HouseCaptureRequest remains set until the last floor shot)
             if (Simitone.Client.UI.Model.OriginalWebExporter.HouseCaptureRequest == null) return;
             Texture2D captured = null;
             try

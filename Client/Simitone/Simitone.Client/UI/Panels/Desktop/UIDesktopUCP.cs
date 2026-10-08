@@ -790,16 +790,22 @@ namespace Simitone.Client.UI.Panels.Desktop
             FriendOriginal.Size = new Vector2(w, line);
         }
 
-        // Engine CPState::GetFamilyFriendCount 0x20c770: a DEDUPLICATED set of
-        // the family's friends — STR# 162[1] states the dedup law verbatim
-        // ("friends are only counted once even if more than one Sim considers
-        // them a friend"). Friend = the port's established engine predicate
-        // (UIJobSubpanel fame law): mutual DAILY relationship >= 50 both
-        // directions; same-family neighbors are excluded. The fame-only
-        // homeless rejection is NOT applied here — that gate belongs to
-        // Neighborhood::GetFamousFriendCount; townies count as family
-        // friends (the 0x1417e0 set-builder internals are undecoded,
-        // disclosed).
+        // Engine CPState::GetFamilyFriendCount 0x102038e0 (r2 0x2038e0):
+        // formats Neighborhood::GetFamilyFriendsCount 0x100a9330 -> cached
+        // string at CPState+0x224. The SET law is UpdateFamilyFriendsCount
+        // 0x100a81c0 (ORIG-02 friend-set-law.md; AUD-18-B re-verified to the
+        // byte): neighbor must BELONG to a family (+0xEE != 0, townies out),
+        // must not be a counted-family member (Family::TestMember 0x1006de80),
+        // must be person type (+0xF6 <= 1, pets/other out), and ANY member
+        // needs mutual DAILY (RelMatrix slot 0) >= T both directions, where
+        // T = the shared friendship-threshold global ([TOC-0x726c] = TOC slot
+        // image 0x105ba1f4 -> data 0x48eb8 = 25; startup loader 0x101098c0
+        // stores FloatConstants::Get("friendship threshold", 25.0f) as int —
+        // key at name-blob 0x491c0+0x28a, default float 25.0 at code pool
+        // 0x59a524+0x60). STR# 162[1]'s "counted once" is the inner-loop
+        // break, not a string-set dedup (the old 0x1417e0 "StringSet builder"
+        // record was raw-file-offset misreading — 0x1417e0 = a
+        // StringEditBuffer ctor; ORIG-02 corrected).
         public static int ComputeFamilyFriendCount(TS1GameScreen game)
         {
             try

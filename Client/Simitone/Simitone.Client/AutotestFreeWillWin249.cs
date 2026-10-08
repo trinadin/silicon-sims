@@ -22,43 +22,38 @@ namespace Simitone.Client
     /// R249 'freewillwin' (opt-in, focused): validates the REBUILT TS1 free-will winner
     /// selection end-to-end against the native law decoded in tools/iff-dump/r249-freewill/
     /// decode.md + skeptic-corrections.md and tools/iff-dump/r249-freewill-cfg/decode.md
-    /// (the maintainer's adjudication is binding):
+    /// (the maintainer's adjudication is binding), as CORRECTED by the AUD-18-A call-site
+    /// proof (coordination/evidence/AUD-18/a-simantics-audit.md "F-3 RESOLUTION" — R250
+    /// is REFUTED: the score/test pair sits INSIDE the gather loop):
     ///
-    ///   gather      = per-candidate TestInteraction ONLY — NO per-candidate scoring
-    ///                 (R250 binding call-site adjudication: GetInteractionScore 0x9f9d4
-    ///                 has exactly two call sites in the binary, the live one at 0x109d48
-    ///                 immediately after the WINNER's re-test 0x109d1c;
-    ///                 AppendInteractionsForAuto contains none, so gather never scores,
-    ///                 Candidate.Score rides lazily at 0, and the draw is uniform over
-    ///                 gather order)
-    ///   winnerScore = atten * (GetInteractionScore(winner ads + re-test MotiveAdChanges)
-    ///                 - H)  (positive = motive improvement; curves = person GLOB
-    ///                 STR#501/503; the re-test's tree may rewrite the ad copy and the
-    ///                 hand-off score consumes the mutated copy — Winner.Score carries it)
-    ///   "sort"      = the faithful heapsort transpile of CW routine 0x59a370 with the
-    ///                 game comparator (eps +1e-7 / -1e-7) — net effect rotate-left-by-one
+    ///   gather      = per-candidate TestInteraction (0x109d1c) THEN GetInteractionScore
+    ///                 (0x109d48) on the tree-mutated ad copy; sentinel drop H'==CFG+4
+    ///                 (0.0); score = atten*(H'-H); push gate score >= FCNS "min
+    ///                 autonomy score for family/visitors" (live 1e-7)
+    ///   candidate   = {objId, actionNumber, score, flag} — Score is the REAL gather
+    ///                 score; the pool carries it end-to-end
+    ///   sort        = the faithful heapsort transpile of CW routine 0x59a370 with the
+    ///                 game comparator (0x1011b0, eps +1e-7/-1e-7, ties compare 0) —
+    ///                 pool DESCENDING (best first)
     ///   K           = max(1, FCNS "random selection count"(=4) - trunc(attr18/2000))
     ///   drawnIdx    = 0                          when (visitor OR post-sort[0].flag != 0)
     ///                                            AND the lot is NOT downtown
-    ///               = rand() % min(K, count)     otherwise  (VMContext.NextRandom xorshift)
+    ///               = rand() % min(K, count)     otherwise  (VMContext.NextRandom xorshift;
+    ///                                            uniform over the K BEST candidates)
     ///   accepted    = standing (attr0 == 0)   : unconditional
-    ///                 engaged  (attr0 != 0)   : winnerScore >= cutoff (FCNS 1e-6)
+    ///                 engaged  (attr0 != 0)   : winner POOL score >= cutoff (FCNS 1e-6)
     ///
     /// Scenario (the controlled multi-candidate design, R249 finish): ride the default
     /// house-5 soak window (elapsed < 9; the soak itself runs 10 sim-min). The SUBJECT is
     /// selected by the round task's stratum knob — the adult avatar whose
     /// (house-number + object id) &amp; 3 stratum opens the EVEN-ID candidate pool
-    /// (stratum 2: obj21 on house 5). Rationale: the faithful heapsort's net effect is
-    /// rotate-left-by-one, so the winner pool (post-sort[0..K-1]) is exactly
-    /// gather[1..K] — the first ADMITTED entries in module order — and the previous
-    /// subject's stratum-3 pool head was entirely chair 'sit' (act4107) entries whose
-    /// test trees fail (with the R250 per-candidate gather tests restored those
-    /// candidates are now EXCLUDED at gather — the pool is test-filtered, and (g)
-    /// requires a SERVED winner as a hard pass condition). Motive pins cannot reshuffle
-    /// that head (the adult Fun curve is flat above 75, so any Fun pin that kills the
-    /// chair ads kills every Fun ad). All avatars are pinned to the competition set
-    /// Fun=0 (with gather scores gone, the >= 2-candidate competition comes from the
-    /// test-passing Fun-advertising entries themselves), Social=50, Hunger/Energy/Hygiene=75, Bladder=100, Comfort/Room=75;
+    /// (stratum 2: obj21 on house 5). With real gather scores the post-sort pool head is
+    /// the K BEST test-passing candidates (the chair 'sit' act4107 entries whose test
+    /// trees fail are EXCLUDED at gather — the pool is test-filtered and score-gated,
+    /// and (g) requires a SERVED winner as a hard pass condition). Motive pins: all
+    /// avatars pinned to the competition set Fun=0 (the >= 2-candidate competition comes
+    /// from the test-passing Fun-advertising entries whose curves are steep at low Fun),
+    /// Social=50, Hunger/Energy/Hygiene=75, Bladder=100, Comfort/Room=75;
     /// the subject additionally pins personality attrs 2..7 + attr18=0 (K = 4) and the
     /// AutonomyLevel ad ceiling; VM.FreeWillEnabled=true (restored in finally).
     /// Decisions are observed through the frozen engine seam
@@ -688,14 +683,13 @@ namespace Simitone.Client
         }
 
         // Faithful heapsort transpile — ported from tools/iff-dump/r249-freewill-cfg/
-        // verify.py heapsort_59a370 (group H fixtures: [1..10] -> [2..10,1], [5,1,9] ->
-        // [1,9,5], n=2 swap, all-equal identity). Comparator (0x10a040, eps +1e-7/-1e-7):
-        //   +1 iff b.score - a.score >= 1e-7 ; -1 iff |delta| < 1e-7 ; 0 otherwise.
-        // Element-level transpilation: verify.py swaps 17 bytes per pair on the engine's
-        // byte image (w=16 + 1 trailing byte that aliases the next record's first byte —
-        // a memory-layout artifact below the seam contract's record resolution); the
-        // record permutation it induces is what this transpile reproduces, and for
-        // strictly-distinct scores it is exactly rotate-left-by-one.
+        // verify.py heapsort_59a370 (routine shape; group-H fixtures re-derived below
+        // for the AUD-18-A corrected comparator). Comparator (0x1011b0,
+        // eps +1e-7/-1e-7, ties compare 0):
+        //   +1 iff b.score - a.score > 1e-7 ; -1 iff < -1e-7 ; else 0.
+        // With real gather scores the transpile yields the pool in DESCENDING
+        // (best-first) order — the old rotate-left-by-one claim was an artifact of
+        // the R250 lazy-zero scores and is retired.
         private static void GameHeapsort(List<Cand> a)
         {
             int n = a.Count;
@@ -743,11 +737,14 @@ namespace Simitone.Client
             }
         }
 
-        // CompareScoredInteractions (0x10a040) with the compiled eps +1e-7 / -1e-7
+        // CompareScoredInteractions (0x1011b0, AUD-18-A corrected polarity) with the
+        // compiled eps +1e-7 / -1e-7: +1 iff delta > eps; -1 iff delta < -eps; ties 0.
+        // (Mirrors the engine's CompareCandidates exactly — the (f) permutation replay
+        // depends on the two staying identical.)
         private static int Cmp(Cand a, Cand b)
         {
             float d = b.Score - a.Score;
-            return (d >= 1e-7f) ? 1 : ((d > -1e-7f) ? -1 : 0);
+            return (d > 1e-7f) ? 1 : ((d < -1e-7f) ? -1 : 0);
         }
 
         /// <summary>Predict the lawful outcome for a subject decision from the snapshot alone.</summary>
@@ -884,23 +881,28 @@ namespace Simitone.Client
                     (_seamBoundAtArm ? "" : " [SEAM-ABSENT: engine seam never bound]") +
                     (multi.Count == 0 && _seamBound ? " — the Fun=0 pin yielded no competing set (honest finding)" : ""));
 
-                // (b) R250 HAND-OFF SCORE LAW (hard assert). With the corrected native law
-                // (gather never scores — the draw is uniform over gather order), the old
-                // "candidates carry positive scores" claim is meaningless: pool scores ride
-                // lazily at 0. The law-true facts asserted instead:
-                //   1. every POOL score is the gather-lazy 0 (no per-candidate scoring
-                //      crept back in),
-                //   2. every drawn subject winner carries a finite HAND-OFF score
-                //      (GetInteractionScore at 0x109d48 on the re-test's tree-mutated ad
-                //      copy), and
-                //   3. the cutoff decision matches that score's sign/law — standing
+                // (b) GATHER SCORE LAW (hard assert; AUD-18-A corrected). The native
+                // scores EVERY candidate inside the gather loop (GetInteractionScore
+                // 0x109d48 on the tree-mutated ad copy; sentinel drop H'==0; push gate
+                // score >= the FCNS min autonomy score, live 1e-7) — so the law-true
+                // facts asserted are:
+                //   1. every POOL score is finite and cleared the push gate
+                //      (>= 1e-7 — a live-1e-7-family value; negative/zero scores in
+                //      the pool would mean the gate or sentinel is gone),
+                //   2. every drawn subject winner carries a finite POOL score (the
+                //      cutoff's operand — winner+8), and
+                //   3. the cutoff decision matches that score's law — standing
                 //      (attr0 == 0) accepts unconditionally; engaged accepts iff
                 //      winnerScore >= cutoff (FCNS 1e-6).
-                int bChecked = 0; bool bLaw = true; float bMaxAbs = 0f; float bPoolMax = 0f;
+                int bChecked = 0; bool bLaw = true; float bMax = 0f; float bPoolMin = float.PositiveInfinity;
                 foreach (var r in subjRecs)
                 {
                     if (r.Candidates == null) continue;
-                    foreach (var c in r.Candidates) bPoolMax = Math.Max(bPoolMax, Math.Abs(c.Score));
+                    foreach (var c in r.Candidates)
+                    {
+                        if (float.IsNaN(c.Score) || float.IsInfinity(c.Score) || c.Score < 1e-7f) bLaw = false;
+                        else bPoolMin = Math.Min(bPoolMin, c.Score);
+                    }
                     if (r.DrawnIdx < 0 || r.DrawnIdx >= r.Candidates.Count) continue;
                     if (r.Winner == null || float.IsNaN(r.Winner.Score) || float.IsInfinity(r.Winner.Score))
                     {
@@ -908,17 +910,18 @@ namespace Simitone.Client
                         continue;
                     }
                     bChecked++;
-                    bMaxAbs = Math.Max(bMaxAbs, Math.Abs(r.Winner.Score));
+                    bMax = Math.Max(bMax, Math.Abs(r.Winner.Score));
                     bool bLawAccept = (r.Attr0AtFrame == 0) || (r.Winner.Score >= r.Cutoff);
                     if (bLawAccept != r.Accepted) bLaw = false;
                 }
-                bool bOk = bChecked > 0 && bLaw && bPoolMax == 0f;
-                Sub("b-handoff-score-law", bOk,
-                    bOk ? (bChecked + " drawn subject winner(s) carry a finite hand-off score " +
-                        "(|score| up to " + bMaxAbs.ToString("0.######") +
-                        "); pool gather scores all lazy-0; cutoff decisions match the hand-off-score law") :
-                        ("hand-off score law violated: drawn=" + bChecked + " law-consistent=" + bLaw +
-                        " max-pool-|score|=" + bPoolMax.ToString("0.######") + " (must be 0)"));
+                bool bOk = bChecked > 0 && bLaw && bPoolMin < float.PositiveInfinity;
+                Sub("b-gather-score-law", bOk,
+                    bOk ? (bChecked + " drawn subject winner(s) carry a finite pool score " +
+                        "(|score| up to " + bMax.ToString("0.######") +
+                        "); all pool scores cleared the 1e-7 push gate (min " + bPoolMin.ToString("0.######") +
+                        "); cutoff decisions match the pool-score law") :
+                        ("gather score law violated: drawn=" + bChecked + " law-consistent=" + bLaw +
+                        " (pool scores must be finite and >= 1e-7)"));
 
                 // (c)+(d)+(f): per-decision lawfulness, seed replay, winner identity
                 int cOk = 0, cBad = 0, dChecked = 0, dOk = 0, dBad = 0, fOk = 0, fBad = 0;
@@ -954,12 +957,13 @@ namespace Simitone.Client
                     if (fPass && r.Winner != null)
                     {
                         var dw = r.Candidates[r.DrawnIdx];
-                        // R250: identity = CalleeId/ActionNumber/Param0/Flag. Score is NOT
-                        // an identity field anymore: the pool entries carry the gather-lazy
-                        // 0 while the Winner carries the hand-off score (0x109d48) — they
-                        // are lawfully different numbers.
+                        // AUD-18-A: identity = CalleeId/ActionNumber/Param0/Flag AND the
+                        // score (the winner's pool score == Candidates[drawnIdx].Score —
+                        // the same gather number rides both; a mismatch means the seam
+                        // recomputed something).
                         fPass = r.Winner.CalleeId == dw.CalleeId && r.Winner.ActionNumber == dw.ActionNumber &&
-                            r.Winner.Param0 == dw.Param0 && r.Winner.Flag == dw.Flag;
+                            r.Winner.Param0 == dw.Param0 && r.Winner.Flag == dw.Flag &&
+                            Math.Abs(r.Winner.Score - dw.Score) <= 1e-9f;
                     }
                     var preSortIsTrueGather = false;
                     if (fPass && r.PreSortCandidates != null && r.PreSortCandidates.Count == r.Candidates.Count)
@@ -1000,14 +1004,17 @@ namespace Simitone.Client
                         "(engine snapshots before the sort transpile) — the heapsort-transpile PERMUTATION assert ran against it on " +
                         trueGatherDecisions + " decision(s), plus the group-H predictor self-test below" +
                         (trueGatherDecisions == 0 ? " [DEGENERATE: every PreSortCandidates equaled the post-sort array this run]" : ""));
-                // predictor self-test (non-vacuous): the transpile must reproduce verify.py's
-                // group-H fixtures exactly or every (f) verdict above is meaningless.
+                // predictor self-test (non-vacuous): the transpile must sort DESCENDING
+                // with the corrected comparator or every (f) verdict above is meaningless.
+                // ([5,1,9] -> [9,5,1]; [1,2,3,4] -> [4,3,2,1] — hand-derived from the
+                // routine + the 0x1011b0 comparator, replacing the R250 group-H
+                // rotate-left fixtures which assumed lazy-zero scores.)
                 var st = new[] { 5f, 1f, 9f }.Select(v => new Cand { Score = v }).ToList();
                 GameHeapsort(st);
-                var stOk = st.Select(c => c.Score).SequenceEqual(new[] { 1f, 9f, 5f });
+                var stOk = st.Select(c => c.Score).SequenceEqual(new[] { 9f, 5f, 1f });
                 var st2 = new[] { 1f, 2f, 3f, 4f }.Select(v => new Cand { Score = v }).ToList();
                 GameHeapsort(st2);
-                stOk &= st2.Select(c => c.Score).SequenceEqual(new[] { 2f, 3f, 4f, 1f });
+                stOk &= st2.Select(c => c.Score).SequenceEqual(new[] { 4f, 3f, 2f, 1f });
                 _log("AUTOTEST freewillwin transpile self-test (verify.py group H): " + (stOk ? "OK" : "DRIFT"));
                 Sub("c-drawnidx-lawful", cBad == 0 && cOk > 0, cOk + " lawful / " + cBad + " unlawful");
                 if (!uniformSeen)
@@ -1023,10 +1030,10 @@ namespace Simitone.Client
                 Sub("f-winner-identity", fBad == 0 && fOk > 0 && stOk,
                     fOk + " winner identities match / " + fBad + " mismatch; transpile self-test " + (stOk ? "OK" : "DRIFT"));
 
-                // (e) cutoff law vs the accept decision, standing vs engaged. R250: the
-                // score side of the law is the WINNER's HAND-OFF score (Winner.Score) —
-                // Candidates[DrawnIdx].Score is the gather-lazy 0 and cannot decide
-                // anything (see (b)).
+                // (e) cutoff law vs the accept decision, standing vs engaged. AUD-18-A:
+                // the score side of the law is the WINNER's POOL score (Winner.Score ==
+                // Candidates[DrawnIdx].Score — the gather number; the native reads
+                // winner+8 directly; there is no recomputed hand-off score).
                 int eChecked = 0, eBad = 0; bool standingSeen = false, engagedSeen = false;
                 foreach (var r in subjRecs)
                 {
@@ -1111,22 +1118,19 @@ namespace Simitone.Client
                     // a non-Autonomous insertion with no seam decision is a directed/NPC
                     // path — outside the free-will law, not a violation.
                 }
-                // drop classification (R250 — the misclassification removed): an ACCEPTED
-                // drawn winner that never enqueued dropped at the hand-off re-test (the
-                // native's own winner re-test, TestInteraction 0x109d1c inside
-                // TryFindBestAction, before the cutoff). Engine invariants make that the
-                // ONLY synchronous cause: the re-test and the insertion resolve the action
-                // through the same deterministic GetAction in the same tick, so a winner
-                // that passed the re-test always enqueues — no insertion means the
-                // re-test's check tree returned false. With the R250 per-candidate gather
-                // tests restored, the pool holds only test-passing candidates (the old
+                // drop classification (AUD-18-A corrected): an ACCEPTED drawn winner
+                // that never enqueued dropped at the enqueue resolve — with the native
+                // law restored there is NO hand-off re-test (the post-draw tail
+                // 0x100f48+ runs neither TestInteraction nor GetInteractionScore), so
+                // the gather test already passed and the cutoff already accepted; the
+                // only remaining synchronous cause is the port-side queue insertion
+                // (GetAction resolve / AttemptPush's directed re-check, P2-5 below).
+                // With the per-candidate gather tests + the score push gate restored,
+                // the pool holds only test-passing, score-clearing candidates (the old
                 // test-failing drop class — urn "Mourn" 4107, phone ring latch 8208,
-                // token-gated magic socials 8662 — is excluded at gather, and the old
-                // "chair-sit/slot-routing" 4107 label was a misclassification: act 4107
-                // is UrnStone.iff "Mourn"). So a drop means conditions genuinely changed
-                // between the gather test and the winner re-test. A drop caused by a
-                // DOCUMENTED harness mutation is the narrow disclosed escape; any other
-                // drop is a FAIL under (g).
+                // token-gated magic socials 8662 — is excluded at gather). A drop caused
+                // by a DOCUMENTED harness mutation is the narrow disclosed escape; any
+                // other drop is a FAIL under (g).
                 // P2-5 DISCLOSED EDGE: the port's queue path can also remove a just-served
                 // winner LAWFULLY in the same tick — VMThread.AttemptPush's insertion
                 // re-check runs CheckAction with auto=0 (the directed-use law, not the
@@ -1162,7 +1166,7 @@ namespace Simitone.Client
                     if (!excused) gUnexcusedDrops++;
                     gDrops.Add("frame" + r.Frame + " av" + r.CallerId + " winner obj" + w.CalleeId +
                         "#act" + w.ActionNumber + " (p" + w.Param0 + ") testBHAV=" + testBhav +
-                        " -> hand-off re-test returned false" +
+                        " -> dropped at the enqueue resolve (AUD-18-A: no hand-off re-test exists; the gather test passed and the cutoff accepted)" +
                         (excused
                             ? " after DOCUMENTED harness mutation '" + cause + "' (disclosed same-tick change)"
                             : " with NO documented same-tick cause — FAIL under (g)"));

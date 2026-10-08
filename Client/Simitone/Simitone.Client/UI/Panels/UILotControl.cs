@@ -948,9 +948,15 @@ namespace Simitone.Client.UI.Panels
                                 // AUD-17 C1-6: clamp the menu origin so the ring
                                 // (radius 90 + label extents) and the overflow
                                 // stack stay reachable — the people pie runs the
-                                // same decoded cTSPieMenu window law; this
-                                // interaction pie used to mount at the raw cursor
-                                // and let edge clicks spawn off-screen bubbles.
+                                // decoded cTSPieMenu window law (measured box
+                                // clamped into the screen rect, margin 8,
+                                // UIOriginalPeoplePie.ClampMargin); this
+                                // interaction pie approximates that clamp with a
+                                // fixed 110 margin (port-chosen: bubble radius 90
+                                // + label headroom — the native clamps the
+                                // measured rect, not a fixed margin). It used to
+                                // mount at the raw cursor and let edge clicks
+                                // spawn off-screen bubbles.
                                 var sw = UIScreen.Current.ScreenWidth;
                                 var sh = UIScreen.Current.ScreenHeight;
                                 PieMenu.X = Math.Max(110, Math.Min(sw - 110, PieMenu.X));

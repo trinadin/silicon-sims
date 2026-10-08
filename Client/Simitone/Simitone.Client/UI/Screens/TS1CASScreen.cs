@@ -504,6 +504,12 @@ namespace Simitone.Client.UI.Screens
                 i++;
             }
             CurrentChild = child;
+            // AUD-18-C: PopulateReal re-dresses every avatar — including the
+            // Vita preview (BodyAvatars[0], SetBody(...,17)) — so the F-3
+            // memo must not survive it; a stale-but-equal index would skip
+            // the next SimEdit re-sync and show the wrong outfit.
+            _lastVitaBody = int.MinValue;
+            _lastVitaHead = int.MinValue;
         }
 
         public TS1CASScreen()
@@ -794,8 +800,11 @@ namespace Simitone.Client.UI.Screens
                     break;
                 case UICASMode.FamilyEdit:
                     if (WIPFamily.Count == 0) return;
-                    if ((Original ? DesktopFamily.FamilyNameBox.CurrentText
-                        : FamilyPanel.SecondName.CurrentText).Length == 0) return; // AUD-17 F-1: never save a blank family name
+                    // AUD-18-C: natively Done with members but a cleared name
+                    // still confirms and saves (TSOnCommand @0x2d05e0 has no
+                    // name check; the name gate is Add-only). AUD-17 F-1's
+                    // save-time blank-name guard was stricter than native —
+                    // removed.
                     ShowConfirmation(GameFacade.Strings.GetString("129", "13"),
                         GameFacade.Strings.GetString("129", "14"),
                         () => { SaveFamily(); SetMode(UICASMode.FamilySelect); });
@@ -953,12 +962,13 @@ namespace Simitone.Client.UI.Screens
                     if ((Original ? DesktopFamilies.GetSelection() : FamiliesPanel.Selection) == -1) disableAccept = true;
                     break;
                 case UICASMode.FamilyEdit:
-                    // AUD-17 F-1: the empty-family-NAME guard existed only on
-                    // Add — Done accepted a blank last name and permanently
-                    // wrote it into the neighborhood FAMs table. Gate Done the
-                    // same way (both chrome paths).
-                    if (WIPFamily.Count == 0 || (Original ? DesktopFamily.FamilyNameBox.CurrentText
-                        : FamilyPanel.SecondName.CurrentText).Length == 0) disableAccept = true;
+                    // AUD-18-C decode correction: the native Done gate is
+                    // COUNT-only (PrepareButtons @0x2d0140 enables Done iff
+                    // member-count != 0); the family-NAME condition lives on
+                    // Add alone, and the Done handler TSOnCommand @0x2d05e0
+                    // has no name check. AUD-17 F-1's name gate on Done was
+                    // stricter than native — removed.
+                    if (WIPFamily.Count == 0) disableAccept = true;
                     break;
             }
 
@@ -1289,6 +1299,7 @@ namespace Simitone.Client.UI.Screens
         public void AcceptMember()
         {
             var mem = BuildMember();
+            if (mem == null) return;
             if (EditIndex == -1)
             {
                 WIPFamily.Add(mem);
@@ -1303,6 +1314,10 @@ namespace Simitone.Client.UI.Screens
         public CASFamilyMember BuildMember()
         {
             //build the object out of the contents of various menus
+            // AUD-18-C (AUD-17 F-5 residual): a partial/corrupt install can
+            // leave a collection empty — PosMod(x, 0) is NaN and the indexer
+            // throws. No outfit means no member can be built.
+            if (ActiveBodies.Count == 0 || ActiveHeads.Count == 0) return null;
             var i = (int)DirectionUtils.PosMod(Math.Round(BodyPosition+8), ActiveBodies.Count);
             var j = (int)DirectionUtils.PosMod(Math.Round(HeadPosition+8), ActiveHeads.Count);
             string name, bio;

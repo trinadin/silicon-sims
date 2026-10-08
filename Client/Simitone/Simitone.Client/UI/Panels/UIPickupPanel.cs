@@ -35,9 +35,12 @@ namespace Simitone.Client.UI.Panels
         // plaque, composed from the original kit — Gendlg picture-window
         // chrome + original caption glyphs + the WinBtn UIBigButton — with
         // the same original STR# 136 sellback strings the mobile strip used.
-        // The true cWinDisposePopup layout law is NOT decoded (carded as the
-        // ORIG-01 residual); sizes/position here are port-chosen, materials
-        // are 100% original.
+        // ORIG-02 dispose-popup-law CLOSED the residual: there is NO
+        // cWinDisposePopup window class in the binary (symbol census) — the
+        // native surface is cMoveTool::StartDisposing 0x1016b940 feeding
+        // CPState's dispose machinery, whose plaque chrome is CPState's
+        // toast. No layout law exists to decode; sizes/position here are
+        // port-chosen, materials are 100% original.
         private const int PlaqueW = 450, PlaqueH = 64;
         private Simitone.Client.UI.Controls.UIOriginalText TitleOriginal;
         private Simitone.Client.UI.Controls.UIOriginalText SubtextOriginal;
@@ -215,8 +218,10 @@ namespace Simitone.Client.UI.Panels
         {
             if (!Visible) return;
             // R144/ORIG-01 #3: mobile keeps its strip; desktop now paints the
-            // carry plaque composed from the original dialog kit (the
-            // cWinDisposePopup layout law itself remains the carded residual).
+            // carry plaque composed from the original dialog kit (ORIG-02
+            // closed the residual: no cWinDisposePopup class exists natively
+            // — the surface is cMoveTool::StartDisposing 0x1016b940 +
+            // CPState's toast; no layout law exists to decode).
             if (!FSO.Common.FSOEnvironment.SoftwareKeyboard) return;
             base.PreDraw(batch);
             Thumb3D?.Draw();

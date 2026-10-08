@@ -66,10 +66,14 @@ namespace Simitone.Client.UI.Model
             // the dividend = B*Working + A*Broken when the constants decode.
             public int FurnishingsValue;   // stats+28: sum of indoor object prices
             public int YardValue;          // stats+32: sum of outdoor object prices
-            public int WorkingObjects;     // objects with RepairState < 600 and == 0
-            public int DirtyObjects;       // RepairState 1..599 (the engine's dirty test)
-            public int BrokenObjects;      // RepairState >= 600 (the engine's own
-                                           // repair threshold, VMFindBestObjectForFunction)
+            public int WorkingObjects;     // native law: repair == 0 AND
+                                           // dirt == 0 (FillInObjectStats)
+            public int DirtyObjects;       // native law: repair == 0 AND
+                                           // dirt(+0x98 / DirtyLevel var 39)
+                                           // > 0 — mutually exclusive with
+                                           // broken
+            public int BrokenObjects;      // native law: repair(+0x68) != 0
+                                           // (ANY nonzero repair state)
             public bool HasPool;           // corpus: yard rating mentions the pool
             public int YardGoodObjects;    // outside RoomImpact >= 0 count
             public int YardNegativeImpact; // outside RoomImpact < 0 signed sum
@@ -92,13 +96,18 @@ namespace Simitone.Client.UI.Model
                 get { return ComputeFurnishingsScore(FurnishingsObjectValue, FurnishingsFixedValue); }
             }
 
-            // R135 + ORIG-02: the UpkeepScore law — GetUpkeepScore 0x8bcd0
-            // with the recovered FCNS defaults ('upkeep penalty per broken
-            // object' = 15, 'per dirty object' = 6):
+            // R135 + ORIG-02 + AUD-18: the UpkeepScore law — GetUpkeepScore
+            // 0x8bcd0 (image 0x10082e40) with the recovered FCNS defaults
+            // ('upkeep penalty per broken object' = 15, 'per dirty object'
+            // = 6):
             //   int(100 * clamp((count - penalty)/count, 0, 1)),
-            // penalty = 15*broken + 6*dirty. (Dirty = RepairState 1..599:
-            // the engine's dirty-vs-broken test; the old r=0 disclosed
-            // approximation is retired.)
+            // penalty = 15*broken + 6*dirty.
+            // NATIVE PREDICATES (FillInObjectStats image 0x100d97a0,
+            // AUD-18-F decompile; implemented since AUD-18): broken iff
+            // repair(+0x68) != 0; dirty iff repair == 0 AND dirt(+0x98) > 0
+            // — two separate fields, mutually exclusive (a nonzero-repair
+            // dirty object counts BROKEN). Port mapping: repair =
+            // RepairState, dirt = DirtyLevel (var 39).
             public int UpkeepScore
             {
                 get
@@ -288,12 +297,20 @@ namespace Simitone.Client.UI.Model
                                 if (outside) res.YardValue += price;
                                 else res.FurnishingsValue += price;
                             }
-                            // the upkeep condition: the engine's own broken test
-                            int repair = 0;
-                            try { repair = go.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.RepairState); }
+                            // the upkeep condition — the native two-field
+                            // test (FillInObjectStats image 0x100d97a0):
+                            // broken = repair(+0x68) != 0;
+                            // dirty = repair == 0 && dirt(+0x98) > 0 —
+                            // mutually exclusive by construction.
+                            int repair = 0, dirt = 0;
+                            try
+                            {
+                                repair = go.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.RepairState);
+                                dirt = go.GetValue(FSO.SimAntics.Model.VMStackObjectVariable.DirtyLevel);
+                            }
                             catch { }
-                            if (repair >= 600) res.BrokenObjects++;
-                            else if (repair > 0) res.DirtyObjects++; // ORIG-02: the engine's dirty test
+                            if (repair != 0) res.BrokenObjects++;
+                            else if (dirt > 0) res.DirtyObjects++;
                             else res.WorkingObjects++;
                         }
                     }

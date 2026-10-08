@@ -152,13 +152,9 @@ namespace Simitone.Client
             VMMotive.Hunger, VMMotive.Comfort, VMMotive.Hygiene, VMMotive.Bladder,
             VMMotive.Energy, VMMotive.Fun, VMMotive.Social
         };
-        // (R251) the Room's constant weight in the mood law (tools/iff-dump/
-        // r251-mood-cadence/implementation.md). The native room weight could NOT be
-        // pinned from the static binary (TOC pointer slots are unrelocated placeholders;
-        // the saved moods are state-dependent per R251), so this is the documented
-        // best-supported default comparable to a weight-1 motive. Kept byte-consistent
-        // with VMTS1MotiveDecay.RoomWeight (must match or the 'mood'/'moodlaw' pins fail).
-        private const float MoodRoomWeight = 1f;
+        // (R251→AUD-18-A) the Room's mood weight is HappyWeightCurves entry 5
+        // ((-100;2)(0;1)(100;2)) — the old flat-constant RoomWeight is retired
+        // (see ComputeMoodLaw + VMTS1MotiveDecay.ComputeMood).
         // Verified corpus counts (PARITY.md / tools/iff-dump): global.iff + species modules.
         private static readonly Dictionary<string, int> CorpusBhavCounts = new Dictionary<string, int>
         {
@@ -10317,19 +10313,25 @@ namespace Simitone.Client
             return row;
         }
 
-        // R251 mood law (corrective repoint of the OLD equal-weight /8 approximation).
+        // R251 mood law, RE-PINNED to the AUD-18-A corrected pairing: the runtime
+        // ladder builder (cXPerson::Initialize raw 0x111cd0) walks the index array
+        // {7,6,8,9,15,13,14} and fills curve i from STR#502/504 string i, so the
+        // participants are {Hunger, Comfort, Hygiene, Bladder, Fun, Social, Room}
+        // with curve indices {0,1,2,3,4,6,5} — ENERGY IS NOT A PARTICIPANT (R251's
+        // (7,5,6,15,8,14,9,13) order matches an unused static rodata table), and the
+        // Room weight is curve 5 ((-100;2)(0;1)(100;2)), not a flat constant.
         // Row layout (SnapshotAvatar): [0..6] = 7 decay motives in DecayMotives order
-        // (Hunger, Comfort, Hygiene, Bladder, Energy, Fun, Social), [7] = raw room score
-        // (clamped -100..100), [8] = stored mood, [9] = age. Returns the SAME weighted
-        // average short the engine's VMTS1MotiveDecay.Tick stores, so the pin asserts the
-        // correctly-decoded law, NOT the old /8.
+        // (Hunger, Comfort, Hygiene, Bladder, Energy, Fun, Social), [7] = raw room
+        // score (clamped -100..100), [8] = stored mood, [9] = age. Returns the SAME
+        // weighted average short the engine's VMTS1MotiveDecay.Tick stores.
         private static short ComputeMoodLaw(short[] row)
         {
             if (row.Length < DecayMotives.Length + 3) return 0;
-            // DecayMotives order -> weight-curve index (curve order is Hunger, Energy,
-            // Comfort, Fun, Hygiene, Social, Bladder):
-            //   Hunger->0, Comfort->2, Hygiene->4, Bladder->6, Energy->1, Fun->3, Social->5
-            var map = new[] { 0, 2, 4, 6, 1, 3, 5 };
+            // DecayMotives order -> curve index (builder pairing; -1 = Energy,
+            // excluded from the native CalcHappy participant set):
+            //   Hunger->0, Comfort->1, Hygiene->2, Bladder->3, Energy->-1,
+            //   Fun->4, Social->6
+            var map = new[] { 0, 1, 2, 3, -1, 4, 6 };
             var global = Content.Get().WorldObjectGlobals;
             if (global == null) return 0;
             var age = row[DecayMotives.Length + 2];
@@ -10339,6 +10341,7 @@ namespace Simitone.Client
             double num = 0, den = 0;
             for (int i = 0; i < DecayMotives.Length; i++)
             {
+                if (map[i] < 0) continue; // Energy: not a participant
                 var m = (double)row[i];
                 double w = 1.0;
                 if (curves != null && map[i] < curves.Length)
@@ -10347,8 +10350,11 @@ namespace Simitone.Client
                 den += w;
             }
             var room = (double)row[DecayMotives.Length];
-            num += MoodRoomWeight * room;
-            den += MoodRoomWeight;
+            double roomW = 1.0;
+            if (curves != null && curves.Length > 5)
+                roomW = curves[5].GetPoint((float)room);
+            num += roomW * room;
+            den += roomW;
             if (den <= 0) return 0;
             return (short)(num / den);
         }
@@ -29281,13 +29287,20 @@ namespace Simitone.Client
                 ok &= File.Exists(Path.Combine(root, "main.html"));
                 ok &= File.Exists(Path.Combine(root, "addressbook.html"));
                 ok &= Directory.GetDirectories(root).Length > 0; // at least one family folder
-                var famDir = Directory.GetDirectories(root)[0];
-                ok &= File.Exists(Path.Combine(famDir, "familyhome.html"));
-                ok &= File.Exists(Path.Combine(famDir, "house.html"));
-                ok &= Directory.GetFiles(famDir, "familymember*.html").Length > 0;
-                ok &= Directory.GetFiles(Path.Combine(famDir, "FamilyGFX"), "family*_face.jpg").Length > 0;
-                // house-exterior is written by the async capture
-                ok &= File.Exists(Path.Combine(famDir, "FamilyGFX", "house-exterior.jpg"));
+                // AUD-18-D: root now also carries the lawful NeighborhoodGFX/ tree
+                // (the root pages reference it) — a family folder is one that holds
+                // familyhome.html, not merely the first directory.
+                var famDir = Directory.GetDirectories(root)
+                    .FirstOrDefault(d => File.Exists(Path.Combine(d, "familyhome.html")));
+                ok &= famDir != null;
+                if (famDir != null)
+                {
+                    ok &= File.Exists(Path.Combine(famDir, "house.html"));
+                    ok &= Directory.GetFiles(famDir, "familymember*.html").Length > 0;
+                    ok &= Directory.GetFiles(Path.Combine(famDir, "FamilyGFX"), "family*_face.jpg").Length > 0;
+                    // house-exterior is written by the async capture
+                    ok &= File.Exists(Path.Combine(famDir, "FamilyGFX", "house-exterior.jpg"));
+                }
                 // no template token may survive anywhere
                 foreach (var f in Directory.GetFiles(root, "*.html", SearchOption.AllDirectories))
                 {
@@ -29315,8 +29328,9 @@ namespace Simitone.Client
         //     xskin-head-arrow-ROOT-ARROW mesh + arrow texture read from the
         //     local game data, rasterized under the PLUMB-01-decoded native
         //     lighting laws; deterministic for this game data:
-        //     sha256 7c57edf8…, and must NOT be the legacy Simitone icon
-        //     28a498e4…);
+        //     sha256 17cfe251… (AUD-18-E: light-rotation order + texture-
+        //     sample precedence corrections; superseded 7c57edf8…), and must
+        //     NOT be the legacy Simitone icon 28a498e4…);
         // (3) the running executable is named TheSims;
         // (4) the window title is "The Sims" (R118 law).
         // The boot screen (R118) and in-game UI were already original art; this
@@ -29348,7 +29362,7 @@ namespace Simitone.Client
                     {
                         var hex = BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
                         iconOK = bytes.Length > 4 && bytes[0] == 'i' && bytes[1] == 'c' && bytes[2] == 'n' && bytes[3] == 's'
-                            && hex == "7c57edf89e4a25ed6be0631665f8366a5ed561d989ad2320f56ffddd5b78a29e";
+                            && hex == "17cfe251a3ee4d55c85160b0199b933db06b3d82b8f259e8295a011ca86f2193";
                         iconInfo = "len=" + bytes.Length + " sha=" + hex.Substring(0, 8) + "…";
                     }
                 }
@@ -38596,17 +38610,20 @@ namespace Simitone.Client
                             if (again.SquareFeet != st.SquareFeet || again.Bedrooms != st.Bedrooms
                                 || again.Bathrooms != st.Bathrooms || again.LotSizeIndex != st.LotSizeIndex)
                             { ok = false; diag += "recompute;"; }
-                            // R134: the FillInObjectStats aggregates — the value split
-                            // (indoor+outdoor = total of priced objects, counted the
-                            // same deduped way) and the upkeep condition invariant
-                            // (working + broken == the deduped object count).
-                            if (st.WorkingObjects + st.BrokenObjects != st.ObjectCount)
-                            { ok = false; diag += "upkeep=" + st.WorkingObjects + "+" + st.BrokenObjects
-                                + "!=" + st.ObjectCount + ";"; }
+                            // R134 + AUD-18: the FillInObjectStats aggregates —
+                            // the value split (indoor+outdoor = total of priced
+                            // objects, counted the same deduped way) and the
+                            // upkeep condition invariant (working + dirty +
+                            // broken == the deduped object count; the native
+                            // two-field predicate is mutually exclusive).
+                            if (st.WorkingObjects + st.DirtyObjects + st.BrokenObjects != st.ObjectCount)
+                            { ok = false; diag += "upkeep=" + st.WorkingObjects + "+" + st.DirtyObjects
+                                + "+" + st.BrokenObjects + "!=" + st.ObjectCount + ";"; }
                             if (st.FurnishingsValue < 0 || st.YardValue < 0)
                             { ok = false; diag += "values;"; }
                             if (again.FurnishingsValue != st.FurnishingsValue || again.YardValue != st.YardValue
-                                || again.BrokenObjects != st.BrokenObjects || again.HasPool != st.HasPool
+                                || again.BrokenObjects != st.BrokenObjects || again.DirtyObjects != st.DirtyObjects
+                                || again.WorkingObjects != st.WorkingObjects || again.HasPool != st.HasPool
                                 || again.FurnishingsObjectValue != st.FurnishingsObjectValue
                                 || again.FurnishingsFixedValue != st.FurnishingsFixedValue
                                 || again.YardGoodObjects != st.YardGoodObjects

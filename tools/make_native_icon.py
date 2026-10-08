@@ -279,7 +279,8 @@ def mood_color(mood):
     if value < 0:
         remaining = 1 - value * value
         return (1.0, remaining, remaining - (0.4 + value) if value > -0.4 else remaining)
-    return (1 - value, 1.0, 0.6 if value < 0.4 else 1 - value)
+    # AUD-18-E: native subtraction form (1−v)−(0.4−v), not a literal 0.6.
+    return (1 - value, 1.0, (1 - value) - (0.4 - value) if value < 0.4 else 1 - value)
 
 
 def _rot_x(a):
@@ -301,8 +302,10 @@ def _v_norm(v):
 
 def _light_direction():
     # front camera: Invert(view)=I, Forward=(0,0,-1); native light follows the
-    # camera ray through RotationTf(Y,-80deg)*RotationTf(X,30deg)
-    m = _mat_mul(_rot_y(math.radians(-80)), _rot_x(math.radians(30)))
+    # camera ray through RotationTf(Y,80deg)*RotationTf(X,30deg) — in XNA's
+    # row-vector form that is rotY(-80) applied FIRST, then rotX(30)
+    # (TS1PlumbBob.LightDirection; AUD-18-E numeric mirror: 0.0 error).
+    m = _mat_mul(_rot_x(math.radians(30)), _rot_y(math.radians(-80)))
     return _v_norm(_mat_vec(m, (0.0, 0.0, -1.0)))
 
 
@@ -348,8 +351,10 @@ def render_authentic(mesh, tw, th, tpx, size, ss=2, angle=0.0, mood=100):
         y0, y1 = max(0, int(ys_l[0])), min(S - 1, int(ys_l[-1]) + 1)
         ua = (mesh["uvs"][tri[0]][0] + mesh["uvs"][tri[1]][0] + mesh["uvs"][tri[2]][0]) / 3
         va = (mesh["uvs"][tri[0]][1] + mesh["uvs"][tri[1]][1] + mesh["uvs"][tri[2]][1]) / 3
-        tx = min(tw - 1, max(0, int(ua % 1.0) * tw))
-        ty = min(th - 1, max(0, int(va % 1.0) * th))
+        # AUD-18-E: parenthesize BEFORE int() — the old `int(ua % 1.0) * tw`
+        # truncated to 0 first and sampled pixel (0,0) for every facet.
+        tx = min(tw - 1, max(0, int((ua % 1.0) * tw)))
+        ty = min(th - 1, max(0, int((va % 1.0) * th)))
         tr, tg, tb = tpx.get((tx, ty), (255, 255, 255))
         for y in range(y0, y1):
             xs_ = []

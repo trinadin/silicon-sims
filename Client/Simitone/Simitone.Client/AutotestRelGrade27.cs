@@ -11,8 +11,10 @@ namespace Simitone.Client.Autotest
     ///
     /// (a) Relationship filter truth table (GetRelatedPeople 0x242360):
     /// mode 1 Friends membership is GetRelation's COMPUTED mutual RelMatrix
-    /// slot-0 >= 50 law (forward AND reverse, raw pre-clamp values), mode 2
-    /// Famous membership is the persisted neighbor word 81
+    /// slot-0 >= 25 law (forward AND reverse, raw pre-clamp values; the
+    /// global is FloatConstants "friendship threshold" = 25 — AUD-18-B
+    /// decompile of GetRelation 0x10238d10, correcting r261's 50 misread),
+    /// mode 2 Famous membership is the persisted neighbor word 81
     /// (TS1FameStarPower) != 0 test with NO in-world requirement, mode 0
     /// Family is the word-61 equality pair, mode >= 3 accepts all.
     ///
@@ -34,29 +36,32 @@ namespace Simitone.Client.Autotest
         {
             var t = Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.FriendThreshold;
 
-            // Mode 1 — the synthetic mutual rows the law doc pins: (0,49),
-            // (50,50), (60,40), (100,100) classify exactly; one-directional
-            // >= 50 must NOT pass; null/empty rows never pass.
-            bool friend = t == 50
-                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(0), Row(49))
-                && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(50), Row(50))
-                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(60), Row(40))
+            // Mode 1 — the synthetic mutual rows pinned to the decoded
+            // threshold 25: (0,24), (25,25), (60,24), (100,100) classify
+            // exactly; one-directional >= 25 must NOT pass; null/empty rows
+            // never pass. (The old (60,40) row was a NON-friend only under
+            // the misread 50 — under 25 it is a mutual friend.)
+            bool friend = t == 25
+                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(0), Row(24))
+                && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(25), Row(25))
+                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(60), Row(24))
                 && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(100), Row(100))
-                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(49), Row(100))
-                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(100), Row(49))
+                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(24), Row(100))
+                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(100), Row(24))
                 && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(100), Row(-100))
-                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(null, Row(50))
-                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(50), null)
-                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(new List<short>(), Row(50));
+                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(null, Row(25))
+                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(Row(25), null)
+                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsNativeFriend(new List<short>(), Row(25));
 
             // Marker law: the smiley (bit 0) is the same mutual class — it
             // starves without the reverse row — while heart (bit 1, forward
             // slot 1) and deep-heart (bit 2, forward slot 3) stay forward-only.
+            // Discriminators sit at the decoded 25 threshold.
             bool markers = Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.MarkerFlagsFor(Row(75), Row(75)) == 1
                 && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.MarkerFlagsFor(Row(75, 1), Row(75)) == 3
                 && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.MarkerFlagsFor(Row(75, 1, 0, 1), Row(75)) == 7
-                && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.MarkerFlagsFor(Row(49, 1, 0, 1), Row(100)) == 6
-                && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.MarkerFlagsFor(Row(100, 1, 0, 1), Row(49)) == 6;
+                && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.MarkerFlagsFor(Row(24, 1, 0, 1), Row(100)) == 6
+                && Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.MarkerFlagsFor(Row(100, 1, 0, 1), Row(24)) == 6;
 
             // Mode 2 — persisted PD81 alone; there is no resolved/in-world
             // parameter left to fail (the old (false, 10) row is unrepresentable).
@@ -78,7 +83,7 @@ namespace Simitone.Client.Autotest
 
             // IsMutualFriend stays the compatible alias of the mutual law.
             bool alias = Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsMutualFriend(Row(50), Row(50))
-                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsMutualFriend(Row(50), Row(49));
+                && !Simitone.Client.UI.Panels.LiveSubpanels.UIRelationshipSubpanel.IsMutualFriend(Row(50), Row(24));
 
             return friend && markers && famous && family && alias;
         }

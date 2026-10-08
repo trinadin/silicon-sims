@@ -1,11 +1,16 @@
 // ORIG-01 asset audit #1: this surface IS TS1-triggered (205 person-data-1
 // 'MoneyAmmountOverHead' write instructions across 100+ shipped objects —
 // MailBox, Fridges, Easel, Global.iff and every expansion); the old header's
-// "no TS1 counterpart" was wrong about reachability. The original renderer
-// law is undecoded (UI-07 covers the port renderer only), so the chrome is
-// the port's most original composition: the game's own SpeechMedium.bmp
-// nine-slice behind original .ffn bold money glyphs — exactly the UCP plate
-// floater (R194). The TSO-era money_bg.png pill is gone.
+// "no TS1 counterpart" was wrong about reachability. ORIG-02
+// money-headline-renderer-law closed the renderer question to the floor:
+// the native has NO dedicated money renderer, window, art asset, or layout
+// table — the amount is drawn as generic float text through the Animator's
+// mode-1 text pass (the same Animator::Render family as the head arrow;
+// census: no money* member in UIGraphics.far or Sprites.iff). The chrome
+// below therefore remains the port's most original composition: the game's
+// own SpeechMedium.bmp nine-slice behind original .ffn bold money glyphs —
+// exactly the UCP plate floater (R194). The TSO-era money_bg.png pill is
+// gone.
 ﻿using FSO.SimAntics.Model;
 using System;
 using System.Collections.Generic;

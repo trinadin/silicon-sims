@@ -1584,15 +1584,24 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                         || other.PersonData.Length <= (int)VMPersonDataVariable.TS1FameStarPower
                         || other.Relationships == null) continue;
                     var otherFamily = other.PersonData[familyWord];
-                    // Neighborhood::GetFamousFriendCount rejects homeless
-                    // neighbors and members of the selected Sim's family.
+                    // Neighborhood::GetFamousFriendCount 0x100a91a0 rejects
+                    // homeless neighbors and members of the selected Sim's
+                    // family, and gates mutual DAILY (slot 0) on the SAME
+                    // shared friendship-threshold global as the family friend
+                    // count (TOC slot image 0x105ba1f4 = [TOC-0x726c] ->
+                    // data 0x48eb8, default 25; AUD-18-B xref-verified: the
+                    // five readers are GetRelation 0x10238d10,
+                    // UpdateFamilyFriendsCount 0x100a81c0,
+                    // AddFamilyHistoryStat 0x100a4640, GetFamousFriendCount
+                    // 0x100a91a0, GetFriendCount 0x100a93b0). The old 50 here
+                    // was the pre-ORIG-02 guess — corrected to 25.
                     if (otherFamily == 0 || otherFamily == selectedFamily) continue;
                     List<short> forward;
                     List<short> reverse;
                     if (!selected.Relationships.TryGetValue(other.NeighbourID, out forward)
                         || !other.Relationships.TryGetValue(selected.NeighbourID, out reverse)
                         || forward.Count == 0 || reverse.Count == 0
-                        || forward[0] < 50 || reverse[0] < 50) continue;
+                        || forward[0] < 25 || reverse[0] < 25) continue;
                     total += Math.Max(0,
                         (int)other.PersonData[(int)VMPersonDataVariable.TS1FameStarPower]);
                 }

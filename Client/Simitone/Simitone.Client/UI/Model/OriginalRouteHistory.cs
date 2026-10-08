@@ -32,16 +32,25 @@ namespace Simitone.Client.UI.Model
     ///     total channel counts sampled family-member Sims and the flagged
     ///     channel counts those holding a route; LayoutScore decays as Sims
     ///     spend more of their sampled time trekking.
-    ///   * ClearRouteHistory 0x8c430 reseeds all twelve from a global
-    ///     ([TOC-29460], BSS — the seed N0 is statically unrecoverable);
-    ///     called from the house-rebuild/stat-snapshot paths
+    ///   * ClearRouteHistory 0x8c430 (image 0x100835a0; AUD-18-F
+    ///     instruction-verified) seeds the five SNAPSHOT pairs
+    ///     (House+0x30..+0x54, ten counters) from the global [TOC-0x7314]
+    ///     (N0 = int(FCNS('fill value for layout history', 200.0f)) —
+    ///     ORIG-02 layout-seed-n0.md) and ZEROES the live accumulator pair
+    ///     +0x58/+0x5c (stw r4=0 at 0x10083620/24 — layout-seed-n0.md's
+    ///     "all twelve reseeded" detail is corrected by AUD-18-F; the
+    ///     fresh-house outcome is unchanged: SA = SB = 5*200 -> ratio -1).
+    ///     Called from the house-rebuild/stat-snapshot paths
     ///     0xb05f4/0xb1684/0xb1c20 (renovation contexts).
-    ///   * THE LAYOUT LAW (GetHouseStats tail): layoutScore =
-    ///     (int)(100.0 * clamp((den - sub)/den, 0.0, 1.0)) with den built
-    ///     through the CW int->double magic on a RAW low word — only the
-    ///     correct signed conversion with bit-31-based counters, i.e.
-    ///     den = N0 + flagged(+76); the engine's own max(sum,1) division
-    ///     guard at 0x8c338 pins the intended divisor as the TOTAL.
+    ///   * THE LAYOUT LAW (GetHouseStats tail, image 0x10083300;
+    ///     AUD-18-F decompile): layoutScore =
+    ///     (int)(100.0 * clamp((SA - 2*SB)/max(SA,1), 0.0, 1.0)) with
+    ///     SA = H48+H56+H64+H72+H80+H88 and SB = H52+...+H92, both
+    ///     int->double conversions PROPERLY XORed (r136's "RAW low word"
+    ///     detail was wrong — ORIG-02 layout-seed-n0.md correction,
+    ///     re-verified in the AUD-18-F decompile); single-precision
+    ///     ratio, double 100.0 scale, fctiwz truncation. The engine's
+    ///     max(sum,1) division guard pins the divisor as the TOTAL.
     ///
     /// PORT (disclosed where engine-internal):
     ///   * FLAG: the port's GetCurrentRoute() equivalent is a VMRoutingFrame
@@ -165,8 +174,13 @@ namespace Simitone.Client.UI.Model
             }
         }
 
-        /// <summary>ClearRouteHistory — the renovation reset; ORIG-02: the
-        /// native reseeds BOTH counters to N0 = 200, not zero.</summary>
+        /// <summary>ClearRouteHistory — the renovation reset. The native
+        /// (0x100835a0) seeds the ten SNAPSHOT counters to N0 = 200 and
+        /// zeroes the accumulator pair; the port's single accumulator pair
+        /// takes the seed 200/200 so the fresh ratio is -1 either way
+        /// (5*200 both sides natively vs 200/200 here — the disclosed
+        /// single-generation model; the post-clear recovery transient
+        /// differs, the fresh score 0 and the long-run ratio do not).</summary>
         public static void Clear()
         {
             TotalSamples = 200;

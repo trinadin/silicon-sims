@@ -170,11 +170,15 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
                 ? Math.Max(-100, Math.Min(100, (int)values[slot])) : 0;
         }
 
-        // UI-27 (r261 §1.3): GetRelation 0x241ba0 computes its FRIEND byte as
-        // forward RelMatrix slot-0 >= G AND reverse slot-0 >= G, where G is
-        // the PersonFinder friend threshold the fork pins to 50 (VMMemory
-        // mutual-friend law + r184). The test uses the raw, pre-clamp values.
-        public const int FriendThreshold = 50;
+        // UI-27 (r261 §1.3, CORRECTED by AUD-18-B): GetRelation 0x241ba0
+        // computes its FRIEND byte as forward RelMatrix slot-0 >= G AND
+        // reverse slot-0 >= G. G is the SAME global the family friend count
+        // reads — FloatConstants "friendship threshold", default 25.0f
+        // (loader 0x101098c0 stores it as int; chain TOC 0x105ba1f4 →
+        // sec1 0x48eb8 = 25). r261's "[TOC-21088] = 50" reading is
+        // disproven by the decompile of GetRelation @ image 0x10238d10.
+        // The test uses the raw, pre-clamp values.
+        public const int FriendThreshold = 25;
 
         /// <summary>
         /// Native PersonFinder::GetRelation's classification byte at +5 (the

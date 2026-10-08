@@ -82,11 +82,30 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
 
         // ORIG-01 D-2: 'Terrain Detail' was persistence-only — it now scales
         // the grass renderer (GrassEffect.DetailScale; disclosed 0.45/0.725/
-        // 1.0 ladder, native one undecoded). Also applied at boot
-        // (SimitoneGame first update).
+        // 1.0 ladder). ORIG-02 pinned the native WIRING: cOptionsMgr::
+        // SetTerrainDetail 0x10231820 TriState 0/1/2 -> cTerrain::SetLow/
+        // Medium/HighQuality 0x101eaa00/0x101ea980/0x101ea900 (vtable slot
+        // 0x34 of the cTerrainRenderer-derived cColorSwatch at cTerrain+0x18;
+        // the base cTerrainRenderer::SetQualityLevel 0x101e9f70 is an empty
+        // blr stub). AUD-18-B decoded the VALUES (cColorSwatch::
+        // SetQualityLevel @ r2 0x1a0280 + ctor stores 0x1a052c-0x1a0540):
+        // LOW = grass layer OFF (show-grass byte 0x7c=0, the same flag
+        // ToggleShowGrass 0x19c890 flips) with LOD pair (0,0); MEDIUM =
+        // pair (300,800), grass budget max(500, 800*4)=3200 entries
+        // (InitGrass 0x19c5c0); HIGH = pair (500,1200), budget 4800. The
+        // drawn count lerps param1->param2 over the fixed [-73,85] range
+        // metric (Predraw 0x19e440). Native default = HIGH (ctor self-calls
+        // SetQualityLevel(2)); the port's default 2 matches. AUD-18 applies
+        // the decoded ladder as the DetailScale scalars — LOW 0 (grass off),
+        // MED 2/3 (the 3200/4800 budget ratio), HIGH 1 — replacing the
+        // ORIG-01 port-invented 0.45/0.725/1.0 interpolation; the renderer's
+        // own per-zoom LOD curve is unchanged (disclosed). Also applied at
+        // boot (SimitoneGame first update).
         public static void ApplyTerrainDetail(int detail)
         {
-            FSO.LotView.Effects.GrassEffect.DetailScale = 0.45f + 0.275f * Math.Max(0, Math.Min(2, detail));
+            // cColorSwatch budget law: 0 -> off, 1 -> 3200/4800, 2 -> 4800/4800
+            detail = Math.Max(0, Math.Min(2, detail));
+            FSO.LotView.Effects.GrassEffect.DetailScale = detail == 0 ? 0f : (detail == 1 ? 2f / 3f : 1f);
         }
 
         // WIRE (a): 'Lighting' — AdvancedLighting is LightingMode > 0, so the
