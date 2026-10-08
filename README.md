@@ -3,7 +3,7 @@
 **The Sims™ (2000), natively on Apple Silicon Macs: a byte-faithful port of the open-source
 Simitone engine, running your legally-owned original game data.**
 
-Formerly **Simitone-macOS**. Not affiliated with EA, Maxis, or the Simitone team. This project is a
+Not affiliated with EA, Maxis, or the Simitone team. This project is a
 fork of [alexjyong/Simitone](https://github.com/alexjyong/Simitone) (itself a fork of
 [riperiperi/Simitone](https://github.com/riperiperi/Simitone)), built on the
 [FreeSO](https://freeso.org) simulation engine. "The Sims" is a trademark of EA — this is an
@@ -36,11 +36,13 @@ engine is corrected to match it — constants, thresholds, formulas and all (see
 ## Status — and how you can help
 
 **Playable:** boots to gameplay, loads and saves neighbourhoods and houses, plays the core
-single-family game — and it is continuously verified by a 144-check automated battery that runs
-the real game headlessly (build + run it yourself with `tools/run-autotest.sh`).
+single-family game — verified by a 144-check automated battery that boots the real game
+headlessly and exercises gameplay, UI, saves, sound, and the autonomy engine on every
+change (run it yourself with `tools/run-autotest.sh`; the one-page state summary is
+[HANDOFF.md](HANDOFF.md)).
 
-**Honest status:** this is an **engine parity project, not a finished 1:1 clone** — and it needs
-real-world testing on real Macs and real saves. That's where you come in:
+**Honest status:** this is an **engine parity project, not a finished 1:1 clone** — and it
+needs real-world testing on real Macs and real saves. That's where you come in:
 
 - **Play it.** Every hour of real play on hardware we don't have is a contribution.
 - **Report what breaks.** Open a [GitHub Issue](https://github.com/trinadin/silicon-sims/issues) —
@@ -48,10 +50,12 @@ real-world testing on real Macs and real saves. That's where you come in:
   below. Vague reports can't be fixed; pinned ones can.
 - **Attach the logs.** `~/Documents/Simitone/game.log` (screen/content-load tracing) and the
   crash log next to it. They're plain text — paste the tail (last ~50 lines) or the whole thing.
-- **Know the known gaps before filing.** Fame career, vacation features, pet AI, Makin' Magic
-  coverage, free-will accuracy, some neighbourhood management, and sound/UI fidelity are tracked
-  honestly in [PARITY.md](PARITY.md) — read it before filing issues; duplicate-gap reports will
-  be closed with a pointer.
+- **Know the known gaps before filing.** The current gap list lives in
+  [PARITY.md](PARITY.md) → "Where the game stands": neighbourhood management is partial,
+  the sound fidelity trace hasn't been run, several UI interactions are modeled rather than
+  decoded, the expansion packs (Hot Date, Unleashed, Vacation, Superstar, Makin' Magic) each
+  have substantial working systems with open completeness gaps — and nothing has had a human
+  acceptance pass yet. Duplicate-gap reports will be closed with a pointer.
 - **Code welcome.** MPL-2.0 — PRs are open. PARITY.md's gap table is the roadmap; small,
   well-evidenced fixes (see the PROVENANCE discipline) land fastest.
 

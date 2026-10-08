@@ -5,7 +5,7 @@ Current verified build, counts, integration decisions and remaining work are
 maintained in [HANDOFF.md](HANDOFF.md). Consult that summary before using the
 build commands below; historical round results are not current-state claims.
 
-This repository (**Silicon Sims**, branch `main`; formerly Simitone-macOS) is a native Apple
+This repository (**Silicon Sims**, branch `main`) is a native Apple
 Silicon port of **Simitone** (alexjyong fork, v0.8.20-forked), the open-source re-implementation
 of The Sims 1 (engine only; it loads the original game's data files). The `FreeSO` engine lives
 in-repo at `FreeSO/` (full history, merged as a subtree — see PROVENANCE.md). Not affiliated with

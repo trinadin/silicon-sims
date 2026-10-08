@@ -5,7 +5,7 @@ maintained alongside PARITY.md and HANDOFF.md as part of the keep-it-honest disc
 
 ## What this repository is
 
-**Silicon Sims** (formerly Simitone-macOS) is a **native macOS port and fidelity-verification project
+**Silicon Sims** is a **native macOS port and fidelity-verification project
 built on top of an MPL-2.0 engine**. It is not a clean-room rewrite and is not "ours alone" in the sense of being
 independent of FreeSO. Concretely:
 
@@ -30,7 +30,7 @@ Our original, value-adding work lives in a thin layer around the engine:
 
 - The macOS packaging/build layer (`packmac.sh`, Info.plist, icon, DMG tooling) and the
   port fixes needed to run on Apple Silicon.
-- The headless `-autotest` verification harness and its 16-check suite (AUTOTEST.md).
+- The headless `-autotest` verification harness and its 144-check suite (AUTOTEST.md).
 - The reverse-engineering toolkit under `tools/` and the staged-data evidence under
   `tools/iff-dump/` (tracked evidence).
 - Engine-side fidelity fixes, each committed with IFF-grounded evidence (e.g. UseNeighbor
