@@ -304,12 +304,14 @@ namespace FSO.SimAntics
             // Praise / Treat / toys / Play / Tricks / Train / pet show entry)
             // was unreachable — live-proven by the ulpets PIECAP trace
             // (run 2: 8200@3 f->14 on every gated row).
+            // (raw array writes: SetAvatarType runs in the ctor BEFORE WorldUI
+            // exists, so SetPersonData's WorldUI side-effect paths are unsafe here)
             if (AvatarType == VMAvatarType.Dog || AvatarType == VMAvatarType.Cat)
             {
-                var g = (ushort)GetPersonData(VMPersonDataVariable.Gender);
+                var g = (ushort)PersonData[(ushort)VMPersonDataVariable.Gender];
                 g |= (AvatarType == VMAvatarType.Dog) ? (ushort)8 : (ushort)16;
-                SetPersonData(VMPersonDataVariable.Gender, (short)g);
-                SetPersonData(VMPersonDataVariable.PersonType, 2);
+                PersonData[(ushort)VMPersonDataVariable.Gender] = (short)g;
+                PersonData[(ushort)VMPersonDataVariable.PersonType] = 2;
             }
 
             Avatar = new SimAvatar(FSO.Content.Content.Get().AvatarSkeletons.Get((data?.GetString(0)??"adult")+".skel"));
