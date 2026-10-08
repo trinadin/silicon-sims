@@ -80,7 +80,7 @@ namespace Simitone.Client
             // candidate house ids, tried in order until one loads with >=1 avatar
             public static string HouseCandidates =
                 "5,4,3,2,1,0,6,7,8,9,10,11,21,22,23,24,25,26,27,28,29,30,40,41,42,43,44,45,46,47,48";
-            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall,webexport,ui37,aud19,cc06";
+            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall,webexport,ui37,aud19,cc06,hdserve";
             public static int TimeoutMs = 300000; // hard cap (real ms)
             public static bool ExitOnDone = true;
         }
@@ -414,6 +414,7 @@ namespace Simitone.Client
                     case 17: StateExp09Route(); break;
                     case 18: StateNBR05UI(); break;
                     case 19: StateNbr06(); break;
+                    case 21: StateExp14HdServe(); break;
                 }
             }
             catch (Exception e)
@@ -523,6 +524,19 @@ namespace Simitone.Client
                 Log("AUTOTEST exp09route neighborhood-screen ready; entering routing battery");
                 _exp09route = new AutotestExp09Route(Log);
                 _state = 17;
+                return;
+            }
+            // EXP-14 'hdserve' opt-in (additive, case-21 takeover): the Hot Date
+            // serve-choreography SELF-START probe — books the production downtown
+            // trip, then observes the arrival VM hands-off (only the disclosed
+            // hunger arm; zero interaction pushes). See AutotestExp14HdServe.cs.
+            if (CheckEnabled("hdserve"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST hdserve neighborhood-screen ready; entering the serve self-start battery");
+                _e14Probe = new AutotestExp14HdServeProbe(Log, () => _vm,
+                    () => _screen != null && _screen.InLot, (short h) => _screen.PlayHouse(h, null));
+                _state = 21;
                 return;
             }
             // SAV-07 'sav07live'/'sav07live2' opt-in (additive): the live
