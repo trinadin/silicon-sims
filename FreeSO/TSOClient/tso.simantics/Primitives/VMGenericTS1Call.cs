@@ -256,6 +256,14 @@ namespace FSO.SimAntics.Primitives
                     crossData.ActiveFamily = context.VM.TS1State.CurrentFamily;
                     crossData.DowntownSimGUID = context.Caller.Object.OBJ.GUID;
                     crossData.LotTransitInfo = (vacation) ? (short)1 : context.VM.GetGlobalValue(34);
+                    // EXP-14 hdserve follow-up (bounded transit diagnostic): one line
+                    // per travel, naming the exact pre-switch transit state the
+                    // arrival-side build (mode 18) will consume.
+                        + " vacation=" + vacation
+                        + " g34=" + context.VM.GetGlobalValue(34)
+                        + " LotTransitInfo=" + crossData.LotTransitInfo
+                        + " ActiveFamily=" + (crossData.ActiveFamily?.ChunkID.ToString() ?? "NULL")
+                        + " DowntownSimGUID=0x" + crossData.DowntownSimGUID.ToString("x8"));
                     // TRV-02: mirror the transit state so a save taken on the
                     // destination lot reloads with the return path intact.
                     context.VM.TS1State.LotTransitInfo = crossData.LotTransitInfo;
@@ -309,6 +317,13 @@ namespace FSO.SimAntics.Primitives
                     // ActiveFamily or a failed create (unresolvable
                     // DowntownSimGUID) NREs below with the same
                     // entity-deletion consequence; soft-fail like mode 26
+                    // EXP-14 hdserve follow-up (bounded transit diagnostic): the
+                    // middle ped marker calls this on attr3; name the exact leg
+                    // taken (one line per ATTEMPT, capped by the marker loop).
+                        + "/" + (context.Caller.Object?.Resource?.MainIff?.Filename ?? "?")
+                        + " ActiveFamily=" + (crossDataDT.ActiveFamily?.ChunkID.ToString() ?? "NULL")
+                        + " LotTransitInfo=" + crossDataDT.LotTransitInfo
+                        + " DowntownSimGUID=0x" + crossDataDT.DowntownSimGUID.ToString("x8"));
                     if (crossDataDT.ActiveFamily == null) return VMPrimitiveExitCode.GOTO_FALSE;
 
                     var control = context.VM.Context.CreateObjectInstance(crossDataDT.DowntownSimGUID, LotTilePos.OUT_OF_WORLD, Direction.NORTH)?.BaseObject;
@@ -318,6 +333,23 @@ namespace FSO.SimAntics.Primitives
                     context.VM.SendCommand(new VMNetChangeControlCmd() { TargetID = control.ObjectID });
                     crossDataDT.ActiveFamily.SelectOneMember(crossDataDT.DowntownSimGUID);
                     context.VM.TS1State.ActivateFamily(context.VM, crossDataDT.ActiveFamily);
+
+                    // EXP-14 follow-up (the mode-18 single-traveler grant; the
+                    // same law the VerifyFamily membership grant applies — EXP-15
+                    // ulpets receipt + EXP-14's PersonGlobals 8192 ins7 decode):
+                    // the record restore computes PersonType against the RECORD's
+                    // stale family word (→ NPC class 2) and pd36 autonomy stays 0
+                    // because 8192 ins7 (pd36=50) only runs on home lots. A family
+                    // traveler keeps the resident class, the live family word, and
+                    // the person-init autonomy — without this the downtown sim
+                    // builds (mode 18 create succeeds) but never self-starts.
+                    var trav18 = control as VMAvatar;
+                    if (trav18 != null)
+                    {
+                        trav18.SetPersonData(VMPersonDataVariable.TS1FamilyNumber, (short)crossDataDT.ActiveFamily.ChunkID);
+                        trav18.SetPersonData(VMPersonDataVariable.PersonType, 0);
+                        trav18.SetPersonData(VMPersonDataVariable.AutonomyLevel, 50);
+                    }
 
                     context.Thread.TempRegisters[0] = context.VM.GetGlobalValue(3);
                     if (VM.UseWorld) context.VM.Context.World.CenterTo((AvatarComponent)(context.VM.GetObjectById(context.VM.GetGlobalValue(3))?.WorldUI));
@@ -416,7 +448,18 @@ namespace FSO.SimAntics.Primitives
                     // any content could scan for them. Natively unreachable
                     // (arrivals always carry a family); fail soft like the
                     // other unavailable-state modes.
-                    if (crossData2.ActiveFamily == null) return VMPrimitiveExitCode.GOTO_FALSE;
+                    if (crossData2.ActiveFamily == null)
+                    {
+                        // EXP-14 hdserve follow-up (bounded transit diagnostic)
+                            + "/" + (context.Caller.Object?.Resource?.MainIff?.Filename ?? "?")
+                            + " ActiveFamily=NULL LotTransitInfo=" + crossData2.LotTransitInfo
+                            + " (the arrival build declines — no traveler materializes)");
+                        return VMPrimitiveExitCode.GOTO_FALSE;
+                    }
+                        + "/" + (context.Caller.Object?.Resource?.MainIff?.Filename ?? "?")
+                        + " ActiveFamily=" + crossData2.ActiveFamily.ChunkID
+                        + " LotTransitInfo=" + crossData2.LotTransitInfo
+                        + " DowntownSimGUID=0x" + crossData2.DowntownSimGUID.ToString("x8"));
                     if (crossData2.LotTransitInfo >= 1)
                     {
                         crossData2.ActiveFamily.SelectWholeFamily();
@@ -442,6 +485,18 @@ namespace FSO.SimAntics.Primitives
                         context.VM.SendCommand(new VMNetChangeControlCmd() { TargetID = control2.ObjectID });
                         crossData2.ActiveFamily.SelectOneMember(crossData2.DowntownSimGUID);
                         context.VM.TS1State.ActivateFamily(context.VM, crossData2.ActiveFamily);
+
+                        // EXP-14 follow-up: the mode-26 single-traveler twin of
+                        // the mode-18 grant — same law, same reasons (record
+                        // restore computes PersonType from the stale family
+                        // word; pd36 never initialized off-home).
+                        var trav26 = control2 as VMAvatar;
+                        if (trav26 != null)
+                        {
+                            trav26.SetPersonData(VMPersonDataVariable.TS1FamilyNumber, (short)crossData2.ActiveFamily.ChunkID);
+                            trav26.SetPersonData(VMPersonDataVariable.PersonType, 0);
+                            trav26.SetPersonData(VMPersonDataVariable.AutonomyLevel, 50);
+                        }
 
                         context.Thread.TempRegisters[0] = context.VM.GetGlobalValue(3);
                     }

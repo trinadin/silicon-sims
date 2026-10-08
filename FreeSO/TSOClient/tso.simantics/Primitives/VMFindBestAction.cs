@@ -583,9 +583,14 @@ namespace FSO.SimAntics.Primitives
             // natively and stay separate here (the port's interaction-group-leader
             // dedupe is NOT applied).
             var ents = vm.Context.ObjectQueries.WithAutonomy;
+            // EXP-14 follow-up diagnostics (probe-gated): coarse skip counters
+            // discriminating entry-gate rejection from TestInteraction failure.
+            var diag = TS1GatherDiag;
+            int dObjSeen = 0, dGatePassed = 0, dTestFail = 0, dPool = 0;
             var candidates = new List<ScoredCandidate>();
             foreach (var obj in ents)
             {
+                if (diag) dObjSeen++;
                 if (obj.Position == LotTilePos.OUT_OF_WORLD) continue;
                 // 0x109ae8-0x109afc: module parallel-flags word bit PPC 12 (0x80000) must be
                 // set. Port mapping: the VMGameObject.Disabled counter (OBJD Disabled /
@@ -703,6 +708,7 @@ namespace FSO.SimAntics.Primitives
                     // Simitone mount; the residential branch is the live one. DISCLOSED
                     // downtown reduction. (The previous landing admitted only mask 0x1.)
                     if (isVisitor && (entry.Flags & (TTABFlags)0x21) == 0) continue;
+                    if (diag) dGatePassed++;
                     // 0x105bc4-0x105c18: downtown-visitor outdoor restriction (room == 0);
                     // dead without downtown lots. DISCLOSED.
                     // 0x105a04-0x105a8c: the vehicle-class {4,7} family-token override
@@ -764,7 +770,7 @@ namespace FSO.SimAntics.Primitives
                         }
                     }
                     catch { candStrings = null; } // a test that dies fails the candidate (the hand-off's own convention)
-                    if (candStrings == null) continue; // TestInteraction failed: the candidate never reaches the pool (native passed-flag law)
+                    if (candStrings == null) { if (diag) dTestFail++; continue; } // TestInteraction failed: the candidate never reaches the pool (native passed-flag law)
                     // 0x109cfc-0x109d08: interaction flags bit0 -> ScoredInteraction+0xc
                     // byte. The ctor tail (0x9cbb4-0x9cbcc) copies TTAB entry flags mask
                     // 0x01000000 (decoded this round from the binary; the person-person
@@ -811,6 +817,7 @@ namespace FSO.SimAntics.Primitives
                     // 0x109d64-0x109d74: the push gate — score >= the FCNS min autonomy
                     // score for the actor's class (family/visitor; live 1e-7).
                     if (score < minScore) continue;
+                    if (diag) dPool++;
                     candidates.Add(new ScoredCandidate
                     {
                         Callee = obj,
@@ -845,12 +852,21 @@ namespace FSO.SimAntics.Primitives
 
             // ---- LAW STEP 5: the sort (0x109df8 -> qsort wrapper 0x5914e0 -> 0x59a370) -
             // CW heapsort with the game comparator CompareScoredInteractions
-            // (0x1011b0, eps +1e-7 / -1e-7, AUD-18-A corrected polarity). With the
-            // restored REAL gather scores this genuinely sorts the pool DESCENDING
+            // (0x1011b0, eps +1e-7 / -1e-7, AUD-18-A corrected polarity). With
+            // the restored REAL gather scores this genuinely sorts the pool DESCENDING
             // (best first) — the old "net rotate-left-by-one" claim was an artifact of
             // the R250 lazy-zero scores and is retired. The routine is ported
             // LITERALLY (element granularity) so permutations match the CFG agent's
             // transpile (tools/iff-dump/r249-freewill-cfg/verify.py, group H).
+            if (diag)
+            {
+                _diagObjSeen = dObjSeen; _diagGatePassed = dGatePassed;
+                _diagTestFail = dTestFail; _diagPool = dPool;
+                _diagCaller = context.Caller != null ? context.Caller.ObjectID : 0;
+                if (_diagCaller == _diagTargetOid)
+                    TS1GatherDiagTargetLast = "objSeen=" + dObjSeen + " gatePassed=" + dGatePassed
+                        + " testFail=" + dTestFail + " pool=" + dPool + " caller=obj" + _diagCaller;
+            }
             GameHeapsort(candidates);
 
             // ---- LAW STEP 6: the winner draw (0x109dd8-0x109ea8) -----------------------
@@ -1236,6 +1252,13 @@ namespace FSO.SimAntics.Primitives
         /// </summary>
         public static event Action<VMTS1Decision> TS1DecisionObserved;
 
+        // EXP-14 follow-up diagnostics (probe-gated, inert unless set).
+        public static bool TS1GatherDiag;
+        public static string TS1GatherDiagLast = "";
+        public static string TS1GatherDiagTargetLast = "(no target gather yet)";
+        internal static int _diagObjSeen, _diagGatePassed, _diagTestFail, _diagPool, _diagCaller;
+        public static int _diagTargetOid;
+
         /// <summary>Frozen battery contract: the most recent decision snapshot (pollable).</summary>
         public static VMTS1Decision LastDecision { get; private set; }
 
@@ -1272,6 +1295,9 @@ namespace FSO.SimAntics.Primitives
                     }
                 };
                 LastDecision = decision;
+                TS1GatherDiagLast = "objSeen=" + _diagObjSeen + " gatePassed=" + _diagGatePassed
+                    + " testFail=" + _diagTestFail + " pool=" + _diagPool
+                    + " caller=obj" + _diagCaller;
                 var evt = TS1DecisionObserved;
                 if (evt == null) return;
                 foreach (Action<VMTS1Decision> handler in evt.GetInvocationList())
