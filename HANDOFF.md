@@ -30,8 +30,9 @@ to the recovered law (constants, thresholds, formulas, UI geometry, art).
 
 See PARITY.md → "Where the game stands" for the full list. Headlines:
 
-- **No human acceptance pass yet** — everything above is machine-verified;
-  real-keyboard/trackpad feel is untested by a human.
+- **Human verification is partial** — every system above is machine-verified, and
+  portions have been played and accepted hands-on (e.g. the plumbob render scenarios);
+  a systematic end-to-end human acceptance pass is still pending.
 - Base game: neighbourhood management (bulldoze/rezone/evict) partial;
   sound audible-fidelity trace not run; custom-animated objects partial;
   assorted modeled UI interactions (disclosed in PARITY).

@@ -42,9 +42,9 @@ exercises all of this on every change; `tools/run-autotest.sh`):
   columns, view-pie gesture arithmetic); a small set of constants carries explicit
   DISCLOSED markers (see the UI-33 remediation note below).
 - Platform: `-3d` is experimental; `-jit`/`-dx` are inherited and unverified; trackpad
-  natural-scroll and other hardware feel items have had no human acceptance pass —
-  **the entire game has had no human acceptance pass** (automation only). Apple Silicon
-  only; no Intel build.
+  natural-scroll and other hardware feel items lack systematic human verification —
+  **human verification is partial** (portions played and accepted hands-on; no
+  systematic end-to-end pass yet). Apple Silicon only; no Intel build.
 
 **Open — expansions (substantial parts landed; completeness is the gap, not presence):**
 
