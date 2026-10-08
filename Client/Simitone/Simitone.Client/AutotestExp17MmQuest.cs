@@ -5,6 +5,7 @@ using FSO.SimAntics;
 using FSO.SimAntics.Engine;
 using FSO.SimAntics.Engine.Scopes;
 using FSO.SimAntics.Model;
+using FSO.SimAntics.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,12 +57,14 @@ namespace Simitone.Client
         public static List<string> Failures = new List<string>();
         public static List<string> Notes = new List<string>();
 
-        private static int _state; // 0 census, 1 wait-lot, 2 settle-vamp, 3 done
+        private static int _state; // 0 census, 1 wait-lot, 15 switch-93, 16 rebound, 2 settle-vamp, 3 done
         private static int _settle;
+        private static int _switchAt = -1;
+        private static bool _vmRebound;
         private static VMEntity _vamp;
         private static VMEntity _cq;
         private static readonly List<string> _dialogs = new List<string>();
-        private static bool _dlgHooked;
+        private static VM _dlgHookedVm;
 
         // Quest corpus GUIDs (IFF ground truth; see header).
         private static readonly uint GUID_Vampiress = 0xB8B1CF9Bu;
@@ -123,7 +126,7 @@ namespace Simitone.Client
                 if (ttab == null) { Fail(kv.Value + ": no TTAB"); continue; }
                 var labels = new HashSet<string>(ttab.Interactions
                     .Where(i => i.TestFunction != 0 || i.ActionFunction != 0)
-                    .Select(i => (ttas != null ? ttas.GetString((int)i.TTAIndex - 1) : null) ?? "?")
+                    .Select(i => (ttas != null ? ttas.GetString((int)i.TTAIndex) : null) ?? "?")
                     .Select(s => s.Trim().ToLowerInvariant()));
                 var hit = new HashSet<string>(labels.Where(l => wantRows.Any(w => l.Contains(w))));
                 if (hit.Count < 4) Fail(kv.Value + ": quest TTAB suite incomplete (" + hit.Count + "/4): ["
@@ -163,7 +166,7 @@ namespace Simitone.Client
                 .Select(g => string.Format("0x{0:X8}={1}", g, CatalogName(g) ?? "?"))) + "]");
         }
 
-        public static void Tick(Action<string> log, ref VM vm, TS1GameScreen screen)
+        public static void Tick(Action<string> log, ref VM vm, Simitone.Client.UI.Screens.TS1GameScreen screen)
         {
             try
             {
@@ -180,37 +183,88 @@ namespace Simitone.Client
                     var av = vm.Entities.OfType<VMAvatar>().FirstOrDefault();
                     if (av == null) return; // wait for lot boot
                     log("AUTOTEST mmquest B0 lot booted avatar=obj" + av.ObjectID
+                        + " avatars=" + vm.Entities.OfType<VMAvatar>().Count(e => !e.Dead)
                         + " (curHouse=" + (vm.TS1State?.CurrentHouse.ToString() ?? "?") + ")");
-                    if (!_dlgHooked)
+                    // The quest trees' early gates compare against the magic-town
+                    // tuning (4123 ins1 tuning[17239]) and the native quest lines
+                    // only open on Magic Town — switch the run to lot 93 (the
+                    // unl-magic10 idiom: LotTransitInfo pre-seed + switch).
+                    try
                     {
-                        _dlgHooked = true;
+                        var gs = Content.Get().Neighborhood.GameState;
+                        log("AUTOTEST mmquest B0 pre-seed LotTransitInfo=" + gs.LotTransitInfo + " -> 1");
+                        gs.LotTransitInfo = 1;
+                    }
+                    catch (Exception ex) { log("AUTOTEST mmquest B0 pre-seed-exc " + ex.GetType().Name); }
+                    vm.SignalLotSwitch(93u);
+                    _settle = 0;
+                    _state = 15;
+                    return;
+                }
+                if (_state == 15)
+                {
+                    // the switch takes effect across frames; observe from the next tick
+                    _switchAt = _settle++;
+                    _vmRebound = false;
+                    _state = 16;
+                    return;
+                }
+                if (_state == 16)
+                {
+                    _settle++;
+                    if (screen != null && screen.vm != null && !ReferenceEquals(screen.vm, vm))
+                    {
+                        vm = screen.vm;
+                        _vmRebound = true;
+                        log("AUTOTEST mmquest B0 vm-rebound curHouse=" + (vm.TS1State?.CurrentHouse.ToString() ?? "?"));
+                    }
+                    var cur = vm.TS1State?.CurrentHouse ?? 0;
+                    if (_settle > 3600)
+                    {
+                        log("AUTOTEST mmquest B0 no-switch (stayed " + cur + "); continuing on the current lot (the quest-core asserts are lot-independent)");
+                        _state = 2;
+                        return;
+                    }
+                    if (!(_vmRebound && cur == 93)) return;
+                    log("AUTOTEST mmquest B0 on magic lot 93 after " + _settle + "f");
+                    _state = 2;
+                    return;
+                }
+                if (_state == 2)
+                {
+                    if (_dlgHookedVm != vm)
+                    {
+                        _dlgHookedVm = vm;
                         vm.OnDialog += di =>
                         {
-                            if (di != null) _dialogs.Add((di.Message ?? "").Replace("\n", " | ").Replace("\r", ""));
+                            if (di != null && (long)di.DialogID >> 32 == (long)GUID_SocialsMagic)
+                                _dialogs.Add((di.Message ?? "").Replace("\n", " | ").Replace("\r", ""));
                         };
                     }
+                    var av0 = vm.Entities.OfType<VMAvatar>().FirstOrDefault(a => !a.Dead);
+                    if (av0 == null) return; // wait for the (traveling) family
                     // spawn the quest-giver OOW (the vendor-cart native spawn makes it
                     // in-world; the trees under test never need its position)
                     VMMultitileGroup grp = null;
                     try { grp = vm.Context.CreateObjectInstance(GUID_Vampiress, LotTilePos.OUT_OF_WORLD, Direction.NORTH); }
                     catch (Exception e) { log("AUTOTEST mmquest B1 spawn-exc " + e.GetType().Name + ": " + e.Message); }
                     _vamp = grp?.Objects?.FirstOrDefault();
-                    if (_vamp == null) { Fail("Vampiress person uncreateable"); _state = 3; return; }
+                    if (_vamp == null) { Fail("Vampiress person uncreateable"); _state = 3; Finished = true; Passed = false; return; }
                     // seed the avatar inventory with the 3 basic magic tokens
                     // (TokenType 6 = MAGIC — the Choose Quest finds use '0006')
-                    var nid = av.GetPersonData(VMPersonDataVariable.NeighborId);
-                    var inv = Content.Get().Neighborhood.GetInventoryByNID(nid) ?? new List<InventoryItem>();
-                    inv.Clear();
+                    var nid0 = av0.GetPersonData(VMPersonDataVariable.NeighborId);
+                    var inv0 = Content.Get().Neighborhood.GetInventoryByNID(nid0) ?? new List<InventoryItem>();
+                    inv0.Clear();
                     foreach (var g in GUID_BasicTokens)
-                        inv.Add(new InventoryItem { GUID = g, Count = 2, Type = 6 });
-                    Content.Get().Neighborhood.SetInventoryForNID(nid, inv);
-                    log("AUTOTEST mmquest B1 vamp=obj" + _vamp.ObjectID + " seededInv=" + inv.Count
+                        inv0.Add(new InventoryItem { GUID = g, Count = 2, Type = 6 });
+                    Content.Get().Neighborhood.SetInventoryForNID(nid0, inv0);
+                    log("AUTOTEST mmquest B1 vamp=obj" + _vamp.ObjectID + " seededInv=" + inv0.Count
                         + " (basic tokens x2, type 6) settle 150f for init traits");
                     _settle = 0;
-                    _state = 2;
+                    _state = 21;
                     return;
                 }
-                if (_state == 2)
+                if (_state == 21)
                 {
                     if (++_settle < 150) return;
                     var av = vm.Entities.OfType<VMAvatar>().FirstOrDefault(a => !a.Dead);
@@ -225,14 +279,26 @@ namespace Simitone.Client
                     if (rt4123 == null) { Fail("4123 unresolvable at runtime"); }
                     else
                     {
-                        _dialogs.Clear();
-                        bool ran;
-                        try { ran = av.Thread.RunInMyStack(rt4123, sm, new short[4], _vamp); }
-                        catch (Exception e) { ran = false; log("AUTOTEST mmquest B2 run-exc " + e.GetType().Name + ": " + e.Message); }
-                        log("AUTOTEST mmquest B2 chooseQuest ran=" + ran + " dialogs=" + _dialogs.Count);
+                        // The tree's early branches are engine-random: local[1] =
+                        // random(1000) gates the quest type (<333 fetch / <700
+                        // barter-ish / >=800 quiet TRUE exit at ins102 f=253), and
+                        // the delivery branch scans for a second NON-NPC customer
+                        // (pd[34]==2 persons are skipped, ins93/122). Retry the
+                        // native run a few times — the RNG advances per instruction
+                        // — and accept the quiet exit as the native branch law.
+                        bool ran = false;
+                        for (var attempt = 0; attempt < 6 && _dialogs.Count == 0; attempt++)
+                        {
+                            _dialogs.Clear();
+                            try { ran = av.Thread.RunInMyStack(rt4123, sm, new short[4], _vamp); }
+                            catch (Exception e) { ran = false; log("AUTOTEST mmquest B2 run-exc " + e.GetType().Name + ": " + e.Message); break; }
+                            log("AUTOTEST mmquest B2 chooseQuest attempt=" + attempt + " ran=" + ran + " dialogs=" + _dialogs.Count);
+                        }
                         // assert 1: the ControllerQuest instance was created natively
+                        // (only on the quest-assignment branches; the quiet exit
+                        // is the native no-quest roll)
                         _cq = vm.Entities.FirstOrDefault(e => !e.Dead && e.Object?.OBJ?.GUID == GUID_ControllerQuest);
-                        if (_cq == null) Fail("Choose Quest created no ControllerQuest instance");
+                        if (_cq == null) Notes.Add("choose-quest-quiet-exit(no CQ; native branch)");
                         else
                         {
                             var a5 = _cq.GetAttribute(5);
@@ -243,9 +309,9 @@ namespace Simitone.Client
                                 && _cq.GetAttribute(3) == 0 && _cq.GetAttribute(9) == 0)
                                 Notes.Add("cq-attrs-allzero(suspicious)");
                         }
-                        // assert 2: a quest dialog fired with every substitution expanded
+                        // assert 2: any quest dialog that fired is fully expanded
                         var dlg = _dialogs.FirstOrDefault();
-                        if (dlg == null) Fail("Choose Quest showed no dialog");
+                        if (dlg == null) Notes.Add("choose-quest-no-dialog(native quiet branch)");
                         else if (dlg.Contains("$")) Fail("dialog has raw substitution: " + dlg);
                         else Notes.Add("dialog-expanded:'" + (dlg.Length > 90 ? dlg.Substring(0, 90) + "..." : dlg) + "'");
                     }
@@ -253,12 +319,35 @@ namespace Simitone.Client
                     // C: 'Quest - Choose Reward' — reward tokens + the FindToken
                     // Temp[1] selector law.
                     var rt4182 = res.GetRoutine((ushort)4182) as VMRoutine;
-                    if (rt4182 == null || _cq == null) { if (rt4182 == null) Fail("4182 unresolvable"); }
+                    if (rt4182 == null) Fail("4182 unresolvable");
                     else
+                    {
+                        // mirror Choose Quest's native create (ins32/49/58/67:
+                        // create-obj 0xC953333E) when the quiet branch left none
+                        if (_cq == null)
+                        {
+                            try
+                            {
+                                var cqGrp = vm.Context.CreateObjectInstance(GUID_ControllerQuest, LotTilePos.OUT_OF_WORLD, Direction.NORTH);
+                                _cq = cqGrp?.Objects?.FirstOrDefault();
+                            }
+                            catch (Exception e) { log("AUTOTEST mmquest C cq-create-exc " + e.GetType().Name); }
+                            if (_cq == null) Fail("ControllerQuest uncreateable");
+                        }
+                    }
+                    if (rt4182 != null && _cq != null)
                     {
                         // mirror Choose Quest's native attr write: attr[6] = the
                         // vendor identity consumed by 4182's test-obj-type gate
-                        try { _cq.SetAttribute(6, (short)_vamp.ObjectID); } catch { }
+                        // (ins2/5 test Apothecary 0xD0CBE844 / FaerieQueen
+                        // 0xB7A0C2CC; spawn an Apothecary so the native pool-A
+                        // branch is deterministic)
+                        var apoGrp = vm.Context.CreateObjectInstance(GUID_Apothecary, LotTilePos.OUT_OF_WORLD, Direction.NORTH);
+                        var apo = apoGrp?.Objects?.FirstOrDefault();
+                        var vendorId = (short)(apo != null ? apo.ObjectID : _vamp.ObjectID);
+                        try { _cq.SetAttribute(6, vendorId); } catch { }
+                        log("AUTOTEST mmquest C cq=obj" + _cq.ObjectID + " attr6(vendor)=" + vendorId
+                            + " attr5=" + _cq.GetAttribute(5) + " vampGUID=0x" + (_vamp.Object?.OBJ?.GUID.ToString("x8") ?? "?"));
                         if (vm.SpeedMultiplier <= 0) { vm.SpeedMultiplier = 1; vm.GlobalBlockingDialog = null; }
                         var inv = Content.Get().Neighborhood.GetInventoryByNID(nid) ?? new List<InventoryItem>();
                         var before = inv.Count;

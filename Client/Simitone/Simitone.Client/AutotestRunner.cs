@@ -10794,6 +10794,10 @@ namespace Simitone.Client
                 AutotestExp17MmQuest.Tick(Log, ref _vm, _screen);
                 if (AutotestExp17MmQuest.Finished)
                 {
+                    // the probe may have switched lots (magic lot 93); re-baseline
+                    // the soak clock so the 10-sim-min window ends on the NEW lot's
+                    // clock instead of hanging on the old baseline.
+                    _motiveStartMinute = -1;
                     if (AutotestExp17MmQuest.Passed)
                     {
                         Log("AUTOTEST mmquest notes: " + string.Join(" | ", AutotestExp17MmQuest.Notes));
