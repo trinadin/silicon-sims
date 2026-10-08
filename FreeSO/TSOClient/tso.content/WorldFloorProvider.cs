@@ -38,7 +38,77 @@ namespace FSO.Content
             this.Entries = new Dictionary<ushort, FloorReference>();
             this.ById = new Dictionary<ushort, Floor>();
             DynamicFloorFromID = new Dictionary<string, ushort>();
+            SoundClassById = new Dictionary<ushort, int>();
 
+        }
+
+        /// <summary>
+        /// AUD-20: per-pattern footstep sound class, decoded from the original
+        /// PPC engine. FloorGraphicsMgr::GetFloorSound (image 0x101a4060)
+        /// looks the pattern up in a std::map and returns the byte at
+        /// FloorData+0; that byte is set by FloorData::FromResName
+        /// (0x101a6d60) from the FIRST LETTER of the floor's SPR2 resource
+        /// label (e.g. "SRC6GADB84" = Berber Carpet). The four letters that
+        /// occur in the shipped catalogs, pinned by cross-referencing the
+        /// floors.iff SPR2 labels with the Build.iff STR#0x82 floor names:
+        ///   M (tile/granite/linoleum) -> 0 (medium)
+        ///   H (hardwood/parquet)      -> 1 (hard)
+        ///   S (carpet/tatami)         -> 2 (soft)
+        ///   C (macadam/cement/gravel) -> 3 (hard family)
+        /// Any other label -> 0; a pattern missing from the catalog -> 2
+        /// (native miss default). The letter jumptable itself lives in BSS
+        /// (0x1064ef14, runtime-filled) — see
+        /// coordination/evidence/AUD-20/footstep-law.md.
+        /// </summary>
+        private Dictionary<ushort, int> SoundClassById;
+
+        public static int FloorSoundClassFromLabel(string label)
+        {
+            if (string.IsNullOrEmpty(label)) return 0;
+            switch (label[0])
+            {
+                case 'M': return 0;
+                case 'H': return 1;
+                case 'S': return 2;
+                case 'C': return 3;
+                default: return 0;
+            }
+        }
+
+        /// <summary>
+        /// AUD-20: native floor-sound byte for a pattern id. Returns the
+        /// catalog byte (0..3) or 2 when the pattern is unknown (native
+        /// map-miss default).
+        /// </summary>
+        public int GetFloorSound(ushort pattern)
+        {
+            int sc;
+            if (SoundClassById.TryGetValue(pattern, out sc)) return sc;
+            return 2;
+        }
+
+        private void NoteFloorSoundClass(ushort floorID, SPR2 far)
+        {
+            if (far == null) return;
+            SoundClassById[floorID] = FloorSoundClassFromLabel(far.ChunkLabel);
+        }
+
+        /// <summary>
+        /// AUD-20: capture the footstep sound class for a floor shipped as a
+        /// standalone .flr IFF — take the first SPR2 that carries a label.
+        /// </summary>
+        private void NoteFloorSoundClassFromIff(ushort floorID, IffFile iff)
+        {
+            if (iff == null) return;
+            foreach (var chunk in iff.SilentListAll())
+            {
+                var spr = chunk as SPR2;
+                if (spr != null && !string.IsNullOrEmpty(spr.ChunkLabel))
+                {
+                    SoundClassById[floorID] = FloorSoundClassFromLabel(spr.ChunkLabel);
+                    return;
+                }
+            }
         }
 
         private void InitGlobals ()
@@ -73,6 +143,10 @@ namespace FSO.Content
                     Price = int.Parse(floorStrs.GetString((i - 1) * 3 + 0)),
                     Description = floorStrs.GetString((i - 1) * 3 + 2)
                 });
+
+                // AUD-20: footstep sound class from the SPR2 resource label
+                // (native FloorData::FromResName 0x101a6d60).
+                NoteFloorSoundClass(floorID, far);
 
                 floorID++;
             }
@@ -144,6 +218,7 @@ namespace FSO.Content
                     Price = int.Parse(catStrings.GetString(1)),
                     Description = catStrings.GetString(2)
                 });
+                NoteFloorSoundClassFromIff(floorID, iff); // AUD-20
 
                 floorID++;
             }
@@ -203,6 +278,7 @@ namespace FSO.Content
                         Price = int.Parse(catStrings.GetString(1)),
                         Description = catStrings.GetString(2)
                     });
+                    NoteFloorSoundClassFromIff(floorID, iff); // AUD-20
 
                     floorID++;
                 }

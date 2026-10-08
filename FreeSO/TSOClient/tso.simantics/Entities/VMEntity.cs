@@ -420,7 +420,26 @@ namespace FSO.SimAntics
                         volume = (SoundThreads[i].Pan) ? 1 - (float)Math.Max(0, Math.Min(1, Math.Sqrt(scrPos.X * scrPos.X + scrPos.Y * scrPos.Y) / worldSpace.WorldPxWidth)) : 1;
                         volume *= worldState.PreciseZoom;
 
-                        if (SoundThreads[i].Zoom) volume /= 4 - (int)worldState.Zoom;
+                        if (SoundThreads[i].Zoom)
+                        {
+                            if (FSO.Content.Content.Get().TS1)
+                            {
+                                // AUD-20: native zoom-volume byte-law (cBoxX::
+                                // GetInstanceVolPan 0x102e1e80, decoded in
+                                // AUD-19 L4): vol = 0x400 - (3-zoom)*att*14 with
+                                // default attenuation att=0x14 (20) ->
+                                // (1024 - (3-zoom)*280)/1024. The port enum
+                                // WorldZoom (Far=1, Medium=2, Near=3) IS the
+                                // native zoom integer. PreciseZoom (==1 at rest)
+                                // stays as the port's transition smoothing.
+                                // DISCLOSED residual: the native near-screen-edge
+                                // floor of 800/1024 and the per-sound att=0x2711
+                                // flags-floor variant are not implemented (edge
+                                // predicate not re-decoded this round).
+                                volume *= (1024 - (3 - (int)worldState.Zoom) * 280) / 1024f;
+                            }
+                            else volume /= 4 - (int)worldState.Zoom;
+                        }
                     }
                     if (FSO.Content.Content.Get().TS1)
                     {

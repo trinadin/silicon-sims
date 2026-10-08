@@ -487,6 +487,16 @@ namespace FSO.SimAntics
 
         private void HandleTimePropsEvent(TimePropertyListItem tp)
         {
+            HandleTimePropsEvent(tp, null);
+        }
+
+        /// <summary>
+        /// animState carries the firing animation's playback direction for
+        /// the AUD-20 footstep law (native gate: playback-rate sign must
+        /// match the event value's sign — Practice+0x24 float, 0x1034cfcc).
+        /// </summary>
+        private void HandleTimePropsEvent(TimePropertyListItem tp, VMAnimationState animState)
+        {
             VMAvatar avatar = this;
             var evt = tp.Properties["xevt"];
             if (evt != null)
@@ -547,6 +557,72 @@ namespace FSO.SimAntics
                 var apr = (VM.UseWorld) ? FSO.Content.Content.Get().AvatarAppearances.Get(undress + ".apr") : null;
                 avatar.BoundAppearances.Remove(undress);
                 if (VM.UseWorld && apr != null) avatar.Avatar.RemoveAccessory(apr);
+            }
+
+            // AUD-20 — footstep events (native SAnimator::HandleVitaBoyAnimEvent
+            // 0x1034ca10, footstep branch 0x1034cd70..0x1034d094). The event
+            // value is authored per footfall in the walk anims (1/2 forward,
+            // -1/-2 backward); decode receipt: evidence/AUD-20/footstep-law.md.
+            var footstep = tp.Properties["footstep"];
+            if (footstep != null)
+            {
+                HandleFootstepEvent(footstep, animState);
+            }
+        }
+
+        /// <summary>
+        /// AUD-20: the native footstep firing law, in native gate order.
+        /// Every constant cites the decode receipt (evidence/AUD-20/footstep-law.md).
+        /// </summary>
+        private void HandleFootstepEvent(string valueStr, VMAnimationState animState)
+        {
+            // trigger value: 1/2 when the anim plays forward, -1/-2 backward
+            // (native G5 @0x1034cfcc: rate sign vs value sign).
+            int value;
+            if (!int.TryParse(valueStr, out value)) return;
+            bool backward = animState != null && animState.PlayingBackwards;
+            if (backward ? (value != -1 && value != -2) : (value != 1 && value != 2)) return;
+
+            // native G1: unplaced (-999) / G2: off-lot tile — port: no world pos.
+            if (!UseWorld || Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD) return;
+
+            // native G3: person contained/hidden in an object (GObject
+            // 0x614/0x634 bit0 pair — the Room::GetPeopleCount exclusion test).
+            if (Container != null) return;
+
+            // native G4 (GObject 0x620&8): exact bit writer undecoded; the
+            // practical suppressors are covered by the unplaced/contained
+            // gates above. DISCLOSED residual — see the receipt.
+
+            var surfaceClass = FSO.SimAntics.Model.VMFootstepLaw.GetSurfaceClass(this);
+            if (surfaceClass < 0) return; // unplaced per the classifier
+
+            // native noshoe flag: current outfit in {Naked, Sleepwear, Luau,
+            // ExpandedSwimsuit} (1<<(outfit-1) & 0x2013 @0x1034ce38).
+            bool noShoe = FSO.SimAntics.Model.VMFootstepLaw.IsNoShoeOutfit(
+                GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.CurrentOutfit));
+
+            var name = FSO.SimAntics.Model.VMFootstepLaw.SoundNameForClass(surfaceClass, noShoe);
+            if (name == null) return;
+
+            // native play: cSoundPlayer::PlayBySource(name, source=object id)
+            // 0x10300550 — same dispatch/volume law as the "sound" key; no
+            // per-name dedupe (each footfall is a fresh native instance).
+            var thread = FSO.HIT.HITVM.Get().PlaySoundEvent(name);
+            if (thread != null)
+            {
+                if (thread is FSO.HIT.HITThread) SubmitHITVars((FSO.HIT.HITThread)thread);
+
+                if (!thread.AlreadyOwns(ObjectID)) thread.AddOwner(ObjectID);
+
+                SoundThreads.Add(new VMSoundEntry()
+                {
+                    Sound = thread,
+                    Pan = true,
+                    Zoom = true,
+                });
+                Thread?.Context?.VM?.SoundEntities?.Add(this);
+                TickSounds();
             }
         }
 
@@ -618,7 +694,7 @@ namespace FSO.SimAntics
                             timeProps.RemoveAt(0);
                             i--;
 
-                            HandleTimePropsEvent(tp);
+                            HandleTimePropsEvent(tp, state);
                         }
                     }
                     else
@@ -632,7 +708,7 @@ namespace FSO.SimAntics
                             }
 
                             timeProps.RemoveAt(timeProps.Count - 1);
-                            HandleTimePropsEvent(tp);
+                            HandleTimePropsEvent(tp, state);
                         }
                     }
                 }
