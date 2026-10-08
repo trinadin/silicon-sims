@@ -6,11 +6,16 @@ namespace FSO.LotView.Effects
 {
     public class GrassEffect : LightMappedEffect
     {
-        // ORIG-01 D-2: multiplier for the Options 'Terrain Detail' radio
-        // (0=low .. 2=high; default 1.0 = high). Set by the client from
-        // GlobalSettings at boot and on option change — tso.world cannot
-        // reference FSO.UI. The exact native ladder is undecoded; the
-        // 0.45/0.725/1.0 mapping is the disclosed port choice.
+        // ORIG-01 D-2 + AUD-18-B decode: multiplier for the Options 'Terrain
+        // Detail' radio (0=low .. 2=high; default 1.0 = high — the native
+        // cColorSwatch ctor self-initializes at level 2). Set by the client
+        // from GlobalSettings at boot and on option change — tso.world cannot
+        // reference FSO.UI. The NATIVE law (cColorSwatch::SetQualityLevel
+        // @ r2 0x1a0280, InitGrass @0x19c5c0): LOW = the grass layer OFF
+        // (show-grass byte +0x7c = 0); MED = entry budget 3200 with the
+        // 300->800 drawn-count LOD lerp; HIGH = budget 4800 with 500->1200.
+        // The port's scalar maps those to 0 / (3200/4800 = 2/3) / 1 — the
+        // per-zoom LOD curve stays the renderer's own (disclosed).
         public static float DetailScale = 1.0f;
 
         protected override Type TechniqueType

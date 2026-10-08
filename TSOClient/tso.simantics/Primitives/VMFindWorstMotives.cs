@@ -13,14 +13,19 @@ namespace FSO.SimAntics.Primitives
     /// Sorts the engine-ID template {5,6,7,8,9,13,14,15} (Energy, Comfort,
     /// Hunger, Hygiene, Bladder, Room, Social, Fun — the same list as
     /// VMFindBestAction) ascending by current value and writes the FIVE
-    /// LOWEST motive IDs to the target object's temps 0..4 (native
-    /// +0x3a..+0x42 — the port's ObjectData tail past the named enum
-    /// slots, accessed via SetValue/GetObjectValue index 100+i).
+    /// LOWEST motive IDs to temps 0..4. AUD-18 binary re-derivation
+    /// (decompile 0x100eef00): the native stores to (this + 0x3a..+0x42) —
+    /// the EXECUTING object's temp slots, NOT the WHO target — and the
+    /// comparator (_MotiveSort 0xef0f0) is a ±epsilon banded ascending
+    /// compare (worst first). Port mapping: the Temps scope reads
+    /// Thread.TempRegisters (VMMemory.cs:66/521), so the IDs go to
+    /// context.Thread.TempRegisters[0..4] (the ORIG-02 port note's mapping;
+    /// the earlier ObjectData[100+i] write was unreadable through the Temps
+    /// scope and targeted the wrong object when WHO = 1).
     /// </summary>
     public class VMFindWorstMotives : VMPrimitiveHandler
     {
         private static readonly int[] MotiveIDs = { 5, 6, 7, 8, 9, 13, 14, 15 };
-        private const int TempBase = 100; // ObjectData index of object temp 0
 
         public override VMPrimitiveExitCode Execute(VMStackFrame context, VMPrimitiveOperand args)
         {
@@ -36,8 +41,8 @@ namespace FSO.SimAntics.Primitives
                 .OrderBy(id => avatar.GetMotiveData((VMMotive)id))
                 .Take(5)
                 .ToArray();
-            for (int i = 0; i < 5 && TempBase + i < target.ObjectData.Length; i++)
-                target.ObjectData[TempBase + i] = (short)worst[i];
+            for (int i = 0; i < 5 && i < context.Thread.TempRegisters.Length; i++)
+                context.Thread.TempRegisters[i] = (short)worst[i];
 
             return VMPrimitiveExitCode.GOTO_TRUE;
         }

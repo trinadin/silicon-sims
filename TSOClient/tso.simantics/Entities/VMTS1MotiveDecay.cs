@@ -9,31 +9,38 @@ namespace FSO.SimAntics.Entities
         // ============================================================================
         // R251 mood law (tools/iff-dump/r251-mood-cadence/implementation.md):
         // mood = Sum(w_i * m_i + w_room * room) / Sum(w_i + w_room), summed over the
-        // 8 mood participants in the native CalcHappy order (Hunger, Energy, Comfort,
-        // Fun, Hygiene, Social, Bladder, Room). The w_i are the piecewise STR#502 /
-        // STR#504 weight curves (the "Happy Weight" curves), looked up per motive value.
-        // There is NO smoothing — the port already recomputes on its 2-game-minute
-        // cadence; only the aggregation is changed (the old law was an equal-weight
-        // (sum of 7 + room) / 8 average).
+        // native CalcHappy participants. The w_i are the piecewise STR#502 /
+        // STR#504 weight curves (the "Happy Weight" curves), looked up per motive
+        // value. There is NO smoothing — the port already recomputes on its
+        // 2-game-minute cadence; only the aggregation is changed (the old law was
+        // an equal-weight (sum of 7 + room) / 8 average).
         //
-        // The native CalcHappy table order (rodata 0x5a45b8) is (7,5,6,15,8,14,9,13)
-        // and the STR#502/504 curves fill entries 0..6 in that same order, i.e.
-        //   curve[0]=Hunger  curve[1]=Energy  curve[2]=Comfort curve[3]=Fun
-        //   curve[4]=Hygiene curve[5]=Social  curve[6]=Bladder
-        // (verified against the extracted Global.iff STR# 502 / STR# 504 resources).
-        // Room is the 8th participant. STR#502/504 contain exactly 7 curves, so the
-        // Room weight is NOT a curve — it is a scalar. I could NOT pin the native room
-        // weight from the static binary (the TOC pointer slots are unrelocated
-        // placeholders and the saved moods are state-dependent, per R251), so this is a
-        // DOCUMENTED BEST-SUPPORTED DEFAULT: RoomWeight = 1 makes Room contribute
-        // comparably to a weight-1 motive. R223's least-squares fit of 8 (and a
-        // state-dependent-derived ~57) are both NON-authoritative and are not used.
+        // AUD-18 / ORIG-02 binary re-derivation (corrects the R251 pairing): the
+        // runtime ladder builder is cXPerson::Initialize (raw 0x111cd0); BOTH
+        // ladder loops (vaddr 0x109000-0x109034, 0x109064-0x109098) walk the index
+        // array at [TOC-0x5930] = sec1+0x48ec0 = {7, 6, 8, 9, 15, 13, 14} and write
+        // entry i + 0x10 = idx[i] while parsing STR#502 (adult, `li r5,0x1f6`) /
+        // STR#504 (child, `li r5,0x1f8`) string i into entry i (stride 0x14). So
+        //   curve[0]->Hunger(7)  curve[1]->Comfort(6) curve[2]->Hygiene(8)
+        //   curve[3]->Bladder(9) curve[4]->Fun(15)    curve[5]->Room(13)
+        //   curve[6]->Social(14)
+        // and Energy (motive 5) is NOT a CalcHappy participant. (R251's claimed
+        // order (7,5,6,15,8,14,9,13) matches a static rodata table at raw
+        // 0x5a45b8 that the builder does not use.) CalcHappy (vaddr 0x102b30)
+        // iterates the container count entries, reads each entry's motive index
+        // at +0x10, applies the suit gate (pool+0x30 = 13.0f, suits 2-5 drop
+        // entries whose motive value is bit-exactly 13.0f — not ported; the port
+        // never stores the 13.0 sentinel), then mood = Sum(m*w)/Sum(w) stored at
+        // person+0x798. STR#502 verified from the owned Global.far: 7 strings,
+        // entry 5 = "(-100;2) (0;1) (100;2)" (the Room curve).
         private static readonly VMMotive[] MoodOrderMotives = new VMMotive[]
         {
-            VMMotive.Hunger, VMMotive.Energy, VMMotive.Comfort, VMMotive.Fun,
-            VMMotive.Hygiene, VMMotive.Social, VMMotive.Bladder
+            VMMotive.Hunger, VMMotive.Comfort, VMMotive.Hygiene,
+            VMMotive.Bladder, VMMotive.Fun, VMMotive.Social
         };
-        private const float RoomWeight = 1f;
+        // Curve-table index per participant (Room's curve 5 is applied separately
+        // below; Energy is excluded per the native index array).
+        private static readonly int[] MoodCurveIndex = { 0, 1, 2, 3, 4, 6 };
 
         // Table split (person+1536, CalcHappy 0x10b9c8-0x10b9e8, reconciled from raw
         // hex in implementation.md): r5=1 (child table) only when person[1536] is in
@@ -166,12 +173,13 @@ namespace FSO.SimAntics.Entities
         }
 
         /// <summary>
-        /// Computes the R251 mood target from the current motives:
-        /// mood = (Sum_i w_i(m_i)·m_i + RoomWeight·room) / (Sum_i w_i(m_i) + RoomWeight)
-        /// over the 8 participants, with w_i from the STR#502 (adult) or STR#504 (child)
-        /// Happy Weight curves. The Room enters with a constant weight (see the class
-        /// doc for the RoomWeight disclosure). Mirrors the native CalcHappy pure-recompute
-        /// law; no smoothing is applied.
+        /// Computes the native mood from the current motives:
+        /// mood = (Sum_i w_i(m_i)·m_i + w_room(room)·room) / (Sum_i w_i(m_i) + w_room(room))
+        /// over the native participant set {Hunger, Comfort, Hygiene, Bladder, Fun,
+        /// Social, Room}, with w from the STR#502 (adult) or STR#504 (child)
+        /// HappyWeightCurves per the builder index array {7,6,8,9,15,13,14}
+        /// (curve 5 = Room; Energy excluded — see the class doc). Mirrors the
+        /// native CalcHappy pure-recompute law; no smoothing is applied.
         /// </summary>
         private short ComputeMood(VMAvatar avatar, int roomScore)
         {
@@ -187,8 +195,9 @@ namespace FSO.SimAntics.Entities
             {
                 var m = (double)avatar.GetMotiveData(MoodOrderMotives[i]);
                 double w = 1.0;
-                if (curves != null && i < curves.Length)
-                    w = curves[i].GetPoint((float)m);
+                int ci = MoodCurveIndex[i];
+                if (curves != null && ci < curves.Length)
+                    w = curves[ci].GetPoint((float)m);
                 num += w * m;
                 den += w;
             }

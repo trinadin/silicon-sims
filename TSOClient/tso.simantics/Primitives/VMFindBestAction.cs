@@ -16,11 +16,17 @@ namespace FSO.SimAntics.Primitives
     // native free-will winner law — see ExecuteTS1Native below; evidence:
     // tools/iff-dump/r249-freewill/{decode.md,skeptic-corrections.md} +
     // tools/iff-dump/r249-freewill-cfg/decode.md (CFG/FCNS resolution; the maintainer's
-    // cutoff-polarity adjudication is binding: ACCEPT IFF score >= cutoff, never <=) +
-    // tools/iff-dump/r250-serving/decode.md (the R250 call-site scan, binding: the
-    // winner's score is computed at HAND-OFF — GetInteractionScore 0x9f9d4 runs once,
-    // at 0x109d48 immediately after the winner's re-test 0x109d1c, on the tree-mutated
-    // ad copy; gather never scores).
+    // cutoff-polarity adjudication is binding: ACCEPT IFF score >= cutoff, never <=).
+    // R250 IS REFUTED (AUD-18-A, coordination/evidence/AUD-18/a-simantics-audit.md
+    // "F-3 RESOLUTION", call-site proof): the score/test pair (TestInteraction
+    // 0x109d1c + GetInteractionScore 0x109d48) sits INSIDE the per-candidate gather
+    // loop (loop closes 0x100f44), NOT at the winner hand-off — the post-draw tail
+    // (0x100f48+) contains no test/score call. Gather DOES score: per candidate,
+    // on the tree-mutated ad copy, with the sentinel drop, the atten multiply,
+    // and the FCNS min-autonomy-score push gate; the pool sorts DESCENDING (best
+    // first, comparator 0x1011b0 ±1e-7); the draw covers the K BEST; the cutoff
+    // consumes the WINNER'S POOL SCORE; the hand-off writes the action/object and
+    // returns with NO re-test.
 
     // How autonomy works in The Sims:
     // 
@@ -398,9 +404,9 @@ namespace FSO.SimAntics.Primitives
 
         // AutonomyConstants (CFG = *(TOC-0x58e8) = 0x59a524, code-section literal pool).
         private const float CFG_ATTENUATION_N = 1.0f;      // CFG+0x20, read live at 0x109d2c
-        // (CFG_SCORE_SENTINEL — CFG+0x4 = 0.0, the skeptic-S5 H' drop — belonged to the
-        // same misattributed gather scoring block and went with it; see the R250 SCORE
-        // LAW comment at gather.)
+        private const float CFG_SCORE_SENTINEL = 0.0f;     // CFG+4 — AUD-18-A restored: the
+        // gather-time H' == sentinel drop (0x109d4c-0x109d54); R250 had misattributed it
+        // to a hand-off block that does not exist.
 
         private static WorldGlobalProvider Globals
         {
@@ -550,11 +556,14 @@ namespace FSO.SimAntics.Primitives
             var isChild = caller.GetPersonData(VMPersonDataVariable.PersonsAge) > 0
                 && caller.GetPersonData(VMPersonDataVariable.PersonsAge) < 0x12; // attr 58 in 1..17
             var autonomyLevel = caller.GetPersonData(VMPersonDataVariable.AutonomyLevel); // attr 36 (+0x5d4) ad ceiling
-            // (The FCNS 1e-7 min-autonomy-score f28 load at 0x109994/0x1099a0 decoded here
-            // fed the old per-candidate push gate; the R250 call-site adjudication moved
-            // the whole scoring block to the winner hand-off, where the binding cutoff
-            // law is the ONLY score consumer — the 1e-7 gate has no live port consumer
-            // and is no longer evaluated. See the R250 SCORE LAW comment at gather.)
+            // 0x109994/0x1099a0 (the f28 load R250 orphaned — AUD-18-A restored): the
+            // per-decision MIN-AUTONOMY-SCORE push gate over the gather pool. FCNS
+            // "min autonomy score for family" (compiled default 0.2, [TOC-0x70c0]) /
+            // "...for visitors" (default 0.05, [TOC-0x70bc]); the shipped Global.iff
+            // FCNS runtime value of both is 1e-7 — the push gate is live "score > 0".
+            var minScore = isVisitor
+                ? Globals.GetAutonomyConstant("min autonomy score for visitors", 0.05f)
+                : Globals.GetAutonomyConstant("min autonomy score for family", 0.2f);
 
             // ---- LAW STEP 2: candidate gathering (0x109a98-0x109dd4) -------------------
             // NATIVE GATHER ORDER (load-bearing — it feeds the draw): the native walks the
@@ -762,29 +771,58 @@ namespace FSO.SimAntics.Primitives
                     // ctor sets it unconditionally).
                     var flag = (byte)(((entry.Flags & (TTABFlags)0x01000000) != 0) ? 1 : 0);
 
-                    // ---- R250 SCORE LAW (MAINTAINER CALL-SITE ADJUDICATION, binding): ---
-                    // NO gather scoring. GetInteractionScore (0x9f9d4) has exactly TWO call
-                    // sites in the binary: 0x109d48 inside TryFindBestAction immediately
-                    // after the WINNER's TestInteraction (0x109d1c), and 0x183ac8 (unrelated
-                    // routine). AppendInteractionsForAuto contains NO GetInteractionScore
-                    // call, so the native NEVER scores candidates at gather: per-candidate
-                    // scores play no role in selection (the 0x59a370 heapsort net-rotates,
-                    // so ordering is irrelevant and the draw is uniform over gather order).
-                    // The old per-candidate block that stood here (GetInteractionScore, the
-                    // S5 sentinel drop 0x109d4c-0x109d54, the atten multiply, the 1e-7
-                    // min-score push gate 0x109d64-0x109d74) was the HAND-OFF sequence
-                    // misattributed to the gather loop by the r249 decode §C — removed with
-                    // it; the winner's score is computed once at hand-off (LAW STEP 7.5
-                    // below) from the tree-mutated ad copy. Score rides lazily at 0; the
-                    // seam exposes it so the battery can verify the no-gather-score law.
+                    // ---- GATHER SCORING (AUD-18-A F-3 RESOLUTION; refutes R250) --------
+                    // The binary runs the WHOLE score sequence per candidate inside the
+                    // gather loop (bl TestInteraction 0x109d1c -> bl GetInteractionScore
+                    // 0x109d48, loop closing 0x100f44 `ble 0x100c10` back to the object
+                    // scan); the post-draw tail 0x100f48+ contains no test/score call.
+                    // The check tree above (CheckTS1Action) IS the native TestInteraction
+                    // run: its result strings carry both the harvested Param0 and the
+                    // MotiveAdChanges of the TREE-MUTATED ad copy the score consumes.
+                    short candParam0 = (short)0;
+                    var adChanges = (candStrings.Count > 0) ? candStrings[0].MotiveAdChanges : null;
+                    if (candStrings.Count > 0) candParam0 = candStrings[0].Param0;
+                    var ads = (TTABMotiveEntry[])entry.MotiveEntries.Clone();
+                    if (adChanges != null)
+                    {
+                        foreach (var kv in adChanges)
+                        {
+                            var motiveI = kv.Key & 0xFFFF;
+                            if (motiveI < 0 || motiveI >= ads.Length) continue;
+                            switch (kv.Key >> 16)
+                            {
+                                case 0: ads[motiveI].EffectRangeMinimum = kv.Value; break;
+                                case 1: ads[motiveI].EffectRangeDelta = kv.Value; break;
+                                case 2: ads[motiveI].PersonalityModifier = (ushort)kv.Value; break;
+                            }
+                        }
+                    }
+                    // GetAttenuationValue (0x155340) + atten = N / (N + dist * att),
+                    // N = CFG+0x20 = 1.0 (0x109d2c-0x109d44).
+                    var attValue = GetAttenuationValue(entry, isVisitor);
+                    var atten = CFG_ATTENUATION_N / (CFG_ATTENUATION_N + distance * attValue);
+                    // GetInteractionScore (0x9f9d4, call site 0x109d48) on the mutated ads.
+                    var hPrime = GetInteractionScore(caller, ads, curves);
+                    // 0x109d4c-0x109d54: the sentinel drop — H' == CFG+4 (0.0) excludes
+                    // the candidate outright.
+                    if (hPrime == CFG_SCORE_SENTINEL) continue;
+                    // 0x109d58-0x109d5c: score = atten * (H' - H).
+                    var score = atten * (hPrime - baseH);
+                    // 0x109d64-0x109d74: the push gate — score >= the FCNS min autonomy
+                    // score for the actor's class (family/visitor; live 1e-7).
+                    if (score < minScore) continue;
                     candidates.Add(new ScoredCandidate
                     {
                         Callee = obj,
                         Entry = entry,
                         CalleeId = obj.ObjectID,
-                        ActionNumber = entry.ActionFunction, // ScoredInteraction+4 (entry+0x18)
-                        Param0 = 0,
-                        Score = 0f, // LAZY gather score — no selection role (see the R250 score law above)
+                        // ScoredInteraction+4 = the mutated copy's +0x18 action number.
+                        // The port's check-tree surface does not rewrite the action
+                        // number (no MotiveActionChanges channel exists), so the entry's
+                        // own ActionFunction stands. DISCLOSED.
+                        ActionNumber = entry.ActionFunction,
+                        Param0 = candParam0, // harvested from the gather TestInteraction
+                        Score = score,
                         Flag = flag,
                         Dist = distance
                     });
@@ -805,12 +843,13 @@ namespace FSO.SimAntics.Primitives
             // transpile mutates the list in place.
             var gatherOrder = ProjectCandidates(candidates);
 
-            // ---- LAW STEP 5: the "sort" — faithful transpile (0x109df8 -> 0x59a370) ----
-            // CW routine 0x59a370 (heapsort) with the game comparator CompareScoredInter-
-            // actions (0x10a040, eps +1e-7 / -1e-7): the sift can never swap strictly-
-            // different scores, so the shipped net effect is rotate-left-by-one. Ported
-            // LITERALLY (element granularity — the routine's 17-byte swaps only alias one
-            // trailing byte below record resolution) so edge cases match the CFG agent's
+            // ---- LAW STEP 5: the sort (0x109df8 -> qsort wrapper 0x5914e0 -> 0x59a370) -
+            // CW heapsort with the game comparator CompareScoredInteractions
+            // (0x1011b0, eps +1e-7 / -1e-7, AUD-18-A corrected polarity). With the
+            // restored REAL gather scores this genuinely sorts the pool DESCENDING
+            // (best first) — the old "net rotate-left-by-one" claim was an artifact of
+            // the R250 lazy-zero scores and is retired. The routine is ported
+            // LITERALLY (element granularity) so permutations match the CFG agent's
             // transpile (tools/iff-dump/r249-freewill-cfg/verify.py, group H).
             GameHeapsort(candidates);
 
@@ -851,126 +890,26 @@ namespace FSO.SimAntics.Primitives
             }
             var winner = candidates[idx];
 
-            // ---- LAW STEP 7.5: the hand-off validation (TestInteraction 0x1062d0) -------
-            // R250 ADJUDICATION: the native re-tests the DRAWN WINNER inside
-            // TryFindBestAction itself (bl TestInteraction at 0x109d1c, immediately
-            // followed by GetInteractionScore 0x109d48) BEFORE the cutoff — this check is
-            // that re-test and stays. (The R249 comment attributed it to TryGosubFound-
-            // Action; TryGosubFoundAction 0x10fdc0 runs no guard — the r250-serving
-            // decode — the winner re-test lives here.) The re-test applies the entry-flag
-            // gates at 0x106450-0x1064d0 (children blocked by 0x10, rlwinm 0x1b/0x1b at
-            // 0x106478; word-65 bit 0x2 (dog) requires entry 0x400, 0x106488-0x10649c
-            // rlwinm 0x15/0x15; bit 0x4 (cat) requires entry 0x200, 0x1064a8-0x1064b8
-            // rlwinm 0x16/0x16; plain humans (word-65 & 6 == 0 — PersonGender 0 AND 1)
-            // blocked by entry 0x40 TS1NoAdult, 0x1064c4-0x1064d0 rlwinm 0x19/0x19), then
-            // the check tree at 0x106570 with params (auto=1, 0, actionNumber, 0); entry
-            // action number 0 auto-passes without a tree (0x1064f8). A failure kills the
-            // pick (no queue insertion). With the R250 gather restore the pool holds only
-            // test-passing candidates, so a failure here means the conditions genuinely
-            // changed mid-tick (rare; the battery treats an unexplained drop as FAIL).
-            // The downtown and vehicle-token arms (0x1063b4-0x1063e8, 0x1063f4-0x10644c)
-            // are dead on Simitone's residential-only mount (DISCLOSED), as is the target
-            // cXObject+0x5a & 0x200 probe (0x106368-0x106374; no decoded port field).
-            var handOffParam0 = (short)0;
-            var handOffOk = true;
-            if (isChild && (winner.Entry.Flags & (TTABFlags)0x10) != 0) handOffOk = false;
-            else if ((gender & 2) != 0)
-            {
-                if ((winner.Entry.Flags & (TTABFlags)0x400) == 0) handOffOk = false;
-            }
-            else if ((gender & 4) != 0)
-            {
-                if ((winner.Entry.Flags & (TTABFlags)0x200) == 0) handOffOk = false;
-            }
-            else if ((winner.Entry.Flags & (TTABFlags)0x40) != 0)
-            {
-                handOffOk = false;
-            }
-            // TestInteraction's check tree (0x106570, params (auto=1, 0, actionNumber, 0),
-            // skeptic S10) — runs ONCE on the drawn winner, exactly the native
-            // GosubFoundAction hand-off. It yields the winner's real Param0 (the sit/slot
-            // number): enqueueing with Param0=0 routes the action to slot 0 and the port's
-            // router spins (the R249 deferred-enqueue freeze). The VMThread.EvaluateCheck
-            // synchronous-check law bounds this run: a yielding/cycling check fails fast
-            // and the pick is dropped (the native would reset the thread instead).
-            if (handOffOk)
-            {
-                try
-                {
-                    caller.ObjectData[(int)VMStackObjectVariable.HideInteraction] = 0;
-                    var action = winner.Callee.GetAction((int)winner.Entry.TTAIndex, caller, vm.Context, false);
-                    List<VMPieMenuInteraction> strings = null;
-                    if (action != null)
-                    {
-                        strings = caller.Thread.CheckTS1Action(action, true,
-                            new short[] { 1, 0, (short)winner.Entry.ActionFunction, 0 });
-                    }
-                    if (strings == null) handOffOk = false; // Interaction+0x38 bit3 (0x1065f0)
-                    else
-                    {
-                        if (strings.Count > 0) handOffParam0 = strings[0].Param0;
-
-                        // ---- R250 SCORE LAW at hand-off (0x109d1c -> 0x109d48) ----------
-                        // The binary calls GetInteractionScore (0x9f9d4) IMMEDIATELY after
-                        // the winner's TestInteraction (0x109d1c): the winner's score is
-                        // computed at hand-off from the TREE-MUTATED candidate copy —
-                        // TestInteraction's tree may rewrite the ad copy via MotiveAdChanges
-                        // (EvaluateCheckInner collects temp.MotiveAdChanges into the result
-                        // strings, VMThread.cs), and the ctor copy the tree mutated is what
-                        // 0x9f9d0 consumes (r250-serving/decode.md §A + the CFG decode).
-                        // Application pattern = the TSO twin above (keys (0<<16)|m ->
-                        // EffectRangeMinimum, (1<<16)|m -> EffectRangeDelta, (2<<16)|m ->
-                        // PersonalityModifier) applied to a COPY of the entry's motive ads
-                        // (TTABMotiveEntry is a struct: the array clone is a deep copy —
-                        // the shared TTAB is never touched). The score then feeds the
-                        // cutoff decision (LAW STEP 7) — its only consumer per the
-                        // binding adjudication. Score = atten * (H' - H) with the SAME
-                        // atten/H laws the old (misattributed) gather block used.
-                        var adChanges = (strings.Count > 0) ? strings[0].MotiveAdChanges : null;
-                        var ads = (TTABMotiveEntry[])winner.Entry.MotiveEntries.Clone();
-                        if (adChanges != null)
-                        {
-                            foreach (var kv in adChanges)
-                            {
-                                var motiveI = kv.Key & 0xFFFF;
-                                if (motiveI < 0 || motiveI >= ads.Length) continue;
-                                switch (kv.Key >> 16)
-                                {
-                                    case 0: ads[motiveI].EffectRangeMinimum = kv.Value; break;
-                                    case 1: ads[motiveI].EffectRangeDelta = kv.Value; break;
-                                    case 2: ads[motiveI].PersonalityModifier = (ushort)kv.Value; break;
-                                }
-                            }
-                        }
-                        // GetAttenuationValue (0x155340) + atten = N / (N + dist * att),
-                        // N = CFG+0x20 = 1.0 (0x109d2c-0x109d44).
-                        var attValue = GetAttenuationValue(winner.Entry, isVisitor);
-                        var atten = CFG_ATTENUATION_N / (CFG_ATTENUATION_N + winner.Dist * attValue);
-                        // GetInteractionScore (0x9f9d4, call site 0x109d48) on the mutated ads.
-                        var hPrime = GetInteractionScore(caller, ads, curves);
-                        // 0x109d58-0x109d5c: score = atten * (H' - H). Carried in
-                        // HandOffScore (NOT Score — the pool entries stay at the lazy
-                        // gather 0 and the seam's Candidates[] must reflect that).
-                        winner.HandOffScore = atten * (hPrime - baseH);
-                    }
-                }
-                catch
-                {
-                    handOffOk = false;
-                }
-            }
-            winner.Param0 = handOffParam0; // the seam snapshot carries the hand-off param
+            // ---- (no hand-off re-test — AUD-18-A call-site proof) ---------------------
+            // The native post-draw tail (0x100f48+) runs NO TestInteraction and NO
+            // GetInteractionScore: the R250 "winner re-test + hand-off score" block
+            // was the gather loop's per-candidate sequence (0x109d1c/0x109d48 inside
+            // the loop, closing 0x100f44) misattributed to the hand-off, and is
+            // REMOVED. The winner carries its gather score (the cutoff operand) and
+            // the Param0 harvested by its gather check run; the native hand-off
+            // itself only writes person+0x72 = action number and StackElem+4 = the
+            // object id (LAW STEP 8's queued-action mapping below).
 
             // ---- LAW STEP 7: the cutoff (0x109eb4-0x109ee8; MAINTAINER ADJUDICATION) ---
             // 0x109eb4-0x109ec4: r0 = attr slot 0 (posture/engagement; person+0x58c).
             // attr0 == 0 (standing/not engaged) -> accept unconditionally (0x109ecc beq).
-            // engaged -> 0x109ed0-0x109ee0: f1 = winner score (lfs f1,8(r5)) — the R250
-            // hand-off score computed above from the tree-mutated ad copy — f0 = the FCNS
+            // engaged -> 0x109ed0-0x109ee0: f1 = the WINNER'S POOL SCORE (lfs f1,8(r5) —
+            // winner+8, the gather score, NOT a recomputed hand-off score), f0 = the FCNS
             // "min autonomy score for sitting" (lfs f0,0(r3) through TOC-0x70cc; runtime
             // 1e-6), fcmpo cr0,f1,f0, bge -> ACCEPT IFF score >= cutoff (never <=).
             var sittingCutoff = Globals.GetAutonomyConstant("min autonomy score for sitting", 0.2f);
             var attr0 = caller.GetPersonData(VMPersonDataVariable.Posture);
-            var accept = (attr0 == 0) || (winner.HandOffScore >= sittingCutoff);
+            var accept = (attr0 == 0) || (winner.Score >= sittingCutoff);
 
             // ---- OBSERVATION SEAM (frozen contract, read-only, exception-isolated) -----
             EmitDecision(caller, vm, isVisitor, isChild, accept, sittingCutoff, idx, seed,
@@ -986,8 +925,7 @@ namespace FSO.SimAntics.Primitives
             // winner object id; the sibling prim re-finds (object, entry) and makes it the
             // current action. Port mapping: the queued-action flow the TSO path already
             // uses — GetAction re-resolves the entry by its TTA index, Args[0] carries the
-            // check-tree Param0, Priority stays Autonomous, StackObject = the callee.
-            if (!handOffOk) return VMPrimitiveExitCode.GOTO_FALSE;
+            // gather check-tree Param0, Priority stays Autonomous, StackObject = the callee.
             var qaction = winner.Callee.GetAction((int)winner.Entry.TTAIndex, caller, vm.Context, false,
                 new short[] { winner.Param0, 0, 0, 0 });
             if (qaction != null)
@@ -1212,11 +1150,12 @@ namespace FSO.SimAntics.Primitives
         }
 
         /// <summary>
-        /// Faithful transpile of the CW routine at 0x59a370 ("qsort") with the game
+        /// Faithful transpile of the CW routine at 0x59a370 ("qsort", reached through
+        /// the 0x5914e0 wrapper whose prologue matches this shape) with the game
         /// comparator: build phase r24 = n/2+1 -> 1 with sift-down, extraction phase
-        /// swapping heap[1] <-> heap[end], children at 2i/2i+1. With the shipped
-        /// comparator the sift never swaps strictly-different scores, so the net effect
-        /// is rotate-left-by-one (identity permutations only within the 1e-7 band).
+        /// swapping heap[1] &lt;-&gt; heap[end], children at 2i/2i+1. With the AUD-18-A
+        /// corrected comparator and real gather scores the net permutation is the
+        /// true descending sort (identity permutations only within the 1e-7 band).
         /// </summary>
         private static void GameHeapsort(List<ScoredCandidate> a)
         {
@@ -1269,15 +1208,18 @@ namespace FSO.SimAntics.Primitives
         }
 
         /// <summary>
-        /// CompareScoredInteractions (0x10a040): delta = b.score - a.score (fsubs);
-        /// returns +1 iff delta >= CFG+0x24 (+1e-7); -1 iff delta > CFG+0x28 (-1e-7)
-        /// (the one-sided signs per skeptic S1); else 0. Ties inside the band compare -1.
+        /// CompareScoredInteractions (comparator 0x1011b0, AUD-18-A corrected):
+        /// delta = b.score - a.score (fsubs); +1 iff delta &gt; +1e-7; -1 iff
+        /// delta &lt; -1e-7; else 0 (ties inside the band compare EQUAL). The
+        /// first landing transposed the -1/0 arms (ties returned -1) — fixed;
+        /// with real gather scores the heapsort therefore yields the pool in
+        /// DESCENDING (best-first) order.
         /// </summary>
         private static int CompareCandidates(ScoredCandidate a, ScoredCandidate b)
         {
             float delta = b.Score - a.Score;
-            if (delta >= 1e-7f) return 1;
-            if (delta > -1e-7f) return -1;
+            if (delta > 1e-7f) return 1;
+            if (delta < -1e-7f) return -1;
             return 0;
         }
 
@@ -1322,10 +1264,9 @@ namespace FSO.SimAntics.Primitives
                         CalleeId = winner.CalleeId,
                         ActionNumber = winner.ActionNumber,
                         Param0 = winner.Param0,
-                        // R250: the HAND-OFF score (0x109d48, from the tree-mutated ad
-                        // copy) — not the pool's lazy gather 0. 0 when the re-test failed
-                        // (no hand-off score exists).
-                        Score = winner.HandOffScore,
+                        // AUD-18-A: the winner's POOL score (gather-time, from the
+                        // tree-mutated ad copy) — the cutoff's operand.
+                        Score = winner.Score,
                         Flag = winner.Flag,
                         Dist = winner.Dist
                     }
@@ -1370,10 +1311,8 @@ namespace FSO.SimAntics.Primitives
             public short CalleeId;
             public ushort ActionNumber;
             public short Param0;
-            public float Score;      // LAZY gather score (R250: always 0 — no selection role)
-            public float HandOffScore; // R250: the winner's score computed at hand-off
-                                       // (0x109d48) from the tree-mutated ad copy; 0 when
-                                       // the re-test failed / not the drawn winner
+            public float Score;      // the gather score (AUD-18-A restored: real, gated
+                                     // by the FCNS min-autonomy push + sentinel drop)
             public byte Flag;
             public float Dist;
         }

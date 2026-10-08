@@ -56,7 +56,10 @@ namespace FSO.Vitaboy
                 return new Vector3(1, remaining,
                     value > -0.4f ? remaining - (0.4f + value) : remaining);
             }
-            return new Vector3(1 - value, 1, value < 0.4f ? 0.6f : 1 - value);
+            // AUD-18-E: the blue arm is the native subtraction (1−v)−(0.4−v),
+            // kept in that exact form — a literal 0.6f differs by 1 ulp for
+            // 13 of 201 mood values.
+            return new Vector3(1 - value, 1, value < 0.4f ? (1 - value) - (0.4f - value) : 1 - value);
         }
 
         public static Vector3 LightDirection(Matrix view)
