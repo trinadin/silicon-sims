@@ -275,7 +275,7 @@ namespace Simitone.Client
                             + " dogQmax=" + _dogQueueMax + " humanQmax=" + _humanQueueMax + " dogTrees=[" + string.Join(",", _dogTrees) + "]");
                         if (!(_trainTreeRan && (_trainPushLanded || _dogQueueMax > 0 || _humanQueueMax > 1)))
                         {
-                            _log("AUTOTEST ulpets train FAIL: 8334 must execute and land its push on the dog");
+                            _log("AUTOTEST ulpets train FAIL: row 45's action 8341 (dogglobals) must execute and land its push on the dog");
                             _fail("ulpets"); State = 99; TeardownTrace(); return;
                         }
                         State = 4; _frame = 0;
@@ -383,11 +383,13 @@ namespace Simitone.Client
             var ent = int.Parse(fm.Groups[1].Value);
             var sgFm = System.Text.RegularExpressions.Regex.Match(s, @" sg=(\S+)");
             var sgName = sgFm.Success ? (sgFm.Groups[1].Value ?? "").ToLowerInvariant() : "";
-            // the training verdict ONLY counts the DogGlobals routine: 8334 collides
-            // with PersonGlobals 8334 'do new adult middle stand' (runs 4/7/8's
-            // treeRan=True was that idle — an id-collision false positive; the sg=
-            // suffix names the routine's own IFF).
-            if (ftid == 8334 && sgName.StartsWith("dogglobals")) _trainTreeRan = true;
+            // the training verdict ONLY counts DogGlobals routines: row 45's ACTION is
+            // 8341 (test 8344 — the live-semiglobal DISASM, run 2; the enumeration's
+            // 8334/8335 pair is the deeper internal trick tree + ITS test), and the
+            // ids collide with PersonGlobals anyway (its 8334 'do new adult middle
+            // stand' made runs 4/7/8's treeRan=True a false positive). The sg= suffix
+            // names the routine's own IFF.
+            if ((ftid == 8341 || ftid == 8334) && sgName.StartsWith("dogglobals")) _trainTreeRan = true;
             if (_dog != null && ent == _dog.ObjectID && ftid >= 8192 && ftid <= 8370) _dogTrees.Add(ftid.ToString());
             else if (_cat != null && ent == _cat.ObjectID && ftid >= 8192 && ftid <= 8370) _catTrees.Add(ftid.ToString());
             // controller/pedestal band: record on the dog set too (shared evidence bag)
@@ -437,7 +439,7 @@ namespace Simitone.Client
                         _log("AUTOTEST ulpets TRAIN-DISASM TTAs " + tta.ChunkID + " [" + i2 + "]='"
                             + (labels.GetString(i2) ?? "<null>") + "'");
                 }
-                foreach (var tid in new ushort[] { 8334, 8335, 8276 })
+                foreach (var tid in new ushort[] { 8341, 8344, 8334, 8335, 8276 })
                 {
                     var rt = sg.GetRoutine(tid) as VMRoutine;
                     if (rt == null) { _log("AUTOTEST ulpets TRAIN-DISASM tree" + tid + " MISSING in semiglobal"); continue; }
@@ -532,6 +534,13 @@ namespace Simitone.Client
                         }).Take(40)) + "]");
                 }
                 catch (Exception mex2) { _log("AUTOTEST ulpets ROW1-MANUAL EXC " + mex2.GetType().Name + " " + mex2.Message); }
+                // run-2 law: restore Social IMMEDIATELY — a pinned-0 human spends the
+                // whole TRAIN window autonomously petting the dog (8276 'Interaction -
+                // Pet' cycles) and never picks up the queued training row (its test
+                // 8344 never executed; dogQmax pushes were the pet-side of the
+                // AUTONOMOUS interaction). The pin was only needed for this census.
+                if (_humanSocialSaved.HasValue)
+                    _human.SetMotiveData(VMMotive.Social, _humanSocialSaved.Value);
                 // the eligibility path (8198/8201/8200) instruction window
                 foreach (var line in _capture.Take(140)) _log("AUTOTEST ulpets PIECAP " + line);
                 var ttasOK = pin[1] == "Call Over" && pin[4] == "Scold" && pin[8] == "Praise"
