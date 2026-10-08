@@ -371,6 +371,10 @@ namespace Simitone.Client
             _neighborhoodSurveyCaptured = false;
 
             Log("AUTOTEST START houses=[" + string.Join(",", _houses) + "] checks=[" + Config.Checks + "] timeout=" + Config.TimeoutMs + "ms");
+            // W4-REG: execution recorder on for the whole run (brainlive/carseek unions;
+            // see VMRoutineExecRecorder — the stack sampler alone only sees parked frames).
+            FSO.SimAntics.Engine.VMRoutineExecRecorder.Enabled = true;
+            FSO.SimAntics.Engine.VMRoutineExecRecorder.Reset();
             GameThread.EveryUpdate(s => Tick());
             Log("AUTOTEST hook-registered");
         }
@@ -14188,6 +14192,36 @@ namespace Simitone.Client
                     catch { }
                 }
 
+                // (b1-exec) W4-REG: union EXECUTED car-owned routines from the VM-side
+                // recorder (drained each frame). The stack scan above only sees frames
+                // parked at the sample instant; fast portal legs (4105 'send to work'
+                // dispatch sites inside 'process') execute between samples. Executed
+                // evidence is the check's own law ("the ORIGINAL career-loop progression
+                // dispatch is IFF-owned ... executed"). Diagnostic counts only.
+                try
+                {
+                    var exec = FSO.SimAntics.Engine.VMRoutineExecRecorder.Drain();
+                    if (exec != null)
+                    {
+                        foreach (var kv in exec)
+                        {
+                            if (kv.Key == null || kv.Key.IndexOf("car", StringComparison.OrdinalIgnoreCase) < 0) continue;
+                            foreach (var idkv in kv.Value)
+                            {
+                                var id = idkv.Key;
+                                if (id == 0) continue;
+                                var ownFile = kv.Key;
+                                if (!_careerFrameOwner.ContainsKey(id)) _careerFrameOwner[id] = ownFile;
+                                else if (_careerFrameOwner[id] != ownFile)
+                                    _careerFrameOwner[id] = _careerFrameOwner[id] + "|" + ownFile;
+                                if (_careerFrameIds.Add(id))
+                                    Log("AUTOTEST carseek first-seen(exec) id=" + id + " owner=" + ownFile + " x" + idkv.Value);
+                            }
+                        }
+                    }
+                }
+                catch (Exception exd) { Log("AUTOTEST carseek exec-drain EXC " + exd.GetType().Name); }
+
                 // (b2) R157 PORTAL STACK TRACER: log every CHANGE of the portal's live stack
                 // signature (routine:ip per frame + top StackObject). If 'process' (4100)
                 // dies mid-run (suppressed exception -> reset), the stack collapses back to
@@ -14869,6 +14903,35 @@ namespace Simitone.Client
                         catch { }
                     }
                 }
+                // W4-REG: union EXECUTED PersonGlobals routines from the VM-side
+                // recorder (drained here each frame). The stack walk above only
+                // sees frames PARKED at the sample instant; the main loop's
+                // ins14 leg (8227 'check next motive' -> 8216 -> 8219 'check
+                // hunger') executes and completes between samples, so a
+                // lawfully-running brain could previously go unobserved and the
+                // gate flip on park-timing alone (wave4-final battery
+                // 2026-10-08: brain-id-hit=False while the loop provably
+                // cycled — multiple do-new-adult-idle variants demand repeated
+                // main-loop passes through ins14). The check's documented law
+                // is EXECUTION of the original brain, so executed evidence is
+                // the honest signal.
+                try
+                {
+                    var exec = FSO.SimAntics.Engine.VMRoutineExecRecorder.Drain();
+                    if (exec != null)
+                    {
+                        foreach (var kv in exec)
+                        {
+                            if (kv.Key == null || kv.Key.IndexOf("ersonglobals", StringComparison.OrdinalIgnoreCase) < 0) continue;
+                            BrainPgSeen = true; // executed PersonGlobals code is live-VM execution too
+                            foreach (var idkv in kv.Value)
+                            {
+                                if (idkv.Key != 0) BrainPgRoutinesSeen.Add(idkv.Key);
+                            }
+                        }
+                    }
+                }
+                catch (Exception) { }
                 BrainDiagDone = true;
             }
             catch (Exception) { }
@@ -47466,6 +47529,7 @@ namespace Simitone.Client
             if (_cutaway244 != null) { _screen?.Remove(_cutaway244); _cutaway244.Dispose(); _cutaway244=null; }
             if (_finished) return;
             _finished = true;
+            FSO.SimAntics.Engine.VMRoutineExecRecorder.Enabled = false;
             RestoreVisualArtifactDialogs();
             StopCareerBudgetObservation();
             StopCareerCreateObservation();

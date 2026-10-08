@@ -981,6 +981,10 @@ namespace FSO.SimAntics.Engine
             var instruction = frame.GetCurrentInstruction();
             var opcode = instruction.Opcode;
 
+            // W4-REG: execution recorder for the autotest probes (see
+            // VMRoutineExecRecorder). Single static bool test when disabled.
+            if (VMRoutineExecRecorder.Enabled) VMRoutineExecRecorder.Record(frame);
+
             if (opcode >= 256)
             {
                 // R249: the native unknown-opcode law. The native dispatch accepts
