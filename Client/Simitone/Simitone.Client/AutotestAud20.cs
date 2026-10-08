@@ -163,7 +163,7 @@ namespace Simitone.Client
                     {
                         if (nm == null || !nm.ToLowerInvariant().Contains("walk")) continue;
                         FSO.Vitaboy.Animation anim = null;
-                        try { anim = anims.Get(nm); } catch { }
+                        try { anim = anims.Get(nm + ".anim"); } catch { } // provider Get() strips a trailing ".anim"
                         if (anim == null || anim.Motions == null) continue;
                         bool has = false;
                         foreach (var motion in anim.Motions)
