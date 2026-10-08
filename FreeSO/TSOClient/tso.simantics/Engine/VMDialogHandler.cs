@@ -36,7 +36,7 @@ namespace FSO.SimAntics.Engine
         private static string[] valid = {
             "Object", "Me", "TempXL:", "Temp:", "$", "Attribute:", "DynamicStringLocal:", "Local:", "TimeLocal:", "NameLocal:",
             "FixedLocal:", "DynamicObjectName", "MoneyXL:", "JobOffer:", "Job:", "JobDesc:", "Param:", "Neighbor", "\r\n", "ListObject",
-            "CatalogLocal:", "DateLocal:", "ObjectLocal:", "\\n"
+            "CatalogLocal:", "DateLocal:", "ObjectLocal:", "TokenNameLocal:", "\\n"
         };
 
         /// <summary>
@@ -389,6 +389,46 @@ namespace FSO.SimAntics.Engine
                                     var catObj = context.VM.GetObjectById(VMMemory.GetVariable(context, Scopes.VMVariableScope.Local, values[0]));
                                     var cat = catObj.Object.Resource.Get<CTSS>(catObj.Object.OBJ.CatalogStringsID)?.GetString(1);
                                     output.Append(cat ?? "");
+                                    break;
+                                case "TokenNameLocal:":
+                                    // EXP-17: the Magic Town quest-line substitution. Native table
+                                    // entry '$TokenNameLocal' in the PPC (image 0x10601F98, the
+                                    // 18-command dialog table at 0x10601EF0..0x10601FA8; raw-file
+                                    // form 0x6018c2..0x60198f). Callers: SocialsMagic STR#301
+                                    // strings 4/13/17/19/22/23/24/39/41 — the quest reward/
+                                    // delivery dialogs. The index operand reads the token's
+                                    // INVENTORY INDEX from Local[n]: 'Quest - Review Quest'
+                                    // (SocialsMagic 4124) ins99-103 chains FindToken '03 08 11
+                                    // 0d' -> local[8]=temp[1] -> dialog, and primitive-51 mode-3
+                                    // writes that temp via the native selector
+                                    // Temp[(op3.0x18)>>3] (PPC 0x100e31ec + store 0x100e3248).
+                                    // Lookup law mirrors $Neighbor/$Object (definition GUID ->
+                                    // CTSS 0 catalog name); the exact native string index for
+                                    // tokens is undecoded (no parser code path found through the
+                                    // TOC) — DISCLOSED inference, bounded to the name source.
+                                    {
+                                        var tnCaller = context.Caller as VMAvatar;
+                                        List<FSO.Files.Formats.IFF.Chunks.InventoryItem> tnInv = null;
+                                        if (tnCaller != null && context.VM.TS1)
+                                        {
+                                            var tnNid = tnCaller.GetPersonData(Model.VMPersonDataVariable.NeighborId);
+                                            tnInv = Content.Content.Get().Neighborhood.GetInventoryByNID(tnNid);
+                                        }
+                                        if (tnInv != null)
+                                        {
+                                            var tnIdx = (context.Locals != null && values[0] < (context.Locals?.Length ?? 0)) ? context.Locals[values[0]] : (short)-1;
+                                            if (tnIdx >= 0 && tnIdx < tnInv.Count)
+                                            {
+                                                var tnGuid = tnInv[tnIdx].GUID;
+                                                var tnObj = Content.Content.Get().WorldObjects.Get(tnGuid);
+                                                if (tnObj?.OBJ != null)
+                                                {
+                                                    var tnName = tnObj.Resource.Get<CTSS>(tnObj.OBJ.CatalogStringsID)?.GetString(0);
+                                                    if (tnName != null) output.Append(tnName);
+                                                }
+                                            }
+                                        }
+                                    }
                                     break;
                                 case "DateLocal:":
                                     var date = new DateTime(context.Locals[values[2]], context.Locals[values[1]], context.Locals[values[0]]);
