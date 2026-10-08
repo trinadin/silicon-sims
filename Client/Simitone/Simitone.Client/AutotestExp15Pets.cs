@@ -80,6 +80,12 @@ namespace Simitone.Client
         private static readonly List<string> _capture = new List<string>();
         private static readonly HashSet<string> _seenKeys = new HashSet<string>();
         private static bool _capturing;
+        // teardown restore pins (central battery run 2 defect 2: the probe used to
+        // leave Global[10]=555, the host's Social pinned 0, the show controller and
+        // pedestal in-world and house 5's family mapping pointing at the probe FAMI)
+        private static short? _global10Saved;
+        private static short? _humanSocialSaved;
+        private static FAMI _origHouseFam;
 
         // brain-band membership (DogGlobals/CatGlobals ids overlap; id alone is enough)
         private static bool IsMotiveScan(int id) { return id >= 8223 && id <= 8232; }
@@ -144,6 +150,7 @@ namespace Simitone.Client
                     };
                     famsChunk.InsertString(0, new STRItem { Comment = "", Value = "Exp15Pets" });
                     neigh.MainResource.AddChunk(famsChunk);
+                    _origHouseFam = neigh.GetFamilyForHouse(ProbeHouse); // teardown restores this
                     neigh.SetFamilyForHouse(ProbeHouse, _fam, false);
                     _probeFamId = (short)newId;
                     _log("AUTOTEST ulpets attach famId=" + newId + " house=" + ProbeHouse
@@ -243,26 +250,51 @@ namespace Simitone.Client
                     if (_frame == 30 && !_pushedTrain)
                     {
                         _pushedTrain = true;
+                        DumpTrainTrees(vm); // receipt evidence: the row-45 chain, decoded
                         _dogQueueMax = 0;
                         _humanQueueMax = _human.Thread.Queue.Count;
                         // adjacency first (the EXP-05 run-9 law: a long route tears
                         // the interaction down) — teleport the host next to the dog
                         var adj = new LotTilePos((short)(_dog.Position.x - 16), _dog.Position.y, _dog.Position.Level);
                         _human.SetPosition(adj, Direction.NORTH, vm.Context);
-                        // row tta=45 'Tricks.../Train Bounce' (action 8334 test 8335)
-                        _dog.PushUserInteraction(45, _human, vm.Context, false);
+                        // row tta=45 'Tricks.../Train Bounce' (action 8341 test 8344 — the
+                        // live-semiglobal DISASM). Runs 1-3 law: PushUserInteraction's bare
+                        // enqueue is silently dropped at AttemptPush (VMIdleForInput) —
+                        // items with priority <= the actor's pd[33]=25 never even reach
+                        // CheckRoutine (8344 never traced). The unl-show run-6 idiom:
+                        // FSOSkipPermissions + CheckRoutine=null + Maximum priority. The
+                        // eligibility law is proven separately by the PIE census +
+                        // ROW1-MANUAL; this leg proves the ACTION chain executes and
+                        // lands its dog-side push.
+                        var act = _dog.GetAction(45, _human, vm.Context, false);
+                        if (act == null)
+                        {
+                            _log("AUTOTEST ulpets TRAIN-PUSH GetAction null (row 45)");
+                        }
+                        else
+                        {
+                            act.Flags |= TTABFlags.FSOSkipPermissions;
+                            act.CheckRoutine = null;
+                            act.Priority = (short)VMQueuePriority.Maximum;
+                            _human.Thread.EnqueueAction(act);
+                        }
                         _log("AUTOTEST ulpets TRAIN-PUSH row45 from humanOid=" + _human.ObjectID
                             + " onto dogOid=" + _dog.ObjectID + " q=" + _dog.Thread.Queue.Count);
                     }
                     _dogQueueMax = Math.Max(_dogQueueMax, _dog.Thread.Queue.Count);
                     _humanQueueMax = Math.Max(_humanQueueMax, _human.Thread.Queue.Count);
-                    if (_frame >= 900)
+                    // run-1 law (2026-10-08 ulpets-fix): the row-45 action executes in
+                    // the CALLER's thread (GetAction enqueues on the human; dogQmax
+                    // stays 0) and its chain takes ~12s to reach the dog-side push
+                    // (8276 -> dog TTAB row 95) — 900 frames cut the trick off before
+                    // the dog ran it. 2400 frames (~40s) covers pickup+route+trick.
+                    if (_frame >= 2400)
                     {
                         _log("AUTOTEST ulpets TRAIN treeRan=" + _trainTreeRan + " pushLanded=" + _trainPushLanded
                             + " dogQmax=" + _dogQueueMax + " humanQmax=" + _humanQueueMax + " dogTrees=[" + string.Join(",", _dogTrees) + "]");
                         if (!(_trainTreeRan && (_trainPushLanded || _dogQueueMax > 0 || _humanQueueMax > 1)))
                         {
-                            _log("AUTOTEST ulpets train FAIL: 8334 must execute and land its push on the dog");
+                            _log("AUTOTEST ulpets train FAIL: row 45's action 8341 (dogglobals) must execute and land its push on the dog");
                             _fail("ulpets"); State = 99; TeardownTrace(); return;
                         }
                         State = 4; _frame = 0;
@@ -280,6 +312,7 @@ namespace Simitone.Client
                         _ctr = vm.Context.CreateObjectInstance(ShowCtrGuid, near, Direction.NORTH)?.Objects?.FirstOrDefault();
                         var pedPos = new LotTilePos((short)(_human.Position.x + 96), (short)(_human.Position.y + 64), _human.Position.Level);
                         _pedestal = vm.Context.CreateObjectInstance(PedestalGuid, pedPos, Direction.NORTH)?.Objects?.FirstOrDefault();
+                        if (!_global10Saved.HasValue) _global10Saved = vm.GetGlobalValue(10);
                         vm.SetGlobalValue(10, 555); // zoning-gate default (unl-show run-17 law)
                         _log("AUTOTEST ulpets SHOW-PLACE ctr=" + (_ctr != null ? _ctr.ObjectID.ToString() : "FAIL")
                             + " pedestal=" + (_pedestal != null ? _pedestal.ObjectID.ToString() : "FAIL")
@@ -358,29 +391,94 @@ namespace Simitone.Client
         {
             if (string.IsNullOrEmpty(s)) return;
             if (_capturing) { if (_capture.Count < 400) _capture.Add(s); return; }
+            // EXP-15 follow-up: parse ONCE and run the recording logic on EVERY
+            // sighting — the old seen-key early-return sat BEFORE the treeRan
+            // check, so a repeat sighting of 8334 (whose "ent:tid" key collides
+            // with PersonGlobals' idle 8334) could never count the training tree.
+            var fm = System.Text.RegularExpressions.Regex.Match(s, @"ent=(\d+) .* (\d+)@");
+            if (!fm.Success) { _log(s); return; }
+            var key = fm.Groups[1].Value + ":" + fm.Groups[2].Value;
+            int ftid = int.Parse(fm.Groups[2].Value);
+            var ent = int.Parse(fm.Groups[1].Value);
+            var sgFm = System.Text.RegularExpressions.Regex.Match(s, @" sg=(\S+)");
+            var sgName = sgFm.Success ? (sgFm.Groups[1].Value ?? "").ToLowerInvariant() : "";
+            // the training verdict ONLY counts DogGlobals routines: row 45's ACTION is
+            // 8341 (test 8344 — the live-semiglobal DISASM, run 2; the enumeration's
+            // 8334/8335 pair is the deeper internal trick tree + ITS test), and the
+            // ids collide with PersonGlobals anyway (its 8334 'do new adult middle
+            // stand' made runs 4/7/8's treeRan=True a false positive). The sg= suffix
+            // names the routine's own IFF.
+            if ((ftid == 8341 || ftid == 8334) && sgName.StartsWith("dogglobals")) _trainTreeRan = true;
+            if (_dog != null && ent == _dog.ObjectID && ftid >= 8192 && ftid <= 8370) _dogTrees.Add(ftid.ToString());
+            else if (_cat != null && ent == _cat.ObjectID && ftid >= 8192 && ftid <= 8370) _catTrees.Add(ftid.ToString());
+            // controller/pedestal band: record on the dog set too (shared evidence bag)
+            else if (ftid >= 4096 && ftid <= 4113) { _dogTrees.Add(ftid.ToString()); }
             // log only first sightings per (ent,tree) + the 4096-4113 show band,
             // so the per-tick flood stays bounded
-            var fm = System.Text.RegularExpressions.Regex.Match(s, @"ent=(\d+) .* (\d+)@");
-            if (fm.Success)
-            {
-                var key = fm.Groups[1].Value + ":" + fm.Groups[2].Value;
-                int ftid = int.Parse(fm.Groups[2].Value);
-                if (!(_seenKeys.Add(key) || (ftid >= 4096 && ftid <= 4113))) return;
-            }
+            if (!(_seenKeys.Add(key) || (ftid >= 4096 && ftid <= 4113))) return;
             _log(s);
-            // format: "... ent=<oid> d=n tick=m <tid>@<ip> op=.."
-            var m = System.Text.RegularExpressions.Regex.Match(s, @"ent=(\d+) .* (\d+)@");
-            if (!m.Success) return;
-            var ent = int.Parse(m.Groups[1].Value);
-            var tid = int.Parse(m.Groups[2].Value);
-            if (tid == 8334 || tid == 8335) _trainTreeRan |= (tid == 8334);
-            if (_dog != null && ent == _dog.ObjectID && tid >= 8192 && tid <= 8370) _dogTrees.Add(tid.ToString());
-            else if (_cat != null && ent == _cat.ObjectID && tid >= 8192 && tid <= 8370) _catTrees.Add(tid.ToString());
-            // controller/pedestal band: record on the dog set too (shared evidence bag)
-            else if (tid >= 4096 && tid <= 4113) { if (_dog != null && ent == _dog.ObjectID) { } _dogTrees.Add(tid.ToString()); }
         }
 
         private static bool HasTree(HashSet<string> set, int id) { return set.Contains(id.ToString()); }
+
+        /// <summary>
+        /// EXP-15 follow-up receipt evidence: the row-45 training chain decoded from
+        /// the LIVE dog semiglobal (the unl-show DISASM idiom) — TTAB 129 rows 44-46
+        /// and 94-96 plus routines 8334 (Train Bounce action), 8335 (its test) and
+        /// 8276 (the router that pushes the dog-side row). Names the resource so the
+        /// PersonGlobals id collision is explicit.
+        /// </summary>
+        private static void DumpTrainTrees(VM vm)
+        {
+            try
+            {
+                var sg = _dog.Object.Resource.SemiGlobal;
+                var iff = sg?.Iff;
+                if (iff == null) { _log("AUTOTEST ulpets TRAIN-DISASM semiglobal ABSENT"); return; }
+                _log("AUTOTEST ulpets TRAIN-DISASM semiglobal=" + (iff.Filename ?? "?"));
+                var ttabs = iff.List<TTAB>() ?? new List<TTAB>();
+                foreach (var tb in ttabs)
+                {
+                    var rows = tb.Interactions;
+                    for (int i = 0; i < rows.Length; i++)
+                    {
+                        if (!((i >= 44 && i <= 46) || (i >= 94 && i <= 96))) continue;
+                        var r = rows[i];
+                        _log("AUTOTEST ulpets TRAIN-DISASM TTAB " + tb.ChunkID + " row " + i
+                            + " action=" + r.ActionFunction + " test=" + r.TestFunction
+                            + " flags=0x" + r.Flags.ToString("x"));
+                    }
+                }
+                var ttas = iff.List<TTAs>() ?? new List<TTAs>();
+                foreach (var tta in ttabs)
+                {
+                    var labels = ttas.FirstOrDefault(t => t.ChunkID == tta.ChunkID);
+                    if (labels == null) continue;
+                    foreach (var i2 in new[] { 44, 45, 46, 94, 95, 96 })
+                        _log("AUTOTEST ulpets TRAIN-DISASM TTAs " + tta.ChunkID + " [" + i2 + "]='"
+                            + (labels.GetString(i2) ?? "<null>") + "'");
+                }
+                foreach (var tid in new ushort[] { 8341, 8344, 8334, 8335, 8276 })
+                {
+                    var rt = sg.GetRoutine(tid) as VMRoutine;
+                    if (rt == null) { _log("AUTOTEST ulpets TRAIN-DISASM tree" + tid + " MISSING in semiglobal"); continue; }
+                    var bhav = rt.Chunk as BHAV;
+                    _log("AUTOTEST ulpets TRAIN-DISASM tree" + tid + " label=" + (bhav != null ? bhav.ChunkLabel : "?")
+                        + " n=" + rt.Instructions.Length);
+                    for (int i = 0; i < rt.Instructions.Length && i < 48; i++)
+                    {
+                        var ins = rt.Instructions[i];
+                        var opProps = ins.Operand?.GetType().GetProperties() ?? new System.Reflection.PropertyInfo[0];
+                        var opDesc = ins.Operand == null ? "null"
+                            : opProps.Length == 0 ? "RawVal=" + Convert.ToString(ins.Operand)
+                            : string.Join(",", opProps.Select(p => p.Name + "=" + Convert.ToString(p.GetValue(ins.Operand))));
+                        _log("AUTOTEST ulpets TRAIN-DISASM tree" + tid + " @" + i + " op=" + ins.Opcode
+                            + " T:" + ins.TruePointer + " F:" + ins.FalsePointer + " " + opDesc);
+                    }
+                }
+            }
+            catch (Exception ex) { _log("AUTOTEST ulpets TRAIN-DISASM EXC " + ex.GetType().Name + " " + ex.Message); }
+        }
 
         private static string StackStr(VMAvatar a)
         {
@@ -440,6 +538,7 @@ namespace Simitone.Client
                 // 8201 ins14 motive gate) + per-row CheckAction outcome
                 try
                 {
+                    if (!_humanSocialSaved.HasValue) _humanSocialSaved = _human.GetMotiveData(VMMotive.Social);
                     _human.SetMotiveData(VMMotive.Social, (short)0);
                     _capture.Clear(); _capturing = true;
                     var act = _dog.GetAction(1, _human, vm.Context, false, new short[] { (short)_dog.ObjectID, 0, 0, 0 });
@@ -454,6 +553,13 @@ namespace Simitone.Client
                         }).Take(40)) + "]");
                 }
                 catch (Exception mex2) { _log("AUTOTEST ulpets ROW1-MANUAL EXC " + mex2.GetType().Name + " " + mex2.Message); }
+                // run-2 law: restore Social IMMEDIATELY — a pinned-0 human spends the
+                // whole TRAIN window autonomously petting the dog (8276 'Interaction -
+                // Pet' cycles) and never picks up the queued training row (its test
+                // 8344 never executed; dogQmax pushes were the pet-side of the
+                // AUTONOMOUS interaction). The pin was only needed for this census.
+                if (_humanSocialSaved.HasValue)
+                    _human.SetMotiveData(VMMotive.Social, _humanSocialSaved.Value);
                 // the eligibility path (8198/8201/8200) instruction window
                 foreach (var line in _capture.Take(140)) _log("AUTOTEST ulpets PIECAP " + line);
                 var ttasOK = pin[1] == "Call Over" && pin[4] == "Scold" && pin[8] == "Praise"
@@ -513,6 +619,40 @@ namespace Simitone.Client
                     _pushHooked = false;
                     VMPushInteraction.PushOutcome -= OnPushOutcome;
                 }
+            }
+            catch { }
+            // EXP-15 follow-up (central battery run 2 defect 2): full world restore so
+            // the ride-along soak after the verdict stays live — the probe used to
+            // leave the show controller + pedestal in-world (their interactions pin
+            // queues and the stale zoning gate), the host's Social pinned at 0, and
+            // house 5's family mapping pointing at the probe FAMI. The runner's
+            // ulpets resync re-binds _vm/_avatars after this.
+            var vm = VM;
+            try
+            {
+                if (vm != null)
+                {
+                    if (_ctr != null && !_ctr.Dead) _ctr.Delete(true, vm.Context);
+                    if (_pedestal != null && !_pedestal.Dead) _pedestal.Delete(true, vm.Context);
+                }
+            }
+            catch (Exception de) { try { _log("AUTOTEST ulpets teardown-delete EXC " + de.GetType().Name); } catch { } }
+            try
+            {
+                if (vm != null && _global10Saved.HasValue) vm.SetGlobalValue(10, _global10Saved.Value);
+                if (_human != null && _humanSocialSaved.HasValue)
+                    _human.SetMotiveData(VMMotive.Social, _humanSocialSaved.Value);
+                if (vm != null && vm.SpeedMultiplier <= 0)
+                {
+                    vm.SpeedMultiplier = 1; // a verdict-time dialog must not pause the following soak
+                    vm.GlobalBlockingDialog = null;
+                }
+            }
+            catch (Exception re) { try { _log("AUTOTEST ulpets teardown-restore EXC " + re.GetType().Name); } catch { } }
+            try
+            {
+                var neigh = Content.Get().Neighborhood;
+                if (neigh != null) neigh.SetFamilyForHouse(ProbeHouse, _origHouseFam, false);
             }
             catch { }
         }

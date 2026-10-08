@@ -186,10 +186,17 @@ namespace FSO.SimAntics.Engine
                 ? tins[tf.InstructionPointer] : null;
             if (tci == null) return;
             if (!unbudgeted) AutotestInstrTraceBudget--;
+            // EXP-15 follow-up: name the routine's OWN IFF — equal routine ids exist
+            // across semiglobals (PersonGlobals 8334 'do new adult middle stand'
+            // collides with DogGlobals 8334 'Train Bounce'; the ulpets training
+            // verdict must discriminate on the resource). Additive suffix; the
+            // existing consumers' regexes key on ent=/tid@/op= and are unaffected.
+            var sgFile = (tf.Routine?.Chunk?.ChunkParent)?.Filename;
             AutotestTraceSink(tag + " ent=" + Entity.ObjectID + " d=" + (Stack.Count - 1)
                 + " tick=" + Context.VM.Scheduler.CurrentTickID
                 + " " + tid + "@" + tf.InstructionPointer
-                + " op=" + tci.Opcode + " t=" + tci.TruePointer + " f=" + tci.FalsePointer);
+                + " op=" + tci.Opcode + " t=" + tci.TruePointer + " f=" + tci.FalsePointer
+                + (string.IsNullOrEmpty(sgFile) ? "" : " sg=" + sgFile));
             if (AutotestVacLotOverride > 0 && tid == 4100
                 && tf.InstructionPointer == 12 && tci.Opcode == 1)
             {
