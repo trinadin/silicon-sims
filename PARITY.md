@@ -90,13 +90,17 @@ cover the decode-pinned laws):
   live. The serve-choreography SELF-START law is DECODED (EXP-14, 2026-10-08:
   podium-anchored autonomous dining — the Eat interaction itself creates
   Controller-Restaurant-Eat; the hunger-gate hypothesis CONFIRMED as the ad/curve
-  law; the port's freewill law proven faithful on zoning-0 lots); the `hdserve`
-  opt-in gate is in follow-up. **Open regression under investigation (first
-  observed in wave-4 central validation): after phone-plugin travel to a
-  NON-vacation destination (downtown lot 21 / Old Town 93), the lot loads with
-  its NPCs but the traveler/family sim never materializes** (the `hdserve` and
-  `petname` opt-in gates fail on it; vacation arrivals are unaffected — `trv05`
-  passes end-to-end from the same build).
+  law; the port's freewill law proven faithful on zoning-0 lots) and the
+  self-start has been OBSERVED live (an autonomous eat-family engagement with
+  zero pushes, from-dist). **The away-lot traveler grant landed the same day**:
+  single-traveler builds (TS1 call modes 18/26) restored the traveller with the
+  NPC person-class and zero autonomy — the record-restore computes the class
+  against a stale family word and the pd36=50 person-init only runs on home
+  lots; both are now granted at build (the same law family as the Unleashed
+  pet-class fix). Residual: the podium-vs-bar draw and the op-42
+  controller-creation leg are the remaining `hdserve` assertions (opt-in gate,
+  follow-up in flight); the family-path twin of the class fix (`petname`)
+  awaits its validation run.
 - Unleashed: pets are live (adoption, naming, transforms incl. the dragon, nests);
   **pet-AI depth root-caused (EXP-15, 2026-10-08): two decoded port defects
   fixed** — family pets carried the NPC person-class 2 (which Cat/DogGlobals

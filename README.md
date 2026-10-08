@@ -56,10 +56,10 @@ needs real-world testing on real Macs and real saves. That's where you come in:
   surfaces and gendered job titles, Vacation's save-on-vacation/bookings, and
   Makin' Magic's quest lines are on decoded native laws; the view-pie pop gesture
   stays a disclosed model (the original's window-manager vtable was not shipped —
-  not statically recoverable). Actively open: a regression where the travelling
-  sim does not materialize on downtown/Old Town arrival (vacation arrivals are
-  fine), the Hot Date serve self-start and Unleashed pet-gate follow-ups,
-  Vacation's score/souvenir live legs — and human verification of the whole is
+  not statically recoverable). Actively open: the Hot Date serve-self-start
+  gate's final assertions (podium draw + controller leg — the self-start itself
+  is observed live), the Unleashed pet-gate follow-up, Vacation's score/souvenir
+  live legs — and human verification of the whole is
   still partial (heavily automated; played and accepted hands-on in portions).
   Duplicate-gap reports will be closed with a pointer.
 - **Code welcome.** MPL-2.0 — PRs are open. PARITY.md's gap table is the roadmap; small,
