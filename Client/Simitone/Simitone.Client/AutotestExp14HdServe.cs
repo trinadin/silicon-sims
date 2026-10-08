@@ -371,6 +371,17 @@ namespace Simitone.Client
                 + " freeWill=" + VM.FreeWillEnabled
                 + " g10=" + fresh.GetGlobalValue(10)
                 + " zoning(lot" + _arrivalLot + ")=" + Content.Get().Neighborhood.GetZoningType((short)_arrivalLot));
+            // EXP-14 follow-up diagnostics: the gather source registry
+            {
+                var wa = fresh.Context.ObjectQueries.WithAutonomy;
+                _log("AUTOTEST hdserve gather-source: WithAutonomy=" + wa.Count
+                    + " podiumsInWA=" + podiums.Count(p => wa.Contains(p))
+                    + string.Join("", podiums.Select(p => " | " + (p.Object?.OBJ?.ChunkLabel ?? "?")
+                        + " tt=" + (p.TreeTable?.Interactions.Length ?? -1)
+                        + " auto=" + (p.TreeTable?.AutoInteractions?.Length ?? -1)
+                        + " disabled=" + ((p as FSO.SimAntics.VMGameObject)?.Disabled.ToString() ?? "-")
+                        + " pos=" + p.Position)));
+            }
             foreach (var a in avs.Take(14))
             {
                 var lotNo = 0;
@@ -439,6 +450,8 @@ namespace Simitone.Client
             _log("AUTOTEST hdserve SOAK OPEN at f=" + _frame + " (" + SoakFrames + "f hands-off): traveler obj"
                 + _traveler.ObjectID + " hunger " + _hunger0 + " -> -80 (DISCLOSED hunger arm;"
                 + " NO interaction pushes — the meal chain must self-start through free will)");
+            FSO.SimAntics.Primitives.VMFindBestAction.TS1GatherDiag = true;
+            FSO.SimAntics.Primitives.VMFindBestAction._diagTargetOid = _traveler.ObjectID;
             _phase = 3;
         }
 
@@ -486,6 +499,8 @@ namespace Simitone.Client
                     + " controllers=" + controllers
                     + " decisions=" + _decisions + " withCands=" + _decisionsWithCandidates
                     + " podiumCandDecisions=" + _podiumCandidateDecisions
+                    + " gather[" + FSO.SimAntics.Primitives.VMFindBestAction.TS1GatherDiagLast + "]"
+                    + " tgt[" + FSO.SimAntics.Primitives.VMFindBestAction.TS1GatherDiagTargetLast + "]"
                     + " ents=" + vm.Entities.Count);
             }
 
