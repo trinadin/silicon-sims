@@ -40,12 +40,20 @@ exercises all of this on every change; `tools/run-autotest.sh`; opt-in batteries
   (`nbr06` opt-in, 9 phases; nghbtns/nbr05ui re-pinned). Residuals: the
   zone-choice dialog's strings table (behaviorally covered by the toggle),
   hide-slot pairing, evict web-export (ENG-27 scope), venue variants.
-- ~~Sound trace~~ **ROUND 1 DONE (AUD-19)**: per-event trace (HITTrace) +
-  10 native laws; the CAS personality-deny sound (dead name → `ui_nhood_error`)
-  and cross-level attenuation (×3/5 both directions) FIXED; dead native names
-  pinned. **Still open**: footsteps are a missing class entirely; the UI-button
-  down-vs-up firing law and the zoom-volume byte-law are documented deltas;
-  gated listen-run on real hardware.
+- ~~Sound trace~~ **ROUND 1 DONE (AUD-19)** + **FOOTSTEPS CLOSED (AUD-20,
+  2026-10-08)**: the footstep class is live on the decoded native law —
+  authored anim-event triggers (±1/±2 forward/backward), the native gate
+  order, the surface classifier (floor sound class from the SPR2 label
+  first letter M/H/S/C), the 12-case name jumptable (14 live names wired;
+  `footstep_terrain_noshoe` stays corpus-dead) and the barefoot outfits
+  {1,5,10,14}. The TS1 zoom-volume byte-law `(1024−(3−zoom)·280)/1024` is
+  implemented (TS1-guarded, TSO path unchanged). Round 1 also fixed the CAS
+  personality-deny sound and cross-level attenuation (×3/5). Residuals
+  (disclosed): the UI-button down-vs-up firing law is decoded+banked but
+  NOT implemented (protected-scale UI change); nhood-terrain snow branch
+  unmapped (no port terrain-type field); pool/deck markers mapped from port
+  floor-grid sentinels; HITVM dedup vs native per-footfall replay (marginal
+  at step cadence); gated listen-run on real hardware.
 - ~~Custom animated objects~~ **CLOSED 2026-10-08 (CC-06)**: five defects
   fixed on decoded native laws — duplicate-skeleton registration threw
   (native silent-replace law), corrupt and hostile custom CFPs crashed the
@@ -55,14 +63,21 @@ exercises all of this on every change; `tools/run-autotest.sh`; opt-in batteries
   suite (synthetic fixture through the real providers). Residuals:
   duplicate-winner order is enumeration-dependent (the fixed law is
   order-independent); UI-preview animation consumers unexercised.
-- ~~UI residuals~~ **LARGELY CLOSED (UI-37)**: phonebook/help columns scroll
-  on the DECODED animated law (ScrollTo pool + 200ms autorepeat); view-pie
-  cell ladder + magnitude + commit clamps decoded (old model replaced;
-  speed-sound attribution corrected — the port already played the native
-  matrix); the "list picker" premise refuted in-binary (no native dropdown);
-  skill-pip/band constants art-anchored. Remaining: the neighbourhood layout
-  montage; the view-pie pop gesture (re-proved vtable-unrecoverable — stays
-  disclosed); the UL filter-toolbar live mount (canon banked).
+- ~~UI residuals~~ **LARGELY CLOSED (UI-37)** and **MONTAGE + UL TOOLBAR
+  CLOSED (UI-38, 2026-10-08)**: phonebook/help columns scroll on the DECODED
+  animated law (ScrollTo pool + 200ms autorepeat); view-pie cell ladder +
+  magnitude + commit clamps decoded; the UL community filter-toolbar is
+  mounted live on the decoded cWinNeighborhoodUL law (strip 5045 as the
+  community screen's top chrome — no navbar on the original community view;
+  7-button engine-literal ladder, STR#171 labels, click/highlight/plaque
+  laws; `uidtbar` gate); the montage's SpriteSlot water positions are
+  decoded closed (UL waves = lot-layer window image at (0,0); TS1.0 deltas
+  = buffer blit with damage bands 375/565..800 × 400..600, mod-4 hold) —
+  the port's mounts were already engine-exact. Remaining: the view-pie pop
+  gesture (re-proved vtable-unrecoverable — permanent disclosure);
+  bounded UI-38 residuals (lot-category-bits writer, filter persistence
+  LoadCurrentFilter, this+0x108/+0x1dc semantics, TS1.0 discrete-cadence
+  alignment).
 - Platform: `-3d` is experimental; `-jit`/`-dx` are inherited and unverified; trackpad
   natural-scroll and other hardware feel items lack systematic human verification —
   **human verification is partial** (portions played and accepted hands-on; no
@@ -74,9 +89,24 @@ exercises all of this on every change; `tools/run-autotest.sh`; opt-in batteries
   live; the serve choreography's self-start is a named residual.
 - Unleashed: pets are live (adoption, naming, transforms incl. the dragon, nests);
   pet-AI depth and shows/training remain partial.
-- Vacation: save-on-vacation, bookings, score, souvenirs remain open.
-- Superstar: fame promote/demote and session machinery verified live; fame screens and
-  objects are partial; gendered job titles are a disclosed missing surface.
+- Vacation: **save-on-vacation + bookings CLOSED (TRV-05, 2026-10-08)** on
+  the decoded native law (Family::DoStream field-8 rental +0x13C in the
+  version-9 shape, the SaveGame matrix — vacation lot saves house only,
+  booking persists at arrival and clears on return — and mode 27 corrected
+  to the true rental-occupied loop; `trv05` gate; shipped-original
+  byte-identity censused). Score + souvenirs are LAW-BANKED (the per-family
+  score controller, souvenir mood-variant mapping via inventory type 6,
+  leftover cleanup) with two bounded live-observation residuals.
+- Superstar: fame promote/demote and session machinery verified live;
+  **fame screens + objects + gendered job titles CLOSED (EXP-16,
+  2026-10-08)** — the gendered title law (career STR block layout +
+  cJob::GetName(bool)) wired into every consumer (job panel, dialog tokens,
+  web export; also fixed the TSO-remnant level*3+4 desc index), fame
+  screens reconciled against cWinSubpanelFame (one TOC float pair stays
+  disclosed), and the 47-file Studio Town object census found zero missing
+  interactions (1125 interactions, 0 unresolved trees; `ssfame` gate).
+  Residuals: EXP-11's award-ceremony choreography blockers (BHAV-level),
+  home fame-decay self-start.
 - Makin' Magic: the major systems are verified live (spells/recipes via the mode-38
   primitive, duels, nectar, dragon, spellbound, family spells, Magic Town transit);
   quest-line coverage is open.
@@ -85,8 +115,9 @@ exercises all of this on every change; `tools/run-autotest.sh`; opt-in batteries
 path throws instead of running the native destructive cleanup (unused by the owned
 corpus); the layout-history score uses a single-generation model (fresh-house outcome
 and long-run ratio exact; post-renovation transient differs, disclosed); web export
-omits the dead TheSims.com teleport packages (`faminfo` .pub/.ini) and gendered job
-titles; the web-export path fragment `_Sim_Lane` is unresolved.
+still omits the dead TheSims.com teleport packages (`faminfo` .pub/.ini) and the
+`_Sim_Lane` path fragment is unresolved (the gendered-job-titles omission was RETIRED
+by EXP-16 — titles now export on the native law).
 
 **Corrections to earlier rows in this file (decode superseded decode):**
 
