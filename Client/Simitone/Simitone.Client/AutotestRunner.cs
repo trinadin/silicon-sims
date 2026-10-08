@@ -4738,6 +4738,15 @@ namespace Simitone.Client
                     Log("AUTOTEST magicbook SPELLBOOK-LIVE (EXP-08 fix card 3: STR pins -> lot 93 -> place book -> push Read -> mount + round-trip close)");
                     _mgbookStrPins = MagicBookStrPins();
                     _mgbookDialogsBefore = Simitone.Client.UI.Panels.UIOriginalMagicBookDialog.DialogsMounted;
+                    // the transit lever (EXP-10/EXP-11 law): a real booked trip
+                    // sets GameState's transit fields in GenericTS1Call mode 17
+                    // BEFORE SignalLotSwitch; a probe-side switch must mirror
+                    // them or the arrival's family activation (InitializeLot's
+                    // LotTransitInfo >= 1 gate) never fires — no family adult
+                    // on the destination lot.
+                    var gsM = FSO.Content.Content.Get().Neighborhood.GameState;
+                    gsM.ActiveFamily = _vm.TS1State.CurrentFamily;
+                    gsM.LotTransitInfo = 1;
                     _vm.SignalLotSwitch(93u);
                     _mgbookSwitchF = _mgbookFrame;
                     Log("AUTOTEST magicbook SWITCH-SIGNALED lot=93 pins=" + _mgbookPins);
@@ -4968,6 +4977,15 @@ namespace Simitone.Client
                     Log("AUTOTEST petname ADOPT-NAME-LIVE (EXP-08 fix card 1: pen STR pins -> community lot -> place dog pen -> push 'Adopt a Dog' -> answer the chain -> name via the editor -> ProbePet avatar)");
                     _ptnameStrPins = PetNameStrPins();
                     _ptnameDialogsBefore = Simitone.Client.UI.Panels.UIOriginalNameEntryDialog.DialogsMounted;
+                    // the transit lever (EXP-10/EXP-11 law): a real booked trip
+                    // sets GameState's transit fields in GenericTS1Call mode 17
+                    // BEFORE SignalLotSwitch; a probe-side switch must mirror
+                    // them or the arrival's family activation (InitializeLot's
+                    // LotTransitInfo >= 1 gate) never fires — no family adult
+                    // on the destination lot.
+                    var gsP = FSO.Content.Content.Get().Neighborhood.GameState;
+                    gsP.ActiveFamily = _vm.TS1State.CurrentFamily;
+                    gsP.LotTransitInfo = 1;
                     _vm.SignalLotSwitch(93u);
                     _ptnameSwitchF = _ptnameFrame;
                     Log("AUTOTEST petname SWITCH-SIGNALED lot=21 pins=" + _ptnamePins);
