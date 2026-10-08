@@ -5,17 +5,24 @@ maintained alongside PARITY.md and HANDOFF.md as part of the keep-it-honest disc
 
 ## What this repository is
 
-Simitone-macOS is a **native macOS port and fidelity-verification project built on top of an
-MPL-2.0 engine**. It is not a clean-room rewrite and is not "ours alone" in the sense of being
+**Verbatim** (formerly Simitone-macOS) is a **native macOS port and fidelity-verification project
+built on top of an MPL-2.0 engine**. It is not a clean-room rewrite and is not "ours alone" in the sense of being
 independent of FreeSO. Concretely:
 
-- The **simulation engine is FreeSO** (MPL-2.0), checked out as a git submodule at
-  `FreeSO/` (tracking the alexjyong/FreeSO fork's `mac-port-rel` branch). The vast
-  majority of gameplay code — the VM, IFF/FAR loader, content pipeline, entities, motives,
-  relationships, sound, world — lives there (4,242 .cs files).
+- The **simulation engine is FreeSO** (MPL-2.0), living in-repo at `FreeSO/` with its **full git
+  history** — merged as a subtree from our engine fork (upstream lineage:
+  riperiperi/FreeSO → the alexjyong fork → our `mac-port-rel` work). The one consolidation
+  change to that history: blobs over GitHub's 100 MB limit under `Other/libs/assimp-net/`
+  were stripped by `git filter-repo` (author dates and messages preserved; SHAs shifted).
+  The vast majority of gameplay code — the VM, IFF/FAR loader, content pipeline, entities,
+  motives, relationships, sound, world — lives there (4,242 .cs files).
 - **Simitone itself is FreeSO-derived**: this repo is a fork of alexjyong/Simitone, which is a
   fork of riperiperi/Simitone, which is a fork of FreeSO. The `Client/Simitone/` shell and the
-  `Simitone.*` assemblies carry that lineage and MPL headers.
+  `Simitone.*` assemblies carry that lineage and MPL headers. The `Simitone.*` namespaces are
+  deliberately kept (invisible to players; keeps diffs against upstream readable).
+- `FreeSO/Other/libs/FSOMonoGame/` and `FreeSO/Other/libs/FSOMina.NET/` are **vendored
+  snapshots** of the (formerly separate) library forks, pinned at the exact commits the port
+  builds against; their upstream repositories remain public.
 
 ## What this project adds (our contribution)
 
@@ -34,7 +41,7 @@ All of that stands on the engine. None of it replaces FreeSO's simulation core.
 
 ## Engine projects and third-party dependencies
 
-The FreeSO submodule carries the simulation and content projects
+The in-repo `FreeSO/` tree carries the simulation and content projects
 (`tso.files`, `tso.content`, `tso.simantics`, `tso.sound`, `tso.client`,
 `vitaboy.*`/mesh viewers, `FSO.Server.*`), plus the Simitone client shell under
 `Client/Simitone/`. Third-party dependencies are NuGet packages (see
@@ -58,7 +65,7 @@ The repository as a whole is licensed **MPL-2.0** (see LICENSE.md), inherited fr
 This is not a cosmetic choice: MPL-2.0 is file-level copyleft, so any FreeSO/Simitone-derived
 file stays MPL-2.0 regardless of later edits, and our additions are offered under the same
 license. If we ever wanted to relicense, that would require MPL compliance on the derived files
-plus upstream agreement — the submodule boundary does not lift that.
+plus upstream agreement — the directory boundary does not lift that.
 
 ## Original game data
 
@@ -68,6 +75,6 @@ original IFF behavior/script logic against your legally owned game data (see REA
 ## TL;DR
 
 FreeSO (MPL-2.0) is the engine; Simitone is FreeSO-derived; this repo is a macOS port of
-Simitone that adds real verification and fidelity work on top. "Our own thing" = the port, the
-harness, the RE tooling, and the verified fixes — not the engine itself.
+Simitone — **Verbatim** — that adds real verification and fidelity work on top. "Our own thing" =
+the port, the harness, the RE tooling, and the verified fixes — not the engine itself.
 

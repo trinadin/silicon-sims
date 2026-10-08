@@ -1,16 +1,17 @@
-# Simitone — Native macOS (Apple Silicon) Port
+# Verbatim — Native macOS (Apple Silicon) Port
 
 **Status: playable on Apple Silicon; base-game parity work continues.**
 Current verified build, counts, integration decisions and remaining work are
 maintained in [HANDOFF.md](HANDOFF.md). Consult that summary before using the
 build commands below; historical round results are not current-state claims.
 
-This branch (`mac-port`) is a native Apple Silicon port of **Simitone** (alexjyong fork,
-v0.8.20-forked), the open-source re-implementation of The Sims 1 (engine only; it loads the
-original game's data files). Inherits the pinned `FreeSO` engine submodule. Not affiliated with
-the Simitone team. See PROVENANCE.md for the exact code lineage.
+This repository (**Verbatim**, branch `main`; formerly Simitone-macOS) is a native Apple
+Silicon port of **Simitone** (alexjyong fork, v0.8.20-forked), the open-source re-implementation
+of The Sims 1 (engine only; it loads the original game's data files). The `FreeSO` engine lives
+in-repo at `FreeSO/` (full history, merged as a subtree — see PROVENANCE.md). Not affiliated with
+the Simitone team.
 
-## What the `mac-port` branch changes
+## What the port changes
 
 1. **Eto.Forms 2.9.0 alignment** — `Simitone.Desktop.csproj`, `Simitone.Shared.csproj`,
    `Simitone.Windows.csproj` pinned to 2.9.0 (the 2.8.4 pins conflicted with the 2.9.0 NuGet
@@ -55,15 +56,14 @@ dialog, or `-path"<path>"`. Selected path persists in `config.ini` (`TS1HybridPa
 - **Fetch:** `fetch-game-data.sh` downloads the ISO from archive.org and extracts GameData —
   only needed if you lack a local copy.
 
-## Build / package (run from `simitone-fork/`)
+## Build / package (run from the repository root)
 
     ROOT="$PWD"
-    git submodule update --init --recursive
     NUGET_PACKAGES="$ROOT/.nuget-packages" DOTNET_CLI_HOME="$ROOT/.dotnet-cli" \
       dotnet publish Client/Simitone/Simitone.Desktop/Simitone.Desktop.csproj \
       -c Release -r osx-arm64 --self-contained true -o "$ROOT/publish/osx-arm64" \
       /p:TreatWarningsAsErrors=false /p:WarningsAsErrors="" -p:NoWarn=NU1605
-    ./packmac.sh arm64            # -> dist/The Sims-arm64.app
+    ./packmac.sh arm64            # -> dist/The Sims-arm64-app
 
 `NUGET_PACKAGES`/`DOTNET_CLI_HOME` must be absolute paths: the .NET 10 SDK refuses
 relative `NUGET_PACKAGES` at restore time (verify with `dotnet --version`; if it reports

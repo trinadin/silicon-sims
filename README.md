@@ -1,24 +1,29 @@
-# Simitone-macOS
+# Verbatim
 
-A maintained fork of **Simitone** — the open-source re-implementation of *The Sims™* (2000) — rebuilt as a native **macOS (Apple Silicon)** application, with an ongoing effort to push gameplay as close to **1:1 fidelity with the original** as feasible.
+**The Sims™ (2000), word-for-word: a byte-faithful, native macOS (Apple Silicon) port of the
+open-source Simitone engine, running your legally-owned original game data.**
 
-> **Not affiliated with the Simitone team.** This repository is a fork of
-> [alexjyong/Simitone](https://github.com/alexjyong/Simitone) (v0.8.20-forked), which is itself a
-> fork of [riperiperi/Simitone](https://github.com/riperiperi/Simitone). The simulation engine is
-> [FreeSO](https://freeso.org).
+Formerly **Simitone-macOS**. Not affiliated with EA, Maxis, or the Simitone team. This project is a
+fork of [alexjyong/Simitone](https://github.com/alexjyong/Simitone) (itself a fork of
+[riperiperi/Simitone](https://github.com/riperiperi/Simitone)), built on the
+[FreeSO](https://freeso.org) simulation engine.
 
 ## What this project is
 
-Simitone is **not a remake**. It is an engine that:
+Verbatim is **not a remake**. It is an engine that:
 
 - loads your legally-owned copy of *The Sims: Complete Collection* game data (IFF format), and
 - compiles and runs the **original game logic** — the original `Behavior.iff` scripted behavior
   (BHAV bytecode) is executed by the engine's VM — so gameplay is driven by the original data
   and the original logic.
 
+The port's mission is in the name: where behavior differs from the 2000 PowerPC original, the
+original binary is disassembled and the engine is corrected to match it — constants, thresholds,
+formulas and all (see [PROVENANCE.md](PROVENANCE.md) and [PARITY.md](PARITY.md)).
+
 It ships **no copyrighted game assets**: you point it at your game files (see [Game data](#game-data)).
 
-## What this fork changes (branch `mac-port`)
+## What this fork changes (branch `main`)
 
 - **Native macOS build.** Self-contained arm64 app bundle + DMG via [packmac.sh](packmac.sh): no .NET
   runtime, SDL or OpenAL installs required.
@@ -28,14 +33,15 @@ It ships **no copyrighted game assets**: you point it at your game files (see [G
 - **Graphics-backend alignment.** Uses the non-MRT rendering path on OpenGL/macOS (same as the
   iOS/Android engine paths); old Eto 2.8.4 vs 2.9.0 crash and NuGet-cache-path build failures fixed.
 - **Boot diagnostics.** Screen transitions and content-load failures are written to
-  `~/Documents/Simitone/game.log`; crash details land in the app's `simitone-crash.log`.
+  `~/Documents/Simitone/game.log` (the pre-existing user-data directory — kept so saves and settings
+  carry over).
 - **Legal game-data fetch.** [fetch-game-data.sh](fetch-game-data.sh) downloads the Complete Collection
   DVD ISO from archive.org and extracts `GameData/` — no disc drive needed.
 - **Fidelity work.** See [PARITY.md](PARITY.md) for the honest gap tracker toward 1:1.
 
 ## Game data
 
-Simitone needs The Sims 1 **Complete Collection / Legacy Collection** data: a folder containing
+Verbatim needs The Sims 1 **Complete Collection / Legacy Collection** data: a folder containing
 `GameData/.../Behavior.iff` and the `UserData` layout. See [PORT_STATUS.md](PORT_STATUS.md)
 ("Required: game data") for what is staged here and how to obtain it legally —
 [fetch-game-data.sh](fetch-game-data.sh) stages the Complete Collection DVD from archive.org
@@ -44,34 +50,36 @@ in the user-data `config.ini` (`TS1HybridPath`); user data and saves live in `~/
 
 ## Running
 
-- Launch `dist/The Sims-arm64.app` (or mount `dist/Simitone-macOS-AppleSilicon.dmg`).
+- Launch `dist/The Sims-arm64.app` (or mount `dist/The Sims-macOS-AppleSilicon.dmg`).
 - First run: pick your game-data folder, or it is auto-detected / pre-seeded in `config.ini`.
 - Flags: `-gl` (OpenGL), `-3d` (3D mode, toggle F12), `-nosound`. `-jit` and `-dx` are inherited
   from upstream and not yet soak-verified on macOS.
 
 ## Building from source
 
-Prerequisites: .NET SDK 9, git. The exact publish + package commands
+One repository, no submodules:
+
+```sh
+git clone https://github.com/trinadin/verbatim.git
+cd verbatim && git checkout main
+```
+
+Prerequisites: .NET SDK 9. The exact publish + package commands
 (and why the `NUGET_PACKAGES`/`DOTNET_CLI_HOME` redirects and `WarningsAsErrors` relaxations are
 needed) are in [PORT_STATUS.md](PORT_STATUS.md) → "Build / package".
 
-## Repository layout (three-repo fork chain)
+## Repository layout
 
-This project keeps its upstreams' structure — a client repo consuming the engine as a
-submodule — so each fork carries its own full history and stays diffable against
-upstream:
+Everything builds from this one repository:
 
-1. **This repo** ([Simitone-macOS](https://github.com/trinadin/Simitone-macOS), branch `mac-port`) — the Simitone client, macOS packaging, docs and battery tooling.
-2. [trinadin/FreeSO-mac-port](https://github.com/trinadin/FreeSO-mac-port) — the engine fork (submodule `FreeSO/`, branch `mac-port-rel`).
-3. [trinadin/FSOMonoGame](https://github.com/trinadin/FSOMonoGame) — the MonoGame fork the engine uses (nested submodule; one commit on top of upstream: the macOS trackpad natural-scroll fix).
-
-```sh
-git clone --recurse-submodules https://github.com/trinadin/Simitone-macOS.git
-cd Simitone-macOS && git checkout mac-port
-```
-
-Every submodule pin resolves inside those three public repos, so
-`--recurse-submodules` is sufficient — nothing else to fetch by hand.
+- `Client/` — the Simitone client (macOS shell, UI, autotest battery).
+- `FreeSO/` — the FreeSO engine fork, merged in-repo with its **full git history** (grafted as a
+  subtree; engine commits remain reachable with their original author dates).
+- `FreeSO/Other/libs/FSOMonoGame/` — the MonoGame fork, vendored at the exact pin the port builds
+  against (upstream + the macOS trackpad natural-scroll fix). Upstream remains at
+  [riperiperi/FSOMonoGame](https://github.com/riperiperi/FSOMonoGame).
+- `FreeSO/Other/libs/FSOMina.NET/` — vendored unmodified from upstream.
+- `tools/` — the decode/verification tooling behind the fidelity program.
 
 ## Parity status
 
@@ -87,27 +95,25 @@ The engine is shared; the iOS shell (FSO.iOS) is legacy Xamarin and needs modern
 
 ## License & credits
 
-- Engine: [FreeSO](https://freeso.org) — MPL-2.0, via our fork
-  [trinadin/FreeSO-mac-port](https://github.com/trinadin/FreeSO-mac-port) (submodule `FreeSO/`;
-  this repo is LICENSE.md MPL-2.0 as a whole; per MPL §3.2/Exhibit A file headers are optional and only a minority of files carry one).
-- Original game & data: © Maxis / EA — not bundled here.
+- Engine: [FreeSO](https://freeso.org) — MPL-2.0, merged in-repo at `FreeSO/` with history
+  (this repo is LICENSE.md MPL-2.0 as a whole; per MPL §3.2/Exhibit A file headers are optional
+  and only a minority of files carry one).
+- Original game & data: © Maxis / EA — not bundled here. "The Sims" is their trademark; this
+  project is an unaffiliated fan engine and presents the game experience to the player, nothing more.
 - Upstream: [riperiperi/Simitone](https://github.com/riperiperi/Simitone),
   [alexjyong/Simitone](https://github.com/alexjyong/Simitone),
   [riperiperi/FreeSO](https://github.com/riperiperi/FreeSO) and
-  [riperiperi/FSOMonoGame](https://github.com/riperiperi/FSOMonoGame) (both forked here — see
-  [Repository layout](#repository-layout-three-repo-fork-chain)).
+  [riperiperi/FSOMonoGame](https://github.com/riperiperi/FSOMonoGame).
 - macOS port & parity work: this repository.
 - Icon/audio attributions from upstream (Icons8, CC0 freesound loops) apply to bundled assets; see ATTRIBUTION.md
 
 ## Source code (MPL §3.2)
 
-The complete corresponding source for this application is this repository at the
-packaged revision: the `mac-port` branch tip, with the `FreeSO` engine submodule at the
-gitlink that commit records (and the engine's own nested pins). Clone with
-`--recurse-submodules`, `git checkout` that parent commit, and build with
-`packmac.sh`/`build-mac-linux.sh` per PORT_STATUS.md. Third-party license notices
-ship with the bundle (`Contents/Resources/THIRD-PARTY-NOTICES.md`) and as
+The complete corresponding source for this application is this repository — including the merged
+engine tree and the vendored libraries — at the packaged revision (the `main` branch tip). Clone,
+`git checkout` that commit, and build with `packmac.sh` per PORT_STATUS.md. Third-party license
+notices ship with the bundle (`Contents/Resources/THIRD-PARTY-NOTICES.md`) and as
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
-For the honest answer to "whose code is this?" (engine vs port vs verification
-layer), read [PROVENANCE.md](PROVENANCE.md).
+For the honest answer to "whose code is this?" (engine vs port vs verification layer), read
+[PROVENANCE.md](PROVENANCE.md).
