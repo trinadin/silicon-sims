@@ -100,6 +100,7 @@ namespace Simitone.Client
         private VMEntity _plugin;
         private VM _homeVm;
         private int _pushUid = -1;
+        private int _notifyArms;
         private bool _entered;
         private int _answers;
         private readonly List<string> _dlgTypes = new List<string>();
@@ -156,6 +157,23 @@ namespace Simitone.Client
                     if (vm == null) return false;
                     KeepUnblocked(vm);
                     AnswerDialogs(vm);
+                    // Wait-For-Notify release (the EXP-03 V1.2 law): the chain parks
+                    // in global 281 'Wait For Notify' whose innermost idle counts down
+                    // 20000 ticks. The native release is ActiveAction.NotifyIdle
+                    // re-evaluated on the next idle execution — arm the flag AND a
+                    // 1-tick scheduler wake, re-armed per park of the pushed action.
+                    {
+                        var aaNi = _traveler?.Thread?.ActiveAction;
+                        if (aaNi != null && aaNi.UID == _pushUid && !aaNi.NotifyIdle)
+                        {
+                            aaNi.NotifyIdle = true;
+                            vm.Scheduler.ScheduleTickIn(_traveler, 1);
+                            _notifyArms++;
+                            if (_notifyArms <= 4)
+                                _log("AUTOTEST hdserve armed NotifyIdle + 1-tick wake #" + _notifyArms
+                                    + " (Wait-For-Notify park of the pushed action) at f=" + _frame);
+                        }
+                    }
                     // the wrapper re-points the _vm accessor on the screen-vm swap
                     // (the EXP-04 replacement law) — the swap IS the arrival signal
                     var fresh = _vm();
