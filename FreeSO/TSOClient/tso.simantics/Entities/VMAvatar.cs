@@ -1108,8 +1108,13 @@ namespace FSO.SimAntics
                 var g = (ushort)GetPersonData(VMPersonDataVariable.Gender);
                 g |= (AvatarType == VMAvatarType.Dog) ? (ushort)8 : (ushort)16;
                 SetPersonData(VMPersonDataVariable.Gender, (short)g);
-                // pd[32] left as stored (family pets: resident class 0; the
-                // brain re-classes off-home) — see SetAvatarType's EXP-15 note.
+                // EXP-15: a FAMILY pet activates as the resident class 0 (8201
+                // ins2's resident path skips the greet gate). Synthesized
+                // records may carry the NPC class 2 (which 8200 ins3 rejects
+                // as a target); the pets' own main loop re-classes to BCON 260
+                // key 1 when off-home. Non-family pets keep their stored class.
+                if (GetPersonData(VMPersonDataVariable.TS1FamilyNumber) == current?.ChunkID)
+                    SetPersonData(VMPersonDataVariable.PersonType, 0);
             }
             SetPersonData(VMPersonDataVariable.VisitorSchedule, sched);
             SetPersonData(VMPersonDataVariable.GreetStatus, 0);
