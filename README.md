@@ -6,7 +6,19 @@ Simitone engine, running your legally-owned original game data.**
 Formerly **Simitone-macOS**. Not affiliated with EA, Maxis, or the Simitone team. This project is a
 fork of [alexjyong/Simitone](https://github.com/alexjyong/Simitone) (itself a fork of
 [riperiperi/Simitone](https://github.com/riperiperi/Simitone)), built on the
-[FreeSO](https://freeso.org) simulation engine.
+[FreeSO](https://freeso.org) simulation engine. "The Sims" is a trademark of EA — this is an
+unaffiliated fan engine that runs the game from **your own copy** of the original data.
+
+## Download
+
+Grab the latest `SiliconSims-macOS-AppleSilicon.dmg` from
+[**Releases**](https://github.com/trinadin/silicon-sims/releases), mount it, and drag
+**The Sims** to your Applications folder.
+
+- **Requirements:** an Apple Silicon Mac (M1 or later), macOS 11 or later. No .NET runtime,
+  SDL, OpenAL, or any other dependencies — the app is self-contained.
+- **Game data:** you need your own copy of *The Sims: Complete Collection* (or Legacy
+  Collection) — see [Game data](#game-data). Nothing EA-owned is bundled.
 
 ## What this project is
 
@@ -21,36 +33,40 @@ Where behavior differs from the 2000 PowerPC original, the original binary is di
 engine is corrected to match it — constants, thresholds, formulas and all (see
 [PROVENANCE.md](PROVENANCE.md) and [PARITY.md](PARITY.md)).
 
-It ships **no copyrighted game assets**: you point it at your game files (see [Game data](#game-data)).
+## Status — and how you can help
 
-## What this fork changes (branch `main`)
+**Playable:** boots to gameplay, loads and saves neighbourhoods and houses, plays the core
+single-family game — and it is continuously verified by a 144-check automated battery that runs
+the real game headlessly (build + run it yourself with `tools/run-autotest.sh`).
 
-- **Native macOS build.** Self-contained arm64 app bundle + DMG via [packmac.sh](packmac.sh): no .NET
-  runtime, SDL or OpenAL installs required.
-- **Apple Silicon verified.** Boots to gameplay, loads user neighbourhoods/houses, renders a live scene
-  (pixel-confirmed) and passes durable soak runs — opened from the historical “builds but does not
-  run” state to playable.
-- **Graphics-backend alignment.** Uses the non-MRT rendering path on OpenGL/macOS (same as the
-  iOS/Android engine paths); old Eto 2.8.4 vs 2.9.0 crash and NuGet-cache-path build failures fixed.
-- **Boot diagnostics.** Screen transitions and content-load failures are written to
-  `~/Documents/Simitone/game.log` (the pre-existing user-data directory — kept so saves and settings
-  carry over).
-- **Legal game-data fetch.** [fetch-game-data.sh](fetch-game-data.sh) downloads the Complete Collection
-  DVD ISO from archive.org and extracts `GameData/` — no disc drive needed.
-- **Fidelity work.** See [PARITY.md](PARITY.md) for the honest gap tracker toward 1:1.
+**Honest status:** this is an **engine parity project, not a finished 1:1 clone** — and it needs
+real-world testing on real Macs and real saves. That's where you come in:
+
+- **Play it.** Every hour of real play on hardware we don't have is a contribution.
+- **Report what breaks.** Open a [GitHub Issue](https://github.com/trinadin/silicon-sims/issues) —
+  the bug template asks for your Mac model, macOS version, and game-data source, and the two logs
+  below. Vague reports can't be fixed; pinned ones can.
+- **Attach the logs.** `~/Documents/Simitone/game.log` (screen/content-load tracing) and the
+  crash log next to it. They're plain text — paste the tail (last ~50 lines) or the whole thing.
+- **Know the known gaps before filing.** Fame career, vacation features, pet AI, Makin' Magic
+  coverage, free-will accuracy, some neighbourhood management, and sound/UI fidelity are tracked
+  honestly in [PARITY.md](PARITY.md) — read it before filing issues; duplicate-gap reports will
+  be closed with a pointer.
+- **Code welcome.** MPL-2.0 — PRs are open. PARITY.md's gap table is the roadmap; small,
+  well-evidenced fixes (see the PROVENANCE discipline) land fastest.
 
 ## Game data
 
 Silicon Sims needs The Sims 1 **Complete Collection / Legacy Collection** data: a folder containing
 `GameData/.../Behavior.iff` and the `UserData` layout. See [PORT_STATUS.md](PORT_STATUS.md)
-("Required: game data") for what is staged here and how to obtain it legally —
+("Required: game data") for how to obtain it legally —
 [fetch-game-data.sh](fetch-game-data.sh) stages the Complete Collection DVD from archive.org
 (you must own/obtain the game; it just avoids needing a disc drive). The selected path persists
 in the user-data `config.ini` (`TS1HybridPath`); user data and saves live in `~/Documents/Simitone/`.
 
 ## Running
 
-- Launch `dist/The Sims-arm64.app` (or mount `dist/The Sims-macOS-AppleSilicon.dmg`).
+- Launch **The Sims** from Applications (or your build's `dist/The Sims-arm64.app`).
 - First run: pick your game-data folder, or it is auto-detected / pre-seeded in `config.ini`.
 - Flags: `-gl` (OpenGL), `-3d` (3D mode, toggle F12), `-nosound`. `-jit` and `-dx` are inherited
   from upstream and not yet soak-verified on macOS.
@@ -81,25 +97,14 @@ Everything builds from this one repository:
 - `FreeSO/Other/libs/FSOMina.NET/` — vendored unmodified from upstream.
 - `tools/` — the decode/verification tooling behind the fidelity program.
 
-## Parity status
-
-⚠ Honest status: this is an **engine parity project**, not a finished 1:1 clone. The engine runs
-original logic from original data, but not everything is faithful yet. Known gaps (fame career,
-vacation features, pet AI, Makin' Magic, free-will accuracy, some neighbourhood management, sound
-and UI fidelity) are tracked in [PARITY.md](PARITY.md) — read it before filing issues.
-
-## iPad / iOS (future)
-
-The engine is shared; the iOS shell (FSO.iOS) is legacy Xamarin and needs modernization. Assessed in
-[PORT_STATUS.md](PORT_STATUS.md). Not started.
-
 ## License & credits
 
 - Engine: [FreeSO](https://freeso.org) — MPL-2.0, merged in-repo at `FreeSO/` with history
   (this repo is LICENSE.md MPL-2.0 as a whole; per MPL §3.2/Exhibit A file headers are optional
   and only a minority of files carry one).
-- Original game & data: © Maxis / EA — not bundled here. "The Sims" is their trademark; this
-  project is an unaffiliated fan engine and presents the game experience to the player, nothing more.
+- Original game & data: © Maxis / EA — **not bundled**; the app icon is a rendering of the
+  in-game plumbob generated from game data at build time (fan-project use, no EA asset files
+  are distributed).
 - Upstream: [riperiperi/Simitone](https://github.com/riperiperi/Simitone),
   [alexjyong/Simitone](https://github.com/alexjyong/Simitone),
   [riperiperi/FreeSO](https://github.com/riperiperi/FreeSO) and

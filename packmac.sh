@@ -14,8 +14,19 @@ cp -R "$SRC"/. "$APP/Contents/MacOS/"
 # Keep one real copy in Resources and preserve FreeSO's ./Content lookup.
 # The SDK-generated nested app duplicates the publish root and is not used.
 rm -rf "$APP/Contents/MacOS/Content" "$APP/Contents/MacOS/Simitone.Desktop.app"
-cp -R "$SRC/Content" "$APP/Contents/Resources/Content"
-ln -s ../Resources/Content "$APP/Contents/MacOS/Content"
+# REL-13: ship ONLY the engine substrate the TS1 game actually reads — the
+# full publish Content/ carries the TSO online-game payload (Objects 262MB,
+# Avatar, Cities, ArchiveCities, Blueprints, Patch, Sounds, MeshReplace,
+# upgrades.json, banlist...), which is EA/TSO-derived, unused by the TS1
+# path, and is NOT distributed. The allowlist below is battery-verified
+# (144/0 from a dist packed with exactly this set; each entry was demanded
+# by a boot or check failure when absent).
+mkdir -p "$APP/Contents/Resources/Content"
+for item in UI Fonts OGL 3D DX iOS uigraphics Cursors TS1Patch Textures \
+            cas.fsov UIScript.egt FSODataDefinition.dat; do
+  [ -e "$SRC/Content/$item" ] && cp -R "$SRC/Content/$item" "$APP/Contents/Resources/Content/"
+done
+ln -sfn ../Resources/Content "$APP/Contents/MacOS/Content"
 # Eto.Forms assemblies are never emitted by MSBuild on macOS; copy explicitly.
 cp -n "$NUGET/eto.forms/2.9.0/lib/net6.0/Eto.dll" "$APP/Contents/MacOS/" 2>/dev/null || true
 cp -n "$NUGET/eto.platform.mac64/2.9.0/lib/netstandard2.0/Eto.Mac64.dll" "$APP/Contents/MacOS/" 2>/dev/null || true
