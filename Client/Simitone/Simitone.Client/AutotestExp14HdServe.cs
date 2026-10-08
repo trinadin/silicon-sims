@@ -578,6 +578,7 @@ namespace Simitone.Client
                     + " podiumCandDecisions=" + _podiumCandidateDecisions
                     + " gather[" + FSO.SimAntics.Primitives.VMFindBestAction.TS1GatherDiagLast + "]"
                     + " tgt[" + FSO.SimAntics.Primitives.VMFindBestAction.TS1GatherDiagTargetLast + "]"
+                    + " pod[" + FSO.SimAntics.Primitives.VMFindBestAction.TS1GatherDiagPodiumLast + "]"
                     + " ents=" + vm.Entities.Count);
             }
 
@@ -647,6 +648,7 @@ namespace Simitone.Client
                     + " own gathers never pooled the podium rows (traveler decisions="
                     + _travelerDecisions + ", with podium candidates=" + _travelerPodiumCandDecisions
                     + "; targetGather[" + FSO.SimAntics.Primitives.VMFindBestAction.TS1GatherDiagTargetLast
+                    + "]; podium rows[" + FSO.SimAntics.Primitives.VMFindBestAction.TS1GatherDiagPodiumLast
                     + "]) — her draw leg is the residual";
                 Done(false);
                 return;
