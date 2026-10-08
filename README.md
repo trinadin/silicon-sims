@@ -1,4 +1,4 @@
-# Sims on Silicon
+# Silicon Sims
 
 **The Sims™ (2000), natively on Apple Silicon Macs: a byte-faithful port of the open-source
 Simitone engine, running your legally-owned original game data.**
@@ -10,7 +10,7 @@ fork of [alexjyong/Simitone](https://github.com/alexjyong/Simitone) (itself a fo
 
 ## What this project is
 
-Sims on Silicon is **not a remake**. It is an engine that:
+Silicon Sims is **not a remake**. It is an engine that:
 
 - loads your legally-owned copy of *The Sims: Complete Collection* game data (IFF format), and
 - compiles and runs the **original game logic** — the original `Behavior.iff` scripted behavior
@@ -41,7 +41,7 @@ It ships **no copyrighted game assets**: you point it at your game files (see [G
 
 ## Game data
 
-Sims on Silicon needs The Sims 1 **Complete Collection / Legacy Collection** data: a folder containing
+Silicon Sims needs The Sims 1 **Complete Collection / Legacy Collection** data: a folder containing
 `GameData/.../Behavior.iff` and the `UserData` layout. See [PORT_STATUS.md](PORT_STATUS.md)
 ("Required: game data") for what is staged here and how to obtain it legally —
 [fetch-game-data.sh](fetch-game-data.sh) stages the Complete Collection DVD from archive.org
@@ -60,8 +60,8 @@ in the user-data `config.ini` (`TS1HybridPath`); user data and saves live in `~/
 One repository, no submodules:
 
 ```sh
-git clone https://github.com/trinadin/sims-on-silicon.git
-cd sims-on-silicon && git checkout main
+git clone https://github.com/trinadin/silicon-sims.git
+cd silicon-sims && git checkout main
 ```
 
 Prerequisites: .NET SDK 9. The exact publish + package commands

@@ -1,11 +1,11 @@
-# Sims on Silicon — Native macOS (Apple Silicon) Port
+# Silicon Sims — Native macOS (Apple Silicon) Port
 
 **Status: playable on Apple Silicon; base-game parity work continues.**
 Current verified build, counts, integration decisions and remaining work are
 maintained in [HANDOFF.md](HANDOFF.md). Consult that summary before using the
 build commands below; historical round results are not current-state claims.
 
-This repository (**Sims on Silicon**, branch `main`; formerly Simitone-macOS) is a native Apple
+This repository (**Silicon Sims**, branch `main`; formerly Simitone-macOS) is a native Apple
 Silicon port of **Simitone** (alexjyong fork, v0.8.20-forked), the open-source re-implementation
 of The Sims 1 (engine only; it loads the original game's data files). The `FreeSO` engine lives
 in-repo at `FreeSO/` (full history, merged as a subtree — see PROVENANCE.md). Not affiliated with
