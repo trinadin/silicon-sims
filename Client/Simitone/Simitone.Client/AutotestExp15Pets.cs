@@ -401,6 +401,22 @@ namespace Simitone.Client
 
                 // capture the CheckAction trace while the census runs (the human
                 // is unbudgeted; every 8xxx test instruction is traced)
+                // gate inputs, direct: both sides of the 8200@3 compare
+                try
+                {
+                    var bcon260 = vm.Context.Globals.Resource.Get<BCON>(260);
+                    var tc = (bcon260 != null && bcon260.Constants != null && bcon260.Constants.Length > 3)
+                        ? string.Join(",", bcon260.Constants.Take(4).Select(x => x.ToString()))
+                        : "ABSENT";
+                    _log("AUTOTEST ulpets GATE dog pd32=" + _dog.GetPersonData(VMPersonDataVariable.PersonType)
+                        + " dog pd65=" + _dog.GetPersonData(VMPersonDataVariable.Gender)
+                        + " dog pd61=" + _dog.GetPersonData(VMPersonDataVariable.TS1FamilyNumber)
+                        + " human pd32=" + _human.GetPersonData(VMPersonDataVariable.PersonType)
+                        + " human pd61=" + _human.GetPersonData(VMPersonDataVariable.TS1FamilyNumber)
+                        + " human social=" + _human.GetMotiveData(VMMotive.Social)
+                        + " BCON260[0..3]=[" + tc + "]");
+                }
+                catch (Exception tex) { _log("AUTOTEST ulpets GATE-EXC " + tex.GetType().Name + " " + tex.Message); }
                 _capture.Clear(); _capturing = true;
                 List<VMPieMenuInteraction> pie;
                 try { pie = _dog.GetPieMenu(vm, _human, true, true); }
@@ -409,6 +425,24 @@ namespace Simitone.Client
                 _pieLabels.AddRange((pie ?? new List<VMPieMenuInteraction>())
                     .Select(p => (p.Name ?? "").Trim()).Where(n => n.Length > 0));
                 _log("AUTOTEST ulpets PIE dog rows=[" + string.Join(" | ", _pieLabels) + "]");
+                // manual single-row re-run with the human's Social pinned low (the
+                // 8201 ins14 motive gate) + per-row CheckAction outcome
+                try
+                {
+                    _human.SetMotiveData(VMMotive.Social, (short)0);
+                    _capture.Clear(); _capturing = true;
+                    var act = _dog.GetAction(1, _human, vm.Context, false, new short[] { (short)_dog.ObjectID, 0, 0, 0 });
+                    var chk = act == null ? null : _human.Thread.CheckAction(act);
+                    _capturing = false;
+                    _log("AUTOTEST ulpets ROW1-MANUAL act=" + (act != null) + " check=" + (chk != null ? "PASS" : "FAIL")
+                        + " humanSocial=" + _human.GetMotiveData(VMMotive.Social)
+                        + " cap=[" + string.Join(" ; ", _capture.Select(l =>
+                        {
+                            var i = l.IndexOf("ent=");
+                            return i >= 0 ? l.Substring(i) : l;
+                        }).Take(40)) + "]");
+                }
+                catch (Exception mex2) { _log("AUTOTEST ulpets ROW1-MANUAL EXC " + mex2.GetType().Name + " " + mex2.Message); }
                 // the eligibility path (8198/8201/8200) instruction window
                 foreach (var line in _capture.Take(140)) _log("AUTOTEST ulpets PIECAP " + line);
                 var ttasOK = pin[1] == "Call Over" && pin[4] == "Scold" && pin[8] == "Praise"
