@@ -13,7 +13,7 @@ This section is the current truth. Everything below it is the historical round r
 (newest-first-ish through late September) — rows there may be superseded; where a row was
 later overturned, corrections are noted in place or here.
 
-**Verified working** (the default 146-check battery boots the real game headlessly and
+**Verified working** (the default 147-check battery boots the real game headlessly and
 exercises all of this on every change; `tools/run-autotest.sh`; opt-in batteries
 `nbr06`, `nbr05ui`, `nghbtns`, `freewillwin`, `moodlaw` cover the decode-pinned laws):
 
@@ -46,9 +46,15 @@ exercises all of this on every change; `tools/run-autotest.sh`; opt-in batteries
   pinned. **Still open**: footsteps are a missing class entirely; the UI-button
   down-vs-up firing law and the zoom-volume byte-law are documented deltas;
   gated listen-run on real hardware.
-- Custom content: objects with custom animations are not fully supported
-  (CC-06 queued — the analysis agent was interrupted by a usage limit; its
-  dart-board custom-anim fixture set is banked in the ledger evidence).
+- ~~Custom animated objects~~ **CLOSED 2026-10-08 (CC-06)**: five defects
+  fixed on decoded native laws — duplicate-skeleton registration threw
+  (native silent-replace law), corrupt and hostile custom CFPs crashed the
+  game outright (now skip+report on the native decoder semantics,
+  ReadNFloats restructured 1:1), untranslated animations and unresolvable
+  skeletons no longer NRE the renderer. Gated by `cc06` in the default
+  suite (synthetic fixture through the real providers). Residuals:
+  duplicate-winner order is enumeration-dependent (the fixed law is
+  order-independent); UI-preview animation consumers unexercised.
 - ~~UI residuals~~ **LARGELY CLOSED (UI-37)**: phonebook/help columns scroll
   on the DECODED animated law (ScrollTo pool + 200ms autorepeat); view-pie
   cell ladder + magnitude + commit clamps decoded (old model replaced;
