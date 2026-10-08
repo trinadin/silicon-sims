@@ -13,7 +13,7 @@ This section is the current truth. Everything below it is the historical round r
 (newest-first-ish through late September) — rows there may be superseded; where a row was
 later overturned, corrections are noted in place or here.
 
-**Verified working** (the default 155-check battery boots the real game headlessly and
+**Verified working** (the default 156-check battery boots the real game headlessly and
 exercises all of this on every change; `tools/run-autotest.sh`; opt-in batteries
 `nbr06`, `nbr05ui`, `nghbtns`, `freewillwin`, `moodlaw`, `trv05`, `hdserve`, `ulpets`
 cover the decode-pinned laws):
@@ -107,9 +107,11 @@ cover the decode-pinned laws):
   8200's eligibility gate rejects as an owner-interaction target, hiding Call
   Over/Scold/Praise/toys/Play/Tricks/Train) and pet avatars lacked the pd[65]
   species bits the TTAB gates read; shows/training were found largely
-  receipt-closed already (EXP-05 unl-show/unl-mice, EXP-09 exp09train). The
-  `ulpets` opt-in gate is in follow-up (record-restore class path + probe
-  soak-release).
+  receipt-closed already (EXP-05 unl-show/unl-mice, EXP-09 exp09train).
+  **CLOSED (follow-up, 2026-10-08)**: the record-restore class path and the
+  probe soak-release are fixed and `ulpets` rides the DEFAULT suite green
+  from dist (156/0; the owner pie rows, the training push, and the show
+  pedestal all live).
 - Vacation: **save-on-vacation + bookings CLOSED (TRV-05, 2026-10-08)** on
   the decoded native law (Family::DoStream field-8 rental +0x13C in the
   version-9 shape, the SaveGame matrix — vacation lot saves house only,

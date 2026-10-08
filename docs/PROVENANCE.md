@@ -30,7 +30,7 @@ Our original, value-adding work lives in a thin layer around the engine:
 
 - The macOS packaging/build layer (`packmac.sh`, Info.plist, icon, DMG tooling) and the
   port fixes needed to run on Apple Silicon.
-- The headless `-autotest` verification harness and its 155-check suite (AUTOTEST.md).
+- The headless `-autotest` verification harness and its 156-check suite (AUTOTEST.md).
 - The reverse-engineering toolkit under `tools/` and the staged-data evidence under
   `tools/iff-dump/` (tracked evidence).
 - Engine-side fidelity fixes, each committed with IFF-grounded evidence (e.g. UseNeighbor
