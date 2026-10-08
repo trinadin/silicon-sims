@@ -51,12 +51,14 @@ needs real-world testing on real Macs and real saves. That's where you come in:
 - **Attach the logs.** `~/Documents/Simitone/game.log` (screen/content-load tracing) and the
   crash log next to it. They're plain text — paste the tail (last ~50 lines) or the whole thing.
 - **Know the known gaps before filing.** The current gap list lives in
-  [PARITY.md](PARITY.md) → "Where the game stands": neighbourhood management is partial,
-  the sound fidelity trace hasn't been run, several UI interactions are modeled rather than
-  decoded, the expansion packs (Hot Date, Unleashed, Vacation, Superstar, Makin' Magic) each
-  have substantial working systems with open completeness gaps — and human verification of
-  the whole is still partial (heavily automated; played and accepted hands-on in portions).
-  Duplicate-gap reports will be closed with a pointer.
+  [PARITY.md](PARITY.md) → "Where the game stands": footsteps are a missing sound class,
+  a few UI surfaces remain disclosed models (the view-pie pop gesture, the neighbourhood
+  layout montage), the expansion packs (Hot Date, Unleashed, Vacation, Superstar,
+  Makin' Magic) each have substantial working systems with open completeness gaps
+  (Vacation most open) — and human verification of the whole is still partial (heavily
+  automated; played and accepted hands-on in portions). Neighbourhood management, list
+  scrolling, the view-pie, custom-animated objects, and sound-fidelity round 1 are
+  already on decoded native laws. Duplicate-gap reports will be closed with a pointer.
 - **Code welcome.** MPL-2.0 — PRs are open. PARITY.md's gap table is the roadmap; small,
   well-evidenced fixes (see the PROVENANCE discipline) land fastest.
 

@@ -33,11 +33,14 @@ See PARITY.md → "Where the game stands" for the full list. Headlines:
 - **Human verification is partial** — every system above is machine-verified, and
   portions have been played and accepted hands-on (e.g. the plumbob render scenarios);
   a systematic end-to-end human acceptance pass is still pending.
-- Base game: neighbourhood management (bulldoze/rezone/evict) partial;
-  sound audible-fidelity trace not run; custom-animated objects partial;
-  assorted modeled UI interactions (disclosed in PARITY).
+- Base game: footsteps are a missing sound class; a few UI surfaces remain
+  disclosed models (view-pie pop gesture, neighbourhood layout montage,
+  UL filter-toolbar live mount); sound fidelity is one decoded round deep.
+  (Neighbourhood management, list scrolling, the view-pie ladder, and
+  custom-animated objects are closed on decoded native laws.)
 - Expansions: Hot Date / Unleashed / Vacation / Superstar / Makin' Magic
-  all have substantial verified systems and open completeness gaps.
+  all have substantial verified systems and open completeness gaps
+  (Vacation most open).
 - Platform: Apple Silicon only; `-3d` experimental; `-jit`/`-dx` unverified.
 
 ## Working on it
