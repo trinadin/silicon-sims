@@ -133,6 +133,10 @@ namespace Simitone.Client
                     short g0 = sel.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.Gender);
                     short jt0 = sel.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.JobType);
                     short jl0 = sel.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.JobPromotionLevel);
+                    short age0 = sel.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.PersonsAge);
+                    // force the adult job surface (a child selection would
+                    // route to ReportCard and never touch JobTitle)
+                    sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.PersonsAge, 27);
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.Gender, 0);
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.JobType, 2);
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.JobPromotionLevel, 0);
@@ -147,6 +151,7 @@ namespace Simitone.Client
                     panelDiag = " male='" + male + "' female='" + female + "'";
                     panelLaw = male == "Waiter" && female == "Waitress";
                     // restore
+                    sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.PersonsAge, age0);
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.Gender, g0);
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.JobType, jt0);
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.JobPromotionLevel, jl0);
@@ -197,6 +202,8 @@ namespace Simitone.Client
                     short l0 = sel.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.TS1FameStarPower);
                     short p0 = sel.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.TS1FameStarHighWatermark);
                     short jt0 = sel.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.JobType);
+                    short age0 = sel.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.PersonsAge);
+                    sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.PersonsAge, 27); // adult -> Fame mode reachable
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.TS1FameScore, 100);
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.TS1FameStarPower, 5);
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.TS1FameStarHighWatermark, 5);
@@ -209,13 +216,15 @@ namespace Simitone.Client
                     fameLaw = fs != null
                         && panel.FameLevelLabel != null
                         && panel.FameLevelLabel.Text == fs.GetString(5 + 1)      // UpdateFameLabel @0x10455de0
-                        && fs.GetString(13 + 5 * 2).Contains("Studio Fly")        // popup pair law (native 1-based 14/15 -> ours 23/24)
+                        && fs.GetString(13 + 5 * 2) != null
+                        && fs.GetString(13 + 5 * 2).Contains(fs.GetString(6))    // popup pair law: title [13+2L] carries the level name
                         && fs.GetString(12).Contains("%s")                        // friends format [12]
                         && panel.FameTitle != null && panel.FameTitle.Text == fs.GetString(0);
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.TS1FameScore, s0);
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.TS1FameStarPower, l0);
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.TS1FameStarHighWatermark, p0);
                     sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.JobType, jt0);
+                    sel.SetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.PersonsAge, age0);
                 }
                 else fameDiag = " no-selected-avatar";
             }
