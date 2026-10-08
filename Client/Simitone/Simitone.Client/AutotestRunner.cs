@@ -4999,6 +4999,23 @@ namespace Simitone.Client
                         _vm = _screen.vm; _ptnameRebound = true;
                         Log("AUTOTEST petname VM-REBOUND curHouse=" + (_vm.TS1State?.CurrentHouse.ToString() ?? "?") + " ents=" + _vm.Entities.Count);
                     }
+                    // LM-2 THE LAST-MILE UN-PARK (r2 scheduler truth: cur=1 frozen,
+                    // bucket 1 never consumed, Main@0, zero ITRACE, motives frozen).
+                    // The away-lot visit session loads per the NBR-06 native entry
+                    // law (cSimsApp::LoadGame @0x258680 tail: visit -> SetMode(BUY)
+                    // + Pause), and UIMainPanel.Update parks vm.SpeedMultiplier=-1
+                    // EVERY FRAME while the HUD is not LIVE — the write lands after
+                    // the runner's per-frame force and before vm.Update, so the
+                    // server driver's `if (SpeedMultiplier > 0) TickID++` never
+                    // advances and InternalTick early-returns at the speed gate:
+                    // RunTick NEVER runs, no entity on the whole lot executes, and
+                    // the 4110 dialog thread can never surface its node-0
+                    // dlg-private. Apply the EXP-04 V4.2 'livelift' (the vacation
+                    // gate's passed run-95 law; ss-book re-asserts per tick): flip
+                    // the panel Mode to LIVE — the player-side un-park of the visit
+                    // session — and force speed once. Re-asserted every probe tick
+                    // while the check runs in case the panel re-asserts non-LIVE.
+                    PetNameLivelift();
                     var cur = _vm.TS1State?.CurrentHouse ?? 0;
                     if (_ptnameSwitchF > 0 && _ptnameFrame >= _ptnameSwitchF + 3600)
                     { Log("AUTOTEST petname verdict no-switch: curHouse=" + cur); Fail("petname"); _ptnameState = 99; return; }
@@ -5058,6 +5075,7 @@ namespace Simitone.Client
                 }
                 if (_ptnameState == 2)
                 {
+                    PetNameLivelift(); // LM-2: sustain the visit-session un-park
                     // run-19 law: the full 4113 path routes first and the lot's
                     // NPC AI preempts the walk forever; Maxis's own DEBUG row
                     // (tta8 -> bhav 4110) is the SAME naming chain with NO
@@ -5177,6 +5195,7 @@ namespace Simitone.Client
                 }
                 if (_ptnameState == 3)
                 {
+                    PetNameLivelift(); // LM-2: sustain the visit-session un-park
                     _ptnameSettle++;
                     if (_ptnameSettle == 1 && _vm.TS1State?.CurrentFamily == null)
                     {
@@ -5264,11 +5283,45 @@ namespace Simitone.Client
                             : "?";
                         var penPosStr = (top != null && top.Callee != null)
                             ? top.Callee.Position.TileX + "," + top.Callee.Position.TileY + ",L" + top.Callee.Position.Level : "?";
+                        // LM-1: scheduler truth for the actor's thread — an entity
+                        // only executes when the scheduler ticks it; TickSchedule is
+                        // private, so reflect it (probe-only read). idleEnd stuck far
+                        // above the current tick = orphaned (spawned into a bucket the
+                        // pipeline never reached); idleEnd ~cur+1 while Main sits at
+                        // ip=0 = ticking but execution-gated elsewhere.
+                        string schedStr = "?";
+                        try
+                        {
+                            var sched = _vm.Scheduler;
+                            var curT = sched.CurrentTickID;
+                            var idleEnd = simQ?.Thread?.ScheduleIdleEnd ?? 0;
+                            var tsField = sched.GetType().GetField("TickSchedule",
+                                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                            int bucketAt = -1, bucketTotal = -1;
+                            if (tsField != null && tsField.GetValue(sched) is System.Collections.IDictionary ts)
+                            {
+                                bucketTotal = ts.Count;
+                                foreach (System.Collections.DictionaryEntry kv in ts)
+                                {
+                                    var key = (uint)kv.Key;
+                                    if (key >= curT && key <= idleEnd)
+                                    {
+                                        var lst = kv.Value as System.Collections.IEnumerable;
+                                        int n = 0; bool hit = false;
+                                        if (lst != null) foreach (var o in lst) { n++; if (o == simQ) hit = true; }
+                                        if (hit) { bucketAt = (int)key; break; }
+                                    }
+                                }
+                            }
+                            schedStr = "cur=" + curT + " idleEnd=" + idleEnd + " buckets=" + bucketTotal + " entBucket=" + bucketAt;
+                        }
+                        catch (Exception se) { schedStr = "EXC " + se.GetType().Name; }
                         Log("AUTOTEST petname QUEUE-SNAP f=" + _ptnameSettle + " q=" + (q != null ? q.Count.ToString() : "null")
                             + " uids=[" + (q != null ? string.Join(",", q.Select(x => x.UID)) : "") + "]"
                             + " top=" + (top?.Routine?.Chunk?.ChunkID.ToString() ?? "?") + "@" + (top?.InstructionPointer.ToString() ?? "?")
                             + " actorPos=(" + actorPosStr + ")"
                             + " penPos=(" + penPosStr + ")"
+                            + " sched=(" + schedStr + ")"
                             + " stack=[" + chain2 + "]");
                     }
                     // run-14/15 law: the Old Town away-family loop never polls
@@ -5493,6 +5546,35 @@ namespace Simitone.Client
 
         private static void PetNameQueueDrop(VMEntity ent, FSO.SimAntics.Engine.VMQueuedAction act)
         { Log("AUTOTEST petname QUEUE-DROP ent=" + ent.ObjectID + " act='" + act.Name + "' checkNull"); }
+
+        /// <summary>
+        /// LM-2: the away-lot visit session un-park. The NBR-06 native entry law
+        /// (visit -> SetMode(BUY)+Pause) leaves the port's HUD non-LIVE, and
+        /// UIMainPanel.Update re-parks vm.SpeedMultiplier=-1 every frame while
+        /// it is — which freezes the whole scheduler (TickID never advances,
+        /// InternalTick early-returns, RunTick never runs). This is the EXP-04
+        /// V4.2 'livelift' (the vacation gate's passed run-95 law; ss-book
+        /// re-asserts per tick): flip the panel Mode to LIVE — the player-side
+        /// un-park — and force speed once. Inert when the panel is already LIVE
+        /// (the LIVE branch leaves a positive speed untouched). Probe-only
+        /// runtime write; no UI/engine source change.
+        /// </summary>
+        private static void PetNameLivelift()
+        {
+            try
+            {
+                var mp = _screen?.Frontend?.MainPanel;
+                if (mp == null) return;
+                if (mp.Mode != Simitone.Client.UI.Panels.UIMainPanelMode.LIVE)
+                {
+                    var was = mp.Mode;
+                    mp.Mode = Simitone.Client.UI.Panels.UIMainPanelMode.LIVE;
+                    if (_vm != null && _vm.SpeedMultiplier <= 0) _vm.SpeedMultiplier = 1;
+                    Log("AUTOTEST petname LIVELIFT panel " + was + " -> LIVE; speed forced 1 (visit-session un-park, V4.2/ss-book law)");
+                }
+            }
+            catch (Exception le) { Log("AUTOTEST petname LIVELIFT-EXC " + le.GetType().Name); }
+        }
 
         private static void PetNameQueueRemove(string reason, VMEntity ent, FSO.SimAntics.Engine.VMQueuedAction act)
         { if (_ptnameState == 3 || _awdrvState == 2 || _awdrvState == 3) Log("AUTOTEST QUEUE-REMOVE(" + reason + ") ent=" + ent.ObjectID + " act='" + act.Name + "'");
