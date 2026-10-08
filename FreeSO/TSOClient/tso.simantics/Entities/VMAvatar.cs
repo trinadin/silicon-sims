@@ -284,6 +284,34 @@ namespace FSO.SimAntics
                 else if (type == "dog") AvatarType = VMAvatarType.Dog;
             }
 
+            // EXP-15 — the native pet-identity law (decoded 2026-10-08; evidence
+            // coordination/evidence/EXP-15/enumeration-20261008.md + the decode
+            // receipt): a pet avatar carries (a) the species bits in the gender
+            // word (dog=8 / cat=16 — the port's identity dialect consumed by
+            // IsPet/IsDog/IsCat, CheckTS1Action's TTAB gates and the outfit
+            // tables; the NATIVE species discriminator is the same body-strings
+            // word: EditPerson::GetSpecies @0x10062290 compares the species
+            // string against {"dogmale","dogfemale","catmale","catfemale"}) and
+            // (b) person type = the PERMANENT Global.iff BCON 260 'Person Types'
+            // class 2: Cat/DogGlobals 8200 'get interaction eligibility'
+            // ins2/ins3 gate the ENTIRE owner-interaction set on pd[32] ==
+            // Tuning[0x4202] (= BCON 260 key 2 = 2); the PPC cXPerson init
+            // (0x10108b00 region) stores the creation type param at
+            // person+0x5cc, and the same function's zoning law exempts class 2
+            // from the visitor conversion. Template-family pets and old saves
+            // previously arrived with pd[32]=0 and no species bits, so 8200's
+            // gate returned false and every pet-owner row (Call Over / Scold /
+            // Praise / Treat / toys / Play / Tricks / Train / pet show entry)
+            // was unreachable — live-proven by the ulpets PIECAP trace
+            // (run 2: 8200@3 f->14 on every gated row).
+            if (AvatarType == VMAvatarType.Dog || AvatarType == VMAvatarType.Cat)
+            {
+                var g = (ushort)GetPersonData(VMPersonDataVariable.Gender);
+                g |= (AvatarType == VMAvatarType.Dog) ? (ushort)8 : (ushort)16;
+                SetPersonData(VMPersonDataVariable.Gender, (short)g);
+                SetPersonData(VMPersonDataVariable.PersonType, 2);
+            }
+
             Avatar = new SimAvatar(FSO.Content.Content.Get().AvatarSkeletons.Get((data?.GetString(0)??"adult")+".skel"));
             if (UseWorld && !FSO.Content.Content.Get().TS1)
             {
@@ -1069,6 +1097,17 @@ namespace FSO.SimAntics
             // visitors left immediately. Visitors are type 2.
             if (lastPersonType == 0) SetPersonData(VMPersonDataVariable.PersonType, (short)((GetPersonData(VMPersonDataVariable.TS1FamilyNumber) == current?.ChunkID) ? 0 : 2));
             else SetPersonData(VMPersonDataVariable.PersonType, lastPersonType);
+            // EXP-15: pets are PERMANENTLY the BCON-260 class 2 regardless of family
+            // (the family gate lives in the 8201 pd61 comparison, not the type word —
+            // see SetAvatarType's EXP-15 decode note); the record's plain-gender
+            // restore also drops the ctor's species bits, so re-derive both.
+            if (AvatarType == VMAvatarType.Dog || AvatarType == VMAvatarType.Cat)
+            {
+                var g = (ushort)GetPersonData(VMPersonDataVariable.Gender);
+                g |= (AvatarType == VMAvatarType.Dog) ? (ushort)8 : (ushort)16;
+                SetPersonData(VMPersonDataVariable.Gender, (short)g);
+                SetPersonData(VMPersonDataVariable.PersonType, 2);
+            }
             SetPersonData(VMPersonDataVariable.VisitorSchedule, sched);
             SetPersonData(VMPersonDataVariable.GreetStatus, 0);
             SetPersonData(VMPersonDataVariable.IsGhost, GetPersonData(VMPersonDataVariable.IsGhost));

@@ -174,6 +174,11 @@ namespace Simitone.Client
                         {
                             _log("AUTOTEST ulpets SPAWN catOid=" + _cat.ObjectID + " dogOid=" + _dog.ObjectID
                                 + " humanOid=" + _human.ObjectID + " avatars=" + avatars.Count
+                                + " dog(pd32=" + _dog.GetPersonData(VMPersonDataVariable.PersonType)
+                                + ",pd65=" + _dog.GetPersonData(VMPersonDataVariable.Gender)
+                                + ",pd61=" + _dog.GetPersonData(VMPersonDataVariable.TS1FamilyNumber) + ")"
+                                + " cat(pd32=" + _cat.GetPersonData(VMPersonDataVariable.PersonType)
+                                + ",pd65=" + _cat.GetPersonData(VMPersonDataVariable.Gender) + ")"
                                 + " dogStack=[" + StackStr(_dog) + "] catStack=[" + StackStr(_cat) + "]");
                             // arm the brain trace: pets + human unbudgeted, EXP-15 pet band on
                             var ub = VMThread.AutotestUnbudgetedEnts;
