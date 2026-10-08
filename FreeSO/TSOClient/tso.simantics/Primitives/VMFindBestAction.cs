@@ -706,7 +706,12 @@ namespace FSO.SimAntics.Primitives
                     if ((gender & 4) != 0 && (entry.Flags & (TTABFlags)0x200) == 0) continue;
                     // 0x105b28-0x105b38: children (attr58 in 1..17) are blocked by entry
                     // mask 0x10 (TS1NoChild) — rlwinm 0x1b/0x1b.
-                    if (isChild && (entry.Flags & (TTABFlags)0x10) != 0) continue;
+                    if (isChild && (entry.Flags & (TTABFlags)0x10) != 0)
+                    {
+                        if (pod != null) pod("CHILD-GATE (TS1NoChild 0x10; caller attr58="
+                            + caller.GetPersonData(VMPersonDataVariable.PersonsAge) + ")");
+                        continue;
+                    }
                     // 0x105b3c-0x105b5c: a plain APPEND person (NOT a child, and
                     // word-65 bits 0x2|0x4 clear) is blocked by entry mask 0x40
                     // (TS1NoAdult) — rlwinm 0x19/0x19. ENG-25 (AUD-16 interpreter P3-5):

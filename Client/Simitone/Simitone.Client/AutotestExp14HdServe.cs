@@ -284,7 +284,47 @@ namespace Simitone.Client
         private void ArmOutbound(VM vm)
         {
             var avs = vm.Entities.OfType<VMAvatar>().ToList();
-            _traveler = avs.FirstOrDefault();
+            // EXP-14 hdserve-residual (run-3 root cause, native record data): the
+            // template family's first avatar is user00011 Cassandra, whose NBRS
+            // record carries PersonData[58] = 9 — A CHILD. The podium's Eat rows
+            // (TTAB 129 rows 0/2, flags 0x31/0x39) both carry bit 0x10 =
+            // TS1NoChild, and the native APPEND child gate (0x105b28-0x105b38:
+            // attr58 in 1..17 blocked by mask 0x10) bars a child from EVER
+            // drawing them — run 3's per-row diag showed rows 0/2 dying exactly
+            // there. The lawful diner class is an ADULT; the travel booking
+            // (already a disclosed probe-side push) therefore books an adult.
+            // Among adults, avoid stratum 1 ((house+oid)&3 == 1, the native
+            // 7-tile distance-capped scan stratum, 0x109c34-0x109c88 / CFG+0x1c
+            // = 7.0): a stratum-1 traveler idling at the arrival corner would
+            // never SEE the far podiums. Strata 0/2/3 see all/even/odd ids.
+            var houseNo = (vm.GlobalState != null && vm.GlobalState.Length > 10) ? vm.GlobalState[10] : (short)0;
+            VMAvatar PickTraveler()
+            {
+                var scored = avs.Select(a =>
+                {
+                    var age = a.GetPersonData(VMPersonDataVariable.PersonsAge);
+                    var child = age > 0 && age < 0x12; // the native child word (0x105978)
+                    var stratum = (houseNo + a.ObjectID) & 3;
+                    return new { a, age, child, stratum };
+                }).OrderBy(x => x.child).ThenBy(x => x.stratum == 1 ? 1 : 0).ToList();
+                foreach (var s in scored.Take(4))
+                    _log("AUTOTEST hdserve traveler candidate obj" + s.a.ObjectID
+                        + " '" + (s.a.Object?.OBJ?.ChunkLabel ?? "?") + "'"
+                        + " age(pd58)=" + s.age + (s.child ? " (CHILD)" : " (adult)")
+                        + " stratum=" + s.stratum);
+                return scored.Count > 0 ? scored[0].a : null;
+            }
+            VMAvatar Describe(VMAvatar a, string tag)
+            {
+                if (a == null) return null;
+                var age = a.GetPersonData(VMPersonDataVariable.PersonsAge);
+                _log("AUTOTEST hdserve traveler " + tag + ": obj" + a.ObjectID
+                    + " '" + (a.Object?.OBJ?.ChunkLabel ?? "?") + "'"
+                    + " age(pd58)=" + age + ((age > 0 && age < 0x12) ? " (CHILD)" : " (adult)")
+                    + " stratum((g10+oid)&3)=" + ((houseNo + a.ObjectID) & 3));
+                return a;
+            }
+            _traveler = Describe(PickTraveler(), "selected");
             if (_traveler == null)
             {
                 Verdict = "no-home-avatar: the home lot has no avatar to travel";
