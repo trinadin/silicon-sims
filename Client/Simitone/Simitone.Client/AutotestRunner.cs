@@ -5257,9 +5257,18 @@ namespace Simitone.Client
                                 try { owner = fr?.ScopeResource?.MainIff?.Filename; } catch { }
                                 chain2 += (fr?.Routine?.Chunk?.ChunkID ?? 0) + "@" + (fr?.InstructionPointer ?? -1) + "(" + (owner ?? "?") + "),";
                             }
+                        var snapActor = _ptnameActorOid > 0 ? _vm.GetObjectById((short)_ptnameActorOid) : null;
+                        var actorPosStr = snapActor != null
+                            ? snapActor.Position.TileX + "," + snapActor.Position.TileY + ",L" + snapActor.Position.Level
+                              + ",oow=" + (snapActor.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)
+                            : "?";
+                        var penPosStr = (top != null && top.Callee != null)
+                            ? top.Callee.Position.TileX + "," + top.Callee.Position.TileY + ",L" + top.Callee.Position.Level : "?";
                         Log("AUTOTEST petname QUEUE-SNAP f=" + _ptnameSettle + " q=" + (q != null ? q.Count.ToString() : "null")
                             + " uids=[" + (q != null ? string.Join(",", q.Select(x => x.UID)) : "") + "]"
                             + " top=" + (top?.Routine?.Chunk?.ChunkID.ToString() ?? "?") + "@" + (top?.InstructionPointer.ToString() ?? "?")
+                            + " actorPos=(" + actorPosStr + ")"
+                            + " penPos=(" + penPosStr + ")"
                             + " stack=[" + chain2 + "]");
                     }
                     // run-14/15 law: the Old Town away-family loop never polls
