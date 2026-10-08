@@ -391,6 +391,11 @@ namespace FSO.HIT
                 VM.QueuePlay(entry);
                 Notes.Add(entry);
                 NotesByChannel.Add(instance, entry);
+                // AUD-19: as-played note trace (volume is post group-master + duck).
+                if (HITTrace.Enabled) HITTrace.Note(HITTrace.KIND_NOTE, Name,
+                    Patch?.Name, Patch != null ? Patch.FileID : 0,
+                    ActiveTrack != null ? ActiveTrack.TrackID : 0,
+                    instance.Volume, InstVolume, Pan, instance.Pitch, (byte)VolGroup, LastMainOwner);
                 return Notes.Count - 1;
             }
             else
@@ -427,6 +432,11 @@ namespace FSO.HIT
                 VM.QueuePlay(entry);
                 Notes.Add(entry);
                 NotesByChannel.Add(instance, entry);
+                // AUD-19: as-played note trace (volume is post group-master + duck).
+                if (HITTrace.Enabled) HITTrace.Note(HITTrace.KIND_NOTE_LOOP, Name,
+                    Patch?.Name, Patch != null ? Patch.FileID : 0,
+                    ActiveTrack != null ? ActiveTrack.TrackID : 0,
+                    instance.Volume, InstVolume, Pan, instance.Pitch, (byte)VolGroup, LastMainOwner);
                 return Notes.Count - 1;
             }
             else

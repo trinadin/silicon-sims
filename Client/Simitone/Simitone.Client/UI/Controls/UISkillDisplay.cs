@@ -25,6 +25,12 @@ namespace Simitone.Client.UI.Controls
     {
         public static Texture2D HiliteTexture;
 
+        // UI-37: art-anchored — SkillsHilite.bmp's own interior navy #000050
+        // (dominant dark of the shipped 4x11 bitmap, 9/44 px; decoded from
+        // UIGraphics.far @0x3165b9). The engine's exact palette-LUT index
+        // stays un-decoded (ORIG-02 ui33 #3 verdict re-verified).
+        public static readonly Microsoft.Xna.Framework.Color EmptyPipTint = new Microsoft.Xna.Framework.Color(0, 0, 80);
+
         public UISkillDisplay() : base()
         {
             if (HiliteTexture == null)
@@ -66,7 +72,7 @@ namespace Simitone.Client.UI.Controls
                 float alpha;
                 if (i < Value) { color = Color.White; alpha = 1f; }
                 else if (i < Needed) { color = Color.White; alpha = 0.45f; }
-                else { color = new Color(30, 34, 66); alpha = 1f; } // DISCLOSED: empty-pip silhouette tint, port-derived against SkillsHilite.bmp (not engine-decoded)
+                else { color = EmptyPipTint; alpha = 1f; }
                 if (HiliteTexture != null)
                     DrawLocalTexture(batch, HiliteTexture, null, new Microsoft.Xna.Framework.Vector2(i * 8, 0), Vector2.One, color * alpha);
                 else

@@ -277,7 +277,7 @@ namespace FSO.HIT
 
         public HITSound PlaySoundEvent(string evt)
         {
-            if (DISABLE_SOUND) return null;
+            if (DISABLE_SOUND) { if (HITTrace.Enabled) HITTrace.Event(evt, HITTrace.RES_DISABLED, 0, null); return null; }
             evt = evt.ToLowerInvariant();
             if (evt.StartsWith("nc_")) NightclubMode = true;
             HITThread InterruptBlocker = null; //the thread we have to wait for to finish before we begin.
@@ -296,7 +296,12 @@ namespace FSO.HIT
                     {
                         InterruptBlocker = (aevt as HITThread);
                     }
-                    else return aevt; //an event of this type is already alive - here, take it.
+                    else
+                    {
+                        // AUD-19: dedup arm — an event of this type is already alive.
+                        if (HITTrace.Enabled) HITTrace.Event(evt, HITTrace.RES_ALREADY_ALIVE, 0, aevt.Name);
+                        return aevt; //an event of this type is already alive - here, take it.
+                    }
                 }
             }
 
@@ -312,11 +317,17 @@ namespace FSO.HIT
                 //the track and HSM associated with the piano_play event, however, are correct. it's just the subroutine that is renamed.
                 if (evt.Equals("piano_play", StringComparison.InvariantCultureIgnoreCase))
                 {
+                    // AUD-19: record the hardcoded remap before switching names.
+                    if (HITTrace.Enabled) HITTrace.Event(evt, HITTrace.RES_PIANO_REMAP, 0, null);
                     evt = "playpiano";
                     if (ActiveEvents.ContainsKey(evt))
                     {
                         if (ActiveEvents[evt].Dead) ActiveEvents.Remove(evt); //if the last event is dead, remove and make a new one
-                        else return ActiveEvents[evt]; //an event of this type is already alive - here, take it.
+                        else
+                        {
+                            if (HITTrace.Enabled) HITTrace.Event(evt, HITTrace.RES_ALREADY_ALIVE, 0, ActiveEvents[evt].Name);
+                            return ActiveEvents[evt]; //an event of this type is already alive - here, take it.
+                        }
                     }
                 }
 
@@ -357,6 +368,7 @@ namespace FSO.HIT
                     thread.VolGroup = GroupForTrack(evtent, HITVolumeGroup.FX);
                     Sounds.Add(thread);
                     ActiveEvents.Add(evt, thread);
+                    if (HITTrace.Enabled) HITTrace.Event(evt, HITTrace.RES_CREATED, evtent.TrackID, thread.Name);
                     return thread;
                 }
                 else if (evtent.EventType == HITEvents.kSetMusicMode)
@@ -372,6 +384,7 @@ namespace FSO.HIT
                     if (NextMusic != null) NextMusic.Kill();
                     if (MusicEvent != null) MusicEvent.Fade();
                     NextMusic = thread;
+                    if (HITTrace.Enabled) HITTrace.Event(evt, HITTrace.RES_CREATED, evtent.TrackID, thread.Name);
                     return thread;
                 }
                 else if (evtent.EventType == HITEvents.kSequenceTrackHitList)
@@ -397,7 +410,11 @@ namespace FSO.HIT
                     { //no subroutine: one-shot the track's own patch, the chain still applies
                         thread = new HITThread(TrackID, this, evtent.ResGroup);
                     }
-                    if (thread == null) return null;
+                    if (thread == null)
+                    {
+                        if (HITTrace.Enabled) HITTrace.Event(evt, HITTrace.RES_NOT_FOUND, TrackID, null);
+                        return null;
+                    }
                     thread.SequenceHitlist = evtent.SequenceHitlist;
                     Sounds.Add(thread);
                     ActiveEvents[evt] = thread;
@@ -407,6 +424,7 @@ namespace FSO.HIT
                         if (!InterruptBlocker.Name.StartsWith("nc_")) InterruptBlocker.KillVocals();
                     }
                     thread.Name = evt;
+                    if (HITTrace.Enabled) HITTrace.Event(evt, HITTrace.RES_CREATED, TrackID, thread.Name);
                     return thread;
                 }
                 else if (SubroutinePointer != 0)
@@ -429,6 +447,7 @@ namespace FSO.HIT
                         if (!InterruptBlocker.Name.StartsWith("nc_")) InterruptBlocker.KillVocals();
                     }
                     thread.Name = evt;
+                    if (HITTrace.Enabled) HITTrace.Event(evt, HITTrace.RES_CREATED, TrackID, thread.Name);
                     return thread;
                 }
                 else if (TrackID != 0 && content.Audio.GetTrack(TrackID, 0, evtent.ResGroup) != null)
@@ -442,10 +461,12 @@ namespace FSO.HIT
                         if (!InterruptBlocker.Name.StartsWith("nc_")) InterruptBlocker.KillVocals();
                     }
                     thread.Name = evt;
+                    if (HITTrace.Enabled) HITTrace.Event(evt, HITTrace.RES_CREATED, TrackID, thread.Name);
                     return thread;
                 }
             }
 
+            if (HITTrace.Enabled) HITTrace.Event(evt, HITTrace.RES_NOT_FOUND, 0, null);
             return null;
         }
     }

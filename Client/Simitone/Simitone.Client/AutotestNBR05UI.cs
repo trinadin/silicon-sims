@@ -373,13 +373,17 @@ namespace Simitone.Client
         private void PhaseVacantBuiltRezone()
         {
             // Template law (UI-30): lot 10 is vacant+built → confirm [8]/[9]
-            // → YES = BulldozeLot. The disclosed single-step chain: the bulldoze
-            // does NOT auto-run the rezone (the next armed click re-decides).
+            // → YES = BulldozeLot. NBR-06 decode CORRECTION: the chain is NOT
+            // single-step — RezoneModeLotHandlerUL @0x469160 runs the evict/
+            // bulldoze confirm cascade AND SetZoningType in the SAME click
+            // after a successful bulldoze/eviction (the zone-choice dialog's
+            // same-zone picks stay inert; a kept toggle answers it).
             Check(N.GetFamilyForHouse(10) == null, "lot10-vacant-on-template");
             var simi = SimiBuildingValues(HousePath(10));
             Check(simi != null && (simi.Item1 > 0 || simi.Item2 > 0), "lot10-built-on-template");
             var bulldozes0 = Screen.ArmedBulldozesForProbe;
             var directs0 = Screen.RezoneDirectForProbe;
+            var chained0 = Screen.RezoneChainedForProbe;
 
             ArmRezone();
             Panel.SelectHouse(10);
@@ -400,10 +404,17 @@ namespace Simitone.Client
             var after = SimiBuildingValues(HousePath(10));
             Check(after != null && after.Item1 == 0 && after.Item2 == 0,
                 "bulldoze-zeroed-simi-building-values-in-the-file");
-            Check(Screen.RezoneDirectForProbe == directs0, "single-step-chain-no-auto-rezone");
-            Check(Screen._bulldozeDialog != null, "bulldoze-receipt-shown");
-            var bulldozeOk = BulldozeDialogButton(UIAlertButtonType.OK);
-            if (bulldozeOk != null) Press(bulldozeOk);
+            // NBR-06: SetZoningType runs in the SAME click after the successful
+            // bulldoze — the chained-law seam (RezoneChainedForProbe; the old
+            // "no auto-rezone" pin pinned the port's pre-NBR-06 single-step
+            // behavior, and the old RezoneDirect seam counts only the
+            // vacant+UNBUILT toggle arm).
+            Check(Screen.RezoneChainedForProbe == chained0 + 1, "chained-law-auto-rezone (NBR-06)");
+            // The chain's completion receipt is the REZONE receipt (ShowRezoneOk
+            // → _rezoneDialog), not the old standalone bulldoze receipt.
+            Check(Screen._rezoneDialog != null, "rezone-receipt-shown (NBR-06 chain)");
+            var rezoneOk = RezoneDialogButton(UIAlertButtonType.OK);
+            if (rezoneOk != null) Press(rezoneOk);
             DisarmAll();
             if (!_passed) { _done = true; return; }
             Next();

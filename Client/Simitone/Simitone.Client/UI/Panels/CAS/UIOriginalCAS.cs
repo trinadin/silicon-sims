@@ -821,7 +821,13 @@ namespace Simitone.Client.UI.Panels.CAS
                 if (Values[i] >= 10) return;
                 if (Pool <= 0)
                 {
-                    FSO.HIT.HITVM.Get().PlaySoundEvent("UI_CAC_personpts_deny");
+                    // AUD-19: the deny click must fire "ui_nhood_error" — the
+                    // string physically at the native CAS deny call (PlaySoundA of
+                    // the blob slot after "UI_CAC_personpts", data 0x5ceb0+0x11;
+                    // see tools/iff-dump/r143/cas-layout-law.md §click). The old
+                    // name "UI_CAC_personpts_deny" exists nowhere in the shipped
+                    // corpus, so the deny was silent.
+                    FSO.HIT.HITVM.Get().PlaySoundEvent(FSO.Client.UI.Model.UISounds.NeighborhoodError);
                     return;
                 }
                 Values[i]++;

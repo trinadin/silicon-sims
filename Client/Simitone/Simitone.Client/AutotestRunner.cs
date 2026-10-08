@@ -80,7 +80,7 @@ namespace Simitone.Client
             // candidate house ids, tried in order until one loads with >=1 avatar
             public static string HouseCandidates =
                 "5,4,3,2,1,0,6,7,8,9,10,11,21,22,23,24,25,26,27,28,29,30,40,41,42,43,44,45,46,47,48";
-            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall,webexport";
+            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall,webexport,ui37,aud19";
             public static int TimeoutMs = 300000; // hard cap (real ms)
             public static bool ExitOnDone = true;
         }
@@ -356,6 +356,9 @@ namespace Simitone.Client
             // mutations land in run-local space. Opt-in only — inert unless the
             // checks string names it.
             AutotestNBR05UI.BeginIsolation(c);
+            // NBR-06 'nbr06' (opt-in, additive): same isolation idiom — the
+            // evict/bulldoze/rezone chained battery mutates run-local space.
+            AutotestNbr06.BeginIsolation(c);
             if (timeoutMs > 0) Config.TimeoutMs = timeoutMs;
             Config.ExitOnDone = exitOnDone;
 
@@ -410,6 +413,7 @@ namespace Simitone.Client
                     case 16: StateExp09Io(); break;
                     case 17: StateExp09Route(); break;
                     case 18: StateNBR05UI(); break;
+                    case 19: StateNbr06(); break;
                 }
             }
             catch (Exception e)
@@ -425,6 +429,20 @@ namespace Simitone.Client
             if (_screen == null)
                 _screen = GameFacade.Screens?.CurrentUIScreen as TS1GameScreen;
             if (_screen == null || _screen.InLot) { _neighborhoodReadyFrames = 0; return; }
+            // UI-37 'ui37' + AUD-19 'aud19' (default-suite additions): pure
+            // law probes that need only mounted content — run ONCE here at
+            // neighborhood-ready (an unconditional point), not inside the
+            // corpus block (which is gated by the corpus family being enabled).
+            if (!_ui37Aud19Run)
+            {
+                _ui37Aud19Run = true;
+                if (CheckEnabled("ui37"))
+                {
+                    if (AutotestUi37.RunAll()) Pass("ui37");
+                    else { Log("AUTOTEST ui37: one or more residual-law probes failed"); Fail("ui37"); }
+                }
+                if (CheckEnabled("aud19")) CheckAud19();
+            }
             // R246 'ucasflow' opt-in (additive): the real-flow CAS audit takes
             // over the run here — it drives the PRODUCTION MoveIn button into
             // GameController.EnterCAS() instead of the house-load pipeline, so
@@ -537,6 +555,17 @@ namespace Simitone.Client
                 Log("AUTOTEST nbr05ui neighborhood-screen ready; entering rezone+switch battery");
                 _nbr05 = new AutotestNBR05UI(Log);
                 _state = 18;
+                return;
+            }
+            // NBR-06 'nbr06' opt-in (additive): the full native management
+            // battery — bulldoze dialogs/evictions, the chained rezone law,
+            // the visit/save entry matrix — through the real toolbar.
+            if (CheckEnabled("nbr06"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST nbr06 neighborhood-screen ready; entering evict/bulldoze/rezone battery");
+                _nbr06 = new AutotestNbr06(Log);
+                _state = 19;
                 return;
             }
             // Only the visual survey needs a settled neighborhood frame. Do
@@ -899,6 +928,7 @@ namespace Simitone.Client
         // state-18 dispatcher case, which is entered only when the configured
         // Checks string contains "nbr05ui".
         private static AutotestNBR05UI _nbr05;
+        private static bool _ui37Aud19Run;
 
         private static void StateNBR05UI()
         {
@@ -908,6 +938,22 @@ namespace Simitone.Client
             Log("AUTOTEST nbr05ui " + _nbr05.Diagnostics);
             if (!_nbr05.Passed) Log("AUTOTEST nbr05ui FAILURES " + _nbr05.Failures);
             _nbr05 = null;
+            Finish();
+        }
+
+        // NBR-06 'nbr06' (opt-in, additive): the evict/bulldoze/rezone
+        // chained battery (AutotestNbr06; the decoded EvictModeLotHandlerUL
+        // / RezoneModeLotHandlerUL / LoadGame entry-matrix laws).
+        private static AutotestNbr06 _nbr06;
+
+        private static void StateNbr06()
+        {
+            if (_nbr06 == null) { Finish(); return; }
+            if (!_nbr06.Tick()) return;
+            if (_nbr06.Passed) Pass("nbr06"); else Fail("nbr06");
+            Log("AUTOTEST nbr06 " + _nbr06.Diagnostics);
+            if (!_nbr06.Passed) Log("AUTOTEST nbr06 FAILURES " + _nbr06.Failures);
+            _nbr06 = null;
             Finish();
         }
 
@@ -9980,6 +10026,8 @@ namespace Simitone.Client
             // HITVM initialized, original audio corpus loaded, PlaySoundEvent executes without
             // exception (OpenAL/MonoGame SoundEffect path) and the created thread ticks in-loop.
             if (CheckEnabled("audio")) CheckAudio();
+            // (ui37/aud19 dispatch lives in StateWaitNeigh — the corpus block
+            // is gated by the corpus family being enabled.)
             // TYPE53-FC1 audit probe (opt-in "type53"): the HIT type-53
             // (kSequenceTrackHitList) data path — parser retention of the payload
             // sequence-hitlist/flag fields plus the live dispatch chain, headless.
@@ -25645,9 +25693,20 @@ namespace Simitone.Client
                         if (!geometry) diag += "geo(items=" + pie.Items.Count + ");";
 
                         var lvl = Math.Max(1, Math.Min(3, game.ZoomLevel));
-                        cells = pie.CellFor(2) == Math.Min(8, lvl * 2 + 1)
-                            && pie.CellFor(0) == Math.Max(0, lvl * 2 - 1)
-                            && pie.CellFor(1) == 3 && pie.CellFor(3) == 1
+                        // UI-37 re-pin: the OLD "level*2 of 9" cell model is
+                        // retired — UpdateViewMenu @0x1020ccb0 decodes the
+                        // base ladder {level→col: zoomin 1→4, 2→1, 3→0;
+                        // zoomout 2→1, 3→4, else 0} + the ±1/±3 preview
+                        // steps with the shift bonus; idle rotation cells 0.
+                        int zoomInBase = (lvl == 1) ? 4 : (lvl == 2) ? 1 : 0;
+                        int zoomOutBase = (lvl == 2) ? 1 : (lvl == 3) ? 4 : 0;
+                        cells = pie.CellFor(2) == zoomInBase
+                            && pie.CellFor(0) == zoomOutBase
+                            && pie.CellFor(1) == 0 && pie.CellFor(3) == 0
+                            && pie.CellFor(2, +2) == Math.Min(8, zoomInBase + 3)
+                            && pie.CellFor(2, +1, true) == Math.Min(8, zoomInBase + 2)
+                            && Simitone.Client.UI.Panels.UIOriginalViewPie.MagnitudeFor(20f) == 1
+                            && Simitone.Client.UI.Panels.UIOriginalViewPie.MagnitudeFor(20f + 3 * 42f) == 3
                             && Simitone.Client.UI.Panels.UIOriginalViewPie.OriginalRadius == 90
                             && Simitone.Client.UI.Panels.UIOriginalViewPie.DragThreshold == 10;
                         if (!cells) diag += "cells(lvl=" + lvl + ");";
@@ -25730,11 +25789,16 @@ namespace Simitone.Client
                 // scroll bounds and viewport remapping; no phone calls are made.
                 var list=new UI.Controls.UIOriginalTextList(UI.Controls.OriginalGlyphFont.LoadByIndex(12,GameFacade.GraphicsDevice),280,10);
                 list.SetItems(Enumerable.Range(0,47).Select(i => "Neighbor "+i));
+                // UI-37: Select/ScrollBy now drive the DECODED animated
+                // ScrollTo ramp — settle it before asserting post-scroll state.
                 list.Select(46);
+                list.SettleRampForProbe();
                 bool overflow=list.SelectedIndex==46 && list.TopRow==37 && list.Rows[9].Text=="Neighbor 46";
                 list.ScrollBy(-1000);
+                list.SettleRampForProbe();
                 overflow &= list.TopRow==0 && list.SelectedIndex==46 && list.Rows[0].Text=="Neighbor 0";
                 list.ScrollBy(1000);
+                list.SettleRampForProbe();
                 overflow &= list.TopRow==37 && list.Rows.Count==10;
                 var input = new FSO.Common.Rendering.Framework.Model.UpdateState {
                     WindowFocused = true, Time = new Microsoft.Xna.Framework.GameTime(),
@@ -25743,9 +25807,11 @@ namespace Simitone.Client
                 list.KeyboardActive = true;
                 input.NewKeys.Add(Microsoft.Xna.Framework.Input.Keys.Home);
                 list.Update(input);
+                list.SettleRampForProbe();
                 bool keyboard = list.SelectedIndex == 0 && list.TopRow == 0;
                 input.NewKeys.Clear(); input.NewKeys.Add(Microsoft.Xna.Framework.Input.Keys.End);
                 list.Update(input);
+                list.SettleRampForProbe();
                 keyboard &= list.SelectedIndex == 46 && list.TopRow == 37;
                 input.NewKeys.Clear();
                 var refs = typeof(FSO.Client.UI.Framework.UIElement).GetField("m_MouseRefs",
@@ -26272,11 +26338,16 @@ namespace Simitone.Client
                 // selection + persistence + scroll clamp law
                 var persisted = Simitone.Client.UI.Panels.UIOriginalHelpDialog.LastSelected;
                 dlg.Select(46);
+                // UI-37: Select's out-of-page scroll is now the DECODED
+                // animated ScrollTo ramp — settle it (the frame-driven law,
+                // fast-forwarded) before asserting the post-scroll state.
+                dlg.TopicList.SettleRampForProbe();
                 bool selLaw = dlg.Selected == 46
                     && Simitone.Client.UI.Panels.UIOriginalHelpDialog.LastSelected == 46
                     && dlg.Scroll == 47 - Simitone.Client.UI.Panels.UIOriginalHelpDialog.VisibleTopics
                     && dlg.Bodies[46] == GameFacade.Strings.GetString("166", "93");
                 dlg.ScrollBy(-1);
+                dlg.TopicList.SettleRampForProbe();
                 selLaw &= dlg.Scroll == 34 && dlg.Selected == 46;
                 bool geometry = dlg.TopicColumnW == 179 && dlg.TopicPitch == 26
                     && dlg.WindowW == 579 && dlg.WindowH == 398

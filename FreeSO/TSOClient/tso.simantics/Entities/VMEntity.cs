@@ -422,8 +422,20 @@ namespace FSO.SimAntics
 
                         if (SoundThreads[i].Zoom) volume /= 4 - (int)worldState.Zoom;
                     }
-                    if (Position.Level > worldState.Level) volume /= 4;
-                    else if (Position.Level != worldState.Level) volume /= 2;
+                    if (FSO.Content.Content.Get().TS1)
+                    {
+                        // AUD-19 native cross-level attenuation law (decoded from
+                        // cBoxX::GetInstanceVolPan @ 0x102e1e80): ANY mismatch
+                        // between the sound's level and the viewer level
+                        // multiplies the volume by 3/5 — there is no separate
+                        // above/below penalty above or below.
+                        if (Position.Level != worldState.Level) volume *= 0.6f;
+                    }
+                    else
+                    {
+                        if (Position.Level > worldState.Level) volume /= 4;
+                        else if (Position.Level != worldState.Level) volume /= 2;
+                    }
 
                     volume = Math.Min(1f, Math.Max(0f, volume));
 

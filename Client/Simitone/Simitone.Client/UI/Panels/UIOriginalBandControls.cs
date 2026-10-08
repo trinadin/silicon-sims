@@ -25,6 +25,13 @@ namespace Simitone.Client.UI.Panels
         public int CellWidth;
         public byte State;
         public bool Hovered;   // R148 compatibility mirror; drawing reads UIButton's exact entered state.
+
+        // UI-37 ART-ANCHORED fallback face — the dominant interior color of
+        // ThumbTemplate1Frame.BMP frame 0 (111,168,191 = 1089/2025 interior
+        // px, decoded from UIGraphics.far @0x610c07); replaces the old
+        // eyeballed (107,165,189). Only drawn on failed frame loads.
+        public static readonly Color FallbackFaceColor = new Color(111, 168, 191, 255);
+
         private Texture2D[] Frames;
 
         private static Texture2D ResolveTexture(string member)
@@ -213,11 +220,13 @@ namespace Simitone.Client.UI.Panels
                 // cell face (navy plate, ThumbTemplate frame-0 family colors).
                 DrawLocalTexture(batch, FSO.Common.Utils.TextureGenerator.GetPxWhite(GameFacade.GraphicsDevice), null,
                     Vector2.Zero, new Vector2(45, 45), new Color(0x00, 0x08, 0x52, 0xFF));
-                // steel-blue face: PORT-AUTHORED fallback hue (only the navy
-                // plate is ThumbTemplate frame-0 anchored; the face hue is
-                // undecoded private-surface chrome)
+                // steel-blue face: UI-37 ART-ANCHORED — the dominant interior
+                // color of ThumbTemplate1Frame.BMP frame 0 itself (111,168,191
+                // = 1089/2025 interior px, decoded from UIGraphics.far @
+                // 0x610c07). Only drawn when the frame art itself failed to
+                // load; the old (107,165,189) was an eyeballed guess.
                 DrawLocalTexture(batch, FSO.Common.Utils.TextureGenerator.GetPxWhite(GameFacade.GraphicsDevice), null,
-                    new Vector2(3, 3), new Vector2(39, 39), new Color(0x6b, 0xa5, 0xbd, 0xFF));
+                    new Vector2(3, 3), new Vector2(39, 39), UIOriginalSheetButton.FallbackFaceColor);
             }
             else
             {

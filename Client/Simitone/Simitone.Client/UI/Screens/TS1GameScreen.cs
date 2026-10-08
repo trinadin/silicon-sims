@@ -284,6 +284,45 @@ namespace Simitone.Client.UI.Screens
                               : NativeMoveInOutcome.ConfirmPurchaseLot;
         }
 
+        // ---- NBR-06: the community-lot build/buy ENTRY matrix ----
+        // Native law (ghidra-n1 decode): the cSimsApp::LoadGame @0x258680 tail
+        // computes the visit flag (the sim context's +0x50, set on the
+        // visit branches: GetZoningType==community native-2, or the public
+        // Magic Town lots 93..99), then gates the lot session:
+        //   DisableLiveMode(visit)                    — LIVE unavailable while visiting
+        //   DisableSave(community||93-99 ? !visit     — save ENABLED on community
+        //                 : (!visit && noFamily))       lots while visiting (that is
+        //                                              how TS1 persists community
+        //                                              edits); a familyless
+        //                                              residential lot never saves
+        //   HideButtonsForLocation(visit)             — extra view chrome hidden
+        //   visit → SetMode(BUY)+Pause; else EnteringHouse
+        // and CPState::SetMode @0x210790's mode-1 (BUY) case picks the catalog
+        // purely by destination (downtown 21..30 → 2, vacation 40..49 → 3,
+        // community-zoned non-magic → 4, studio 81..89 → 5, magic 93..98 → 6,
+        // else 1). The port's zoning encoding is 0/1 (NBR-03); these pure
+        // statics take the boolean so the encoding never leaks in.
+        public static bool NativeEntryVisit(bool zoningCommunity, int lot)
+        {
+            return zoningCommunity || (lot > 0x5c && lot < 100);
+        }
+
+        public static bool NativeEntrySaveDisabled(bool zoningCommunity, int lot, bool visit, bool hasFamily)
+        {
+            if (zoningCommunity || (lot > 0x5c && lot < 100)) return !visit;
+            return !visit && !hasFamily;
+        }
+
+        public static int NativeBuyCatalog(bool zoningCommunity, int lot)
+        {
+            if (lot >= 21 && lot <= 30) return 2;                       // downtown
+            if (lot >= 40 && lot <= 49) return 3;                       // vacation
+            if (zoningCommunity && !(lot > 0x5c && lot < 99)) return 4; // community (non-magic)
+            if (lot >= 81 && lot <= 89) return 5;                       // studiotown
+            if (lot > 0x5c && lot < 99) return 6;                       // magic town public
+            return 1;                                                   // normal home
+        }
+
 
         public void NeighSelection(NeighSelectionMode mode)
         {
@@ -1694,17 +1733,72 @@ namespace Simitone.Client.UI.Screens
     internal int SwitchAttemptsForProbe;           // Previous/Next switch attempts
     internal int SwitchesForProbe;                 // successful SwitchToNeighborhood + rebuild
 
-    // Port literals (disclosed): confirm-2, the rezone receipt and the switch
-    // failure wording are not in any decoded STR set; the rezone cascade
-    // confirms reuse the user-approved STR# 131 (r197 decode).
+    // Port literals (disclosed): the receipts and the switch failure wording
+    // are not in any decoded STR set; the rezone cascade confirms reuse the
+    // user-approved STR# 131 (r197 decode).
     internal const string BulldozeTitle = "Bulldoze";
-    internal const string BulldozeConfirmMessage = "Bulldoze this house? The building will be demolished.";
-    internal const string BulldozeAlsoMessage = "Do you also want to bulldoze the house and delete the family members?";
     internal const string EvictDoneMessage = "The family has moved out.";
     internal const string BulldozeDoneMessage = "The house has been bulldozed.";
     internal const string RezoneTitle = "Rezone";
     internal const string RezoneDoneMessage = "Lot rezoned.";
     internal const string RezoneFailMessage = "Could not rezone the lot.";
+    // NBR-06 (r262/ghidra-n1 decode — cWinNeighborhoodUL::EvictModeLotHandler
+    // @0x469760 and RezoneModeLotHandler @0x469160): BOTH bulldoze confirms
+    // (the vacant+built arm AND the occupied chain's second confirm) are STR#
+    // 131 [0]/[1] "Bulldoze House?"/"Do you want to bulldoze this house?"; the
+    // evict-mode vacant+unbuilt leg is STR# 132 [4]/[5] "Nothing to
+    // Bulldoze"/"There is no house here to bulldoze." mounted as an OK dialog;
+    // the executor failure leg is STR# 131 [10]/[11] "Error"/"Could not
+    // evict!". The old port confirm literals are retired. Same fallback law
+    // as SwitchFailTitle: a missing table must not blank the chrome.
+    internal static string BulldozeHouseTitle
+    {
+        get
+        {
+            var s = GameFacade.Strings.GetString("131", "0");
+            return (string.IsNullOrEmpty(s) || s.StartsWith("131:")) ? BulldozeTitle : s;
+        }
+    }
+    internal static string BulldozeHouseMessage
+    {
+        get
+        {
+            var s = GameFacade.Strings.GetString("131", "1");
+            return (string.IsNullOrEmpty(s) || s.StartsWith("131:")) ? "Do you want to bulldoze this house?" : s;
+        }
+    }
+    internal static string NothingToBulldozeTitle
+    {
+        get
+        {
+            var s = GameFacade.Strings.GetString("132", "4");
+            return (string.IsNullOrEmpty(s) || s.StartsWith("132:")) ? BulldozeTitle : s;
+        }
+    }
+    internal static string NothingToBulldozeMessage
+    {
+        get
+        {
+            var s = GameFacade.Strings.GetString("132", "5");
+            return (string.IsNullOrEmpty(s) || s.StartsWith("132:")) ? "There is no house here to bulldoze." : s;
+        }
+    }
+    internal static string EvictFailTitle
+    {
+        get
+        {
+            var s = GameFacade.Strings.GetString("131", "10");
+            return (string.IsNullOrEmpty(s) || s.StartsWith("131:")) ? SwitchFailTitle : s;
+        }
+    }
+    internal static string EvictFailMessage
+    {
+        get
+        {
+            var s = GameFacade.Strings.GetString("131", "11");
+            return (string.IsNullOrEmpty(s) || s.StartsWith("131:")) ? "Could not evict!" : s;
+        }
+    }
     // AUD-17 E-6: from STR# 131[10] (the probe pins it == "Error") — keeps
     // localization coherent with the other reused 131 strings.
     internal static string SwitchFailTitle
@@ -1768,13 +1862,16 @@ namespace Simitone.Client.UI.Screens
                         _bulldozeDialog = null;
                         if (built)
                         {
-                            // Confirm 2: its answer IS the killSims flag (law §2).
+                            // Confirm 2 (NBR-06): the native second confirm IS
+                            // the STR# 131 [0]/[1] bulldoze pair — its answer
+                            // is the MoveOut bulldoze flag (0x469760 @
+                            // 0x469bf0 region).
                             BulldozeConfirm2ForProbe++;
                             UIMobileAlert confirm2 = null;
                             confirm2 = new UIMobileAlert(new UIAlertOptions
                             {
-                                Title = GameFacade.Strings.GetString("131", "2"),
-                                Message = BulldozeAlsoMessage,
+                                Title = BulldozeHouseTitle,
+                                Message = BulldozeHouseMessage,
                                 Buttons = UIAlertButton.YesNo(
                                     (b2) => { confirm2.Close(); _bulldozeDialog = null; ArmedEvict(house, family, true); },
                                     (b2) => { confirm2.Close(); _bulldozeDialog = null; ArmedEvict(house, family, false); })
@@ -1800,8 +1897,8 @@ namespace Simitone.Client.UI.Screens
             UIMobileAlert confirm = null;
             confirm = new UIMobileAlert(new UIAlertOptions
             {
-                Title = BulldozeTitle,
-                Message = BulldozeConfirmMessage,
+                Title = BulldozeHouseTitle,
+                Message = BulldozeHouseMessage,
                 Buttons = UIAlertButton.YesNo(
                     (b) => { confirm.Close(); _bulldozeDialog = null; ArmedBulldoze(house); },
                     (b) => { confirm.Close(); _bulldozeDialog = null; })
@@ -1811,28 +1908,80 @@ namespace Simitone.Client.UI.Screens
             return;
         }
 
-        // Vacant + unbuilt: two status messages, NO dialog (law §2).
+        // Vacant + unbuilt: the native mounts the STR# 132 [4]/[5] OK dialog
+        // ("Nothing to Bulldoze" / "There is no house here to bulldoze." —
+        // NBR-06 decode @0x469a58 region; the old port surfaced logs only).
         BulldozeStatusOnlyForProbe++;
         GameLog.Write("nghbtns: lot " + house + " has nothing to bulldoze");
-        GameLog.Write("nghbtns: lot " + house + " is already undeveloped");
+        UIMobileAlert nothing = null;
+        nothing = new UIMobileAlert(new UIAlertOptions
+        {
+            Title = NothingToBulldozeTitle,
+            Message = NothingToBulldozeMessage,
+            Buttons = UIAlertButton.Ok((b) => { nothing.Close(); _bulldozeDialog = null; })
+        });
+        _bulldozeDialog = nothing;
+        GlobalShowDialog(nothing, true);
     }
 
     /// <summary>The EvictFamily executor's occupied arm: MoveOut FIRST (law §3),
-    /// then the save, the per-item repaint and the OK dialog on success.</summary>
+    /// then the save, the per-item repaint and the OK dialog on success. The
+    /// failure leg mounts the native STR# 131 [10]/[11] "Error"/"Could not
+    /// evict!" dialog (NBR-06 decode: EvictFamily @0x2323a0 returns 0 on
+    /// failure and the handler answers with 131[0xb]/131[10]).
+    /// NBR-06 DEMOLITION LAW: the native EvictFamily(lot, 1) — the confirm-2
+    /// YES answer to "Do you want to bulldoze this house?" — deletes the house
+    /// FILE (Neighborhood::MoveOut @0xb1800 gates the record purge 0xb1c54 and
+    /// the Houses/Import file deletion 0xb1cdc on the SAME r30 bool that gates
+    /// the character-file purge). The port expresses that net state through
+    /// NBR-03's BulldozeLot (the reviewed SIMI-zeroing demolition primitive)
+    /// after the eviction unbinds the lot. This supersedes the UI-29 reading
+    /// ("evict never demolishes") — its AutotestUI30 'house-standing' pin is
+    /// stale and flagged on the NBR-06 receipt for a coordinator update.</summary>
     private void ArmedEvict(int house, FAMI family, bool killSims)
     {
         var neigh = Content.Get().Neighborhood;
         ArmedEvictsForProbe++;
-        if (neigh.MoveOut((short)house, killSims) != 1) return;   // native nonzero = nothing happened
+        if (neigh.MoveOut((short)house, killSims) != 1)
+        {
+            ShowEvictFail();
+            return;   // native nonzero = nothing happened
+        }
         neigh.SaveNeighbourhood(false);   // the eviction confirm path owns the save
+        if (killSims) neigh.BulldozeLot((short)house);   // the demolition rode the evict (one native call)
         RefreshLotTile(house);
         ShowBulldozeOk(EvictDoneMessage);
     }
 
+    /// <summary>NBR-06: the executor-failure dialog (STR# 131 [10]/[11]).</summary>
+    private void ShowEvictFail()
+    {
+        UIMobileAlert fail = null;
+        fail = new UIMobileAlert(new UIAlertOptions
+        {
+            Title = EvictFailTitle,
+            Message = EvictFailMessage,
+            Buttons = UIAlertButton.Ok((b) => { fail.Close(); _bulldozeDialog = null; })
+        });
+        _bulldozeDialog = fail;
+        GlobalShowDialog(fail, true);
+    }
+
     /// <summary>The vacant+built arm through NBR-03's BulldozeLot (1 bulldozed /
-    /// 0 nothing / -1 occupied-refusal — the refusal and no-op legs surface as
-    /// status only, matching the native's ticker messages).</summary>
+    /// 0 nothing / -1 occupied-refusal). NBR-06: the nothing leg mounts the
+    /// native STR# 132 [4]/[5] OK dialog (the executor's own refusal surface);
+    /// the -1 leg stays a log (unreachable through the armed flow — an occupied
+    /// click always routes through the evict arm).</summary>
     private void ArmedBulldoze(int house)
+    {
+        ArmedBulldozeInner(house, null);
+    }
+
+    /// <summary>ArmedBulldoze with the NBR-06 rezone chain hook: when the
+    /// bulldoze came from the rezone cascade, a successful demolition completes
+    /// the pending SetZoningType in the same click (RezoneModeLotHandlerUL
+    /// @0x469160 chains EvictFamily/BulldozeLot straight into the rezone).</summary>
+    private bool ArmedBulldozeInner(int house, short? rezoneTarget)
     {
         var neigh = Content.Get().Neighborhood;
         ArmedBulldozesForProbe++;
@@ -1840,33 +1989,59 @@ namespace Simitone.Client.UI.Screens
         if (result == 1)
         {
             RefreshLotTile(house);
+            if (rezoneTarget != null)
+            {
+                CompleteChainedRezone(house, rezoneTarget.Value);
+                return true;
+            }
             ShowBulldozeOk(BulldozeDoneMessage);
+            return true;
         }
         else if (result == 0)
         {
             GameLog.Write("nghbtns: lot " + house + " has nothing to bulldoze");
+            UIMobileAlert nothing = null;
+            nothing = new UIMobileAlert(new UIAlertOptions
+            {
+                Title = NothingToBulldozeTitle,
+                Message = NothingToBulldozeMessage,
+                Buttons = UIAlertButton.Ok((b) => { nothing.Close(); _bulldozeDialog = null; })
+            });
+            _bulldozeDialog = nothing;
+            GlobalShowDialog(nothing, true);
         }
         else
         {
             GameLog.Write("nghbtns: lot " + house + " is occupied; evict the family first");
+            ShowEvictFail();
         }
+        return false;
     }
 
     // ---- NBR-05: the armed rezone lot flow (the STR# 151 [10] 'Evict or
     // Rezone' tool; the rezone twin of the UI-30 evict/bulldoze arm) ----
-    // Armed lot clicks land here on the STR# 131 'EvictModeStrs' cascade
-    // (r197 decode — the rezone strings live in the evict-mode set):
+    // NBR-06 CHAIN LAW (RezoneModeLotHandlerUL @0x469160, ghidra-n1 decode):
+    // armed lot clicks run the STR# 131 'EvictModeStrs' cascade and the
+    // rezone COMPLETES IN THE SAME CLICK —
     //   occupied → confirm [6]/[7] "cannot rezone until ... evicted. Proceed
-    //     with the eviction?" — YES = MoveOut(house, killSims:false) (eviction
-    //     only; the native chain depth beyond this step is undecoded — the
-    //     next armed click re-decides the branch); NO = inert.
+    //     with the eviction?" — YES → (built? second confirm [8]/[9], answer =
+    //     the MoveOut bulldoze flag) → MoveOut → SetZoningType(target);
+    //     NO = inert.
     //   vacant + built → confirm [8]/[9] "cannot rezone until ... bulldozed.
-    //     Proceed with the bulldoze?" — YES = BulldozeLot (NBR-03); NO = inert.
-    //   vacant + unbuilt → direct SetZoningType toggle (nothing blocks the
-    //     rezone; no dialog). Target = the provider's other value (0
-    //     residential ↔ 1 community; NBR-03's clamp, absent = residential).
-    // Success refreshes the lot tile; the receipt is a port literal (disclosed).
+    //     Proceed with the bulldoze?" — YES = BulldozeLot (NBR-03) →
+    //     SetZoningType(target); NO = inert.
+    //   vacant + unbuilt → direct SetZoningType toggle (the native's first
+    //     dialog offers the zone choice with same-zone picks inert — with the
+    //     port's two-zone model that is exactly the toggle; no dialog).
+    // Target = the provider's other value (0 residential ↔ 1 community;
+    // NBR-03's clamp, absent = residential). The native enum is
+    // 1=residential/2=community (SetZoningType @0xaa700 writes the ",
+    // community" suffix for 2); the port keeps its 0/1 IFF-derived encoding.
+    // Executor failure mounts STR# 131 [10]/[11]. Success refreshes the lot
+    // tile; the receipt is a port literal (disclosed).
     internal int HouseRezonedForProbe = -1;        // last successfully rezoned lot
+    internal int RezoneChainedConfirmsForProbe;    // occupied+built second confirm ([8]/[9]) shown
+    internal int RezoneChainedForProbe;            // auto-SetZoningType completions after evict/bulldoze
     internal void RezoneLotClickFlow(int house)
     {
         var neigh = Content.Get().Neighborhood;
@@ -1875,6 +2050,10 @@ namespace Simitone.Client.UI.Screens
         // HouseInfo+0x18 proxy: the port's built marker (same gate as move-in
         // and the bulldoze arm).
         bool built = simi != null && (simi.ObjectsValue > 0 || simi.ArchitectureValue > 0);
+        // The rezone target is decided up front (the native's zone-choice
+        // dialog precedes everything; a same-zone pick is inert).
+        var currentZone = neigh.GetZoningType((short)house);
+        var target = (short)(currentZone == 1 ? 0 : 1);
 
         if (family != null)
         {
@@ -1894,10 +2073,35 @@ namespace Simitone.Client.UI.Screens
                     {
                         confirm.Close(); _rezoneDialog = null;
                         RezoneEvictsForProbe++;
-                        if (neigh.MoveOut((short)house, false) != 1) return;   // native nonzero = nothing happened
-                        neigh.SaveNeighbourhood(false);   // the eviction confirm path owns the save
-                        RefreshLotTile(house);
-                        ShowRezoneOk(EvictDoneMessage);
+                        if (built)
+                        {
+                            // NBR-06: the chained second confirm — its answer is
+                            // the MoveOut bulldoze flag, then the rezone completes.
+                            RezoneChainedConfirmsForProbe++;
+                            UIMobileAlert confirm2 = null;
+                            confirm2 = new UIMobileAlert(new UIAlertOptions
+                            {
+                                Title = GameFacade.Strings.GetString("131", "8"),
+                                Message = GameFacade.Strings.GetString("131", "9"),
+                                Buttons = UIAlertButton.YesNo(
+                                    (b2) =>
+                                    {
+                                        confirm2.Close(); _rezoneDialog = null;
+                                        EvictAndCompleteRezone(house, family, true, target);
+                                    },
+                                    (b2) =>
+                                    {
+                                        confirm2.Close(); _rezoneDialog = null;
+                                        EvictAndCompleteRezone(house, family, false, target);
+                                    })
+                            });
+                            _rezoneDialog = confirm2;
+                            GlobalShowDialog(confirm2, true);
+                        }
+                        else
+                        {
+                            EvictAndCompleteRezone(house, family, false, target);
+                        }
                     },
                     (b) => { confirm.Close(); _rezoneDialog = null; })
             });
@@ -1915,7 +2119,7 @@ namespace Simitone.Client.UI.Screens
                 Title = GameFacade.Strings.GetString("131", "8"),
                 Message = GameFacade.Strings.GetString("131", "9"),
                 Buttons = UIAlertButton.YesNo(
-                    (b) => { confirm.Close(); _rezoneDialog = null; ArmedBulldoze(house); },
+                    (b) => { confirm.Close(); _rezoneDialog = null; ArmedBulldozeInner(house, target); },
                     (b) => { confirm.Close(); _rezoneDialog = null; })
             });
             _rezoneDialog = confirm;
@@ -1927,11 +2131,39 @@ namespace Simitone.Client.UI.Screens
         // backend persists LotZoning.iff atomically (NBR-03), so no neighborhood
         // save rides here.
         RezoneDirectForProbe++;
-        var zone = neigh.GetZoningType((short)house);
-        var target = (short)(zone == 1 ? 0 : 1);
+        CompleteChainedRezone(house, target);
+    }
+
+    /// <summary>NBR-06: the rezone cascade's eviction executor — MoveOut, the
+    /// neighborhood save, the repaint, then the SAME-CLICK rezone completion
+    /// (the native chains SetZoningType immediately after a successful
+    /// EvictFamily; the NBR-05 single-step-chain disclosure is closed). The
+    /// bulldoze-flag YES arm also demolishes the house (EvictFamily(lot, 1)
+    /// deletes the house file — see ArmedEvict's NBR-06 demolition note).</summary>
+    private void EvictAndCompleteRezone(int house, FAMI family, bool killSims, short target)
+    {
+        var neigh = Content.Get().Neighborhood;
+        if (neigh.MoveOut((short)house, killSims) != 1)
+        {
+            ShowEvictFail();
+            return;   // native nonzero = nothing happened (and no rezone runs)
+        }
+        neigh.SaveNeighbourhood(false);   // the eviction confirm path owns the save
+        if (killSims) neigh.BulldozeLot((short)house);   // the native's bulldoze-flag demolition
+        RefreshLotTile(house);
+        CompleteChainedRezone(house, target);
+    }
+
+    /// <summary>NBR-06: the shared rezone completion — the SetZoningType call,
+    /// the receipt dialog and the tile refresh (used by the direct toggle and
+    /// both chained arms).</summary>
+    private void CompleteChainedRezone(int house, short target)
+    {
+        var neigh = Content.Get().Neighborhood;
         if (neigh.SetZoningType((short)house, target))
         {
             RezonesForProbe++;
+            RezoneChainedForProbe++;
             HouseRezonedForProbe = house;
             RefreshLotTile(house);
             ShowRezoneOk(RezoneDoneMessage);

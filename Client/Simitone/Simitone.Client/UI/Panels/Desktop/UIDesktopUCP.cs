@@ -534,16 +534,32 @@ namespace Simitone.Client.UI.Panels.Desktop
             if (b != null) OpenViewPie(b);
         }
 
-        public void SelectViewPieItem(string key)
+        public void SelectViewPieItem(string key, int mag)
         {
             ViewPieRemoved();
+            // UI-37 decoded commit (UpdateViewMenu @0x1020ccb0): zoom state
+            // ±mag clamped [1,3] (the port's ZoomLevel setter applies the
+            // same clamp); rotation ±mag with the native ±2 rotation cap.
+            int m = Math.Max(1, Math.Min(3, mag));
             switch (key)
             {
-                case "zoomin": ZoomControl(ZoomInButton); break;
-                case "zoomout": ZoomControl(ZoomOutButton); break;
-                case "rotleft": RotateCounterClockwise(RotateCCWButton); break;
-                case "rotright": RotateClockwise(RotateCWButton); break;
+                case "zoomin": ApplyZoom(-m); break;
+                case "zoomout": ApplyZoom(+m); break;
+                case "rotleft": ApplyRotation(-Math.Min(2, m)); break;
+                case "rotright": ApplyRotation(+Math.Min(2, m)); break;
             }
+        }
+
+        private void ApplyZoom(int delta)
+        {
+            if (Game == null) return;
+            Game.ZoomLevel = Math.Max(1, Math.Min(3, Game.ZoomLevel + delta));
+        }
+
+        private void ApplyRotation(int delta)
+        {
+            if (Game == null) return;
+            Game.Rotation = ((Game.Rotation + delta) % 4 + 4) % 4;
         }
 
         /// <summary>The pie removes itself from the screen on completion; the

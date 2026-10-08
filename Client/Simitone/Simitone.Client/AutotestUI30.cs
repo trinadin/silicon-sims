@@ -374,7 +374,13 @@ namespace Simitone.Client
             Check(Switcher.BulldozeArmed, "armed-for-lot11");
             Panel.SelectHouse(11);
             Check(Screen.BulldozeStatusOnlyForProbe == 1, "vacant-unbuilt-status-only");
-            Check(Screen._bulldozeDialog == null, "vacant-unbuilt-no-dialog");
+            // NBR-06 decode: the vacant+unbuilt arm mounts the native STR#
+            // 132[4]/[5] "Nothing to Bulldoze" OK DIALOG (EvictModeLot-
+            // HandlerUL @0x469760) — the old "no dialog" pin described the
+            // port's pre-NBR-06 behavior.
+            Check(Screen._bulldozeDialog != null, "vacant-unbuilt-nothing-dialog (NBR-06 law)");
+            var nothingOk = DialogButton(UIAlertButtonType.OK);
+            if (nothingOk != null) Press(nothingOk);
             Check(Screen.ArmedEvictsForProbe == 0 && Screen.ArmedBulldozesForProbe == 0,
                 "vacant-unbuilt-no-backend-call");
             Disarm();
@@ -498,8 +504,14 @@ namespace Simitone.Client
             Press(DialogButton(UIAlertButtonType.OK));
 
             var after = SimiBuildingValues(HousePath(22));
-            Check(after != null && (after.Item1 > 0 || after.Item2 > 0),
-                "killSims-evict-still-left-the-house-standing");
+            // NBR-06 decode correction: the native EvictFamily YES-leg
+            // (confirm2 bool) gates the HOUSE-RECORD PURGE and the house-file
+            // deletion alongside the character purge — an occupied bulldoze
+            // DEMOLISHES (EvictFamily @0x2323a0 → MoveOut @0xb1800, the
+            // 0xb1c4c/0xb1cdc arms). The old "still left the house standing"
+            // pin described the port's pre-NBR-06 behavior.
+            Check(after != null && after.Item1 == 0 && after.Item2 == 0,
+                "killSims-true-evict-demolished-the-house (NBR-06 law)");
             Disarm();
             if (!_passed) { _done = true; return; }
             Next();
@@ -536,7 +548,12 @@ namespace Simitone.Client
             Arm();
             Panel.SelectHouse(10);
             Check(Screen.BulldozeStatusOnlyForProbe == 2, "post-bulldoze-lot-status-only");
-            Check(Screen._bulldozeDialog == null, "post-bulldoze-no-dialog");
+            // NBR-06 decode: vacant+unbuilt bulldoze is the STR# 132[4]/[5]
+            // "Nothing to Bulldoze" OK DIALOG (EvictModeLotHandlerUL), not a
+            // silent log — the old "no dialog" pin pinned the port's old
+            // behavior.
+            Check(Screen._bulldozeDialog != null, "post-bulldoze-nothing-dialog (NBR-06 law)");
+            Press(DialogButton(UIAlertButtonType.OK));
             Disarm();
             Check(!Switcher.BulldozeArmed, "disarmed-after-matrix");
             _done = true;

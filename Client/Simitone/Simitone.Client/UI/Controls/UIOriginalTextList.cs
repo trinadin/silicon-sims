@@ -20,6 +20,10 @@ namespace Simitone.Client.UI.Controls
     /// and resizes the list to page-size * row-height. Rows are imageless
     /// cTSWinBtn children; the navy +64 value is the list fill, not text ink.
     /// Evidence: tools/iff-dump/r238-phonebook/{textlist,child-add}.txt.
+    /// UI-37: the animated ScrollTo law (RampGenerator constant-speed ramp,
+    /// pool {56, 1, 4, 60, 0.001, 0.5} at TOC-0x4350) and the scrollbar
+    /// autorepeat law (cTSWinScrollbar::TSPaint @0x51d100: repeat the held
+    /// zone action every >200ms of cTSTimer elapsed, then Reset+Start).
     /// </summary>
     public class UIOriginalTextList : UIContainer
     {
@@ -52,6 +56,23 @@ namespace Simitone.Client.UI.Controls
         private int ThumbY => ScrollbarCellHeight + (MaxTopRow == 0 ? 0 :
             (int)Math.Round(TopRow * (double)Math.Max(0, TrackHeight - ThumbHeight) / MaxTopRow));
 
+        // ==== UI-37 decoded scroll-animation state (native +0xf4 flag,
+        // +0xfc RampGenerator {target, dirSpeed, speed, endMs}).
+        private bool RampActive;
+        private float RampTarget, RampSpeed;   // rows per ms
+        private double RampEndMs;
+        private int AnimatedOffset;            // native +0xec (negated pixel offset)
+        public static double AnimPixelsTotal;  // gate counter (proof of animated frames)
+
+        // ==== UI-37 decoded autorepeat state (cTSWinScrollbar +0x140 zone,
+        // +0x144 pressed, +0x128 cTSTimer; repeat period 200ms).
+        private int HeldZone;
+        private bool HeldPressed;
+        private double RepeatStartMs;
+        public static int AutorepeatFires;
+
+        private static double NowMs => Stopwatch.GetTimestamp() * 1000.0 / Stopwatch.Frequency;
+
         public UIOriginalTextList(OriginalGlyphFont font, int width, int visibleRows)
         {
             Font = font;
@@ -83,17 +104,30 @@ namespace Simitone.Client.UI.Controls
                 Rows.Add(row);
                 Add(row);
             }
-            ListenForMouse(new Rectangle(width - ScrollbarGutter, 0, ScrollbarWidth, HeightPixels), (type, state) =>
-            {
-                if (type != UIMouseEventType.MouseDown || MaxTopRow == 0) return;
-                ActiveList = this;
-                var y = GetMousePosition(state.MouseState).Y;
-                if (y < ScrollbarCellHeight) ScrollBy(-1);
-                else if (y >= HeightPixels - ScrollbarCellHeight) ScrollBy(1);
-                else if (y >= ThumbY && y < ThumbY + ThumbHeight)
-                { Dragging = true; DragOffset = (int)y - ThumbY; }
-                else ScrollBy(y < ThumbY ? -VisibleRows : VisibleRows);
-            });
+                ListenForMouse(new Rectangle(width - ScrollbarGutter, 0, ScrollbarWidth, HeightPixels), (type, state) =>
+                {
+                    if (type != UIMouseEventType.MouseDown || MaxTopRow == 0) return;
+                    ActiveList = this;
+                    var y = GetMousePosition(state.MouseState).Y;
+                    // UI-37 decoded zones (cTSWinScrollbar::DoCursorPositionHitTest
+                    // 0x51c860): 1 up-line / 3 page-prev / 5 thumb / 4 page-next /
+                    // 2 down-line along the axis; press fires the zone action
+                    // immediately (TSOnMouseDownL 0x51cf90) and starts the repeat
+                    // timer; thumb drag maps cursor position to value directly.
+                    int zone = ScrollbarZone((int)y);
+                    if (zone == 5)
+                    {
+                        Dragging = true;
+                        DragOffset = (int)y - ThumbY;
+                    }
+                    else
+                    {
+                        FireZone(zone);
+                        HeldZone = zone;
+                        HeldPressed = true;
+                        RepeatStartMs = NowMs;
+                    }
+                });
             ActiveList = null;
             RefreshRows();
         }
@@ -105,6 +139,9 @@ namespace Simitone.Client.UI.Controls
             // some list again (KeyboardActive is only honored while
             // ActiveList == null).
             if (ReferenceEquals(ActiveList, this)) ActiveList = null;
+            HeldPressed = false;
+            HeldZone = 0;
+            RampActive = false;
             base.Removed();
         }
 
@@ -115,6 +152,10 @@ namespace Simitone.Client.UI.Controls
             SelectedIndex = -1;
             LastClickRow = -1;
             TopRow = 0;
+            RampActive = false;
+            AnimatedOffset = 0;
+            HeldPressed = false;
+            HeldZone = 0;
             RefreshRows();
         }
 
@@ -125,8 +166,10 @@ namespace Simitone.Client.UI.Controls
             SelectedIndex = index;
             if (index >= 0)
             {
-                if (index < TopRow) TopRow = index;
-                else if (index >= TopRow + VisibleRows) TopRow = index - VisibleRows + 1;
+                // UI-37: the native select scrolls to the row through the
+                // animated ScrollTo when it falls outside the visible page.
+                if (index < TopRow) ScrollTo(index);
+                else if (index >= TopRow + VisibleRows) ScrollTo(index - VisibleRows + 1);
             }
             RefreshRows();
             if (changed) OnSelectionChange?.Invoke(index);
@@ -134,8 +177,91 @@ namespace Simitone.Client.UI.Controls
 
         public void ScrollBy(int delta)
         {
-            TopRow = Math.Max(0, Math.Min(MaxTopRow, TopRow + delta));
+            ScrollTo(TopRow + delta);
+        }
+
+        /// <summary>
+        /// UI-37 decoded law — cTSWinTextList::ScrollTo @raw 0x535f30 with the
+        /// RampGenerator pool {56.0, 1.0, 4.0, 60.0, 0.001, 0.5} at TOC-0x4350
+        /// (image 0x1059c3bc): speed(rows/ms) = clamp(4 + 56*(|d|-1)/(2*visRows-1),
+        /// 4, 60) * 0.001; SetupConstantSpeedRamp(current, target, speed, now)
+        /// stores {target, signedSpeed, endMs = now + |d|/speed}. GetVal (raw
+        /// 0x535b00-family, image 0x10145aa0) = target - (end-now)*speed.
+        /// </summary>
+        public void ScrollTo(int row)
+        {
+            row = Math.Max(0, Math.Min(MaxTopRow, row));
+            float current = RampActive ? RampValue(NowMs) : TopRow;
+            double d = Math.Abs(current - row);
+            float slope = 56f / Math.Max(1, 2 * VisibleRows - 1);
+            float speedRowsPerS = Math.Min(60f, Math.Max(4f, 4f + slope * ((float)d - 1f)));
+            RampSpeed = speedRowsPerS / 1000f;
+            RampTarget = row;
+            RampActive = true;
+            RampEndMs = NowMs + d / RampSpeed;
+            // Keep the integer row in sync immediately when idle so callers
+            // reading TopRow right after ScrollTo see the destination intent
+            // (the ramp advances it per frame as the native TSPaint does).
+        }
+
+        private float RampValue(double nowMs)
+        {
+            if (!RampActive || nowMs >= RampEndMs) return RampTarget;
+            return RampTarget - (float)((RampEndMs - nowMs) * RampSpeed);
+        }
+
+        /// <summary>The TSPaint advance (raw 0x5370a0): rowInt = (int)(v+0.5),
+        /// offset = -(int)((v-rowInt)*rowHeight + 0.5) with the >=rowHeight
+        /// carry; done when now >= endMs.</summary>
+        private void RampStep()
+        {
+            double now = NowMs;
+            float v = RampValue(now);
+            int rowInt = (int)Math.Floor(v + 0.5f);
+            float frac = v - rowInt;
+            int offset = (int)(frac * RowHeight + 0.5f);
+            if (offset >= RowHeight) { offset = 0; rowInt++; }
+            AnimatedOffset = -offset;
+            if (rowInt != TopRow) { TopRow = Math.Max(0, Math.Min(MaxTopRow, rowInt)); }
+            if (AnimatedOffset != 0) AnimPixelsTotal += Math.Abs(AnimatedOffset);
+            if (now >= RampEndMs) { RampActive = false; AnimatedOffset = 0; }
             RefreshRows();
+        }
+
+        /// <summary>Probe seam: settle any active scroll ramp synchronously —
+        /// the same RampStep law the per-frame Update drives, advanced on the
+        /// real clock until the ramp completes (headless checks assert
+        /// post-scroll state without a running frame loop).</summary>
+        public void SettleRampForProbe()
+        {
+            var guard = Environment.TickCount + 5000;
+            while (RampActive && Environment.TickCount < guard)
+            {
+                RampStep();
+                if (RampActive) System.Threading.Thread.Sleep(10);
+            }
+        }
+
+        /// <summary>Decoded hit zones (axis = vertical for these lists).</summary>
+        public int ScrollbarZone(int y)
+        {
+            if (y < ScrollbarCellHeight) return 1;
+            if (y >= HeightPixels - ScrollbarCellHeight) return 2;
+            if (y >= ThumbY && y < ThumbY + ThumbHeight) return 5;
+            return y < ThumbY ? 3 : 4;
+        }
+
+        /// <summary>Zone actions — line/page steps go through the animated
+        /// ScrollTo (the native scrollbar dispatches cmd 12 to the list).</summary>
+        private void FireZone(int zone)
+        {
+            switch (zone)
+            {
+                case 1: ScrollBy(-1); break;
+                case 2: ScrollBy(1); break;
+                case 3: ScrollBy(-VisibleRows); break;
+                case 4: ScrollBy(VisibleRows); break;
+            }
         }
 
         private void RefreshRows()
@@ -145,6 +271,8 @@ namespace Simitone.Client.UI.Controls
                 int index = TopRow + i;
                 Rows[i].Text = index < Items.Count ? Items[index] : "";
                 Rows[i].Color = index == SelectedIndex ? SelectedColor : TextColor;
+                // Native TileItems: y = (index - topRow)*rowHeight + animatedOffset.
+                Rows[i].Position = new Vector2(0, i * RowHeight + AnimatedOffset);
             }
         }
 
@@ -162,11 +290,45 @@ namespace Simitone.Client.UI.Controls
                 if (state.MouseState.LeftButton == ButtonState.Released) Dragging = false;
                 else
                 {
+                    // UI-37: thumb drag maps cursor position to value directly
+                    // (ConvertCursorPositionToValue 0x51c2e0) — no ramp.
+                    RampActive = false;
                     var span = Math.Max(1, TrackHeight - ThumbHeight);
                     int target = (int)Math.Round((mouse.Y - DragOffset - ScrollbarCellHeight) * MaxTopRow / span);
-                    ScrollBy(target - TopRow);
+                    target = Math.Max(0, Math.Min(MaxTopRow, target));
+                    if (target != TopRow) { TopRow = target; RefreshRows(); }
                 }
             }
+            // UI-37 decoded autorepeat — cTSWinScrollbar::TSPaint 0x51d100:
+            // while captured and pressed and zone in [1..4], if the cTSTimer
+            // elapsed exceeds 200ms (0xc8) fire the zone action, then Reset +
+            // Start (a fresh 200ms window). TSOnMouseMove 0x51cd50 keeps
+            // pressed true only while the cursor stays in the SAME zone.
+            if (HeldPressed)
+            {
+                if (state.MouseState.LeftButton == ButtonState.Released || HeldZone == 0 || HeldZone == 5)
+                {
+                    HeldPressed = false;
+                    HeldZone = 0;
+                }
+                else
+                {
+                    bool insideGutter = mouse.X >= ListWidth - ScrollbarGutter && mouse.X < ListWidth - ScrollbarGutter + ScrollbarWidth
+                        && mouse.Y >= 0 && mouse.Y < HeightPixels;
+                    if (!insideGutter || ScrollbarZone((int)mouse.Y) != HeldZone)
+                    {
+                        HeldPressed = false;
+                        HeldZone = 0;
+                    }
+                    else if (NowMs - RepeatStartMs > 200)
+                    {
+                        FireZone(HeldZone);
+                        AutorepeatFires++;
+                        RepeatStartMs = NowMs;
+                    }
+                }
+            }
+            if (RampActive) RampStep();
             if (state.WindowFocused && (ActiveList == this || (ActiveList == null && KeyboardActive)))
             {
                 if (state.NewKeys.Contains(Keys.Up)) Select(Math.Max(0, SelectedIndex - 1));

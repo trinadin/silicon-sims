@@ -1456,11 +1456,17 @@ namespace Simitone.Client.UI.Panels
         // (Community/UL) — dormant until the cheat bar submits "nessie".
         public NeighborhoodImageAnim Nessie;
         // DISCLOSED port default frame cadence for the animation layers —
-        // port-authored, not engine-decoded. Only the discrete Old Town waves
-        // family bypasses it (its decoded CounterIntervalMilliseconds=160,
-        // r173); the car-lane/cloud/balloon/nessie layers consume this value
-        // as their frame step. (Review note 1, indep-review-ui33-20260929:
-        // the original "never read this default" wording was overbroad.)
+        // UI-37 UPGRADE (ORIG-02 ui33-unsourced-constants-law.md #2, hunt
+        // re-verified): the binary contains NO single native cadence
+        // constant — each ambient family is its own state machine
+        // (cWinNeighborhoodUL::TSPaint 0x46b0a0 and siblings); the
+        // single-value PREMISE is refuted, so this cannot be "decoded" as
+        // one number. Per-family status: Old Town waves = native-exact
+        // 160ms discrete counter (r173); Studiotown cars = STATIC bitmap
+        // variants, no cadence exists (r90/r91 Random()%18 picks); the
+        // cloud/balloon/nessie machines' own tick laws are the remaining
+        // optional follow-up. 15 (~250ms @60fps) is the port's uniform
+        // approximation over those machines.
         public int FrameDuration = 15;
         public bool Pulsate = true;
         public string Music = "bkground_nhood1";
@@ -1495,11 +1501,11 @@ namespace Simitone.Client.UI.Panels
         private bool Hovered;
         private THMB Offsets;
         public float AlphaTime { get; set; }
-        // DISCLOSED port hover-fade duration — no engine decode backs it
-        // (cWinLotBtn's hover law decodes COLORS at 0x25d6b4, r143; the ramp
-        // timing is unrecovered). Formerly misnamed "Native".
-        // ORIG-02 ui33: cWinLotBtn::Hilite 0x2d2690 — one-shot 9% blend
-        // (literal pool {1.0, 0.09, 255.0}); no ramp, no timer.
+        // DECODED (ORIG-02 ui33-unsourced-constants-law.md #1, UI-37
+        // re-verified): cWinLotBtn::Hilite 0x2d2690 is a ONE-SHOT 9% blend
+        // toward the highlight through the pool {1.0, 0.09, 255.0} — NO
+        // ramp, NO timer, NO duration. The former 0.300s fade (and its
+        // "Native" misname) was a port embellishment, removed.
         public const float NativeHoverBlend = 0.09f;
         // cWinLotBtn's zero-delay shared cWinLotPopup hooks.
         public Action<int, UINeighborhoodHouseButton, UpdateState> HoverNotify;

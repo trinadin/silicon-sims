@@ -118,7 +118,21 @@ namespace Simitone.Client.UI.Panels
             MainPanel.Y = Game.Desktop ? screen.ScreenHeight - 100 : screen.ScreenHeight - (128 + 15);
             MainPanel.Visible = false;
 
-            if (Game.vm.GetGlobalValue(32) > 0)
+            // NBR-06 entry law (cSimsApp::LoadGame @0x258680 tail): a visit lot
+            // (community-zoned or the public Magic lots 93..99 — the pure matrix
+            // TS1GameScreen.NativeEntryVisit) enters in BUY mode PAUSED; the
+            // engine's own visit flag is global 32 (the port's simless session,
+            // which is the only reachable visit state — families cannot move
+            // into community lots, 132[12]/[13]). Either arm forces the entry.
+            var entryLot = Game.vm != null ? Game.vm.GetGlobalValue(10) : 0;
+            bool zoningCommunity;
+            try
+            {
+                zoningCommunity = FSO.Content.Content.Get().Neighborhood.GetZoningType((short)entryLot) == 1;
+            }
+            catch { zoningCommunity = false; }
+            if (Game.vm.GetGlobalValue(32) > 0
+                || Screens.TS1GameScreen.NativeEntryVisit(zoningCommunity, entryLot))
             {
                 MainPanel.SetMode(UIMainPanelMode.BUY);
                 ModeSwitcher?.EndSwitch(MainPanel.Mode);

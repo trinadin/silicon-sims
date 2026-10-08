@@ -167,16 +167,27 @@ namespace Simitone.Client.UI.Panels.LiveSubpanels
             public Func<bool> Disabled; // ORIG-02: native save-disable law
         }
 
-        // ORIG-02 community-buildbuy law (cDDDSimsView/Neighborhood::GetZoningType
-        // 0xaaa20): Save is disabled on community lots (zoning == 2) and lots
-        // 93-99 (downtown/visitor).
+        // NBR-06 native save gate (cSimsApp::LoadGame @0x258680 tail, ghidra-n1
+        // decode — supersedes the ORIG-02 community-disable reading, which also
+        // carried a dead `== 2` compare against the port's 0/1 zoning encoding):
+        //   zone = GetZoningType(lot)
+        //   if (zone == COMMUNITY || 93 <= lot < 100)  DisableSave(!visit)
+        //   else                                        DisableSave(!visit && family == null)
+        // Visiting is the port's simless session (engine global 32 — every
+        // reachable community/magic entry). Net law: community-zoned and magic
+        // public lots SAVE while visiting (that is how TS1 persists community
+        // edits); a FAMILYLESS residential lot never saves; a family home
+        // always saves. Pure matrix = TS1GameScreen.NativeEntrySaveDisabled.
         private bool CommunityNoSave()
         {
             try
             {
                 var lot = Game?.vm?.GetGlobalValue(10) ?? 0;
-                if (lot >= 93 && lot <= 99) return true;
-                return FSO.Content.Content.Get().Neighborhood.GetZoningType((short)lot) == 2;
+                var zoningCommunity =
+                    FSO.Content.Content.Get().Neighborhood.GetZoningType((short)lot) == 1;
+                var visit = (Game?.vm?.GetGlobalValue(32) ?? 0) != 0;
+                var hasFamily = Game?.ActiveFamily != null;
+                return Screens.TS1GameScreen.NativeEntrySaveDisabled(zoningCommunity, lot, visit, hasFamily);
             }
             catch { return false; }
         }

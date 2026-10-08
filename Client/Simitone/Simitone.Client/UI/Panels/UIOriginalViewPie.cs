@@ -23,20 +23,43 @@ namespace Simitone.Client.UI.Panels
     /// cpanel\ViewMenuBackground.bmp (17x17 chip), max radius 90, label
     /// color RGB(187,187,187) (r142 dialog-chrome-law §5); slice count from
     /// the Layout quantizer (4 items -> 8 slices, items on the even
-    /// spokes); UpdateViewMenu @0x215b42 refreshes the item ladder cells.
-    /// The pop gesture is not statically recoverable (virtual dispatch
-    /// through the window manager; the panel buttons' click path provably
-    /// only steps): the port models the classic tear-off — dragging >=
-    /// DragThreshold px while a small zoom/rotate button is held opens the
-    /// radial at that button; a plain click still steps. Item cells follow
-    /// the UpdateViewMenu ladder law quantized onto the port's 3-level zoom
-    /// (base cell = level*2) and 4-quarter rotation (center cell 2, +/-1
-    /// preview) — disclosed models.
+    /// spokes).
+    /// UI-37 UPDATE — UpdateViewMenu FULLY DECODED (image 0x1020ccb0, raw
+    /// 0x2051c0-space): the item ladder is mag = diff/42 + 1 (the r217
+    /// "/42 quantize magic"; the getter pair resolves through the pie
+    /// vtable — modeled here as cursor distance past the ctor's 20px
+    /// inactive radius, +0x178 = 0x14), commit deltas zoom = ±mag clamped
+    /// to zoom state [1,3] and rotation = ±mag clamped ±2, and the CELL
+    /// ladder is exact: zoom base cells by state {0:(0,0), 1:(4,0),
+    /// 2:(1,1), 3:(0,4)} (ZoomIn,ZoomOut), rotation base 0, with the
+    /// pending-delta preview +1 (|d|==1) / +3 (|d|==2) and +1 more while a
+    /// shift key is held; |d|==3 previews no cell change (the native
+    /// switch falls through).
+    /// POP GESTURE re-attempted with the improved tooling (UI-37):
+    /// cWinViewControl::TSOnMouseDownL @0x102aac80 is provably EMPTY
+    /// (returns 1); cTSWinBtn::TSOnMouseDownL/MouseMove contain no
+    /// drag-distance threshold; the cTSPieMenu vtable (TOC-0x60D0 ->
+    /// sec1+0x75d00) survives only as unrelocated section-relative words,
+    /// so the popup entry points (Popup/PopupBegin/BeginPopupWindow) are
+    /// virtual-dispatch-only — the r218 verdict CONFIRMED with new
+    /// evidence. DragThreshold stays a disclosed port model.
+    /// DoSpeedTransitionSound attribution CORRECTED (UI-37): it is NOT a
+    /// zoom/rotate sound — fully decoded at 0x102aa100 it maps the
+    /// PAUSE/1/2/3 game-speed states through the 4x4 "UI_speed_XtoY"
+    /// name table (sec1+0x5ae58; the 12 events exist in
+    /// SoundData/SimsGeneratedHitSource.hot) and is called only from the
+    /// speed-button branches (+0x110..+0x11c) of cWinViewControl::
+    /// TSOnCommand; the zoom/rotate branches (+0xd0..+0xdc) call
+    /// CPState::Rotate/Zoom with NO sound. The port already plays the
+    /// exact matrix (UIClockPanel.SwitchSpeed). No zoom sound exists to
+    /// recover.
     /// </summary>
     public class UIOriginalViewPie : UIContainer
     {
         public const int OriginalRadius = 90;   // cDDDSimsView::Init vtable+488
-        public const int DragThreshold = 10;    // port model (disclosed)
+        public const int DragThreshold = 10;    // port model (disclosed; UI-37 re-attempt confirmed unrecoverable)
+        public const int InactiveRadius = 20;   // cTSPieMenu ctor +0x178 = 0x14
+        public const int MagnitudeQuantum = 42; // UpdateViewMenu /0x2a quantize
 
         // gate counters
         public static int PiesOpened;
@@ -59,14 +82,15 @@ namespace Simitone.Client.UI.Panels
         public int HoverIndex = -1;
 
         private readonly UIImage _bg;
-        private readonly Action<string> _onSelect;
+        private readonly Action<string, int> _onSelect;
         private readonly Action _onClose;
         private readonly Func<int> _zoomLevel;
         private double _grow;
         private bool _done;
         private bool _wasDown = true;   // opened during a press
+        private int _hoverMag = 1;      // UI-37: the /42 magnitude under the cursor
 
-        public UIOriginalViewPie(Action<string> onSelect, Func<int> zoomLevel, Action onClose = null)
+        public UIOriginalViewPie(Action<string, int> onSelect, Func<int> zoomLevel, Action onClose = null)
         {
             _onSelect = onSelect;
             _zoomLevel = zoomLevel;
@@ -125,20 +149,56 @@ namespace Simitone.Client.UI.Panels
         }
 
         /// <summary>
-        /// The UpdateViewMenu ladder model: each item's cell previews its own
-        /// step from the current state (zoom base cell = level*2 of 9; the
-        /// rotate items sit at +/-1 of the 5-cell center 2).
+        /// UI-37 decoded law — cDDDSimsView::UpdateViewMenu @ image 0x1020ccb0.
+        /// zoomState (native +0x115c) picks the base cells: {0:(0,0), 1:(4,0),
+        /// 2:(1,1), 3:(0,4)} for (ZoomIn, ZoomOut); rotation base is 0. A
+        /// pending delta of ±1 adds shift+1, ±2 adds shift+3 to the stepping
+        /// item's cell; ±3 adds nothing (the native switch falls through).
         /// </summary>
-        public int CellFor(int itemIndex)
+        public int CellFor(int itemIndex, int pendingDelta = 0, bool shiftHeld = false)
         {
-            var level = (_zoomLevel != null) ? Math.Max(1, Math.Min(3, _zoomLevel())) : 2;
+            var level = (_zoomLevel != null) ? Math.Max(0, Math.Min(3, _zoomLevel())) : 2;
             var key = (itemIndex < Items.Count) ? Items[itemIndex].Key : ItemKeyByIndex(itemIndex);
+            int bonus = shiftHeld ? 1 : 0;
+            int mag = Math.Abs(pendingDelta);
+            int step = mag == 2 ? bonus + 3 : mag == 1 ? bonus + 1 : 0;
             switch (key)
             {
-                case "zoomin": return Math.Min(8, level * 2 + 1);
-                case "zoomout": return Math.Max(0, level * 2 - 1);
-                case "rotright": return 3;
-                default: return 1; // rotleft
+                case "zoomin":
+                    {
+                        int col = level == 1 ? 4 : level == 2 ? 1 : 0; // state0 -> 0
+                        return pendingDelta > 0 ? Math.Min(8, col + step) : col;
+                    }
+                case "zoomout":
+                    {
+                        int col = level == 2 ? 1 : level == 3 ? 4 : 0;
+                        return pendingDelta < 0 ? Math.Min(8, col + step) : col;
+                    }
+                case "rotright": return pendingDelta > 0 ? step : 0;
+                default: return pendingDelta < 0 ? step : 0; // rotleft
+            }
+        }
+
+        /// <summary>The UI-37 magnitude model: the /42 quantize over the
+        /// cursor distance past the ctor's 20px inactive radius, clamped to
+        /// the ladder's 1..3 (the native getter pair is vtable-dispatched —
+        /// disclosed model of the exact /42 + 1 arithmetic).</summary>
+        public static int MagnitudeFor(float distanceFromCenter)
+        {
+            return Math.Max(1, Math.Min(3, (int)(distanceFromCenter - InactiveRadius) / MagnitudeQuantum + 1));
+        }
+
+        /// <summary>The commit delta for an item key on the decoded
+        /// UpdateViewMenu clamps: zoom ±mag keeps state in [1,3];
+        /// rotation ±mag clamps to ±2.</summary>
+        public static int CommitDelta(string key, int mag)
+        {
+            switch (key)
+            {
+                case "zoomin": return mag;
+                case "zoomout": return -mag;
+                case "rotright": return Math.Min(2, mag);
+                default: return -Math.Min(2, mag); // rotleft
             }
         }
 
@@ -174,10 +234,14 @@ namespace Simitone.Client.UI.Panels
 
         private void RefreshCells()
         {
+            bool shift = Microsoft.Xna.Framework.Input.Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftShift)
+                || Microsoft.Xna.Framework.Input.Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.RightShift);
             for (int i = 0; i < Items.Count; i++)
             {
+                int delta = (i == HoverIndex && HoverIndex > -1)
+                    ? CommitDelta(Items[i].Key, _hoverMag) : 0;
                 var old = Items[i].Icon.Texture;
-                Items[i].Icon.Texture = CropCell(Items[i], CellFor(i));
+                Items[i].Icon.Texture = CropCell(Items[i], CellFor(i, delta, shift));
                 if (old != null) old.Dispose();
                 Items[i].Icon.SetSize(Items[i].CellW, Items[i].CellH);
             }
@@ -207,10 +271,13 @@ namespace Simitone.Client.UI.Panels
                 if ((slice & 1) == 0) hover = slice / 2;
             }
             if (hover >= Items.Count) hover = -1;
-            if (hover != HoverIndex)
+            int newMag = hover > -1 ? MagnitudeFor(dist) : 1;
+            if (hover != HoverIndex || newMag != _hoverMag)
             {
                 if (hover > -1) HITVM.Get().PlaySoundEvent(FSO.Client.UI.Model.UISounds.PieMenuHighlight);
                 HoverIndex = hover;
+                _hoverMag = newMag;
+                RefreshCells(); // the ladder previews the pending step (UI-37)
             }
 
             // the pie completes on the release of the gesture that opened it
@@ -238,7 +305,8 @@ namespace Simitone.Client.UI.Panels
                 LastSelected = item.Key;
                 ItemsSelected++;
                 HITVM.Get().PlaySoundEvent(FSO.Client.UI.Model.UISounds.PieMenuSelect);
-                try { _onSelect(item.Key); } catch { }
+                var mag = _hoverMag;
+                try { _onSelect(item.Key, mag); } catch { }
             }
             else Cancels++;
             var parent = Parent as UIContainer;
