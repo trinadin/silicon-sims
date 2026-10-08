@@ -645,14 +645,7 @@ namespace Simitone.Client.UI.Model
                 {
                     var jl = job.JobLevels[level];
                     m.Tokens["sims_familymemberX_career"] = job.ChunkLabel ?? "";
-                    // EXP-16: native GenerateFamilyMemberData @ 0x1021d410
-                    // substitutes cJob::GetName(GetGender(person)==1) (call @
-                    // 0x1021d798) — the gendered STR title with the
-                    // empty-female-falls-back-to-male law, not the single
-                    // CARR JobName. Disclosure retired.
-                    m.Tokens["sims_familymemberX_job"] =
-                        FSO.Content.Content.Get().Jobs.JobTitle((short)jobType, level, female)
-                        ?? jl.JobName ?? "";
+                    m.Tokens["sims_familymemberX_job"] = FamilyMemberJobTitle(ava, jobType, level, jl);
                     m.Tokens["sims_familymemberX_salary"] = jl.Salary.ToString();
                 }
                 else
@@ -687,8 +680,22 @@ namespace Simitone.Client.UI.Model
             }
         }
 
-        private static string Skill(VMAvatar ava, FSO.SimAntics.Model.VMPersonDataVariable v)
+        /// <summary>
+        /// EXP-16: the native web-export job-title law, extracted pure for the
+        /// ssfame gate. GenerateFamilyMemberData @ 0x1021d410 substitutes
+        /// cJob::GetName(GetGender(person)==1) (call @ 0x1021d798) — the
+        /// gendered STR title with the empty-female-falls-back-to-male law,
+        /// not the single CARR JobName (disclosure retired).
+        /// </summary>
+        public static string FamilyMemberJobTitle(VMAvatar ava, int jobType, int level,
+            FSO.Files.Formats.IFF.Chunks.JobLevel jl)
         {
+            var female = (ava.GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.Gender) & 1) == 1;
+            return FSO.Content.Content.Get().Jobs.JobTitle((short)jobType, level, female)
+                ?? jl?.JobName ?? "";
+        }
+
+        private static string Skill(VMAvatar ava, FSO.SimAntics.Model.VMPersonDataVariable v)        {
             return Math.Max(0, ava.GetPersonData(v) / 100).ToString();   // 0..1000 -> 0..10
         }
 

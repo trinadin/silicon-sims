@@ -80,7 +80,7 @@ namespace Simitone.Client
             // candidate house ids, tried in order until one loads with >=1 avatar
             public static string HouseCandidates =
                 "5,4,3,2,1,0,6,7,8,9,10,11,21,22,23,24,25,26,27,28,29,30,40,41,42,43,44,45,46,47,48";
-            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall,webexport,ui37,aud19,cc06";
+            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall,webexport,ui37,aud19,cc06,ssfame";
             public static int TimeoutMs = 300000; // hard cap (real ms)
             public static bool ExitOnDone = true;
         }
@@ -975,6 +975,31 @@ namespace Simitone.Client
             Finish();
         }
 
+        // (EXP-16) 'ssfame' one-shot (opt-in, additive): the Superstar
+        // residual legs — gendered job titles (law + live panel + web
+        // token), the fame-screen display laws re-pinned live, and the
+        // Studio Town object/interaction census. See AutotestExp16SSFame.cs
+        // + coordination/evidence/EXP-16/.
+        private static bool _ssFameDone;
+
+        private static void StateSSFame()
+        {
+            try
+            {
+                foreach (var part in AutotestExp16SSFame.Run(_vm))
+                {
+                    Log("AUTOTEST ssfame " + part.Key + " " + part.Detail);
+                    if (part.Ok) Pass(part.Key); else Fail(part.Key);
+                }
+            }
+            catch (Exception e)
+            {
+                Log("AUTOTEST ssfame EXC " + e.GetType().Name + " " + e.Message);
+                Fail("ssfame");
+            }
+            _ssFameDone = true;
+        }
+
         // SAV-07 'sav07live'/'sav07live2' (opt-in, additive): the live
         // export→import→save→fresh-load round-trip probe — see
         // AutotestSav07.cs. Reached only through the StateWaitNeigh entry
@@ -1153,7 +1178,8 @@ namespace Simitone.Client
                 || CheckEnabled("exp09train")
                 || CheckEnabled("exp09spawn")
                 || CheckEnabled("exp09neg")
-                || CheckEnabled("exp09restart"))
+                || CheckEnabled("exp09restart")
+                || CheckEnabled("ssfame"))
             {
                 // (R249) focused-gate dispatch: freewill/freewillvar live inside RunCorpus
                 // (corpus-gated). When a focused opts string names them WITHOUT corpus,
@@ -10615,6 +10641,9 @@ namespace Simitone.Client
             if (_plPushed) ProposeTick(); // EXP-02: phase-2 propose watch + run-55 postmortem + run-63 neg arm (post-postmortem)
             if (CheckEnabled("ss-book") && !_ssBookDone) { SSBookTick(); return; }
             if (CheckEnabled("famesess") && !_fsDone) { FameSessTick(); return; }
+            // (EXP-16) 'ssfame' one-shot: gendered job-title law + fame-screen
+            // re-pin + the Studio Town object census. Opt-in only.
+            if (CheckEnabled("ssfame") && !_ssFameDone) { StateSSFame(); return; }
             if ((CheckEnabled("hddowntown2") || CheckEnabled("hddowntown3") || CheckEnabled("hddowntown4") || CheckEnabled("hddowntown5") || CheckEnabled("hddowntown6") || CheckEnabled("hddowntown7")) && !_hd2Done) { HDDowntown2Tick(); return; } // EXP-10 leg 1: the Hot Date downtown re-baseline (+ leg 3: the return row)
             if (CheckEnabled("socexec") && !_socExecDone) { SocExecTick(); return; }
             if (CheckEnabled("saveresume") && !_srDone) { SaveResumeTick(); return; }
