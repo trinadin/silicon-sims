@@ -284,6 +284,36 @@ namespace FSO.SimAntics
                 else if (type == "dog") AvatarType = VMAvatarType.Dog;
             }
 
+            // EXP-15 — the native pet-identity law (decoded 2026-10-08; evidence
+            // coordination/evidence/EXP-15/enumeration-20261008.md + the decode
+            // receipt): a pet avatar carries (a) the species bits in the gender
+            // word (dog=8 / cat=16 — the port's identity dialect consumed by
+            // IsPet/IsDog/IsCat, CheckTS1Action's TTAB gates and the outfit
+            // tables; the NATIVE species discriminator is the same body-strings
+            // word: EditPerson::GetSpecies @0x10062290 compares the species
+            // string against {"dogmale","dogfemale","catmale","catfemale"}) and
+            // (b) person type: family pets are class 0 (resident) at creation —
+            // 8201 'get social eligibility' ins2's resident path (target class
+            // 0, t=12) skips the GreetStatus gate; the pets' own main loop
+            // (Dog/CatGlobals 8222 ins7) re-classes them to BCON 260 key 1 on
+            // non-residential lots; and 8200 ins3 (t=255 = Pop RETURN_FALSE)
+            // REJECTS class-2 targets — the port's synthesized records gave
+            // pets the 'init NPC' class 2 (MakePersonData), hiding every
+            // pet-owner row. The PPC cXPerson init (0x10108b00 region) stores
+            // the creation type param at person+0x5cc; its zoning law exempts
+            // class 2 from the visitor conversion.
+            // (raw array writes: SetAvatarType runs in the ctor BEFORE WorldUI
+            // exists, so SetPersonData's WorldUI side-effect paths are unsafe here)
+            if (AvatarType == VMAvatarType.Dog || AvatarType == VMAvatarType.Cat)
+            {
+                var g = (ushort)PersonData[(ushort)VMPersonDataVariable.Gender];
+                g |= (AvatarType == VMAvatarType.Dog) ? (ushort)8 : (ushort)16;
+                PersonData[(ushort)VMPersonDataVariable.Gender] = (short)g;
+                // pd[32] stays the family-resident class 0 at home: 8201 ins2's
+                // resident path (target class 0 -> t=12) skips the greet gate;
+                // the pets' own main loop re-classes to key 1 off-home.
+            }
+
             Avatar = new SimAvatar(FSO.Content.Content.Get().AvatarSkeletons.Get((data?.GetString(0)??"adult")+".skel"));
             if (UseWorld && !FSO.Content.Content.Get().TS1)
             {
@@ -1145,6 +1175,23 @@ namespace FSO.SimAntics
             // visitors left immediately. Visitors are type 2.
             if (lastPersonType == 0) SetPersonData(VMPersonDataVariable.PersonType, (short)((GetPersonData(VMPersonDataVariable.TS1FamilyNumber) == current?.ChunkID) ? 0 : 2));
             else SetPersonData(VMPersonDataVariable.PersonType, lastPersonType);
+            // EXP-15: pets are PERMANENTLY the BCON-260 class 2 regardless of family
+            // (the family gate lives in the 8201 pd61 comparison, not the type word —
+            // see SetAvatarType's EXP-15 decode note); the record's plain-gender
+            // restore also drops the ctor's species bits, so re-derive both.
+            if (AvatarType == VMAvatarType.Dog || AvatarType == VMAvatarType.Cat)
+            {
+                var g = (ushort)GetPersonData(VMPersonDataVariable.Gender);
+                g |= (AvatarType == VMAvatarType.Dog) ? (ushort)8 : (ushort)16;
+                SetPersonData(VMPersonDataVariable.Gender, (short)g);
+                // EXP-15: a FAMILY pet activates as the resident class 0 (8201
+                // ins2's resident path skips the greet gate). Synthesized
+                // records may carry the NPC class 2 (which 8200 ins3 rejects
+                // as a target); the pets' own main loop re-classes to BCON 260
+                // key 1 when off-home. Non-family pets keep their stored class.
+                if (GetPersonData(VMPersonDataVariable.TS1FamilyNumber) == current?.ChunkID)
+                    SetPersonData(VMPersonDataVariable.PersonType, 0);
+            }
             SetPersonData(VMPersonDataVariable.VisitorSchedule, sched);
             SetPersonData(VMPersonDataVariable.GreetStatus, 0);
             SetPersonData(VMPersonDataVariable.IsGhost, GetPersonData(VMPersonDataVariable.IsGhost));

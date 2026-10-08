@@ -265,3 +265,8 @@ tools/iff-dump/**/*.iff
 
 # SIM-19/SIM-16 familymerge run artifacts (2026-09-20 review P2-2)
 user-fm*/
+
+# EXP-15 worker scratch (extracted game-data IFFs + decode scripts) — regenerable, never committed
+scratch/
+userdirs/
+publish/

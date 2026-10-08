@@ -44,6 +44,14 @@ namespace Simitone.Client.Utils
             var result = obj.GetPersonDataClone();
             obj.Delete(true, TempVM.Context);
 
+            // EXP-15 pet person-class law: synthesized PET records carry the
+            // resident class 0 (VMAvatar.InheritNeighbor's note — class 2 is the
+            // NPC/visitor canon that 8200 'get interaction eligibility' ins3
+            // rejects as an interaction target; the pet brains re-class to key 1
+            // off-home themselves via Dog/CatGlobals 8222 ins7).
+            if (obj.IsPet)
+                result[(int)FSO.SimAntics.Model.VMPersonDataVariable.PersonType] = 0;
+
             return result.Take(88).ToArray();
         }
     }

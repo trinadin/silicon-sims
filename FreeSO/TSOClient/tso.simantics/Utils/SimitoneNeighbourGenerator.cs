@@ -254,9 +254,14 @@ namespace FSO.SimAntics.Utils
             }
         }
 
+        /// <summary>EXP-15: true for the pet ctor — the pet person-class law
+        /// (BCON 260 key 1) applies at creation.</summary>
+        public bool IsPet;
+
         public SimTemplateCreateInfo(string petType, bool gender)
         {
             //kat/dog. 
+            IsPet = true;
             Child = false;
             BodyStringReplace = new Dictionary<int, string>()
             {
@@ -315,7 +320,12 @@ namespace FSO.SimAntics.Utils
             // IFF 'init NPC' (8298) trailing writes: pd[29]=1 (Cheats), pd[32]=
             // Tuning[16898] (PersonType -> global BCON 260 'Person Types' key 2 = 2).
             pd[29] = 1;                        // Cheats
-            pd[32] = 2;                        // PersonType (IFF Tuning[16898] -> BCON 260 key 2)
+            // EXP-15 pet-class law: PETS are the resident class 0 (8201 ins2's
+            // resident path skips the greet gate; the pet brains re-class to
+            // BCON 260 key 1 off-home; 8200 ins3 REJECTS class-2 targets) — the
+            // 'init NPC' key 2 stays the rule for person-type creations (the
+            // SIM-19 visitor canon).
+            pd[32] = (short)(IsPet ? 0 : 2);   // PersonType: pets class 0, others the NPC class 2
 
             // R152: interests = the ENGINE'S OWN creation law, replacing the
             // pre-decode guesses (pd[13]/[14]=500..800, pd[16]=pd[26]=600)
