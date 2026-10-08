@@ -5,7 +5,7 @@ maintained alongside PARITY.md and HANDOFF.md as part of the keep-it-honest disc
 
 ## What this repository is
 
-**Verbatim** (formerly Simitone-macOS) is a **native macOS port and fidelity-verification project
+**Sims on Silicon** (formerly Simitone-macOS) is a **native macOS port and fidelity-verification project
 built on top of an MPL-2.0 engine**. It is not a clean-room rewrite and is not "ours alone" in the sense of being
 independent of FreeSO. Concretely:
 
@@ -75,6 +75,6 @@ original IFF behavior/script logic against your legally owned game data (see REA
 ## TL;DR
 
 FreeSO (MPL-2.0) is the engine; Simitone is FreeSO-derived; this repo is a macOS port of
-Simitone — **Verbatim** — that adds real verification and fidelity work on top. "Our own thing" =
+Simitone — **Sims on Silicon** — that adds real verification and fidelity work on top. "Our own thing" =
 the port, the harness, the RE tooling, and the verified fixes — not the engine itself.
 

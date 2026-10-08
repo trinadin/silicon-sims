@@ -1,7 +1,7 @@
-# Verbatim
+# Sims on Silicon
 
-**The Sims™ (2000), word-for-word: a byte-faithful, native macOS (Apple Silicon) port of the
-open-source Simitone engine, running your legally-owned original game data.**
+**The Sims™ (2000), natively on Apple Silicon Macs: a byte-faithful port of the open-source
+Simitone engine, running your legally-owned original game data.**
 
 Formerly **Simitone-macOS**. Not affiliated with EA, Maxis, or the Simitone team. This project is a
 fork of [alexjyong/Simitone](https://github.com/alexjyong/Simitone) (itself a fork of
@@ -10,16 +10,16 @@ fork of [alexjyong/Simitone](https://github.com/alexjyong/Simitone) (itself a fo
 
 ## What this project is
 
-Verbatim is **not a remake**. It is an engine that:
+Sims on Silicon is **not a remake**. It is an engine that:
 
 - loads your legally-owned copy of *The Sims: Complete Collection* game data (IFF format), and
 - compiles and runs the **original game logic** — the original `Behavior.iff` scripted behavior
   (BHAV bytecode) is executed by the engine's VM — so gameplay is driven by the original data
   and the original logic.
 
-The port's mission is in the name: where behavior differs from the 2000 PowerPC original, the
-original binary is disassembled and the engine is corrected to match it — constants, thresholds,
-formulas and all (see [PROVENANCE.md](PROVENANCE.md) and [PARITY.md](PARITY.md)).
+Where behavior differs from the 2000 PowerPC original, the original binary is disassembled and the
+engine is corrected to match it — constants, thresholds, formulas and all (see
+[PROVENANCE.md](PROVENANCE.md) and [PARITY.md](PARITY.md)).
 
 It ships **no copyrighted game assets**: you point it at your game files (see [Game data](#game-data)).
 
@@ -41,7 +41,7 @@ It ships **no copyrighted game assets**: you point it at your game files (see [G
 
 ## Game data
 
-Verbatim needs The Sims 1 **Complete Collection / Legacy Collection** data: a folder containing
+Sims on Silicon needs The Sims 1 **Complete Collection / Legacy Collection** data: a folder containing
 `GameData/.../Behavior.iff` and the `UserData` layout. See [PORT_STATUS.md](PORT_STATUS.md)
 ("Required: game data") for what is staged here and how to obtain it legally —
 [fetch-game-data.sh](fetch-game-data.sh) stages the Complete Collection DVD from archive.org
@@ -60,8 +60,8 @@ in the user-data `config.ini` (`TS1HybridPath`); user data and saves live in `~/
 One repository, no submodules:
 
 ```sh
-git clone https://github.com/trinadin/verbatim.git
-cd verbatim && git checkout main
+git clone https://github.com/trinadin/sims-on-silicon.git
+cd sims-on-silicon && git checkout main
 ```
 
 Prerequisites: .NET SDK 9. The exact publish + package commands
