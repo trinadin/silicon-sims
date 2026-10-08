@@ -4998,7 +4998,18 @@ namespace Simitone.Client
                     if (sim == null)
                     {
                         if (++_ptnameSettle > 2700)
-                        { Log("AUTOTEST petname verdict no-adult-on-93"); Fail("petname"); _ptnameState = 99; }
+                        {
+                            // diagnostic census (EXP-14 follow-up class of defect)
+                            var lti = (FSO.Content.Content.Get().Neighborhood?.GameState?.LotTransitInfo ?? -1);
+                            var af = _screen?.ActiveFamily?.ChunkID.ToString() ?? "null";
+                            var cs = string.Join(" | ", _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>().Select(a =>
+                                "obj" + a.ObjectID + " age=" + a.GetPersonData(VMPersonDataVariable.PersonsAge)
+                                + " pd32=" + a.GetPersonData(VMPersonDataVariable.PersonType)
+                                + " pd61=" + a.GetPersonData(VMPersonDataVariable.TS1FamilyNumber)
+                                + " pet=" + a.IsPet + " oow=" + (a.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD)));
+                            Log("AUTOTEST petname verdict no-adult-on-93 LTI=" + lti + " AF=" + af + " avatars=[" + cs + "]");
+                            Fail("petname"); _ptnameState = 99;
+                        }
                         return;
                     }
                     _ptnameActorOid = sim.ObjectID;

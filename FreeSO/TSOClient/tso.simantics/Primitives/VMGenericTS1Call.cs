@@ -256,14 +256,6 @@ namespace FSO.SimAntics.Primitives
                     crossData.ActiveFamily = context.VM.TS1State.CurrentFamily;
                     crossData.DowntownSimGUID = context.Caller.Object.OBJ.GUID;
                     crossData.LotTransitInfo = (vacation) ? (short)1 : context.VM.GetGlobalValue(34);
-                    // EXP-14 hdserve follow-up (bounded transit diagnostic): one line
-                    // per travel, naming the exact pre-switch transit state the
-                    // arrival-side build (mode 18) will consume.
-                        + " vacation=" + vacation
-                        + " g34=" + context.VM.GetGlobalValue(34)
-                        + " LotTransitInfo=" + crossData.LotTransitInfo
-                        + " ActiveFamily=" + (crossData.ActiveFamily?.ChunkID.ToString() ?? "NULL")
-                        + " DowntownSimGUID=0x" + crossData.DowntownSimGUID.ToString("x8"));
                     // TRV-02: mirror the transit state so a save taken on the
                     // destination lot reloads with the return path intact.
                     context.VM.TS1State.LotTransitInfo = crossData.LotTransitInfo;
@@ -317,13 +309,6 @@ namespace FSO.SimAntics.Primitives
                     // ActiveFamily or a failed create (unresolvable
                     // DowntownSimGUID) NREs below with the same
                     // entity-deletion consequence; soft-fail like mode 26
-                    // EXP-14 hdserve follow-up (bounded transit diagnostic): the
-                    // middle ped marker calls this on attr3; name the exact leg
-                    // taken (one line per ATTEMPT, capped by the marker loop).
-                        + "/" + (context.Caller.Object?.Resource?.MainIff?.Filename ?? "?")
-                        + " ActiveFamily=" + (crossDataDT.ActiveFamily?.ChunkID.ToString() ?? "NULL")
-                        + " LotTransitInfo=" + crossDataDT.LotTransitInfo
-                        + " DowntownSimGUID=0x" + crossDataDT.DowntownSimGUID.ToString("x8"));
                     if (crossDataDT.ActiveFamily == null) return VMPrimitiveExitCode.GOTO_FALSE;
 
                     var control = context.VM.Context.CreateObjectInstance(crossDataDT.DowntownSimGUID, LotTilePos.OUT_OF_WORLD, Direction.NORTH)?.BaseObject;
@@ -450,16 +435,8 @@ namespace FSO.SimAntics.Primitives
                     // other unavailable-state modes.
                     if (crossData2.ActiveFamily == null)
                     {
-                        // EXP-14 hdserve follow-up (bounded transit diagnostic)
-                            + "/" + (context.Caller.Object?.Resource?.MainIff?.Filename ?? "?")
-                            + " ActiveFamily=NULL LotTransitInfo=" + crossData2.LotTransitInfo
-                            + " (the arrival build declines — no traveler materializes)");
                         return VMPrimitiveExitCode.GOTO_FALSE;
                     }
-                        + "/" + (context.Caller.Object?.Resource?.MainIff?.Filename ?? "?")
-                        + " ActiveFamily=" + crossData2.ActiveFamily.ChunkID
-                        + " LotTransitInfo=" + crossData2.LotTransitInfo
-                        + " DowntownSimGUID=0x" + crossData2.DowntownSimGUID.ToString("x8"));
                     if (crossData2.LotTransitInfo >= 1)
                     {
                         crossData2.ActiveFamily.SelectWholeFamily();
@@ -1094,8 +1071,6 @@ namespace FSO.SimAntics.Primitives
                 // letting the NGBH/live writes land on a failed house patch).
                 if (!nbhd.PatchHouseSimiGlobal(house, 26, 0))
                 {
-                    System.Console.WriteLine("R247 TutorialCompleted: house " + house
-                        + " SIMI global-26 patch failed; no completion writes performed");
                     return;
                 }
             }
