@@ -256,6 +256,15 @@ namespace FSO.SimAntics.Primitives
                     crossData.ActiveFamily = context.VM.TS1State.CurrentFamily;
                     crossData.DowntownSimGUID = context.Caller.Object.OBJ.GUID;
                     crossData.LotTransitInfo = (vacation) ? (short)1 : context.VM.GetGlobalValue(34);
+                    // EXP-14 hdserve follow-up (bounded transit diagnostic): one line
+                    // per travel, naming the exact pre-switch transit state the
+                    // arrival-side build (mode 18) will consume.
+                    System.Console.WriteLine("[TransitDiag] mode17 switch->lot " + switchLotId
+                        + " vacation=" + vacation
+                        + " g34=" + context.VM.GetGlobalValue(34)
+                        + " LotTransitInfo=" + crossData.LotTransitInfo
+                        + " ActiveFamily=" + (crossData.ActiveFamily?.ChunkID.ToString() ?? "NULL")
+                        + " DowntownSimGUID=0x" + crossData.DowntownSimGUID.ToString("x8"));
                     // TRV-02: mirror the transit state so a save taken on the
                     // destination lot reloads with the return path intact.
                     context.VM.TS1State.LotTransitInfo = crossData.LotTransitInfo;
@@ -309,9 +318,18 @@ namespace FSO.SimAntics.Primitives
                     // ActiveFamily or a failed create (unresolvable
                     // DowntownSimGUID) NREs below with the same
                     // entity-deletion consequence; soft-fail like mode 26
+                    // EXP-14 hdserve follow-up (bounded transit diagnostic): the
+                    // middle ped marker calls this on attr3; name the exact leg
+                    // taken (one line per ATTEMPT, capped by the marker loop).
+                    System.Console.WriteLine("[TransitDiag] mode18 build-attempt by obj" + context.Caller.ObjectID
+                        + "/" + (context.Caller.Object?.Resource?.MainIff?.Filename ?? "?")
+                        + " ActiveFamily=" + (crossDataDT.ActiveFamily?.ChunkID.ToString() ?? "NULL")
+                        + " LotTransitInfo=" + crossDataDT.LotTransitInfo
+                        + " DowntownSimGUID=0x" + crossDataDT.DowntownSimGUID.ToString("x8"));
                     if (crossDataDT.ActiveFamily == null) return VMPrimitiveExitCode.GOTO_FALSE;
 
                     var control = context.VM.Context.CreateObjectInstance(crossDataDT.DowntownSimGUID, LotTilePos.OUT_OF_WORLD, Direction.NORTH)?.BaseObject;
+                    System.Console.WriteLine("[TransitDiag] mode18 create=" + (control?.ObjectID.ToString() ?? "NULL"));
                     if (control == null) return VMPrimitiveExitCode.GOTO_FALSE; // P3-1: the create-deref twin
                     ((VMAvatar)control).AvatarState.Permissions = Model.TSOPlatform.VMTSOAvatarPermissions.Owner;
                     context.VM.SetGlobalValue(3, control.ObjectID);

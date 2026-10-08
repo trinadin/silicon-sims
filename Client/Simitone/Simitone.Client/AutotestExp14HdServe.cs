@@ -194,19 +194,27 @@ namespace Simitone.Client
                     AnswerDialogs(vm);
                     if (_traveler == null)
                     {
+                        // hdserve-fix: the wait is GUID-STRICT on the traveler's own
+                        // DowntownSimGUID — downtown staff/visitor NPCs also satisfy
+                        // a FirstOrDefault and would silently pass the arrival gate
+                        // while the real traveler never builds (run1's defect).
                         var avs2 = vm.Entities.OfType<VMAvatar>().ToList();
-                        if (avs2.Count > 0)
+                        var built = _travelerGuid != 0
+                            ? avs2.FirstOrDefault(a => a.Object?.OBJ?.GUID == _travelerGuid)
+                            : avs2.FirstOrDefault();
+                        if (built != null)
                         {
-                            _traveler = _travelerGuid != 0
-                                ? avs2.FirstOrDefault(a => a.Object?.OBJ?.GUID == _travelerGuid) ?? avs2.FirstOrDefault()
-                                : avs2.FirstOrDefault();
+                            _traveler = built;
                             _log("AUTOTEST hdserve: downtown sim built at f=" + _frame
-                                + " (+" + (_frame - _arrivalFrame) + " after the swap)");
+                                + " (+" + (_frame - _arrivalFrame) + " after the swap) obj" + built.ObjectID
+                                + " guid=0x" + _travelerGuid.ToString("x8") + " (GUID-exact)");
                             _arrivalFrame = _frame; // restart the settle window from the build
                         }
                         else if (_frame - _arrivalFrame > 1800)
                         {
-                            Verdict = "arrival-no-traveler: no avatar on the downtown VM within 1800f of the swap (mode-18 build never landed)";
+                            Verdict = "arrival-no-traveler: the traveler's downtown sim (GUID 0x"
+                                + _travelerGuid.ToString("x8") + ") never built within 1800f of the swap"
+                                + " — avatars present=" + avs2.Count + " are all NPCs (mode-18 build leg failed)";
                             Done(false);
                             return true;
                         }
@@ -328,18 +336,19 @@ namespace Simitone.Client
                 + " (picker answer " + _dest + ") oldEnts=" + oldEnts + " newEnts=" + fresh.Entities.Count
                 + " answers=" + _answers + " types=[" + string.Join(",", _dlgTypes) + "]");
 
-            // re-resolve the traveler by GUID (the EXP-04 orphaning law)
+            // re-resolve the traveler by GUID (the EXP-04 orphaning law).
+            // hdserve-fix: GUID-STRICT — no FirstOrDefault fallback. The swap-time
+            // resolution only succeeds if the traveler survived the lot switch
+            // itself; otherwise phase 2 waits for the mode-18 build.
             var avs = fresh.Entities.OfType<VMAvatar>().ToList();
-            _traveler = _travelerGuid != 0
-                ? avs.FirstOrDefault(a => a.Object?.OBJ?.GUID == _travelerGuid) ?? avs.FirstOrDefault()
-                : avs.FirstOrDefault();
+            _traveler = avs.FirstOrDefault(a => a.Object?.OBJ?.GUID == _travelerGuid);
             if (_traveler == null)
             {
                 // Mode-18 law (VMGenericTS1Call): the caller travels as
-                // inventory transit data; the destination lot's controller
-                // BUILDS the downtown sim after arrival. The avatar can lag
+                // inventory transit data; the destination lot's Ped Marker - Middle
+                // (attr3) BUILDS the downtown sim after arrival. The avatar can lag
                 // the VM swap by many frames — phase 2 waits for it (bounded).
-                _log("AUTOTEST hdserve arrival: no avatar at swap (mode-18 build pending); waiting");
+                _log("AUTOTEST hdserve arrival: traveler not on the swap VM (mode-18 build pending); waiting");
                 return;
             }
 
