@@ -132,10 +132,18 @@ namespace FSO.SimAntics.Primitives
                     var itemcount = (short)(items.Count);
                     // ENG-06 (decode mode-3 law): count-dst = Temp[(Flags2.0x60)>>5],
                     // index-dst = Temp[(Flags.0x18)>>3], BOTH written unconditionally on
-                    // success (the old FoundIndexIntoTemp gate + the shared selectors
-                    // were the port's guess; zero corpus callers — latent)
+                    // success.
+                    // EXP-17 native re-decode supersedes the index-dst half: the
+                    // selector reads op3 (Flags2) bits 3-4 — PPC 0x100e31ec
+                    // (rlwinm 0,0,0x13,0x14 over the op+2 u16 -> (op3.0x18)>>3)
+                    // with the store at 0x100e3248-0x100e3250 (lha 0x42(r1) =
+                    // FindToken's index out-param; sth into the selected temp).
+                    // The quest corpus is the caller set ENG-06 lacked:
+                    // SocialsMagic 4124 ins99-101 carry '03 08 11 0d' ->
+                    // Temp[1], read back at ins102 (local[8]=temp[1]) for the
+                    // $TokenNameLocal:8 reward dialog (STR#301 string 19).
                     context.Thread.TempRegisters[(operand.Flags2 & 0x60) >> 5] = itemcount;
-                    context.Thread.TempRegisters[(operand.Flags & 0x18) >> 3] = (short)foundindex;
+                    context.Thread.TempRegisters[(operand.Flags2 & 0x18) >> 3] = (short)foundindex;
                     return (itemcount > 0) ? VMPrimitiveExitCode.GOTO_TRUE : VMPrimitiveExitCode.GOTO_FALSE;
                     //return (itemcount >= count)? VMPrimitiveExitCode.GOTO_TRUE : VMPrimitiveExitCode.GOTO_FALSE;
 
