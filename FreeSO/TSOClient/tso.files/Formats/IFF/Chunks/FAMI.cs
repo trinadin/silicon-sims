@@ -44,6 +44,25 @@ namespace FSO.Files.Formats.IFF.Chunks
         /// (SAV-10: the marshal's post-FAMI tail is 5 bytes when the block is
         /// absent, so a "read iff >=12 bytes remain" reader never over-reads).
         /// </summary>
+        /// <summary>
+        /// TRV-05 (native Family::DoStream 0x76d710, field 8): the family's
+        /// current Vacation Island rental (lot 40..48) while the family is on
+        /// vacation — the port equivalent of native Family+0x13C. Decoded law:
+        /// written at travel arrival (cSimsApp::LoadGame 0x1024f7f0,
+        /// app-trip-flag 0x109 path: family->0x13c = lot, then an IMMEDIATE
+        /// Neighborhood::Save); cleared on return
+        /// (Neighborhood::RemoveFromVacation 0xa83e0: +0x13c = 0 plus flag bit
+        /// 0x8 of +0x138, then Neighborhood::Save); consumed by GenericTS1Call
+        /// mode 27's availability loop (TRV-01: families whose +0x13c equals
+        /// the rental make it unavailable); persisted as ONE int AFTER the
+        /// GUID list and BEFORE the spell block, gated version > 7 (the
+        /// shipped original FAMIs are version 7 — never re-saved by the
+        /// Complete engine — so the field is absent there; the native writer
+        /// passes version 9 via Family::SaveFamily -> ReconSaveObject).
+        /// 0 = no vacation booking.
+        /// </summary>
+        public int VacationHouseNumber;
+
         public short[] SpellWords = null;
 
         public uint[] RuntimeSubset = new uint[] { }; //the members of this family currently active. don't save!
@@ -86,6 +105,14 @@ namespace FSO.Files.Formats.IFF.Chunks
                 // (R252), and this reader also runs on shared lot-marshal streams where
                 // an over-read consumes the following payload (SAV-10).
 
+                // TRV-05 vacation-rental field (native DoStream field 8):
+                // exactly one int between the GUID list and any spell block,
+                // read only for version > 7 (originals are version 7; the
+                // shared lot-marshal stream is symmetric because the writer
+                // emits the int under the same version gate).
+                if (Version > 7) VacationHouseNumber = io.ReadInt32();
+                else VacationHouseNumber = 0;
+
                 // ENG-12 spell block: read iff the stream is EXHAUSTED by exactly
                 // the 6 shorts. An IFF chunk stream is chunk-sized (block present
                 // -> exactly 12 remain; absent -> 0), so this is exact there.
@@ -110,6 +137,22 @@ namespace FSO.Files.Formats.IFF.Chunks
         {
             using (var io = IoWriter.FromStream(stream, ByteOrder.LITTLE_ENDIAN))
             {
+                // TRV-05 vacation-rental field: when the family holds a
+                // booking, the chunk is promoted to the native Complete
+                // writer's version 9 shape — [GUIDs][vacation int][spell
+                // block] — so the booking persists exactly like native
+                // Family::DoStream field 8. DISCLOSED divergence: the native
+                // writer passes version 9 unconditionally (Family::SaveFamily
+                // 0x1006d4e0 -> ReconSaveObject(...,9)), so a native v9 chunk
+                // also carries the 6 spell shorts when spell-less; the port
+                // keeps bookless/spellless families byte-identical to the
+                // R252/ENG-12 canon (version 7, no trailing fields) and only
+                // promotes the version when there is a vacation booking to
+                // persist. Both readers honour the chunk's own version word.
+                if (VacationHouseNumber != 0)
+                {
+                    Version = 9;
+                }
                 io.WriteInt32(0);
                 io.WriteUInt32(Version); // honour the loaded version (7 original; a 9 legacy port FAMI round-trips as 9); was hardcoded 9 (R252)
                 io.WriteCString("IMAF", 4);
@@ -122,6 +165,7 @@ namespace FSO.Files.Formats.IFF.Chunks
                 io.WriteInt32(FamilyGUIDs.Length);
                 foreach (var guid in FamilyGUIDs)
                     io.WriteUInt32(guid);
+                if (Version > 7) io.WriteInt32(VacationHouseNumber);
 
                 // R252: the original FAMI chunk has NO trailing zero int32s (data
                 // size is exactly 40 + 4*guidCount). The port previously wrote 4

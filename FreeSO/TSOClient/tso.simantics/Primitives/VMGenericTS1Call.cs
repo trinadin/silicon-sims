@@ -450,9 +450,16 @@ namespace FSO.SimAntics.Primitives
                     break;
                 case VMGenericTS1CallMode.ReturnNumberOfAvaiableVacationLotsInTemp0: //27
                     {
-                        // TRV-02 (TRV-01 decode, native case 27): nine rentals
-                        // (40..48); one is unavailable while a neighborhood family
-                        // references it as its house. Native writes the remainder
+                        // TRV-02 (TRV-01 decode, native case 27; TRV-05 field
+                        // correction): nine rentals (40..48); one is unavailable
+                        // while a neighborhood family's VACATION-RENTAL reference
+                        // (native Family+0x13C = FAMI.VacationHouseNumber —
+                        // written at travel arrival by cSimsApp::LoadGame
+                        // 0x1024f7f0, cleared on return by
+                        // Neighborhood::RemoveFromVacation 0xa83e0) equals it.
+                        // NOT HouseNumber (+0x110): the family's home lot stays
+                        // home while it vacations, so counting homes never marks
+                        // a rental occupied. Native writes the remainder of nine
                         // to Temp0.
                         var occupied = CountOccupiedVacationLots(
                             Content.Content.Get().Neighborhood.MainResource?.List<FAMI>());
@@ -1064,14 +1071,15 @@ namespace FSO.SimAntics.Primitives
         }
 
         /// <summary>
-        /// TRV-02 (native case 27): vacation rentals 40..48 are unavailable while
-        /// a neighborhood family's house reference equals them; the remainder of
-        /// nine is the bookable count.
+        /// TRV-02 (native case 27; TRV-05 field correction): vacation rentals
+        /// 40..48 are unavailable while a neighborhood family's vacation-rental
+        /// reference (native Family+0x13C = FAMI.VacationHouseNumber) equals
+        /// them; the remainder of nine is the bookable count.
         /// </summary>
         public static int CountOccupiedVacationLots(IEnumerable<FAMI> families)
         {
             if (families == null) return 0;
-            return families.Count(f => f != null && f.HouseNumber >= 40 && f.HouseNumber <= 48);
+            return families.Count(f => f != null && f.VacationHouseNumber >= 40 && f.VacationHouseNumber <= 48);
         }
 
         private void SaveIData(List<InventoryItem> inventory, uint guid, short data)

@@ -666,6 +666,35 @@ namespace Simitone.Client.UI.Screens
                 }
                 else
                 {
+                    // TRV-05 (native cSimsApp::LoadGame 0x1024f7f0, trip-flag
+                    // +0x109 path; and Neighborhood::RemoveFromVacation
+                    // 0xa83e0): the vacation booking lives on the FAMILY
+                    // record (native Family+0x13C = FAMI.VacationHouseNumber).
+                    // On arrival at a Vacation Island rental (40..49) the
+                    // native writes family->0x13c = lot and IMMEDIATELY saves
+                    // the neighborhood; on the return home it clears the field
+                    // and saves again. The port mirrors both edges of the trip
+                    // here, at the single choke point every travel lot switch
+                    // funnels through (mode 17 -> SignalLotSwitch ->
+                    // VMLotSwitch -> SwitchLot).
+                    try
+                    {
+                        var isVacationDestination = SwitchLot >= 40 && SwitchLot < 50;
+                        if (isVacationDestination && ActiveFamily.VacationHouseNumber != SwitchLot)
+                        {
+                            ActiveFamily.VacationHouseNumber = SwitchLot;
+                            Content.Get().Neighborhood.SaveNeighbourhood(false);
+                        }
+                        else if (!isVacationDestination && ActiveFamily.VacationHouseNumber != 0)
+                        {
+                            ActiveFamily.VacationHouseNumber = 0;
+                            Content.Get().Neighborhood.SaveNeighbourhood(false);
+                        }
+                    }
+                    catch (Exception tripEx)
+                    {
+                        GameLog.Write("trv05 booking edge: " + tripEx.GetType().Name + " " + tripEx.Message);
+                    }
                     if (!Downtown) SavedLot = vm.Save();
                     if (SwitchLot == ActiveFamily.HouseNumber && SavedLot != null)
                     {
