@@ -80,7 +80,7 @@ namespace Simitone.Client
             // candidate house ids, tried in order until one loads with >=1 avatar
             public static string HouseCandidates =
                 "5,4,3,2,1,0,6,7,8,9,10,11,21,22,23,24,25,26,27,28,29,30,40,41,42,43,44,45,46,47,48";
-            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall,webexport,ui37,aud19,cc06";
+            public static string Checks = "corpus,lot,motive,mood,load,savedthreads,relation,censor,rel-key,rel-mode,names,audio,jobs,npcinfo,persondata,travelinv,career,freewill,freewillvar,personality,motiveinit,skills,motiveact,relact,money,ttab,ttas,opcodes,genericcall12,genericcall13,genericcall14,callgraph,globalcalls,catalog,snd,iff,objd,ctss,strs,consts,bhvi,bhop,dgrp,slot,operand,opmx,chunks,brainlive,deathchain,savesim,uidump,uipal,loadscreen,carseek,uichrome,uitoolbar,uicur,uiglyph,uiboot,uilogo,uianim,uinbhd,uisplash,uidialog,uilotq,uilive,uijob,uivis,uicas,uidtips,uivfont,uimpanel,uiopts,uibuy,uiexpband,uibandlaw,uienamat,uiinterest,uiintvals,uiexpint,uiexprand,uiconv,uibrand,uidesc,uitt,uibuild,uibldt,uiinterest,uiroof,uigauge,uirate,uihouse,uivalue,uitext,uisurvey,uizoomcage,uicp,uidlgchrome,uibargeom,uiqueuegeom,uicasorig,uirel,uinav,uibudget,uihelp,uiscrap,uipie,uipiesub,uiphone,uismall,uiballoon,uisyschrome,uibigbtn,simvis,uidirt,uistrfam,uifriend,uipanelentry,uicheat,uitrans,uivita,uivitaplay,uicheathelp,uitotal,uiviewpie,censorpixel,roomlaw,uitutorial,uicapture,uipip,uiclip,uicutaway,uitutorial-highlight,uir258,uitall,webexport,ui37,aud19,cc06,trv05";
             public static int TimeoutMs = 300000; // hard cap (real ms)
             public static bool ExitOnDone = true;
         }
@@ -414,6 +414,7 @@ namespace Simitone.Client
                     case 17: StateExp09Route(); break;
                     case 18: StateNBR05UI(); break;
                     case 19: StateNbr06(); break;
+                    case 23: StateTrv05(); break;
                 }
             }
             catch (Exception e)
@@ -523,6 +524,21 @@ namespace Simitone.Client
                 Log("AUTOTEST exp09route neighborhood-screen ready; entering routing battery");
                 _exp09route = new AutotestExp09Route(Log);
                 _state = 17;
+                return;
+            }
+            // TRV-05 'trv05' opt-in (additive): vacation booking persistence —
+            // the FAMI +0x13c law (native Family::DoStream field 8) through
+            // the REAL travel path (home lot -> SignalLotSwitch to a Vacation
+            // Island rental -> return home), with disk-level persistence
+            // checks on Neighborhood.iff between the legs.
+            if (CheckEnabled("trv05"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST trv05 neighborhood-screen ready; entering vacation booking battery");
+                _trv05 = new AutotestTrv05(Log, () => _vm, () => _screen,
+                    (short h) => _screen.PlayHouse(h, null),
+                    (uint l) => _screen.vm.SignalLotSwitch(l));
+                _state = 23;
                 return;
             }
             // SAV-07 'sav07live'/'sav07live2' opt-in (additive): the live
@@ -904,6 +920,19 @@ namespace Simitone.Client
             Log("AUTOTEST exp09io " + _exp09io.Diagnostics);
             if (!_exp09io.Passed) Log("AUTOTEST exp09io FAILURES " + _exp09io.Failures);
             _exp09io = null;
+            Finish();
+        }
+
+        // TRV-05 'trv05': vacation booking battery (AutotestTrv05).
+        private static AutotestTrv05 _trv05;
+
+        private static void StateTrv05()
+        {
+            if (_trv05 == null) { Finish(); return; }
+            if (!_trv05.Tick()) return;
+            if (_trv05.Passed) Pass("trv05"); else Fail("trv05");
+            Log("AUTOTEST trv05 " + _trv05.Diagnostics);
+            _trv05 = null;
             Finish();
         }
 
@@ -43710,9 +43739,16 @@ namespace Simitone.Client
                 Log("AUTOTEST travelstate mode23 hours=" + hours + " minutes=" + minutes
                     + " tokensGone=" + tokensGone + " decoyAlive=" + decoyAlive + " wrongTypeAlive=" + wrongTypeAlive);
 
+                // TRV-05 fixture correction: mode 27 counts the VACATION-RENTAL
+                // reference (native Family+0x13C = VacationHouseNumber), not the
+                // home HouseNumber — families LIVING on 41/42 as homes never
+                // occupied a rental, while a family HOME on 5/7 holding a
+                // booking for 41/42 does. Mirrors the TRV-01 native loop with
+                // the field TRV-05 completed.
                 var fams = new List<FAMI>
                 {
-                    new FAMI { HouseNumber = 41 }, new FAMI { HouseNumber = 42 },
+                    new FAMI { HouseNumber = 5, VacationHouseNumber = 41 },
+                    new FAMI { HouseNumber = 7, VacationHouseNumber = 42 },
                     new FAMI { HouseNumber = 7 }, new FAMI { HouseNumber = 60 },
                 };
                 var occupied = FSO.SimAntics.Primitives.VMGenericTS1Call.CountOccupiedVacationLots(fams);
