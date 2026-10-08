@@ -591,8 +591,9 @@ namespace Simitone.Client.UI.Panels
                 for (int ui = 0; ui < ULFilterLaw.Length; ui++)
                 {
                     var slot = ULFilterLaw[ui];
-                    var ubtn = new UIOriginalNavbarButton(slot.Member, 4, 1, ULTip171(slot.LabelIndex))
-                    { ForceState = 0 };
+                    // no ForceState: the pressed state renders cell 1 through
+                    // Selected (the engine's SetState(btn, 0/1) on switch).
+                    var ubtn = new UIOriginalNavbarButton(slot.Member, 4, 1, ULTip171(slot.LabelIndex));
                     RegisterAnchor(ubtn, new Vector2(slot.X, 52 + slot.Y), true);
                     var cmd = slot.CmdBit;
                     ubtn.OnButtonClick += (b) => ProcessULFilterByType(cmd);
