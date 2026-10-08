@@ -146,14 +146,14 @@ namespace Simitone.Client
                             _log("AUTOTEST hdserve: entering home lot (PlayHouse(5)) at tick " + _frame);
                             try { _playHouse(5); } catch (Exception e) { _log("AUTOTEST hdserve PlayHouse EXC " + e.GetType().Name); }
                         }
-                        return true;
+                        return false;
                     }
-                    if (vm == null || vm.Entities.Count == 0) return true;
+                    if (vm == null || vm.Entities.Count == 0) return false;
                     ArmOutbound(vm);
-                    return true;
+                    return false;
 
                 case 1: // outbound watch: keep the VM unblocked, answer the picker, detect the switch
-                    if (vm == null) return true;
+                    if (vm == null) return false;
                     KeepUnblocked(vm);
                     AnswerDialogs(vm);
                     // the wrapper re-points the _vm accessor on the screen-vm swap
@@ -162,28 +162,28 @@ namespace Simitone.Client
                     if (fresh != null && !ReferenceEquals(fresh, _homeVm))
                     {
                         OnArrival(fresh, _homeVm != null ? _homeVm.Entities.Count : -1);
-                        return true;
+                        return false;
                     }
                     if (_arrivalLot < 0 && _frame % 300 == 0)
                         _log("AUTOTEST hdserve outbound wait f=" + _frame
                             + " travelerActive='" + (_traveler?.Thread?.ActiveAction?.Name ?? "-") + "'");
-                    return true;
+                    return false;
 
                 case 2: // post-arrival settling: hand control to the soak after a short census delay
-                    if (vm == null) return true;
+                    if (vm == null) return false;
                     KeepUnblocked(vm);
                     AnswerDialogs(vm);
-                    if (_frame - _arrivalFrame < 120) return true;
+                    if (_frame - _arrivalFrame < 120) return false;
                     ArmHungerAndOpenSoak(vm);
-                    return true;
+                    return false;
 
                 case 3:
-                    if (vm == null) return true;
+                    if (vm == null) return false;
                     KeepUnblocked(vm);
                     AnswerDialogs(vm);
                     return Soak(vm);
             }
-            return true; // unknown phase: idle (never gate-fatal without a verdict)
+            return _phase >= 4; // phase 4 = verdict delivered; anything else keeps ticking
         }
 
         private VM CurrentScreenVm()
@@ -442,8 +442,9 @@ namespace Simitone.Client
             if ((_eatSeen && _frame >= _eatSeenFrame + 1200) || armed >= SoakFrames)
             {
                 CloseSoak(vm, armed);
+                return true; // verdict delivered
             }
-            return true;
+            return false; // still soaking
         }
 
         private void CloseSoak(VM vm, int armed)
