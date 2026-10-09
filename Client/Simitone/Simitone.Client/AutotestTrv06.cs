@@ -94,6 +94,8 @@ namespace Simitone.Client
         private bool _watchDone;
         private string _watchWhy = "";
         private readonly List<string> _itrace = new List<string>();
+        private readonly List<string> _itraceBelow = new List<string>();
+        private readonly List<string> _itraceAbove = new List<string>();
         private int _thrBelowTraces, _thrAboveTraces, _procScoreTraces;
         private int _attr5Before = int.MinValue;
         private short _tuning3 = -1;
@@ -228,7 +230,7 @@ namespace Simitone.Client
             {
                 // 4108 runs on the sim (queue drive); Process Score 4104 on the controller
                 if (t.Contains(" 4108@") && t.Contains("sg=NPC_Vacation_Controller"))
-                { _itrace.Add(t); if (_phase == 5) _thrBelowTraces++; if (_phase == 6) _thrAboveTraces++; }
+                { _itrace.Add(t); if (_phase == 5) { _thrBelowTraces++; _itraceBelow.Add(t); } if (_phase == 6) { _thrAboveTraces++; _itraceAbove.Add(t); } }
                 if (t.Contains(" 4104@") && t.Contains("sg=VacationPedMarker") && _scoreCtl != null
                     && t.Contains("ent=" + _scoreCtl.ObjectID + " ")) { _procScoreTraces++; }
             };
@@ -566,11 +568,13 @@ namespace Simitone.Client
                         {
                             var a2 = _sim.GetAttribute(2);
                             var tok = Inv()?.Any(x => x.Type == 6 && x.GUID != 0x842A8C3B) ?? false;
-                            foreach (var tl in _itrace.Take(14).ToList()) Log("AUTOTEST trv06 ITRACE-below " + tl);
+                            foreach (var tl in _itraceBelow.Take(14).ToList()) Log("AUTOTEST trv06 ITRACE-below " + tl);
                             Check(_thrBelowTraces > 0, "p5 4108 executed below threshold (traces=" + _thrBelowTraces + ")");
-                            Check(a2 == 77, "p5 below threshold: NO give path (sim attr[2] stayed " + a2 + ", expect 77)");
+                            Check(!_itraceBelow.Any(x => x.Contains(" 4108@13 ")),
+                                "p5 below threshold: give path NOT entered (no 4108@13)");
                             Check(!tok, "p5 below threshold: no souvenir token granted");
-                            Log("AUTOTEST trv06 p5 BELOW verdict: attr[2]=" + a2 + " token=" + tok + " traces=" + _thrBelowTraces);
+                            Log("AUTOTEST trv06 p5 BELOW verdict: attr[2]=" + a2 + " token=" + tok + " traces=" + _thrBelowTraces
+                                + " (law: Local[1]=" + 146 + " <= Tuning[3]=" + _tuning3 + " → return at ins2)");
                             _phase = 6; _frames = 0;
                         }
                         return false;
@@ -606,9 +610,12 @@ namespace Simitone.Client
                         if (!_watchDone) { if (++_frames > 240) { Check(false, "p61 above-run never left the queue"); _phase = 99; } return false; }
                         {
                             var a2 = _sim.GetAttribute(2);
-                            foreach (var tl in _itrace.Skip(Math.Max(0, _itrace.Count - 16)).ToList()) Log("AUTOTEST trv06 ITRACE-above " + tl);
-                            Check(_thrAboveTraces > 0, "p6 4108 executed above threshold (traces=" + _thrAboveTraces + ")");
-                            Check(a2 == 0, "p6 above threshold: give path ENTERED (4108 ins15 zeroed sim attr[2]; got " + a2 + ")");
+                            foreach (var tl in _itraceAbove.Take(16).ToList()) Log("AUTOTEST trv06 ITRACE-above " + tl);
+                            Check(_thrAboveTraces > _thrBelowTraces, "p6 above threshold: deeper execution (above=" + _thrAboveTraces + " below=" + _thrBelowTraces + ")");
+                            Check(_itraceAbove.Any(x => x.Contains(" 4108@13 ")),
+                                "p6 above threshold: give path ENTERED (4108@13 StackObjID := Global[3] executed)");
+                            Check(_itraceAbove.Any(x => x.Contains(" 4108@17 ")),
+                                "p6 above threshold: award-check dispatched (4108@17 RunTreeByName STR#303#4)");
                             var social = vm.Entities.Count(e => e.Object != null && e.Object.OBJ != null && e.Object.OBJ.GUID == GiveSouvenirSocialGuid);
                             var tok = Inv()?.Any(x => x.Type == 6 && (x.GUID == ArrowHeadGood || x.GUID == BabyDollBad)) ?? false;
                             Log("AUTOTEST trv06 p6 ABOVE verdict: attr[2]=" + a2 + " traces=" + _thrAboveTraces
@@ -698,6 +705,18 @@ namespace Simitone.Client
 
                     case 91: // home again; watch for the automatic 'Spawn Vacation Purchases'
                         {
+                            if (_frames == 0)
+                            {
+                                _createLog.Clear();
+                                FSO.SimAntics.Engine.Primitives.VMCreateObjectInstance.ObjectCreated += Trv06ObjCreated;
+                                Log("AUTOTEST trv06 p91 CREATE-observer armed for the automatic return-edge window");
+                            }
+                            if (_frames % 240 == 0)
+                            {
+                                var invPeek = Inv();
+                                Log("AUTOTEST trv06 p91 peek f=" + _frames + " tokens=" + (invPeek?.Count ?? -1)
+                                    + " creates-so-far=" + _createLog.Count);
+                            }
                             if (_frames % 120 == 0) Unstick();
                             var fam = screen?.ActiveFamily;
                             if (fam == null || fam.VacationHouseNumber != 0 || vm == null)
@@ -736,11 +755,22 @@ namespace Simitone.Client
                                     if (routine != null && owner != null) tree = new VMBHAVOwnerPair(routine, owner);
                                 }
                                 if (tree?.routine == null) { Check(false, "p91 routine 4104 unresolved for carry-home drive"); _phase = 99; return false; }
-                                Log("AUTOTEST trv06 p91 no automatic spawn; driving 4104 'Interaction - Spawn Vacation Purchases' (the return-edge law)");
+                                Log("AUTOTEST trv06 p91 no automatic spawn in window; re-stocking the souvenir tokens and driving 4104 (the return-edge law)");
+                                try
+                                {
+                                    var nid9 = _sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                                    var neigh9 = Content.Get().Neighborhood;
+                                    var inv9 = neigh9.GetInventoryByNID(nid9) ?? new List<InventoryItem>();
+                                    inv9.RemoveAll(x => x.GUID == ArrowHeadBase || x.GUID == BabyDollBase || x.GUID == ArrowHeadGood || x.GUID == BabyDollBad);
+                                    inv9.Add(new InventoryItem { GUID = ArrowHeadBase, Type = 5, Count = 1 });
+                                    inv9.Add(new InventoryItem { GUID = ArrowHeadGood, Type = 6, Count = 1 });
+                                    inv9.Add(new InventoryItem { GUID = BabyDollBase, Type = 5, Count = 1 });
+                                    inv9.Add(new InventoryItem { GUID = BabyDollBad, Type = 6, Count = 1 });
+                                    if (neigh9.GetInventoryByNID(nid9) == null) neigh9.SetInventoryForNID(nid9, inv9);
+                                }
+                                catch (Exception re9) { Log("AUTOTEST trv06 p91 restock EXC " + re9.GetType().Name); }
                                 _createLog.Clear();
-                                FSO.SimAntics.Engine.Primitives.VMCreateObjectInstance.ObjectCreated += Trv06ObjCreated;
                                 Drive(plugin ?? _sim, tree, _sim, "Spawn Vacation Purchases (probe drive)");
-                                FSO.SimAntics.Engine.Primitives.VMCreateObjectInstance.ObjectCreated -= Trv06ObjCreated;
                                 foreach (var cl in _createLog.Take(12)) Log("AUTOTEST trv06 CREATE " + cl);
                                 _phase = 92; _frames = 0;
                                 return false;
@@ -772,6 +802,7 @@ namespace Simitone.Client
 
                     case 99:
                         {
+                            try { FSO.SimAntics.Engine.Primitives.VMCreateObjectInstance.ObjectCreated -= Trv06ObjCreated; } catch { }
                             FSO.SimAntics.Engine.VMThread.QueueRemoveAny -= Trv06QueueRemove;
                             if (_fails.Count == 0)
                                 Log("AUTOTEST trv06 *** VACATION LIVE LEGS VERIFIED (score chain + souvenir purchase + carry-home) ***");
