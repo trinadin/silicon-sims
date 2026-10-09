@@ -330,7 +330,16 @@ namespace FSO.Client.UI.Controls
         // passes 'UI_Nhood_click', byte-proven at pool 0x6c6e0+0xe). The
         // old blanket ui_click on mouse-UP was a port invention.
         public string PressSound;
+        // The s1/rollover slot analog (cWinLotBtn is the only native user:
+        // UI_Nhood_rollover on hover + UI_Nhood_click press).
+        public string HoverSound;
         public static string DefaultPressSound;
+        // AUD-20 filterbar-override-table.md (2026-10-09 decode): the
+        // OverrideDefaultUISound NULL-fallback built-ins are
+        // {"", UI_click, "", UI_error} — the BASE class-default press sound
+        // is UI_click, NOT silence (silence exists only per-button: NULL
+        // override + empty class slot). Community view windows install
+        // UI_Nhood_click as their class press default while mounted.
 
         protected void OnMouseEvent(UIMouseEventType type, UpdateState state)
         {
@@ -340,8 +349,12 @@ namespace FSO.Client.UI.Controls
             {
                 case UIMouseEventType.MouseOver:
                     m_isOver = true;
+                    // the s1/rollover slot (cWinLotBtn: UI_Nhood_rollover)
+                    var hover = HoverSound;
                     if (!m_isDown)
                     {
+                        if (!string.IsNullOrEmpty(hover))
+                            HITVM.Get()?.PlaySoundEvent(hover);
                         CurrentFrame = 2;
                         if (OnButtonHover != null)
                         {
@@ -370,7 +383,8 @@ namespace FSO.Client.UI.Controls
                         // button with no override (and no window default) is SILENT
                         // (the native ultimate default is the EMPTY string — treat
                         // empty as silent too, review P3-6).
-                        var press = PressSound ?? DefaultPressSound;
+                        var press = PressSound ?? DefaultPressSound
+                            ?? FSO.Client.UI.Model.UISounds.Click; // the ODUIS built-in
                         if (!string.IsNullOrEmpty(press))
                             HITVM.Get()?.PlaySoundEvent(press);
                         if (OnButtonDown != null)

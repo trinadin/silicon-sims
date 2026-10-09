@@ -40622,7 +40622,11 @@ namespace Simitone.Client
                         lock (Simitone.Client.UI.Panels.UINeighborhoodAnimationLayer.AdvancesByFamily)
                             Simitone.Client.UI.Panels.UINeighborhoodAnimationLayer.AdvancesByFamily.TryGetValue(famKey, out adv);
                         bool multi = layerCounts[l] > 1;
-                        bool good = mounted && adv > adv0 && (!multi || layer.FrameNum > 0) && firstBad.Length == 0;
+                        // skip-slot cycles (TS1.0 deltas) mount IN the skip
+                        // slot and legitimately land on FrameNum 0 (f1) —
+                        // the advance-count delta is the movement proof there.
+                        bool moved = layer.SkipSlots > 0 ? (adv > adv0) : (!multi || layer.FrameNum > 0);
+                        bool good = mounted && adv > adv0 && moved && firstBad.Length == 0;
                         if (good) famOK++;
                         else
                         {
@@ -40671,6 +40675,29 @@ namespace Simitone.Client
                     cfgs[1].FullImageAnimations[0], cfgs[1].Pulsate, cfgs[1].FrameDuration);
                 if (genericLayer.Discrete || !genericLayer.DrawsInterpolatedFrameForProbe)
                 { ulCadence = false; ulinfo += "global-regression;"; }
+                // TS1.0 VC skip-cadence (plus108-and-ts1-cadence decode):
+                // 200 ms/step, counter mod 4, slot 0 SKIPPED — the mount
+                // counter starts IN the skip slot (native ctor -1), so the
+                // visible cycle is [skip] f1 f2 f3 [skip], period 800 ms.
+                var ts1Anim = cfgs[0].FullImageAnimations[0];
+                var ts1Layer = new Simitone.Client.UI.Panels.UINeighborhoodAnimationLayer(
+                    ts1Anim, cfgs[0].Pulsate, cfgs[0].FrameDuration);
+                if (!ts1Anim.Discrete || ts1Anim.SkipSlots != 1 || ts1Anim.FrameRepeat != 1
+                    || Math.Abs(ts1Anim.CounterIntervalMilliseconds - 200.0) > 0.000001
+                    || ts1Layer.VisibleFrameForProbe != -2)
+                { ulCadence = false; ulinfo += "ts1-policy;"; }
+                ts1Layer.AdvanceMilliseconds(199.99);
+                if (ts1Layer.VisibleFrameForProbe != -2) { ulCadence = false; ulinfo += "ts1-early;"; }
+                ts1Layer.AdvanceMilliseconds(0.02);
+                if (ts1Layer.VisibleFrameForProbe != 0) { ulCadence = false; ulinfo += "ts1-f1;"; }
+                ts1Layer.AdvanceMilliseconds(200);
+                if (ts1Layer.VisibleFrameForProbe != 1) { ulCadence = false; ulinfo += "ts1-f2;"; }
+                ts1Layer.AdvanceMilliseconds(200);
+                if (ts1Layer.VisibleFrameForProbe != 2) { ulCadence = false; ulinfo += "ts1-f3;"; }
+                ts1Layer.AdvanceMilliseconds(200);
+                if (ts1Layer.VisibleFrameForProbe != -2) { ulCadence = false; ulinfo += "ts1-skip;"; }
+                ts1Layer.AdvanceMilliseconds(200);
+                if (ts1Layer.VisibleFrameForProbe != 0) { ulCadence = false; ulinfo += "ts1-wrap;"; }
                 // R91 ENGINE-DERIVED car-lane pins — literal re-declaration of the
                 // cWinStudiotown::InitCars six-lane table (literal stores 0x475e1c..
                 // 0x4760ec; direction split cmpwi r25,3 @0x475f54; bitmap pick

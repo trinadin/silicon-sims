@@ -726,6 +726,11 @@ namespace Simitone.Client.UI.Screens
                     if (SwitchLot == ActiveFamily.HouseNumber && SavedLot != null)
                     {
                         Downtown = false;
+                        // cab-chain-decode: the DOWNTOWN/away return parks the
+                        // same 281 transit (callee 0xA6F31853 row-2/row-4 trees
+                        // park before sims_call mode 17) — arm the completion
+                        // scan at EVERY home return, not just the vacation edge.
+                        StaleTransitClearBudget = 2400;
                         InitializeLot(SavedLot);
                         SavedLot = null;
                     }
@@ -812,10 +817,21 @@ namespace Simitone.Client.UI.Screens
                     }
                     // review P2-1: the structural 281-park alone is too broad (any
                     // notify-waiting action in the arrival window would cancel) —
-                    // require the action's callee to be the travel plugin (the
-                    // transit interactions' owner) as well.
+                    // require the action's callee to be a TRAVEL PLUGIN (the
+                    // transit interactions' owner) as well. cab-chain-decode
+                    // (2026-10-09): ALL FIVE travel plugins park their persisted
+                    // transit in global.iff 281 before sims_call mode 17 —
+                    // downtown 0xA6F31853, vacation 0xABA9DF4A, community
+                    // 0xEAA79D86, studio 0xC61F8102, magic 0x99197314 (the
+                    // 281-frame requirement safely excludes the magic portals,
+                    // which mode-17 with NO park). Natively no BHAV frame
+                    // survives a lot switch at all (LoadHouse clears histories
+                    // on every load); the residue is a port construction.
                     if (!parkedInTransitWait) continue;
-                    if (!(act.Callee?.Object?.OBJ != null && act.Callee.Object.OBJ.GUID == 0xABA9DF4Au)) continue;
+                    var calleeGuid = act.Callee?.Object?.OBJ?.GUID ?? 0;
+                    if (!(calleeGuid == 0xA6F31853u || calleeGuid == 0xABA9DF4Au
+                        || calleeGuid == 0xEAA79D86u || calleeGuid == 0xC61F8102u
+                        || calleeGuid == 0x99197314u)) continue;
                     member.Thread.CancelAction(act.UID);
                     cancelled = true;
                     GameLog.Write("trv06b arrival: completed the stale return-transit '"

@@ -358,6 +358,26 @@ namespace Simitone.Client
                 { log("uidtbar: plaque counter sequence " + seqStr + " want " + wantSeq); return false; }
                 log("uidtbar: PLAQUE PING-PONG VERIFIED (truth table + counter sequence " + seqStr + ")");
 
+                // (j) the show_zones CHEAT (+0x108 — plus108-and-ts1-cadence
+                // decode: the flag's ONLY runtime writer is the UL
+                // CheatCallback after "show_zones <on|other>"; ctor zeroes).
+                // With the flag set, HighlightLotsForMode routes the
+                // Gardening-style zone tints for EVERY mode except 5.
+                if (panel.ULShowZones) { log("uidtbar: show_zones default-on (ctor must zero it)"); return false; }
+                panel.ApplyULFilterMode(0x08, 2, "cpanel\\filtershopping.bmp"); // mode 2, NOT Gardening
+                var appsBefore = panel.ULFilterHiliteApplications;
+                var submit = typeof(Simitone.Client.UI.Panels.UINeighborhoodSelectionPanel)
+                    .GetMethod("SubmitCheat", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                submit.Invoke(panel, new object[] { "show_zones on" });
+                if (!panel.ULShowZones) { log("uidtbar: show_zones on did not set the flag"); return false; }
+                var appsDelta = panel.ULFilterHiliteApplications - appsBefore;
+                if (appsDelta <= 0) { log("uidtbar: show_zones did not re-route the highlight (delta=" + appsDelta + ")"); return false; }
+                submit.Invoke(panel, new object[] { "show_zones off" });
+                if (panel.ULShowZones) { log("uidtbar: show_zones off did not clear the flag"); return false; }
+                submit.Invoke(panel, new object[] { "show_zones" }); // bare: arg-count-gated, no state change
+                if (panel.ULShowZones) { log("uidtbar: bare show_zones must be a no-op"); return false; }
+                log("uidtbar: SHOW_ZONES CHEAT VERIFIED (flag + re-route + off + bare no-op)");
+
                 return true;
             }
             catch (Exception e)

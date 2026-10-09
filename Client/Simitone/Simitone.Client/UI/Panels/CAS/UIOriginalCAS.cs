@@ -674,10 +674,19 @@ namespace Simitone.Client.UI.Panels.CAS
             LightBtn.OnButtonClick += (b) => SetSkin("lgt");
             MediumBtn.OnButtonClick += (b) => SetSkin("med");
             DarkBtn.OnButtonClick += (b) => SetSkin("drk");
-            BodyPrevBtn.OnButtonClick += (b) => { OnCycleBody?.Invoke(-1); FSO.HIT.HITVM.Get().PlaySoundEvent("UI_CAC_CycleParts"); };
-            BodyNextBtn.OnButtonClick += (b) => { OnCycleBody?.Invoke(1); FSO.HIT.HITVM.Get().PlaySoundEvent("UI_CAC_CycleParts"); };
-            HeadPrevBtn.OnButtonClick += (b) => { OnCycleHead?.Invoke(-1); FSO.HIT.HITVM.Get().PlaySoundEvent("UI_CAC_Cyclehead"); };
-            HeadNextBtn.OnButtonClick += (b) => { OnCycleHead?.Invoke(1); FSO.HIT.HITVM.Get().PlaySoundEvent("UI_CAC_Cyclehead"); };
+            // AUD-20 filterbar-override-table: cWinDesignCharacter::Init
+            // installs UI_CAC_CycleParts (both body arrows) and
+            // UI_CAC_Cyclehead (both head arrows) as per-button PRESS
+            // overrides — the slot fires on mouse-DOWN (the explicit
+            // up-clicks here double-fired once the base default existed).
+            BodyPrevBtn.PressSound = "UI_CAC_CycleParts";
+            BodyNextBtn.PressSound = "UI_CAC_CycleParts";
+            HeadPrevBtn.PressSound = "UI_CAC_Cyclehead";
+            HeadNextBtn.PressSound = "UI_CAC_Cyclehead";
+            BodyPrevBtn.OnButtonClick += (b) => OnCycleBody?.Invoke(-1);
+            BodyNextBtn.OnButtonClick += (b) => OnCycleBody?.Invoke(1);
+            HeadPrevBtn.OnButtonClick += (b) => OnCycleHead?.Invoke(-1);
+            HeadNextBtn.OnButtonClick += (b) => OnCycleHead?.Invoke(1);
 
             DoneBtn = new UIOriginalSystemButton(GameFacade.Strings.GetString("130", "11"), font) { Position = new Vector2(11, 529) };
             DoneBtn.CenterCaption();

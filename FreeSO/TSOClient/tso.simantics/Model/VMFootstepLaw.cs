@@ -128,6 +128,24 @@ namespace FSO.SimAntics.Model
         /// </summary>
         public static string SoundNameForClass(int surfaceClass, bool noShoe)
         {
+            return SoundNameForClass(surfaceClass, noShoe, 0);
+        }
+
+        /// <summary>
+        /// footstep-residuals-decode (2026-10-09): the class-0 default's
+        /// snow/99 branch reads the CURRENT LOT NUMBER (cSimulator global #10,
+        /// set by LoadHouse — cAudioInfo::GetLotNumber computes the identical
+        /// chain): lot 40..42 (the Vacation snow lots) -> footstep_snow,
+        /// lot 99 (Magic Town) -> footstep_soft, else footstep_terrain.
+        /// Exact-values law — no terrain plumbing.
+        /// </summary>
+        public static string SoundNameForClass(int surfaceClass, bool noShoe, int lotNumber)
+        {
+            if (surfaceClass == 0 && lotNumber != 0)
+            {
+                if (lotNumber >= 40 && lotNumber <= 42) return "footstep_snow";
+                if (lotNumber == 99) return noShoe ? "footstep_soft_noshoe" : "footstep_soft";
+            }
             switch (surfaceClass)
             {
                 case 6: return "footstep_plant";
