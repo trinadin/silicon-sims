@@ -147,14 +147,29 @@ cover the decode-pinned laws):
   probe soak-release are fixed and `ulpets` rides the DEFAULT suite green
   from dist (156/0; the owner pie rows, the training push, and the show
   pedestal all live).
-- Vacation: **save-on-vacation + bookings CLOSED (TRV-05, 2026-10-08)** on
-  the decoded native law (Family::DoStream field-8 rental +0x13C in the
-  version-9 shape, the SaveGame matrix — vacation lot saves house only,
-  booking persists at arrival and clears on return — and mode 27 corrected
-  to the true rental-occupied loop; `trv05` gate; shipped-original
-  byte-identity censused). Score + souvenirs are LAW-BANKED (the per-family
-  score controller, souvenir mood-variant mapping via inventory type 6,
-  leftover cleanup) with two bounded live-observation residuals.
+- Vacation: **ALL FOUR AREAS CLOSED (TRV-05/TRV-06, 2026-10-08)**. Save-on-
+  vacation + bookings on the decoded native law (Family::DoStream field-8
+  rental +0x13C in the version-9 shape, the SaveGame matrix — vacation lot
+  saves house only, booking persists at arrival and clears on return — and
+  mode 27 corrected to the true rental-occupied loop; shipped-original
+  byte-identity censused). **Score + souvenirs live-verified (TRV-06)** on
+  the `trv05` opt-in gate: the per-family score chain (Controller - Vacation
+  - Score attr[5]/attr[6] tag; type-6 score token 0x842A8C3B spawned/restored
+  by 4126; Process Score 4104 accumulation; the 4108 threshold — BCON tuning
+  indices are 0-BASED at runtime, Tuning[3]=150, correcting the TRV-05
+  receipt — and the 8547 award check via RunTreeByName), souvenir purchase
+  (CT 4116: type-5 base + mood-gated type-6 good/bad variants, 17
+  base→variant pairs byte-pinned), and carry-home (4106/4107 op-42-create
+  BOTH bases at the byte-matched tree sites, tokens consumed). Two engine
+  fixes landed with it: the VMFindLocationFor null-object law (a missing
+  stack/reference object is the native FALSE branch, not an NRE — the
+  exception had killed VacationPedMarker 4128 'Main - Family Spawn', so
+  vacation families never materialized on template rentals) and the
+  transit-seeding/visit-lifelift probe levers (disclosed, each citing its
+  law). **Bounded residual (banked)**: the created souvenir base's
+  in-hand→placed persistence tail — the object vanishes ~2 ticks after
+  creation even with the Global[20] visit flag set (the souvenir
+  main/in-hand lifecycle; runs 13–15 + the dist gate).
 - Superstar: fame promote/demote and session machinery verified live;
   **fame screens + objects + gendered job titles CLOSED (EXP-16,
   2026-10-08)** — the gendered title law (career STR block layout +
