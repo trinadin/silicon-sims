@@ -42,7 +42,15 @@ namespace Simitone.Client.UI.Panels
             {
                 Graphic = "Nbhd\\NScreen.BMP",
                 Scale = 1f,
-                FullImageAnimations = new NeighborhoodImageAnim[] {new NeighborhoodImageAnim("Nbhd\\DiffN1-N2_8.bmp", "Nbhd\\DiffN1-N3_8.bmp", "Nbhd\\DiffN1-N4_8.bmp") }
+                // plus108-and-ts1-cadence decode: TSPaint__18cWinNeighborhoodVC
+                // — 200 ms/step (1000/elapsed <= 5.0 advances/sec, ctor stfs),
+                // counter mod 4 with slot 0 SKIPPED (blit iff counter>0):
+                // the visible cycle is f1,f2,f3,SKIP, period 800 ms; the
+                // skip retains the last delta on the damaged surface.
+                FullImageAnimations = new NeighborhoodImageAnim[] {new NeighborhoodImageAnim("Nbhd\\DiffN1-N2_8.bmp", "Nbhd\\DiffN1-N3_8.bmp", "Nbhd\\DiffN1-N4_8.bmp") {
+                    Discrete = true, FrameRepeat = 1, SkipSlots = 1,
+                    CounterIntervalMilliseconds = 200.0
+                } }
             },
             new NeighborhoodViewConfig()
             {
@@ -310,6 +318,16 @@ namespace Simitone.Client.UI.Panels
         {
             Mode = mode;
             NativeExpansionDesc = null;
+            // AUD-20 filterbar-override-table: the community view classes
+            // (Vacation/UL/VC/Studiotown/Magicland Init) install UI_Nhood_click
+            // as the window-class press default; the base home view keeps the
+            // built-in (ui_click), and cWinDowntown::Init installs NOTHING
+            // (its asymmetry — per-button overrides carry the name there).
+            // null = the UIButton built-in fallback chain.
+            FSO.Client.UI.Controls.UIButton.DefaultPressSound =
+                (mode == 3 || mode == 4 || mode == 5 || mode == 6)
+                    ? FSO.Client.UI.Model.UISounds.NeighborhoodClick
+                    : null;
             // The shared neighborhood provider historically routed every lot
             // below 80 through NeighborhoodDesc. The executable selects the
             // expansion descriptor for Downtown and Vacation, whose native
@@ -558,8 +576,15 @@ namespace Simitone.Client.UI.Panels
 
         internal int ULPlaqueFrame { get { return ULPlaqueFrameForStep(ULPlaqueCounter % 6); } }
 
+        private int _lastFilterCmd;
+        private int _lastEngineMode = -1;
+        private string _lastPlaque;
+        private int _lastImportLot = -1;
+
         public void ApplyULFilterMode(int filterCmdId, int engineMode, string plaqueMember, int importTargetLot = -1)
         {
+            _lastFilterCmd = filterCmdId; _lastEngineMode = engineMode;
+            _lastPlaque = plaqueMember; _lastImportLot = importTargetLot;
             var neigh = Content.Get().Neighborhood;
             foreach (var kv in LotButtonByHouse)
             {
@@ -576,7 +601,8 @@ namespace Simitone.Client.UI.Panels
                     btn.SetULFilterHilite(UINeighborhoodHouseButton.ULCommunityTint);
                     ULFilterHiliteApplications++;
                 }
-                if (engineMode == 3)                               // the Gardening arm (unconditional)
+                if (engineMode == 3                                // the Gardening arm (unconditional)
+                    || (ULShowZones && engineMode != 5))            // the show_zones cheat (+0x108, mode != Lot Move)
                 {
                     Color hilite;
                     if (community) hilite = UINeighborhoodHouseButton.ULCommunityTint;
@@ -644,6 +670,9 @@ namespace Simitone.Client.UI.Panels
         {
             base.Removed();
             BgSound?.RemoveOwner(-25);
+            // The native Shutdown restores the BASE class defaults
+            // ({"", UI_click, "", UI_error}) — never silence.
+            FSO.Client.UI.Controls.UIButton.DefaultPressSound = null;
         }
 
         public override void Draw(UISpriteBatch batch)
@@ -856,7 +885,36 @@ namespace Simitone.Client.UI.Panels
                     ShowCheatMessage("Sorry only one Nessie at a time.");   // engine string
                 else
                     LastCheatMessage = null;
+                return;
             }
+            // plus108-and-ts1-cadence decode (2026-10-09): cWinNeighborhoodUL's
+            // CheatCallback matches "show_zones", compares arg1 against "on"
+            // (stb 1, +0x108; any other arg stb 0) and immediately re-runs
+            // HighlightLotsForMode — the ONLY runtime writer of the flag the
+            // ctor zeroes. Bare "show_zones" (no arg) is arg-count-gated off.
+            if (command != null && command.StartsWith("show_zones", StringComparison.OrdinalIgnoreCase))
+            {
+                var parts = command.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 2)
+                {
+                    ULShowZones = string.Equals(parts[1], "on", StringComparison.OrdinalIgnoreCase);
+                    RefreshULHighlightForCheat();
+                }
+            }
+        }
+
+        // native this+0x108 — the show_zones cheat flag (ctor zero; the
+        // HighlightLotsForMode gate "(mode==3) OR (+0x108!=0 AND mode!=5)").
+        public bool ULShowZones;
+
+        private void RefreshULHighlightForCheat()
+        {
+            // HighlightLotsForMode re-run on the cheat (the engine calls it
+            // immediately after the store): re-apply the current filter mode
+            // so the zone routing (community/residential/disabled tints)
+            // reflects the new flag even for non-Gardening modes.
+            try { ApplyULFilterMode(_lastFilterCmd, _lastEngineMode, _lastPlaque, _lastImportLot); }
+            catch { }
         }
 
         // R100: show the engine's cheat response in the ORIGINAL glyph style
@@ -902,6 +960,7 @@ namespace Simitone.Client.UI.Panels
         public NeighborhoodImageAnim Anim;
         public bool Discrete;
         public int FrameRepeat;
+        public int SkipSlots;
         public double CounterIntervalMilliseconds;
         public double CounterRemainderMilliseconds;
 
@@ -930,6 +989,8 @@ namespace Simitone.Client.UI.Panels
             Anim = anim;
             Discrete = anim.Discrete;
             FrameRepeat = Math.Max(1, anim.FrameRepeat);
+            SkipSlots = Math.Max(0, anim.SkipSlots);
+            if (SkipSlots > 0) FrameNum = TotalFrames * FrameRepeat; // native ctor -1: the first advance lands on the skip slot, so f1 appears one interval after first paint
             CounterIntervalMilliseconds = anim.CounterIntervalMilliseconds;
             LayersMounted++;
             lock (AdvancesByFamily)
@@ -982,7 +1043,7 @@ namespace Simitone.Client.UI.Panels
 
         private void AdvanceCounter()
         {
-            int counterFrames = TotalFrames * FrameRepeat;
+            int counterFrames = TotalFrames * FrameRepeat + SkipSlots;
             FrameNum++;
             if (counterFrames > 0) FrameNum %= counterFrames;
             RegisterAdvance();
@@ -1005,6 +1066,10 @@ namespace Simitone.Client.UI.Panels
         private int ResolveFrame(int counter)
         {
             int sequenceFrame = Discrete ? counter / FrameRepeat : counter;
+            if (SkipSlots > 0 && sequenceFrame >= Frames.Length)
+                return -2; // the skip window (discrete skip configs only —
+                           // counter 0..SkipSlots-1 after the last frame):
+                           // draw nothing; the retained surface persists.
             return (sequenceFrame >= Frames.Length)
                 ? ((Frames.Length - 2) - (sequenceFrame - Frames.Length))
                 : sequenceFrame;
@@ -1014,6 +1079,9 @@ namespace Simitone.Client.UI.Panels
         {
             if (!Visible) return;
             var realFrame = ResolveFrame(FrameNum);
+            // -2 = the discrete SKIP slot: draw nothing this step — the last
+            // delta persists on the retained surface (the TS1.0 VC law).
+            if (realFrame == -2) return;
             DrawLocalTexture(batch, Frames[Math.Max(0, realFrame)], Vector2.Zero);
             if (Discrete) return;
 
@@ -1590,6 +1658,10 @@ namespace Simitone.Client.UI.Panels
         public Vector2 Position;
         public bool Discrete;
         public int FrameRepeat = 1;
+        // plus108-and-ts1-cadence decode: the TS1.0 VC delta cycle is
+        // f1,f2,f3,SKIP (counter 0 draws nothing — the last delta persists
+        // on the retained surface), 200 ms/step, period 800 ms.
+        public int SkipSlots;
         public double CounterIntervalMilliseconds;
 
         public NeighborhoodImageAnim(params string[] frames)
@@ -1716,8 +1788,13 @@ namespace Simitone.Client.UI.Panels
                 {
                     switch (evt)
                     {
-                        case UIMouseEventType.MouseUp:
+                        // AUD-20 filterbar-override-table: cWinLotBtn's press
+                        // slot (UI_Nhood_click) fires on mouse-DOWN like every
+                        // cTSWinBtn; the selection itself stays on the click.
+                        case UIMouseEventType.MouseDown:
                             HITVM.Get().PlaySoundEvent(FSO.Client.UI.Model.UISounds.NeighborhoodClick);
+                            break;
+                        case UIMouseEventType.MouseUp:
                             selectionCallback(houseNumber); break;
                         case UIMouseEventType.MouseOver:
                             HITVM.Get().PlaySoundEvent(FSO.Client.UI.Model.UISounds.NeighborhoodRollover);

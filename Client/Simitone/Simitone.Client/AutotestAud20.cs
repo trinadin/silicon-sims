@@ -117,6 +117,15 @@ namespace Simitone.Client
                 info += " noShoe=" + noShoe;
                 if (!noShoe) ok = false;
 
+                // A3b (filterbar-override-table 2026-10-09): the recovered
+                // UI-button names must be corpus-live (mixed-case native ids
+                // lowercase in the port's corpus; CycleHead is stored mixed).
+                string[] uiNames = { "ui_nhood_click", "ui_nhood_rollover",
+                    "ui_cac_cycleparts", "ui_cac_cyclehead", "ui_click", "ui_error" };
+                int uiHave = uiNames.Count(n => evts != null && evts.ContainsKey(n));
+                info += " uiNames=" + uiHave + "/6";
+                if (uiHave != uiNames.Length) ok = false;
+
                 // A4 SPR2 label-letter law (FloorData::FromResName):
                 // M(tile)=0 H(hardwood)=1 S(carpet)=2 C(concrete)=3, else 0.
                 bool labelLaw =
@@ -252,11 +261,13 @@ namespace Simitone.Client
 
                 // Native cTSWinBtn: PlayUISound fires on mouse-DOWN against
                 // four per-button override slots; per-slot null falls to the
-                // window default; the ULTIMATE default is EMPTY (silent) —
-                // only specific toolbars override (the UL community filter
-                // bar passes 'UI_Nhood_click', byte-proven at pool 0x6c6e0
-                // +0xe via [TOC-18180]). The old blanket ui_click on UP was
-                // a port invention, now removed.
+                // window-class default; the ODUIS NULL-fallback BUILT-INS are
+                // {"", UI_click, "", UI_error} (pool sec1 0x747c8) — the base
+                // press default is ui_click, NOT silence (silence is
+                // per-button only: NULL override + empty class slot);
+                // community view windows install UI_Nhood_click as their class
+                // default while mounted (filterbar-override-table.md). The old
+                // blanket ui_click on UP was a port invention, removed.
                 bool btnLaw = true;
                 try
                 {
@@ -270,12 +281,13 @@ namespace Simitone.Client
                     else
                     {
                         var input = new FSO.Common.Rendering.Framework.Model.UpdateState();
-                        // E1: a button with NO override is silent on BOTH down and up
-                        //    (the native ultimate default is the empty string).
-                        // (review P2-1) subscribe a no-op handler: the removed
-                        // blanket up-click lived inside `if (OnButtonClick != null)`
-                        // — subscriber-less buttons would never reach a restored
-                        // regression line, false-greening this probe.
+                        // E1: the BUILT-IN CHAIN — no override + no class default
+                        //    plays ui_click ONCE on DOWN (the ODUIS NULL-fallback
+                        //    built-in); a set class default replaces it; the HOVER
+                        //    slot fires on MouseOver. (review P2-1's no-op
+                        //    subscriber kept: a restored up-click must redden.)
+                        var savedDefault = FSO.Client.UI.Controls.UIButton.DefaultPressSound;
+                        FSO.Client.UI.Controls.UIButton.DefaultPressSound = null;
                         var plain = new FSO.Client.UI.Controls.UIButton();
                         plain.OnButtonClick += (b) => { };
                         FSO.HIT.HITTrace.Reset();
@@ -283,7 +295,27 @@ namespace Simitone.Client
                         dispatch.Invoke(plain, new object[] { FSO.Common.Rendering.Framework.IO.UIMouseEventType.MouseDown, input });
                         dispatch.Invoke(plain, new object[] { FSO.Common.Rendering.Framework.IO.UIMouseEventType.MouseUp, input });
                         FSO.HIT.HITTrace.Enabled = false;
-                        bool plainSilent = FSO.HIT.HITTrace.Count == 0;
+                        var snap1 = FSO.HIT.HITTrace.Snapshot();
+                        bool plainBuiltIn = FSO.HIT.HITTrace.Count == 1
+                            && snap1.Count == 1 && snap1[0].EventName == "ui_click";
+                        FSO.Client.UI.Controls.UIButton.DefaultPressSound = FSO.Client.UI.Model.UISounds.NeighborhoodClick;
+                        FSO.HIT.HITTrace.Reset();
+                        FSO.HIT.HITTrace.Enabled = true;
+                        dispatch.Invoke(plain, new object[] { FSO.Common.Rendering.Framework.IO.UIMouseEventType.MouseDown, input });
+                        FSO.HIT.HITTrace.Enabled = false;
+                        var snap1b = FSO.HIT.HITTrace.Snapshot();
+                        bool classDefaultLaw = snap1b.Count == 1 && snap1b[0].EventName == "ui_nhood_click";
+                        FSO.Client.UI.Controls.UIButton.DefaultPressSound = savedDefault;
+                        // E1c: the HOVER slot (cWinLotBtn's UI_Nhood_rollover is
+                        //    the only native non-press override).
+                        var hov = new FSO.Client.UI.Controls.UIButton
+                        { HoverSound = FSO.Client.UI.Model.UISounds.NeighborhoodRollover };
+                        FSO.HIT.HITTrace.Reset();
+                        FSO.HIT.HITTrace.Enabled = true;
+                        dispatch.Invoke(hov, new object[] { FSO.Common.Rendering.Framework.IO.UIMouseEventType.MouseOver, input });
+                        FSO.HIT.HITTrace.Enabled = false;
+                        var snap1c = FSO.HIT.HITTrace.Snapshot();
+                        bool hoverLaw = snap1c.Count == 1 && snap1c[0].EventName == "ui_nhood_rollover";
                         // E2: an override fires EXACTLY ONCE, on the DOWN event.
                         var over = new FSO.Client.UI.Controls.UIButton
                         { PressSound = FSO.Client.UI.Model.UISounds.NeighborhoodClick };
@@ -330,13 +362,16 @@ namespace Simitone.Client
                         }
                         catch (Exception e3) { Log("AUTOTEST aud20: E3 switcher EXC " + e3.GetType().Name); }
                         bool stripWired = wired == 7;
-                        btnLaw = plainSilent && overOnceOnDown && firedRight && stripWired;
-                        info += " btnLaw=" + btnLaw + "(plainSilent=" + plainSilent
+                        btnLaw = plainBuiltIn && classDefaultLaw && hoverLaw
+                            && overOnceOnDown && firedRight && stripWired;
+                        info += " btnLaw=" + btnLaw + "(builtIn=" + plainBuiltIn
+                            + " classDefault=" + classDefaultLaw + " hover=" + hoverLaw
                             + " onceOnDown=" + overOnceOnDown + " name=" + firedName
                             + " stripWired=" + wired + "/7)";
                         if (!btnLaw)
-                            Log("AUTOTEST aud20: button firing law failed (plainSilent=" + plainSilent
-                                + " onDown=" + onDown + " total=" + FSO.HIT.HITTrace.Count
+                            Log("AUTOTEST aud20: button firing law failed (builtIn=" + plainBuiltIn
+                                + " classDefault=" + classDefaultLaw + " hover=" + hoverLaw
+                                + " onDown=" + onDown
                                 + " name=" + firedName + " wired=" + wired + ")");
                     }
                 }
