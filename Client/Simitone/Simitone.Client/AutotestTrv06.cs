@@ -809,9 +809,17 @@ namespace Simitone.Client
                     case 92: // carry-home verdict: tokens consumed + base objects materialized
                         {
                             var newVm = Vm;
-                            var bases = newVm.Entities.Count(e => e.Object != null && e.Object.OBJ != null
-                                && (e.Object.OBJ.GUID == ArrowHeadBase || e.Object.OBJ.GUID == BabyDollBase));
-                            if (bases == 0 && !_watchDone)
+                            var matches = newVm.Entities.Where(e => e.Object != null && e.Object.OBJ != null
+                                && (e.Object.OBJ.GUID == ArrowHeadBase || e.Object.OBJ.GUID == BabyDollBase)).ToList();
+                            var bases = matches.Count;
+                            // the hand-held materialization: the return-edge creates the base
+                            // INTO the sim's hand slot (op-42 pos=2 InMyHand — container=sim)
+                            VMEntity hand = null; uint handGuid = 0;
+                            try { hand = _sim.GetSlot(0); handGuid = hand?.Object?.OBJ?.GUID ?? 0; } catch { }
+                            Log("AUTOTEST trv06 p92 diag ents=" + newVm.Entities.Count + " guidMatches=" + bases
+                                + " hand0=" + (hand != null) + " handGuid=0x" + handGuid.ToString("X8")
+                                + " matched=[" + string.Join(",", matches.Select(m => m.ObjectID + ":0x" + m.Object.OBJ.GUID.ToString("X8"))) + "]");
+                            if (bases == 0 && handGuid != ArrowHeadBase && handGuid != BabyDollBase)
                             {
                                 if (++_frames > 420) { Check(false, "p92 carry-home spawn never materialized"); _phase = 99; }
                                 return false;
@@ -819,7 +827,8 @@ namespace Simitone.Client
                             var inv = Inv();
                             var t5 = inv != null && inv.Any(x => x.Type == 5 && (x.GUID == ArrowHeadBase || x.GUID == BabyDollBase));
                             var t6 = inv != null && inv.Any(x => x.Type == 6 && (x.GUID == ArrowHeadGood || x.GUID == BabyDollBad));
-                            Check(bases > 0, "p9 carry-home: base souvenir objects MATERIALIZED on home lot (got " + bases + ")");
+                            Check(bases > 0 || handGuid == ArrowHeadBase || handGuid == BabyDollBase,
+                                "p9 carry-home: base souvenir MATERIALIZED (entities=" + bases + " hand=0x" + handGuid.ToString("X8") + ")");
                             Check(!t5, "p9 carry-home: type-5 base tokens consumed");
                             Check(!t6, "p9 carry-home: type-6 variant tokens consumed");
                             Log("AUTOTEST trv06 p9 CARRY-HOME verdict: baseObjects=" + bases + " t5-remain=" + t5 + " t6-remain=" + t6
