@@ -63,6 +63,11 @@ namespace Simitone.Client
 
         public static int State;          // 0 attach, 1 spawn, 2 brain, 3 train, 4 show, 99 done
         public static VM VM;              // the runner re-reads this after PlayHouse
+        // ENV-04 review P2-1/P2-2: the teardown restore must be CORRELATED to
+        // this probe's own corruption (baseline-snapshot scoping), and the
+        // runner's discovery guard must know ulpets ran in this process.
+        public static bool RanThisProcess;
+        internal static System.Collections.Generic.Dictionary<VMEntity, short> _pd32Baseline;
         private static TS1GameScreen _screen;
         private static Action<string> _log, _pass, _fail;
         private static int _frame, _settle;
@@ -317,6 +322,21 @@ namespace Simitone.Client
                         var pedPos = new LotTilePos((short)(_human.Position.x + 96), (short)(_human.Position.y + 64), _human.Position.Level);
                         _pedestal = vm.Context.CreateObjectInstance(PedestalGuid, pedPos, Direction.NORTH)?.Objects?.FirstOrDefault();
                         if (!_global10Saved.HasValue) _global10Saved = vm.GetGlobalValue(10);
+                        if (_pd32Baseline == null)
+                        {
+                            // review P2-1: snapshot everyone's pd32 at the moment
+                            // the corruption window OPENS — the teardown restores
+                            // only values THIS window changed (a real engine
+                            // pd32 regression outside the window stays visible).
+                            _pd32Baseline = new System.Collections.Generic.Dictionary<VMEntity, short>();
+                            foreach (var bav in vm.Entities.OfType<VMAvatar>())
+                            {
+                                short b = 0;
+                                try { b = (short)bav.GetPersonData(VMPersonDataVariable.PersonType); } catch { }
+                                _pd32Baseline[bav] = b;
+                            }
+                        }
+                        RanThisProcess = true;
                         vm.SetGlobalValue(10, 555); // zoning-gate default (unl-show run-17 law)
                         _log("AUTOTEST ulpets SHOW-PLACE ctr=" + (_ctr != null ? _ctr.ObjectID.ToString() : "FAIL")
                             + " pedestal=" + (_pedestal != null ? _pedestal.ObjectID.ToString() : "FAIL")
@@ -802,9 +822,17 @@ namespace Simitone.Client
                         try { jt = av.GetPersonData(VMPersonDataVariable.JobType); } catch { continue; }
                         try { apd32 = av.GetPersonData(VMPersonDataVariable.PersonType); } catch { }
                         if (jt <= 0 || apd32 == 0 || av.IsPet) continue;
-                        av.SetPersonData(VMPersonDataVariable.PersonType, 0);
-                        restored.Add("obj=" + av.ObjectID + " pd32 " + apd32 + " -> 0");
+                        // review P2-1/P2-2: baseline-scoped — restore only avatars
+                        // whose pd32 CHANGED inside this probe's G10 window, and
+                        // only back to the baseline value (an employed VISITOR
+                        // whose lawful class predates the window keeps it).
+                        short baseline;
+                        if (_pd32Baseline == null || !_pd32Baseline.TryGetValue(av, out baseline) || baseline == apd32)
+                            continue;
+                        av.SetPersonData(VMPersonDataVariable.PersonType, baseline);
+                        restored.Add("obj=" + av.ObjectID + " pd32 " + apd32 + " -> " + baseline);
                     }
+                    _pd32Baseline = null;
                     if (restored.Count > 0)
                         _log("AUTOTEST ulpets teardown pd32-restore [" + string.Join("; ", restored) + "]");
                 }

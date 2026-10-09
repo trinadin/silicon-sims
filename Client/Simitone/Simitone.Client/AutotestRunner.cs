@@ -13702,20 +13702,40 @@ namespace Simitone.Client
                 // every employed, non-pet, non-hidden avatar and log the restore.
                 try
                 {
-                    var restored = new List<string>();
-                    foreach (var a in _avatars)
+                    // review P2-1: this guard covers ONLY the teardown ->
+                    // discovery gap after ulpets corrupted state in THIS
+                    // process; without ulpets it must not touch anything (a
+                    // pd32 flip in a ulpets-less run is a REAL regression
+                    // signal — tripwire, not a restore).
+                    if (!Simitone.Client.AutotestExp15Pets.RanThisProcess)
                     {
-                        int jt = 0, apd32 = 0, hidden = 0;
-                        try { jt = a.GetPersonData(VMPersonDataVariable.JobType); } catch { continue; }
-                        try { apd32 = a.GetPersonData(VMPersonDataVariable.PersonType); } catch { }
-                        try { hidden = a.GetValue(VMStackObjectVariable.Hidden); } catch { }
-                        if (jt <= 0 || apd32 == 0 || hidden == 1 || a.IsPet) continue;
-                        a.SetPersonData(VMPersonDataVariable.PersonType, 0);
-                        restored.Add("obj=" + a.ObjectID + " pd32 " + apd32 + " -> 0 (JobType=" + jt + ")");
+                        foreach (var a in _avatars)
+                        {
+                            int jt = 0, apd32 = 0;
+                            try { jt = a.GetPersonData(VMPersonDataVariable.JobType); } catch { continue; }
+                            try { apd32 = a.GetPersonData(VMPersonDataVariable.PersonType); } catch { }
+                            if (jt > 0 && apd32 != 0 && !a.IsPet)
+                                Log("AUTOTEST carseek RED-FLAG: employed avatar obj=" + a.ObjectID
+                                    + " pd32=" + apd32 + " with NO ulpets window this process (not restored — real-regression signal)");
+                        }
                     }
-                    if (restored.Count > 0)
-                        Log("AUTOTEST carseek worker-eligibility restore (ulpets-show pd32 corruption): ["
-                            + string.Join("; ", restored) + "]");
+                    else
+                    {
+                        var restored = new List<string>();
+                        foreach (var a in _avatars)
+                        {
+                            int jt = 0, apd32 = 0, hidden = 0;
+                            try { jt = a.GetPersonData(VMPersonDataVariable.JobType); } catch { continue; }
+                            try { apd32 = a.GetPersonData(VMPersonDataVariable.PersonType); } catch { }
+                            try { hidden = a.GetValue(VMStackObjectVariable.Hidden); } catch { }
+                            if (jt <= 0 || apd32 == 0 || hidden == 1 || a.IsPet) continue;
+                            a.SetPersonData(VMPersonDataVariable.PersonType, 0);
+                            restored.Add("obj=" + a.ObjectID + " pd32 " + apd32 + " -> 0 (JobType=" + jt + ")");
+                        }
+                        if (restored.Count > 0)
+                            Log("AUTOTEST carseek worker-eligibility restore (ulpets-show pd32 corruption): ["
+                                + string.Join("; ", restored) + "]");
+                    }
                 }
                 catch (Exception wre) { Log("AUTOTEST carseek worker-eligibility restore EXC " + wre.GetType().Name); }
                 // R157 dialog-latch probe at discovery (see the hourly probe in StateCarpool).
