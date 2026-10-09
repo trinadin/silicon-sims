@@ -98,6 +98,7 @@ namespace Simitone.Client
         private readonly List<string> _itraceBelow = new List<string>();
         private readonly List<string> _itraceAbove = new List<string>();
         private int _thrBelowTraces, _thrAboveTraces, _procScoreTraces;
+        private readonly List<string> _spawnTrace = new List<string>();
         private int _attr5Before = int.MinValue;
         private short _tuning3 = -1;
 
@@ -234,6 +235,8 @@ namespace Simitone.Client
                 { _itrace.Add(t); if (_phase == 5) { _thrBelowTraces++; _itraceBelow.Add(t); } if (_phase == 6) { _thrAboveTraces++; _itraceAbove.Add(t); } }
                 if (t.Contains(" 4104@") && t.Contains("sg=VacationPedMarker") && _scoreCtl != null
                     && t.Contains("ent=" + _scoreCtl.ObjectID + " ")) { _procScoreTraces++; }
+                if ((t.Contains(" 4106@") || t.Contains(" 4107@") || t.Contains(" 4115@") || t.Contains(" 4127@") || t.Contains(" 4129@"))
+                    && t.Contains("sg=VacationPhonePlugin")) { _spawnTrace.Add(t); }
             };
         }
 
@@ -762,22 +765,40 @@ namespace Simitone.Client
                                     if (routine != null && owner != null) tree = new VMBHAVOwnerPair(routine, owner);
                                 }
                                 if (tree?.routine == null) { Check(false, "p91 routine 4104 unresolved for carry-home drive"); _phase = 99; return false; }
-                                Log("AUTOTEST trv06 p91 no automatic spawn in window; re-stocking the souvenir tokens and driving 4104 (the return-edge law)");
+                                Log("AUTOTEST trv06 p91 no automatic spawn in window; re-stocking the souvenir tokens and driving the SPAWN TREES (the carry-home law proper — 4104 ins1 op-50 is an unconditional TRUE jump in-port, so the umbrella interaction cannot walk its spawn gosubs from a probe drive)");
                                 try
                                 {
                                     var nid9 = _sim.GetPersonData(VMPersonDataVariable.NeighborId);
                                     var neigh9 = Content.Get().Neighborhood;
                                     var inv9 = neigh9.GetInventoryByNID(nid9) ?? new List<InventoryItem>();
-                                    inv9.RemoveAll(x => x.GUID == ArrowHeadBase || x.GUID == BabyDollBase || x.GUID == ArrowHeadGood || x.GUID == BabyDollBad);
+                                    inv9.RemoveAll(x => x.GUID == ArrowHeadBase || x.GUID == BabyDollBase || x.GUID == ArrowHeadGood || x.GUID == BabyDollBad
+                                        || x.GUID == 0x842A8C3Bu || x.GUID == 0xEA1E99B3u);
                                     inv9.Add(new InventoryItem { GUID = ArrowHeadBase, Type = 5, Count = 1 });
                                     inv9.Add(new InventoryItem { GUID = ArrowHeadGood, Type = 6, Count = 1 });
                                     inv9.Add(new InventoryItem { GUID = BabyDollBase, Type = 5, Count = 1 });
                                     inv9.Add(new InventoryItem { GUID = BabyDollBad, Type = 6, Count = 1 });
-                                    if (neigh9.GetInventoryByNID(nid9) == null) neigh9.SetInventoryForNID(nid9, inv9);
+                                    inv9.Add(new InventoryItem { GUID = 0x842A8C3Bu, Type = 6, Count = 1 }); // the score token (4127's target)
+                                    neigh9.SetInventoryForNID(nid9, inv9); // explicit write-back
+                                    Log("AUTOTEST trv06 p91 tokens re-stocked (4 souvenirs + score) for the deterministic spawn drive");
                                 }
                                 catch (Exception re9) { Log("AUTOTEST trv06 p91 restock EXC " + re9.GetType().Name); }
-                                _createLog.Clear();
-                                Drive(plugin ?? _sim, tree, _sim, "Spawn Vacation Purchases (probe drive)");
+                                _createLog.Clear(); _spawnTrace.Clear();
+                                // resolve the three trees on the plugin resource (entity or content fallback)
+                                VMBHAVOwnerPair TreeOf(int id)
+                                {
+                                    var t = plugin != null ? plugin.GetRoutineWithOwner((ushort)id, vm.Context) : null;
+                                    if (t?.routine != null) return t;
+                                    var owner = Res(PluginGuid);
+                                    var routine = owner?.Resource?.GetRoutine((ushort)id) as VMRoutine;
+                                    return (routine != null && owner != null) ? new VMBHAVOwnerPair(routine, owner) : null;
+                                }
+                                var tGood = TreeOf(4107); var tBad = TreeOf(4106); var tClear = TreeOf(4127);
+                                if (tGood?.routine == null || tBad?.routine == null || tClear?.routine == null)
+                                { Check(false, "p91 spawn trees unresolved (good=" + (tGood != null) + " bad=" + (tBad != null) + " clear=" + (tClear != null) + ")"); _phase = 99; return false; }
+                                Drive(plugin ?? _sim, tBad, _sim, "Spawn Bad Mood Souvenirs (probe drive)");
+                                Drive(plugin ?? _sim, tGood, _sim, "Spawn Good Mood Souvenirs (probe drive)");
+                                Drive(plugin ?? _sim, tClear, _sim, "Clear Vacation Score (probe drive)");
+                                foreach (var tl in _spawnTrace.Take(20).ToList()) Log("AUTOTEST trv06 SPAWNTRACE " + tl);
                                 foreach (var cl in _createLog.Take(12)) Log("AUTOTEST trv06 CREATE " + cl);
                                 _phase = 92; _frames = 0;
                                 return false;
