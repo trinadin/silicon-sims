@@ -890,7 +890,7 @@ namespace Simitone.Client
                                     var sgp = fr.Routine?.Chunk?.ChunkParent?.Filename ?? "";
                                     if ((rid >= 4096 && rid <= 4129 && sgp.IndexOf("VacationPhonePlugin", StringComparison.OrdinalIgnoreCase) >= 0)
                                         || (rid >= 4102 && rid <= 4124 && sgp.IndexOf("Souvenirs", StringComparison.OrdinalIgnoreCase) >= 0)
-                                        || ((rid == 313 || rid == 406) && sgp.IndexOf("global", StringComparison.OrdinalIgnoreCase) >= 0))
+                                        || ((rid == 313 || rid == 406) && string.Equals(sgp, "global.iff", StringComparison.OrdinalIgnoreCase)))
                                     { carryOnStack = true; break; }
                                 }
                             }
@@ -945,7 +945,7 @@ namespace Simitone.Client
                                     foreach (var rl in _rmLog.Take(24).ToList()) Log("AUTOTEST trv06 RMWATCH(end) " + rl);
                                     foreach (var dl in _delLog.Take(24).ToList()) Log("AUTOTEST trv06 DELWATCH(end) " + dl);
                                     foreach (var dt in _dropTrace.Take(80).ToList()) Log("AUTOTEST trv06 DROPTRACE " + dt);
-                                    Check(false, "p92 carry-home: no souvenir base PLACED in-world within the interaction window (creates=" + _createLog.Count + ")");
+                                    Check(false, "p92 carry-home: carry chain did not complete with both bases placed in-world within the window (creates=" + _createLog.Count + " placed=" + bases + ")");
                                     _phase = 99;
                                 }
                                 return false;
@@ -957,8 +957,14 @@ namespace Simitone.Client
                                 _persistFrames++;
                                 if (_persistFrames % 60 == 0)
                                     Log("AUTOTEST trv06 p92 persist-soak f=" + _persistFrames + " placed=" + bases);
-                                // EITHER placed base vanishing during the soak fails the verdict
-                                if (bases < 2) { Check(false, "p9 carry-home: a placed base vanished during the persistence soak (placed=" + bases + " at f=" + _persistFrames + ")"); _phase = 99; return false; }
+                                // review P2-1: recount HERE — the guard's `bases` is from the
+                                // same tick; a mid-soak vanish must fail by name, not via the
+                                // 2600f timeout's generic message.
+                                var soakBases = newVm.Entities.Count(e => e.Object != null && e.Object.OBJ != null
+                                    && (e.Object.OBJ.GUID == ArrowHeadBase || e.Object.OBJ.GUID == BabyDollBase)
+                                    && e.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                                    && e.Container == null);
+                                if (soakBases < 2) { Check(false, "p9 carry-home: a placed base vanished during the persistence soak (placed=" + soakBases + " at f=" + _persistFrames + ")"); _phase = 99; return false; }
                                 return false;
                             }
                             var inv = Inv();
