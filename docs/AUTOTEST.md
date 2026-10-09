@@ -68,6 +68,12 @@ Opt-in takeovers (end the run at their verdict; run solo):
   consumption). Disclosed: the surface-path put-away branch ('CT - Put Away'
   4103 op-14/op-20) is not asserted (returns false in-port; the floor-drop
   path via global 'do the drop' 313 is the asserted law).
+- **`homepark`** — ENG-28b: the home-lot park restricted-tick law — a BUY-park
+  soak on family-less lot 21 asserting the scheduler keeps waking
+  (schedAdv≥30), street liveness advances, and the clock stays frozen (the
+  only thing the native restricted tick freezes). The explicit-pause (0)
+  half is deliberately not gated (retracted on hdserve evidence — see the
+  PARITY ENG-28b bullet).
 - **`hdserve`** — EXP-14: the Hot Date serve-choreography self-start — hands-off,
   the adult traveler's free-will draw must pick the podium's 'Eat Alone' row and
   the interaction's op-42 must create Controller-Restaurant-Eat (proven).

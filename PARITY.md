@@ -103,10 +103,23 @@ cover the decode-pinned laws):
   so the scheduler's wakes fire (native scheduling is pass-driven — TryIdle
   0x100e8530). Focused magicbook-ALONE — the standing FAIL class — now PASSES
   with zero probe change; petname PASS with the new VISIT-PARK-NPC-TICKS
-  evidence (schedAdv=80, npcDelta, clockFrozen). Residual (disclosed): the
-  native applies the same restricted tick to HOME-lot buy/pause (family
-  simulates, clock frozen); the port keeps its shipped household full-freeze
-  there by scope decision — observable divergence remains on home lots only.
+  evidence (schedAdv=80, npcDelta, clockFrozen). **HOME-LOT BUY PARK CLOSED
+  (ENG-28b, 2026-10-09)**: the −1 park now falls through + advances TickID on
+  EVERY TS1 lot, gated on `VM.PrimingTick` (the load-time priming pass keeps
+  its non-ticking semantics — without the gate the arrival choreography
+  stalls deterministically, hdserve bisect-proven). `homepark` gate (lot-21
+  buy soak: schedAdv + street-liveness + clock frozen) PASS 3/3. The
+  EXPLICIT-PAUSE (speed 0) half was attempted and RETRACTED on evidence: the
+  port's speed 0 conflates the pause button with dialog-park transients and
+  advancing it burns transit wait countdowns (the hdserve outbound stall,
+  2/2) — the 0 park keeps the shipped freeze until the native dialog-park
+  law is decoded (carded). The same lane fixed the stale return-transit
+  ENGINE-side: at the vacation-return arrival, the persisted transit action
+  parked in global 281 'Wait For Notify' is completed (player-cancel law;
+  the native arrival clears trip residue — RemoveFromVacation
+  ClearHistory/ClearRouteHistory); `trv05` passes with zero probe
+  intervention (the former lifelift removed). Receipt:
+  evidence/ENG-28/eng28b-restricted-tick.md.
 - Platform: `-3d` is experimental; `-jit`/`-dx` are inherited and unverified; trackpad
   natural-scroll and other hardware feel items lack systematic human verification —
   **human verification is partial** (portions played and accepted hands-on; no
