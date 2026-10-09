@@ -3,6 +3,7 @@ using FSO.Files.Formats.IFF.Chunks;
 using FSO.SimAntics;
 using FSO.SimAntics.Engine;
 using FSO.SimAntics.Model;
+using Simitone.Client.UI.Screens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -332,7 +333,7 @@ namespace Simitone.Client
                                     "p0 4107 ins4 create Fertility God BASE (carry-home materialization)");
                             }
                             var plugin4104 = Bhav(PluginGuid, 4104);
-                            Check(plugin4104 != null && plugin4104.Instructions.Select(i => i.Opcode)
+                            Check(plugin4104 != null && plugin4104.Instructions.Select(i => (int)i.Opcode)
                                 .Where(o => o >= 4096 && o <= 4199).Contains(4127),
                                 "p0 plugin 4104 gosubs 4127 'Clear Vacation Score'");
                             Log("AUTOTEST trv06 p0 decode law verified (4108 threshold/tag/score-read, 4104 counter law, "
@@ -521,8 +522,9 @@ namespace Simitone.Client
 
                     case 7: // SOUVENIR purchase leg — good mood: base → type-5 + type-6 good variant
                         {
-                            var souv = vm.Context.CreateObjectInstance(ArrowHeadBase,
+                            var souvGrp = vm.Context.CreateObjectInstance(ArrowHeadBase,
                                 FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                            var souv = souvGrp?.BaseObject;
                             if (souv == null) { Check(false, "p7 Arrow Head base creation failed"); _phase = 99; return false; }
                             _souvGood = souv;
                             Log("AUTOTEST trv06 p7 Arrow Head base created oid=" + souv.ObjectID
@@ -559,7 +561,7 @@ namespace Simitone.Client
                     case 8: // bad mood leg
                         {
                             var souv = vm.Context.CreateObjectInstance(BabyDollBase,
-                                FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH);
+                                FSO.LotView.Model.LotTilePos.OUT_OF_WORLD, FSO.LotView.Model.Direction.NORTH)?.BaseObject;
                             if (souv == null) { Check(false, "p8 Baby Doll base creation failed"); _phase = 99; return false; }
                             _souvBad = souv;
                             _phase = 81; _frames = 0;
@@ -633,7 +635,7 @@ namespace Simitone.Client
                                     Log("AUTOTEST trv06 p91 plugin entity not on home lot; resolving 4104 by content resource");
                                     var owner = Res(PluginGuid);
                                     var routine = owner?.Resource?.GetRoutine(4104) as VMRoutine;
-                                    if (routine != null && owner != null) tree = new VMBHAVOwnerPair { routine = routine, owner = owner };
+                                    if (routine != null && owner != null) tree = new VMBHAVOwnerPair(routine, owner);
                                 }
                                 if (tree?.routine == null) { Check(false, "p91 routine 4104 unresolved for carry-home drive"); _phase = 99; return false; }
                                 Log("AUTOTEST trv06 p91 no automatic spawn; driving 4104 'Interaction - Spawn Vacation Purchases' (the return-edge law)");
