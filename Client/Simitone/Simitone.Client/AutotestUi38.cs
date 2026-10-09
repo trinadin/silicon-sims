@@ -159,12 +159,13 @@ namespace Simitone.Client
                 { log("uidtbar: strip pos " + strip.Position); return false; }
 
                 // (a2) UI-38b probe setup (DISCLOSED, the trv06 restock idiom):
-                // reset the persisted filter to the SHIPPED default ('16' —
-                // every stock LotLocations.iff carries it) and re-drive the
-                // default through the real law path, so the entry-state
-                // assertions below hold regardless of what an earlier probe
-                // phase or run persisted. The restore law itself is asserted
-                // by the (g)/(h) legs and the restore log on later entries.
+                // reset the persisted filter to the 0x10 DEFAULT (a probe
+                // choice — the SHIPPED slot value is '4', a Gardening save,
+                // which would legitimately override the entry default and
+                // invalidate the mode-0 entry assertions below) and re-drive
+                // the default through the real law path. The restore law
+                // itself is asserted by the (g)/(h) legs and the restore log
+                // on later entries.
                 var nbhdR = FSO.Content.Content.Get().Neighborhood;
                 Simitone.Client.UI.Panels.ULFilterLaws.SavePersistedFilterCmd(
                     System.IO.Path.Combine(nbhdR.UserPath, "LotLocations.iff"), 0x10);
@@ -200,6 +201,8 @@ namespace Simitone.Client
                     new FSO.Files.Formats.IFF.IffFile(System.IO.Path.Combine(nbhd0.UserPath, "LotLocations.iff")));
                 var expectedCmd = persisted0 > 0 ? persisted0 : ULDefaultFilterCmd;
                 var expectedIdx = System.Array.IndexOf(ULCmdBits, expectedCmd);
+                if (expectedIdx < 0)
+                { log("uidtbar: persisted cmd 0x" + expectedCmd.ToString("x") + " is not a filter bit"); return false; }
                 if (sw.ULFilterCmdId != expectedCmd || sw.ULFilterEngineMode != ULModes[expectedIdx]
                     || sw.ULFilterPlaqueMember != ULPlaqueMembers[expectedIdx])
                 { log("uidtbar: default filter cmd=" + sw.ULFilterCmdId + " mode=" + sw.ULFilterEngineMode + " plaque=" + sw.ULFilterPlaqueMember + " (expected persisted-or-default 0x" + expectedCmd.ToString("x") + ")"); return false; }
@@ -258,6 +261,15 @@ namespace Simitone.Client
                     if (lots[h].ULFilterTintForProbe != ULDisabledColor)
                     { log("uidtbar: occupied lot " + h + " not red under mode 3"); return false; }
 
+                // (f0) UI-38b review P1: SNAPSHOT the production census NOW —
+                // before the (f) demo leg seeds and resets communityLots[0]'s
+                // bits (the original census leg read the clobbered 0 and
+                // pinned it: 58 is really 0x46).
+                var censusSnapshot = new System.Collections.Generic.Dictionary<int, int>();
+                foreach (var kv in lots)
+                    if (communityLots.Contains(kv.Key))
+                        censusSnapshot[kv.Key] = kv.Value.ULFilterCategoryBits;
+
                 // (f) the plaque gate + anchor: a lot with the category bit
                 // carries the plaque member; the anchor law is the static pin.
                 int demo = communityLots[0];
@@ -282,26 +294,23 @@ namespace Simitone.Client
                 // community lot 0. Assert the LIVE bits field (the census ran at
                 // button build — no probe seeding).
                 var censusDump = new System.Text.StringBuilder();
-                foreach (var kv in lots)
-                    if (communityLots.Contains(kv.Key))
-                        censusDump.Append(kv.Key).Append("=0x").Append(kv.Value.ULFilterCategoryBits.ToString("x")).Append(' ');
+                foreach (var kv in censusSnapshot)
+                    censusDump.Append(kv.Key).Append("=0x").Append(kv.Value.ToString("x")).Append(' ');
                 log("uidtbar: production census lots: " + censusDump.ToString());
                 // the pinned ground truth — the LIVE census of the shipped n=1
-                // community-mode lots (the port's version-exact OBJT parse; the
-                // multi-venue values are the real Old Town content: e.g. 70 =
-                // cafe+garden+shopping+smallpet+recreation, 72 = the garden
-                // store, 58 = empty):
+                // community-mode lots, snapshotted BEFORE any probe seeding
+                // (review P1): 58 = the basketball/cafe/garden lot (0x46),
+                // 70 = the big multi-venue lot (0x7c), 72 = the garden store:
                 var expectBits = new System.Collections.Generic.Dictionary<int, int>
-                { { 58, 0x00 }, { 61, 0x6e }, { 70, 0x7c }, { 71, 0x2e }, { 72, 0x04 }, { 73, 0x46 }, { 74, 0x26 }, { 75, 0x2e } };
-                foreach (var kv in lots)
+                { { 58, 0x46 }, { 61, 0x6e }, { 70, 0x7c }, { 71, 0x2e }, { 72, 0x04 }, { 73, 0x46 }, { 74, 0x26 }, { 75, 0x2e } };
+                foreach (var kv in censusSnapshot)
                 {
-                    if (!communityLots.Contains(kv.Key)) continue;
                     int want;
                     if (!expectBits.TryGetValue(kv.Key, out want)) want = 0;
-                    if (kv.Value.ULFilterCategoryBits != want)
-                    { log("uidtbar: census lot " + kv.Key + " = 0x" + kv.Value.ULFilterCategoryBits.ToString("x") + " expected 0x" + want.ToString("x")); return false; }
+                    if (kv.Value != want)
+                    { log("uidtbar: census lot " + kv.Key + " = 0x" + kv.Value.ToString("x") + " expected 0x" + want.ToString("x")); return false; }
                 }
-                log("uidtbar: PRODUCTION CENSUS VERIFIED (58=0 61=0x6e 70=0x7c 71=0x2e 72=0x04 73=0x46 74=0x26 75=0x2e)");
+                log("uidtbar: PRODUCTION CENSUS VERIFIED (58=0x46 61=0x6e 70=0x7c 71=0x2e 72=0x04 73=0x46 74=0x26 75=0x2e)");
 
                 // and the production PLAQUE follows the census (Gardening on a
                 // garden lot needs no probe bits):

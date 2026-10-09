@@ -21,20 +21,24 @@ namespace Simitone.Client.UI.Panels
     /// pens = DogCat; park/play/fountain families = Recreation; no Lodging
     /// marker exists in the corpus — UL Old Town ships none, so that bit
     /// lawfully stays dark). Census ground truth (the LIVE n=1 community
-    /// lots, the port's version-exact OBJT parse): 58=0x00, 61=0x6e,
-    /// 70=0x7c, 71=0x2e, 72=0x04, 73=0x46, 74=0x26, 75=0x2e — the
-    /// button-visibility law (a button shows iff at least one community lot
-    /// carries its bit) yields six of the seven buttons on n=1 (all but
-    /// Lodging).
+    /// lots, the port's version-exact OBJT parse, snapshotted before any
+    /// probe seeding — review P1): 58=0x46, 61=0x6e, 70=0x7c, 71=0x2e,
+    /// 72=0x04, 73=0x46, 74=0x26, 75=0x2e — the button-visibility law (a
+    /// button shows iff at least one community lot carries its bit) yields
+    /// six of the seven buttons on n=1 (all but Lodging).
     ///
     /// LAW 2 — FILTER PERSISTENCE (native LoadCurrentFilter @0x10458d60).
     /// Byte-proven storage: STR# 6 'Filter Bar Settings' in the
-    /// neighborhood directory's LotLocations.iff, slot 3 (1-based) holding
-    /// the persisted cmd-bit as a decimal string — every shipped
-    /// UserData*/LotLocations.iff carries ['2','2','4','16','2048'] (the
-    /// '16' = the 0x10 DogCat default). At community entry the Init tail
-    /// applies the default and THEN loads+reprocesses the persisted value;
-    /// every filter change writes it back.
+    /// neighborhood directory's LotLocations.iff, slot 3 (1-based; the
+    /// port's 0-based GetString(2) — native GetString is 1-based, the
+    /// NBR-06/ORIG-02 receipts) holding the persisted cmd-bit as a decimal
+    /// string — every shipped UserData*/LotLocations.iff carries
+    /// ['2','2','4','16','2048']: slot 3 = '4' (a Gardening save — the
+    /// shipped state, NOT the default; '16' is slot 4). A fresh install
+    /// therefore RESTORES 0x04 Gardening; the 0x10 Init default applies
+    /// only when the slot is absent/invalid. At community entry the Init
+    /// tail applies the default and THEN loads+reprocesses the persisted
+    /// value; every filter change writes it back.
     /// </summary>
     public static class ULFilterLaws
     {
@@ -152,21 +156,35 @@ namespace Simitone.Client.UI.Panels
         }
 
         /// <summary>LAW 2: write the persisted cmd-bit back to the
-        /// neighborhood's LotLocations.iff (STR# 6 slot 3).</summary>
-        public static void SavePersistedFilterCmd(string lotLocationsPath, int cmdBit)
+        /// neighborhood's LotLocations.iff (STR# 6 slot 3). The CACHED
+        /// provider instance (if supplied) is updated in the same write —
+        /// the Init-tail restore reads it, and a stale cache would clobber
+        /// the player's last choice on the next community entry (review
+        /// P2). Atomicity follows the repo's AtomicWrite idiom
+        /// (File.Replace — no missing-file window) with tmp cleanup.</summary>
+        public static void SavePersistedFilterCmd(string lotLocationsPath, int cmdBit, IffFile cachedInstance = null)
         {
+            string tmp = null;
             try
             {
                 var iff = new IffFile(lotLocationsPath);
                 var str = iff.Get<STR>(6);
                 if (str == null) return;
                 str.SetStringForce(2, cmdBit.ToString());
-                var tmp = lotLocationsPath + ".tmp";
+                tmp = lotLocationsPath + ".tmp";
                 using (var s = File.Create(tmp)) iff.Write(s);
-                if (File.Exists(lotLocationsPath)) File.Delete(lotLocationsPath);
-                File.Move(tmp, lotLocationsPath);
+                if (File.Exists(lotLocationsPath)) File.Replace(tmp, lotLocationsPath, null);
+                else File.Move(tmp, lotLocationsPath);
+                tmp = null; // moved
+                var cachedStr = cachedInstance?.Get<STR>(6);
+                cachedStr?.SetStringForce(2, cmdBit.ToString());
             }
-            catch { /* parse/write failures keep the last good file */ }
+            catch
+            {
+                // parse/write failures keep the last good file; the tmp (if
+                // any survived) is cleaned up rather than littering
+                if (tmp != null) { try { File.Delete(tmp); } catch { } }
+            }
         }
     }
 }

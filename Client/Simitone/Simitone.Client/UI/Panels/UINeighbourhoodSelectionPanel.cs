@@ -361,15 +361,19 @@ namespace Simitone.Client.UI.Panels
                 // UI-38b LAW 1 (production): the per-lot category bits from the
                 // lot's own house-file object census (the native lot+0x1ac port
                 // representation — ULFilterLaws' class comment carries the law +
-                // the disclosure; the shipped n=1 census: 54/72 -> Gardening,
-                // 58 -> Recreation, others 0).
-                try
+                // the disclosure). Scoped to the community mode: only its
+                // filter bar consumes the bits (review P3 — the parse is a
+                // full house-IFF read, ~29MB across all modes' lots).
+                if (mode == 4) // the UL community view (the filter bar's mode)
                 {
-                    var houseIff = new FSO.Files.Formats.IFF.IffFile(
-                        Content.Get().Neighborhood.GetHousePath((short)num));
-                    button.ULFilterCategoryBits = ULFilterLaws.ComputeCategoryBits(houseIff);
+                    try
+                    {
+                        var houseIff = new FSO.Files.Formats.IFF.IffFile(
+                            Content.Get().Neighborhood.GetHousePath((short)num));
+                        button.ULFilterCategoryBits = ULFilterLaws.ComputeCategoryBits(houseIff);
+                    }
+                    catch { }
                 }
-                catch { }
                 HousePositions[num] = button.Position;
                 LotButtonByHouse[num] = button;
                 buttons.Add(button);

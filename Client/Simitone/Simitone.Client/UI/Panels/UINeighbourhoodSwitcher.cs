@@ -189,7 +189,7 @@ namespace Simitone.Client.UI.Panels
                 var nbhd = FSO.Content.Content.Get().Neighborhood;
                 if (nbhd?.LotLocations != null)
                     ULFilterLaws.SavePersistedFilterCmd(
-                        System.IO.Path.Combine(nbhd.UserPath, "LotLocations.iff"), cmdBit);
+                        System.IO.Path.Combine(nbhd.UserPath, "LotLocations.iff"), cmdBit, nbhd.LotLocations);
             }
             catch { }
             GameLog.Write("uidtbar: filter " + next.DebugName + " (cmd 0x" + cmdBit.ToString("x")
@@ -582,7 +582,7 @@ namespace Simitone.Client.UI.Panels
             // filter 0x10 (DogCat) — this+0x188 = 0x10, plaque 0x1346,
             // ProcessFilterToolbarByType(this, 0x10) — then the persisted
             // filter overrides (LoadCurrentFilter; port keeps the default,
-            // persistence not ported, DISCLOSED).
+            // persistence ported UI-38b).
             // DISCLOSED divergence: the port's mode 4 is the MERGED
             // residential+community view that keeps the engine navbar as its
             // navigation surface, so the strip band mounts directly BELOW
@@ -618,7 +618,7 @@ namespace Simitone.Client.UI.Panels
                 // PERSISTED filter (LoadCurrentFilter @0x10458d60 — STR# 6
                 // 'Filter Bar Settings' slot 3 in the neighborhood dir's
                 // LotLocations.iff) and reprocess — the save overrides the
-                // default (shipped files carry '16' = the default itself).
+                // default (the shipped slot carries '4', a Gardening save).
                 ProcessULFilterByType(0x10);
                 var persistedCmd = ULFilterLaws.LoadPersistedFilterCmd(
                     FSO.Content.Content.Get().Neighborhood.LotLocations);
