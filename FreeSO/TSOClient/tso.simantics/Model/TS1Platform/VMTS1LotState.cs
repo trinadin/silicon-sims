@@ -66,6 +66,38 @@ namespace FSO.SimAntics.Model.TS1Platform
         private bool TransitRestored;
 
         /// <summary>
+        /// ENG-28: the native visit-session flag — cSimsApp::LoadGame @0x258680
+        /// tail sets the sim context's +0x50 on the visit arms (GetZoningType ==
+        /// community, or the public Magic Town lots 93..99), which drives
+        /// DisableLiveMode + SetMode(BUY)+Pause at entry. This is the SAME matrix
+        /// as TS1GameScreen.NativeEntryVisit, computed engine-side from
+        /// CurrentHouse (set once per load by VMTS1ActivatorNew) and cached for
+        /// the session. Transient, never serialized. Consumed by VM.InternalTick /
+        /// VMServerDriver.Tick to run the native restricted tick (objects tick,
+        /// clock frozen) while a visit session is parked — NOT by global 32,
+        /// which the port sets only for family-less sessions (VerifyFamily) and
+        /// which reads 0 for the away-lot family visits (EXP-08 petname class).
+        /// </summary>
+        private bool? _VisitSession;
+        public bool VisitSession
+        {
+            get
+            {
+                if (_VisitSession == null)
+                {
+                    bool zoningCommunity = false;
+                    try
+                    {
+                        zoningCommunity = FSO.Content.Content.Get().Neighborhood.GetZoningType(CurrentHouse) == 1;
+                    }
+                    catch { }
+                    _VisitSession = zoningCommunity || (CurrentHouse > 0x5c && CurrentHouse < 100);
+                }
+                return _VisitSession.Value;
+            }
+        }
+
+        /// <summary>
         /// AUD-03/SIM-09 note: category indices into TodayReport/HistoryReport,
         /// in native SIMI day-record order.
         /// </summary>

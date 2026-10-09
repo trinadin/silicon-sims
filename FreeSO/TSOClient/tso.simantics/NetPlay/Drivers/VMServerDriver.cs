@@ -318,7 +318,22 @@ namespace FSO.SimAntics.NetPlay.Drivers
             var tick = new VMNetTick();
             tick.Commands = new List<VMNetCommand>(cmdQueue);
             tick.TickID = TickID;
-            if (vm.SpeedMultiplier > 0) tick.TickID = TickID++;
+            // ENG-28 (native restricted-tick law, full decode on VM.InternalTick's
+            // park gate): the native tick counter (cSimulator+0x98) freezes on the
+            // restricted pass, but native scheduling is PASS-based (TryIdle
+            // @0x100e8530 decrements persons' idle locals per Simulate pass;
+            // non-persons park in the flags-word low-16 pass divisor), so townie
+            // trees keep advancing while the clock stands still. The port's
+            // scheduler is tickID-based (VMSleep/ScheduleTickIn compare against
+            // Scheduler.CurrentTickID), so a frozen TickID with a running object
+            // pass would strand every parked thread — the petname LM-1 QUEUE-SNAP
+            // stall class. Advance TickID on the TS1 visit-session park (the
+            // NativeEntryVisit matrix, VMTS1LotState.VisitSession) so wakes fire
+            // while parked, mirroring the native pass-driven scheduling. The -1
+            // park only; the focus park (0) and the TSO path are untouched.
+            if (vm.SpeedMultiplier > 0
+                || (vm.SpeedMultiplier < 0 && vm.TS1 && vm.TS1State != null && vm.TS1State.VisitSession))
+                tick.TickID = TickID++;
             tick.RandomSeed = vm.Context.RandomSeed;
             cmdQueue.Clear();
             InternalTick(vm, tick);

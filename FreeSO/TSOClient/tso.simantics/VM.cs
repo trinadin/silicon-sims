@@ -499,7 +499,37 @@ namespace FSO.SimAntics
             if (SpeedMultiplier < 0)
             {
                 Context.ProcessLightingChanges();
-                return;
+                // ENG-28 (native restricted-tick law): the native pause/mode park
+                // NEVER stops the object pump. cDDDSimsView::Simulate @0x1020e000
+                // calls cSimulator::Simulate @0x1012fb80 every view frame with no
+                // pause/mode gate; cSimulator::Pause @0x10130260 only sets +0x32,
+                // and the restriction (paused 0x32, or the CPState mode mirror
+                // 0x36 — UpdateWorldFromCPState @0x10208790: mode BUY→2, LIVE→0 —
+                // with a lot loaded) filters INSIDE TickAllObjects @0x10130570:
+                // the per-object Simulate virtual (descriptor+0x1c →
+                // cXObject::Simulate @0x100e7e70 → TreeSim::Simulate @0x1014a900,
+                // which ignores the frozen tick counter and executes
+                // DoNodeAction per pass) keeps running for objects carrying
+                // SetSimFlag enum-2 (0x20000) — set at PostLoad/Reset from
+                // obj+0xc2 >= 0, and +0xc2 is only ever zeroed (ctor memset
+                // 0x4a..0xd9) with no writer anywhere in the code section, i.e.
+                // effectively universal. The clock advance (minute/hour/day +
+                // tick counter @0x98) is the ONLY thing the restricted tick
+                // freezes: TickAllObjects returns false and SimulateOneTick
+                // @0x10130770 gates the counters on it; PostSim(idle=true) still
+                // runs every pass. The port fuses that law's clock gate (the
+                // SpeedMultiplier > 0 Clock.Tick() above — motives stay frozen
+                // too, VMTS1MotiveDecay is clock-minute gated) but historically
+                // full-stopped the object pass here, freezing the whole lot —
+                // visibly divergent on away-lot visit sessions, whose streets
+                // natively keep simulating while the player sits in BUY/pause.
+                // Scoped fix: on TS1 visit sessions (the NativeEntryVisit
+                // matrix, see VMTS1LotState.VisitSession) fall through to the
+                // object pass while parked, matching the native restricted tick.
+                // Home-lot pause semantics are deliberately unchanged (the
+                // port's shipped household freeze); the TSO path (vm.TS1 false)
+                // is untouched.
+                if (!(TS1 && TS1State != null && TS1State.VisitSession)) return;
             }
             if (!UseSchedule) { //scheduleless mode is still useful for desync debug.
                 var entCpy = Entities.ToArray();

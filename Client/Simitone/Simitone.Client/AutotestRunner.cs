@@ -4973,6 +4973,40 @@ namespace Simitone.Client
         private static int _ptnameDialogsBefore, _ptnameAnswers, _ptnamePenOid, _ptnameActorOid;
         private static bool _ptnameDirectNamed, _ptnameTreeNamed, _ptnameFamilyJoined;
         private static string _ptnamePins = "";
+        // ENG-28 visit-park soak state (-1 = proven/na)
+        private static int _ptnameParkSoak;
+        private static uint _ptnameParkSched0;
+        private static string _ptnameParkNpc0 = "";
+        private static int _ptnameParkClock0 = -1;
+
+        /// <summary>
+        /// ENG-28: snapshot every in-world NON-family avatar's observable tick
+        /// state (tile, top frame routine@ip, queue depth). Any delta between
+        /// snapshots = that NPC's thread/position advanced — the observable for
+        /// "the visit streets simulate while parked".
+        /// </summary>
+        private static string PetNameParkNpcSnapshot()
+        {
+            var sb = new System.Text.StringBuilder();
+            try
+            {
+                var fam = _vm.GetGlobalValue(9);
+                foreach (var a in _vm.Context.ObjectQueries.Avatars.OfType<VMAvatar>())
+                {
+                    if (a.Position == FSO.LotView.Model.LotTilePos.OUT_OF_WORLD) continue;
+                    if (a.GetPersonData(VMPersonDataVariable.TS1FamilyNumber) == fam) continue;
+                    var st = a.Thread?.Stack;
+                    var top = (st != null && st.Count > 0) ? st[st.Count - 1] : null;
+                    sb.Append(a.ObjectID).Append(':')
+                      .Append(a.Position.TileX).Append(',').Append(a.Position.TileY)
+                      .Append('/').Append(top?.Routine?.Chunk?.ChunkID.ToString() ?? "0")
+                      .Append('@').Append(top?.InstructionPointer.ToString() ?? "-1")
+                      .Append("/q").Append(a.Thread?.Queue.Count ?? -1).Append(';');
+                }
+            }
+            catch (Exception e) { sb.Append("EXC").Append(e.GetType().Name); }
+            return sb.ToString();
+        }
 
         private static void PetNameTick()
         {
@@ -5007,6 +5041,45 @@ namespace Simitone.Client
                     {
                         _vm = _screen.vm; _ptnameRebound = true;
                         Log("AUTOTEST petname VM-REBOUND curHouse=" + (_vm.TS1State?.CurrentHouse.ToString() ?? "?") + " ents=" + _vm.Entities.Count);
+                    }
+                    // ENG-28 VISIT-PARK proof (probe-gated, runs BEFORE the first
+                    // lifelift so the session is still parked): the native
+                    // restricted-tick law keeps the object world ticking during a
+                    // visit-lot BUY/pause park (TickAllObjects @0x10130570 filters
+                    // per-object, never stops the pump; only the clock/counter
+                    // freeze — full decode on VM.InternalTick's park gate). Soak
+                    // ~5s parked and assert the engine now advances the scheduler
+                    // and ticks the street NPCs. This is the product-behavior
+                    // assertion behind the engine fix; the lifelift below stays
+                    // (probe law) and the drive proceeds unchanged after the soak.
+                    if (_ptnameRebound && (_vm.TS1State?.CurrentHouse ?? 0) == 93 && _ptnameParkSoak >= 0)
+                    {
+                        _ptnameParkSoak++;
+                        // baseline at frame 40 (post-placement settle: the family
+                        // lands OOW→in-world during the first parked frames; a
+                        // frame-0 baseline would make the delta a population
+                        // change, not a tick change)
+                        if (_ptnameParkSoak == 40)
+                        {
+                            _ptnameParkSched0 = _vm.Scheduler.CurrentTickID;
+                            _ptnameParkNpc0 = PetNameParkNpcSnapshot();
+                            _ptnameParkClock0 = _vm.Context.Clock.Minutes;
+                        }
+                        if (_ptnameParkSoak <= 200) return; // stay parked (no lifelift yet)
+                        var schedAdv = (int)(_vm.Scheduler.CurrentTickID - _ptnameParkSched0);
+                        var npc1 = PetNameParkNpcSnapshot();
+                        var npcDelta = npc1 != _ptnameParkNpc0;
+                        var mpP = _screen?.Frontend?.MainPanel;
+                        var parked = (mpP != null) ? mpP.Mode != Simitone.Client.UI.Panels.UIMainPanelMode.LIVE : _vm.SpeedMultiplier < 0;
+                        Log("AUTOTEST petname VISIT-PARK-NPC-TICKS schedAdv=" + schedAdv
+                            + " npcDelta=" + npcDelta + " parked=" + parked
+                            + " clockFrozen=" + (_vm.Context.Clock.Minutes == _ptnameParkClock0)
+                            + " npcCensus=" + (_ptnameParkNpc0.Length == 0 ? 0 : _ptnameParkNpc0.Split(';').Length - 1)
+                            + " clockMin=" + _vm.Context.Clock.Minutes);
+                        if (!parked || schedAdv < 30 || _vm.Context.Clock.Minutes != _ptnameParkClock0
+                            || (_ptnameParkNpc0.Length > 0 && !npcDelta))
+                        { Log("AUTOTEST petname verdict visit-park-frozen (ENG-28 law: parked visit session must keep ticking the lot)"); Fail("petname"); _ptnameState = 99; return; }
+                        _ptnameParkSoak = -1; // proven — hand control back to the drive
                     }
                     // LM-2 THE LAST-MILE UN-PARK (r2 scheduler truth: cur=1 frozen,
                     // bucket 1 never consumed, Main@0, zero ITRACE, motives frozen).
