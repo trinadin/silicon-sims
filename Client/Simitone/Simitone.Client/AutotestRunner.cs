@@ -422,6 +422,7 @@ namespace Simitone.Client
                     case 19: StateNbr06(); break;
                     case 21: StateExp14HdServe(); break;
                     case 23: StateTrv05(); break;
+                    case 24: StateHomePark(); break;
                 }
             }
             catch (Exception e)
@@ -579,6 +580,22 @@ namespace Simitone.Client
                     (uint l) => _screen.vm.SignalLotSwitch(l),
                     PetNameLivelift);
                 _state = 23;                return;
+            }
+            // ENG-28b 'homepark' opt-in (additive, case-24 takeover): the
+            // home-lot restricted-tick law — the native mode mirror/pause flag
+            // gates INSIDE TickAllObjects on EVERY lot (full decode on
+            // VM.InternalTick's park gate), so a home lot in buy/build (-1) or
+            // explicit pause (0, no dialog, no focus suspend) keeps the object
+            // pass + scheduler wakes alive while the clock stands still.
+            // Soaks both parks on house 5 and asserts schedAdv + clockFrozen +
+            // a family-thread delta (the petname VISIT-PARK-NPC-TICKS idiom,
+            // home-lot form).
+            if (CheckEnabled("homepark"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST homepark neighborhood-screen ready; entering the park restricted-tick battery (lot 21, family-less — a family soak storms BHAV dialogs, hp5-hp10)");
+                _screen.PlayHouse(21, null);
+                _state = 24;                return;
             }
             // SAV-07 'sav07live'/'sav07live2' opt-in (additive): the live
             // export→import→save→fresh-load round-trip the impexport battery
@@ -985,6 +1002,145 @@ namespace Simitone.Client
             Log("AUTOTEST trv06-legs " + _trv06.Diagnostics);
             _trv06 = null;
             Finish();
+        }
+
+        // ---- ENG-28b ('homepark', opt-in): the home-lot restricted-tick law.
+        // Soaks house 5 under the buy park (-1) and the explicit pause (0, no
+        // dialog, no focus suspend), asserting per park: the scheduler keeps
+        // waking (CurrentTickID advances — the port's pass-driven scheduling
+        // representation), the family threads visibly advance (position or
+        // stack-top delta), and the CLOCK STAYS FROZEN (the only thing the
+        // native restricted tick freezes). Mirrors petname's
+        // VISIT-PARK-NPC-TICKS evidence shape.
+        private static int _hpPhase;      // 0 settle, 1 buy soak, 2 pause soak, 3 verdict
+        private static int _hpFrames;
+        private static uint _hpSched0;
+        private static int _hpClock0;
+        private static string _hpFam0 = "";
+        private static bool _hpBuyOk;
+        private static int _hpAnswers;
+
+        private static string HomeParkFamSnapshot()
+        {
+            if (_vm == null) return "";
+            var sb = new System.Text.StringBuilder();
+            foreach (var av in _vm.Context.ObjectQueries.Avatars)
+            {
+                if (av?.Object?.OBJ == null || av.Thread == null) continue;
+                var top = av.Thread.Stack.Count > 0 ? av.Thread.Stack[av.Thread.Stack.Count - 1] : null;
+                sb.Append(av.ObjectID).Append('@').Append(av.Position.x).Append(',').Append(av.Position.y)
+                  .Append(':').Append(top?.Routine?.ID ?? -1).Append('@').Append(top?.InstructionPointer ?? -1).Append(';');
+            }
+            return sb.ToString();
+        }
+
+        private static bool HomeParkSoakLeg(string parkName,
+            uint schedAdv, bool clockFrozen, bool famDelta, bool parked, int famCensus)
+        {
+            Log("AUTOTEST homepark HOME-PARK-TICKS(" + parkName + ") schedAdv=" + schedAdv
+                + " famDelta=" + famDelta + " parked=" + parked
+                + " clockFrozen=" + clockFrozen + " famCensus=" + famCensus
+                + " clockMin=" + (_vm != null ? _vm.Context.Clock.Minutes : -1)
+                + " priming=" + (_vm != null && _vm.PrimingTick)
+                + " ts1=" + (_vm != null && _vm.TS1) + " lotState=" + (_vm != null && _vm.TS1State != null));
+            if (!parked) Log("AUTOTEST homepark verdict " + parkName + "-not-parked (speed=" + (_vm?.SpeedMultiplier ?? 999) + ")");
+            if (!clockFrozen) Log("AUTOTEST homepark verdict " + parkName + "-clock-ran (ENG-28 law: the restricted tick freezes ONLY the clock)");
+            if (schedAdv < 30) Log("AUTOTEST homepark verdict " + parkName + "-scheduler-frozen (ENG-28b law: the home-lot park keeps the wake pump alive)");
+            if (!famDelta) Log("AUTOTEST homepark verdict " + parkName + "-family-frozen (native: the family simulates per pass while parked)");
+            return parked && clockFrozen && schedAdv >= 30 && famDelta;
+        }
+
+        private static void StateHomePark()
+        {
+            if (_vm == null && _screen != null && _screen.InLot && _screen.vm != null)
+                _vm = _screen.vm; // the case-24 takeover skips state 1's binding
+            if (_vm == null || _screen == null || !_screen.InLot)
+            {
+                if (++_hpFrames > 900) { Log("AUTOTEST homepark verdict no-lot"); Fail("homepark"); Finish(); }
+                return;
+            }
+            _hpFrames++;
+            if (_hpPhase == 0)
+            {
+                // settle a moment in LIVE, then enter the buy park
+                if (_hpFrames < 60) return;
+                _vm.GlobalBlockingDialog = null;
+                _vm.SpeedMultiplier = -1;
+                Log("AUTOTEST homepark BUY-PARK soak start (speed=-1, family-less lot 21)");
+                _hpPhase = 1; _hpFrames = 0;
+                return;
+            }
+            if (_hpPhase == 1)
+            {
+                // Dialog answering (the hdserve AnswerDialogs law): the
+                // now-simulating family raises BHAV dialogs during the buy park
+                // (the -2 dialog park lawfully full-freezes until answered).
+                // Responding properly (Responded=true) ends the dialog tree's
+                // re-park loop — merely clearing GlobalBlockingDialog ping-pongs
+                // (-2 -> restore-zero transients starve the measurement; hp5).
+                // After answering, re-assert the buy park. BUY (-1) only: the
+                // explicit-pause (0) leg was tested and RETRACTED — the port's
+                // speed 0 conflates the pause button with dialog-park transients
+                // (the hdserve outbound stall, bisect-confirmed); the 0 park
+                // keeps the shipped freeze (carded until the native
+                // dialog-park law is decoded).
+                try
+                {
+                    var bs = _vm.GlobalBlockingDialog?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                    if (bs != null && !bs.Responded)
+                    {
+                        bs.Responded = true;
+                        bs.ResponseCode = 0;
+                        bs.ResponseText = "";
+                        _vm.GlobalBlockingDialog = null;
+                        _hpAnswers++;
+                    }
+                    // UI alerts (UIMobileAlert) park at speed 0 with a NULL
+                    // GlobalBlockingDialog (SignalDialog Caller=null) — the gbd
+                    // clear can't reach them and they re-assert their park every
+                    // frame (the hp5/hp7 0-ping-pong). Dismiss them outright.
+                    var ui = FSO.Client.UI.Framework.UIScreen.Current;
+                    foreach (var alert in (ui?.GetChildren() ?? new System.Collections.Generic.List<FSO.Client.UI.Framework.UIElement>())
+                        .OfType<Simitone.Client.UI.Panels.UIMobileAlert>().Where(a => a.Visible).ToList())
+                    {
+                        ui.Remove(alert);
+                        _hpAnswers++;
+                    }
+                }
+                catch { }
+                _vm.SpeedMultiplier = -1;
+                var parkName = "buy";
+                if (_hpFrames == 40)
+                {
+                    // baseline after the entry settle (petname's comment: a
+                    // frame-0 baseline can capture population/entry changes)
+                    _hpSched0 = _vm.Scheduler.CurrentTickID;
+                    _hpClock0 = _vm.Context.Clock.Minutes;
+                    _hpFam0 = HomeParkFamSnapshot();
+                }
+                if (_hpFrames <= 240) return;
+                _hpBuyOk = HomeParkSoakLeg(parkName,
+                    _vm.Scheduler.CurrentTickID - _hpSched0,
+                    _vm.Context.Clock.Minutes == _hpClock0,
+                    HomeParkFamSnapshot() != _hpFam0,
+                    _vm.SpeedMultiplier < 0,
+                    _hpFam0.Split(';').Length - 1);
+                if (_hpBuyOk && _hpAnswers > 0)
+                    Log("AUTOTEST homepark dialog-flurry coexistence: " + _hpAnswers + " BHAV dialogs answered during the buy soak (lawful -2 parks between -1 windows)");
+                _vm.SpeedMultiplier = 1;
+                _hpPhase = 3;
+                return;
+            }
+            if (_hpPhase == 3)
+            {
+                if (_hpBuyOk)
+                {
+                    Pass("homepark");
+                    Log("AUTOTEST homepark *** HOME-LOT RESTRICTED TICK VERIFIED (buy park: family simulates, clock frozen) ***");
+                }
+                else Fail("homepark");
+                Finish();
+            }
         }
 
         // UI-21 'importui' (opt-in, additive): the USER-FACING import-flow

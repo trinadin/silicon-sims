@@ -332,6 +332,14 @@ namespace FSO.SimAntics
         // driven directly by the 'uioptswire' gate.
         public bool FocusSuspended;
         private int FocusSavedSpeed;
+        // ENG-28b: TS1GameScreen.InitializeLot primes a fresh lot with one
+        // synchronous -1 tick (speed set, vm.Tick(), speed restored). That is a
+        // LOAD-TIME priming pass, not the build/buy mode park — the ENG-28b
+        // home-lot restricted tick must not fire on it (the lot's arrival
+        // choreography — transit waits, dialog sequencing — is calibrated to a
+        // non-ticking priming pass; ticking it stalls the hdserve outbound
+        // 'Go Downtown' 281 wait, bisect-confirmed). Set only around that call.
+        public bool PrimingTick;
 
         /// <summary>
         /// UI-26: apply the focus suspend/restore law (native cSimulator +52
@@ -523,13 +531,23 @@ namespace FSO.SimAntics
                 // full-stopped the object pass here, freezing the whole lot —
                 // visibly divergent on away-lot visit sessions, whose streets
                 // natively keep simulating while the player sits in BUY/pause.
-                // Scoped fix: on TS1 visit sessions (the NativeEntryVisit
-                // matrix, see VMTS1LotState.VisitSession) fall through to the
-                // object pass while parked, matching the native restricted tick.
-                // Home-lot pause semantics are deliberately unchanged (the
-                // port's shipped household freeze); the TSO path (vm.TS1 false)
-                // is untouched.
-                if (!(TS1 && TS1State != null && TS1State.VisitSession)) return;
+                // ENG-28 first landing: scoped to TS1 visit sessions (the
+                // NativeEntryVisit matrix, VMTS1LotState.VisitSession).
+                // ENG-28b: the native restricted tick is lot-agnostic (the mode
+                // mirror gates inside TickAllObjects on EVERY lot) — the same
+                // law applies to HOME lots in buy/build. Drop the
+                // VisitSession-only gate: every TS1 lot falls through to the
+                // object pass while buy-parked. The TSO path (vm.TS1 false) is
+                // untouched. The dialog park (speed 0 with GlobalBlockingDialog)
+                // and the focus suspend (FocusSuspended) never reach this -1
+                // branch and keep the shipped full freeze; the explicit-pause
+                // (speed 0) object pass already ran — its TickID advance is
+                // handled in VMServerDriver.Tick. The BHAV dialog park (-2,
+                // VMDialogPrivateStrings) is NOT the build/buy mode park: it
+                // sets GlobalBlockingDialog and keeps its shipped full freeze
+                // (its native law is not decoded in ENG-28) — hence the exact
+                // == -1 match, not < 0.
+                if (!(TS1 && TS1State != null && SpeedMultiplier == -1 && !PrimingTick)) return;
             }
             if (!UseSchedule) { //scheduleless mode is still useful for desync debug.
                 var entCpy = Entities.ToArray();

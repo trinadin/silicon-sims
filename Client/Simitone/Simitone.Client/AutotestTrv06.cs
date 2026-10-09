@@ -874,29 +874,38 @@ namespace Simitone.Client
                             if (bases == 0 || carryActive)
                             {
                                 _frames++;
-                                // Lifelift (disclosed, the PetNameLivelift class): the return
-                                // transit's persisted 'Go Home' queue item re-runs on the HOME
-                                // lot with a stale route (VMTS1ActivatorNew restores
-                                // person.InteractionQueue across the lot switch) and its routing
-                                // frame never completes, starving the umbrella's own walks.
-                                // A player cancelling the walk is the native-visible equivalent:
-                                // cancel the stale transit item once, after a 360-frame grace.
-                                if (_frames == 360 && cur != null && cur.Name != null && cur.Name.Contains("Go Home"))
-                                {
-                                    try
-                                    {
-                                        _sim.Thread.CancelAction(cur.UID);
-                                        Log("AUTOTEST trv06 p92 LIFELIFT: cancelled the stale return-transit 'Go Home' action (uid=" + cur.UID + ") after 360f — its stale route starved the carry-home walks");
-                                    }
-                                    catch (Exception cx) { Log("AUTOTEST trv06 p92 lifelift EXC " + cx.GetType().Name); }
-                                }
+                                // Lane B: the former probe lifelift (cancel the stale 'Go
+                                // Home' transit after 360f) is REMOVED — the engine now
+                                // completes stale transit routes at arrival (the native
+                                // RemoveFromVacation ClearRouteHistory law, ported at the
+                                // lot-switch arrival edge in TS1GameScreen). This gate must
+                                // pass WITHOUT any probe-side intervention.
                                 if (_frames % 120 == 0)
                                 {
                                     Unstick();
+                                    // lane B diagnostic: name the starved action's stack
+                                    var stb = new System.Text.StringBuilder();
+                                    FSO.SimAntics.Engine.VMRoutingFrame topRoute = null;
+                                    try
+                                    {
+                                        var st = _sim.Thread.Stack;
+                                        for (int si = Math.Max(0, st.Count - 10); si < st.Count; si++)
+                                        {
+                                            var fr = st[si];
+                                            if (fr is FSO.SimAntics.Engine.VMRoutingFrame rf) { topRoute = rf; stb.Append(si).Append(":ROUTE ").Append(rf.State.ToString()).Append(' '); }
+                                            else stb.Append(si).Append(':')
+                                              .Append(fr.Routine?.Chunk?.ChunkID.ToString() ?? "?").Append('@').Append(fr.InstructionPointer)
+                                              .Append('/').Append(fr.Routine?.Chunk?.ChunkLabel ?? "?").Append(' ');
+                                        }
+                                    }
+                                    catch { }
                                     Log("AUTOTEST trv06 p92 diag f=" + _frames + " placed=" + bases + " carriedOrPlaced=" + carried
                                         + " pos=[" + string.Join(",", matches.Select(m => m.ObjectID + "@" + m.Position.ToString())) + "]"
                                         + " persist=" + _persistFrames + " queue=" + (q?.Count ?? -1)
-                                        + " cur=" + (cur?.Name ?? "none"));
+                                        + " cur=" + (cur?.Name ?? "none")
+                                        + " sim=" + _sim.Position.ToString()
+                                        + (topRoute != null ? " route=" + topRoute.State + " wait=" + topRoute.WaitTime : "")
+                                        + " stack=[" + stb.ToString() + "]");
                                     var rmNew = _rmLog.Skip(_rmDumped).ToList();
                                     var delNew = _delLog.Skip(_delDumped).ToList();
                                     foreach (var rl in rmNew.Take(6)) Log("AUTOTEST trv06 RMWATCH(t" + _frames + ") " + rl);
