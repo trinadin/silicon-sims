@@ -342,7 +342,12 @@ namespace FSO.SimAntics.NetPlay.Drivers
             // arm additionally burns transit wait countdowns through
             // dialog-adjacent transients — retracted).
             if (vm.SpeedMultiplier > 0
-                || (vm.TS1 && vm.TS1State != null && vm.SpeedMultiplier == -1 && !vm.PrimingTick))
+                || (vm.TS1 && vm.TS1State != null
+                    && ((!vm.PrimingTick || vm.TS1State.VisitSession)
+                        && (vm.SpeedMultiplier == -1
+                            // ENG-28's shipped visit-session -2 ticking (see VM.InternalTick's
+                            // park gate; home lots stay frozen — native dialog law not decoded).
+                            || (vm.SpeedMultiplier == -2 && vm.TS1State.VisitSession)))))
                 tick.TickID = TickID++;
             tick.RandomSeed = vm.Context.RandomSeed;
             cmdQueue.Clear();

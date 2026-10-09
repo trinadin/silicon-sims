@@ -547,7 +547,18 @@ namespace FSO.SimAntics
                 // sets GlobalBlockingDialog and keeps its shipped full freeze
                 // (its native law is not decoded in ENG-28) — hence the exact
                 // == -1 match, not < 0.
-                if (!(TS1 && TS1State != null && SpeedMultiplier == -1 && !PrimingTick)) return;
+                if (!(TS1 && TS1State != null && (
+                    // ENG-28b scope: visit sessions keep their SHIPPED behavior
+                    // wholesale (the original <0 gate — both the -1 park and the
+                    // -2 BHAV dialog park ticked there, INCLUDING InitializeLot's
+                    // priming pass); the eng28b extension is the NON-VISIT -1
+                    // park, with the priming pass exempted (the arrival
+                    // choreography is calibrated to a non-ticking priming tick —
+                    // the hdserve bisect). Home lots keep the -2 dialog freeze
+                    // (native dialog law not decoded).
+                    (SpeedMultiplier == -1 && (!PrimingTick || TS1State.VisitSession))
+                    || (SpeedMultiplier == -2 && TS1State.VisitSession))))
+                    return;
             }
             if (!UseSchedule) { //scheduleless mode is still useful for desync debug.
                 var entCpy = Entities.ToArray();
