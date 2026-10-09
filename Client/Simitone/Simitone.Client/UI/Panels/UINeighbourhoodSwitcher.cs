@@ -182,6 +182,16 @@ namespace Simitone.Client.UI.Panels
             ULFilterPlaqueMember = next.PlaqueMember;         // SetFilterMode 0x1342+idx
             ULFilterClicksForProbe++;
             Panel?.ApplyULFilterMode(cmdBit, next.Mode, next.PlaqueMember);
+            // UI-38b LAW 2: every filter change persists (the native writes the
+            // cmd-bit back to STR# 6 slot 3 — the LoadCurrentFilter pair).
+            try
+            {
+                var nbhd = FSO.Content.Content.Get().Neighborhood;
+                if (nbhd?.LotLocations != null)
+                    ULFilterLaws.SavePersistedFilterCmd(
+                        System.IO.Path.Combine(nbhd.UserPath, "LotLocations.iff"), cmdBit);
+            }
+            catch { }
             GameLog.Write("uidtbar: filter " + next.DebugName + " (cmd 0x" + cmdBit.ToString("x")
                 + " mode " + next.Mode + " plaque " + next.PlaqueMember + ")");
         }
@@ -603,8 +613,20 @@ namespace Simitone.Client.UI.Panels
                 ULFilterButtonsMounted = ULFilterButtons.Count == 7
                     && ULFilterButtons.TrueForAll(b => b.OriginalMounted);
                 // the Init default: filter 0x10 (DogCat) pressed + plaque +
-                // HighlightLotsForMode (mode 0 -> community lots blue).
+                // HighlightLotsForMode (mode 0 -> community lots blue). THEN the
+                // UI-38b LAW 2 tail (the native Init second block): load the
+                // PERSISTED filter (LoadCurrentFilter @0x10458d60 — STR# 6
+                // 'Filter Bar Settings' slot 3 in the neighborhood dir's
+                // LotLocations.iff) and reprocess — the save overrides the
+                // default (shipped files carry '16' = the default itself).
                 ProcessULFilterByType(0x10);
+                var persistedCmd = ULFilterLaws.LoadPersistedFilterCmd(
+                    FSO.Content.Content.Get().Neighborhood.LotLocations);
+                if (persistedCmd > 0 && persistedCmd != 0x10)
+                {
+                    ProcessULFilterByType(persistedCmd);
+                    GameLog.Write("uidtbar: persisted filter restored (cmd 0x" + persistedCmd.ToString("x") + ")");
+                }
             }
 
             // The engine emits this from PostChildDraw, after the banner and
