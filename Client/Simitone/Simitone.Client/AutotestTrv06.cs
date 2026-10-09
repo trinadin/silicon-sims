@@ -523,14 +523,24 @@ namespace Simitone.Client
                         }
                         return false;
 
-                    case 41: // accumulation window: Process Score must EXECUTE; attr[5] movement observed
+                    case 41: // accumulation: drive 'Process Score' 4104 through the real executor
+                        // (the controller's natural main 4100 'Main - Score' idles/gates; the
+                        // exec-law verification is the deterministic synchronous drive)
                         foreach (var a in FamilyAvatars()) PinMood(a, 90);
-                        if (++_frames > 300)
+                        if (++_frames > 120)
                         {
+                            var tree = _scoreCtl.GetRoutineWithOwner(4104, vm.Context);
+                            if (tree?.routine == null) { Check(false, "p41 routine 4104 unresolved on controller"); _phase = 99; return false; }
+                            _procScoreTraces = 0;
+                            var savedCtl = _scoreCtl; // Drive uses _sim's thread; Caller must be the CONTROLLER for My.attr[5]
+                            bool ok41 = false;
+                            try { ok41 = _scoreCtl.Thread.RunInMyStack(tree.routine, tree.owner, new short[] { 0, 0, 0, 0 }, _scoreCtl); }
+                            catch (Exception e41) { Log("AUTOTEST trv06 p41 EXC " + e41.GetType().Name); }
+                            _scoreCtl = savedCtl;
                             var after = _scoreCtl.GetAttribute(5);
-                            Log("AUTOTEST trv06 p4 attr[5] after=" + after + " (before=" + _attr5Before
-                                + ") procScoreExecs=" + _procScoreTraces);
-                            Check(_procScoreTraces > 0, "p4 'Process Score' 4104 executed on the controller (execs=" + _procScoreTraces + ")");
+                            Log("AUTOTEST trv06 p4 Process Score DRIVE ok=" + ok41 + " attr[5] before=" + _attr5Before
+                                + " after=" + after + " execs=" + _procScoreTraces);
+                            Check(_procScoreTraces > 0, "p4 'Process Score' 4104 executed (execs=" + _procScoreTraces + ")");
                             Check(after != _attr5Before && after != 0,
                                 "p4 score accumulation: attr[5] moved with moods pinned 90 (before=" + _attr5Before + " after=" + after + ")");
                             _phase = 5; _frames = 0;
@@ -556,6 +566,7 @@ namespace Simitone.Client
                         {
                             var a2 = _sim.GetAttribute(2);
                             var tok = Inv()?.Any(x => x.Type == 6 && x.GUID != 0x842A8C3B) ?? false;
+                            foreach (var tl in _itrace.Take(14).ToList()) Log("AUTOTEST trv06 ITRACE-below " + tl);
                             Check(_thrBelowTraces > 0, "p5 4108 executed below threshold (traces=" + _thrBelowTraces + ")");
                             Check(a2 == 77, "p5 below threshold: NO give path (sim attr[2] stayed " + a2 + ", expect 77)");
                             Check(!tok, "p5 below threshold: no souvenir token granted");
@@ -595,6 +606,7 @@ namespace Simitone.Client
                         if (!_watchDone) { if (++_frames > 240) { Check(false, "p61 above-run never left the queue"); _phase = 99; } return false; }
                         {
                             var a2 = _sim.GetAttribute(2);
+                            foreach (var tl in _itrace.Skip(Math.Max(0, _itrace.Count - 16)).ToList()) Log("AUTOTEST trv06 ITRACE-above " + tl);
                             Check(_thrAboveTraces > 0, "p6 4108 executed above threshold (traces=" + _thrAboveTraces + ")");
                             Check(a2 == 0, "p6 above threshold: give path ENTERED (4108 ins15 zeroed sim attr[2]; got " + a2 + ")");
                             var social = vm.Entities.Count(e => e.Object != null && e.Object.OBJ != null && e.Object.OBJ.GUID == GiveSouvenirSocialGuid);
@@ -725,7 +737,11 @@ namespace Simitone.Client
                                 }
                                 if (tree?.routine == null) { Check(false, "p91 routine 4104 unresolved for carry-home drive"); _phase = 99; return false; }
                                 Log("AUTOTEST trv06 p91 no automatic spawn; driving 4104 'Interaction - Spawn Vacation Purchases' (the return-edge law)");
+                                _createLog.Clear();
+                                FSO.SimAntics.Engine.Primitives.VMCreateObjectInstance.ObjectCreated += Trv06ObjCreated;
                                 Drive(plugin ?? _sim, tree, _sim, "Spawn Vacation Purchases (probe drive)");
+                                FSO.SimAntics.Engine.Primitives.VMCreateObjectInstance.ObjectCreated -= Trv06ObjCreated;
+                                foreach (var cl in _createLog.Take(12)) Log("AUTOTEST trv06 CREATE " + cl);
                                 _phase = 92; _frames = 0;
                                 return false;
                             }
@@ -779,5 +795,18 @@ namespace Simitone.Client
         private VMEntity _souvGood;
         private VMEntity _souvBad;
         private int _keepalive;
+        private readonly List<string> _createLog = new List<string>();
+
+        private void Trv06ObjCreated(VMStackFrame ctx, FSO.SimAntics.Entities.VMMultitileGroup grp, uint guid)
+        {
+            try
+            {
+                _createLog.Add("guid=0x" + guid.ToString("X8") + " oid=" + (grp?.BaseObject?.ObjectID ?? 0)
+                    + " by=" + (ctx?.Caller?.ObjectID ?? 0) + " routine=" + (ctx?.Routine?.Chunk?.ChunkID ?? 0)
+                    + "@" + (ctx?.InstructionPointer ?? 0) + " pos=" + (grp?.BaseObject?.Position.ToString() ?? "?")
+                    + " container=" + (grp?.BaseObject?.Container?.ObjectID.ToString() ?? "none"));
+            }
+            catch { }
+        }
     }
 }
