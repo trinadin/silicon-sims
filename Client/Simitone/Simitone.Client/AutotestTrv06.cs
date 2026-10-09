@@ -749,8 +749,9 @@ namespace Simitone.Client
                             if (_frames > 420)
                             {
                                 // lawful fallback: drive the return-edge interaction itself
+                                // (_sim is the guid-matched token holder — do NOT reset to avs[0];
+                                // avatar order varies and r11 drove the wrong member)
                                 if (avs.Count == 0) { Check(false, "p91 no family avatars home"); _phase = 99; return false; }
-                                _sim = avs[0];
                                 var plugin = vm.Entities.FirstOrDefault(e => e.Object != null && e.Object.OBJ != null && e.Object.OBJ.GUID == PluginGuid);
                                 VMBHAVOwnerPair tree = plugin != null ? plugin.GetRoutineWithOwner(4104, vm.Context) : null;
                                 if (tree?.routine == null)
