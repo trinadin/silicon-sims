@@ -234,37 +234,29 @@ namespace Simitone.Client
             };
         }
 
-        /// <summary>Direct tree drive through the REAL executor (the petname
-        /// run-24/hdserve idiom: enqueued action, no check routine, permission
-        /// skip). Caller = the family sim (the thread owner); Callee/CodeOwner
-        /// resolve the tree's own IFF.</summary>
+        /// <summary>Deterministic direct tree drive through the REAL executor:
+        /// synchronous RunInMyStack on the family sim's thread (the same
+        /// machinery RunTreeByName Destination=1 uses). Queue-based drives
+        /// proved nondeterministic — the sim's free-will interaction can hold
+        /// the queue indefinitely (runs 5-6). Caller = the sim (the thread
+        /// owner: MyMotives/MyPersonData/op-51 target); StackObject per call;
+        /// CodeOwner carries the routine's own IFF (tuning BCON resolution
+        /// rides the SCOPE RESOURCE, not the callee — VMMemory.GetTuningVariable
+        /// mode-0 reads context.ScopeResource.TuningCache).</summary>
         private bool Drive(VMEntity callee, VMBHAVOwnerPair tree, VMEntity stackObj, string name)
         {
             var vm = Vm;
-            if (vm == null || tree?.routine == null || _sim == null) return false;
-            if (!name.Contains("(probe drive)")) name = name + " (probe drive)";
-            var act = new VMQueuedAction
-            {
-                Callee = callee,
-                StackObject = stackObj,
-                CodeOwner = tree.owner,
-                ActionRoutine = tree.routine,
-                CheckRoutine = null,
-                Flags = TTABFlags.RunImmediately | TTABFlags.FSOSkipPermissions | TTABFlags.AllowVisitors,
-                Flags2 = (TSOFlags)0x1f,
-                Name = name,
-                Args = new short[] { 0, 0, 0, 0 },
-                InteractionNumber = -1,
-                Priority = (short)VMQueuePriority.UserDriven,
-            };
-            _watchUid = 0;
-            _watchDone = false; _watchWhy = "";
-            _sim.Thread.EnqueueAction(act);
-            Log("AUTOTEST trv06 DRIVE '" + name + "' uid=" + _watchUid + " callee=" + (callee?.ObjectID ?? 0)
-                + " stack=" + (stackObj?.ObjectID ?? 0) + " caller(sim)=" + _sim.ObjectID);
+            if (vm == null || tree?.routine == null || _sim == null || stackObj == null) return false;
+            _watchWhy = "";
+            bool ok = false;
+            try { ok = _sim.Thread.RunInMyStack(tree.routine, tree.owner, new short[] { 0, 0, 0, 0 }, stackObj); }
+            catch (Exception re) { _watchWhy = "exc:" + re.GetType().Name; }
+            _watchDone = true;
+            if (_watchWhy == "") _watchWhy = ok ? "sync-true" : "sync-false";
+            Log("AUTOTEST trv06 DRIVE '" + name + "' SYNC on sim=" + _sim.ObjectID + " stack=" + stackObj.ObjectID
+                + " callee-role=" + (callee?.ObjectID ?? 0) + " -> " + _watchWhy);
             return true;
         }
-        private static ushort _uidSeed;
 
         public bool Tick()
         {
@@ -493,7 +485,7 @@ namespace Simitone.Client
                         }
                         return false;
 
-                    case 31: // wait for the 4126-driven spawn
+                    case 31: // the 4126-driven spawn (synchronous drive — settle a tick)
                         {
                             var found = vm.Entities.FirstOrDefault(e => e.Object != null && e.Object.OBJ != null
                                 && e.Object.OBJ.GUID == ScoreCtlGuid);
@@ -510,6 +502,7 @@ namespace Simitone.Client
 
                     case 4: // the tag law + Process Score live
                         {
+                            ArmTrace(); // re-arm now that the controller exists (adds its oid)
                             var g9 = 0; try { g9 = vm.GetGlobalValue(9); } catch { }
                             var tag = _scoreCtl.GetAttribute(6);
                             Check(tag == g9, "p4 tag law: attr[6] == Global[9] (got attr6=" + tag + " g9=" + g9 + ")");
