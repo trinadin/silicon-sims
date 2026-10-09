@@ -782,6 +782,17 @@ namespace Simitone.Client
                                     Log("AUTOTEST trv06 p91 tokens re-stocked (4 souvenirs + score) for the deterministic spawn drive");
                                 }
                                 catch (Exception re9) { Log("AUTOTEST trv06 p91 restock EXC " + re9.GetType().Name); }
+                                // Visit-flag law (Souvenirs.iff 'main' 4096 ins2: Global[20]
+                                // flag 4 — IsFlagSet tests bit 3 — must be set or the spawned
+                                // souvenir SELF-DELETES at ins15; the native's pack travel sets
+                                // the visit bits, the probe's engine-funnel switch does not).
+                                try
+                                {
+                                    var g20 = vm.GetGlobalValue(20);
+                                    vm.SetGlobalValue(20, (short)(g20 | (1 << 3)));
+                                    Log("AUTOTEST trv06 p91 Global[20] visit-flag bit set (vacation): " + g20 + " -> " + vm.GetGlobalValue(20) + " (the souvenir main's persistence gate)");
+                                }
+                                catch (Exception g20e) { Log("AUTOTEST trv06 p91 g20 EXC " + g20e.GetType().Name); }
                                 _createLog.Clear(); _spawnTrace.Clear();
                                 // resolve the three trees on the plugin resource (entity or content fallback)
                                 VMBHAVOwnerPair TreeOf(int id)
