@@ -158,6 +158,19 @@ namespace Simitone.Client
                 if (strip.Position != new Vector2(0, 52) + board)
                 { log("uidtbar: strip pos " + strip.Position); return false; }
 
+                // (a2) UI-38b probe setup (DISCLOSED, the trv06 restock idiom):
+                // reset the persisted filter to the 0x10 DEFAULT (a probe
+                // choice — the SHIPPED slot value is '4', a Gardening save,
+                // which would legitimately override the entry default and
+                // invalidate the mode-0 entry assertions below) and re-drive
+                // the default through the real law path. The restore law
+                // itself is asserted by the (g)/(h) legs and the restore log
+                // on later entries.
+                var nbhdR = FSO.Content.Content.Get().Neighborhood;
+                Simitone.Client.UI.Panels.ULFilterLaws.SavePersistedFilterCmd(
+                    System.IO.Path.Combine(nbhdR.UserPath, "LotLocations.iff"), 0x10);
+                sw.ProcessULFilterByType(0x10);
+
                 // (b) the seven buttons: engine members, ladder anchors
                 // (strip-local y=20 -> artboard 72), 50x52 cells, labels.
                 var law = Simitone.Client.UI.Panels.UINeighbourhoodSwitcher.ULFilterLaw;
@@ -177,12 +190,24 @@ namespace Simitone.Client
                 }
 
                 // (c) the Init default: filter 0x10 (DogCat) pressed, plaque
-                // 4934 mounted, engine mode 0, community lots BLUE.
-                if (sw.ULFilterCmdId != ULDefaultFilterCmd || sw.ULFilterEngineMode != 0
-                    || sw.ULFilterPlaqueMember != ULPlaqueMembers[0])
-                { log("uidtbar: default filter cmd=" + sw.ULFilterCmdId + " mode=" + sw.ULFilterEngineMode + " plaque=" + sw.ULFilterPlaqueMember); return false; }
-                if (!sw.ULFilterButtons[0].Selected || sw.ULFilterButtons.Skip(1).Any(x => x.Selected))
-                { log("uidtbar: default selection state wrong"); return false; }
+                // 4934 mounted, engine mode 0, community lots BLUE. UI-38b LAW 2
+                // second block: the PERSISTED filter (STR#6 slot 3) then
+                // overrides the default — expect 0x10 exactly when nothing
+                // valid is persisted (the shipped files carry '16' = default).
+                var nbhd0 = FSO.Content.Content.Get().Neighborhood;
+                // fresh-file read (the disk truth; the cached provider instance
+                // only equals it at session load — the probe mutates mid-run)
+                var persisted0 = Simitone.Client.UI.Panels.ULFilterLaws.LoadPersistedFilterCmd(
+                    new FSO.Files.Formats.IFF.IffFile(System.IO.Path.Combine(nbhd0.UserPath, "LotLocations.iff")));
+                var expectedCmd = persisted0 > 0 ? persisted0 : ULDefaultFilterCmd;
+                var expectedIdx = System.Array.IndexOf(ULCmdBits, expectedCmd);
+                if (expectedIdx < 0)
+                { log("uidtbar: persisted cmd 0x" + expectedCmd.ToString("x") + " is not a filter bit"); return false; }
+                if (sw.ULFilterCmdId != expectedCmd || sw.ULFilterEngineMode != ULModes[expectedIdx]
+                    || sw.ULFilterPlaqueMember != ULPlaqueMembers[expectedIdx])
+                { log("uidtbar: default filter cmd=" + sw.ULFilterCmdId + " mode=" + sw.ULFilterEngineMode + " plaque=" + sw.ULFilterPlaqueMember + " (expected persisted-or-default 0x" + expectedCmd.ToString("x") + ")"); return false; }
+                if (!sw.ULFilterButtons[expectedIdx].Selected || sw.ULFilterButtons.Where((x, i) => i != expectedIdx).Any(x => x.Selected))
+                { log("uidtbar: default selection state wrong (expected pressed idx=" + expectedIdx + ")"); return false; }
                 var lots = panel.LotButtonsForProbe;
                 if (lots.Count == 0) { log("uidtbar: no lot buttons on panel"); return false; }
                 var neigh = FSO.Content.Content.Get().Neighborhood;
@@ -236,6 +261,15 @@ namespace Simitone.Client
                     if (lots[h].ULFilterTintForProbe != ULDisabledColor)
                     { log("uidtbar: occupied lot " + h + " not red under mode 3"); return false; }
 
+                // (f0) UI-38b review P1: SNAPSHOT the production census NOW —
+                // before the (f) demo leg seeds and resets communityLots[0]'s
+                // bits (the original census leg read the clobbered 0 and
+                // pinned it: 58 is really 0x46).
+                var censusSnapshot = new System.Collections.Generic.Dictionary<int, int>();
+                foreach (var kv in lots)
+                    if (communityLots.Contains(kv.Key))
+                        censusSnapshot[kv.Key] = kv.Value.ULFilterCategoryBits;
+
                 // (f) the plaque gate + anchor: a lot with the category bit
                 // carries the plaque member; the anchor law is the static pin.
                 int demo = communityLots[0];
@@ -251,6 +285,54 @@ namespace Simitone.Client
                     ?.Get(FSO.Client.GameFacade.GraphicsDevice);
                 if (plaqueTex == null || plaqueTex.Width != ULPlaqueWidth || plaqueTex.Height != ULPlaqueHeight)
                 { log("uidtbar: plaque art missing or wrong dims"); return false; }
+
+                // ==== 3. UI-38b production legs (the two unbanked laws) ====
+                // (g) LAW 1 — the production category bits: the census computed
+                // from the lots' own house files. The shipped n=1 ground truth:
+                // House54 -> 0x04 (Gardening: seeds + garden controller), House58
+                // -> 0x40 (Recreation: basketball), House72 -> 0x04; every other
+                // community lot 0. Assert the LIVE bits field (the census ran at
+                // button build — no probe seeding).
+                var censusDump = new System.Text.StringBuilder();
+                foreach (var kv in censusSnapshot)
+                    censusDump.Append(kv.Key).Append("=0x").Append(kv.Value.ToString("x")).Append(' ');
+                log("uidtbar: production census lots: " + censusDump.ToString());
+                // the pinned ground truth — the LIVE census of the shipped n=1
+                // community-mode lots, snapshotted BEFORE any probe seeding
+                // (review P1): 58 = the basketball/cafe/garden lot (0x46),
+                // 70 = the big multi-venue lot (0x7c), 72 = the garden store:
+                var expectBits = new System.Collections.Generic.Dictionary<int, int>
+                { { 58, 0x46 }, { 61, 0x6e }, { 70, 0x7c }, { 71, 0x2e }, { 72, 0x04 }, { 73, 0x46 }, { 74, 0x26 }, { 75, 0x2e } };
+                foreach (var kv in censusSnapshot)
+                {
+                    int want;
+                    if (!expectBits.TryGetValue(kv.Key, out want)) want = 0;
+                    if (kv.Value != want)
+                    { log("uidtbar: census lot " + kv.Key + " = 0x" + kv.Value.ToString("x") + " expected 0x" + want.ToString("x")); return false; }
+                }
+                log("uidtbar: PRODUCTION CENSUS VERIFIED (58=0x46 61=0x6e 70=0x7c 71=0x2e 72=0x04 73=0x46 74=0x26 75=0x2e)");
+
+                // and the production PLAQUE follows the census (Gardening on a
+                // garden lot needs no probe bits):
+                sw.ProcessULFilterByType(0x04);
+                var gardenLot = communityLots.First(h => lots[h].ULFilterCategoryBits == 0x04);
+                if (lots[gardenLot].ULPlaqueMember != ULPlaqueMembers[3])
+                { log("uidtbar: production plaque not mounted on the garden lot"); return false; }
+
+                // (h) LAW 2 — persistence (LoadCurrentFilter STR#6 slot 3):
+                // the click above (0x04) must have written the file; read it
+                // back through a FRESH IffFile (disk round-trip, not the cached
+                // instance) and assert the slot.
+                var nbhd = FSO.Content.Content.Get().Neighborhood;
+                var llPath = System.IO.Path.Combine(nbhd.UserPath, "LotLocations.iff");
+                var persisted = Simitone.Client.UI.Panels.ULFilterLaws.LoadPersistedFilterCmd(
+                    new FSO.Files.Formats.IFF.IffFile(llPath));
+                if (persisted != 0x04)
+                { log("uidtbar: persisted filter wrong after click (got " + persisted + ")"); return false; }
+                // and the loader API reads the same file the native would:
+                if (Simitone.Client.UI.Panels.ULFilterLaws.LoadPersistedFilterCmd(nbhd.LotLocations) != 0x04)
+                { log("uidtbar: cached-provider load mismatch"); return false; }
+                log("uidtbar: FILTER PERSISTENCE VERIFIED (STR#6 slot 3 round-trip = 0x04)");
 
                 return true;
             }

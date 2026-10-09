@@ -358,6 +358,22 @@ namespace Simitone.Client.UI.Panels
                 button.Position = new Vector2(int.Parse(loc[1].TrimStart()), int.Parse(loc[2].TrimStart()));
                 button.HoverNotify = (n, b, state) => ShowLotPopup(n, b, state);
                 button.HoverLeave = HideLotPopup;
+                // UI-38b LAW 1 (production): the per-lot category bits from the
+                // lot's own house-file object census (the native lot+0x1ac port
+                // representation — ULFilterLaws' class comment carries the law +
+                // the disclosure). Scoped to the community mode: only its
+                // filter bar consumes the bits (review P3 — the parse is a
+                // full house-IFF read, ~29MB across all modes' lots).
+                if (mode == 4) // the UL community view (the filter bar's mode)
+                {
+                    try
+                    {
+                        var houseIff = new FSO.Files.Formats.IFF.IffFile(
+                            Content.Get().Neighborhood.GetHousePath((short)num));
+                        button.ULFilterCategoryBits = ULFilterLaws.ComputeCategoryBits(houseIff);
+                    }
+                    catch { }
+                }
                 HousePositions[num] = button.Position;
                 LotButtonByHouse[num] = button;
                 buttons.Add(button);
@@ -1583,12 +1599,11 @@ namespace Simitone.Client.UI.Panels
         public static readonly Color ULImportTint = new Color(242, 255, 29);
         private Color? _ulFilterTint;
         private Texture2D _ulHiliteTex;
-        // UI-38: the per-lot filter CATEGORY BITS (native lot+0x1ac — the
-        // plaque/match gate `(filterId & bits) != 0`, DrawFilterAt callers
-        // 0x45ac40/0x45b06c). The native writer was not located (no direct
-        // stw; computed/stwx) — production lots carry 0 bits (no plaque)
-        // until the source is decoded; the probe drives the machinery via
-        // this field (DISCLOSED).
+        // UI-38/UI-38b: the per-lot filter CATEGORY BITS (native lot+0x1ac —
+        // the plaque/match gate `(filterId & bits) != 0`, DrawFilterAt callers
+        // 0x45ac40/0x45b06c). PRODUCTION source since UI-38b: the house-file
+        // object census (ULFilterLaws.ComputeCategoryBits — the port
+        // representation of the unlocated native writer; disclosure there).
         public int ULFilterCategoryBits;
         // UI-38 (DrawFilterAt @0x1045a340): the active plaque member for
         // THIS lot; drawn at (Position.x - 24, Position.y - 70) — the lot's
