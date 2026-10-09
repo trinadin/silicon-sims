@@ -175,7 +175,10 @@ namespace FSO.SimAntics.Engine
             // DogGlobals/PetSitGlobals routine space) under the same armed-only
             // ShowTrees flag — the ulpets brain audit traces the pet main loop
             // (8194/8222), the motive scans and the idles. Inert in play.
-            if (!((AutotestTraceShowTrees && ((tid >= 4096 && tid <= 4113) || tid == 4211 || (tid >= 8192 && tid <= 8370)))
+            // trv06 residual lane: ShowTrees also admits the full 4096..4129
+            // Vacation/souvenir band and global 313 'do the drop' — the carry-home
+            // persistence trace needs the drop chain's executed path. Inert in play.
+            if (!((AutotestTraceShowTrees && ((tid >= 4096 && tid <= 4129) || tid == 4211 || tid == 313 || (tid >= 8192 && tid <= 8370)))
                 || ((tid == 4100 || tid == 280 || tid == 281 || tid == 4103)
                     && Stack.Any(f => (f.Routine?.Chunk?.ChunkID ?? 0) == 4100))
                 || ((tid == 366 || tid == 280)

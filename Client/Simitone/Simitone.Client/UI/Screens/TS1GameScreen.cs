@@ -15,6 +15,7 @@ using FSO.HIT;
 using FSO.LotView;
 using FSO.LotView.Model;
 using FSO.SimAntics;
+using FSO.SimAntics.Engine;
 using FSO.SimAntics.Engine.TSOTransaction;
 using FSO.SimAntics.Marshals;
 using FSO.SimAntics.Model;
@@ -44,6 +45,10 @@ namespace Simitone.Client.UI.Screens
         public UIContainer WindowContainer;
         public bool Downtown;
         public bool Desktop = !FSOEnvironment.SoftwareKeyboard;
+        // TRV-06 residual lane: set at the vacation-return edge, consumed in
+        // Update once the home lot's family avatars are live (the native
+        // carry-home push representation — see TryPushVacationCarryHome).
+        private bool PendingVacationCarryHome;
 
         public UILotControl LotControl { get; set; }
         public UIOriginalCameraOverlay CameraOverlay { get; set; }
@@ -689,6 +694,17 @@ namespace Simitone.Client.UI.Screens
                         {
                             ActiveFamily.VacationHouseNumber = 0;
                             Content.Get().Neighborhood.SaveNeighbourhood(false);
+                            // TRV-06 residual lane: the carry-home law. The native return
+                            // (RemoveFromVacation 0x100a83e0) broadcasts to the ObjectModule,
+                            // through which the 'Spawn Vacation Purchases' umbrella runs as a
+                            // REAL queued interaction per token-carrying member (proven by the
+                            // tree itself: 4104 ins1 op-50 change_action_string needs a queue
+                            // item; 'do the drop' 313 ins8 goto_routing_slot needs a walkable
+                            // thread — both impossible in check-context sync drives, which is
+                            // why probe-driven spawns destructively unwound at 313@31). The
+                            // port's representation of the native push: a deferred flag
+                            // consumed once the home lot's family avatars are live.
+                            PendingVacationCarryHome = true;
                         }
                     }
                     catch (Exception tripEx)
@@ -713,7 +729,90 @@ namespace Simitone.Client.UI.Screens
             //vm.Context.Clock.Hours = 12;
             if (vm != null) vm.Update();
 
+            // TRV-06 residual lane: the deferred carry-home push — once the home
+            // lot is live and the family avatars materialized, enqueue the real
+            // 'Spawn Vacation Purchases' interaction on each token-carrying member.
+            if (PendingVacationCarryHome && vm != null && ActiveFamily != null && !Downtown)
+            {
+                var famGuids = new HashSet<uint>(ActiveFamily.FamilyGUIDs ?? new uint[0]);
+                var members = vm.Context.ObjectQueries.Avatars
+                    .Where(a => a != null && a.Object?.OBJ != null && famGuids.Contains(a.Object.OBJ.GUID))
+                    .ToList();
+                if (members.Count > 0)
+                {
+                    PendingVacationCarryHome = false;
+                    TryPushVacationCarryHome(members);
+                }
+            }
+
             //SaveHouseButton_OnButtonClick(null);
+        }
+
+        /// <summary>
+        /// TRV-06 residual lane: enqueue the plugin's 'Spawn Vacation Purchases'
+        /// umbrella (VacationPhonePlugin 4104) as a REAL queued action on every
+        /// member whose inventory carries purchase tokens (type-5 base or type-6
+        /// variant). The interaction's own FindToken gates decide which spawn
+        /// trees run (vacation souvenirs; the other packs' spawns are Global[20]
+        /// flag-gated inside 4104). CheckRoutine is deliberately null: the engine
+        /// push already knows purchases exist — the TTAB TEST (4119) gates
+        /// pie-menu availability, not engine-initiated returns. Review note: the
+        /// deferred flag is memory-only — a quit between the return edge and
+        /// avatar materialization loses that return's push (tokens survive in
+        /// inventory; the next vacation return re-runs the umbrella), and the
+        /// flag can survive a Downtown detour to fire on the next home entry.
+        /// </summary>
+        private void TryPushVacationCarryHome(List<VMEntity> members)
+        {
+            try
+            {
+                var plugin = vm.Entities.FirstOrDefault(e => e?.Object?.OBJ != null && e.Object.OBJ.GUID == 0xABA9DF4Au);
+                if (plugin == null)
+                {
+                    // review P3: never enqueue with a null Callee — a saved action with a
+                    // dead callee NREs the TS1 activator's queue-name recovery at load.
+                    GameLog.Write("trv06 carry-home: phone plugin entity not on lot — push skipped");
+                    return;
+                }
+                var tree = plugin.GetRoutineWithOwner(4104, vm.Context);
+                if (tree?.routine == null)
+                {
+                    var owner = Content.Get().WorldObjects.Get(0xABA9DF4Au);
+                    var routine = owner?.Resource?.GetRoutine(4104) as VMRoutine;
+                    if (routine != null && owner != null) tree = new VMBHAVOwnerPair(routine, owner);
+                }
+                if (tree?.routine == null)
+                {
+                    GameLog.Write("trv06 carry-home: plugin routine 4104 unresolved — push skipped");
+                    return;
+                }
+                var pushed = 0;
+                foreach (var memberEnt in members)
+                {
+                    var member = memberEnt as VMAvatar;
+                    if (member == null) continue;
+                    var nid = member.GetPersonData(VMPersonDataVariable.NeighborId);
+                    var inv = Content.Get().Neighborhood.GetInventoryByNID(nid);
+                    if (inv == null || !inv.Any(x => x.Type == 5 || x.Type == 6)) continue;
+                    var action = new VMQueuedAction
+                    {
+                        Callee = plugin,
+                        IconOwner = plugin,
+                        CodeOwner = tree.owner,
+                        ActionRoutine = (VMRoutine)tree.routine,
+                        StackObject = member,
+                        Name = "Spawn Vacation Purchases",
+                        Priority = (short)VMQueuePriority.Maximum
+                    };
+                    action.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                    member.Thread.EnqueueAction(action);
+                    pushed++;
+                }
+            }
+            catch (Exception carryEx)
+            {
+                GameLog.Write("trv06 carry-home push failed: " + carryEx.GetType().Name + " " + carryEx.Message);
+            }
         }
 
         private void UpdateWeatherEffects()

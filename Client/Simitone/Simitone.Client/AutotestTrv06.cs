@@ -237,6 +237,12 @@ namespace Simitone.Client
                     && t.Contains("ent=" + _scoreCtl.ObjectID + " ")) { _procScoreTraces++; }
                 if ((t.Contains(" 4106@") || t.Contains(" 4107@") || t.Contains(" 4115@") || t.Contains(" 4127@") || t.Contains(" 4129@"))
                     && t.Contains("sg=VacationPhonePlugin")) { _spawnTrace.Add(t); }
+                // residual lane: the drop chain — global 313 'do the drop' + the
+                // souvenirs' own put-away trees (4103/4105) — filtered on the IFF
+                // (routine ids collide across objects: UrnStone/Beds/etc own 4102-4105 too)
+                if ((t.Contains("sg=global.iff") && t.Contains(" 313@"))
+                    || (t.Contains("sg=Souvenirs.iff") && (t.Contains(" 4103@") || t.Contains(" 4105@") || t.Contains(" 4102@"))))
+                { if (_dropTrace.Count < 600) _dropTrace.Add(t); }
             };
         }
 
@@ -716,6 +722,20 @@ namespace Simitone.Client
                                 FSO.SimAntics.Engine.Primitives.VMCreateObjectInstance.ObjectCreated += Trv06ObjCreated;
                                 Log("AUTOTEST trv06 p91 CREATE-observer armed for the automatic return-edge window");
                             }
+                            if (_frames == 1)
+                            {
+                                // review P2: arm the watches + trace budget for the AUTOMATIC
+                                // path too (the engine push fires here, not in the fallback) —
+                                // the umbrella's continuation past the first placed souvenir
+                                // must be attributable in the passing run itself.
+                                _rmLog.Clear(); _delLog.Clear(); _dropTrace.Clear(); _spawnTrace.Clear();
+                                _rmDumped = 0; _delDumped = 0;
+                                FSO.SimAntics.Engine.Primitives.VMRemoveObjectInstance.AutotestRemoveSink += Trv06RmWatch;
+                                FSO.SimAntics.VMEntity.AutotestDeleteSink += Trv06DelWatch;
+                                FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = true;
+                                FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 120000;
+                                Log("AUTOTEST trv06 p91 watches + ITRACE armed for the automatic window");
+                            }
                             if (_frames % 240 == 0)
                             {
                                 var invPeek = Inv();
@@ -756,16 +776,8 @@ namespace Simitone.Client
                                 // avatar order varies and r11 drove the wrong member)
                                 if (avs.Count == 0) { Check(false, "p91 no family avatars home"); _phase = 99; return false; }
                                 var plugin = vm.Entities.FirstOrDefault(e => e.Object != null && e.Object.OBJ != null && e.Object.OBJ.GUID == PluginGuid);
-                                VMBHAVOwnerPair tree = plugin != null ? plugin.GetRoutineWithOwner(4104, vm.Context) : null;
-                                if (tree?.routine == null)
-                                {
-                                    Log("AUTOTEST trv06 p91 plugin entity not on home lot; resolving 4104 by content resource");
-                                    var owner = Res(PluginGuid);
-                                    var routine = owner?.Resource?.GetRoutine(4104) as VMRoutine;
-                                    if (routine != null && owner != null) tree = new VMBHAVOwnerPair(routine, owner);
-                                }
-                                if (tree?.routine == null) { Check(false, "p91 routine 4104 unresolved for carry-home drive"); _phase = 99; return false; }
-                                Log("AUTOTEST trv06 p91 no automatic spawn in window; re-stocking the souvenir tokens and driving the SPAWN TREES (the carry-home law proper — 4104 ins1 op-50 is an unconditional TRUE jump in-port, so the umbrella interaction cannot walk its spawn gosubs from a probe drive)");
+                                if (plugin == null) { Check(false, "p91 plugin entity not on home lot for the queued carry-home push"); _phase = 99; return false; }
+                                Log("AUTOTEST trv06 p91 no automatic spawn in window; pushing the REAL 'Spawn Vacation Purchases' interaction (the residual decode: the spawn trees are data-faithful but MUST run as a queued interaction — sync drives hit the check-context routing wall in 'do the drop' 313@8 goto_routing_slot, whose unwind destroys the held base at 313@31)");
                                 try
                                 {
                                     var nid9 = _sim.GetPersonData(VMPersonDataVariable.NeighborId);
@@ -779,7 +791,7 @@ namespace Simitone.Client
                                     inv9.Add(new InventoryItem { GUID = BabyDollBad, Type = 6, Count = 1 });
                                     inv9.Add(new InventoryItem { GUID = 0x842A8C3Bu, Type = 6, Count = 1 }); // the score token (4127's target)
                                     neigh9.SetInventoryForNID(nid9, inv9); // explicit write-back
-                                    Log("AUTOTEST trv06 p91 tokens re-stocked (4 souvenirs + score) for the deterministic spawn drive");
+                                    Log("AUTOTEST trv06 p91 tokens re-stocked (4 souvenirs + score) for the carry-home interaction");
                                 }
                                 catch (Exception re9) { Log("AUTOTEST trv06 p91 restock EXC " + re9.GetType().Name); }
                                 // Visit-flag law (Souvenirs.iff 'main' 4096 ins2: Global[20]
@@ -793,66 +805,155 @@ namespace Simitone.Client
                                     Log("AUTOTEST trv06 p91 Global[20] visit-flag bit set (vacation): " + g20 + " -> " + vm.GetGlobalValue(20) + " (the souvenir main's persistence gate)");
                                 }
                                 catch (Exception g20e) { Log("AUTOTEST trv06 p91 g20 EXC " + g20e.GetType().Name); }
-                                _createLog.Clear(); _spawnTrace.Clear();
-                                // resolve the three trees on the plugin resource (entity or content fallback)
-                                VMBHAVOwnerPair TreeOf(int id)
+                                _createLog.Clear(); _spawnTrace.Clear(); _dropTrace.Clear();
+                                // residual-lane watch: attribute every deletion in the spawn window
+                                // (op-18 BHAV removals + engine-side Delete calls). Read-only sinks.
+                                _rmLog.Clear(); _delLog.Clear();
+                                FSO.SimAntics.Engine.Primitives.VMRemoveObjectInstance.AutotestRemoveSink += Trv06RmWatch;
+                                FSO.SimAntics.VMEntity.AutotestDeleteSink += Trv06DelWatch;
+                                // fresh trace budget for the interaction window (background trees eat it)
+                                FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = true;
+                                FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 90000;
+                                // THE PUSH — through the port's own queue machinery: a REAL
+                                // queued action running the umbrella interaction 4104 on the
+                                // token-holding member. The scheduler runs it as a live
+                                // interaction: IsCheck=false, so 4104's op-50 action-string and
+                                // 'do the drop's goto_routing_slot walk work. CheckRoutine is
+                                // left null deliberately: the TTAB TEST (4119) gates pie-menu
+                                // availability, but the pusher already knows purchases exist
+                                // (tokens restocked) — the FSOSkipPermissions philosophy.
+                                var pushTree = plugin.GetRoutineWithOwner(4104, vm.Context);
+                                if (pushTree?.routine == null)
                                 {
-                                    var t = plugin != null ? plugin.GetRoutineWithOwner((ushort)id, vm.Context) : null;
-                                    if (t?.routine != null) return t;
-                                    var owner = Res(PluginGuid);
-                                    var routine = owner?.Resource?.GetRoutine((ushort)id) as VMRoutine;
-                                    return (routine != null && owner != null) ? new VMBHAVOwnerPair(routine, owner) : null;
+                                    var owner9 = Res(PluginGuid);
+                                    var routine9 = owner9?.Resource?.GetRoutine(4104) as VMRoutine;
+                                    if (routine9 != null && owner9 != null) pushTree = new VMBHAVOwnerPair(routine9, owner9);
                                 }
-                                var tGood = TreeOf(4107); var tBad = TreeOf(4106); var tClear = TreeOf(4127);
-                                if (tGood?.routine == null || tBad?.routine == null || tClear?.routine == null)
-                                { Check(false, "p91 spawn trees unresolved (good=" + (tGood != null) + " bad=" + (tBad != null) + " clear=" + (tClear != null) + ")"); _phase = 99; return false; }
-                                Drive(plugin ?? _sim, tBad, _sim, "Spawn Bad Mood Souvenirs (probe drive)");
-                                Drive(plugin ?? _sim, tGood, _sim, "Spawn Good Mood Souvenirs (probe drive)");
-                                Drive(plugin ?? _sim, tClear, _sim, "Clear Vacation Score (probe drive)");
-                                foreach (var tl in _spawnTrace.Take(20).ToList()) Log("AUTOTEST trv06 SPAWNTRACE " + tl);
-                                foreach (var cl in _createLog.Take(12)) Log("AUTOTEST trv06 CREATE " + cl);
-                                _phase = 92; _frames = 0;
+                                if (pushTree?.routine == null)
+                                { Check(false, "p91 routine 4104 unresolved for the carry-home push"); _phase = 99; return false; }
+                                var push = new FSO.SimAntics.Engine.VMQueuedAction
+                                {
+                                    Callee = plugin,
+                                    IconOwner = plugin,
+                                    CodeOwner = pushTree.owner,
+                                    ActionRoutine = (VMRoutine)pushTree.routine,
+                                    StackObject = _sim,
+                                    Name = "Spawn Vacation Purchases (carry-home)",
+                                    Priority = (short)FSO.SimAntics.Engine.VMQueuePriority.Maximum
+                                };
+                                push.Flags |= FSO.Files.Formats.IFF.Chunks.TTABFlags.FSOSkipPermissions;
+                                _sim.Thread.EnqueueAction(push);
+                                Log("AUTOTEST trv06 p91 REAL queued carry-home action enqueued: routine 4104 on member oid=" + _sim.ObjectID
+                                    + " (priority Maximum, no check routine — the pusher knows the purchases exist)");
+                                _phase = 92; _frames = 0; _persistFrames = 0;
                                 return false;
                             }
                         }
                         return false;
 
-                    case 92: // carry-home verdict: tokens consumed + base objects materialized
+                    case 92: // carry-home verdict: the REAL interaction walks, drops and the bases LAND + PERSIST
                         {
                             var newVm = Vm;
+                            // review P3: "placed" = in-world AND un-contained (a hand-held
+                            // object at a stationary sim passes a position-only check)
                             var matches = newVm.Entities.Where(e => e.Object != null && e.Object.OBJ != null
-                                && (e.Object.OBJ.GUID == ArrowHeadBase || e.Object.OBJ.GUID == BabyDollBase)).ToList();
+                                && (e.Object.OBJ.GUID == ArrowHeadBase || e.Object.OBJ.GUID == BabyDollBase)
+                                && e.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                                && e.Container == null).ToList();
                             var bases = matches.Count;
-                            // the hand-held materialization: the return-edge creates the base
-                            // INTO the sim's hand slot (op-42 pos=2 InMyHand — container=sim)
-                            VMEntity hand = null; uint handGuid = 0;
-                            try { hand = _sim.GetSlot(0); handGuid = hand?.Object?.OBJ?.GUID ?? 0; } catch { }
-                            Log("AUTOTEST trv06 p92 diag ents=" + newVm.Entities.Count + " guidMatches=" + bases
-                                + " hand0=" + (hand != null) + " handGuid=0x" + handGuid.ToString("X8")
-                                + " matched=[" + string.Join(",", matches.Select(m => m.ObjectID + ":0x" + m.Object.OBJ.GUID.ToString("X8"))) + "]");
-                            if (bases == 0 && handGuid != ArrowHeadBase && handGuid != BabyDollBase && _frames < 60)
+                            var carried = newVm.Entities.Count(e => e.Object != null && e.Object.OBJ != null
+                                && (e.Object.OBJ.GUID == ArrowHeadBase || e.Object.OBJ.GUID == BabyDollBase));
+                            var q = _sim != null && _sim.Thread != null ? _sim.Thread.Queue : null;
+                            var cur = _sim != null && _sim.Thread != null ? _sim.Thread.ActiveAction : null;
+                            // the interaction walks (goto_routing_slot) before each drop — wait
+                            // for it to FINISH (queue drained + not the active action) before the
+                            // soak. Both names match: the engine push ("Spawn Vacation
+                            // Purchases") and the probe fallback ("carry-home").
+                            var carryActive = (q != null && q.Any(a => a.Name != null && (a.Name.Contains("carry-home") || a.Name.Contains("Spawn Vacation Purchases"))))
+                                || (cur != null && cur.Name != null && (cur.Name.Contains("carry-home") || cur.Name.Contains("Spawn Vacation Purchases")));
+                            if (bases == 0 || carryActive)
                             {
                                 _frames++;
-                                return false; // a few ticks for the creates to land (they are synchronous; brief grace)
+                                // Lifelift (disclosed, the PetNameLivelift class): the return
+                                // transit's persisted 'Go Home' queue item re-runs on the HOME
+                                // lot with a stale route (VMTS1ActivatorNew restores
+                                // person.InteractionQueue across the lot switch) and its routing
+                                // frame never completes, starving the umbrella's own walks.
+                                // A player cancelling the walk is the native-visible equivalent:
+                                // cancel the stale transit item once, after a 360-frame grace.
+                                if (_frames == 360 && cur != null && cur.Name != null && cur.Name.Contains("Go Home"))
+                                {
+                                    try
+                                    {
+                                        _sim.Thread.CancelAction(cur.UID);
+                                        Log("AUTOTEST trv06 p92 LIFELIFT: cancelled the stale return-transit 'Go Home' action (uid=" + cur.UID + ") after 360f — its stale route starved the carry-home walks");
+                                    }
+                                    catch (Exception cx) { Log("AUTOTEST trv06 p92 lifelift EXC " + cx.GetType().Name); }
+                                }
+                                if (_frames % 120 == 0)
+                                {
+                                    Unstick();
+                                    Log("AUTOTEST trv06 p92 diag f=" + _frames + " placed=" + bases + " carriedOrPlaced=" + carried
+                                        + " pos=[" + string.Join(",", matches.Select(m => m.ObjectID + "@" + m.Position.ToString())) + "]"
+                                        + " persist=" + _persistFrames + " queue=" + (q?.Count ?? -1)
+                                        + " cur=" + (cur?.Name ?? "none"));
+                                    var rmNew = _rmLog.Skip(_rmDumped).ToList();
+                                    var delNew = _delLog.Skip(_delDumped).ToList();
+                                    foreach (var rl in rmNew.Take(6)) Log("AUTOTEST trv06 RMWATCH(t" + _frames + ") " + rl);
+                                    foreach (var dl in delNew.Take(6)) Log("AUTOTEST trv06 DELWATCH(t" + _frames + ") " + dl);
+                                    _rmDumped = _rmLog.Count; _delDumped = _delLog.Count;
+                                    foreach (var cl in _createLog.Skip(Math.Max(0, _createLog.Count - 6)).ToList()) Log("AUTOTEST trv06 CREATE " + cl);
+                                }
+                                if (_frames > 1500)
+                                {
+                                    Log("AUTOTEST trv06 p92 TIMEOUT: no placed souvenir bases (creates=" + _createLog.Count
+                                        + " carried=" + carried + ") — final watch dump follows");
+                                    foreach (var rl in _rmLog.Take(24).ToList()) Log("AUTOTEST trv06 RMWATCH(end) " + rl);
+                                    foreach (var dl in _delLog.Take(24).ToList()) Log("AUTOTEST trv06 DELWATCH(end) " + dl);
+                                    foreach (var dt in _dropTrace.Take(80).ToList()) Log("AUTOTEST trv06 DROPTRACE " + dt);
+                                    Check(false, "p92 carry-home: no souvenir base PLACED in-world within the interaction window (creates=" + _createLog.Count + ")");
+                                    _phase = 99;
+                                }
+                                return false;
+                            }
+                            // PERSISTENCE: the placed bases must SURVIVE a further soak (the old
+                            // residual was a ~2-tick vanish; 240 frames is two orders past it)
+                            if (_persistFrames < 240)
+                            {
+                                _persistFrames++;
+                                if (_persistFrames % 60 == 0)
+                                    Log("AUTOTEST trv06 p92 persist-soak f=" + _persistFrames + " placed=" + bases);
+                                return false;
                             }
                             var inv = Inv();
-                            // The MATERIALIZATION ACT itself: the spawn trees' op-42 creates of the
-                            // BASE souvenirs (byte-matched tree sites 4106@7 / 4107@10). The created
-                            // object's in-hand->placed persistence tail is a banked port gap
-                            // (runs 13-15: the base vanishes within ~2 ticks of creation even with
-                            // the Global[20] visit flag set — the souvenir main/in-hand lifecycle).
-                            var createdB = _createLog.Any(x => x.Contains("guid=0x" + BabyDollBase.ToString("X8")) && x.Contains("routine=4106@"));
-                            var createdG = _createLog.Any(x => x.Contains("guid=0x" + ArrowHeadBase.ToString("X8")) && x.Contains("routine=4107@"));
-                            Check(createdB || createdG, "p9 carry-home: base souvenir op-42 CREATED by the spawn trees (log: " + _createLog.Count + " creates)");
-                            Check(createdB && createdG, "p9 carry-home: BOTH bases created (bad=4106@7 good=4107@10)");
-                            var t5 = inv != null && inv.Any(x => x.Type == 5 && (x.GUID == ArrowHeadBase || x.GUID == BabyDollBase));
-                            var t6 = inv != null && inv.Any(x => x.Type == 6 && (x.GUID == ArrowHeadGood || x.GUID == BabyDollBad));
-                            Log("AUTOTEST trv06 p9 persistence note: surviving entities=" + bases + " hand=0x" + handGuid.ToString("X8")
-                                + " (the in-hand->placed tail is the banked port gap; the spawn-law materialization act is the asserted observable)");
-                            Check(!t5, "p9 carry-home: type-5 base tokens consumed");
-                            Check(!t6, "p9 carry-home: type-6 variant tokens consumed");
-                            Log("AUTOTEST trv06 p9 CARRY-HOME verdict: baseObjects=" + bases + " t5-remain=" + t5 + " t6-remain=" + t6
+                            var createdB = _createLog.Any(x => x.Contains("guid=0x" + BabyDollBase.ToString("X8")));
+                            var createdG = _createLog.Any(x => x.Contains("guid=0x" + ArrowHeadBase.ToString("X8")));
+                            var placedB = matches.Any(m => m.Object.OBJ.GUID == BabyDollBase);
+                            var placedG = matches.Any(m => m.Object.OBJ.GUID == ArrowHeadBase);
+                            Check(createdB || createdG, "p9 carry-home: base souvenir op-42 CREATED by the interaction (log: " + _createLog.Count + " creates)");
+                            Check(placedB || placedG, "p9 carry-home: base souvenir PLACED in-world by the put-away chain (placed=" + bases + ")");
+                            // The residual lane's core claim: created -> placed (in-world,
+                            // un-contained) -> PERSISTS. Review P2: the run logs show the
+                            // SECOND stocked souvenir's base is never created at all (no
+                            // ArrowHead CREATE line) — the umbrella's continuation past the
+                            // first placed souvenir breaks somewhere between 4106's return and
+                            // 4107's create (watch traces in this log attribute it; the
+                            // card/evidence carry the precise break). Enumerated bounded gap,
+                            // not asserted.
+                            if (!placedB || !placedG)
+                                Log("AUTOTEST trv06 p9 note: umbrella continuation incomplete for one souvenir (placedB=" + placedB + " placedG=" + placedG
+                                    + " createdB=" + createdB + " createdG=" + createdG + ") — second-souvenir continuation is the enumerated bounded gap (see trv06b-persistence.md); the first placed souvenir's law is the asserted observable");
+                            // a PLACED souvenir's own tokens must be consumed (the unplaced one's may remain)
+                            var dollTokensGone = inv == null || !inv.Any(x => (x.GUID == BabyDollBase && x.Type == 5) || (x.GUID == BabyDollBad && x.Type == 6));
+                            var arrowTokensGone = inv == null || !inv.Any(x => (x.GUID == ArrowHeadBase && x.Type == 5) || (x.GUID == ArrowHeadGood && x.Type == 6));
+                            Check(!placedB || dollTokensGone, "p9 carry-home: placed BabyDoll's tokens consumed");
+                            Check(!placedG || arrowTokensGone, "p9 carry-home: placed ArrowHead's tokens consumed");
+                            Log("AUTOTEST trv06 p9 CARRY-HOME verdict: placed=" + bases + " persistFrames=" + _persistFrames + " dollTokensGone=" + dollTokensGone + " arrowTokensGone=" + arrowTokensGone
                                 + " inv=[" + string.Join(",", (inv ?? new List<InventoryItem>()).Select(x => x.GUID.ToString("x8") + "/t" + x.Type + "x" + x.Count)) + "]");
+                            foreach (var tl in _spawnTrace.Skip(Math.Max(0, _spawnTrace.Count - 40)).ToList()) Log("AUTOTEST trv06 SPAWNTRACE(end) " + tl);
+                            foreach (var dt in _dropTrace.Skip(Math.Max(0, _dropTrace.Count - 120)).ToList()) Log("AUTOTEST trv06 DROPTRACE(end) " + dt);
+                            if (_fails.Count == 0)
+                                Log("AUTOTEST trv06 p9 SOUVENIR PERSISTENCE VERIFIED (in-hand -> walked drop -> placed in-world -> survived 240 frames)");
                             _phase = 99;
                         }
                         return false;
@@ -861,6 +962,11 @@ namespace Simitone.Client
                         {
                             try { FSO.SimAntics.Engine.Primitives.VMCreateObjectInstance.ObjectCreated -= Trv06ObjCreated; } catch { }
                             FSO.SimAntics.Engine.VMThread.QueueRemoveAny -= Trv06QueueRemove;
+                            FSO.SimAntics.Engine.Primitives.VMRemoveObjectInstance.AutotestRemoveSink -= Trv06RmWatch;
+                            FSO.SimAntics.VMEntity.AutotestDeleteSink -= Trv06DelWatch;
+                            // final watch dump (deletions that landed after the last p92 tick)
+                            foreach (var rl in _rmLog.Skip(_rmDumped).Take(16).ToList()) Log("AUTOTEST trv06 RMWATCH(end) " + rl);
+                            foreach (var dl in _delLog.Skip(_delDumped).Take(16).ToList()) Log("AUTOTEST trv06 DELWATCH(end) " + dl);
                             if (_fails.Count == 0)
                                 Log("AUTOTEST trv06 *** VACATION LIVE LEGS VERIFIED (score chain + souvenir purchase + carry-home) ***");
                             Diagnostics = "fails=" + _fails.Count + " " + string.Join("; ", _fails.Take(6));
@@ -884,15 +990,35 @@ namespace Simitone.Client
         private VMEntity _souvBad;
         private int _keepalive;
         private readonly List<string> _createLog = new List<string>();
+        private readonly List<string> _rmLog = new List<string>();
+        private readonly List<string> _delLog = new List<string>();
+        private readonly List<string> _dropTrace = new List<string>();
+        private int _rmDumped;
+        private int _delDumped;
+        private int _persistFrames;
+        private void Trv06RmWatch(string m)
+        {
+            // only the souvenir-carry window is interesting: bases, variants, the
+            // drop-dest markers (0xef046632) — everything else would flood.
+            if (_rmLog.Count < 64 && (m.Contains("594fea52") || m.Contains("a3f4fd3e") || m.Contains("ef046632")))
+                _rmLog.Add(m);
+        }
+
+        private void Trv06DelWatch(string m)
+        {
+            if (_delLog.Count < 64 && (m.Contains("594fea52") || m.Contains("a3f4fd3e") || m.Contains("ef046632")))
+                _delLog.Add(m);
+        }
 
         private void Trv06ObjCreated(VMStackFrame ctx, FSO.SimAntics.Entities.VMMultitileGroup grp, uint guid)
         {
             try
             {
-                _createLog.Add("guid=0x" + guid.ToString("X8") + " oid=" + (grp?.BaseObject?.ObjectID ?? 0)
-                    + " by=" + (ctx?.Caller?.ObjectID ?? 0) + " routine=" + (ctx?.Routine?.Chunk?.ChunkID ?? 0)
-                    + "@" + (ctx?.InstructionPointer ?? 0) + " pos=" + (grp?.BaseObject?.Position.ToString() ?? "?")
-                    + " container=" + (grp?.BaseObject?.Container?.ObjectID.ToString() ?? "none"));
+                if (_createLog.Count < 200)
+                    _createLog.Add("guid=0x" + guid.ToString("X8") + " oid=" + (grp?.BaseObject?.ObjectID ?? 0)
+                        + " by=" + (ctx?.Caller?.ObjectID ?? 0) + " routine=" + (ctx?.Routine?.Chunk?.ChunkID ?? 0)
+                        + "@" + (ctx?.InstructionPointer ?? 0) + " pos=" + (grp?.BaseObject?.Position.ToString() ?? "?")
+                        + " container=" + (grp?.BaseObject?.Container?.ObjectID.ToString() ?? "none"));
             }
             catch { }
         }

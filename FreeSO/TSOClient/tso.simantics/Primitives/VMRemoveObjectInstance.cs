@@ -5,12 +5,31 @@ namespace FSO.SimAntics.Engine.Primitives
 {
     public class VMRemoveObjectInstance : VMPrimitiveHandler
     {
+        /// <summary>
+        /// Read-only watch point for op-18 removals (trv06 residual lane).
+        /// Null unless an autotest probe subscribes; never changes behavior.
+        /// </summary>
+        public static Action<string> AutotestRemoveSink;
+
         public override VMPrimitiveExitCode Execute(VMStackFrame context, VMPrimitiveOperand args)
         {
             var operand = (VMRemoveObjectInstanceOperand)args;
             VMEntity obj;
             if (operand.Target == 0) obj = context.Caller;
             else obj = context.StackObject;
+
+            // trv06 residual watch (the pet-gone pattern above): names the BHAV
+            // frame behind every op-18 removal while a subscriber is attached.
+            // Null in normal play; read-only, never alters the removal.
+            if (AutotestRemoveSink != null && obj != null)
+            {
+                try
+                {
+                    AutotestRemoveSink("rm guid=0x" + obj.Object.OBJ.GUID.ToString("x8") + " oid=" + obj.ObjectID
+                        + " target=" + operand.Target + " at " + FSO.SimAntics.Primitives.VMGenericTSOCall.FrameInfo(context));
+                }
+                catch { }
+            }
 
             //TODO: what do CleanupAll and ReturnImmediately do?
             //cleanup all likely resets all avatars using the object, though that should really happen regardless?
