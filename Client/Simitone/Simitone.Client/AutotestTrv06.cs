@@ -61,6 +61,10 @@ namespace Simitone.Client
 
         private Func<VM> _vm;
         private Func<TS1GameScreen> _screen;
+        // the runner's _vm field goes stale/null across lot switches (its own
+        // probes rebind it per-state — the _ptnameRebound idiom); resolve the
+        // LIVE vm from the screen every tick instead.
+        private VM Vm => _screen()?.vm ?? _vm();
         private Action<uint> _signalLotSwitch;
         private Action _livelift;
 
@@ -153,13 +157,13 @@ namespace Simitone.Client
 
         private VMEntity Ent(uint guid)
         {
-            var vm = _vm();
+            var vm = Vm;
             return vm?.Entities.FirstOrDefault(e => e.Object != null && e.Object.OBJ != null && e.Object.OBJ.GUID == guid);
         }
 
         private List<VMAvatar> FamilyAvatars()
         {
-            var vm = _vm();
+            var vm = Vm;
             var fam = _screen()?.ActiveFamily;
             if (vm == null || fam == null) return new List<VMAvatar>();
             var guids = new HashSet<uint>(fam.FamilyGUIDs ?? new uint[0]);
@@ -175,7 +179,7 @@ namespace Simitone.Client
         {
             try
             {
-                var vm = _vm();
+                var vm = Vm;
                 if (vm == null) return;
                 if (vm.GlobalBlockingDialog != null)
                 {
@@ -231,7 +235,7 @@ namespace Simitone.Client
         /// resolve the tree's own IFF.</summary>
         private bool Drive(VMEntity callee, VMBHAVOwnerPair tree, VMEntity stackObj, string name)
         {
-            var vm = _vm();
+            var vm = Vm;
             if (vm == null || tree?.routine == null || _sim == null) return false;
             var act = new VMQueuedAction
             {
@@ -260,7 +264,7 @@ namespace Simitone.Client
         public bool Tick()
         {
             if (Done) return true;
-            var vm = _vm();
+            var vm = Vm;
             var screen = _screen();
             try
             {
@@ -703,7 +707,7 @@ namespace Simitone.Client
 
                     case 92: // carry-home verdict: tokens consumed + base objects materialized
                         {
-                            var newVm = _vm();
+                            var newVm = Vm;
                             var bases = newVm.Entities.Count(e => e.Object != null && e.Object.OBJ != null
                                 && (e.Object.OBJ.GUID == ArrowHeadBase || e.Object.OBJ.GUID == BabyDollBase));
                             if (bases == 0 && !_watchDone)
