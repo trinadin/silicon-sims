@@ -79,14 +79,34 @@ cover the decode-pinned laws):
   bounded UI-38 residuals (lot-category-bits writer, filter persistence
   LoadCurrentFilter, this+0x108/+0x1dc semantics, TS1.0 discrete-cadence
   alignment).
-- **Disclosed (visit-session park, 2026-10-08)**: away-lot visit sessions load in
+- ~~**Disclosed (visit-session park, 2026-10-08)**: away-lot visit sessions load in
   BUY mode + paused per the port's own NBR-06 native entry decode
   (`cSimsApp::LoadGame` visit → SetMode(BUY)+Pause) and the HUD panel re-parks
   the clock until the player enters LIVE — until then the whole lot (including
   NPC townsfolk) is frozen, where the native's visit streets simulate. The
   autotest probes apply the V4.2 "livelift" (panel → LIVE at rebound); a
   player entering LIVE sees normal simulation. Bounded engine-side follow-up:
-  keep townies ticking during the visit park.
+  keep townies ticking during the visit park.~~ **CLOSED (ENG-28, 2026-10-09):
+  the native restricted-tick law decoded and ported.** The native park NEVER
+  stops the object pump — `cDDDSimsView::Simulate` 0x1020e000 →
+  `cSimulator::Simulate` 0x1012fb80 (no pause/mode gate) → `SimulateOneTick`
+  0x10130770 every pulse; pause (+0x32) / non-LIVE mode (the CPState mirror
+  +0x36, `UpdateWorldFromCPState` 0x10208790: BUY→2/LIVE→0) restrict INSIDE
+  `TickAllObjects` 0x10130570 — per-object Simulate (→ `cXObject::Simulate`
+  0x100e7e70 → `TreeSim::Simulate` 0x1014a900, per pass, tick-counter-blind)
+  keeps running (SetSimFlag enum-2 = obj+0xc2 ≥ 0, only ever zeroed ⇒
+  effectively universal), and ONLY the clock/counter freezes
+  (minute/hour/day + 0x98; motives are clock-minute gated). Ported scoped to
+  TS1 visit sessions (`VMTS1LotState.VisitSession` = the NativeEntryVisit
+  matrix): `VM.InternalTick` falls through the park to the object pass with
+  the clock gate intact; `VMServerDriver.Tick` advances TickID on the −1 park
+  so the scheduler's wakes fire (native scheduling is pass-driven — TryIdle
+  0x100e8530). Focused magicbook-ALONE — the standing FAIL class — now PASSES
+  with zero probe change; petname PASS with the new VISIT-PARK-NPC-TICKS
+  evidence (schedAdv=80, npcDelta, clockFrozen). Residual (disclosed): the
+  native applies the same restricted tick to HOME-lot buy/pause (family
+  simulates, clock frozen); the port keeps its shipped household full-freeze
+  there by scope decision — observable divergence remains on home lots only.
 - Platform: `-3d` is experimental; `-jit`/`-dx` are inherited and unverified; trackpad
   natural-scroll and other hardware feel items lack systematic human verification —
   **human verification is partial** (portions played and accepted hands-on; no
