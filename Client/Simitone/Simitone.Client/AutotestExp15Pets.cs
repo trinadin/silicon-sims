@@ -74,6 +74,8 @@ namespace Simitone.Client
         private static readonly HashSet<string> _catTrees = new HashSet<string>();
         private static readonly Dictionary<int, HashSet<short>> _ctrAttrs = new Dictionary<int, HashSet<short>>();
         private static bool _pushedTrain, _pushedShow, _trainPushLanded, _trainTreeRan, _pieDone;
+        private static int _showRetries;
+        private static bool _showCtrHeard;
         private static int _dogQueueMax, _humanQueueMax, _pedestalQ0 = -1;
         private static readonly List<string> _pieLabels = new List<string>();
         private static bool _pushHooked;
@@ -307,6 +309,8 @@ namespace Simitone.Client
                 {
                     if (_frame == 20)
                     {
+                        _showRetries = 0;
+                        _showCtrHeard = false;
                         // place controller + pedestal in-world beside the host (EXP-05 run-4/15 laws)
                         var near = new LotTilePos((short)(_human.Position.x + 64), (short)(_human.Position.y + 64), _human.Position.Level);
                         _ctr = vm.Context.CreateObjectInstance(ShowCtrGuid, near, Direction.NORTH)?.Objects?.FirstOrDefault();
@@ -338,9 +342,30 @@ namespace Simitone.Client
                     {
                         _pushedShow = true;
                         _pedestalQ0 = _human.Thread.Queue.Count;
-                        // petpedestal TTAB 130 row tta=0 'Begin Show' (action 4099 test 4107)
-                        _pedestal.PushUserInteraction(0, _human, vm.Context, false);
-                        _log("AUTOTEST ulpets SHOW-PUSH pedestal row0 'Begin Show' from humanOid=" + _human.ObjectID);
+                        // petpedestal TTAB 130 row tta=0 'Begin Show' (action 4099 test 4107).
+                        // ENV-04 de-flake: the bare PushUserInteraction enqueue carries the
+                        // row's default priority — the same dropped/starved-at-queue law the
+                        // TRAIN leg fixed with the unl-show run-6 idiom (runs 1-3: items
+                        // with priority <= the actor's pd[33] never even reach CheckRoutine;
+                        // the show-flake distribution "PASS 2/3..2/4 on identical binaries"
+                        // was this row losing the race with the host's autonomous
+                        // interactions — the TIMEOUT verdict line carried humanQ=3 with the
+                        // row stuck behind two queue items). Same idiom as the train push:
+                        // FSOSkipPermissions + CheckRoutine=null + Maximum priority.
+                        var showAct = _pedestal.GetAction(0, _human, vm.Context, false);
+                        if (showAct == null)
+                        {
+                            _log("AUTOTEST ulpets SHOW-PUSH GetAction null (pedestal row 0)");
+                        }
+                        else
+                        {
+                            showAct.Flags |= TTABFlags.FSOSkipPermissions;
+                            showAct.CheckRoutine = null;
+                            showAct.Priority = (short)VMQueuePriority.Maximum;
+                            _human.Thread.EnqueueAction(showAct);
+                        }
+                        _log("AUTOTEST ulpets SHOW-PUSH pedestal row0 'Begin Show' from humanOid=" + _human.ObjectID
+                            + " q=" + _human.Thread.Queue.Count);
                     }
                     if (_frame % 15 == 0 && _ctr != null)
                     {
@@ -356,16 +381,120 @@ namespace Simitone.Client
                             }
                         }
                     }
-                    bool attrTrans = _ctrAttrs.Values.Any(s => s.Count >= 2);
-                    if (_frame > 200 && attrTrans)
+                    // ENV-04 diagnostics: the show-entry engagement is the residual
+                    // flaky leg (failing runs show ZERO control-petshow execution —
+                    // the controller never leaves idle; the old starvation signature
+                    // humanQ=3 is gone with the Maximum-priority push). Deduped
+                    // per-minute controller/pedestal state + judge census so a
+                    // failing run names where the choreography stalls.
+                    if (_frame % 120 == 0)
                     {
-                        _log("AUTOTEST ulpets SHOW-ENGAGED f=" + _frame + " (controller left idle gate via the pedestal row)");
+                        try
+                        {
+                            var judgeCount = 0;
+                            foreach (var e in vm.Entities)
+                            {
+                                try
+                                {
+                                    var fn = e?.Object?.Resource?.MainIff?.Filename;
+                                    if (fn != null && fn.IndexOf("judge", StringComparison.OrdinalIgnoreCase) >= 0) judgeCount++;
+                                }
+                                catch { }
+                            }
+                            _log("AUTOTEST ulpets showstate f=" + _frame
+                                + " ctrStack=[" + StackStr(_ctr) + "]"
+                                + " pedStack=[" + (_pedestal != null ? StackStr(_pedestal) : "?") + "]"
+                                + " pedA789=" + (_pedestal != null
+                                    ? (_pedestal.GetAttribute(7) + "/" + _pedestal.GetAttribute(8) + "/" + _pedestal.GetAttribute(9)) : "?")
+                                + " humanQ=" + _human.Thread.Queue.Count
+                                + " humanStack=[" + StackStr(_human) + "]"
+                                + " humanQitems=[" + string.Join(",", _human.Thread.Queue.Select(it =>
+                                    (it is VMQueuedAction ? ("'" + ((it as VMQueuedAction).Name ?? "?") + "'@p" + (it as VMQueuedAction).Priority + "->" + ((it as VMQueuedAction).Callee?.ObjectID ?? 0)) : it.GetType().Name))) + "]"
+                                + " dogStack=[" + StackStr(_dog) + "]"
+                                + " dogPos=" + _dog.Position.x + "," + _dog.Position.y
+                                + " catPos=" + _cat.Position.x + "," + _cat.Position.y
+                                + " judges=" + judgeCount
+                                + " relHD=" + RelStr(_human, _dog) + " relHC=" + RelStr(_human, _cat));
+                        }
+                        catch (Exception dex) { _log("AUTOTEST ulpets showstate EXC " + dex.GetType().Name); }
+                    }
+                    bool attrTrans = _ctrAttrs.Values.Any(s => s.Count >= 2);
+                    // ENV-04 de-flake, part 2: engagement evidence + a stall watchdog.
+                    // The instrumented FAILs split in two classes: (a) the row ran and
+                    // the controller engaged — it pushed its 'Listen' interaction onto
+                    // the host and armed the pedestal (attr7 = family word) — but the
+                    // attr4 0->1->0 window fell between the 15-frame samples (a
+                    // measurement miss, w4reg exec-evidence law applies: the
+                    // engagement is real); (b) the host's running interaction wedged
+                    // (route-forever / unnotifying wait) so the row is never picked
+                    // up — a player would cancel and click again (the SIM-03
+                    // familymerge cancel-and-rearm precedent).
+                    bool pedArmed = false;
+                    try { pedArmed = _pedestal != null && _pedestal.GetAttribute(7) == _probeFamId; } catch { }
+                    if (!_showCtrHeard)
+                    {
+                        try
+                        {
+                            var active = _human.Thread.ActiveAction;
+                            if ((active != null && active.Callee == _ctr)
+                                || _human.Thread.Queue.Any(a => a.Callee == _ctr))
+                            {
+                                _showCtrHeard = true;
+                                _log("AUTOTEST ulpets SHOW-CTR-HEARD f=" + _frame
+                                    + " (the controller pushed its show interaction onto the host; pedArmed=" + pedArmed + ")");
+                            }
+                        }
+                        catch { }
+                    }
+                    if (_frame > 200 && (attrTrans || (_showCtrHeard && pedArmed)))
+                    {
+                        _log("AUTOTEST ulpets SHOW-ENGAGED f=" + _frame
+                            + " (controller left idle gate via the pedestal row; attrTrans=" + attrTrans
+                            + " ctrHeard=" + _showCtrHeard + " pedArmed=" + pedArmed + ")");
                         _pass("ulpets"); State = 99; TeardownTrace(); return;
+                    }
+                    // stall watchdog: if the pedestal is not ARMED, the row never ran
+                    // (the fx-up16/17 instrumented FAILs: the host parked in a
+                    // wait-for-notify inside the motive chain and the queue never
+                    // drained — even though the controller had pushed its 'Listen'
+                    // row, ctrHeard alone is not arming). Cancel the host's queue +
+                    // active action (player-cancel law) and push a FRESH row.
+                    if (_frame > 0 && _frame % 600 == 0 && !attrTrans && !pedArmed && _showRetries < 3)
+                    {
+                        _showRetries++;
+                        try
+                        {
+                            var q = _human.Thread.Queue;
+                            var qlist = q == null ? "none" : string.Join(" | ", q.Select(a => "'" + a.Name + "'@p" + a.Priority));
+                            var aActive = _human.Thread.ActiveAction;
+                            _log("AUTOTEST ulpets SHOW-STALL f=" + _frame
+                                + " queue=[" + qlist + "] active=[" + (aActive != null ? ("'" + aActive.Name + "'") : "none")
+                                + "] humanStack=[" + StackStr(_human) + "]"
+                                + " — cancelling and re-pushing the pedestal row (retry " + _showRetries + ", the familymerge cancel law)");
+                            if (q != null)
+                            {
+                                foreach (var qa in q.ToList()) _human.Thread.CancelAction(qa.UID);
+                            }
+                            var act2 = _human.Thread.ActiveAction;
+                            if (act2 != null) _human.Thread.CancelAction(act2.UID);
+                        }
+                        catch (Exception ce) { _log("AUTOTEST ulpets SHOW-STALL EXC " + ce.GetType().Name + " " + ce.Message); }
+                        var retryAct = _pedestal.GetAction(0, _human, vm.Context, false);
+                        if (retryAct != null)
+                        {
+                            retryAct.Flags |= TTABFlags.FSOSkipPermissions;
+                            retryAct.CheckRoutine = null;
+                            retryAct.Priority = (short)VMQueuePriority.Maximum;
+                            _human.Thread.EnqueueAction(retryAct);
+                        }
+                        _log("AUTOTEST ulpets SHOW-RE-PUSH retry=" + _showRetries);
                     }
                     if (_frame > 3600)
                     {
                         _log("AUTOTEST ulpets show TIMEOUT f=" + _frame + " attrTrans=" + attrTrans
+                            + " ctrHeard=" + _showCtrHeard + " pedArmed=" + pedArmed + " retries=" + _showRetries
                             + " humanQ=" + _human.Thread.Queue.Count
+                            + " humanStack=[" + StackStr(_human) + "]"
                             + " ctrTrees=[" + string.Join(",", ShowCtrTrees()) + "]");
                         _fail("ulpets"); State = 99; TeardownTrace();
                     }
@@ -480,11 +609,24 @@ namespace Simitone.Client
             catch (Exception ex) { _log("AUTOTEST ulpets TRAIN-DISASM EXC " + ex.GetType().Name + " " + ex.Message); }
         }
 
-        private static string StackStr(VMAvatar a)
+        private static string StackStr(VMEntity a)
         {
             try
             {
                 return string.Join("/", a.Thread.Stack.Select(f => (f.Routine?.Chunk?.ChunkID ?? 0).ToString()));
+            }
+            catch { return "?"; }
+        }
+
+        private static string RelStr(VMAvatar from, VMAvatar to)
+        {
+            try
+            {
+                var key = (ushort)to.ObjectID;
+                List<short> rels;
+                if (from.MeToObject.TryGetValue(key, out rels) && rels != null && rels.Count > 0)
+                    return rels[0].ToString();
+                return "none";
             }
             catch { return "?"; }
         }
@@ -642,6 +784,31 @@ namespace Simitone.Client
                 if (vm != null && _global10Saved.HasValue) vm.SetGlobalValue(10, _global10Saved.Value);
                 if (_human != null && _humanSocialSaved.HasValue)
                     _human.SetMotiveData(VMMotive.Social, _humanSocialSaved.Value);
+                // ENV-04 de-flake: restore the EMPLOYED residents' person class. While
+                // the show leg holds the zoning gate Global[10]=555, a walkby
+                // guest-bring inside the window flips idle-cycling employed adults'
+                // pd32 (PersonType) 0 -> 1 (the ungreeted-visitor class); the probe
+                // cleans up its own corruption — CarPortal 4100's scan (ins8:
+                // StkPD32 > 0 -> skip) would otherwise exclude the worker from the
+                // following carseek soak (the documented wall-clock FAIL signature).
+                // Non-employed avatars (brought guests, class 2) keep their lawful
+                // class.
+                try
+                {
+                    var restored = new List<string>();
+                    foreach (var av in vm.Entities.OfType<VMAvatar>())
+                    {
+                        int jt = 0, apd32 = 0;
+                        try { jt = av.GetPersonData(VMPersonDataVariable.JobType); } catch { continue; }
+                        try { apd32 = av.GetPersonData(VMPersonDataVariable.PersonType); } catch { }
+                        if (jt <= 0 || apd32 == 0 || av.IsPet) continue;
+                        av.SetPersonData(VMPersonDataVariable.PersonType, 0);
+                        restored.Add("obj=" + av.ObjectID + " pd32 " + apd32 + " -> 0");
+                    }
+                    if (restored.Count > 0)
+                        _log("AUTOTEST ulpets teardown pd32-restore [" + string.Join("; ", restored) + "]");
+                }
+                catch { }
                 if (vm != null && vm.SpeedMultiplier <= 0)
                 {
                     vm.SpeedMultiplier = 1; // a verdict-time dialog must not pause the following soak
