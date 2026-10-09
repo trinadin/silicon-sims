@@ -202,13 +202,18 @@ namespace Simitone.Client.UI.Screens
 
         internal static ushort GetNeighborhoodModeFromHouse(short house)
         {
-            // House number ranges match the lot types (NBR-07 decode bands:
-            // MapHouseNumToIndex windows DT 21-30, Magic 90-98 — lot 99 is
-            // NOT in the Magic window; review P3-5 corrected the bounds)
-            if (house >= 21 && house <= 30) return 2;  // Downtown
+            // House number ranges match the lot types — VIEW/CATALOG routing
+            // bands (R176-pinned: 99 maps to the Magic view; the uiexpband
+            // boundary pin holds this). DISTINCT from the NBR-07 evict-window
+            // bands (MapHouseNumToIndex: DT 21-30, Magic 90-98 — lot 99 is
+            // excluded from the Magic EVICT window but still routes to the
+            // Magic view; the panel's IsNativeHouseForMode carries the evict
+            // bands). The P3-5 edit that narrowed these bounds broke the
+            // pinned boundary and was reverted.
+            if (house >= 21 && house <= 31) return 2;  // Downtown
             else if (house >= 40 && house <= 49) return 3;  // Vacation
             else if (house >= 81 && house <= 89) return 5;  // Studiotown
-            else if (house >= 90 && house <= 98) return 7;  // Magictown
+            else if (house >= 90 && house <= 99) return 7;  // Magictown
             else return 4;  // Normal/Old Town (default)
         }
 
