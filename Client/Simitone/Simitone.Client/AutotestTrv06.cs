@@ -117,7 +117,9 @@ namespace Simitone.Client
 
         private void Trv06QueueRemove(string reason, VMEntity ent, VMQueuedAction act)
         {
-            if (act != null && act.UID != 0 && act.UID == _watchUid) { _watchDone = true; _watchWhy = reason; }
+            // EnqueueAction reassigns UID (ActionUID++) — match by NAME instead
+            // (every trv06 drive carries a "trv06" prefixed name).
+            if (act != null && act.Name != null && act.Name.Contains("(probe drive)")) { _watchDone = true; _watchWhy = reason; }
         }
 
         private static string Hex(byte[] b) { return b == null ? "" : string.Concat(b.Select(x => x.ToString("x2"))); }
@@ -218,14 +220,17 @@ namespace Simitone.Client
         private void ArmTrace()
         {
             FSO.SimAntics.Engine.VMThread.AutotestTraceShowTrees = true;
+            FSO.SimAntics.Engine.VMThread.AutotestInstrTraceBudget = 1200;
+            if (_sim != null) FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Add(_sim.ObjectID);
+            if (_npcCtl != null) FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Add(_npcCtl.ObjectID);
+            if (_scoreCtl != null) FSO.SimAntics.Engine.VMThread.AutotestUnbudgetedEnts.Add(_scoreCtl.ObjectID);
             FSO.SimAntics.Engine.VMThread.AutotestTraceSink = t =>
             {
-                if (_sim != null && t.Contains("ent=" + _sim.ObjectID + " "))
-                {
-                    if (t.Contains(" 4108@") && t.Contains("sg=NPC_Vacation_Controller")) { _itrace.Add(t); if (_phase == 5) _thrBelowTraces++; if (_phase == 6) _thrAboveTraces++; }
-                }
-                if (_scoreCtl != null && t.Contains("ent=" + _scoreCtl.ObjectID + " ")
-                    && t.Contains(" 4104@") && t.Contains("sg=VacationPedMarker")) { _procScoreTraces++; }
+                // 4108 runs on the sim (queue drive); Process Score 4104 on the controller
+                if (t.Contains(" 4108@") && t.Contains("sg=NPC_Vacation_Controller"))
+                { _itrace.Add(t); if (_phase == 5) _thrBelowTraces++; if (_phase == 6) _thrAboveTraces++; }
+                if (t.Contains(" 4104@") && t.Contains("sg=VacationPedMarker") && _scoreCtl != null
+                    && t.Contains("ent=" + _scoreCtl.ObjectID + " ")) { _procScoreTraces++; }
             };
         }
 
@@ -237,6 +242,7 @@ namespace Simitone.Client
         {
             var vm = Vm;
             if (vm == null || tree?.routine == null || _sim == null) return false;
+            if (!name.Contains("(probe drive)")) name = name + " (probe drive)";
             var act = new VMQueuedAction
             {
                 Callee = callee,
@@ -251,8 +257,7 @@ namespace Simitone.Client
                 InteractionNumber = -1,
                 Priority = (short)VMQueuePriority.UserDriven,
             };
-            _watchUid = ++_uidSeed;
-            act.UID = _watchUid;
+            _watchUid = 0;
             _watchDone = false; _watchWhy = "";
             _sim.Thread.EnqueueAction(act);
             Log("AUTOTEST trv06 DRIVE '" + name + "' uid=" + _watchUid + " callee=" + (callee?.ObjectID ?? 0)
@@ -509,8 +514,11 @@ namespace Simitone.Client
                             var tag = _scoreCtl.GetAttribute(6);
                             Check(tag == g9, "p4 tag law: attr[6] == Global[9] (got attr6=" + tag + " g9=" + g9 + ")");
                             var pd61 = _sim.GetPersonData((VMPersonDataVariable)61);
+                            var epMain = 0; var epInit = 0; var epLoad = 0;
+                            try { epInit = _scoreCtl.EntryPoints[0].ActionFunction; epMain = _scoreCtl.EntryPoints[1].ActionFunction; epLoad = _scoreCtl.EntryPoints[2].ActionFunction; } catch { }
                             Log("AUTOTEST trv06 p4 family tag live: ctl attr[6]=" + tag + " Global[9]=" + g9
-                                + " sim pd[61]=" + pd61 + " (the 4126 ins7 tag source)");
+                                + " sim pd[61]=" + pd61 + " (the 4126 ins7 tag source); ctl entrypoints init=" + epInit
+                                + " main=" + epMain + " load=" + epLoad + " (4104='Process Score')");
                             _attr5Before = _scoreCtl.GetAttribute(5);
                             // pin moods high so 'Process Score' has lawful non-zero inputs
                             foreach (var a in FamilyAvatars()) PinMood(a, 90);
@@ -564,6 +572,21 @@ namespace Simitone.Client
                         {
                             _scoreCtl.SetAttribute(5, (short)(_tuning3 + 1)); // probe lever: just over the decoded threshold
                             _sim.SetAttribute(2, 77);
+                            // Termination lever (disclosed): the above-threshold member loop
+                            // ends when PersonGlobals 8547 'CT - Does Stk Obj have Vacation
+                            // Award?' finds a type-5 Pine Cone/Sun/SnowGlobe token — the
+                            // post-first-gift state. Seed it so the driven run completes.
+                            try
+                            {
+                                var nid6 = _sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                                var neigh6 = Content.Get().Neighborhood;
+                                var inv6 = neigh6.GetInventoryByNID(nid6) ?? new List<InventoryItem>();
+                                if (!inv6.Any(x => x.GUID == 0xEA1E99B3u && x.Type == 5))
+                                    inv6.Add(new InventoryItem { GUID = 0xEA1E99B3u, Type = 5, Count = 1 });
+                                if (neigh6.GetInventoryByNID(nid6) == null) neigh6.SetInventoryForNID(nid6, inv6);
+                                Log("AUTOTEST trv06 p6 award state seeded (type-5 Golden Pine Cone token — 8547's first check)");
+                            }
+                            catch (Exception ae) { Log("AUTOTEST trv06 p6 award-seed EXC " + ae.GetType().Name); }
                             var tree = _npcCtl.GetRoutineWithOwner(4108, vm.Context);
                             _thrAboveTraces = 0;
                             Drive(_npcCtl, tree, _sim, "Check to Give Souvenir (above threshold)");
