@@ -59,6 +59,10 @@ Default-suite additions (the battery is 156 checks with all of these):
 
 Opt-in takeovers (end the run at their verdict; run solo):
 
+- **`homeparkfam`** — ENG-28b closeout (2026-10-09): the family-lot variant
+  of the homepark battery — lot 5 (the Goths), the same buy/pause/modal legs
+  with BHAV dialogs answered per the hdserve law (11 answered in the buy
+  soak). Closes the family buy-soak measurement residual.
 - **`trv05`** — TRV-05/TRV-06/TRV-06b: the vacation booking round-trip on the
   native Family+0x13C law (book → persist → travel → return → clear →
   persist), then the live-observation legs (AutotestTrv06, chained in the
@@ -74,9 +78,12 @@ Opt-in takeovers (end the run at their verdict; run solo):
 - **`homepark`** — ENG-28b: the home-lot park restricted-tick law — a BUY-park
   soak on family-less lot 21 asserting the scheduler keeps waking
   (schedAdv≥30), street liveness advances, and the clock stays frozen (the
-  only thing the native restricted tick freezes). The explicit-pause (0)
-  half is deliberately not gated (retracted on hdserve evidence — see the
-  PARITY ENG-28b bullet).
+  only thing the native restricted tick freezes). The 2026-10-09 closeout
+  wave added the PAUSE-BUTTON leg (speed 0 + PauseButtonPark rides the same
+  restricted law — the decoded +0x32 class) and the MODAL-PUMP leg
+  (ModalPumpBlock freezes the pump outright per the decoded +0x111
+  SetBlockSimulator law, release resumes). Phase 0 enters BUY MODE first
+  (family lots enter LIVE whose unpark law would ping-pong the probe's -1).
 - **`hdserve`** — EXP-14: the Hot Date serve-choreography self-start — hands-off,
   the adult traveler's free-will draw must pick the podium's 'Eat Alone' row and
   the interaction's op-42 must create Controller-Restaurant-Eat (proven).

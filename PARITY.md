@@ -55,7 +55,13 @@ follow-up):
   NOT implemented (protected-scale UI change); nhood-terrain snow branch
   unmapped (no port terrain-type field); pool/deck markers mapped from port
   floor-grid sentinels; HITVM dedup vs native per-footfall replay (marginal
-  at step cadence); gated listen-run on real hardware.
+  at step cadence); gated listen-run on real hardware. **The down-vs-up firing
+  law CLOSED 2026-10-09 (the owner's closeout directive lifted the gate):
+  button sounds fire on mouse-DOWN from PlayUISound's per-button slots
+  (default EMPTY = silent); the UL filter bar carries 'UI_Nhood_click'
+  (pool 0x6c6e0+0xe, byte-proven); the blanket up-click removed (several
+  surfaces that double-played now sound once). Receipt:
+  evidence/AUD-20/button-firing-law.md.**
 - ~~Custom animated objects~~ **CLOSED 2026-10-08 (CC-06)**: five defects
   fixed on decoded native laws — duplicate-skeleton registration threw
   (native silent-replace law), corrupt and hostile custom CFPs crashed the
@@ -87,9 +93,13 @@ follow-up):
   lot's own house-file OBJT census against a 74-entry corpus-derived
   venue-marker table, gated on the live n=1 census: 58=0x46 61=0x6e
   70=0x7c 71=0x2e 72=0x04 73=0x46 74=0x26 75=0x2e — six of seven buttons
-  visible). Receipt: evidence/UI-38/ui38b-filter-laws.md). Remaining UI-38
-  residuals: this+0x108/+0x1dc semantics, TS1.0 discrete-cadence
-  alignment.
+  visible). Receipt: evidence/UI-38/ui38b-filter-laws.md). +0x1dc CLOSED
+  2026-10-09: the plaque ANIMATES — a 3-frame ping-pong (0→F0, 1→F1,
+  2|3→F2, 4→F1, 5→F0, byte-verified at DrawFilterAt) in lockstep with the
+  wave counter's advance gate; ported + gated in uidtbar (receipt:
+  evidence/UI-38/plaque-pingpong-law.md). Remaining UI-38 residuals
+  (evidence-pinned): this+0x108 stays a pinned-0 dormant flag (writer
+  unisolable); TS1.0 discrete-cadence alignment stays disclosed.
 - ~~**Disclosed (visit-session park, 2026-10-08)**: away-lot visit sessions load in
   BUY mode + paused per the port's own NBR-06 native entry decode
   (`cSimsApp::LoadGame` visit → SetMode(BUY)+Pause) and the HUD panel re-parks
@@ -120,11 +130,20 @@ follow-up):
   its non-ticking semantics — without the gate the arrival choreography
   stalls deterministically, hdserve bisect-proven). `homepark` gate (lot-21
   buy soak: schedAdv + street-liveness + clock frozen) PASS 3/3. The
-  EXPLICIT-PAUSE (speed 0) half was attempted and RETRACTED on evidence: the
-  port's speed 0 conflates the pause button with dialog-park transients and
-  advancing it burns transit wait countdowns (the hdserve outbound stall,
-  2/2) — the 0 park keeps the shipped freeze until the native dialog-park
-  law is decoded (carded). The same lane fixed the stale return-transit
+  EXPLICIT-PAUSE (speed 0) half CLOSED 2026-10-09 on the newly decoded
+  DIALOG-PARK LAW: SetBlockSimulator (flat 0x209ae0) stores view+0x111 and
+  cDDDSimsView::Simulate gates its cSimulator::Simulate call on it — a
+  blocking modal STOPS the pump entirely, while the pause button (+0x32)
+  only restricts inside the tick. The port splits the conflated speed-0:
+  PauseButtonPark (button/focus parks ride the restricted law incl. TickID)
+  + ModalPumpBlock (UIModalSimPause windows stop the object pass at ANY
+  park). homepark pause/modal legs + homeparkfam (lot-5 family soak,
+  dialogs answered — the family buy-soak measurement residual CLOSED) all
+  PASS; hdserve holds (the retraction's stall class keeps its freeze).
+  Receipt: evidence/ENG-28/dialog-park-law.md. The non-vacation
+  travel-edge transit residual is probe-ruled-out on the phone-plugin path
+  (rows enumerated, return-candidate booked, no home switch — the cab-chain
+  decode is owed). The same lane fixed the stale return-transit
   ENGINE-side: at the vacation-return arrival, the persisted transit action
   parked in global 281 'Wait For Notify' is completed (player-cancel law;
   the native arrival clears trip residue — RemoveFromVacation
