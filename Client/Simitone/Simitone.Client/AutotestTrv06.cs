@@ -398,6 +398,14 @@ namespace Simitone.Client
                         _homeLot = (short)fam1.HouseNumber;
                         Log("AUTOTEST trv06 p1 home stable (lot " + _homeLot + ", family chunk " + fam1.ChunkID
                             + "); booking Vacation Island rental " + VacationLot + " for the live legs");
+                        // the transit lever (EXP-10/EXP-11/magicbook law): mode 17
+                        // (VMGenericTS1Call ChangeToLotInTemp0) sets GameState's
+                        // transit fields BEFORE the lot switch; a probe-side switch
+                        // must mirror them or the arrival's family activation
+                        // (InitializeLot's LotTransitInfo >= 1 gate) never fires.
+                        var gs = Content.Get().Neighborhood.GameState;
+                        gs.ActiveFamily = vm.TS1State.CurrentFamily ?? fam1;
+                        gs.LotTransitInfo = 1;
                         _signalLotSwitch((uint)VacationLot);
                         _phase = 2; _frames = 0;
                         return false;
