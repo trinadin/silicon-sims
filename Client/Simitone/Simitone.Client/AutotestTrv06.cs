@@ -90,6 +90,7 @@ namespace Simitone.Client
         private VMEntity _scoreCtl;
         private VMEntity _npcCtl;
         private VMAvatar _sim;
+        private uint _simGuid; // the SAME family member across lot switches (avatar order varies)
         private ushort _watchUid;
         private bool _watchDone;
         private string _watchWhy = "";
@@ -435,6 +436,7 @@ namespace Simitone.Client
                                 return false;
                             }
                             _sim = avs[0];
+                            _simGuid = _sim.Object.OBJ.GUID;
                             var g9 = 0; try { g9 = vm.GetGlobalValue(9); } catch { }
                             Log("AUTOTEST trv06 p2 ARRIVED lot=" + VacationLot + " avatars=" + avs.Count
                                 + " sim oid=" + _sim.ObjectID + " npcCtl oid=" + _npcCtl.ObjectID
@@ -716,6 +718,7 @@ namespace Simitone.Client
                                 var invPeek = Inv();
                                 Log("AUTOTEST trv06 p91 peek f=" + _frames + " tokens=" + (invPeek?.Count ?? -1)
                                     + " creates-so-far=" + _createLog.Count);
+                                foreach (var cl in _createLog.Skip(Math.Max(0, _createLog.Count - 4)).ToList()) Log("AUTOTEST trv06 CREATE-auto " + cl);
                             }
                             if (_frames % 120 == 0) Unstick();
                             var fam = screen?.ActiveFamily;
@@ -734,12 +737,15 @@ namespace Simitone.Client
                                 return false;
                             }
                             var avs = FamilyAvatars();
-                            // re-resolve the sim on the HOME vm (the vacation-VM entity is stale after the switch)
-                            if (avs.Count > 0 && !ReferenceEquals(_sim, avs[0]))
+                            // re-resolve the SAME member (by person GUID — avatar order varies per lot build)
+                            var sameSim = avs.FirstOrDefault(a => a.Object.OBJ.GUID == _simGuid);
+                            if (sameSim != null && !ReferenceEquals(_sim, sameSim))
                             {
-                                _sim = avs[0];
-                                Log("AUTOTEST trv06 p91 sim re-resolved on home vm oid=" + _sim.ObjectID);
+                                _sim = sameSim;
+                                Log("AUTOTEST trv06 p91 sim re-resolved BY GUID on home vm oid=" + _sim.ObjectID + " (guid 0x" + _simGuid.ToString("X8") + ")");
                             }
+                            else if (sameSim == null && avs.Count > 0 && _frames % 240 == 0)
+                                Log("AUTOTEST trv06 p91 WAIT the token-holding member not on home lot yet (avs=" + avs.Count + ")");
                             if (_frames > 420)
                             {
                                 // lawful fallback: drive the return-edge interaction itself
