@@ -49,6 +49,10 @@ namespace Simitone.Client.UI.Screens
         // Update once the home lot's family avatars are live (the native
         // carry-home push representation — see TryPushVacationCarryHome).
         private bool PendingVacationCarryHome;
+        // TRV-06b lane B: frames remaining to look for (and cancel) the stale
+        // return-transit parked in global 281 'Wait For Notify' after arrival
+        // (see CompleteStaleTransit).
+        private int StaleTransitClearBudget;
 
         public UILotControl LotControl { get; set; }
         public UIOriginalCameraOverlay CameraOverlay { get; set; }
@@ -705,6 +709,12 @@ namespace Simitone.Client.UI.Screens
                             // port's representation of the native push: a deferred flag
                             // consumed once the home lot's family avatars are live.
                             PendingVacationCarryHome = true;
+                            // TRV-06b lane B: same edge — the native arrival clears the
+                            // trip residue (ClearHistory/ClearRouteHistory); the persisted
+                            // transit action re-runs parked in 281 otherwise. The budget
+                            // spans the whole arrival window: the transit's resume-and-
+                            // park timing varies by run (lb4 parked <360f, lb5 >1200f).
+                            StaleTransitClearBudget = 2400;
                         }
                     }
                     catch (Exception tripEx)
@@ -732,7 +742,7 @@ namespace Simitone.Client.UI.Screens
             // TRV-06 residual lane: the deferred carry-home push — once the home
             // lot is live and the family avatars materialized, enqueue the real
             // 'Spawn Vacation Purchases' interaction on each token-carrying member.
-            if (PendingVacationCarryHome && vm != null && ActiveFamily != null && !Downtown)
+            if ((PendingVacationCarryHome || StaleTransitClearBudget > 0) && vm != null && ActiveFamily != null && !Downtown)
             {
                 var famGuids = new HashSet<uint>(ActiveFamily.FamilyGUIDs ?? new uint[0]);
                 var members = vm.Context.ObjectQueries.Avatars
@@ -740,12 +750,76 @@ namespace Simitone.Client.UI.Screens
                     .ToList();
                 if (members.Count > 0)
                 {
-                    PendingVacationCarryHome = false;
-                    TryPushVacationCarryHome(members);
+                    // Lane B FIRST (the umbrella queues behind the transit): complete
+                    // the stale return-transit action — the native arrival discards
+                    // the outbound trip's residual execution (RemoveFromVacation
+                    // ClearHistory/ClearRouteHistory @0x100a83e0); the port's
+                    // engine-funnel lot switch bypasses that completion, leaving the
+                    // persisted transit action parked in global 281 'Wait For Notify'
+                    // forever (4/4 reproduction starving the carry-home walks —
+                    // trv06b receipt). Player-visible the transit is DONE: the family
+                    // is home. Cancel the parked action (the player-cancel law).
+                    // Retry over a short window: the transit may not have resumed
+                    // (and parked at 281) at the exact frame the avatars materialize.
+                    if (StaleTransitClearBudget > 0)
+                    {
+                        StaleTransitClearBudget--;
+                        if (CompleteStaleTransit(members)) StaleTransitClearBudget = 0;
+                    }
+                    if (PendingVacationCarryHome)
+                    {
+                        PendingVacationCarryHome = false;
+                        TryPushVacationCarryHome(members);
+                    }
                 }
             }
 
             //SaveHouseButton_OnButtonClick(null);
+        }
+
+        /// <summary>
+        /// TRV-06b lane B: complete the stale return-transit at the arrival edge.
+        /// The persisted transit queue item re-runs on the home lot parked in
+        /// global 281 'Wait For Notify' (the transit's signature frame) with a
+        /// route that can never satisfy — starving every later walk (4/4
+        /// reproduction; the trv06b receipt). The native arrival completes the
+        /// trip by construction (RemoveFromVacation clears the histories); the
+        /// port's engine-funnel lot switch bypasses that, so this mirrors it:
+        /// cancel the parked transit action (the player-cancel law) on each
+        /// member whose active action sits under a global.iff 281 frame.
+        /// </summary>
+        private bool CompleteStaleTransit(List<VMEntity> members)
+        {
+            var cancelled = false;
+            try
+            {
+                foreach (var memberEnt in members)
+                {
+                    var member = memberEnt as VMAvatar;
+                    if (member?.Thread == null) continue;
+                    var act = member.Thread.ActiveAction;
+                    if (act == null) continue;
+                    var parkedInTransitWait = false;
+                    foreach (var fr in member.Thread.Stack)
+                    {
+                        var parent = fr.Routine?.Chunk?.ChunkParent?.Filename;
+                        if (fr.Routine?.Chunk?.ChunkID == 281 && parent != null
+                            && parent.IndexOf("global", StringComparison.OrdinalIgnoreCase) >= 0)
+                        { parkedInTransitWait = true; break; }
+                    }
+                    if (!parkedInTransitWait) continue;
+                    member.Thread.CancelAction(act.UID);
+                    cancelled = true;
+                    GameLog.Write("trv06b arrival: completed the stale return-transit '"
+                        + (act.Name ?? "?") + "' on member oid=" + member.ObjectID
+                        + " (native arrival clears the trip residue; the family is home)");
+                }
+            }
+            catch (Exception transitEx)
+            {
+                GameLog.Write("trv06b arrival transit clear failed: " + transitEx.GetType().Name + " " + transitEx.Message);
+            }
+            return cancelled;
         }
 
         /// <summary>
