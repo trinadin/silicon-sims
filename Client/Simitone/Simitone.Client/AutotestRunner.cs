@@ -41075,8 +41075,14 @@ namespace Simitone.Client
                 bool uichromeBtn = mbTex != null && mbTex.Width == 128 && mbTex.Height == 39;
                 bool uichromeBar = barTex != null && barTex.Width == 27 && barTex.Height == 25;
                 Log("AUTOTEST uichrome tree: btn=" + uichromeBtn + " (" + (mbTex != null ? mbTex.Width + "x" + mbTex.Height : "null") + ") bar=" + uichromeBar + " (" + (barTex != null ? barTex.Width + "x" + barTex.Height : "null") + ")");
+                // REL-06 800x600 sweep finding (2026-10-09): the old
+                // min(804, w-220) expectation was a stale R142-era formula —
+                // the R144 decode (UIMainPanel's own comment) keeps PanelBack
+                // a NATURAL 804x100 buffer that narrow viewports CLIP (the
+                // band's landmarks must not compress). The two only diverge
+                // below 1024 wide, where the default suite never ran.
                 bool uibackOk = bmp != null && pb != null && pb.Visible && (int)pb.Size.Y == 100 &&
-                    System.Math.Abs(pb.Size.X - Math.Min(804, w - 220)) <= 4;
+                    System.Math.Abs(pb.Size.X - 804) <= 4;
                 if (!uibackOk) { Log("AUTOTEST uidump FAIL: original IFF backdrop not mounted/live (pb=" + (pb != null) + " vis=" + (pb?.Visible ?? false) + " size=" + (pb != null ? (int)pb.Size.X + "x" + (int)pb.Size.Y : "?") + ")"); Fail("uidump"); }
                 else Pass("uidump");
                 if (!uichromeBtn || !uichromeBar) { Log("AUTOTEST uichrome FAIL: original chrome not mounted/live (btn=" + (mbTex != null ? mbTex.Width + "x" + mbTex.Height : "null") + " bar=" + (barTex != null ? barTex.Width + "x" + barTex.Height : "null") + ")"); Fail("uichrome"); }
