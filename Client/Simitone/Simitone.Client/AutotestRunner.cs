@@ -361,6 +361,9 @@ namespace Simitone.Client
             // NBR-06 'nbr06' (opt-in, additive): same isolation idiom — the
             // evict/bulldoze/rezone chained battery mutates run-local space.
             AutotestNbr06.BeginIsolation(c);
+            // NBR-07 'nbr07' (opt-in, additive): same isolation idiom — the
+            // expansion-venue evict battery mutates run-local space.
+            AutotestNbr07.BeginIsolation(c);
             if (timeoutMs > 0) Config.TimeoutMs = timeoutMs;
             Config.ExitOnDone = exitOnDone;
 
@@ -420,6 +423,7 @@ namespace Simitone.Client
                     case 17: StateExp09Route(); break;
                     case 18: StateNBR05UI(); break;
                     case 19: StateNbr06(); break;
+                    case 26: StateNbr07(); break;
                     case 21: StateExp14HdServe(); break;
                     case 23: StateTrv05(); break;
                     case 24: StateHomePark(); break;
@@ -665,6 +669,18 @@ namespace Simitone.Client
                 Log("AUTOTEST nbr06 neighborhood-screen ready; entering evict/bulldoze/rezone battery");
                 _nbr06 = new AutotestNbr06(Log);
                 _state = 19;
+                return;
+            }
+            // NBR-07 'nbr07' opt-in (additive): the expansion-venue evict
+            // battery — DT/Studio occupied no-op, the Vacation [18]/[19]
+            // confirm + sound-only unbuilt leg, the Magic venue pair, the
+            // zone-choice strings + the UCP pairing law.
+            if (CheckEnabled("nbr07"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST nbr07 neighborhood-screen ready; entering expansion-venue evict battery");
+                _nbr07 = new AutotestNbr07(Log);
+                _state = 26;
                 return;
             }
             // Only the visual survey needs a settled neighborhood frame. Do
@@ -1311,6 +1327,23 @@ namespace Simitone.Client
             Log("AUTOTEST nbr06 " + _nbr06.Diagnostics);
             if (!_nbr06.Passed) Log("AUTOTEST nbr06 FAILURES " + _nbr06.Failures);
             _nbr06 = null;
+            Finish();
+        }
+
+        // NBR-07 'nbr07' (opt-in, additive): the expansion-venue evict
+        // battery (AutotestNbr07; the decoded cWinDowntown/cWinVacation/
+        // cWinStudiotown/cWinMagicland EvictModeLotHandler laws + the
+        // zone-choice strings + the UCP hide-slot pairing).
+        private static AutotestNbr07 _nbr07;
+
+        private static void StateNbr07()
+        {
+            if (_nbr07 == null) { Finish(); return; }
+            if (!_nbr07.Tick()) return;
+            if (_nbr07.Passed) Pass("nbr07"); else Fail("nbr07");
+            Log("AUTOTEST nbr07 " + _nbr07.Diagnostics);
+            if (!_nbr07.Passed) Log("AUTOTEST nbr07 FAILURES " + _nbr07.Failures);
+            _nbr07 = null;
             Finish();
         }
 
