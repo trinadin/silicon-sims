@@ -1965,6 +1965,9 @@ namespace Simitone.Client.UI.Screens
     // NBR-05 probe seams: the armed rezone flow (the STR# 151 [10] 'Evict or
     // Rezone' tool) and the neighborhood switcher's Previous/Next backend.
     internal UIMobileAlert _rezoneDialog;          // probe seam: the mounted rezone confirm
+    internal UIMobileAlert _rezoneChoiceDialog;    // NBR-08: the mounted zone-choice (STR# 250/251)
+    internal int RezoneChoiceShownForProbe;        // NBR-08: zone-choice dialogs mounted
+    internal int RezoneChoiceSameZoneForProbe;     // NBR-08: same-zone picks answered inert
     internal int RezoneConfirmEvictForProbe;       // occupied rezone confirm ([6]/[7]) shown
     internal int RezoneConfirmBulldozeForProbe;    // vacant+built rezone confirm ([8]/[9]) shown
     internal int RezoneDirectForProbe;             // vacant+unbuilt direct rezone attempts
@@ -2186,7 +2189,12 @@ namespace Simitone.Client.UI.Screens
     /// confirm pair. The lot-band gating (MapHouseNumToIndex: DT lots 21-30,
     /// Vacation 40-49, Studio 81-89, Magic 90-98) is already enforced by the
     /// panel's IsNativeHouseForMode mounting, so the flow itself branches on
-    /// the mounted mode + the lot's family/built state.</summary>
+    /// the mounted mode + the lot's family/built state. NBR-08 (P3-4): the
+    /// base/UL/Magic legs carry the native sound law — the unbuilt leg's OK
+    /// dialog is bracketed cancel→bdoze (0x469878-0x4698b4), the confirm YES
+    /// arms play demolish before the executor (0x4698dc) and the occupied
+    /// executor arms play demolish/evict by the bulldoze flag
+    /// (0x469a08-0x469a38).</summary>
     private void BulldozeLotClickFlow(int house)
     {
         var neigh = Content.Get().Neighborhood;
@@ -2246,14 +2254,32 @@ namespace Simitone.Client.UI.Screens
                                 Title = confirm2Title,
                                 Message = confirm2Message,
                                 Buttons = UIAlertButton.YesNo(
-                                    (b2) => { confirm2.Close(); _bulldozeDialog = null; ArmedEvict(house, family, true); },
-                                    (b2) => { confirm2.Close(); _bulldozeDialog = null; ArmedEvict(house, family, false); })
+                                    (b2) =>
+                                    {
+                                        confirm2.Close(); _bulldozeDialog = null;
+                                        // NBR-08 (P3-4): the executor arms carry
+                                        // the sounds — bulldoze flag 1 →
+                                        // UI_Nhood_bdoze_demolish, 0 → evict
+                                        // (0x469a08-0x469a38; pool r30+788/+812).
+                                        PlayVenueBulldozeSound(UISounds.BulldozeDemolish);
+                                        ArmedEvict(house, family, true);
+                                    },
+                                    (b2) =>
+                                    {
+                                        confirm2.Close(); _bulldozeDialog = null;
+                                        PlayVenueBulldozeSound(UISounds.BulldozeEvict);
+                                        ArmedEvict(house, family, false);
+                                    })
                             });
                             _bulldozeDialog = confirm2;
                             GlobalShowDialog(confirm2, true);
                         }
                         else
                         {
+                            // NBR-08 (P3-4): the not-built evict arm plays the
+                            // evict sound before EvictFamily(lot, 0) — the same
+                            // 0x469a08-0x469a38 arm pair's flag-0 side.
+                            PlayVenueBulldozeSound(UISounds.BulldozeEvict);
                             ArmedEvict(house, family, false);
                         }
                     },
@@ -2273,7 +2299,15 @@ namespace Simitone.Client.UI.Screens
                 Title = confirm2Title,
                 Message = confirm2Message,
                 Buttons = UIAlertButton.YesNo(
-                    (b) => { confirm.Close(); _bulldozeDialog = null; ArmedBulldoze(house); },
+                    (b) =>
+                    {
+                        confirm.Close(); _bulldozeDialog = null;
+                        // NBR-08 (P3-4): the YES arm plays UI_Nhood_bdoze_demolish
+                        // before the executor (0x4698dc, pool r30+788 — the same
+                        // demolish the venue handlers play on their YES arms).
+                        PlayVenueBulldozeSound(UISounds.BulldozeDemolish);
+                        ArmedBulldoze(house);
+                    },
                     (b) => { confirm.Close(); _bulldozeDialog = null; })
             });
             _bulldozeDialog = confirm;
@@ -2283,9 +2317,13 @@ namespace Simitone.Client.UI.Screens
 
         // Vacant + unbuilt: the native mounts the STR# 132 [4]/[5] OK dialog
         // ("Nothing to Bulldoze" / "There is no house here to bulldoze." —
-        // NBR-06 decode @0x469a58 region; the old port surfaced logs only).
+        // NBR-06 decode @0x469a58 region; the old port surfaced logs only),
+        // bracketed by the UI_Nhood_bdoze_cancel / UI_Nhood_bdoze sounds —
+        // cancel BEFORE the dialog, bdoze AFTER (NBR-08/P3-4: the UL anchor
+        // 0x469878-0x4698b4; the venue legs already carry this bracket).
         BulldozeStatusOnlyForProbe++;
         GameLog.Write("nghbtns: lot " + house + " has nothing to bulldoze");
+        PlayVenueBulldozeSound(UISounds.BulldozeCancel);
         UIMobileAlert nothing = null;
         nothing = new UIMobileAlert(new UIAlertOptions
         {
@@ -2295,6 +2333,7 @@ namespace Simitone.Client.UI.Screens
         });
         _bulldozeDialog = nothing;
         GlobalShowDialog(nothing, true);
+        PlayVenueBulldozeSound(UISounds.Bulldoze);
     }
 
     /// <summary>NBR-07 cWinDowntown::EvictModeLotHandler @0x3fdb10 (and the
@@ -2570,44 +2609,72 @@ namespace Simitone.Client.UI.Screens
     //   vacant + built → confirm [8]/[9] "cannot rezone until ... bulldozed.
     //     Proceed with the bulldoze?" — YES = BulldozeLot (NBR-03) →
     //     SetZoningType(target); NO = inert.
-    //   vacant + unbuilt → direct SetZoningType toggle (the native's first
-    //     dialog offers the zone choice with same-zone picks inert — with the
-    //     port's two-zone model that is exactly the toggle; no dialog).
-    // Target = the provider's other value (0 residential ↔ 1 community;
-    // NBR-03's clamp, absent = residential). The native enum is
-    // 1=residential/2=community (SetZoningType @0xaa700 writes the ",
-    // community" suffix for 2); the port keeps its 0/1 IFF-derived encoding.
-    // Executor failure mounts STR# 131 [10]/[11]. Success refreshes the lot
-    // tile; the receipt is a port literal (disclosed).
+    //   vacant + unbuilt → direct SetZoningType.
+    // NBR-08 CHOICE LAW (WIRED — was NBR-07 decode-banked): the native FIRST
+    // dialog is RezoneModeLotHandlerUL @0x469160 0x4691f0-0x46927c — cSimsApp
+    // vt+0x118 with STR# 250 [0] "Rezone House?" / [1] "This lot is currently
+    // zoned as a %s lot. Please choose what type of lot you want this to be:"
+    // (the %s = the current zone's STR# 251 name) and the STR# 251 captions
+    // ("Residential"/"Community") riding the ZoningData table [TOC-18228] as
+    // the choice row (choice button 0 = array[+0] Residential, button 1 =
+    // array[+4] Community — the SAME indices as the port's 0/1 zone encoding).
+    // The dialog precedes EVERY cascade arm (occupied/built/unbuilt). The
+    // native re-queries the zone AFTER the choice returns and answers a
+    // SAME-ZONE pick inert (0x4692a0-0x4692dc); result -1 (dismiss) returns
+    // with nothing run. Port shape: the non-modal UIMobileAlert +
+    // GlobalShowDialog idiom of the NBR-06 confirms, two buttons with custom
+    // Text via UIAlertButton, same-zone re-checked against the live zone in
+    // the picked handler, dismiss = no button pressed (both handlers are
+    // explicit, so a bare Close() runs nothing).
     internal int HouseRezonedForProbe = -1;        // last successfully rezoned lot
     internal int RezoneChainedConfirmsForProbe;    // occupied+built second confirm ([8]/[9]) shown
     internal int RezoneChainedForProbe;            // auto-SetZoningType completions after evict/bulldoze
     internal void RezoneLotClickFlow(int house)
     {
-        // NBR-07 DECODE-BANKED (the zone CHOICE dialog): the native FIRST
-        // dialog is RezoneModeLotHandlerUL @0x469160 0x4691f0-0x46927c —
-        // cSimsApp vt+0x118 with STR# 250 [0] "Rezone House?" / [1] "This lot
-        // is currently zoned as a %s lot. Please choose what type of lot you
-        // want this to be:" (the %s = the current zone's STR# 251 name) and
-        // the STR# 251 captions ("Residential"/"Community") riding the
-        // ZoningData table [TOC-18228] as the choice row; a same-zone pick is
-        // INERT, a dismiss returns. NOT WIRED: the port's toggle flow (target
-        // = the other zone, same-zone picks impossible) is the reviewed
-        // behavioral cover AND is pinned as-is by the nbr05ui/nbr06 probe
-        // phases (AutotestNBR05UI.PhaseDirectRezone expects the direct
-        // SetZoningType to run in the click itself; that probe is outside
-        // NBR-07's edit scope). The strings + the law live in the getters
-        // below and the receipt; re-wiring is a coordinator re-pin decision.
         var neigh = Content.Get().Neighborhood;
+        var currentZone = neigh.GetZoningType((short)house);
+
+        RezoneChoiceShownForProbe++;
+        UIMobileAlert choice = null;
+        choice = new UIMobileAlert(new UIAlertOptions
+        {
+            Title = RezoneChoiceTitle,
+            Message = RezoneChoiceMessage(currentZone),
+            Buttons = new[]
+            {
+                // Button ORDER is the native choice-row order (251 [0] then
+                // [1]); the types are only the port's two-button vehicle —
+                // the captions are the STR# 251 names via UIAlertButton.Text.
+                new UIAlertButton(UIAlertButtonType.Yes,
+                    (b) => { choice.Close(); _rezoneChoiceDialog = null; RezoneLotClickFlowPicked(house, 0); },
+                    NativeZoneName(0)),
+                new UIAlertButton(UIAlertButtonType.No,
+                    (b) => { choice.Close(); _rezoneChoiceDialog = null; RezoneLotClickFlowPicked(house, 1); },
+                    NativeZoneName(1)),
+            }
+        });
+        _rezoneChoiceDialog = choice;
+        GlobalShowDialog(choice, true);
+    }
+
+    /// <summary>NBR-08: the zone-choice answer. Same-zone = INERT (the native
+    /// re-queries the zone after the dialog returns — 0x4692a0/0x4692c4); any
+    /// other pick runs the existing NBR-06 cascade with the PICKED target.</summary>
+    private void RezoneLotClickFlowPicked(int house, short target)
+    {
+        var neigh = Content.Get().Neighborhood;
+        var currentZone = neigh.GetZoningType((short)house);
+        if (target == currentZone)
+        {
+            RezoneChoiceSameZoneForProbe++;
+            return;   // same-zone pick is inert (native 0x4692a0-0x4692dc)
+        }
+
         var family = neigh.GetFamilyForHouse((short)house);
         var simi = neigh.GetHouse(house)?.Get<SIMI>(1);
         // HouseInfo+0x18 proxy: the port's built marker (same gate as move-in
         // and the bulldoze arm).
         bool built = simi != null && (simi.ObjectsValue > 0 || simi.ArchitectureValue > 0);
-        // The rezone target is decided up front (the native's zone-choice
-        // dialog precedes everything; a same-zone pick is inert).
-        var currentZone = neigh.GetZoningType((short)house);
-        var target = (short)(currentZone == 1 ? 0 : 1);
 
         if (family != null)
         {
@@ -2681,9 +2748,10 @@ namespace Simitone.Client.UI.Screens
             return;
         }
 
-        // Vacant + unbuilt: the direct rezone. Toggle the zoning (0 ↔ 1); the
-        // backend persists LotZoning.iff atomically (NBR-03), so no neighborhood
-        // save rides here.
+        // Vacant + unbuilt: the direct rezone at the PICKED target (NBR-08:
+        // the choice dialog already ran; same-zone picks never reach here);
+        // the backend persists LotZoning.iff atomically (NBR-03), so no
+        // neighborhood save rides here.
         RezoneDirectForProbe++;
         CompleteChainedRezone(house, target);
     }

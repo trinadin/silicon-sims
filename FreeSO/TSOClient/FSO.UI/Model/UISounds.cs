@@ -15,6 +15,13 @@
         public static readonly string BulldozeLoop = "ui_nhood_bdoze_loop";
         public static readonly string BulldozeEnd = "ui_nhood_bdoze_end";
         public static readonly string BulldozeEvict = "ui_nhood_bdoze_evict";
+        // NBR-08 (review P3-3): the two bracket sounds the neighborhood
+        // EvictModeLotHandlers play around the vacant+unbuilt "Nothing to
+        // Bulldoze" OK dialog (cancel before the mount, bdoze after) — present
+        // in the live corpus (SoundData/SimsGeneratedHitSource.hot; HITVM and
+        // the HOT loader both lowercase, so the names resolve as-is).
+        public static readonly string BulldozeCancel = "ui_nhood_bdoze_cancel";
+        public static readonly string Bulldoze = "ui_nhood_bdoze";
         public static readonly string NeighborhoodClick = "ui_nhood_click";
         public static readonly string NeighborhoodError = "ui_nhood_error";
         public static readonly string NeighborhoodRollover = "ui_nhood_rollover";
