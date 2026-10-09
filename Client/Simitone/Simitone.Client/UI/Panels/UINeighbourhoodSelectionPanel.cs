@@ -307,6 +307,18 @@ namespace Simitone.Client.UI.Panels
         private int Mode;
         private IffFile NativeExpansionDesc;
 
+        /// <summary>NBR-07: the MOUNTED view mode (kept in sync by
+        /// PopulateScreen/PopMode). The venue EvictModeLotHandler variants in
+        /// TS1GameScreen key off this, not the screen-level mode copy — the
+        /// screen copy only tracks the last ENTERED lot's neighborhood, so a
+        /// pure view switch (base → Downtown → base, no lot entry) would
+        /// otherwise apply the wrong handler law.</summary>
+        internal ushort CurrentViewMode { get { return (ushort)Mode; } }
+
+        /// <summary>Probe seam: point the venue branch laws at another mode
+        /// without remounting the screen (NBR-07).</summary>
+        internal void SetViewModeForProbe(ushort mode) { Mode = mode; }
+
         internal static bool IsNativeHouseForMode(ushort mode, int house)
         {
             // cWinStudiotown::Init creates exactly House81..House89. The next

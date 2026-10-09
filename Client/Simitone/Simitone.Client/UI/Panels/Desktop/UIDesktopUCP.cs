@@ -951,8 +951,17 @@ namespace Simitone.Client.UI.Panels.Desktop
             BuyButton.Disabled = !bbEnable;
             BuildButton.Disabled = !bbEnable;
             LiveButton.Disabled = Game.vm.GetGlobalValue(32) != 0;
-            // The engine disables camera mode together with Live mode when
-            // CPState::IsLiveModeDisabled() is true.
+            // NBR-07 hide-slot pairing decode (UpdateViewFromCPState raw
+            // 0x2b3e40 tail): the NATIVE drives are IsLiveModeDisabled
+            // (CPState+0x55) → BUILD+CAMERA, and IsBuyAndBuildDisabled
+            // (CPState+0x54) → BUY+LIVE (TS1GameScreen.
+            // NativeUcpDisablePairing is the law's single source). The port
+            // pairs {BUY,BUILD} with the engine's BuildBuyEnabled and
+            // {LIVE,CAMERA} with global 32 — a DISCLOSED port-side pairing:
+            // in every port-reachable state both drives are true together
+            // (the visit lock sets BuildBuyEnabled=false AND global 32), so
+            // the visible outcome matches the native law; see the NBR-07
+            // receipt before changing this gate.
             CameraButton.Disabled = LiveButton.Disabled;
         }
 
