@@ -27,6 +27,17 @@ namespace FSO.SimAntics.Primitives
             var refObj = (operand.UseLocalAsRef) ? context.VM.GetObjectById((short)context.Locals[operand.Local]) : context.Caller;
 
             var obj = context.StackObject;
+            // TRV-06 (vacation family spawn): a missing stack/reference object is
+            // the native FALSE branch, not an exception. VacationPedMarker 4128
+            // 'Main - Family Spawn' re-entry passes probe placement (ins26-27,
+            // StackObjID := Local[5] = Temp[0] = 0) BEFORE the member creation at
+            // ins30 — the native's null walk takes the f= pointer; the port's NRE
+            // killed the whole spawn main (SimAnticsExc at VMFindLocationFor:126),
+            // so vacation families never materialized. Same convention as
+            // VMRunTreeByName and the other null-object laws.
+            if (obj == null) return VMPrimitiveExitCode.GOTO_FALSE;
+            if (refObj == null && (operand.Mode == 0 || operand.Mode == 3 || operand.Mode == 4 || operand.Mode == 5))
+                return VMPrimitiveExitCode.GOTO_FALSE;
             var flags = VMPlaceRequestFlags.AcceptSlots;
             if (operand.UserEditableTilesOnly) flags |= VMPlaceRequestFlags.UserBuildableLimit;
 
