@@ -29,6 +29,44 @@ retained 800x600 / 1024x768 captures expose that remaining gap. Evidence:
 
 ## Checks (from AutotestRunner.cs Config.Checks)
 
+### Wave-4 gates (2026-10-08)
+
+Default-suite additions (the battery is 156 checks with all of these):
+
+- **`ui37`** — UI-37: column scrolling on the decoded animated law (ScrollTo ramp
+  + 200 ms autorepeat), view-pie cell ladder/magnitude/commit clamps.
+- **`aud19`** — AUD-19 round 1: the per-event sound trace (HITTrace), 10 native
+  laws, the CAS deny sound, cross-level ×3/5 attenuation, dead native names.
+- **`cc06`** — CC-06: corrupt/duplicate custom content through the real providers
+  (duplicate-skeleton silent-replace, corrupt CFP skip/report, untranslated
+  animations, unresolvable skeletons).
+- **`uidtbar`** — UI-38: the UL community filter-toolbar live mount (strip as the
+  community screen's top chrome, 7-button ladder, STR#171 labels, click/highlight/
+  plaque laws).
+- **`aud20`** — AUD-20: the footsteps class on the decoded native law (anim-event
+  triggers, SPR2-label surface classifier, 12-case name table, barefoot outfits,
+  the TS1 zoom-volume byte-law).
+- **`ssfame`** — EXP-16: gendered job titles on the native STR law across every
+  consumer, fame-screen re-pins, the Studio Town object census.
+- **`mmquest`** — EXP-17: the Magic Town quest lines (content census + native
+  Choose Quest/Choose Reward + the $TokenNameLocal dialog law).
+- **`ulpets`** — EXP-15 (+follow-up): Unleashed pet-AI depth — the owner pie rows,
+  the training push (row 45 → action 8341), the show pedestal, the record-restore
+  person-class law.
+
+Opt-in takeovers (end the run at their verdict; run solo):
+
+- **`trv05`** — TRV-05: the vacation booking round-trip on the native Family+0x13C
+  law (book → persist → travel → return → clear → persist), now with the
+  score-controller and souvenir live legs in follow-up.
+- **`hdserve`** — EXP-14: the Hot Date serve-choreography self-start — hands-off,
+  the adult traveler's free-will draw must pick the podium's 'Eat Alone' row and
+  the interaction's op-42 must create Controller-Restaurant-Eat (proven).
+- **`petname`** — the adoption + naming chain on Old Town (needs the visit-session
+  lifelift; see EXP-08's last-mile receipt for the visit-park law).
+- **`magicbook`** — the magic-book mount flow on the magic lot (same visit-park
+  class; the engine fix made the probe lifelift optional).
+
 R252 adds opt-in `recordfmt`: the port now writes the ORIGINAL created-record
 format — NBRS chunk-data version `0x3E`, record Version `0x4` (80-short
 PersonData), `PersonMode 5`, `Name` = lowercase char-file stem, skin `pd[60]`
@@ -405,7 +443,7 @@ Families (each pins IFF canon or an IFF-factual runtime behavior — see ../PARI
 
 ## Limitations
 
-Headless-only: no pixel-veracity proof for censored mosaics, no audible-fidelity proof, and no live-play-feel claim. Desktop personality allocation is covered; pet naming and touch CAS remain. The career/school state traces now cover the successful outbound/return/pay/promotion and SchoolBus attendance/return branches, but their UI presentation, Chance Cards, and alternate outcomes remain. `brainlive` proves the original brain runs; live multi-candidate winner priority is the honest free-will residual.
+Headless-only: no pixel-veracity proof for censored mosaics, and no audible LISTEN-run on real hardware (the per-event trace and its native laws are gated — AUD-19/AUD-20 — but nobody has yet sat at speakers and confirmed the mix). Desktop personality allocation, pet naming (adoption + editor chain, `petname`), and the freewill gather/winner law (`freewillwin`) are covered. The career/school state traces cover the successful outbound/return/pay/promotion and SchoolBus attendance/return branches; their UI presentation, Chance Cards, and alternate outcomes remain. Touch CAS remains. Takeover probes (e.g. `trv05`, `hdserve`, `nbr06`) end the run at their verdict — run them solo, never combined in one opts string.
 
 ### R141 additions — the control panel on original engine art
 - **uicp (NEW):** the desktop UCP composes the ORIGINAL engine art per Res_CPanel.RT —

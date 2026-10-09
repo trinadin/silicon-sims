@@ -7,7 +7,7 @@
 
 **Goal:** drive the game as close to 1:1 behavior with the original *The Sims* (2000) as feasible, verified against the original IFF data and the original PowerPC binary. Every claim is labelled with its source; nothing is asserted from live play unless a read/write trace proves it. IFF-literalism and binary decode are the verification standards.
 
-## Where the game stands — v0.9.1, 2026-10-08 (READ THIS FIRST)
+## Where the game stands — v0.9.2+, 2026-10-08 (READ THIS FIRST)
 
 This section is the current truth. Everything below it is the historical round record
 (newest-first-ish through late September) — rows there may be superseded; where a row was

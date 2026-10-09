@@ -11,7 +11,7 @@ unaffiliated fan engine that runs the game from **your own copy** of the origina
 
 ## Download
 
-Grab the latest `SiliconSims-macOS-AppleSilicon.dmg` from
+Grab the latest `SimSilicon-macOS-AppleSilicon.dmg` from
 [**Releases**](https://github.com/trinadin/simsilicon/releases), mount it, and drag
 **The Sims** to your Applications folder.
 
@@ -57,9 +57,7 @@ needs real-world testing on real Macs and real saves. That's where you come in:
   Makin' Magic's quest lines are on decoded native laws; the view-pie pop gesture
   stays a disclosed model (the original's window-manager vtable was not shipped —
   not statically recoverable). Actively open: Vacation's score/souvenir live
-  legs, one disclosed engine behavior (away-lot visit sessions load paused in
-  buy mode — the lot simulates once you enter live mode) — and human
-  verification of the whole is
+  legs — and human verification of the whole is
   still partial (heavily automated; played and accepted hands-on in portions).
   Duplicate-gap reports will be closed with a pointer.
 - **Code welcome.** MPL-2.0 — PRs are open. PARITY.md's gap table is the roadmap; small,

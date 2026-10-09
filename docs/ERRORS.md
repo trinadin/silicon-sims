@@ -41,8 +41,8 @@ when you actually observed it. Do not turn this into a novel; delete entries tha
   model natively at `http://127.0.0.1:11436/api/chat` with `stream:false, think:false` and a
   ~280 s timeout. Model reads approximate colors only — treat byte-level pixel extraction as the
   authority.
-- **`sample` needs the right PID.** `pgrep -f 'MacOS/Simitone'` can match the wrapping bash; pick
-  the pid whose command is the `.../Simitone -path...` binary before sampling.
+- **`sample` needs the right PID.** `pgrep -f 'MacOS/TheSims'` can match the wrapping bash; pick
+  the pid whose command is the `.../TheSims -path...` binary before sampling.
 - **Tool stdout can come back empty on some invocations** — if a bash result has no stdout but
   exit 0, redirect to a file and read the file, don't retry "harder".
 - **Headless render colors WOBBLE run-to-run.** Same binary, same source, separate runs render
@@ -54,4 +54,4 @@ when you actually observed it. Do not turn this into a novel; delete entries tha
 ## Docs / guardrails
 
 - Evidence under `tools/iff-dump/` is tracked (not gitignored) — commit normally. Never weaken an IFF
-  pin; extend it and keep the suite 50/50 green.
+  pin; extend it and keep the suite green (156 checks at time of writing).

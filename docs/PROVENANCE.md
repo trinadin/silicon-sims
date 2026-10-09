@@ -56,8 +56,8 @@ SDL2/OpenAL native runtimes and Eto.Forms UI toolkit.
   carries no license file in either upstream repo; treat it as
   redistribution-restricted until upstream clarifies, and never bundle original
   Maxis/EA game data — `game-data/` is untracked and ignored by design.
-- Known open items are tracked in the REL-09 audit (Info.plist branding /
-  trademark question is a repo-owner decision).
+- One known open item: the Info.plist branding / trademark question (a
+  repo-owner decision).
 
 ## License
 

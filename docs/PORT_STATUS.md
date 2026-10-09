@@ -25,8 +25,9 @@ the Simitone team.
    (and DMG).
 6. **Headless/remote-session fix** — `SynchronizeWithVerticalRetrace` disabled so the loop never
    parks in a vsync wait; still frame-limited by `IsFixedTimeStep` + `TargetElapsedTime`.
-7. **Engine fidelity fixes** — each IFF-grounded, committed in the FreeSO submodule
-   (`mac-port-rel`). See PARITY.md → "Verified — engine fixes" for the list and evidence.
+7. **Engine fidelity fixes** — each IFF-grounded, committed in-repo under `FreeSO/`
+   (the merged engine subtree). See PARITY.md → "Where the game stands" for the
+   verified-working summary; the per-fix decode notes ride their commits.
 
 ## Verified on Apple Silicon (macOS 26.5, arm64)
 
@@ -49,8 +50,9 @@ containing `GameData/.../Behavior.iff` and the `UserData` layout. Detection
 (`MacOSLocator.cs`): portable `../The Sims/`, the Steam directory, Wine prefixes, the install
 dialog, or `-path"<path>"`. Selected path persists in `config.ini` (`TS1HybridPath`).
 
-- **Staged:** `game-data/The Sims/` holds GameData + UserData6/7/8 + ExpansionPack2–7 + ExpansionShared + ExpansionPack (complete
-  collection). This is the corpus every IFF-literal pin and the harness verify against.
+- **Staged (dev convention):** a local checkout stages the complete collection at
+  `game-data/The Sims/` (untracked — never committed). That staged corpus is what the
+  IFF-literal pins and the harness verify against.
 - **Legal acquisition:** The Sims: Legacy Collection (Steam app 3314060 / EA App / Epic) or the
   owned Complete Collection DVD ISO (archive.org). Data files are platform-neutral IFF.
 - **Fetch:** `fetch-game-data.sh` downloads the ISO from archive.org and extracts GameData —
@@ -63,7 +65,7 @@ dialog, or `-path"<path>"`. Selected path persists in `config.ini` (`TS1HybridPa
       dotnet publish Client/Simitone/Simitone.Desktop/Simitone.Desktop.csproj \
       -c Release -r osx-arm64 --self-contained true -o "$ROOT/publish/osx-arm64" \
       /p:TreatWarningsAsErrors=false /p:WarningsAsErrors="" -p:NoWarn=NU1605
-    ./packmac.sh arm64            # -> dist/The Sims-arm64-app
+    ./packmac.sh arm64            # -> dist/The Sims-arm64.app
 
 `NUGET_PACKAGES`/`DOTNET_CLI_HOME` must be absolute paths: the .NET 10 SDK refuses
 relative `NUGET_PACKAGES` at restore time (verify with `dotnet --version`; if it reports
@@ -76,4 +78,4 @@ Run: `dist/The Sims-arm64.app/Contents/MacOS/TheSims -path"<gamedata>" -autotest
 Engine is shared; only the Eto install-dialog + DesktopGL backend are macOS-specific. `FSO.iOS`
 is a legacy Xamarin.iOS / MonoGame v3.0 project that will not build under .NET 9; an iPad target
 needs a modernized `net9.0-ios` shell + MonoGame's iOS backend + a path picker instead of the
-Eto dialog. Assessed in Round 6. Not started.
+Eto dialog. Assessed 2026-09; not started.
