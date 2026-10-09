@@ -37,6 +37,13 @@ namespace Simitone.Client
     ///   D. ZOOM BYTE-LAW PIN: WorldZoom must stay on the native integer
     ///      scale (Far=1/Medium=2/Near=3) — the AUD-20 TickSounds law
     ///      (1024-(3-zoom)*280)/1024 is only native-true under that mapping.
+    ///   F. kSpl PER-TRACK ATTENUATION (AUD-21, receipt §(c)): the [Track]
+    ///      column-7 parse pinned through the real mounted corpus for every
+    ///      shipped variant class (infinite 0, loud 10, stereo 0x2711,
+    ///      normal 20, kSplNone-unresolved 0; all footstep tracks = 20),
+    ///      the census value-set/counts over event-reachable groups, and
+    ///      the vol integer law at 3 zooms per arm through the production
+    ///      VMEntity.NativeInstanceVol (0x2711 floor, att-0 bypass, clamp).
     /// </summary>
     public static partial class AutotestRunner
     {
@@ -400,6 +407,172 @@ namespace Simitone.Client
                 }
                 catch (Exception eb) { btnLaw = false; info += " btnLaw=EXC:" + eb.GetType().Name; }
                 if (!btnLaw) ok = false;
+
+                // ---------- F. kSpl PER-TRACK ATTENUATION LAW (AUD-21) -------------
+
+                // The [Track] kSpl column (column 7 — the port used to skip it)
+                // is the native sound-object register 0x39 read by cBoxX::
+                // GetInstanceVolPan FLAT 0x2E1E80 (decode receipt evidence/
+                // AUD-20/footstep-residuals-decode.md §(c)). F1 pins the parse
+                // through the real mounted corpus (per-file equates; unresolved
+                // symbols read 0); F2 pins the census over every event-reachable
+                // resource group; F3 pins the vol integer law through the
+                // production VMEntity.NativeInstanceVol (the exact function
+                // TickSounds multiplies by) at three zooms for every arm —
+                // including the 0x2711 floor and the att-0 bypass; F4 pins the
+                // live thread wiring when a sound device exists.
+                bool kspl = true;
+                try
+                {
+                    Func<string, FSO.Content.Model.HITEventRegistration> regOf = delegate (string n)
+                    {
+                        FSO.Content.Model.HITEventRegistration r;
+                        if (evts == null || !evts.TryGetValue(n, out r)) return null;
+                        return r;
+                    };
+                    Func<uint, FSO.Content.Model.HITEventRegistration, FSO.Files.HIT.Track> trkOf = delegate (uint id, FSO.Content.Model.HITEventRegistration reg)
+                    {
+                        if (reg == null || reg.ResGroup == null) return null;
+                        try { return audio.GetTrack(id, id, reg.ResGroup); } catch { return null; }
+                    };
+                    var fails = new List<string>();
+
+                    // F1 parse pins — one representative per shipped variant
+                    // class, resolved through the event's own resource group.
+                    // sting_danger1 (track 1861, kSplInfinite) has no event of
+                    // its own — reach it through ui_click's group
+                    // (SimsGeneratedHitSource.hot); sting_death IS an event.
+                    var uic = regOf("ui_click");
+                    if ((trkOf(1861, uic)?.kSpl ?? 0xFFFFFFFFu) != 0u) { kspl = false; fails.Add("sting_danger1"); }
+                    var sdeath = regOf("sting_death");
+                    if ((trkOf(sdeath?.TrackID ?? 0, sdeath)?.kSpl ?? 0xFFFFFFFFu) != 0u) { kspl = false; fails.Add("sting_death"); }
+                    var tvr = regOf("tv_romance_cheap");
+                    if ((trkOf(tvr?.TrackID ?? 0, tvr)?.kSpl ?? 0xFFFFFFFFu) != 10u) { kspl = false; fails.Add("TrkTvRomance"); }
+                    if ((trkOf(500, tvr)?.kSpl ?? 0xFFFFFFFFu) != 0u) { kspl = false; fails.Add("SetSimSpeed0(kSplNone->0)"); }
+                    var stc = regOf("stereo_country");
+                    if ((trkOf(stc?.TrackID ?? 0, stc)?.kSpl ?? 0xFFFFFFFFu) != 10001u) { kspl = false; fails.Add("TrkRadioStationCountry(0x2711)"); }
+                    var moo = regOf("moosehead_moo");
+                    if ((trkOf(moo?.TrackID ?? 0, moo)?.kSpl ?? 0xFFFFFFFFu) != 20u) { kspl = false; fails.Add("moose(literal20)"); }
+
+                    // F1b no-change assertion: EVERY live footstep track keeps
+                    // the default 20 (receipt: all 14 names map to literal-20 /
+                    // kSplNormal tracks — the port's historic uniform law is
+                    // byte-correct for footsteps).
+                    int foot20 = 0;
+                    foreach (var n in liveNames)
+                    {
+                        var r = regOf(n);
+                        if ((trkOf(r?.TrackID ?? 0, r)?.kSpl ?? 0xFFFFFFFFu) == 20u) foot20++;
+                        else { kspl = false; fails.Add("footstep20:" + n); }
+                    }
+                    if (foot20 != liveNames.Length) kspl = false;
+
+                    // F2 census over every event-reachable resource group: the
+                    // value SET must be exactly the shipped variants {0, 10, 20,
+                    // 10001} (kSplQuiet=100 ships unused) and the single-copy
+                    // classes are exact: loud 9 (4 TV + 5 Superstar speakers),
+                    // stereo 9 (4 radio + 3 Unleashed + 2 HotDate), zero 51
+                    // (34 kSplInfinite + 16 kSplNone + the kSplnfinite typo).
+                    // The 20 count carries a ±379 ambiguity (the two vacsnd.hot
+                    // copies share one merged event namespace), so it is pinned
+                    // as a floor; the observed value goes to the log.
+                    var groups = new HashSet<FSO.Content.Model.HITResourceGroup>();
+                    if (evts != null) foreach (var r in evts.Values) if (r != null && r.ResGroup != null) groups.Add(r.ResGroup);
+                    var census = new Dictionary<uint, int>();
+                    foreach (var g in groups)
+                    {
+                        if (g.hot == null || g.hot.Tracks == null) continue;
+                        foreach (var t in g.hot.Tracks.Values)
+                        {
+                            int c; census.TryGetValue(t.kSpl, out c);
+                            census[t.kSpl] = c + 1;
+                        }
+                    }
+                    Func<uint, int> cntOf = v => { int c; return census.TryGetValue(v, out c) ? c : 0; };
+                    bool censusSet = census.Count == 4 && cntOf(0u) > 0 && cntOf(10u) > 0 && cntOf(20u) > 0 && cntOf(10001u) > 0;
+                    bool censusExact = cntOf(10u) == 9 && cntOf(10001u) == 9 && cntOf(0u) == 51;
+                    bool census20Floor = cntOf(20u) >= 4200;
+                    if (!(censusSet && censusExact && census20Floor)) { kspl = false; fails.Add("census"); }
+                    info += " kSpl(foot20=" + foot20 + "/14"
+                        + ", census={0:" + cntOf(0u) + ",10:" + cntOf(10u) + ",20:" + cntOf(20u)
+                        + ",10001:" + cntOf(10001u) + ",vals:" + census.Count + "}";
+
+                    // F3 the vol integer law through the PRODUCTION function
+                    // (VMEntity.NativeInstanceVol — what TickSounds multiplies
+                    // by), at three zooms for every arm: default 20, loud 10,
+                    // stereo floor 0x2711, the att-0 bypass, and the kSplQuiet
+                    // 100 clamp arm (label ships unused but the law is total).
+                    int[][] arms =
+                    {
+                        new[] { 20,   1024, 744,  464 },
+                        new[] { 10,   1024, 884,  744 },
+                        new[] { 10001, 1024, 800,  800 },
+                        new[] { 0,    1024, 1024, 1024 },
+                        new[] { 100,  1024, 0,    0   },
+                    };
+                    bool law = true;
+                    foreach (var arm in arms)
+                    {
+                        for (int zoom = 3; zoom >= 1; zoom--)
+                        {
+                            int want = arm[4 - zoom];
+                            int got = FSO.SimAntics.VMEntity.NativeInstanceVol(zoom, (uint)arm[0]);
+                            if (got != want) { law = false; Log("AUTOTEST aud20: kSpl law att=" + arm[0] + " zoom=" + zoom + " got " + got + " want " + want); }
+                        }
+                    }
+                    // the thread plumbing: a real one-shot thread resolves its
+                    // track's kSpl (footstep_snow group -> track 14189 -> 20);
+                    // a station thread with no track keeps the native default.
+                    uint deflt = 0xDEAD;
+                    try
+                    {
+                        var snow = regOf("footstep_snow");
+                        var thr = new FSO.HIT.HITThread(snow != null ? snow.TrackID : 0, null, snow != null ? snow.ResGroup : null);
+                        deflt = thr.kSpl;
+                        if (deflt != 20u) { law = false; Log("AUTOTEST aud20: kSpl HITThread(footstep_snow) got " + deflt + " want 20"); }
+                    }
+                    catch (Exception te) { law = false; Log("AUTOTEST aud20: kSpl HITThread ctor EXC " + te.GetType().Name); }
+                    try
+                    {
+                        var station = new FSO.HIT.Events.HITTVOn(0, null, true);
+                        if (station.kSpl != 20u) { law = false; Log("AUTOTEST aud20: kSpl HITTVOn default got " + station.kSpl + " want 20"); }
+                    }
+                    catch (Exception te2) { law = false; Log("AUTOTEST aud20: kSpl HITTVOn ctor EXC " + te2.GetType().Name); }
+                    if (!law) kspl = false;
+                    info += " law=" + law + ")";
+
+                    // F4 live wiring: PlaySoundEvent hands the created thread
+                    // its kSpl (radio station -> 0x2711, TV channel -> 10,
+                    // footstep -> 20 through the dedup return). Only with a
+                    // sound device; the created stations are killed again.
+                    if (hit != null && !FSO.HIT.HITVM.DISABLE_SOUND)
+                    {
+                        try
+                        {
+                            var radio = hit.PlaySoundEvent("stereo_country");
+                            var tvon = hit.PlaySoundEvent("tv_romance_cheap");
+                            var step = hit.PlaySoundEvent("footstep_terrain");
+                            bool radioOk = (radio as FSO.HIT.Events.HITTVOn)?.kSpl == 10001u;
+                            bool tvOk = (tvon as FSO.HIT.Events.HITTVOn)?.kSpl == 10u;
+                            bool stepOk = (step as FSO.HIT.HITThread)?.kSpl == 20u;
+                            (radio as FSO.HIT.Events.HITTVOn)?.Kill();
+                            (tvon as FSO.HIT.Events.HITTVOn)?.Kill();
+                            if (!(radioOk && tvOk && stepOk))
+                            {
+                                kspl = false;
+                                fails.Add("wiring(radio=" + radioOk + ",tv=" + tvOk + ",step=" + stepOk + ")");
+                            }
+                            info += " wire=ok";
+                        }
+                        catch (Exception wl) { kspl = false; info += " wire=EXC:" + wl.GetType().Name; }
+                    }
+                    else info += " wire=skip(no-device)";
+
+                    if (fails.Count > 0)
+                        Log("AUTOTEST aud20: kSpl section failures: " + string.Join(",", fails));
+                }
+                catch (Exception ek) { kspl = false; info += " kSpl=EXC:" + ek.GetType().Name + " " + ek.Message; }
+                if (!kspl) ok = false;
 
                 Log("AUTOTEST aud20:" + info + (ok ? "" : " (FAILED)"));
                 if (ok) { Pass("aud20"); } else { Fail("aud20"); }

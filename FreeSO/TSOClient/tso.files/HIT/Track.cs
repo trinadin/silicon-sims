@@ -27,6 +27,22 @@ namespace FSO.Files.HIT
         public uint HitlistID;
 
         /// <summary>
+        /// AUD-21: the [Track] kSpl / sound-pressure-level column (column 7 of
+        /// the .hot [Track] CSV; the native sound-object register 0x39 set at
+        /// track load — cHitIniFile::IniFileCallbackTrack FLAT 0x3017F0, decode
+        /// receipt evidence/AUD-20/footstep-residuals-decode.md §(c)). Parsed by
+        /// Hot.cs via ParseEME so equate labels resolve (kSplNormal=20,
+        /// kSplInfinite=0, kSplLoud=10, kSplStereo=10001/0x2711, kSplQuiet=100)
+        /// and unresolved symbols (kSplNone, the kSplnfinite typo) read 0.
+        /// Default 0x14 = the native default attenuation for sounds with no
+        /// track (cBoxX::GetInstanceVolPan FLAT 0x2E1E80: att=0x14 unless a
+        /// sound object supplies register 0x39). The TRK binary layout's
+        /// matching column is unidentified, so TRK-loaded (TSO) tracks keep the
+        /// default — the TSO mix path is unchanged.
+        /// </summary>
+        public uint kSpl = 0x14;
+
+        /// <summary>
         /// Creates a new track.
         /// </summary>
         /// <param name="Filedata">The data to create the track from.</param>

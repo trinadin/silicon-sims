@@ -358,6 +358,28 @@ namespace FSO.SimAntics
             }
         }
 
+        /// <summary>
+        /// AUD-21: the native instance-volume integer law (cBoxX::
+        /// GetInstanceVolPan FLAT 0x2E1E80; decode receipt evidence/AUD-20/
+        /// footstep-residuals-decode.md §(c)):
+        ///   vol = 0x400 - (3-zoom) * att * 0xE, clamped >= 0,
+        /// then floored at 800 when att == 0x2711 (kSplStereo — the flags
+        /// value bypasses the zoom law's bottom). att == 0 (kSplInfinite /
+        /// kSplNone / unresolved labels) bypasses the law entirely — full
+        /// 0x400 wherever audible (the caller also drops the pan offset and
+        /// the near-screen-edge rolloff for that arm). att defaults to 0x14
+        /// (kSplNormal — the historic uniform law this replaces). The aud20
+        /// probe pins this through this same production function.
+        /// </summary>
+        public static int NativeInstanceVol(int zoom, uint att)
+        {
+            if (att == 0) return 0x400;
+            int vol = 0x400 - (3 - zoom) * (int)att * 0xE;
+            if (vol < 0) vol = 0;
+            if (att == 0x2711 && vol < 800) vol = 800;
+            return vol;
+        }
+
         public void TickSounds()
         {
             if (!UseWorld) return;
@@ -372,6 +394,7 @@ namespace FSO.SimAntics
                 var worldSpace = worldState.WorldSpace;
                 var scrPos = WorldUI.GetScreenPos(worldState);
                 scrPos -= new Vector2(worldSpace.WorldPxWidth/2, worldSpace.WorldPxHeight/2);
+                bool ts1 = FSO.Content.Content.Get().TS1;
                 for (int i = 0; i < SoundThreads.Count; i++)
                 {
                     var sound = SoundThreads[i].Sound;
@@ -386,7 +409,7 @@ namespace FSO.SimAntics
                     pan = pan * pan * ((pan > 0)?1:-1);
 
                     float volume;
-                    
+
                     var rcs = worldState.Cameras.ActiveCamera as CameraController3D;
                     if (rcs != null)
                     {
@@ -423,31 +446,44 @@ namespace FSO.SimAntics
                     }
                     else
                     {
-                        volume = (SoundThreads[i].Pan) ? 1 - (float)Math.Max(0, Math.Min(1, Math.Sqrt(scrPos.X * scrPos.X + scrPos.Y * scrPos.Y) / worldSpace.WorldPxWidth)) : 1;
+                        // AUD-21: per-track attenuation (kSpl — [Track] column 7,
+                        // the native sound-object register 0x39; decode receipt
+                        // evidence/AUD-20/footstep-residuals-decode.md §(c),
+                        // cBoxX::GetInstanceVolPan FLAT 0x2E1E80):
+                        //   att == 0  (kSplInfinite / unresolved labels): NO
+                        //              zoom/edge attenuation and no pan offset —
+                        //              full 0x400 wherever audible.
+                        //   otherwise: the zoom law below uses the per-track att
+                        //              (kSplStereo 0x2711 floors at 800/1024).
+                        // The near-screen-edge rolloff (Pan flag) keeps the port's
+                        // existing predicate — the exact native edge law remains
+                        // a disclosed AUD-20 residual. TSO is unchanged.
+                        uint att = ts1 ? sound.kSpl : 0x14;
+                        bool attBypass = ts1 && att == 0;
+
+                        if (attBypass) pan = 0; // no pan offset at att == 0
+                        volume = (!attBypass && SoundThreads[i].Pan) ? 1 - (float)Math.Max(0, Math.Min(1, Math.Sqrt(scrPos.X * scrPos.X + scrPos.Y * scrPos.Y) / worldSpace.WorldPxWidth)) : 1;
                         volume *= worldState.PreciseZoom;
 
                         if (SoundThreads[i].Zoom)
                         {
-                            if (FSO.Content.Content.Get().TS1)
+                            if (ts1)
                             {
-                                // AUD-20: native zoom-volume byte-law (cBoxX::
-                                // GetInstanceVolPan 0x102e1e80, decoded in
-                                // AUD-19 L4): vol = 0x400 - (3-zoom)*att*14 with
-                                // default attenuation att=0x14 (20) ->
-                                // (1024 - (3-zoom)*280)/1024. The port enum
-                                // WorldZoom (Far=1, Medium=2, Near=3) IS the
-                                // native zoom integer. PreciseZoom (==1 at rest)
-                                // stays as the port's transition smoothing.
-                                // DISCLOSED residual: the native near-screen-edge
-                                // floor of 800/1024 and the per-sound att=0x2711
-                                // flags-floor variant are not implemented (edge
-                                // predicate not re-decoded this round).
-                                volume *= (1024 - (3 - (int)worldState.Zoom) * 280) / 1024f;
+                                // AUD-20/AUD-21: native zoom-volume byte-law
+                                // (cBoxX::GetInstanceVolPan 0x102e1e80, decoded in
+                                // AUD-19 L4 / AUD-20 §(c)): vol = 0x400 - (3-zoom)
+                                // * att * 0xE clamped >= 0, floored at 800 when
+                                // att == 0x2711 (kSplStereo); att == 0 bypasses
+                                // (returns 0x400). The port enum WorldZoom
+                                // (Far=1, Medium=2, Near=3) IS the native zoom
+                                // integer. PreciseZoom (==1 at rest) stays as the
+                                // port's transition smoothing.
+                                volume *= NativeInstanceVol((int)worldState.Zoom, att) / 1024f;
                             }
                             else volume /= 4 - (int)worldState.Zoom;
                         }
                     }
-                    if (FSO.Content.Content.Get().TS1)
+                    if (ts1)
                     {
                         // AUD-19 native cross-level attenuation law (decoded from
                         // cBoxX::GetInstanceVolPan @ 0x102e1e80): ANY mismatch

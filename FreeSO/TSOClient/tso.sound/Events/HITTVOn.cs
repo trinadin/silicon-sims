@@ -27,6 +27,17 @@ namespace FSO.HIT.Events
 
         private int FadeOut = -1;
 
+        /// <summary>
+        /// AUD-21: the event track's kSpl, assigned by HITVM.PlaySoundEvent at
+        /// creation (TV channels carry kSplLoud=10, radio stations
+        /// kSplStereo=10001/0x2711 — the exact tracks the native attenuation
+        /// variants were decoded for). Music modes and station ids with no
+        /// [Track] entry keep the native default 0x14.
+        /// </summary>
+        private uint _kSpl = 0x14;
+        public override uint kSpl { get { return _kSpl; } }
+        public void SetkSpl(uint value) { _kSpl = value; }
+
         public void Kill()
         {
             if (Instance != null)
