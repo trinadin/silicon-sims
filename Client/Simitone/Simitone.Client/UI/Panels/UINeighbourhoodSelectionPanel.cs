@@ -520,6 +520,44 @@ namespace Simitone.Client.UI.Panels
         // (DrawFilterAt callers 0x45ac40/0x45b06c); production bits are 0
         // until the native lot+0x1ac writer is decoded (DISCLOSED).
         public int ULFilterHiliteApplications;
+        // UI-38 residual lane (2026-10-09): the plaque ANIMATES. Native
+        // TSPaint__18cWinNeighborhoodUL (0x10462210) increments TWO counters
+        // in the same advance gate: this+0x1e0 mod 12 (the wave frame,
+        // floor(c/2)) AND this+0x1dc mod 6 — DrawFilterAt @0x1045a340 selects
+        // the plaque sheet frame from +0x1dc: 0->0, 1|4->1, 2|3->2 — a
+        // 3-frame PING-PONG in lockstep with the waves (each plaque frame
+        // spans two wave steps; full plaque cycle = one wave rotation).
+        // Port: an independent discrete counter at the SAME cadence constants
+        // (phase-equivalent within one interval; natively both derive from one
+        // gate — the relative phase is not observable against anything else).
+        internal double ULPlaqueCounterMs;
+        internal int ULPlaqueCounter;
+        internal int ULPlaqueDrawFrameForProbe = -1;
+
+        internal void AdvanceULPlaque(double elapsedMilliseconds)
+        {
+            ULPlaqueCounterMs += Math.Max(0, elapsedMilliseconds);
+            var interval = UINeighborhoodAnimationLayer.OldTownCounterIntervalMilliseconds;
+            if (interval <= 0) return;
+            while (ULPlaqueCounterMs >= interval)
+            {
+                ULPlaqueCounterMs -= interval;
+                ULPlaqueCounter = (ULPlaqueCounter + 1) % 12;
+            }
+        }
+
+        /// <summary>PlaqueFrameForStep: +0x1dc value -> sheet frame.
+        /// DrawFilterAt @0x1045a340 (file 0x463258 ladder, byte-verified):
+        /// cmpwi/beq/bge chain — 0->F0, 1->F1, 2|3 (v>=1 fallthrough)->F2,
+        /// 4->F1, 5|6+ (the v>=4 bge arm)->F0. The counter is mod 6, so the
+        /// observable cycle is the 3-frame PING-PONG 0,1,2,2,1,0.</summary>
+        public static int ULPlaqueFrameForStep(int step6)
+        {
+            switch (step6) { case 1: case 4: return 1; case 2: case 3: return 2; default: return 0; }
+        }
+
+        internal int ULPlaqueFrame { get { return ULPlaqueFrameForStep(ULPlaqueCounter % 6); } }
+
         public void ApplyULFilterMode(int filterCmdId, int engineMode, string plaqueMember, int importTargetLot = -1)
         {
             var neigh = Content.Get().Neighborhood;
@@ -624,6 +662,7 @@ namespace Simitone.Client.UI.Panels
             // easing curves.
             if (LotPopup != null && LotPopup.Visible && HoveredLotButton != null)
                 LotPopup.SetRampOpacity(HoveredLotButton.AlphaTime);
+            AdvanceULPlaque(state.Time.ElapsedGameTime.TotalMilliseconds);
             UpdateCheatBar(state);
         }
 
@@ -1774,7 +1813,12 @@ namespace Simitone.Client.UI.Panels
                 var plaque = UIOriginal.EnsureResolved(ULPlaqueMember)?.Get(GameFacade.GraphicsDevice);
                 if (plaque != null)
                 {
-                    var src = new Rectangle(0, 0, plaque.Width / 3, plaque.Height);
+                    // UI-38 residual: frame from the panel's +0x1dc-law counter
+                    // (0->0, 1|4->1, 2|3->2) — the ping-pong, was frame-0 static.
+                    var panel = Parent as UINeighborhoodSelectionPanel;
+                    var frame = panel != null ? panel.ULPlaqueFrame : 0;
+                    if (panel != null) panel.ULPlaqueDrawFrameForProbe = frame;
+                    var src = new Rectangle(frame * (plaque.Width / 3), 0, plaque.Width / 3, plaque.Height);
                     DrawLocalTexture(batch, plaque, src,
                         new Vector2(ULPlaqueOffsetX, ULPlaqueOffsetY));
                 }

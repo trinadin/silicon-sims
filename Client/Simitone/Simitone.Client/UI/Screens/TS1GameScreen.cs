@@ -584,10 +584,11 @@ namespace Simitone.Client.UI.Screens
 
             switch (speed)
             {
-                case 0: vm.SpeedMultiplier = 0; break;
-                case 1: vm.SpeedMultiplier = 1; break;
-                case 2: vm.SpeedMultiplier = 3; break;
-                case 3: vm.SpeedMultiplier = 10; break;
+                case 4: vm.SpeedMultiplier = 0; vm.PauseButtonPark = true; break;
+                case 0: vm.SpeedMultiplier = 0; vm.PauseButtonPark = true; break;
+                case 1: vm.SpeedMultiplier = 1; vm.PauseButtonPark = false; break;
+                case 2: vm.SpeedMultiplier = 3; vm.PauseButtonPark = false; break;
+                case 3: vm.SpeedMultiplier = 10; vm.PauseButtonPark = false; break;
             }
             vm.ResetTickAlign();
         }
@@ -1471,6 +1472,7 @@ namespace Simitone.Client.UI.Screens
         private void VMLotSwitch(uint lotId)
         {
             vm.SpeedMultiplier = 0;
+            vm.PauseButtonPark = false; // transit = the modal full-freeze class
             if ((short)lotId == -1)
             {
                 // AUD-17 E-10: the -1 "home lot" sentinel dereferenced

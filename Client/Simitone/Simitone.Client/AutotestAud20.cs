@@ -248,6 +248,101 @@ namespace Simitone.Client
                 info += " zoomLaw=" + zoomLaw;
                 if (!zoomLaw) ok = false;
 
+                // ---------- E. BUTTON FIRING LAW (AUD-19 L5, closed 2026-10-09) ------
+
+                // Native cTSWinBtn: PlayUISound fires on mouse-DOWN against
+                // four per-button override slots; per-slot null falls to the
+                // window default; the ULTIMATE default is EMPTY (silent) —
+                // only specific toolbars override (the UL community filter
+                // bar passes 'UI_Nhood_click', byte-proven at pool 0x6c6e0
+                // +0xe via [TOC-18180]). The old blanket ui_click on UP was
+                // a port invention, now removed.
+                bool btnLaw = true;
+                try
+                {
+                    var hitv = FSO.HIT.HITVM.Get();
+                    var dispatch = typeof(FSO.Client.UI.Controls.UIButton).GetMethod("OnMouseEvent",
+                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                    if (hitv == null || dispatch == null)
+                    {
+                        info += " btnLaw=skip(no-hitvm)";
+                    }
+                    else
+                    {
+                        var input = new FSO.Common.Rendering.Framework.Model.UpdateState();
+                        // E1: a button with NO override is silent on BOTH down and up
+                        //    (the native ultimate default is the empty string).
+                        // (review P2-1) subscribe a no-op handler: the removed
+                        // blanket up-click lived inside `if (OnButtonClick != null)`
+                        // — subscriber-less buttons would never reach a restored
+                        // regression line, false-greening this probe.
+                        var plain = new FSO.Client.UI.Controls.UIButton();
+                        plain.OnButtonClick += (b) => { };
+                        FSO.HIT.HITTrace.Reset();
+                        FSO.HIT.HITTrace.Enabled = true;
+                        dispatch.Invoke(plain, new object[] { FSO.Common.Rendering.Framework.IO.UIMouseEventType.MouseDown, input });
+                        dispatch.Invoke(plain, new object[] { FSO.Common.Rendering.Framework.IO.UIMouseEventType.MouseUp, input });
+                        FSO.HIT.HITTrace.Enabled = false;
+                        bool plainSilent = FSO.HIT.HITTrace.Count == 0;
+                        // E2: an override fires EXACTLY ONCE, on the DOWN event.
+                        var over = new FSO.Client.UI.Controls.UIButton
+                        { PressSound = FSO.Client.UI.Model.UISounds.NeighborhoodClick };
+                        over.OnButtonClick += (b) => { };
+                        FSO.HIT.HITTrace.Reset();
+                        FSO.HIT.HITTrace.Enabled = true;
+                        dispatch.Invoke(over, new object[] { FSO.Common.Rendering.Framework.IO.UIMouseEventType.MouseDown, input });
+                        int onDown = FSO.HIT.HITTrace.Count;
+                        dispatch.Invoke(over, new object[] { FSO.Common.Rendering.Framework.IO.UIMouseEventType.MouseUp, input });
+                        FSO.HIT.HITTrace.Enabled = false;
+                        bool overOnceOnDown = onDown == 1 && FSO.HIT.HITTrace.Count == 1;
+                        var snap20 = FSO.HIT.HITTrace.Snapshot();
+                        string firedName = snap20.Count > 0 ? snap20[snap20.Count - 1].EventName : null;
+                        bool firedRight = firedName == "ui_nhood_click";
+                        // E3: the production UL filter strip carries the override on
+                        //    all seven mounted buttons (the uidtbar construction idiom).
+                        int wired = 0;
+                        try
+                        {
+                            var panel = new Simitone.Client.UI.Panels.UINeighborhoodSelectionPanel(4);
+                            var sw = new Simitone.Client.UI.Panels.UINeighbourhoodSwitcher(panel, 4, false);
+                            if (sw.ULFilterButtons != null)
+                                foreach (var b in sw.ULFilterButtons)
+                                    if (b != null && b.PressSound == FSO.Client.UI.Model.UISounds.NeighborhoodClick) wired++;
+                            // (review P2-2) pin FIRING on a production strip button,
+                            // not just the field — a subclass overriding OnMouseEvent
+                            // without base would leave the strip silent yet wired=7.
+                            var stripBtn = sw.ULFilterButtons != null && sw.ULFilterButtons.Count > 0
+                                ? sw.ULFilterButtons[0] : null;
+                            if (stripBtn != null)
+                            {
+                                FSO.HIT.HITTrace.Reset();
+                                FSO.HIT.HITTrace.Enabled = true;
+                                dispatch.Invoke(stripBtn, new object[] { FSO.Common.Rendering.Framework.IO.UIMouseEventType.MouseDown, input });
+                                FSO.HIT.HITTrace.Enabled = false;
+                                var snap3 = FSO.HIT.HITTrace.Snapshot();
+                                if (!(snap3.Count == 1 && snap3[0].EventName == "ui_nhood_click"))
+                                {
+                                    wired = -1;
+                                    Log("AUTOTEST aud20: E3 strip fire got " + snap3.Count + " events"
+                                        + (snap3.Count > 0 ? " first=" + snap3[0].EventName : ""));
+                                }
+                            }
+                        }
+                        catch (Exception e3) { Log("AUTOTEST aud20: E3 switcher EXC " + e3.GetType().Name); }
+                        bool stripWired = wired == 7;
+                        btnLaw = plainSilent && overOnceOnDown && firedRight && stripWired;
+                        info += " btnLaw=" + btnLaw + "(plainSilent=" + plainSilent
+                            + " onceOnDown=" + overOnceOnDown + " name=" + firedName
+                            + " stripWired=" + wired + "/7)";
+                        if (!btnLaw)
+                            Log("AUTOTEST aud20: button firing law failed (plainSilent=" + plainSilent
+                                + " onDown=" + onDown + " total=" + FSO.HIT.HITTrace.Count
+                                + " name=" + firedName + " wired=" + wired + ")");
+                    }
+                }
+                catch (Exception eb) { btnLaw = false; info += " btnLaw=EXC:" + eb.GetType().Name; }
+                if (!btnLaw) ok = false;
+
                 Log("AUTOTEST aud20:" + info + (ok ? "" : " (FAILED)"));
                 if (ok) { Pass("aud20"); } else { Fail("aud20"); }
             }

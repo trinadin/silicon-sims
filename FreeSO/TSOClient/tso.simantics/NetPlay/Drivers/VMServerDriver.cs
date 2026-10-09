@@ -345,9 +345,20 @@ namespace FSO.SimAntics.NetPlay.Drivers
                 || (vm.TS1 && vm.TS1State != null
                     && ((!vm.PrimingTick || vm.TS1State.VisitSession)
                         && (vm.SpeedMultiplier == -1
+                            // ENG-28b: a UI modal over the buy park full-freezes
+                            // (the native +0x111 pump gate is park-agnostic).
+                            && vm.ModalPumpBlock == 0
                             // ENG-28's shipped visit-session -2 ticking (see VM.InternalTick's
                             // park gate; home lots stay frozen — native dialog law not decoded).
-                            || (vm.SpeedMultiplier == -2 && vm.TS1State.VisitSession)))))
+                            || (vm.SpeedMultiplier == -2 && vm.TS1State.VisitSession))))
+                // ENG-28b pause-0 lane (native dialog-park law decoded 2026-10-09):
+                // the pause BUTTON/focus park advances TickID on the same restricted
+                // law as -1 (wakes must fire while pause-parked; the +0x32 class);
+                // dialog/lot-switch 0s and modal latches (+0x111 SetBlockSimulator
+                // pump gate) keep the shipped full freeze.
+                || (vm.TS1 && vm.TS1State != null
+                    && vm.SpeedMultiplier == 0 && vm.PauseButtonPark && !vm.PrimingTick
+                    && vm.GlobalBlockingDialog == null && vm.ModalPumpBlock == 0))
                 tick.TickID = TickID++;
             tick.RandomSeed = vm.Context.RandomSeed;
             cmdQueue.Clear();

@@ -342,6 +342,28 @@ namespace FSO.SimAntics
         public bool PrimingTick;
 
         /// <summary>
+        /// ENG-28b pause-0 lane (native dialog-park law decoded 2026-10-09):
+        /// cDDDSimsView::Simulate flat 0x20e2cc gates its call to
+        /// cSimulator::Simulate on view+0x111 == 0 — SetBlockSimulator
+        /// (flat 0x209ae0, stb r4,273(r3)) stores exactly that flag, set
+        /// around DoSimsModalDialog's modal loop (flat 0x24aa80: save the
+        /// old flag, SetBlockSimulator(1), modal event loop 0x51ca60,
+        /// restore). So a BLOCKING MODAL stops the simulator pump ENTIRELY
+        /// (no ticks, no clock, no object passes), while the PAUSE BUTTON
+        /// (+0x32 via cSimulator::Pause flat 0x10130260) only restricts
+        /// INSIDE the tick — objects keep simulating, clock frozen. The
+        /// port historically conflated both onto SpeedMultiplier == 0.
+        /// PauseButtonPark marks the BUTTON/focus park (restricted tick,
+        /// the -1 law at speed 0); plain 0 without it stays the shipped
+        /// full freeze (dialogs, lot switches). ModalPumpBlock is the
+        /// UI-modal counter (UIModalSimPause) so UI-level modals stop the
+        /// pump the way SetBlockSimulator does natively.
+        /// </summary>
+        public bool PauseButtonPark;
+        private bool FocusSavedPauseButton;
+        public int ModalPumpBlock;
+
+        /// <summary>
         /// UI-26: apply the focus suspend/restore law (native cSimulator +52
         /// signed speed). Safe to call repeatedly with the same state.
         /// </summary>
@@ -353,13 +375,21 @@ namespace FSO.SimAntics
                 {
                     FocusSuspended = false;
                     SpeedMultiplier = FocusSavedSpeed;
+                    // Restore the user's own park class, not the one the
+                    // focus park imposed (review P3-1: a suspend over an
+                    // alert-0 must not convert it to a restricted park).
+                    PauseButtonPark = FocusSavedPauseButton;
                 }
             }
             else if (!simInBackground && !FocusSuspended)
             {
                 FocusSuspended = true;
                 FocusSavedSpeed = SpeedMultiplier;
+                FocusSavedPauseButton = PauseButtonPark;
                 SpeedMultiplier = 0;
+                // Native app-deactivate is a CPState::Pause caller (R214) —
+                // the restricted +0x32 park, not a modal pump stop.
+                PauseButtonPark = true;
             }
         }
 
@@ -556,10 +586,25 @@ namespace FSO.SimAntics
                     // choreography is calibrated to a non-ticking priming tick —
                     // the hdserve bisect). Home lots keep the -2 dialog freeze
                     // (native dialog law not decoded).
-                    (SpeedMultiplier == -1 && (!PrimingTick || TS1State.VisitSession))
+                    (SpeedMultiplier == -1 && (!PrimingTick || TS1State.VisitSession)
+                        // ENG-28b dialog-park law: +0x111 stops the pump at ANY
+                        // park — a UI modal over buy mode (UIModalSimPause leaves
+                        // speed at -1 and raises ModalPumpBlock) full-freezes.
+                        && ModalPumpBlock == 0)
                     || (SpeedMultiplier == -2 && TS1State.VisitSession))))
                     return;
             }
+            // ENG-28b pause-0 (review P2-1 correction): at speed 0 the object
+            // pass below runs UNCONDITIONALLY in the shipped port (the <0
+            // block above never gates it) — that IS the restricted law for
+            // the pause-button park (PauseButtonPark marks which 0-parks are
+            // the +0x32 class; their TickID advance lives in
+            // VMServerDriver.Tick). The decoded +0x111 modal law needs an
+            // INDEPENDENT gate: a UI modal (UIModalSimPause — the decoded
+            // SetBlockSimulator/DoSimsModalDialog users) stops the pump at
+            // ANY park, button pause included.
+            if (TS1 && TS1State != null && ModalPumpBlock > 0)
+                return;
             if (!UseSchedule) { //scheduleless mode is still useful for desync debug.
                 var entCpy = Entities.ToArray();
                 foreach (var obj in entCpy)

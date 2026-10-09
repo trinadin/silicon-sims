@@ -224,10 +224,11 @@ namespace Simitone.Client.UI.Panels
 
             switch (speed)
             {
-                case 4: VM.SpeedMultiplier = 0; break;
-                case 1: VM.SpeedMultiplier = 1; break;
-                case 2: VM.SpeedMultiplier = 3; break;
-                case 3: VM.SpeedMultiplier = 10; break;
+                case 4: VM.SpeedMultiplier = 0; VM.PauseButtonPark = true; break;
+                case 0: VM.SpeedMultiplier = 0; VM.PauseButtonPark = true; break;
+                case 1: VM.SpeedMultiplier = 1; VM.PauseButtonPark = false; break;
+                case 2: VM.SpeedMultiplier = 3; VM.PauseButtonPark = false; break;
+                case 3: VM.SpeedMultiplier = 10; VM.PauseButtonPark = false; break;
             }
 
             if (Expand) SetExpanded(false);
