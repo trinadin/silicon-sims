@@ -35,8 +35,9 @@ namespace Simitone.Client
     ///       overwrites slot 0/1 with rows 15/16 (GetString is 1-based);
     ///   (c) the zone-choice strings: UIText STR# 250 'Rezone Mode strings'
     ///       [0]/[1] + STR# 251 'Zoning Types' [0]/[1] (the ZoningData
-    ///       captions) — the DIALOG itself is decode-banked (the port's
-    ///       toggle flow is the reviewed cover and is pinned by nbr05ui);
+    ///       captions) — the DIALOG itself is WIRED as of NBR-08 (mounted
+    ///       ahead of the cascade with same-zone picks inert; pinned by this
+    ///       probe's PhaseZoneChoice);
     ///   (d) the UCP hide-slot pairing law: IsLiveModeDisabled (CPState+0x55)
     ///       drives BUILD+CAMERA; IsBuyAndBuildDisabled (CPState+0x54) drives
     ///       BUY+LIVE (TS1GameScreen.NativeUcpDisablePairing).
@@ -120,7 +121,9 @@ namespace Simitone.Client
                     case 3: PhaseVenueQuiet(); break;
                     case 4: PhaseVenueVacation(); break;
                     case 5: PhaseVenueMagic(); break;
-                    case 6: PhaseRestore(); break;
+                    case 6: PhaseZoneChoice(); break;       // NBR-08
+                    case 7: PhaseBulldozeSounds(); break;   // NBR-08
+                    case 8: PhaseRestore(); break;
                     default:
                         _done = true;
                         break;
@@ -188,10 +191,52 @@ namespace Simitone.Client
             if (!Switcher.BulldozeArmed) Press(ToolbarButton("NghUI\\Bulldoze.bmp"));
         }
 
+        private void ArmRezone()
+        {
+            if (!Switcher.RezoneArmed) Press(ToolbarButton("NghUI\\Rezone.bmp"));
+        }
+
         private void DisarmAll()
         {
             if (Switcher.BulldozeArmed || Switcher.RezoneArmed)
                 Press(ToolbarButton("NghUI\\InetBtn.bmp"));
+        }
+
+        // NBR-08: the zone-choice dialog's buttons — Yes = STR# 251 [0]
+        // "Residential" (target 0), No = [1] "Community" (target 1).
+        private UIButton RezoneChoiceButton(int target)
+        {
+            UIButton btn = null;
+            Screen._rezoneChoiceDialog?.ButtonMap.TryGetValue(
+                target == 0 ? UIAlertButtonType.Yes : UIAlertButtonType.No, out btn);
+            return btn;
+        }
+
+        // NBR-08 sound pins (the AUD-20 event-snapshot idiom): the ordered
+        // ui_nhood_bdoze* dispatch names in the trace window (other UI sounds
+        // are filtered out), and whether any of them failed to resolve.
+        private static List<string> BdozeSequence()
+        {
+            var names = new List<string>();
+            foreach (var e in FSO.HIT.HITTrace.Snapshot())
+                if (e.Kind == FSO.HIT.HITTrace.KIND_EVENT && e.EventName != null
+                    && e.EventName.StartsWith("ui_nhood_bdoze"))
+                    names.Add(e.EventName);
+            return names;
+        }
+
+        private static bool BdozeAllResolved()
+        {
+            foreach (var e in FSO.HIT.HITTrace.Snapshot())
+                if (e.Kind == FSO.HIT.HITTrace.KIND_EVENT && e.EventName != null
+                    && e.EventName.StartsWith("ui_nhood_bdoze")
+                    && e.Result == FSO.HIT.HITTrace.RES_NOT_FOUND) return false;
+            return true;
+        }
+
+        private static string BdozeJoin(List<string> seq)
+        {
+            return string.Join(",", seq.ToArray());
         }
 
         private UIButton BulldozeDialogButton(UIAlertButtonType type)
@@ -495,13 +540,201 @@ namespace Simitone.Client
             Next();
         }
 
+        private void PhaseZoneChoice()
+        {
+            // NBR-08: the zone-choice dialog is WIRED ahead of the rezone
+            // cascade (was decode-banked) — RezoneModeLotHandlerUL
+            // 0x4691f0-0x46927c, cSimsApp vt+0x118, STR# 250 [0]/[1] with the
+            // %s = the current zone's STR# 251 name, the STR# 251 captions as
+            // the two choice buttons. Same-zone pick INERT (0x4692a0-0x4692dc
+            // re-query the zone AFTER the choice returns); dismiss returns;
+            // other-zone pick runs the cascade at the picked target.
+            Check(Panel.CurrentViewMode == 4, "zone-choice-leg-base-mode");
+            Check(N.GetFamilyForHouse(11) == null, "lot11-vacant-zonechoice");
+            var simi = SimiBuildingValues(HousePath(11));
+            Check(simi != null && simi.Item1 == 0 && simi.Item2 == 0, "lot11-unbuilt-zonechoice");
+            Check(N.GetZoningType(11) == 0, "lot11-residential-before-choice");
+            var shown0 = Screen.RezoneChoiceShownForProbe;
+            var same0 = Screen.RezoneChoiceSameZoneForProbe;
+            var rezones0 = Screen.RezonesForProbe;
+            var directs0 = Screen.RezoneDirectForProbe;
+
+            // MOUNT: the armed click mounts the CHOICE, not the cascade.
+            ArmRezone();
+            Panel.SelectHouse(11);
+            var choice = Screen._rezoneChoiceDialog;
+            Check(Screen.RezoneChoiceShownForProbe == shown0 + 1, "zone-choice-mounted");
+            Check(choice != null, "zone-choice-dialog-live");
+            if (choice != null)
+            {
+                Check(choice.TitleTextForProbe == "Rezone House?", "zone-choice-title-str250-0");
+                Check(choice.MessageTextForProbe
+                    == GameFacade.Strings.GetString("250", "1").Replace("%s", "Residential"),
+                    "zone-choice-message-str250-1-residential-formatted");
+                var res = RezoneChoiceButton(0);
+                var com = RezoneChoiceButton(1);
+                Check(res != null && com != null, "zone-choice-has-both-buttons");
+                Check(res != null && res.Caption == "Residential", "zone-choice-button0-str251-0");
+                Check(com != null && com.Caption == "Community", "zone-choice-button1-str251-1");
+            }
+            else { Fail("zone-choice-dialog-missing"); _done = true; return; }
+
+            // SAME-ZONE pick: INERT — no rezone, no receipt, zone unchanged.
+            var sameBtn = RezoneChoiceButton(0);   // current zone is residential
+            Check(sameBtn != null, "same-zone-button-present");
+            if (sameBtn != null) Press(sameBtn);
+            Check(Screen.RezoneChoiceSameZoneForProbe == same0 + 1, "same-zone-pick-counted");
+            Check(Screen.RezonesForProbe == rezones0 && Screen.RezoneDirectForProbe == directs0,
+                "same-zone-pick-made-no-rezone");
+            Check(N.GetZoningType(11) == 0, "same-zone-zone-unchanged");
+            Check(Screen._rezoneDialog == null, "same-zone-no-receipt-dialog");
+
+            // DISMISS: a bare Close() (the native -1 arm) — nothing runs.
+            Panel.SelectHouse(11);
+            Check(Screen.RezoneChoiceShownForProbe == shown0 + 2, "zone-choice-remounted-for-dismiss");
+            Screen._rezoneChoiceDialog?.Close();
+            Screen._rezoneChoiceDialog = null;   // mirrors the handlers' seam cleanup
+            Check(Screen.RezonesForProbe == rezones0 && Screen.RezoneDirectForProbe == directs0,
+                "dismiss-made-no-rezone");
+            Check(N.GetZoningType(11) == 0, "dismiss-zone-unchanged");
+            Check(Screen.RezoneChoiceSameZoneForProbe == same0 + 1,
+                "dismiss-not-counted-as-same-zone");
+
+            // OTHER-ZONE pick: the direct rezone completes at the PICKED target.
+            Panel.SelectHouse(11);
+            Check(Screen.RezoneChoiceShownForProbe == shown0 + 3, "zone-choice-remounted-for-other-zone");
+            var otherBtn = RezoneChoiceButton(1);
+            Check(otherBtn != null, "other-zone-button-present");
+            if (otherBtn != null) Press(otherBtn);
+            Check(Screen.RezoneDirectForProbe == directs0 + 1, "other-zone-direct-rezone-ran");
+            Check(Screen.RezonesForProbe == rezones0 + 1, "other-zone-rezone-counted");
+            Check(N.GetZoningType(11) == 1, "other-zone-toggled-to-community");
+            Check(Screen._rezoneDialog != null, "other-zone-receipt-shown");
+            Check(Screen.HouseRezonedForProbe == 11, "other-zone-receipt-lot-recorded");
+            UIButton okBtn = null;
+            Screen._rezoneDialog?.ButtonMap.TryGetValue(UIAlertButtonType.OK, out okBtn);
+            if (okBtn != null) Press(okBtn);
+            // restore the template zone
+            Check(N.SetZoningType(11, 0), "zone-choice-restore-residential");
+            DisarmAll();
+            if (!_passed) { _done = true; return; }
+            Next();
+        }
+
+        private void PhaseBulldozeSounds()
+        {
+            // NBR-08 (P3-3/P3-4): the base/UL bulldoze sound law, pinned two
+            // ways — (a) CORPUS: the four neighborhood bulldoze names resolve
+            // in the mounted HOT event tables (HITVM + the HOT loader both
+            // lowercase; wrong/missing names fail loudly); (b) DISPATCH: the
+            // AUD-20 event-snapshot idiom — HITTrace windows around the REAL
+            // legs: the unbuilt OK-dialog bracket cancel→bdoze
+            // (0x469878-0x4698b4), demolish on the confirm-YES arms
+            // (0x4698dc), evict on the occupied keep-house executor arm
+            // (0x469a08-0x469a38, flag-0 side).
+            Check(Panel.CurrentViewMode == 4, "sounds-leg-base-mode");
+            var audio = FSO.Content.Content.Get().Audio;
+            Check(audio != null && audio.Events != null, "hit-event-tables-mounted");
+            if (audio != null && audio.Events != null)
+            {
+                Check(audio.Events.ContainsKey(FSO.Client.UI.Model.UISounds.BulldozeCancel),
+                    "corpus-ui_nhood_bdoze_cancel-resolves");
+                Check(audio.Events.ContainsKey(FSO.Client.UI.Model.UISounds.Bulldoze),
+                    "corpus-ui_nhood_bdoze-resolves");
+                Check(audio.Events.ContainsKey(FSO.Client.UI.Model.UISounds.BulldozeDemolish),
+                    "corpus-ui_nhood_bdoze_demolish-resolves");
+                Check(audio.Events.ContainsKey(FSO.Client.UI.Model.UISounds.BulldozeEvict),
+                    "corpus-ui_nhood_bdoze_evict-resolves");
+                Check(!audio.Events.ContainsKey("ui_nhood_bdoze_nosuch"),
+                    "corpus-negative-control-absent");
+            }
+
+            var hit = FSO.HIT.HITVM.Get();
+            if (hit == null)
+            {
+                // The AUD-20 degrade idiom: corpus laws stand, dispatch pins skip.
+                _notes.Add("sounds: dispatch pins skipped (no HITVM)");
+                if (!_passed) { _done = true; return; }
+                Next();
+                return;
+            }
+
+            // (b1) OCCUPIED keep-house arm → evict: lot 3 is vacant+built after
+            // the venue legs; bind FAMI 4, confirm1 YES, confirm2 NO.
+            var fam = N.GetFamily(4);
+            Check(fam != null, "sounds-family-4-found");
+            if (fam == null) { _done = true; return; }
+            Check(N.GetFamilyForHouse(3) == null, "sounds-lot3-vacant");
+            var simi3 = SimiBuildingValues(HousePath(3));
+            Check(simi3 != null && (simi3.Item1 > 0 || simi3.Item2 > 0), "sounds-lot3-built");
+            if (simi3 == null || N.GetFamilyForHouse(3) != null)
+            { Fail("sounds-template-lot3-not-vacant-built"); _done = true; return; }
+            N.SetFamilyForHouse(3, fam, false);
+            FSO.HIT.HITTrace.Reset();
+            FSO.HIT.HITTrace.Enabled = true;
+            ArmBulldoze();
+            Panel.SelectHouse(3);
+            Press(BulldozeDialogButton(UIAlertButtonType.Yes));   // confirm1 [2]/[3]
+            Press(BulldozeDialogButton(UIAlertButtonType.No));    // confirm2 [0]/[1] keep house
+            FSO.HIT.HITTrace.Enabled = false;
+            var s1 = BdozeSequence();
+            Check(s1.Count == 1 && s1[0] == "ui_nhood_bdoze_evict",
+                "occupied-keep-house-plays-evict (" + BdozeJoin(s1) + ")");
+            Check(BdozeAllResolved(), "occupied-arm-sounds-resolved");
+            Check(N.GetFamilyForHouse(3) == null, "sounds-evict-unbound-family");
+            var r1 = BulldozeDialogButton(UIAlertButtonType.OK);
+            if (r1 != null) Press(r1);   // the evict receipt
+            DisarmAll();
+
+            // (b2) VACANT+BUILT confirm YES → demolish (lot 3, house still
+            // standing after the keep-house arm).
+            FSO.HIT.HITTrace.Reset();
+            FSO.HIT.HITTrace.Enabled = true;
+            ArmBulldoze();
+            Panel.SelectHouse(3);
+            Press(BulldozeDialogButton(UIAlertButtonType.Yes));
+            FSO.HIT.HITTrace.Enabled = false;
+            var s2 = BdozeSequence();
+            Check(s2.Count == 1 && s2[0] == "ui_nhood_bdoze_demolish",
+                "vacant-built-yes-plays-demolish (" + BdozeJoin(s2) + ")");
+            Check(BdozeAllResolved(), "vacant-built-sound-resolved");
+            var after3 = SimiBuildingValues(HousePath(3));
+            Check(after3 != null && after3.Item1 == 0 && after3.Item2 == 0,
+                "sounds-vacant-built-bulldozed");
+            var r2 = BulldozeDialogButton(UIAlertButtonType.OK);
+            if (r2 != null) Press(r2);   // the bulldoze receipt
+            DisarmAll();
+
+            // (b3) VACANT+UNBUILT → the cancel/bdoze bracket around the
+            // 132 [4]/[5] OK dialog (0x469878-0x4698b4; lot 11).
+            var status0 = Screen.BulldozeStatusOnlyForProbe;
+            FSO.HIT.HITTrace.Reset();
+            FSO.HIT.HITTrace.Enabled = true;
+            ArmBulldoze();
+            Panel.SelectHouse(11);
+            FSO.HIT.HITTrace.Enabled = false;
+            var s3 = BdozeSequence();
+            Check(Screen.BulldozeStatusOnlyForProbe == status0 + 1, "sounds-unbuilt-leg-counted");
+            Check(Screen._bulldozeDialog != null, "sounds-unbuilt-nothing-dialog-mounted");
+            Check(s3.Count == 2 && s3[0] == "ui_nhood_bdoze_cancel" && s3[1] == "ui_nhood_bdoze",
+                "unbuilt-leg-cancel-bdoze-bracket (" + BdozeJoin(s3) + ")");
+            Check(BdozeAllResolved(), "bracket-sounds-resolved");
+            var r3 = BulldozeDialogButton(UIAlertButtonType.OK);
+            if (r3 != null) Press(r3);   // the nothing-dialog OK
+            DisarmAll();
+            if (!_passed) { _done = true; return; }
+            Next();
+        }
+
         private void PhaseRestore()
         {
             DisarmAll();
             Check(!Switcher.BulldozeArmed && !Switcher.RezoneArmed, "ends-disarmed");
             Check(Panel.CurrentViewMode == 4, "view-mode-restored-to-base");
+            Check(N.GetZoningType(11) == 0, "zone-choice-leg-zone-restored");
             _notes.Add("summary: venues=DT/ST-occupied-noop+VA[18]/[19]+MG-venue-pair; " +
-                "zone-choice=STR250/251-decoded-dialog-banked; ucp-pairing=+0x54→BUY+LIVE/+0x55→BUILD+CAMERA");
+                "zone-choice=STR250/251-WIRED(NBR-08); ucp-pairing=+0x54→BUY+LIVE/+0x55→BUILD+CAMERA; " +
+                "sounds=corpus+evict/demolish/cancel-bdoze-bracket-pinned");
             _done = true;
         }
     }

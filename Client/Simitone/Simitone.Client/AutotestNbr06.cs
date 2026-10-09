@@ -227,6 +227,16 @@ namespace Simitone.Client
             return btn;
         }
 
+        // NBR-08: answer the mounted zone-choice dialog (STR# 250/251) with
+        // the given target — Yes = Residential (0), No = Community (1).
+        private void AnswerRezoneChoice(int target)
+        {
+            UIButton btn = null;
+            Screen._rezoneChoiceDialog?.ButtonMap.TryGetValue(
+                target == 0 ? UIAlertButtonType.Yes : UIAlertButtonType.No, out btn);
+            if (btn != null) Press(btn);
+        }
+
         private string HousePath(int house)
         {
             // The port's house-file convention is zero-padded (House05.iff —
@@ -507,6 +517,7 @@ namespace Simitone.Client
 
             ArmRezone();
             Panel.SelectHouse(3);
+            AnswerRezoneChoice(1);   // NBR-08: answer the zone choice (Community)
             var c1 = Screen._rezoneDialog;
             Check(c1 != null && c1.TitleTextForProbe == "Are You Sure?", "chain-confirm-6-7-title");
             Press(RezoneDialogButton(UIAlertButtonType.Yes));
@@ -546,6 +557,7 @@ namespace Simitone.Client
 
             ArmRezone();
             Panel.SelectHouse(10);
+            AnswerRezoneChoice(1);   // NBR-08: answer the zone choice (Community)
             var c = Screen._rezoneDialog;
             Check(c != null && c.TitleTextForProbe == "Are you sure?", "vacant-built-chain-confirm");
             Press(RezoneDialogButton(UIAlertButtonType.Yes));
