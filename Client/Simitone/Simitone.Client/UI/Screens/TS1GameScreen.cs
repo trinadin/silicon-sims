@@ -1350,9 +1350,14 @@ namespace Simitone.Client.UI.Screens
             }
 
             var isSimless = (ActiveFamily == null && !isSurrounding);
+            // ENG-28b: mark this as the load-time PRIMING pass — the home-lot
+            // restricted tick must not fire on it (see VM.PrimingTick; the
+            // arrival choreography is calibrated to a non-ticking priming pass).
+            vm.PrimingTick = true;
             vm.SpeedMultiplier = -1;
             vm.Tick();
             vm.SpeedMultiplier = 1;
+            vm.PrimingTick = false;
 
             if (isSimless)
             {

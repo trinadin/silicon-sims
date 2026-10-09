@@ -327,12 +327,22 @@ namespace FSO.SimAntics.NetPlay.Drivers
             // scheduler is tickID-based (VMSleep/ScheduleTickIn compare against
             // Scheduler.CurrentTickID), so a frozen TickID with a running object
             // pass would strand every parked thread — the petname LM-1 QUEUE-SNAP
-            // stall class. Advance TickID on the TS1 visit-session park (the
-            // NativeEntryVisit matrix, VMTS1LotState.VisitSession) so wakes fire
-            // while parked, mirroring the native pass-driven scheduling. The -1
-            // park only; the focus park (0) and the TSO path are untouched.
+            // stall class. Advance TickID on the TS1 park so wakes fire while
+            // parked, mirroring the native pass-driven scheduling.
+            // ENG-28b: the buy park (-1) now advances on EVERY TS1 lot (the
+            // native restricted tick is lot-agnostic — see VM.InternalTick's
+            // park gate), superseding the visit-session-only gate. Two
+            // exclusions, both bisect-proven necessary (the hdserve outbound
+            // 'Go Downtown' 281-wait stall, deterministic 2/2 per variant):
+            // the LOAD-TIME priming tick (VM.PrimingTick — InitializeLot's
+            // synchronous -1 pass) keeps its non-ticking semantics, and the
+            // dialog parks (-2 BHAV / 0+GlobalBlockingDialog screen alerts)
+            // plus the focus suspend and the explicit pause (0) keep the
+            // shipped full freeze (their native laws are not decoded; the 0
+            // arm additionally burns transit wait countdowns through
+            // dialog-adjacent transients — retracted).
             if (vm.SpeedMultiplier > 0
-                || (vm.SpeedMultiplier < 0 && vm.TS1 && vm.TS1State != null && vm.TS1State.VisitSession))
+                || (vm.TS1 && vm.TS1State != null && vm.SpeedMultiplier == -1 && !vm.PrimingTick))
                 tick.TickID = TickID++;
             tick.RandomSeed = vm.Context.RandomSeed;
             cmdQueue.Clear();
