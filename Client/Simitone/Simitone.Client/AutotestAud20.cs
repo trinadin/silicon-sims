@@ -102,6 +102,29 @@ namespace Simitone.Client
                         nameLaw = false;
                     }
                 }
+                // footstep-residuals-decode (2026-10-09): the class-0 default's
+                // snow/99 arm = the CURRENT LOT (global #10): lots 40-42 snow,
+                // 99 soft (noshoe twin live), other lots terrain.
+                var lotCases = new[]
+                {
+                    new [] { "0", "0", "41", "footstep_snow" },
+                    new [] { "0", "0", "40", "footstep_snow" },
+                    new [] { "0", "0", "42", "footstep_snow" },
+                    new [] { "0", "0", "99", "footstep_soft" },
+                    new [] { "0", "1", "99", "footstep_soft_noshoe" },
+                    new [] { "0", "0", "5",  "footstep_terrain" },
+                    new [] { "0", "1", "41", "footstep_snow" },   // snow family is single-name
+                    new [] { "4", "0", "41", "footstep_soft" },   // non-zero class ignores the lot
+                };
+                foreach (var c in lotCases)
+                {
+                    var got = FSO.SimAntics.Model.VMFootstepLaw.SoundNameForClass(int.Parse(c[0]), c[1] == "1", int.Parse(c[2]));
+                    if (got != c[3])
+                    {
+                        Log("AUTOTEST aud20: lot law class=" + c[0] + " lot=" + c[2] + " got " + got + " want " + c[3]);
+                        nameLaw = false;
+                    }
+                }
                 info += " nameLaw=" + nameLaw;
                 if (!nameLaw) ok = false;
 

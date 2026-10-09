@@ -632,7 +632,12 @@ namespace FSO.SimAntics
             bool noShoe = FSO.SimAntics.Model.VMFootstepLaw.IsNoShoeOutfit(
                 GetPersonData(FSO.SimAntics.Model.VMPersonDataVariable.CurrentOutfit));
 
-            var name = FSO.SimAntics.Model.VMFootstepLaw.SoundNameForClass(surfaceClass, noShoe);
+            // footstep-residuals-decode: the class-0 default's snow/99 arm
+            // reads the CURRENT LOT (cSimulator global #10 = the port's
+            // TS1State.CurrentHouse).
+            var lotNo = 0;
+            try { lotNo = Thread?.Context?.VM?.TS1State?.CurrentHouse ?? 0; } catch { }
+            var name = FSO.SimAntics.Model.VMFootstepLaw.SoundNameForClass(surfaceClass, noShoe, lotNo);
             if (name == null) return;
 
             // native play: cSoundPlayer::PlayBySource(name, source=object id)
