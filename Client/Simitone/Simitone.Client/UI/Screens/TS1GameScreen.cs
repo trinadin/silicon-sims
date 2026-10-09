@@ -756,14 +756,25 @@ namespace Simitone.Client.UI.Screens
         /// trees run (vacation souvenirs; the other packs' spawns are Global[20]
         /// flag-gated inside 4104). CheckRoutine is deliberately null: the engine
         /// push already knows purchases exist — the TTAB TEST (4119) gates
-        /// pie-menu availability, not engine-initiated returns.
+        /// pie-menu availability, not engine-initiated returns. Review note: the
+        /// deferred flag is memory-only — a quit between the return edge and
+        /// avatar materialization loses that return's push (tokens survive in
+        /// inventory; the next vacation return re-runs the umbrella), and the
+        /// flag can survive a Downtown detour to fire on the next home entry.
         /// </summary>
         private void TryPushVacationCarryHome(List<VMEntity> members)
         {
             try
             {
                 var plugin = vm.Entities.FirstOrDefault(e => e?.Object?.OBJ != null && e.Object.OBJ.GUID == 0xABA9DF4Au);
-                var tree = plugin?.GetRoutineWithOwner(4104, vm.Context);
+                if (plugin == null)
+                {
+                    // review P3: never enqueue with a null Callee — a saved action with a
+                    // dead callee NREs the TS1 activator's queue-name recovery at load.
+                    GameLog.Write("trv06 carry-home: phone plugin entity not on lot — push skipped");
+                    return;
+                }
+                var tree = plugin.GetRoutineWithOwner(4104, vm.Context);
                 if (tree?.routine == null)
                 {
                     var owner = Content.Get().WorldObjects.Get(0xABA9DF4Au);
@@ -797,8 +808,6 @@ namespace Simitone.Client.UI.Screens
                     member.Thread.EnqueueAction(action);
                     pushed++;
                 }
-                if (pushed > 0)
-                    GameLog.Write("trv06 carry-home: umbrella interaction pushed on " + pushed + " member(s)");
             }
             catch (Exception carryEx)
             {
