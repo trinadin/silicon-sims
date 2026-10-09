@@ -958,10 +958,11 @@ namespace Simitone.Client.UI.Panels.Desktop
             // NativeUcpDisablePairing is the law's single source). The port
             // pairs {BUY,BUILD} with the engine's BuildBuyEnabled and
             // {LIVE,CAMERA} with global 32 — a DISCLOSED port-side pairing:
-            // in every port-reachable state both drives are true together
-            // (the visit lock sets BuildBuyEnabled=false AND global 32), so
-            // the visible outcome matches the native law; see the NBR-07
-            // receipt before changing this gate.
+            // on the correlated visit-lock path both drives are true
+            // together (the visit lock sets BuildBuyEnabled=false AND
+            // global 32), so the visible outcome matches the native law
+            // there; the drives are correlated, not coupled (review P3-2);
+            // see the NBR-07 receipt before changing this gate.
             CameraButton.Disabled = LiveButton.Disabled;
         }
 

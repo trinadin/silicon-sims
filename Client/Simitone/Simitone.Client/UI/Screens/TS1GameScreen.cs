@@ -202,11 +202,13 @@ namespace Simitone.Client.UI.Screens
 
         internal static ushort GetNeighborhoodModeFromHouse(short house)
         {
-            // House number ranges match the lot types
-            if (house >= 21 && house <= 31) return 2;  // Downtown
+            // House number ranges match the lot types (NBR-07 decode bands:
+            // MapHouseNumToIndex windows DT 21-30, Magic 90-98 — lot 99 is
+            // NOT in the Magic window; review P3-5 corrected the bounds)
+            if (house >= 21 && house <= 30) return 2;  // Downtown
             else if (house >= 40 && house <= 49) return 3;  // Vacation
             else if (house >= 81 && house <= 89) return 5;  // Studiotown
-            else if (house >= 90 && house <= 99) return 7;  // Magictown
+            else if (house >= 90 && house <= 98) return 7;  // Magictown
             else return 4;  // Normal/Old Town (default)
         }
 
@@ -2124,10 +2126,13 @@ namespace Simitone.Client.UI.Screens
     /// buy-and-build drive pairs BUY+LIVE (view+0xf0/+0xf4). IsHideForLocation
     /// (@0x20c5e0) shows/hides the +0x100/+0x1a8 elements via vt+0x9c/0xa0 —
     /// those two have no identified port counterpart (banked in the receipt).
-    /// In every port-reachable state both drives are true together (the visit
-    /// lock sets BuildBuyEnabled=false AND global 32), so the port's existing
-    /// pairing {BUY,BUILD}/{LIVE,CAMERA} yields the same visible outcome;
-    /// kept and disclosed here as the single source of the native law.</summary>
+    /// On the correlated visit-lock path both drives are true together (the
+    /// visit lock sets BuildBuyEnabled=false AND global 32), so the port's
+    /// existing pairing {BUY,BUILD}/{LIVE,CAMERA} yields the same visible
+    /// outcome there; the drives are only correlated, not coupled (a BHAV
+    /// DisableBuildBuy via VMGenericTS1Call 10/11 without global 32 would
+    /// diverge — review P3-2 disclosure); kept here as the law's single
+    /// source.</summary>
     internal static void NativeUcpDisablePairing(bool buyAndBuildDisabled, bool liveModeDisabled,
         out bool buy, out bool build, out bool live, out bool camera)
     {
