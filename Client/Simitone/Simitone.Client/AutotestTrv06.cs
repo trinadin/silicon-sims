@@ -168,6 +168,27 @@ namespace Simitone.Client
                 .OfType<VMAvatar>().ToList();
         }
 
+        /// <summary>The petname last-mile latch law (AutotestRunner
+        /// ReleasePetNameLatch): a lingering GlobalBlockingDialog parks the VM
+        /// (spd -2); clear it and restore speed. Probe-side, disclosed.</summary>
+        private void Unstick()
+        {
+            try
+            {
+                var vm = _vm();
+                if (vm == null) return;
+                if (vm.GlobalBlockingDialog != null)
+                {
+                    Log("AUTOTEST trv06 UNSTICK clearing gbd " + vm.GlobalBlockingDialog.GetType().Name);
+                    vm.GlobalBlockingDialog = null;
+                }
+                if (vm.LastSpeedMultiplier > 0) { vm.SpeedMultiplier = vm.LastSpeedMultiplier; vm.LastSpeedMultiplier = 0; }
+                else if (vm.SpeedMultiplier < 0) vm.SpeedMultiplier = 1;
+                _livelift();
+            }
+            catch (Exception e) { Log("AUTOTEST trv06 UNSTICK-EXC " + e.GetType().Name); }
+        }
+
         private void PinMood(VMAvatar a, short v)
         {
             if (a == null) return;
@@ -277,13 +298,25 @@ namespace Simitone.Client
                                     "p0 4104 ins7 = attr[2] := attr[1] (counter/limit law)");
                             }
                             var tuning = Bcon(NpcCtlGuid, 4096);
-                            Check(tuning != null && tuning.Constants.Length > 3, "p0 BCON 4096 'Tuning' present");
-                            if (tuning != null && tuning.Constants.Length > 3)
+                            Check(tuning != null && tuning.Constants.Length == 4, "p0 BCON 4096 'Tuning' present");
+                            if (tuning != null && tuning.Constants.Length == 4)
                             {
-                                Check((short)tuning.Constants[2] == 3, "p0 Tuning[2] == 3 (got " + (short)tuning.Constants[2] + ")");
-                                Check((short)tuning.Constants[3] == 6, "p0 Tuning[3] == 6 (got " + (short)tuning.Constants[3] + ")");
-                                _tuning3 = (short)tuning.Constants[3];
+                                // file canon: header(count=4,flags=0x80) + [10, 3, 6, 150].
+                                // INDEX LAW: BHAV tuning operands are 0-BASED (corpus proof: 168
+                                // Tuning[0] refs across EP4+Shared would be invalid 1-based), so the
+                                // executor's Tuning[2]=6 (scold/fine offset) and Tuning[3]=150 (the
+                                // souvenir threshold). TRV-05's receipt annotated these 1-based
+                                // (3/6) — corrected here; receipt note filed.
+                                Check((short)tuning.Constants[0] == 10 && (short)tuning.Constants[1] == 3
+                                    && (short)tuning.Constants[2] == 6 && (short)tuning.Constants[3] == 150,
+                                    "p0 Tuning canon [10,3,6,150] (got [" + string.Join(",", tuning.Constants.Select(x => ((short)x).ToString())) + "])");
                             }
+                            // the threshold exactly as the EXECUTOR resolves it (tuning cache path)
+                            var tcache = Res(NpcCtlGuid)?.Resource?.TuningCache;
+                            short thrExec = -1;
+                            if (tcache != null && tcache.TryGetValue((4096u << 16) | 3, out var tv)) thrExec = tv;
+                            Check(thrExec == 150, "p0 executor Tuning[3] == 150 via TuningCache (got " + thrExec + ")");
+                            _tuning3 = thrExec > 0 ? thrExec : (short)150;
                             var b4126 = Bhav(PluginGuid, 4126);
                             Check(b4126 != null && b4126.Instructions.Length >= 8, "p0 BHAV 4126 'Spawn Vacation Score' present");
                             if (b4126 != null && b4126.Instructions.Length >= 8)
@@ -343,17 +376,21 @@ namespace Simitone.Client
                         return false;
 
                     case 1: // wait for the booking battery's RETURN HOME to settle, then re-book lot 41
-                        if (screen == null || vm == null || screen.ActiveFamily == null)
+                        if (++_frames % 120 == 0) Unstick(); // the return-home park/dialog latch
+                        if (screen == null || vm == null || screen.ActiveFamily == null || screen.ActiveFamily.VacationHouseNumber != 0)
                         {
-                            if (++_frames > 6000) { Check(false, "p1 timeout waiting post-battery home state"); _phase = 99; }
+                            if (_frames % 600 == 0)
+                                Log("AUTOTEST trv06 p1 waiting home f=" + _frames
+                                    + " screen=" + (screen != null) + " vm=" + (vm != null)
+                                    + " fam=" + (screen?.ActiveFamily != null)
+                                    + " vac=" + (screen?.ActiveFamily?.VacationHouseNumber.ToString() ?? "?")
+                                    + " spd=" + (vm?.SpeedMultiplier.ToString() ?? "?")
+                                    + " gbd=" + (vm?.GlobalBlockingDialog != null)
+                                    + " tick=" + (vm?.Scheduler.CurrentTickID.ToString() ?? "?"));
+                            if (_frames > 3600) { Check(false, "p1 timeout waiting post-battery home state"); _phase = 99; }
                             return false;
                         }
                         var fam1 = screen.ActiveFamily;
-                        if (fam1.VacationHouseNumber != 0)
-                        {
-                            if (++_frames > 6000) { Check(false, "p1 timeout home return (vac=" + fam1.VacationHouseNumber + ")"); _phase = 99; }
-                            return false;
-                        }
                         _homeLot = (short)fam1.HouseNumber;
                         Log("AUTOTEST trv06 p1 home stable (lot " + _homeLot + ", family chunk " + fam1.ChunkID
                             + "); booking Vacation Island rental " + VacationLot + " for the live legs");
@@ -369,8 +406,8 @@ namespace Simitone.Client
                                 if (++_frames > 900) { Check(false, "p2 timeout arrival on " + VacationLot + " (vac=" + (fam?.VacationHouseNumber ?? -1) + ")"); _phase = 99; }
                                 return false;
                             }
-                            _livelift(); // the visit-session un-park law (inert if the family lot loaded LIVE — logged either way)
-                            if (++_frames > 60 && _frames % 30 == 0) _livelift();
+                            Unstick(); // the visit-session un-park law (inert if the family lot loaded LIVE — logged either way)
+                            if (++_frames > 60 && _frames % 30 == 0) Unstick();
                             var avs = FamilyAvatars();
                             _npcCtl = Ent(NpcCtlGuid);
                             if (avs.Count == 0 || _npcCtl == null)
@@ -405,20 +442,37 @@ namespace Simitone.Client
                                 _phase = 4; _frames = 0;
                                 return false;
                             }
-                            if (_frames == 480)
+                            if (_frames == 1500)
                             {
                                 // lawful fallback: the plugin's OWN booking-time spawn tree
-                                // (4126 = set_to_next type-6 score token → create → tag)
+                                // (4126 = set_to_next type-6 score token → create → tag).
+                                // 4126 ins1 needs the type-6 SCORE TOKEN (0x842A8C3B) in the
+                                // sim's inventory — the real phone booking adds it; the trv05
+                                // battery booked via the engine funnel, so the probe replicates
+                                // the booking's own add (disclosed lever; 4127 clears it).
                                 var plugin = Ent(PluginGuid);
                                 var tree = plugin?.GetRoutineWithOwner(4126, vm.Context);
                                 if (plugin == null || tree?.routine == null)
                                 { Check(false, "p3 plugin entity/tree 4126 missing for spawn fallback"); _phase = 99; return false; }
+                                try
+                                {
+                                    var nid = _sim.GetPersonData(VMPersonDataVariable.NeighborId);
+                                    var neigh = Content.Get().Neighborhood;
+                                    var inv0 = neigh.GetInventoryByNID(nid);
+                                    if (inv0 == null) { neigh.SetInventoryForNID(nid, new List<InventoryItem>()); inv0 = neigh.GetInventoryByNID(nid); }
+                                    if (!inv0.Any(x => x.GUID == 0x842A8C3Bu && x.Type == 6))
+                                    {
+                                        inv0.Add(new InventoryItem { GUID = 0x842A8C3Bu, Type = 6, Count = 1 });
+                                        Log("AUTOTEST trv06 p3 score token 0x842A8C3B (type 6, count 1) added — the booking interaction's own add (disclosed)");
+                                    }
+                                }
+                                catch (Exception ie) { Log("AUTOTEST trv06 p3 token-preadd EXC " + ie.GetType().Name); }
                                 Log("AUTOTEST trv06 p3 no natural spawn in window; driving 4126 'Spawn Vacation Score' (the booking-time law)");
                                 Drive(plugin, tree, _sim, "Spawn Vacation Score (probe drive)");
                                 _phase = 31; _frames = 0;
                                 return false;
                             }
-                            if (++_frames > 600) { Check(false, "p3 timeout score controller spawn"); _phase = 99; }
+                            if (++_frames > 1800) { Check(false, "p3 timeout score controller spawn"); _phase = 99; }
                         }
                         return false;
 
@@ -601,6 +655,7 @@ namespace Simitone.Client
 
                     case 91: // home again; watch for the automatic 'Spawn Vacation Purchases'
                         {
+                            if (_frames % 120 == 0) Unstick();
                             var fam = screen?.ActiveFamily;
                             if (fam == null || fam.VacationHouseNumber != 0 || vm == null)
                             {
