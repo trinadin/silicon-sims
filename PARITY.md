@@ -47,9 +47,19 @@ idiom + a bounded watchdog. TWO consecutive 156/0 batteries on merged main
   eviction-with-demolition (EvictFamily → MoveOut's house-file deletion), the
   same-click rezone chain, and the community build/buy entry + SAVE matrix
   (the port's save gate was inverted) are decoded, implemented and gated
-  (`nbr06` opt-in, 9 phases; nghbtns/nbr05ui re-pinned). Residuals: the
-  zone-choice dialog's strings table (behaviorally covered by the toggle),
-  hide-slot pairing, evict web-export (ENG-27 scope), venue variants.
+  (`nbr06` opt-in, 9 phases; nghbtns/nbr05ui re-pinned). **Residuals
+  CLOSED 2026-10-09 (NBR-07 + NBR-08)**: all four expansion-venue evict
+  handlers DECODED + PORTED (Downtown/Studio occupied = native silent
+  no-op; Vacation's [18]/[19] confirm ladder + sounds-only unbuilt leg +
+  RemoveFromVacation executor; Magic = the UL net-worth law + the [14]/[15]
+  venue pair; the [20] "visiting" string corrected to the import flow), the
+  zone-choice strings (STR# 250/251) decoded + wired, and the hide-slot
+  pairing resolved (native BUILD+CAMERA / BUY+LIVE drives; port pairing
+  equivalent on the correlated visit-lock path, disclosed). NBR-08 mounts
+  the zone-choice DIALOG itself + the venue/base bulldoze sound bracket
+  (`nbr07` gate). Remaining: evict web-export (ENG-27 scope), the Magic
+  [16]/[17] vacation pre-scan (needs port vacation state), the +0x100/+0x1a8
+  hide elements (no port counterpart).
 - ~~Sound trace~~ **ROUND 1 DONE (AUD-19)** + **FOOTSTEPS CLOSED (AUD-20,
   2026-10-08)**: the footstep class is live on the decoded native law —
   authored anim-event triggers (±1/±2 forward/backward), the native gate
@@ -81,8 +91,18 @@ idiom + a bounded watchdog. TWO consecutive 156/0 batteries on merged main
   (footstep-residuals-decode.md: the class-0 default reads cSimulator global
   #10 = the CURRENT LOT — 40-42 snow, 99 soft; ported with 8 lot-cases); the
   0x620&8 suppressor is a DEAD GATE (zero writers corpus-wide — the note
-  retires); kSpl attenuation variants and the native's per-track
-  channel-sharing stay disclosed. Receipts:
+  retires). **kSpl CLOSED 2026-10-09 (AUD-21): the per-track attenuation law
+  PORTED — the [Track] kSpl column (speaker placement) is parsed and the
+  TS1 volume law is att-driven per track (`0x400 − (3−zoom)·att·0xE`, stereo
+  0x2711 floors at 800, att 0 = stings/horns/ambience with NO zoom/edge/pan
+  attenuation; TV channels 10, radio stations 0x2711; every footstep = the
+  20 default, no-change asserted). Runtime census matches the decode
+  digit-for-digit ({0:51, 10:9, 20:4236, 0x2711:9}); review ACCEPT-WITH-NOTES
+  (receipt evidence/AUD-21/kspl-attenuation-port.md). Channel-sharing stays
+  disclosed as behaviorally-equivalent (the port's dedup is name-global ≈ the
+  native's per-track unit; 49 corpus name-groups sharing one track can layer;
+  SetVolume is max-wins vs the native instance-map recompute — both
+  marginal). Receipts:
   evidence/AUD-20/button-firing-law.md + footstep-residuals-decode.md.**
 - ~~Custom animated objects~~ **CLOSED 2026-10-08 (CC-06)**: five defects
   fixed on decoded native laws — duplicate-skeleton registration threw
@@ -272,8 +292,16 @@ idiom + a bounded watchdog. TWO consecutive 156/0 batteries on merged main
   screens reconciled against cWinSubpanelFame (one TOC float pair stays
   disclosed), and the 47-file Studio Town object census found zero missing
   interactions (1125 interactions, 0 unresolved trees; `ssfame` gate).
-  Residuals: EXP-11's award-ceremony choreography blockers (BHAV-level),
-  home fame-decay self-start.
+  ~~Residuals: EXP-11's award-ceremony choreography blockers (BHAV-level),
+  home fame-decay self-start.~~ **CORRECTED 2026-10-09: EXP-11 is TERMINAL
+  (its acceptance map closed every row 2026-10-03 — V4 home fame-decay and
+  V5 award-ceremony CLOSED-BY-DISPOSITION at the controller-idle boundary:
+  a CONFIRMED cross-cutting IFF-native scheduler law (global-280 long-phase
+  idle) that executes in real play; every live primitive mechanically proven
+  across runs 1-14; V6 save/reload CLOSED LIVE PASS 5/0). The fame-decay
+  law itself is DECODED and the controller mounts (ss census); nothing
+  remains implementable without native-side changes.** Remaining Superstar
+  residual: the fame-screen TOC float pair (wave-2 decode candidate).
 - Makin' Magic: the major systems are verified live (spells/recipes via the
   mode-38 primitive, duels, nectar, dragon, spellbound, family spells, Magic
   Town transit); **quest-line coverage CLOSED (EXP-17, 2026-10-08)**: the quest
@@ -631,7 +659,7 @@ older scopes; they do not certify complete base-game or visual equivalence.
 
 - [CLOSED R249/R250] Free-will winner selection and serving — native selection law and per-candidate tests are implemented; focused R250 run served 4/4 winners, sub-assertions 11/0, default 142/0. See `tools/iff-dump/r250/` and `r250-serving/`. Earlier unobserved-winner/serving claims are superseded.
 - [GAP-partial] Generic Sims Call 13 malformed/custom-call boundary — R167 closes all two owned-corpus sites and proves both set Stack Object ID to self before calling. The original unresolved-id path reports error 10 and then invokes broad `CleanupPeople(null)` object/person teardown; the port deliberately throws instead. Reproducing that destructive null-target path requires a separate full cleanup-contract decode and is not needed by the owned corpus.
-- ~~[GAP-partial] Superstar (Fame promote/demote + objects), Vacation (save-on-vacation, bookings, score, souvenirs), Unleashed (pet AI, shows/training), Makin' Magic (Magic Town, quests, spells), neighbourhood mgmt (bulldoze/rezone/create), eviction.~~ **SUPERSEDED (2026-10-08/09 waves — the named coverage gaps are CLOSED, see "Where the game stands"): Superstar EXP-16; Vacation TRV-05/TRV-06 incl. 06b/06c; Unleashed EXP-15 + follow-up (`ulpets` in the default suite); Makin' Magic quest coverage EXP-17; neighbourhood mgmt NBR-06 (bulldoze/rezone/evict + the community build/buy entry+save matrix, closing this row's NBR-04 entry-gate request). Still open per the cards: Superstar award-ceremony choreography (EXP-11) + home fame-decay self-start; NBR-06 bounded residuals (zone-choice strings table, hide-slot pairing, evict web-export = ENG-27 scope, venue variants, no create-lot handler).** ~~buy-on-community-lot~~ SUPERSEDED (MAP-02 tranche-2 sweep): NBR-04 closed the community/downtown funds-attribution hole (visited family pays via GameState.ActiveFamily fallback; UILotControl.Budget fallback so InsufficientFunds stays reachable). ~~The community build/buy *enable-matrix* decode (entry gate) remains open (NBR-04 bounded request).~~ CLOSED by NBR-06 (see the supersession note above).
+- ~~[GAP-partial] Superstar (Fame promote/demote + objects), Vacation (save-on-vacation, bookings, score, souvenirs), Unleashed (pet AI, shows/training), Makin' Magic (Magic Town, quests, spells), neighbourhood mgmt (bulldoze/rezone/create), eviction.~~ **SUPERSEDED (2026-10-08/09 waves — the named coverage gaps are CLOSED, see "Where the game stands"): Superstar EXP-16; Vacation TRV-05/TRV-06 incl. 06b/06c; Unleashed EXP-15 + follow-up (`ulpets` in the default suite); Makin' Magic quest coverage EXP-17; neighbourhood mgmt NBR-06 (bulldoze/rezone/evict + the community build/buy entry+save matrix, closing this row's NBR-04 entry-gate request). 2026-10-09 correction: EXP-11 is TERMINAL (every acceptance row closed or closed-by-disposition at the IFF-native controller-idle law — see "Where the game stands"); the NBR-06 bounded residuals are CLOSED by NBR-07/NBR-08 (venue variants, zone-choice strings + dialog, hide-slot pairing) except evict web-export (ENG-27 scope) and the create-lot non-existence (closed as native-absent).** ~~buy-on-community-lot~~ SUPERSEDED (MAP-02 tranche-2 sweep): NBR-04 closed the community/downtown funds-attribution hole (visited family pays via GameState.ActiveFamily fallback; UILotControl.Budget fallback so InsufficientFunds stays reachable). ~~The community build/buy *enable-matrix* decode (entry gate) remains open (NBR-04 bounded request).~~ CLOSED by NBR-06 (see the supersession note above).
 - [GAP-partial] Career/school **progression loop** — R157/R158 closed the outbound commute and one-car multitile law. R163's opt-in `carreturn` trace closes the successful House 5 return/pay/promotion branch: exactly one outbound `CarJunk.iff` creation at `CarPortal.iff:4106:20`, exactly one return creation at `4121:19`, Science promotion level 0→1, and exact `CarPortal.iff:4103` budget transactions +460 bonus and +230 salary with mounted tuning[132]=2. Household net changed +680 because an unrelated `Fridges.iff` expense contributed −10; attributed career pay remained exactly 690. R165's opt-in `schoolreturn` trace closes the successful original SchoolBus day: exact creates at `CarPortal.iff:4119:4` from outbound `4115:10` and return `4116:27`, one visible bus group maximum with both legs naturally removed, Cassandra herself hidden/out-of-world with PersonData[87]=1 at school and visible/in-world with PersonData[87]=0 at home, grade 4→3. The static scan separately pins the missed-school `4117:4` +3 penalty. R166 closes Generic Sims Call 12 on the vehicle path from the original PPC law and confirms `SchoolBus.iff` BHAV 4121 instruction 9 is one of its 47 owned-corpus callers. R222 closes CHANCE CARDS live end-to-end: the fork decoded (4103 ins39-43 `MyPD[63] > min(rnd100,rnd100)`, false → ins54 CALL 4134; 4104-false also falls to ins54), the probability gate decoded (`4134 ins90 PD[24]==0` → `ins121/122 rnd(0..99) < Tuning[135]` = BCON4097[7] = 12% per pay), the cascade mapped (4134 careers 17-21 → 4124 careers 1-10 → 4133 12-16), and the opt-in `chancetrace` caught the exact chain `[4102:13][4103:54][4134:120][4124:55]` live — the Science02 card dialog answered as the player (VMNetDialogResponseCmd law), effects pinned (`4124:56=+5000`, PD[12]+100, PD[24]=1, salary `4103:9` after the welcome dialog); the no-card return ladder is live-evidenced in both variants (fine-only, demotion). Residuals: alternate career/school outcome branches beyond the card remain untraced (school has no cards — the A++/missed-school events are already pinned).
 - [CLOSED R219] relationship→death runtime end-to-end. IFF-factually pinned: original death chain 20/20 (R71), closure 47/47 (R72), trigger-wiring (R73), engine-driven entry (R74/R78), serve-proofs 8305/8306/8641 (R75/R76), PersonType bridge (R79), shipped-save death persistence (R80: 8 IsGhost residents of the shipped UserData/Neighborhood.iff — ids 19,20,26,27,28,29,30,31, ages 9/27). R219 caught the live trace in-window: the R77 probe failed because it collapsed motives to +3 while the real 8299 gate is a literal Energy/Hunger/Bladder < -98; with Hunger at the floor the ORIGINAL chain executed at exact decoded instruction sites (8283 ins5 -> 8299 ins4 -> 8198 ins4 -> Global 393 'kill person for good' -> 316 'do grim reaper'), created UrnStone.iff (GUID 5A6FA529) at 393:8, and landed PersonData[68]=1 + entity.Dead. The death notice is a BLOCKING MODAL owned by the tombstone (UrnStone.iff) — the opt-in `deathtrace` check plays the player and releases the latch (r219 law doc). R220 caught the ghost in-window: `Ghost - Main Loop`(8641) + `Ghost - Wander`(8638) executing at 01:48 on the DEAD SIM'S OWN entity (person main ins38 -> 8641, the exact decoded dead-branch site) after the UrnStone night gate (main ins5, Global[0] = the live hour, night 22:00-01:59, 1-in-8 spawn roll per ~30-sim-min pass, cap 3); the grace idle is nominally 200 ticks but the engine's sleep semantics (elapsed-idle decrement + interrupts) spend ~10 sim-min in practice. Disclosed: the one-tick 4100 'generate ghost' frame itself fell between samples (the nightfall avatar join is the attributed evidence) and Ghost Scare/haunt-sound did not execute in-window.
 - [CLOSED R221] Censorship blur — trigger→PreFrame→renderer pipeline verified end-to-end (IFF-literal pd30, live exec 0→3→0) AND the pixel level now pinned in the DEFAULT suite (`censorpixel`, 128 checks): the R36 GetLotThumb render pair proved EMPTY (0-pixel diff — that path never rasterizes the censor), so the check captures the LIVE composition with flags 0 vs 3 and pins the mosaic block itself (97% of the diff in the densest window at the pelvis, density 0.54, flat-run median 7 = the port's 8x8 grid law). The ORIGINAL law decoded from the binary (HouseViewer::Censor @0x1ce894 +2-symbol-offset: per-cell MEAN of underlying pixels + a ±8-per-channel jitter + clamp; RenderCensoredBlocks @0x1ce5b4: the 1x3/2x6/4x12 zoom cell ladder). DISCLOSED port approximation: a static 12-color (SUPERSEDED 2026-09-22, UI-32: the native law is ported — per-cell mean + ±8 jitter + the literal-device-pixel (1,3)/(2,6)/(4,12) ladder, re-decoded from RenderCensoredBlocks 0x1ce5b4; censorpixel re-pinned to native, medianErr 0) skin palette texture instead of the original's mean+jitter mosaic.
