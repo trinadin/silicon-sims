@@ -189,16 +189,17 @@ cover the decode-pinned laws):
   push of the umbrella: TS1GameScreen now enqueues 4104 on each token-carrying
   member at the vacation-return booking edge (the port's representation of the
   native RemoveFromVacation→ObjectModule broadcast push site, disclosed).
-  `trv05` gates it on the automatic engine-push path: placed in-world
-  (un-contained) + 240-frame persistence + placed souvenir's tokens consumed
-  (trv06b-persistence.md). Residual (enumerated): the SECOND stocked
-  souvenir's put-away unwinds through the drop idiom's recursion (313
-  ins0/ins1 re-entry, removal at 313@9, the drop animate loop) and its base
-  is gone by verdict — both bases are created and both tokens consumed; the
-  first placed souvenir carries home end-to-end. Also disclosed: the
-  persisted 'Go Home' transit item re-runs on the home lot with a stale
-  route and can starve the walks until cancelled (probe lifelift; player
-  cancel has the same effect).
+  `trv05` gates it on the automatic engine-push path: BOTH stocked bases
+  placed in-world (un-contained) + the 240-frame persistence soak + both
+  token sets consumed (trv06b-persistence.md + trv06c-both-bases.md).
+  **Second-souvenir continuation CLOSED (TRV-06c, 2026-10-09) — a verdict
+  artifact, not an engine defect**: the baseEntities dump proved the second
+  base alive, still in-hand, mid-put-away when the probe's queue-name
+  completion signal fired early (after the engine's transit cancel the
+  queue reads empty while the spawn chain still executes on the thread
+  stack). The gate now waits for true stack drain; both souvenirs carry
+  home end-to-end (PASS ×4). The stale 'Go Home' transit starvation is
+  fixed ENGINE-side (ENG-28b lane B: completed at the arrival edge).
 - Superstar: fame promote/demote and session machinery verified live;
   **fame screens + objects + gendered job titles CLOSED (EXP-16,
   2026-10-08)** — the gendered title law (career STR block layout +

@@ -64,10 +64,10 @@ Opt-in takeovers (end the run at their verdict; run solo):
   souvenir purchase/carry-home (CT 4116 mood-variant purchase; the carry-home
   runs as the REAL queued umbrella interaction — the engine's return-edge
   push, observed by the probe's automatic window at ~f=274 — and asserts
-  placed-in-world + 240-frame persistence + the placed souvenir's token
-  consumption). Disclosed: the surface-path put-away branch ('CT - Put Away'
-  4103 op-14/op-20) is not asserted (returns false in-port; the floor-drop
-  path via global 'do the drop' 313 is the asserted law).
+  BOTH bases placed in-world + the 240-frame persistence soak + both token
+  sets consumed; the completion wait drains the member's thread stack of
+  the carry-chain frames (the queue-name signal alone reads empty after the
+  engine's transit cancel — TRV-06c).
 - **`homepark`** — ENG-28b: the home-lot park restricted-tick law — a BUY-park
   soak on family-less lot 21 asserting the scheduler keeps waking
   (schedAdv≥30), street liveness advances, and the clock stays frozen (the

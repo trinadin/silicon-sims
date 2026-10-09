@@ -57,9 +57,9 @@ needs real-world testing on real Macs and real saves. That's where you come in:
   score/souvenir systems, and Makin' Magic's quest lines are on decoded native
   laws; the view-pie pop gesture stays a disclosed model (the original's
   window-manager vtable was not shipped — not statically recoverable). The
-  vacation souvenir carry-home is live end-to-end (return push → walked drop
-  → placed in-world → persists; one bounded residual: the surface-shelf
-  put-away branch). Human
+  vacation souvenir carry-home is live end-to-end for every stocked
+  souvenir (return push → walked drops → placed in-world → persisting).
+  Human
   verification of the whole is
   still partial (heavily automated; played and accepted hands-on in portions).
   Duplicate-gap reports will be closed with a pointer.
