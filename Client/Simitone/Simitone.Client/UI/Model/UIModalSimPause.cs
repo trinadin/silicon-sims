@@ -23,6 +23,11 @@ namespace Simitone.Client.UI.Model
             SavedSpeed[key] = speed;
             PausedVM[key] = vm;
             if (speed > 0) vm.SpeedMultiplier = 0;
+            // ENG-28b: natively these windows run under SetBlockSimulator —
+            // the +0x111 pump gate that stops cSimulator::Simulate outright.
+            // The counter freezes the pump even over a button pause (the
+            // speed stays 0-with-flag; the flag resumes on Resume).
+            vm.ModalPumpBlock++;
         }
 
         public static void Resume(object key)
@@ -31,7 +36,11 @@ namespace Simitone.Client.UI.Model
             SavedSpeed.Remove(key);
             var vm = PausedVM[key];
             PausedVM.Remove(key);
-            if (vm != null && vm.SpeedMultiplier == 0 && speed > 0) vm.SpeedMultiplier = speed;
+            if (vm != null)
+            {
+                if (vm.ModalPumpBlock > 0) vm.ModalPumpBlock--;
+                if (vm.SpeedMultiplier == 0 && speed > 0) vm.SpeedMultiplier = speed;
+            }
         }
     }
 }

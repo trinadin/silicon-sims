@@ -1288,9 +1288,16 @@ namespace Simitone.Client.UI.Panels
             if (Mode != UIMainPanelMode.LIVE)
             {
                 Game.vm.SpeedMultiplier = -1;
+                // (review P2-2) the BUY re-assert is a MODE park, not a
+                // button park — a stale button-pause flag from before the
+                // mode switch must not leak into a later LIVE-entry 0.
+                Game.vm.PauseButtonPark = false;
             } else if (Game.vm.SpeedMultiplier == -1)
             {
                 Game.vm.SpeedMultiplier = 0;
+                // (review P2-2) the LIVE-entry unpark 0 is a transient full
+                // freeze until the player picks a speed — not the +0x32 class.
+                Game.vm.PauseButtonPark = false;
             }
 
             // R136: the route-history sampler behind the House tab's Layout
@@ -1403,10 +1410,11 @@ namespace Simitone.Client.UI.Panels
             }
             switch (speed)
             {
-                case 4: vm.SpeedMultiplier = 0; break;
-                case 1: vm.SpeedMultiplier = 1; break;
-                case 2: vm.SpeedMultiplier = 3; break;
-                case 3: vm.SpeedMultiplier = 10; break;
+                case 4: vm.SpeedMultiplier = 0; vm.PauseButtonPark = true; break;
+                case 0: vm.SpeedMultiplier = 0; vm.PauseButtonPark = true; break;
+                case 1: vm.SpeedMultiplier = 1; vm.PauseButtonPark = false; break;
+                case 2: vm.SpeedMultiplier = 3; vm.PauseButtonPark = false; break;
+                case 3: vm.SpeedMultiplier = 10; vm.PauseButtonPark = false; break;
             }
         }
 

@@ -107,8 +107,15 @@ namespace Simitone.Client
         private readonly Func<bool> _inLot;
         private readonly Action<short> _playHouse;
 
-        // phases: 0 wait-lot, 1 armed-outbound, 2 arrival+arm, 3 soak, 4 done
+        // phases: 0 wait-lot, 1 armed-outbound, 2 arrival+arm, 3 soak,
+        // 4 return-evidence probe (log-only), 6 done
         private int _phase;
+        private bool _retBooked;
+        private int _retRow = -1;
+        private VM _retDowntownVm;
+        private int _retSwitchF = -1;
+        private bool _retArrived;
+        private int _retArriveF;
         private int _frame;
         private int _arrivalFrame = -1;
         private int _arrivalLot = -1;
@@ -267,9 +274,150 @@ namespace Simitone.Client
                     if (vm == null) return false;
                     KeepUnblocked(vm);
                     AnswerDialogs(vm);
-                    return Soak(vm);
+                    var soaked = Soak(vm);
+                    // phase 4 = the soak verdict landed: KEEP TICKING so the
+                    // log-only return-evidence probe runs before the harness
+                    // finishes (the verdict is already recorded in Passed).
+                    if (_phase == 4) return false;
+                    return soaked;
+
+                case 4:
+                    // ENG-28b residual EVIDENCE PROBE (log-only, never fails the
+                    // gate): book the RETURN home on the same plugin law and watch
+                    // the home arrival for a stale transit action parked in
+                    // global 281 (the vacation-return edge needed completion —
+                    // does the downtown return leave the same residue?). The
+                    // receipt decides: extend CompleteStaleTransit's call site
+                    // only on a positive census.
+                    return ReturnEvidenceProbe(vm);
             }
-            return _phase >= 4; // phase 4 = verdict delivered; anything else keeps ticking
+            return _phase >= 6; // verdict delivered + return probe finished
+        }
+
+        private bool ReturnEvidenceProbe(VM vm)
+        {
+            if (vm == null) return false;
+            KeepUnblocked(vm);
+            AnswerDialogs(vm);
+            var f = _frame;
+            if (!_retBooked)
+            {
+                _retBooked = true;
+                _retDowntownVm = vm; // (review P2-3) the baseline for arrival:
+                                     // the runner's _vm FOLLOWS screen.vm, so
+                                     // comparing against the method arg is
+                                     // always ReferenceEquals-true.
+                try
+                {
+                    var plugin = vm.Entities.FirstOrDefault(e => e.Object?.OBJ != null && e.Object.OBJ.GUID == 0xA6F31853u);
+                    if (plugin == null)
+                    {
+                        var grp = vm.Context.CreateObjectInstance(0xA6F31853u,
+                            LotTilePos.OUT_OF_WORLD, Direction.NORTH);
+                        plugin = grp?.BaseObject;
+                    }
+                    var traveler = vm.Entities.OfType<VMAvatar>()
+                        .FirstOrDefault(a => a.Object?.OBJ != null && a.Object.OBJ.GUID == _travelerGuid);
+                    if (plugin == null || traveler?.Thread == null)
+                    {
+                        _log("AUTOTEST hdserve return-probe: no plugin/traveler on the downtown lot (probe limitation, disclosed)");
+                        _phase = 6; return true;
+                    }
+                    // Enumerate the plugin's TTAB rows and book the HOME-return
+                    // by name (row 1 is 'Ask To Go Downtown' — the wrong leg).
+                    VMQueuedAction push = null;
+                    var rowNames = new System.Text.StringBuilder();
+                    try
+                    {
+                        var ttab = plugin.Object.Resource.List<TTAB>().FirstOrDefault();
+                        if (ttab?.Interactions != null)
+                        {
+                            for (var ri = 0; ri < ttab.Interactions.Length && ri < 12; ri++)
+                            {
+                                string nm = null;
+                                VMQueuedAction probe = null;
+                                try { probe = plugin.GetAction(ri, traveler, vm.Context, false); nm = probe?.Name; } catch { }
+                                rowNames.Append(ri + "='" + (nm ?? "?") + "' ");
+                                if (_retRow < 0 && nm != null)
+                                {
+                                    var isHome = nm.IndexOf("home", StringComparison.OrdinalIgnoreCase) >= 0;
+                                    var isCab = nm.Trim().Equals("Wait For Cab", StringComparison.Ordinal); // the return-leg candidate
+                                    if ((isHome || isCab) && probe != null) { _retRow = ri; push = probe; }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception en) { rowNames.Append("enum-EXC " + en.GetType().Name); }
+                    _log("AUTOTEST hdserve return-probe: plugin rows " + rowNames.ToString());
+                    if (push == null)
+                    {
+                        _log("AUTOTEST hdserve return-probe: no home-named row (probe limitation, disclosed)");
+                        _phase = 6; return true;
+                    }
+                    push.Flags |= TTABFlags.FSOSkipPermissions;
+                    push.CheckRoutine = null; // the EXP-03 push law (disclosed)
+                    plugin.SetAttribute(1, (short)traveler.ObjectID);
+                    vm.SetGlobalValue(10, 40);
+                    traveler.Thread.EnqueueAction(push);
+                    _retSwitchF = f;
+                    _log("AUTOTEST hdserve return-probe: return booked — row " + _retRow + " '" + push.Name + "' uid=" + push.UID);
+                }
+                catch (Exception rex)
+                { _log("AUTOTEST hdserve return-probe EXC " + rex.GetType().Name + " " + rex.Message); _phase = 6; return true; }
+            }
+            if (_retSwitchF > 0 && f >= _retSwitchF + 3600 && !_retArrived)
+            {
+                _log("AUTOTEST hdserve return-probe: no home switch observed in 3600f (probe limitation, disclosed)");
+                _phase = 6; return true;
+            }
+            var svm = CurrentScreenVm();
+            if (!_retArrived && svm != null && !ReferenceEquals(svm, _retDowntownVm))
+            {
+                var cur = svm.TS1State?.CurrentHouse ?? 0;
+                _log("AUTOTEST hdserve return-probe: screen vm swapped, curHouse=" + cur);
+                if (cur != 0)
+                {
+                    _retArrived = true;
+                    _retArriveF = f;
+                    return false;
+                }
+            }
+            if (_retArrived)
+            {
+                var homeVm = CurrentScreenVm();
+                if (homeVm == null) return false;
+                if (f - _retArriveF < 600) return false; // materialization settle
+                if (f - _retArriveF > 1800)
+                { _log("AUTOTEST hdserve return-probe: census window expired (probe limitation, disclosed)"); _phase = 6; return true; }
+                var census = new System.Text.StringBuilder();
+                var anyParked = false;
+                try
+                {
+                    foreach (var av in homeVm.Entities.OfType<VMAvatar>())
+                    {
+                        if (av?.Thread == null) continue;
+                        var act = av.Thread.ActiveAction;
+                        if (act == null) continue;
+                        var parked281 = false;
+                        foreach (var fr in av.Thread.Stack)
+                        {
+                            var parent = fr.Routine?.Chunk?.ChunkParent?.Filename;
+                            if (fr.Routine?.Chunk?.ChunkID == 281 && parent != null
+                                && parent.IndexOf("global", StringComparison.OrdinalIgnoreCase) >= 0)
+                            { parked281 = true; break; }
+                        }
+                        if (!parked281) continue;
+                        anyParked = true;
+                        census.Append("[oid=" + av.ObjectID + " act='" + (act.Name ?? "?")
+                            + "' callee=0x" + (act.Callee?.Object?.OBJ != null ? act.Callee.Object.OBJ.GUID.ToString("x8") : "none") + "]");
+                    }
+                }
+                catch (Exception cex) { _log("AUTOTEST hdserve return-probe census EXC " + cex.GetType().Name); }
+                _log("AUTOTEST hdserve return-probe: home-arrival 281-park census " + (anyParked ? "POSITIVE " : "NEGATIVE (no stale transit parked)")
+                    + census.ToString());
+                _phase = 6; return true;
+            }
+            return false;
         }
 
         private VM CurrentScreenVm()

@@ -320,6 +320,18 @@ namespace FSO.Client.UI.Controls
             get { return m_isDown; }
         }
 
+        // AUD-19 L5 / AUD-20 residual (native cTSWinBtn, The Sims Complete
+        // PPC): button sounds fire on mouse-DOWN from PlayUISound (flat
+        // 0x5023a0) against four per-button slots (btn+0x178..0x184, the
+        // OverrideUISound strdup store); the action-1 "press" slot takes
+        // r5, per-slot null falls to the window-class default, and the
+        // ultimate default is EMPTY (silent) — only specific toolbars
+        // install overrides (the nhood filter bars; the UL community bar
+        // passes 'UI_Nhood_click', byte-proven at pool 0x6c6e0+0xe). The
+        // old blanket ui_click on mouse-UP was a port invention.
+        public string PressSound;
+        public static string DefaultPressSound;
+
         protected void OnMouseEvent(UIMouseEventType type, UpdateState state)
         {
             if ((m_Disabled || Opacity < 1f) && type != UIMouseEventType.MouseOut) { return; }
@@ -351,11 +363,20 @@ namespace FSO.Client.UI.Controls
                     break;
 
                 case UIMouseEventType.MouseDown:
-                    m_isDown = true;
-                    CurrentFrame = 1;
-                    if (OnButtonDown != null)
-                        OnButtonDown(this);
-                    break;
+                    {
+                        m_isDown = true;
+                        CurrentFrame = 1;
+                        // AUD-19 L5: the press sound rides the DOWN event, and a
+                        // button with no override (and no window default) is SILENT
+                        // (the native ultimate default is the EMPTY string — treat
+                        // empty as silent too, review P3-6).
+                        var press = PressSound ?? DefaultPressSound;
+                        if (!string.IsNullOrEmpty(press))
+                            HITVM.Get()?.PlaySoundEvent(press);
+                        if (OnButtonDown != null)
+                            OnButtonDown(this);
+                        break;
+                    }
 
                 case UIMouseEventType.MouseUp:
                     if (m_isDown)
@@ -363,7 +384,6 @@ namespace FSO.Client.UI.Controls
                         if (OnButtonClick != null)
                         {
                             OnButtonClick(this);
-                            HITVM.Get().PlaySoundEvent(UISounds.Click);
                         }
                     }
                     m_isDown = false;

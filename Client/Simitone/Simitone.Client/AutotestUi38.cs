@@ -334,6 +334,30 @@ namespace Simitone.Client
                 { log("uidtbar: cached-provider load mismatch"); return false; }
                 log("uidtbar: FILTER PERSISTENCE VERIFIED (STR#6 slot 3 round-trip = 0x04)");
 
+                // (i) the plaque PING-PONG law (UI-38 residual, 2026-10-09):
+                // TSPaint increments +0x1dc mod 6 in the wave advance gate;
+                // DrawFilterAt maps 0->0, 1|4->1, 2|3->2 — 3-frame ping-pong.
+                var truth = new[] { 0, 1, 2, 2, 1, 0 };
+                for (var s = 0; s < 6; s++)
+                {
+                    var want0 = truth[s];
+                    var got0 = Simitone.Client.UI.Panels.UINeighborhoodSelectionPanel.ULPlaqueFrameForStep(s);
+                    if (got0 != want0)
+                    { log("uidtbar: plaque truth step " + s + " got " + got0 + " want " + want0); return false; }
+                }
+                var seq = new System.Text.StringBuilder();
+                var interval = Simitone.Client.UI.Panels.UINeighborhoodAnimationLayer.OldTownCounterIntervalMilliseconds;
+                for (var i = 0; i < 13; i++)
+                {
+                    panel.AdvanceULPlaque(interval);
+                    seq.Append(panel.ULPlaqueFrame);
+                }
+                var seqStr = seq.ToString();
+                var wantSeq = "1221001221001"; // 13 advances from c=0: c mod 6 = 1,2,3,4,5,0,... -> frames 1,2,2,1,0,0,...
+                if (seqStr != wantSeq)
+                { log("uidtbar: plaque counter sequence " + seqStr + " want " + wantSeq); return false; }
+                log("uidtbar: PLAQUE PING-PONG VERIFIED (truth table + counter sequence " + seqStr + ")");
+
                 return true;
             }
             catch (Exception e)

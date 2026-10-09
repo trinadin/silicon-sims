@@ -604,6 +604,10 @@ namespace Simitone.Client.UI.Panels
                     // no ForceState: the pressed state renders cell 1 through
                     // Selected (the engine's SetState(btn, 0/1) on switch).
                     var ubtn = new UIOriginalNavbarButton(slot.Member, 4, 1, ULTip171(slot.LabelIndex));
+                    // AUD-19 L5: BuildFilterToolbar's common tail calls
+                    // OverrideUISound(btn, 0, pool+0xe, 0, 0) — the press slot
+                    // carries 'UI_Nhood_click' (pool 0x6c6e0, byte-proven).
+                    ubtn.PressSound = FSO.Client.UI.Model.UISounds.NeighborhoodClick;
                     RegisterAnchor(ubtn, new Vector2(slot.X, 52 + slot.Y), true);
                     var cmd = slot.CmdBit;
                     ubtn.OnButtonClick += (b) => ProcessULFilterByType(cmd);

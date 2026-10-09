@@ -590,10 +590,19 @@ namespace Simitone.Client
             // Soaks both parks on house 5 and asserts schedAdv + clockFrozen +
             // a family-thread delta (the petname VISIT-PARK-NPC-TICKS idiom,
             // home-lot form).
+            if (CheckEnabled("homeparkfam"))
+            {
+                if (++_neighborhoodReadyFrames < 60) return;
+                Log("AUTOTEST homeparkfam neighborhood-screen ready; entering the family-lot park battery (lot 5, the Goths — dialogs answered per the hdserve law)");
+                _hpLot = 5; _hpGate = "homeparkfam";
+                _screen.PlayHouse(5, null);
+                _state = 24;                return;
+            }
             if (CheckEnabled("homepark"))
             {
                 if (++_neighborhoodReadyFrames < 60) return;
                 Log("AUTOTEST homepark neighborhood-screen ready; entering the park restricted-tick battery (lot 21, family-less — a family soak storms BHAV dialogs, hp5-hp10)");
+                _hpLot = 21; _hpGate = "homepark";
                 _screen.PlayHouse(21, null);
                 _state = 24;                return;
             }
@@ -1018,6 +1027,10 @@ namespace Simitone.Client
         private static int _hpClock0;
         private static string _hpFam0 = "";
         private static bool _hpBuyOk;
+        private static bool _hpPauseOk;
+        private static bool _hpModalOk;
+        private static int _hpLot = 21;
+        private static string _hpGate = "homepark";
         private static int _hpAnswers;
 
         private static string HomeParkFamSnapshot()
@@ -1032,6 +1045,34 @@ namespace Simitone.Client
                   .Append(':').Append(top?.Routine?.ID ?? -1).Append('@').Append(top?.InstructionPointer ?? -1).Append(';');
             }
             return sb.ToString();
+        }
+
+        // The hdserve AnswerDialogs law, shared by every homepark leg: respond
+        // to BHAV blocking dialogs (Responded=true ends the tree's re-park
+        // loop — clearing the latch alone ping-pongs) and dismiss visible
+        // UIMobileAlerts (they park at speed 0 with a NULL gbd).
+        private static void HomeParkAnswerDialogs()
+        {
+            try
+            {
+                var bs = _vm.GlobalBlockingDialog?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
+                if (bs != null && !bs.Responded)
+                {
+                    bs.Responded = true;
+                    bs.ResponseCode = 0;
+                    bs.ResponseText = "";
+                    _vm.GlobalBlockingDialog = null;
+                    _hpAnswers++;
+                }
+                var ui = FSO.Client.UI.Framework.UIScreen.Current;
+                foreach (var alert in (ui?.GetChildren() ?? new System.Collections.Generic.List<FSO.Client.UI.Framework.UIElement>())
+                    .OfType<Simitone.Client.UI.Panels.UIMobileAlert>().Where(a => a.Visible).ToList())
+                {
+                    ui.Remove(alert);
+                    _hpAnswers++;
+                }
+            }
+            catch { }
         }
 
         private static bool HomeParkSoakLeg(string parkName,
@@ -1056,7 +1097,7 @@ namespace Simitone.Client
                 _vm = _screen.vm; // the case-24 takeover skips state 1's binding
             if (_vm == null || _screen == null || !_screen.InLot)
             {
-                if (++_hpFrames > 900) { Log("AUTOTEST homepark verdict no-lot"); Fail("homepark"); Finish(); }
+                if (++_hpFrames > 900) { Log("AUTOTEST homepark verdict no-lot"); Fail(_hpGate); Finish(); }
                 return;
             }
             _hpFrames++;
@@ -1065,8 +1106,15 @@ namespace Simitone.Client
                 // settle a moment in LIVE, then enter the buy park
                 if (_hpFrames < 60) return;
                 _vm.GlobalBlockingDialog = null;
+                // Enter BUY MODE first (the player's path): a family home
+                // enters LIVE, and UIMainPanel's LIVE-entry unpark law
+                // (Mode==LIVE && speed==-1 -> 0) would ping-pong the probe's
+                // -1 re-assert into per-frame 0-freezes (family lots only —
+                // family-less lot 21 already parks at BUY per the NBR-06
+                // native entry law).
+                try { _screen.Frontend?.MainPanel?.SetMode(Simitone.Client.UI.Panels.UIMainPanelMode.BUY); } catch { }
                 _vm.SpeedMultiplier = -1;
-                Log("AUTOTEST homepark BUY-PARK soak start (speed=-1, family-less lot 21)");
+                Log("AUTOTEST homepark BUY-PARK soak start (speed=-1, lot " + _hpLot + ")");
                 _hpPhase = 1; _hpFrames = 0;
                 return;
             }
@@ -1084,30 +1132,7 @@ namespace Simitone.Client
                 // (the hdserve outbound stall, bisect-confirmed); the 0 park
                 // keeps the shipped freeze (carded until the native
                 // dialog-park law is decoded).
-                try
-                {
-                    var bs = _vm.GlobalBlockingDialog?.Thread?.BlockingState as FSO.SimAntics.Primitives.VMDialogResult;
-                    if (bs != null && !bs.Responded)
-                    {
-                        bs.Responded = true;
-                        bs.ResponseCode = 0;
-                        bs.ResponseText = "";
-                        _vm.GlobalBlockingDialog = null;
-                        _hpAnswers++;
-                    }
-                    // UI alerts (UIMobileAlert) park at speed 0 with a NULL
-                    // GlobalBlockingDialog (SignalDialog Caller=null) — the gbd
-                    // clear can't reach them and they re-assert their park every
-                    // frame (the hp5/hp7 0-ping-pong). Dismiss them outright.
-                    var ui = FSO.Client.UI.Framework.UIScreen.Current;
-                    foreach (var alert in (ui?.GetChildren() ?? new System.Collections.Generic.List<FSO.Client.UI.Framework.UIElement>())
-                        .OfType<Simitone.Client.UI.Panels.UIMobileAlert>().Where(a => a.Visible).ToList())
-                    {
-                        ui.Remove(alert);
-                        _hpAnswers++;
-                    }
-                }
-                catch { }
+                HomeParkAnswerDialogs();
                 _vm.SpeedMultiplier = -1;
                 var parkName = "buy";
                 if (_hpFrames == 40)
@@ -1128,17 +1153,94 @@ namespace Simitone.Client
                 if (_hpBuyOk && _hpAnswers > 0)
                     Log("AUTOTEST homepark dialog-flurry coexistence: " + _hpAnswers + " BHAV dialogs answered during the buy soak (lawful -2 parks between -1 windows)");
                 _vm.SpeedMultiplier = 1;
-                _hpPhase = 3;
+                // LIVE mode, or the main panel's per-frame BUY re-assert
+                // (UIMainPanel Update) clobbers the 0 park back to -1.
+                try { _screen.Frontend?.MainPanel?.SetMode(Simitone.Client.UI.Panels.UIMainPanelMode.LIVE); } catch { }
+                _hpPhase = 2; _hpFrames = 0;
+                return;
+            }
+            if (_hpPhase == 2)
+            {
+                // ENG-28b pause-0 lane: the explicit pause rides the restricted
+                // law ONLY as the button park (PauseButtonPark) — objects and
+                // wakes advance, clock frozen. Native +0x32 class (R214's pause
+                // button/app-deactivate callers), NOT the +0x111 modal gate.
+                HomeParkAnswerDialogs();
+                if (_hpFrames == 20)
+                    Log("AUTOTEST homepark PAUSE-BUTTON soak start (speed=0 + PauseButtonPark)");
+                if (_hpFrames >= 20)
+                {
+                    _vm.SpeedMultiplier = 0;
+                    _vm.PauseButtonPark = true;
+                }
+                if (_hpFrames < 20) return;
+                if (_hpFrames == 60)
+                {
+                    _hpSched0 = _vm.Scheduler.CurrentTickID;
+                    _hpClock0 = _vm.Context.Clock.Minutes;
+                    _hpFam0 = HomeParkFamSnapshot();
+                }
+                if (_hpFrames <= 240) return;
+                _hpPauseOk = HomeParkSoakLeg("pause",
+                    _vm.Scheduler.CurrentTickID - _hpSched0,
+                    _vm.Context.Clock.Minutes == _hpClock0,
+                    HomeParkFamSnapshot() != _hpFam0,
+                    _vm.SpeedMultiplier == 0 && _vm.PauseButtonPark,
+                    _hpFam0.Split(';').Length - 1);
+                _hpPhase = 3; _hpFrames = 0;
                 return;
             }
             if (_hpPhase == 3)
             {
-                if (_hpBuyOk)
+                // The modal-pump leg (the decoded +0x111 law): a UI modal over
+                // the button pause STOPS the pump outright (UIModalSimPause's
+                // counter), and releasing it resumes the restricted tick.
+                HomeParkAnswerDialogs();
+                if (_hpFrames == 20)
                 {
-                    Pass("homepark");
-                    Log("AUTOTEST homepark *** HOME-LOT RESTRICTED TICK VERIFIED (buy park: family simulates, clock frozen) ***");
+                    _hpSched0 = _vm.Scheduler.CurrentTickID;
+                    _vm.ModalPumpBlock++;
+                    Log("AUTOTEST homepark MODAL-PUMP freeze start (ModalPumpBlock=1 over the button pause)");
                 }
-                else Fail("homepark");
+                if (_hpFrames >= 20 && _hpFrames < 140)
+                {
+                    _vm.SpeedMultiplier = 0;
+                    _vm.PauseButtonPark = true;
+                }
+                if (_hpFrames < 20) return;
+                if (_hpFrames == 140)
+                {
+                    int frozenAdv = (int)(_vm.Scheduler.CurrentTickID - _hpSched0);
+                    _hpModalOk = frozenAdv <= 2; // the pump is stopped (allow re-assert jitter)
+                    Log("AUTOTEST homepark MODAL-PUMP frozenAdv=" + frozenAdv + " (native +0x111: the modal stops cSimulator::Simulate entirely)");
+                    _vm.ModalPumpBlock--;
+                    _hpSched0 = _vm.Scheduler.CurrentTickID;
+                }
+                if (_hpFrames > 140 && _hpFrames <= 260)
+                {
+                    _vm.SpeedMultiplier = 0;
+                    _vm.PauseButtonPark = true;
+                    if (_hpFrames == 260)
+                    {
+                        int resumedAdv = (int)(_vm.Scheduler.CurrentTickID - _hpSched0);
+                        bool resumes = resumedAdv >= 20;
+                        _hpModalOk = _hpModalOk && resumes;
+                        Log("AUTOTEST homepark MODAL-PUMP resumedAdv=" + resumedAdv + " (release restores the restricted tick)");
+                    }
+                    return;
+                }
+                if (_hpFrames > 260) { _vm.SpeedMultiplier = 1; _vm.PauseButtonPark = false; _hpPhase = 4; }
+                return;
+            }
+            if (_hpPhase == 4)
+            {
+                var all = _hpBuyOk && _hpPauseOk && _hpModalOk;
+                if (all)
+                {
+                    Pass(_hpGate);
+                    Log("AUTOTEST " + _hpGate + " *** HOME-LOT RESTRICTED TICK VERIFIED (buy park + pause button: family simulates, clock frozen; modal pump freeze + resume) ***");
+                }
+                else Fail(_hpGate);
                 Finish();
             }
         }
