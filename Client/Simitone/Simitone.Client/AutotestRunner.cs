@@ -1034,7 +1034,7 @@ namespace Simitone.Client
             return sb.ToString();
         }
 
-        private static bool HomeParkSoakLeg(string parkName, bool ok,
+        private static bool HomeParkSoakLeg(string parkName,
             uint schedAdv, bool clockFrozen, bool famDelta, bool parked, int famCensus)
         {
             Log("AUTOTEST homepark HOME-PARK-TICKS(" + parkName + ") schedAdv=" + schedAdv
@@ -1066,7 +1066,7 @@ namespace Simitone.Client
                 if (_hpFrames < 60) return;
                 _vm.GlobalBlockingDialog = null;
                 _vm.SpeedMultiplier = -1;
-                Log("AUTOTEST homepark BUY-PARK soak start (speed=-1, home lot house 5)");
+                Log("AUTOTEST homepark BUY-PARK soak start (speed=-1, family-less lot 21)");
                 _hpPhase = 1; _hpFrames = 0;
                 return;
             }
@@ -1119,7 +1119,7 @@ namespace Simitone.Client
                     _hpFam0 = HomeParkFamSnapshot();
                 }
                 if (_hpFrames <= 240) return;
-                _hpBuyOk = HomeParkSoakLeg(parkName, true,
+                _hpBuyOk = HomeParkSoakLeg(parkName,
                     _vm.Scheduler.CurrentTickID - _hpSched0,
                     _vm.Context.Clock.Minutes == _hpClock0,
                     HomeParkFamSnapshot() != _hpFam0,

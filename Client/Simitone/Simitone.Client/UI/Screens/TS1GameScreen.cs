@@ -765,6 +765,8 @@ namespace Simitone.Client.UI.Screens
                     {
                         StaleTransitClearBudget--;
                         if (CompleteStaleTransit(members)) StaleTransitClearBudget = 0;
+                        else if (StaleTransitClearBudget == 0)
+                            GameLog.Write("trv06b arrival: no stale transit found in the arrival window (none parked at 281 — nothing to complete)");
                     }
                     if (PendingVacationCarryHome)
                     {
@@ -807,7 +809,12 @@ namespace Simitone.Client.UI.Screens
                             && parent.IndexOf("global", StringComparison.OrdinalIgnoreCase) >= 0)
                         { parkedInTransitWait = true; break; }
                     }
+                    // review P2-1: the structural 281-park alone is too broad (any
+                    // notify-waiting action in the arrival window would cancel) —
+                    // require the action's callee to be the travel plugin (the
+                    // transit interactions' owner) as well.
                     if (!parkedInTransitWait) continue;
+                    if (!(act.Callee?.Object?.OBJ != null && act.Callee.Object.OBJ.GUID == 0xABA9DF4Au)) continue;
                     member.Thread.CancelAction(act.UID);
                     cancelled = true;
                     GameLog.Write("trv06b arrival: completed the stale return-transit '"
@@ -1427,11 +1434,17 @@ namespace Simitone.Client.UI.Screens
             // ENG-28b: mark this as the load-time PRIMING pass — the home-lot
             // restricted tick must not fire on it (see VM.PrimingTick; the
             // arrival choreography is calibrated to a non-ticking priming pass).
+            // review P2-2: try/finally so a non-BHAV exception out of Tick()
+            // can never strand the flag (a stuck-true flag degrades to the
+            // consistent full freeze, but must not outlive the call).
             vm.PrimingTick = true;
-            vm.SpeedMultiplier = -1;
-            vm.Tick();
-            vm.SpeedMultiplier = 1;
-            vm.PrimingTick = false;
+            try
+            {
+                vm.SpeedMultiplier = -1;
+                vm.Tick();
+                vm.SpeedMultiplier = 1;
+            }
+            finally { vm.PrimingTick = false; }
 
             if (isSimless)
             {
