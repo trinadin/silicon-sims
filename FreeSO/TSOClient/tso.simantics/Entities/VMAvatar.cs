@@ -641,8 +641,9 @@ namespace FSO.SimAntics
             if (name == null) return;
 
             // native play: cSoundPlayer::PlayBySource(name, source=object id)
-            // 0x10300550 — same dispatch/volume law as the "sound" key; no
-            // per-name dedupe (each footfall is a fresh native instance).
+            // 0x10300550 — same dispatch/volume law as the "sound" key; the
+            // native unit is one pre-created sound object per TRACK (state-
+            // gated retrigger, AUD-20 §(d) / AUD-21 review P3-2 correction).
             var thread = FSO.HIT.HITVM.Get().PlaySoundEvent(name);
             if (thread != null)
             {
