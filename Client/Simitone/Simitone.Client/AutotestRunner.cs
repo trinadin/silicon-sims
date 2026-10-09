@@ -40622,7 +40622,11 @@ namespace Simitone.Client
                         lock (Simitone.Client.UI.Panels.UINeighborhoodAnimationLayer.AdvancesByFamily)
                             Simitone.Client.UI.Panels.UINeighborhoodAnimationLayer.AdvancesByFamily.TryGetValue(famKey, out adv);
                         bool multi = layerCounts[l] > 1;
-                        bool good = mounted && adv > adv0 && (!multi || layer.FrameNum > 0) && firstBad.Length == 0;
+                        // skip-slot cycles (TS1.0 deltas) mount IN the skip
+                        // slot and legitimately land on FrameNum 0 (f1) —
+                        // the advance-count delta is the movement proof there.
+                        bool moved = layer.SkipSlots > 0 ? (adv > adv0) : (!multi || layer.FrameNum > 0);
+                        bool good = mounted && adv > adv0 && moved && firstBad.Length == 0;
                         if (good) famOK++;
                         else
                         {

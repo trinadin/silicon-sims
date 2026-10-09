@@ -50,7 +50,11 @@ namespace Simitone.Client.UI.Panels
                 FullImageAnimations = new NeighborhoodImageAnim[] {new NeighborhoodImageAnim("Nbhd\\DiffN1-N2_8.bmp", "Nbhd\\DiffN1-N3_8.bmp", "Nbhd\\DiffN1-N4_8.bmp") {
                     Discrete = true, FrameRepeat = 1, SkipSlots = 1,
                     CounterIntervalMilliseconds = 200.0
-                } }
+                } },
+                // The skip-slot family never pulses (the pulsate formula
+                // would make TotalFrames 2N-2 and stretch the cycle; the
+                // decode's port spec: Pulsate=false).
+                Pulsate = false,
             },
             new NeighborhoodViewConfig()
             {
