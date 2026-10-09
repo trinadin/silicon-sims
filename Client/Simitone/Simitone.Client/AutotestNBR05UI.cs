@@ -35,13 +35,18 @@ namespace Simitone.Client
     /// 2. Arm law — the Rezone toolbar click arms the rezone mode; arming one
     ///    tool disarms the other (mutual exclusion); any other toolbar click
     ///    disarms both; a second tool click toggles off (disclosed semantics).
-    /// 3. Vacant+unbuilt rezone — direct SetZoningType toggle 0→1 with the
-    ///    receipt dialog, LotZoning.iff persisted (fresh-parse), then restored.
-    /// 4. Vacant+built rezone — confirm [8]/[9]; YES = BulldozeLot (NBR-03); the
-    ///    disclosed single-step chain (no auto-rezone after the bulldoze).
-    /// 5. Occupied rezone — confirm [6]/[7] names the family; NO is inert (no
-    ///    backend call, family stays bound). The YES-evict leg shares the
-    ///    UI-30-validated eviction lambda and NBR-02's nbrmgmt-pinned MoveOut.
+    /// 3. Vacant+unbuilt rezone — the native zone-choice dialog (NBR-08:
+    ///    STR# 250/251, mounted ahead of the cascade) is answered with the
+    ///    other zone, then the SAME direct-SetZoningType completion semantics:
+    ///    0→1 toggle with the receipt dialog, LotZoning.iff persisted
+    ///    (fresh-parse), then restored.
+    /// 4. Vacant+built rezone — answer the zone choice, then confirm [8]/[9];
+    ///    YES = BulldozeLot (NBR-03); the disclosed single-step chain (no
+    ///    auto-rezone after the bulldoze).
+    /// 5. Occupied rezone — answer the zone choice, then confirm [6]/[7]
+    ///    names the family; NO is inert (no backend call, family stays
+    ///    bound). The YES-evict leg shares the UI-30-validated eviction
+    ///    lambda and NBR-02's nbrmgmt-pinned MoveOut.
     /// 6. Previous/Next — the real buttons call SwitchNeighborhood; on the
     ///    single-neighborhood isolated userdir the switch is a counted no-op
     ///    (enumeration law asserted).
@@ -222,6 +227,27 @@ namespace Simitone.Client
             return btn;
         }
 
+        // NBR-08: the zone-choice dialog's two buttons — the Yes slot carries
+        // the STR# 251 [0] "Residential" caption (target 0), the No slot the
+        // [1] "Community" caption (target 1); ButtonMap is type-keyed, so the
+        // two choices ride the port's two-button vehicle.
+        private UIButton RezoneChoiceButton(int target)
+        {
+            UIButton btn = null;
+            Screen._rezoneChoiceDialog?.ButtonMap.TryGetValue(
+                target == 0 ? UIAlertButtonType.Yes : UIAlertButtonType.No, out btn);
+            return btn;
+        }
+
+        /// <summary>Answer the mounted zone-choice dialog with the given
+        /// target zone (NBR-08 re-pin: the click now mounts the choice first;
+        /// same-zone picks are the nbr07 leg's concern).</summary>
+        private void AnswerRezoneChoice(int target)
+        {
+            var btn = RezoneChoiceButton(target);
+            if (btn != null) Press(btn);
+        }
+
         // The rezone cascade's YES-bulldoze leg reuses ArmedBulldoze, whose
         // receipt rides the UI-30 bulldoze dialog seam.
         private UIButton BulldozeDialogButton(UIAlertButtonType type)
@@ -345,10 +371,20 @@ namespace Simitone.Client
             Check(zone0 == 0, "lot11-starts-residential (" + zone0 + ")");
             var other0 = PersistedZone(10);
             var probe0 = Screen.RezoneDirectForProbe;
+            var choice0 = Screen.RezoneChoiceShownForProbe;
 
             ArmRezone();
             Check(Switcher.RezoneArmed, "armed-for-lot11-rezone");
             Panel.SelectHouse(11);
+            // NBR-08: the click mounts the native zone-choice dialog FIRST
+            // (RezoneModeLotHandlerUL 0x4691f0-0x46927c) — nothing rezones
+            // until it is answered.
+            Check(Screen.RezoneChoiceShownForProbe == choice0 + 1, "zone-choice-mounted-first (NBR-08)");
+            var choice = Screen._rezoneChoiceDialog;
+            Check(choice != null, "zone-choice-dialog-live");
+            Check(choice != null && choice.TitleTextForProbe == "Rezone House?",
+                "zone-choice-title-str250-0");
+            AnswerRezoneChoice(1);   // pick Community (the other zone)
             Check(Screen.RezoneDirectForProbe == probe0 + 1, "direct-rezone-attempted");
             Check(Screen.RezonesForProbe == probe0 + 1, "rezones-counted");
             Check(Screen._rezoneDialog != null, "rezone-receipt-dialog-shown");
@@ -387,6 +423,7 @@ namespace Simitone.Client
 
             ArmRezone();
             Panel.SelectHouse(10);
+            AnswerRezoneChoice(1);   // NBR-08: answer the zone choice first
             Check(Screen.RezoneConfirmBulldozeForProbe == 1, "vacant-built-rezone-confirm-shown");
             Check(Screen._rezoneDialog != null, "rezone-confirm-mounted");
             Check(Screen._rezoneDialog.MessageTextForProbe == GameFacade.Strings.GetString("131", "9"),
@@ -395,8 +432,11 @@ namespace Simitone.Client
             Check(Screen._rezoneDialog == null, "confirm-no-aborts");
             Check(Screen.ArmedBulldozesForProbe == bulldozes0, "abort-made-no-backend-call");
 
+            // Second leg: YES runs the bulldoze (after re-answering the zone
+            // choice — NBR-08).
             ArmRezone();
             Panel.SelectHouse(10);
+            AnswerRezoneChoice(1);
             var yes = RezoneDialogButton(UIAlertButtonType.Yes);
             Check(yes != null, "confirm-has-yes");
             Press(yes);
@@ -434,6 +474,7 @@ namespace Simitone.Client
 
             ArmRezone();
             Panel.SelectHouse(11);
+            AnswerRezoneChoice(1);   // NBR-08: answer the zone choice first
             Check(Screen.RezoneConfirmEvictForProbe == 1, "occupied-rezone-confirm-shown");
             var dlg = Screen._rezoneDialog;
             Check(dlg != null, "rezone-confirm-mounted");
