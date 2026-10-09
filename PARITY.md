@@ -17,7 +17,15 @@ later overturned, corrections are noted in place or here.
 exercises all of this on every change; `tools/run-autotest.sh`; opt-in batteries
 `nbr06`, `nbr05ui`, `nghbtns`, `freewillwin`, `moodlaw`, `trv05`, `hdserve`, `homepark`
 cover the decode-pinned laws; `ulpets` rides the default suite since EXP-15's
-follow-up):
+follow-up; **ENV-04 (2026-10-09): the two documented battery flakes are
+DE-FLAKED — carseek's "wall-clock" FAIL was ulpets probe corruption (the
+show window's G10=555 gate flipping employed residents' pd32 to the visitor
+class when the ~7:2x guest-bring landed inside it — 100% correlation across
+~15 logs), fixed probe-side with baseline-snapshot-scoped restores + a
+red-flag tripwire (evidence/ENV-04/deflake.md); ulpets' show-flake was a
+bare default-priority push starving at AttemptPush, fixed with the train-leg
+idiom + a bounded watchdog. TWO consecutive 156/0 batteries on merged main
+(c4bc550e4) — the suite is deterministic.**
 
 - Boot → neighbourhood → lot → live play; saves and reload (byte-audited against the
   original record format); CAS on the original desktop law (portraits, personality
@@ -60,8 +68,22 @@ follow-up):
   button sounds fire on mouse-DOWN from PlayUISound's per-button slots
   (default EMPTY = silent); the UL filter bar carries 'UI_Nhood_click'
   (pool 0x6c6e0+0xe, byte-proven); the blanket up-click removed (several
-  surfaces that double-played now sound once). Receipt:
-  evidence/AUD-20/button-firing-law.md.**
+  surfaces that double-played now sound once). **Wave-2 (2026-10-09
+  subagent decode, evidence/AUD-20/filterbar-override-table.md): the ODUIS
+  NULL-fallback built-ins are {"", UI_click, "", UI_error} — the BASE press
+  default is ui_click, not silence (silence is per-button only); all FIVE
+  filter bars pass the identical UI_Nhood_click; community view windows
+  install it as their class press default while mounted; the lot button
+  carries UI_Nhood_rollover on the hover slot (the only native non-press
+  override) with its click on the down edge; the CAS cycle arrows use
+  UI_CAC_CycleParts/UI_CAC_Cyclehead press slots — all ported + gated.**
+  The footstep snow/99 branch closed on the lot-id decode
+  (footstep-residuals-decode.md: the class-0 default reads cSimulator global
+  #10 = the CURRENT LOT — 40-42 snow, 99 soft; ported with 8 lot-cases); the
+  0x620&8 suppressor is a DEAD GATE (zero writers corpus-wide — the note
+  retires); kSpl attenuation variants and the native's per-track
+  channel-sharing stay disclosed. Receipts:
+  evidence/AUD-20/button-firing-law.md + footstep-residuals-decode.md.**
 - ~~Custom animated objects~~ **CLOSED 2026-10-08 (CC-06)**: five defects
   fixed on decoded native laws — duplicate-skeleton registration threw
   (native silent-replace law), corrupt and hostile custom CFPs crashed the
@@ -97,9 +119,15 @@ follow-up):
   2026-10-09: the plaque ANIMATES — a 3-frame ping-pong (0→F0, 1→F1,
   2|3→F2, 4→F1, 5→F0, byte-verified at DrawFilterAt) in lockstep with the
   wave counter's advance gate; ported + gated in uidtbar (receipt:
-  evidence/UI-38/plaque-pingpong-law.md). Remaining UI-38 residuals
-  (evidence-pinned): this+0x108 stays a pinned-0 dormant flag (writer
-  unisolable); TS1.0 discrete-cadence alignment stays disclosed.
+  evidence/UI-38/plaque-pingpong-law.md). **+0x108 CLOSED (subagent decode,
+  evidence/UI-38/plus108-and-ts1-cadence.md): it IS the show_zones cheat
+  flag (the UL CheatCallback's only runtime writer, ctor-zeroed, bare form
+  arg-count-gated) — now a working cheat in the port (show_zones on/off
+  re-routes the lot highlighting; gated incl. the off + bare no-op arms).
+  The TS1.0 discrete-cadence residual CLOSED: 200 ms/step, counter mod 4
+  with slot-0 SKIP (visible cycle f1,f2,f3,skip — period 800 ms; the 2^52
+  magic correction), mounted via the SkipSlots capability + gated. UI-38's
+  residual list is now EMPTY.**
 - ~~**Disclosed (visit-session park, 2026-10-08)**: away-lot visit sessions load in
   BUY mode + paused per the port's own NBR-06 native entry decode
   (`cSimsApp::LoadGame` visit → SetMode(BUY)+Pause) and the HUD panel re-parks
@@ -140,10 +168,16 @@ follow-up):
   park). homepark pause/modal legs + homeparkfam (lot-5 family soak,
   dialogs answered — the family buy-soak measurement residual CLOSED) all
   PASS; hdserve holds (the retraction's stall class keeps its freeze).
-  Receipt: evidence/ENG-28/dialog-park-law.md. The non-vacation
-  travel-edge transit residual is probe-ruled-out on the phone-plugin path
-  (rows enumerated, return-candidate booked, no home switch — the cab-chain
-  decode is owed). The same lane fixed the stale return-transit
+  Receipt: evidence/ENG-28/dialog-park-law.md. **The non-vacation travel-edge transit residual CLOSED on the cab-chain
+  decode (2026-10-09 subagent, evidence/ENG-28/cab-chain-decode.md): ALL
+  FIVE travel plugins park their persisted transit in global.iff 281 before
+  sims_call mode 17 (downtown 0xA6F31853, vacation 0xABA9DF4A, community
+  0xEAA79D86, studio 0xC61F8102, magic 0x99197314 — the 281-frame
+  requirement excludes the parkless portals); natively NO BHAV frame
+  survives a lot switch (LoadHouse clears histories on every load) — the
+  residue is a port construction, now completed at every travel edge
+  (CompleteStaleTransit's callee predicate = the five-GUID set, armed at
+  every home return).** The same lane fixed the stale return-transit
   ENGINE-side: at the vacation-return arrival, the persisted transit action
   parked in global 281 'Wait For Notify' is completed (player-cancel law;
   the native arrival clears trip residue — RemoveFromVacation
