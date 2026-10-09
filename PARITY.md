@@ -79,6 +79,14 @@ cover the decode-pinned laws):
   bounded UI-38 residuals (lot-category-bits writer, filter persistence
   LoadCurrentFilter, this+0x108/+0x1dc semantics, TS1.0 discrete-cadence
   alignment).
+- **Disclosed (visit-session park, 2026-10-08)**: away-lot visit sessions load in
+  BUY mode + paused per the port's own NBR-06 native entry decode
+  (`cSimsApp::LoadGame` visit → SetMode(BUY)+Pause) and the HUD panel re-parks
+  the clock until the player enters LIVE — until then the whole lot (including
+  NPC townsfolk) is frozen, where the native's visit streets simulate. The
+  autotest probes apply the V4.2 "livelift" (panel → LIVE at rebound); a
+  player entering LIVE sees normal simulation. Bounded engine-side follow-up:
+  keep townies ticking during the visit park.
 - Platform: `-3d` is experimental; `-jit`/`-dx` are inherited and unverified; trackpad
   natural-scroll and other hardware feel items lack systematic human verification —
   **human verification is partial** (portions played and accepted hands-on; no
