@@ -573,6 +573,11 @@ namespace Simitone.Client
                 _trv05 = new AutotestTrv05(Log, () => _vm, () => _screen,
                     (short h) => _screen.PlayHouse(h, null),
                     (uint l) => _screen.vm.SignalLotSwitch(l));
+                // TRV-06: the live-observation legs chained after the booking
+                // battery (same opt-in gate; verdict combines both probes).
+                _trv06 = new AutotestTrv06(Log, () => _vm, () => _screen,
+                    (uint l) => _screen.vm.SignalLotSwitch(l),
+                    PetNameLivelift);
                 _state = 23;                return;
             }
             // SAV-07 'sav07live'/'sav07live2' opt-in (additive): the live
@@ -957,16 +962,28 @@ namespace Simitone.Client
             Finish();
         }
 
-        // TRV-05 'trv05': vacation booking battery (AutotestTrv05).
+        // TRV-05 'trv05': vacation booking battery (AutotestTrv05), then the
+        // TRV-06 live-observation legs (AutotestTrv06: score controller chain +
+        // souvenir purchase/carry-home — the card's enumerated residuals).
         private static AutotestTrv05 _trv05;
+        private static AutotestTrv06 _trv06;
 
         private static void StateTrv05()
         {
-            if (_trv05 == null) { Finish(); return; }
-            if (!_trv05.Tick()) return;
-            if (_trv05.Passed) Pass("trv05"); else Fail("trv05");
-            Log("AUTOTEST trv05 " + _trv05.Diagnostics);
-            _trv05 = null;
+            if (_trv05 == null && _trv06 == null) { Finish(); return; }
+            if (_trv05 != null)
+            {
+                if (!_trv05.Tick()) return;
+                var baseOk = _trv05.Passed;
+                Log("AUTOTEST trv05 " + _trv05.Diagnostics);
+                _trv05 = null;
+                if (!baseOk) { Fail("trv05"); _trv06 = null; Finish(); return; }
+                return; // legs probe (created at the same hook) ticks next frame
+            }
+            if (!_trv06.Tick()) return;
+            if (_trv06.Passed) Pass("trv05"); else Fail("trv05");
+            Log("AUTOTEST trv06-legs " + _trv06.Diagnostics);
+            _trv06 = null;
             Finish();
         }
 
