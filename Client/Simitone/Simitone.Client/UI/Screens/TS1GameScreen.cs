@@ -1971,6 +1971,11 @@ namespace Simitone.Client.UI.Screens
     internal int SwitchAttemptsForProbe;           // Previous/Next switch attempts
     internal int SwitchesForProbe;                 // successful SwitchToNeighborhood + rebuild
 
+    // NBR-07 probe seams: the expansion-venue EvictModeLotHandler variants.
+    internal int VenueOccupiedNoOpsForProbe;       // DT/Studio occupied silent no-ops
+    internal int VenueVacationEvictConfirmsForProbe; // Vacation [18]/[19] confirms shown
+    internal int VenueVacationNoDialogForProbe;    // Vacation unbuilt sound-only outcomes
+
     // Port literals (disclosed): the receipts and the switch failure wording
     // are not in any decoded STR set; the rezone cascade confirms reuse the
     // user-approved STR# 131 (r197 decode).
@@ -2037,6 +2042,100 @@ namespace Simitone.Client.UI.Screens
             return (string.IsNullOrEmpty(s) || s.StartsWith("131:")) ? "Could not evict!" : s;
         }
     }
+    // NBR-07 (ppc_decode — the four expansion-venue EvictModeLotHandlers +
+    // their LoadUIStrings__Fv slot maps): the VENUE windows overwrite their
+    // STR# 131 slot 0/1 with rows [14]/[15] ("Bulldoze Lot?"/"Do you want to
+    // bulldoze this lot?" — GetString(15)/GetString(16), 1-based; loaders
+    // cWinDowntown 0x3fc6f0, cWinVacation 0x43eb4c, cWinMagicland 0x581bd4;
+    // cWinStudiotown consumes the same pair through its own struct). The
+    // VACATION occupied confirm is rows [18]/[19] (msg "There is a family on
+    // vacation on this lot. If you evict them from the lot, the family will
+    // be sent home..." / title "Are you sure?" — cWinVacation 0x440390 slots
+    // 14/15, loader GetString(19)/GetString(20) at 0x43eb78). Same fallback
+    // law as SwitchFailTitle: a missing table must not blank the chrome.
+    internal static string BulldozeLotTitle
+    {
+        get
+        {
+            var s = GameFacade.Strings.GetString("131", "14");
+            return (string.IsNullOrEmpty(s) || s.StartsWith("131:")) ? BulldozeTitle : s;
+        }
+    }
+    internal static string BulldozeLotMessage
+    {
+        get
+        {
+            var s = GameFacade.Strings.GetString("131", "15");
+            return (string.IsNullOrEmpty(s) || s.StartsWith("131:")) ? "Do you want to bulldoze this lot?" : s;
+        }
+    }
+    internal static string VacationEvictTitle
+    {
+        get
+        {
+            var s = GameFacade.Strings.GetString("131", "19");
+            return (string.IsNullOrEmpty(s) || s.StartsWith("131:")) ? "Are you sure?" : s;
+        }
+    }
+    internal static string VacationEvictMessage
+    {
+        get
+        {
+            var s = GameFacade.Strings.GetString("131", "18");
+            return (string.IsNullOrEmpty(s) || s.StartsWith("131:")) ? "There is a family on vacation on this lot." : s;
+        }
+    }
+    // NBR-07 zone-choice strings (RezoneModeLotHandlerUL @0x469160
+    // 0x4691f0-0x46927c; UL LoadUIStrings__Fv @0x4655a0 loads table 250 into
+    // [TOC-18224] and table 251 rides the ZoningData table [TOC-18228] as the
+    // choice-dialog button captions, cSimsApp vt+0x118 choice form):
+    // UIText.iff STR# 250 'Rezone Mode strings' [0]/[1] and STR# 251
+    // 'Zoning Types' [0]/[1]. The %s rides the CURRENT zone's 251 name
+    // (zone==2 → array[+4] "Community", else array[+0] "Residential").
+    internal static string RezoneChoiceTitle
+    {
+        get
+        {
+            var s = GameFacade.Strings.GetString("250", "0");
+            return (string.IsNullOrEmpty(s) || s.StartsWith("250:")) ? RezoneTitle : s;
+        }
+    }
+    internal static string RezoneChoiceMessage(int currentZone)
+    {
+        var s = GameFacade.Strings.GetString("250", "1");
+        if (string.IsNullOrEmpty(s) || s.StartsWith("250:"))
+            s = "This lot is currently zoned as a %s lot. Please choose what type of lot you want this to be:";
+        return s.Replace("%s", NativeZoneName(currentZone));
+    }
+    /// <summary>STR# 251 'Zoning Types' — the ZoningData choice captions.
+    /// Takes the PORT encoding (0 = residential, 1 = community; NBR-03) so
+    /// the native enum (1/2) never leaks in.</summary>
+    internal static string NativeZoneName(int portZone)
+    {
+        var s = GameFacade.Strings.GetString("251", portZone == 1 ? "1" : "0");
+        if (string.IsNullOrEmpty(s) || s.StartsWith("251:"))
+            return portZone == 1 ? "Community" : "Residential";
+        return s;
+    }
+    /// <summary>NBR-07 hide-slot pairing (cWinViewControl::UpdateViewFromCPState
+    /// raw 0x2b3e40 tail; CPState::IsLiveModeDisabled @0x210e30 reads +0x55,
+    /// CPState::IsBuyAndBuildDisabled @0x210ec0 reads +0x54): the live-disable
+    /// drive pairs BUILD+CAMERA (view+0xec/+0xfc, the +0x160 byte) and the
+    /// buy-and-build drive pairs BUY+LIVE (view+0xf0/+0xf4). IsHideForLocation
+    /// (@0x20c5e0) shows/hides the +0x100/+0x1a8 elements via vt+0x9c/0xa0 —
+    /// those two have no identified port counterpart (banked in the receipt).
+    /// In every port-reachable state both drives are true together (the visit
+    /// lock sets BuildBuyEnabled=false AND global 32), so the port's existing
+    /// pairing {BUY,BUILD}/{LIVE,CAMERA} yields the same visible outcome;
+    /// kept and disclosed here as the single source of the native law.</summary>
+    internal static void NativeUcpDisablePairing(bool buyAndBuildDisabled, bool liveModeDisabled,
+        out bool buy, out bool build, out bool live, out bool camera)
+    {
+        buy = buyAndBuildDisabled;
+        live = buyAndBuildDisabled;
+        build = liveModeDisabled;
+        camera = liveModeDisabled;
+    }
     // AUD-17 E-6: from STR# 131[10] (the probe pins it == "Error") — keeps
     // localization coherent with the other reused 131 strings.
     internal static string SwitchFailTitle
@@ -2071,7 +2170,18 @@ namespace Simitone.Client.UI.Screens
         };
     }
 
-    /// <summary>The EvictModeLotHandler branch decision, on the clicked lot.</summary>
+    /// <summary>The EvictModeLotHandler branch decision, on the clicked lot.
+    /// NBR-07: the expansion-venue windows carry their own handler variants —
+    /// Downtown (file 0x3fdb10) and Studio Town (0x4795c0) answer an occupied
+    /// click with a silent no-op; Vacation (0x4401c0) runs the STR# 131
+    /// [18]/[19] vacation-evict confirm; Magicland (0x5840d0) runs the UL law
+    /// (its occupied net-worth confirm + a family-home-on-vacation pre-scan
+    /// that the port cannot reach — no vacation state exists port-side, so the
+    /// [16]/[17] refusal leg is decode-banked) with the venue [14]/[15]
+    /// confirm pair. The lot-band gating (MapHouseNumToIndex: DT lots 21-30,
+    /// Vacation 40-49, Studio 81-89, Magic 90-98) is already enforced by the
+    /// panel's IsNativeHouseForMode mounting, so the flow itself branches on
+    /// the mounted mode + the lot's family/built state.</summary>
     private void BulldozeLotClickFlow(int house)
     {
         var neigh = Content.Get().Neighborhood;
@@ -2079,6 +2189,26 @@ namespace Simitone.Client.UI.Screens
         var simi = neigh.GetHouse(house)?.Get<SIMI>(1);
         // HouseInfo+0x18 proxy: the port's built marker (same gate as move-in).
         bool built = simi != null && (simi.ObjectsValue > 0 || simi.ArchitectureValue > 0);
+
+        var mode = TS1NeighPanel != null ? TS1NeighPanel.CurrentViewMode : CurrentNeighborhoodMode;
+        if (mode == 2 || mode == 5)
+        {
+            BulldozeLotClickFlowQuietVenue(house, family, built, mode);
+            return;
+        }
+        if (mode == 3)
+        {
+            BulldozeLotClickFlowVacation(house, family, built);
+            return;
+        }
+
+        // Base/UL (modes 1/4/6) and Magicland (mode 7): the UL branch law.
+        // Magicland's confirms use the venue [14]/[15] lot pair (its loader
+        // overwrites slots 0/1 with rows 15/16 like every other venue);
+        // base/UL keep the [0]/[1] house pair (NBR-06).
+        bool venuePair = mode == 7;
+        string confirm2Title = venuePair ? BulldozeLotTitle : BulldozeHouseTitle;
+        string confirm2Message = venuePair ? BulldozeLotMessage : BulldozeHouseMessage;
 
         if (family != null)
         {
@@ -2101,15 +2231,15 @@ namespace Simitone.Client.UI.Screens
                         if (built)
                         {
                             // Confirm 2 (NBR-06): the native second confirm IS
-                            // the STR# 131 [0]/[1] bulldoze pair — its answer
-                            // is the MoveOut bulldoze flag (0x469760 @
-                            // 0x469bf0 region).
+                            // the STR# 131 [0]/[1] bulldoze pair (venues:
+                            // [14]/[15]) — its answer is the MoveOut bulldoze
+                            // flag (0x469760 @ 0x469bf0 region).
                             BulldozeConfirm2ForProbe++;
                             UIMobileAlert confirm2 = null;
                             confirm2 = new UIMobileAlert(new UIAlertOptions
                             {
-                                Title = BulldozeHouseTitle,
-                                Message = BulldozeHouseMessage,
+                                Title = confirm2Title,
+                                Message = confirm2Message,
                                 Buttons = UIAlertButton.YesNo(
                                     (b2) => { confirm2.Close(); _bulldozeDialog = null; ArmedEvict(house, family, true); },
                                     (b2) => { confirm2.Close(); _bulldozeDialog = null; ArmedEvict(house, family, false); })
@@ -2135,8 +2265,8 @@ namespace Simitone.Client.UI.Screens
             UIMobileAlert confirm = null;
             confirm = new UIMobileAlert(new UIAlertOptions
             {
-                Title = BulldozeHouseTitle,
-                Message = BulldozeHouseMessage,
+                Title = confirm2Title,
+                Message = confirm2Message,
                 Buttons = UIAlertButton.YesNo(
                     (b) => { confirm.Close(); _bulldozeDialog = null; ArmedBulldoze(house); },
                     (b) => { confirm.Close(); _bulldozeDialog = null; })
@@ -2160,6 +2290,173 @@ namespace Simitone.Client.UI.Screens
         });
         _bulldozeDialog = nothing;
         GlobalShowDialog(nothing, true);
+    }
+
+    /// <summary>NBR-07 cWinDowntown::EvictModeLotHandler @0x3fdb10 (and the
+    /// byte-identical branch shape of cWinStudiotown @0x4795c0): the occupied
+    /// leg jumps straight to the window redraw with NO dialog and NO executor
+    /// (0x3fdb80 → 0x3fdca8) — a silent no-op. The vacant legs match the UL
+    /// shape with the venue confirm pair [14]/[15] and the 132 [4]/[5]
+    /// nothing-dialog bracketed by the UI_Nhood_bdoze_cancel/UI_Nhood_bdoze
+    /// sounds (0x3fdb90-0x3fdbc0; the venue pools carry the names: DT pool
+    /// [TOC-18756]+323/+345, Studio [TOC-17968]+298/+320).</summary>
+    private void BulldozeLotClickFlowQuietVenue(int house, FAMI family, bool built, ushort mode)
+    {
+        if (family != null)
+        {
+            VenueOccupiedNoOpsForProbe++;
+            GameLog.Write("nghbtns: venue mode " + mode + " lot " + house
+                + " occupied — native evict click is a silent no-op (no dialog)");
+            return;
+        }
+
+        if (built)
+        {
+            BulldozeVacantBuiltConfirmsForProbe++;
+            UIMobileAlert confirm = null;
+            confirm = new UIMobileAlert(new UIAlertOptions
+            {
+                Title = BulldozeLotTitle,
+                Message = BulldozeLotMessage,
+                Buttons = UIAlertButton.YesNo(
+                    (b) =>
+                    {
+                        confirm.Close(); _bulldozeDialog = null;
+                        // The YES arm plays UI_Nhood_bdoze_demolish then runs
+                        // EvictFamily(lot, 1) (0x3fdc18-0x3fdc44: sound, busy
+                        // cursor, the executor) — the port's ArmedBulldoze is
+                        // the same demolition arm.
+                        PlayVenueBulldozeSound("ui_nhood_bdoze_demolish");
+                        ArmedBulldoze(house);
+                    },
+                    (b) => { confirm.Close(); _bulldozeDialog = null; })
+            });
+            _bulldozeDialog = confirm;
+            GlobalShowDialog(confirm, true);
+            return;
+        }
+
+        // Vacant + unbuilt: the 132 [4]/[5] OK dialog, bracketed by the
+        // cancel/bdoze sounds exactly as the UL handler does.
+        BulldozeStatusOnlyForProbe++;
+        GameLog.Write("nghbtns: venue lot " + house + " has nothing to bulldoze");
+        PlayVenueBulldozeSound("ui_nhood_bdoze_cancel");
+        UIMobileAlert nothing = null;
+        nothing = new UIMobileAlert(new UIAlertOptions
+        {
+            Title = NothingToBulldozeTitle,
+            Message = NothingToBulldozeMessage,
+            Buttons = UIAlertButton.Ok((b) => { nothing.Close(); _bulldozeDialog = null; })
+        });
+        _bulldozeDialog = nothing;
+        GlobalShowDialog(nothing, true);
+        PlayVenueBulldozeSound("ui_nhood_bdoze");
+    }
+
+    /// <summary>NBR-07 cWinVacation::EvictModeLotHandler @0x4401c0: the
+    /// occupied leg is the STR# 131 [18]/[19] vacation-evict confirm (a
+    /// family is vacationing on the lot; evicting sends them home); its
+    /// built sub-confirm and the vacant+built confirm are the venue [14]/[15]
+    /// pair; the vacant+UNBUILT leg mounts NO dialog at all — only the
+    /// UI_Nhood_bdoze_cancel + UI_Nhood_bdoze sounds (0x44023c-0x440264).
+    /// The native executor is RemoveFromVacation (0x232330 — a wrapper over
+    /// Neighborhood::RemoveFromVacation @0xb1270 that always reports success);
+    /// the port's ArmedEvict (MoveOut + save + repaint) is the lawful
+    /// equivalence — the port carries no separate vacation state, so the
+    /// "sent home" routing does not exist and the error leg is unreachable,
+    /// matching the wrapper's always-1 return.</summary>
+    private void BulldozeLotClickFlowVacation(int house, FAMI family, bool built)
+    {
+        if (family != null)
+        {
+            VenueVacationEvictConfirmsForProbe++;
+            UIMobileAlert confirm1 = null;
+            confirm1 = new UIMobileAlert(new UIAlertOptions
+            {
+                Title = VacationEvictTitle,
+                Message = VacationEvictMessage,
+                Buttons = UIAlertButton.YesNo(
+                    (b) =>
+                    {
+                        confirm1.Close(); _bulldozeDialog = null;
+                        if (built)
+                        {
+                            BulldozeConfirm2ForProbe++;
+                            UIMobileAlert confirm2 = null;
+                            confirm2 = new UIMobileAlert(new UIAlertOptions
+                            {
+                                Title = BulldozeLotTitle,
+                                Message = BulldozeLotMessage,
+                                Buttons = UIAlertButton.YesNo(
+                                    (b2) =>
+                                    {
+                                        confirm2.Close(); _bulldozeDialog = null;
+                                        // bulldoze=1 → demolish sound; else the evict
+                                        // sound (0x4403fc-0x44042c).
+                                        PlayVenueBulldozeSound("ui_nhood_bdoze_demolish");
+                                        ArmedEvict(house, family, true);
+                                    },
+                                    (b2) =>
+                                    {
+                                        confirm2.Close(); _bulldozeDialog = null;
+                                        PlayVenueBulldozeSound("ui_nhood_bdoze_evict");
+                                        ArmedEvict(house, family, false);
+                                    })
+                            });
+                            _bulldozeDialog = confirm2;
+                            GlobalShowDialog(confirm2, true);
+                        }
+                        else
+                        {
+                            PlayVenueBulldozeSound("ui_nhood_bdoze_evict");
+                            ArmedEvict(house, family, false);
+                        }
+                    },
+                    (b) => { confirm1.Close(); _bulldozeDialog = null; })
+            });
+            _bulldozeDialog = confirm1;
+            GlobalShowDialog(confirm1, true);
+            return;
+        }
+
+        if (built)
+        {
+            BulldozeVacantBuiltConfirmsForProbe++;
+            UIMobileAlert confirm = null;
+            confirm = new UIMobileAlert(new UIAlertOptions
+            {
+                Title = BulldozeLotTitle,
+                Message = BulldozeLotMessage,
+                Buttons = UIAlertButton.YesNo(
+                    (b) =>
+                    {
+                        confirm.Close(); _bulldozeDialog = null;
+                        PlayVenueBulldozeSound("ui_nhood_bdoze_demolish");
+                        ArmedBulldoze(house);
+                    },
+                    (b) => { confirm.Close(); _bulldozeDialog = null; })
+            });
+            _bulldozeDialog = confirm;
+            GlobalShowDialog(confirm, true);
+            return;
+        }
+
+        // Vacant + unbuilt: NO dialog — the native plays the two sounds only.
+        VenueVacationNoDialogForProbe++;
+        GameLog.Write("nghbtns: vacation lot " + house + " unbuilt — cancel/bdoze sounds only (no dialog)");
+        PlayVenueBulldozeSound("ui_nhood_bdoze_cancel");
+        PlayVenueBulldozeSound("ui_nhood_bdoze");
+    }
+
+    /// <summary>The venue bulldoze sound names ride the per-window literal
+    /// pools (DT [TOC-18756], Vacation [TOC-18540], Studio [TOC-17968],
+    /// Magic [TOC-16908]) — fire-and-forget the same way UIButton plays its
+    /// press default. Missing HIT routines degrade silently, matching the
+    /// button-sound path.</summary>
+    private static void PlayVenueBulldozeSound(string name)
+    {
+        try { FSO.HIT.HITVM.Get()?.PlaySoundEvent(name); }
+        catch { /* a missing routine must not take the dialog chain down */ }
     }
 
     /// <summary>The EvictFamily executor's occupied arm: MoveOut FIRST (law §3),
@@ -2282,6 +2579,20 @@ namespace Simitone.Client.UI.Screens
     internal int RezoneChainedForProbe;            // auto-SetZoningType completions after evict/bulldoze
     internal void RezoneLotClickFlow(int house)
     {
+        // NBR-07 DECODE-BANKED (the zone CHOICE dialog): the native FIRST
+        // dialog is RezoneModeLotHandlerUL @0x469160 0x4691f0-0x46927c —
+        // cSimsApp vt+0x118 with STR# 250 [0] "Rezone House?" / [1] "This lot
+        // is currently zoned as a %s lot. Please choose what type of lot you
+        // want this to be:" (the %s = the current zone's STR# 251 name) and
+        // the STR# 251 captions ("Residential"/"Community") riding the
+        // ZoningData table [TOC-18228] as the choice row; a same-zone pick is
+        // INERT, a dismiss returns. NOT WIRED: the port's toggle flow (target
+        // = the other zone, same-zone picks impossible) is the reviewed
+        // behavioral cover AND is pinned as-is by the nbr05ui/nbr06 probe
+        // phases (AutotestNBR05UI.PhaseDirectRezone expects the direct
+        // SetZoningType to run in the click itself; that probe is outside
+        // NBR-07's edit scope). The strings + the law live in the getters
+        // below and the receipt; re-wiring is a coordinator re-pin decision.
         var neigh = Content.Get().Neighborhood;
         var family = neigh.GetFamilyForHouse((short)house);
         var simi = neigh.GetHouse(house)?.Get<SIMI>(1);
