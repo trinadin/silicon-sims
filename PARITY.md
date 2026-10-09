@@ -75,10 +75,20 @@ cover the decode-pinned laws):
   decoded closed (UL waves = lot-layer window image at (0,0); TS1.0 deltas
   = buffer blit with damage bands 375/565..800 × 400..600, mod-4 hold) —
   the port's mounts were already engine-exact. Remaining: the view-pie pop
-  gesture (re-proved vtable-unrecoverable — permanent disclosure);
-  bounded UI-38 residuals (lot-category-bits writer, filter persistence
-  LoadCurrentFilter, this+0x108/+0x1dc semantics, TS1.0 discrete-cadence
-  alignment).
+  gesture (re-proved vtable-unrecoverable — permanent disclosure); UI-38b
+  CLOSED the two unbanked filter laws (2026-10-09): **filter persistence**
+  on the native LoadCurrentFilter law (STR# 6 'Filter Bar Settings' slot 3
+  in LotLocations.iff — byte-proven; entry applies the 0x10 default then
+  restores the persisted cmd; every filter change saves atomically and
+  syncs the cached provider instance) and the **production lot-category
+  bits** (the native lot+0x1ac writer remains unlocated — re-verified
+  across every direct stw site; the port computes per-lot bits from the
+  lot's own house-file OBJT census against a 74-entry corpus-derived
+  venue-marker table, gated on the live n=1 census: 58=0x46 61=0x6e
+  70=0x7c 71=0x2e 72=0x04 73=0x46 74=0x26 75=0x2e — six of seven buttons
+  visible). Receipt: evidence/UI-38/ui38b-filter-laws.md). Remaining UI-38
+  residuals: this+0x108/+0x1dc semantics, TS1.0 discrete-cadence
+  alignment.
 - ~~**Disclosed (visit-session park, 2026-10-08)**: away-lot visit sessions load in
   BUY mode + paused per the port's own NBR-06 native entry decode
   (`cSimsApp::LoadGame` visit → SetMode(BUY)+Pause) and the HUD panel re-parks

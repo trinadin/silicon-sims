@@ -40,9 +40,12 @@ Default-suite additions (the battery is 156 checks with all of these):
 - **`cc06`** — CC-06: corrupt/duplicate custom content through the real providers
   (duplicate-skeleton silent-replace, corrupt CFP skip/report, untranslated
   animations, unresolvable skeletons).
-- **`uidtbar`** — UI-38: the UL community filter-toolbar live mount (strip as the
-  community screen's top chrome, 7-button ladder, STR#171 labels, click/highlight/
-  plaque laws).
+- **`uidtbar`** — UI-38/UI-38b: the UL community filter-toolbar live mount (strip
+  as the community screen's top chrome, 7-button ladder, STR#171 labels,
+  click/highlight/plaque laws) + the two production laws: the per-lot
+  category census from the lots' own house files (pinned live n=1 values,
+  snapshotted before any probe seeding) and the STR#6 slot-3 filter
+  persistence round-trip (entry default-then-restore, save-on-change).
 - **`aud20`** — AUD-20: the footsteps class on the decoded native law (anim-event
   triggers, SPR2-label surface classifier, 12-case name table, barefoot outfits,
   the TS1 zoom-volume byte-law).
