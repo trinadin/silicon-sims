@@ -69,6 +69,12 @@ namespace FSO.SimAntics
         public short ContainerSlot;
         public bool Dead; //set when the entity is removed, threads owned by this object or with this object as callee will be cancelled/have their stack emptied.
 
+        /// <summary>
+        /// Read-only engine-side deletion watch (trv06 residual lane). Null in
+        /// normal play; subscribed only by an autotest probe run.
+        /// </summary>
+        public static Action<string> AutotestDeleteSink;
+
         /** Persistent state variables controlled by bhavs **/
         //in TS1, NumAttributes can be 0 and it will dynamically resize as required.
         //for backwards compatability, we support this.
@@ -1413,6 +1419,32 @@ namespace FSO.SimAntics
 
         public void Delete(bool cleanupAll, VMContext context)
         {
+            // trv06 residual watch: engine-side deletion attribution (guid, oid,
+            // container, position + the first managed frames). Null in normal
+            // play; read-only, never alters deletion.
+            if (AutotestDeleteSink != null && !Dead)
+            {
+                try
+                {
+                    var st = new System.Diagnostics.StackTrace(2, false);
+                    var frames = new System.Text.StringBuilder();
+                    var shown = 0;
+                    foreach (var f in st.GetFrames())
+                    {
+                        var m = f.GetMethod();
+                        if (m == null || m.DeclaringType == null) continue;
+                        var n = m.DeclaringType.Name + ":" + m.Name;
+                        if (n.StartsWith("System.")) continue;
+                        frames.Append(frames.Length == 0 ? "" : " <- ").Append(n);
+                        if (++shown >= 6) break;
+                    }
+                    AutotestDeleteSink("del guid=0x" + Object.OBJ.GUID.ToString("x8") + " oid=" + ObjectID
+                        + " cont=" + (Container != null ? Container.ObjectID.ToString() : "none")
+                        + " pos=" + Position.ToString() + " cleanupAll=" + cleanupAll
+                        + " by " + frames.ToString());
+                }
+                catch { }
+            }
             if (cleanupAll && !DynamicMultitile) MultitileGroup.Delete(context);
             else
             {
