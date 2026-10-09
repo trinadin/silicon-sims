@@ -21,6 +21,17 @@ namespace FSO.HIT
         public HITVolumeGroup VolGroup;
         public string Name;
 
+        /// <summary>
+        /// AUD-21: this sound's native per-track attenuation — the [Track] kSpl
+        /// column / sound-object register 0x39. Default 0x14 is the native
+        /// default for sounds with no track (cBoxX::GetInstanceVolPan FLAT
+        /// 0x2E1E80: att=0x14; if a sound object exists, its register 0x39
+        /// supplies the value — HITThread returns its ActiveTrack's kSpl,
+        /// HITTVOn is assigned the event track's value at creation). Consumed
+        /// by VMEntity.TickSounds on the TS1 path only.
+        /// </summary>
+        public virtual uint kSpl { get { return 0x14; } }
+
         // AUD-06 native ducking law. A sound's suffered duck priority (reg 25
         // `duckpri`) and its announced main_duckpri (reg 123, 0 = none). The
         // law: a sound is attenuated to 50% iff it announced a non-zero

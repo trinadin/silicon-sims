@@ -366,6 +366,13 @@ namespace FSO.HIT
                     // kGroupMusic) instead of the TSO-era forced FX. TSO keeps
                     // the historic FX forcing.
                     thread.VolGroup = GroupForTrack(evtent, HITVolumeGroup.FX);
+                    // AUD-21: the same lookup hands the thread the event track's
+                    // kSpl (TV channels kSplLoud=10, radio stations
+                    // kSplStereo=10001) so VMEntity.TickSounds applies the native
+                    // per-track attenuation law (receipt §(c)). No [Track] entry
+                    // (music modes) keeps the default 0x14.
+                    var tvTrack = content.TS1 ? content.Audio.GetTrack(evtent.TrackID, evtent.TrackID, evtent.ResGroup) : null;
+                    if (tvTrack != null) thread.SetkSpl(tvTrack.kSpl);
                     Sounds.Add(thread);
                     ActiveEvents.Add(evt, thread);
                     if (HITTrace.Enabled) HITTrace.Event(evt, HITTrace.RES_CREATED, evtent.TrackID, thread.Name);

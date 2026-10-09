@@ -66,6 +66,16 @@ namespace FSO.HIT
             }
         }
 
+        /// <summary>
+        /// AUD-21: the thread's track kSpl ([Track] column 7 — the attenuation
+        /// the native reads from the per-track sound object's register 0x39).
+        /// Synthetic/fallback tracks carry the Track class default 0x14.
+        /// </summary>
+        public override uint kSpl
+        {
+            get { return (ActiveTrack != null) ? ActiveTrack.kSpl : 0x14; }
+        }
+
         public bool ZeroFlag; //flags set by instructions
         public bool SignFlag;
         public int TickN;

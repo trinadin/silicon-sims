@@ -167,6 +167,17 @@ namespace FSO.Files.HIT
                                         ArgType = (HITArgs)ParseEME(tcSplit[3]),
                                         DuckingPriority = (HITDuckingPriorities)ParseEME(tcSplit[4]),
                                         ControlGroup = (HITControlGroups)ParseEME(tcSplit[5]),
+                                        // AUD-21: column 7 = kSpl (sound pressure
+                                        // level / per-track attenuation), the
+                                        // column the port used to skip. Resolved
+                                        // through this file's [EventMappingEquate]
+                                        // (ParseEME): labels map to their values,
+                                        // unresolved symbols (kSplNone, the
+                                        // kSplnfinite typo) read 0 — the native
+                                        // default only applies when the column is
+                                        // absent outright. Law receipt:
+                                        // evidence/AUD-20/footstep-residuals-decode.md §(c).
+                                        kSpl = (tcSplit.Length > 6) ? (uint)ParseEME(tcSplit[6]) : 0x14,
                                         HitlistID = (uint)HSMConst(tcSplit[7].Substring(1)), //cut out @
                                         SoundID = (uint)ParseEME(tcSplit[8])
                                     };
