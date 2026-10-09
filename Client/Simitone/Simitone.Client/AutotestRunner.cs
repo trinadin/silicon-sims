@@ -13686,6 +13686,38 @@ namespace Simitone.Client
                     }
                 }
                 catch (Exception pde) { Log("AUTOTEST carseek commute-inputs EXC " + pde.GetType().Name); }
+                // ENV-04 de-flake: worker-eligibility restore (the R222 probe-state-set
+                // precedent — no engine change). ROOT CAUSE of the documented carseek
+                // wall-clock flake, named with the ENV-04 ptw per-minute census
+                // (evidence/ENV-04/deflake.md): in-battery, the ulpets probe's show leg
+                // holds the zoning gate Global[10]=555 for its whole window; when the
+                // ~7:2x walkby guest-bring lands inside that window, the idle-cycling
+                // EMPLOYED residents' PersonType (pd32) flips 0 -> 1 (visitor classes;
+                // focused runs never see this — their clock offset puts the show window
+                // hours away from the bring). CarPortal.iff 4100 'process' ins8
+                // (StkPD32 > 0 -> skip person) then excludes the worker from the scan:
+                // no ins48-54 bookmark, no 4106 Create Car, attr0Max=0, spawnedCars=0 —
+                // the exact documented FAIL signature. The fixture's lawful input is
+                // the resident class 0 (what the focused fixture has); restore it for
+                // every employed, non-pet, non-hidden avatar and log the restore.
+                try
+                {
+                    var restored = new List<string>();
+                    foreach (var a in _avatars)
+                    {
+                        int jt = 0, apd32 = 0, hidden = 0;
+                        try { jt = a.GetPersonData(VMPersonDataVariable.JobType); } catch { continue; }
+                        try { apd32 = a.GetPersonData(VMPersonDataVariable.PersonType); } catch { }
+                        try { hidden = a.GetValue(VMStackObjectVariable.Hidden); } catch { }
+                        if (jt <= 0 || apd32 == 0 || hidden == 1 || a.IsPet) continue;
+                        a.SetPersonData(VMPersonDataVariable.PersonType, 0);
+                        restored.Add("obj=" + a.ObjectID + " pd32 " + apd32 + " -> 0 (JobType=" + jt + ")");
+                    }
+                    if (restored.Count > 0)
+                        Log("AUTOTEST carseek worker-eligibility restore (ulpets-show pd32 corruption): ["
+                            + string.Join("; ", restored) + "]");
+                }
+                catch (Exception wre) { Log("AUTOTEST carseek worker-eligibility restore EXC " + wre.GetType().Name); }
                 // R157 dialog-latch probe at discovery (see the hourly probe in StateCarpool).
                 try
                 {
