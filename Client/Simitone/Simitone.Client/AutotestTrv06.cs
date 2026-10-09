@@ -263,6 +263,9 @@ namespace Simitone.Client
             if (Done) return true;
             var vm = Vm;
             var screen = _screen();
+            // keepalive: the panel/dialog park can re-engage at any phase — the
+            // petname livelift is inert when already LIVE
+            if (_phase >= 2 && _keepalive++ % 120 == 0) Unstick();
             try
             {
                 switch (_phase)
@@ -775,5 +778,6 @@ namespace Simitone.Client
 
         private VMEntity _souvGood;
         private VMEntity _souvBad;
+        private int _keepalive;
     }
 }
