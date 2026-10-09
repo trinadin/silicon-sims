@@ -166,10 +166,26 @@ cover the decode-pinned laws):
   exception had killed VacationPedMarker 4128 'Main - Family Spawn', so
   vacation families never materialized on template rentals) and the
   transit-seeding/visit-lifelift probe levers (disclosed, each citing its
-  law). **Bounded residual (banked)**: the created souvenir base's
-  in-hand→placed persistence tail — the object vanishes ~2 ticks after
-  creation even with the Global[20] visit flag set (the souvenir
-  main/in-hand lifecycle; runs 13–15 + the dist gate).
+  law). **Souvenir persistence CLOSED (TRV-06b, 2026-10-09)**: the "~2-tick
+  vanish" was an execution-model artifact, not an object-lifecycle defect —
+  the spawn trees must run as a REAL queued interaction (4104's op-50
+  change_action_string needs a queue item; global 'do the drop' 313 ins8
+  goto_routing_slot needs a walkable thread — sync check-context drives
+  lawfully short-circuit routing and the drop idiom's give-up path destroys
+  the held base at 313@31). The actual port gap was the missing return-edge
+  push of the umbrella: TS1GameScreen now enqueues 4104 on each token-carrying
+  member at the vacation-return booking edge (the port's representation of the
+  native RemoveFromVacation→ObjectModule broadcast push site, disclosed).
+  `trv05` gates it on the automatic engine-push path: placed in-world
+  (un-contained) + 240-frame persistence + placed souvenir's tokens consumed
+  (trv06b-persistence.md). Residual (enumerated): the SECOND stocked
+  souvenir's put-away unwinds through the drop idiom's recursion (313
+  ins0/ins1 re-entry, removal at 313@9, the drop animate loop) and its base
+  is gone by verdict — both bases are created and both tokens consumed; the
+  first placed souvenir carries home end-to-end. Also disclosed: the
+  persisted 'Go Home' transit item re-runs on the home lot with a stale
+  route and can starve the walks until cancelled (probe lifelift; player
+  cancel has the same effect).
 - Superstar: fame promote/demote and session machinery verified live;
   **fame screens + objects + gendered job titles CLOSED (EXP-16,
   2026-10-08)** — the gendered title law (career STR block layout +

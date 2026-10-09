@@ -56,15 +56,18 @@ Default-suite additions (the battery is 156 checks with all of these):
 
 Opt-in takeovers (end the run at their verdict; run solo):
 
-- **`trv05`** — TRV-05/TRV-06: the vacation booking round-trip on the native
-  Family+0x13C law (book → persist → travel → return → clear → persist), then
-  the live-observation legs (AutotestTrv06, chained in the same gate): the
-  score-controller chain (4126 spawn/restore → 4104 accumulation → the 4108
-  threshold on the 0-based Tuning[3]=150) and the souvenir purchase/carry-home
-  (CT 4116 mood-variant purchase; the 4106/4107 spawn trees' op-42 create-act +
-  token consumption). Bounded, disclosed: the created souvenir base's
-  in-hand→placed persistence tail is not asserted (vanishes ~2 ticks after
-  creation; the port gap is banked in PARITY.md).
+- **`trv05`** — TRV-05/TRV-06/TRV-06b: the vacation booking round-trip on the
+  native Family+0x13C law (book → persist → travel → return → clear →
+  persist), then the live-observation legs (AutotestTrv06, chained in the
+  same gate): the score-controller chain (4126 spawn/restore → 4104
+  accumulation → the 4108 threshold on the 0-based Tuning[3]=150) and the
+  souvenir purchase/carry-home (CT 4116 mood-variant purchase; the carry-home
+  runs as the REAL queued umbrella interaction — the engine's return-edge
+  push, observed by the probe's automatic window at ~f=274 — and asserts
+  placed-in-world + 240-frame persistence + the placed souvenir's token
+  consumption). Disclosed: the surface-path put-away branch ('CT - Put Away'
+  4103 op-14/op-20) is not asserted (returns false in-port; the floor-drop
+  path via global 'do the drop' 313 is the asserted law).
 - **`hdserve`** — EXP-14: the Hot Date serve-choreography self-start — hands-off,
   the adult traveler's free-will draw must pick the podium's 'Eat Alone' row and
   the interaction's op-42 must create Controller-Restaurant-Eat (proven).
