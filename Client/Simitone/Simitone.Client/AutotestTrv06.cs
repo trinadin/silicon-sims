@@ -871,7 +871,32 @@ namespace Simitone.Client
                             // Purchases") and the probe fallback ("carry-home").
                             var carryActive = (q != null && q.Any(a => a.Name != null && (a.Name.Contains("carry-home") || a.Name.Contains("Spawn Vacation Purchases"))))
                                 || (cur != null && cur.Name != null && (cur.Name.Contains("carry-home") || cur.Name.Contains("Spawn Vacation Purchases")));
-                            if (bases == 0 || carryActive)
+                            // TRV-06c: the queue-name signal is NOT the umbrella's completion —
+                            // after the engine's transit cancel the queue can read empty while
+                            // the spawn chain still executes ON THE THREAD STACK (the ArrowHead
+                            // base was created, left in-hand, and the early verdict abandoned
+                            // it mid-chain — c2's baseEntities dump). ALSO wait for the stack:
+                            // no umbrella/spawn/put-away/drop frames (VacationPhonePlugin
+                            // 4096..4129, Souvenirs 4102..4124, global 313/406) on the member.
+                            bool carryOnStack = false;
+                            try
+                            {
+                                var st = _sim.Thread.Stack;
+                                for (int si = 0; si < st.Count; si++)
+                                {
+                                    var fr = st[si];
+                                    if (fr is FSO.SimAntics.Engine.VMRoutingFrame) continue; // free-will routes are not ours
+                                    var rid = fr.Routine?.Chunk?.ChunkID ?? 0;
+                                    var sgp = fr.Routine?.Chunk?.ChunkParent?.Filename ?? "";
+                                    if ((rid >= 4096 && rid <= 4129 && sgp.IndexOf("VacationPhonePlugin", StringComparison.OrdinalIgnoreCase) >= 0)
+                                        || (rid >= 4102 && rid <= 4124 && sgp.IndexOf("Souvenirs", StringComparison.OrdinalIgnoreCase) >= 0)
+                                        || ((rid == 313 || rid == 406) && string.Equals(sgp, "global.iff", StringComparison.OrdinalIgnoreCase)))
+                                    { carryOnStack = true; break; }
+                                }
+                            }
+                            catch { }
+                            carryActive = carryActive || carryOnStack;
+                            if (bases < 2 || carryActive)
                             {
                                 _frames++;
                                 // Lane B: the former probe lifelift (cancel the stale 'Go
@@ -913,14 +938,14 @@ namespace Simitone.Client
                                     _rmDumped = _rmLog.Count; _delDumped = _delLog.Count;
                                     foreach (var cl in _createLog.Skip(Math.Max(0, _createLog.Count - 6)).ToList()) Log("AUTOTEST trv06 CREATE " + cl);
                                 }
-                                if (_frames > 1500)
+                                if (_frames > 2600)
                                 {
                                     Log("AUTOTEST trv06 p92 TIMEOUT: no placed souvenir bases (creates=" + _createLog.Count
                                         + " carried=" + carried + ") — final watch dump follows");
                                     foreach (var rl in _rmLog.Take(24).ToList()) Log("AUTOTEST trv06 RMWATCH(end) " + rl);
                                     foreach (var dl in _delLog.Take(24).ToList()) Log("AUTOTEST trv06 DELWATCH(end) " + dl);
                                     foreach (var dt in _dropTrace.Take(80).ToList()) Log("AUTOTEST trv06 DROPTRACE " + dt);
-                                    Check(false, "p92 carry-home: no souvenir base PLACED in-world within the interaction window (creates=" + _createLog.Count + ")");
+                                    Check(false, "p92 carry-home: carry chain did not complete with both bases placed in-world within the window (creates=" + _createLog.Count + " placed=" + bases + ")");
                                     _phase = 99;
                                 }
                                 return false;
@@ -932,6 +957,14 @@ namespace Simitone.Client
                                 _persistFrames++;
                                 if (_persistFrames % 60 == 0)
                                     Log("AUTOTEST trv06 p92 persist-soak f=" + _persistFrames + " placed=" + bases);
+                                // review P2-1: recount HERE — the guard's `bases` is from the
+                                // same tick; a mid-soak vanish must fail by name, not via the
+                                // 2600f timeout's generic message.
+                                var soakBases = newVm.Entities.Count(e => e.Object != null && e.Object.OBJ != null
+                                    && (e.Object.OBJ.GUID == ArrowHeadBase || e.Object.OBJ.GUID == BabyDollBase)
+                                    && e.Position != FSO.LotView.Model.LotTilePos.OUT_OF_WORLD
+                                    && e.Container == null);
+                                if (soakBases < 2) { Check(false, "p9 carry-home: a placed base vanished during the persistence soak (placed=" + soakBases + " at f=" + _persistFrames + ")"); _phase = 99; return false; }
                                 return false;
                             }
                             var inv = Inv();
@@ -939,30 +972,29 @@ namespace Simitone.Client
                             var createdG = _createLog.Any(x => x.Contains("guid=0x" + ArrowHeadBase.ToString("X8")));
                             var placedB = matches.Any(m => m.Object.OBJ.GUID == BabyDollBase);
                             var placedG = matches.Any(m => m.Object.OBJ.GUID == ArrowHeadBase);
-                            Check(createdB || createdG, "p9 carry-home: base souvenir op-42 CREATED by the interaction (log: " + _createLog.Count + " creates)");
-                            Check(placedB || placedG, "p9 carry-home: base souvenir PLACED in-world by the put-away chain (placed=" + bases + ")");
-                            // The residual lane's core claim: created -> placed (in-world,
-                            // un-contained) -> PERSISTS. Review P2: the run logs show the
-                            // SECOND stocked souvenir's base is never created at all (no
-                            // ArrowHead CREATE line) — the umbrella's continuation past the
-                            // first placed souvenir breaks somewhere between 4106's return and
-                            // 4107's create (watch traces in this log attribute it; the
-                            // card/evidence carry the precise break). Enumerated bounded gap,
-                            // not asserted.
-                            if (!placedB || !placedG)
-                                Log("AUTOTEST trv06 p9 note: umbrella continuation incomplete for one souvenir (placedB=" + placedB + " placedG=" + placedG
-                                    + " createdB=" + createdB + " createdG=" + createdG + ") — second-souvenir continuation is the enumerated bounded gap (see trv06b-persistence.md); the first placed souvenir's law is the asserted observable");
-                            // a PLACED souvenir's own tokens must be consumed (the unplaced one's may remain)
+                            Check(createdB && createdG, "p9 carry-home: BOTH base souvenirs op-42 CREATED by the interaction (log: " + _createLog.Count + " creates; createdB=" + createdB + " createdG=" + createdG + ")");
+                            Check(placedB && placedG, "p9 carry-home: BOTH bases PLACED in-world by the put-away chains (placedB=" + placedB + " placedG=" + placedG + ")");
+                            // TRV-06c: the BOTH-bases claim is RESTORED as an assertion — the
+                            // "second-souvenir continuation" was never an engine defect: the
+                            // probe's queue-name completion signal fired early (after the
+                            // engine's transit cancel the queue reads empty while the spawn
+                            // chain still executes on the thread stack), abandoning the second
+                            // put-away mid-walk with its base in-hand (c2's baseEntities dump:
+                            // ArrowHead alive, cont=the sim). The stack-drain wait above lets
+                            // both chains finish; both bases place (c3) and now must persist.
+                            // a PLACED souvenir's own tokens must be consumed
                             var dollTokensGone = inv == null || !inv.Any(x => (x.GUID == BabyDollBase && x.Type == 5) || (x.GUID == BabyDollBad && x.Type == 6));
                             var arrowTokensGone = inv == null || !inv.Any(x => (x.GUID == ArrowHeadBase && x.Type == 5) || (x.GUID == ArrowHeadGood && x.Type == 6));
-                            Check(!placedB || dollTokensGone, "p9 carry-home: placed BabyDoll's tokens consumed");
-                            Check(!placedG || arrowTokensGone, "p9 carry-home: placed ArrowHead's tokens consumed");
-                            Log("AUTOTEST trv06 p9 CARRY-HOME verdict: placed=" + bases + " persistFrames=" + _persistFrames + " dollTokensGone=" + dollTokensGone + " arrowTokensGone=" + arrowTokensGone
+                            Check(dollTokensGone, "p9 carry-home: placed BabyDoll's tokens consumed");
+                            Check(arrowTokensGone, "p9 carry-home: placed ArrowHead's tokens consumed");
+                            Log("AUTOTEST trv06 p9 CARRY-HOME verdict: placed=" + bases + " carried=" + carried + " persistFrames=" + _persistFrames + " dollTokensGone=" + dollTokensGone + " arrowTokensGone=" + arrowTokensGone
+                                + " hand=0x" + ((_sim != null && _sim.GetSlot(0) != null) ? (_sim.GetSlot(0).Object.OBJ.GUID).ToString("x8") : "none")
+                                + " baseEntities=[" + string.Join(",", newVm.Entities.Where(e => e.Object != null && e.Object.OBJ != null && (e.Object.OBJ.GUID == ArrowHeadBase || e.Object.OBJ.GUID == BabyDollBase)).Select(e => e.ObjectID + ":0x" + e.Object.OBJ.GUID.ToString("x8") + "@pos=" + e.Position.ToString() + ",cont=" + (e.Container != null ? e.Container.ObjectID.ToString() : "none") + ",dead=" + e.Dead)) + "]"
                                 + " inv=[" + string.Join(",", (inv ?? new List<InventoryItem>()).Select(x => x.GUID.ToString("x8") + "/t" + x.Type + "x" + x.Count)) + "]");
                             foreach (var tl in _spawnTrace.Skip(Math.Max(0, _spawnTrace.Count - 40)).ToList()) Log("AUTOTEST trv06 SPAWNTRACE(end) " + tl);
                             foreach (var dt in _dropTrace.Skip(Math.Max(0, _dropTrace.Count - 120)).ToList()) Log("AUTOTEST trv06 DROPTRACE(end) " + dt);
                             if (_fails.Count == 0)
-                                Log("AUTOTEST trv06 p9 SOUVENIR PERSISTENCE VERIFIED (in-hand -> walked drop -> placed in-world -> survived 240 frames)");
+                                Log("AUTOTEST trv06 p9 SOUVENIR PERSISTENCE VERIFIED (BOTH bases: in-hand -> walked drop -> placed in-world -> survived the 240-frame soak)");
                             _phase = 99;
                         }
                         return false;
